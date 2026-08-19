@@ -137,7 +137,9 @@ function celluleHtml(pa: PartieSignature, tampon?: string): string {
     : "";
   const visuel = pa.image
     ? `<img src="${pa.image}" alt="Signature ${pa.libelle}" style="max-height:58px;max-width:170px;object-fit:contain;display:block;margin:2px auto;" />`
-    : `<div style="border:1.5px dashed #dc2626;color:#dc2626;font-size:10px;padding:14px 6px;text-align:center;border-radius:4px;">Signature manquante — ${pa.libelle}</div>`;
+    : pa.nom
+      ? `<div style="font-family:'Brush Script MT','Lucida Handwriting','Segoe Script',cursive;font-size:22px;color:#1a3a8c;text-align:center;line-height:1.1;padding:10px 4px 6px;">${pa.nom}</div>`
+      : `<div style="border-bottom:1px solid #94a3b8;height:34px;"></div>`;
   return (
     `<td style="border:1px solid #94a3b8;padding:8px;vertical-align:top;width:33%;${fond}">` +
     `<div style="font-size:10.5px;font-weight:bold;color:#0b2545;">${pa.libelle}</div>` +
@@ -170,7 +172,7 @@ export function blocSignatureHtml(
     `<div class="bloc-signature" style="margin-top:18px;">` +
     `<div style="font-size:11px;font-weight:bold;color:#0b2545;margin-bottom:4px;">Signatures — fait à ${lieu}</div>` +
     `<table style="border-collapse:collapse;width:100%;"><tr>${cellules}</tr></table>` +
-    `<div style="font-size:9px;color:#64748b;margin-top:4px;">Date de signature : ${regle.dateLibelle}. Signature manuscrite scannée ou tracée dans l'application, horodatée.</div>` +
+    `<div style="font-size:9px;color:#64748b;margin-top:4px;">Date de signature : ${regle.dateLibelle}. Signature manuscrite scannée, tracée dans l'application ou apposée par le signataire, horodatée.</div>` +
     `</div>`
   );
 }
