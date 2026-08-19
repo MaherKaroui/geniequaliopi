@@ -18,6 +18,11 @@ import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
+import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat } from "./bdcModel";
+import { sanitizeBdcMarkdown, isDocumentDeclaratif } from "./bdcCompliance";
+import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
+import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
+
 
 const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 
