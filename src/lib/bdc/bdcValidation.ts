@@ -135,15 +135,31 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V08", "Durée légale maximale du bilan respectée (24 h)", p.categorieAction !== "BC" || p.dureeTotaleH <= 24,
     "Durée légale maximale du bilan dépassée (art. R6313-4)"));
 
-  // V09
+  // V09 — disponibilités LUES dans la fiche d'analyse du besoin du bénéficiaire
   const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-  const horsDispo = beneficiaires.flatMap((b) => {
-    const dispo = b.joursDisponibles || [];
-    if (!dispo.length) return [];
-    return seancesFor(ctx, b).filter((s) => !dispo.includes(JOURS[s.date.getDay()] as never));
-  });
-  B.push(r("V09", "Séances programmées dans les disponibilités déclarées", horsDispo.length === 0,
-    "Séance programmée hors disponibilités déclarées", horsDispo.map((s) => `Séance ${s.numero} — ${fmtDateFR(s.date)}`)));
+  const dispoDeclareeDansFiche = (b: { prenom: string; nom: string }): string[] => {
+    const fiche = entries.find(([nom]) =>
+      /analyse (du|de) besoin|analyse des besoins/i.test(nom) && nom.includes(b.nom));
+    if (!fiche) return [];
+    const ligne = fiche[1].split("\n").find((l) => /disponibilit[ée]s d[ée]clar[ée]es/i.test(l));
+    if (!ligne) return [];
+    return JOURS.filter((j) => new RegExp(`\\b${j}\\b`, "i").test(ligne));
+  };
+  const horsDispo: string[] = [];
+  for (const b of beneficiaires) {
+    const declarees = dispoDeclareeDansFiche(b);
+    const reference = declarees.length ? declarees : (b.joursDisponibles || []);
+    if (!reference.length) continue;
+    for (const s of seancesFor(ctx, b)) {
+      const jour = JOURS[s.date.getDay()];
+      if (!reference.includes(jour)) {
+        horsDispo.push(`${b.prenom} ${b.nom} — séance ${s.numero} le ${fmtDateFR(s.date)} (${jour}) hors disponibilités déclarées : ${reference.join(", ")}`);
+      }
+    }
+  }
+  B.push(r("V09", "Séances programmées dans les disponibilités déclarées par le bénéficiaire", horsDispo.length === 0,
+    "Séance programmée hors disponibilités déclarées (élargir la période, jamais les disponibilités)", horsDispo.slice(0, 8)));
+
 
   // V10 — collision d'agenda entre bénéficiaires (même consultant)
   const creneaux = new Map<string, string>();
