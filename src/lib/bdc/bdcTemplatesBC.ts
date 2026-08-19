@@ -23,6 +23,14 @@ export interface BdcDocDef {
 
 const H = (t: string) => `# ${t}\n`;
 const H2 = (t: string) => `\n## ${t}\n`;
+
+/** Graine déterministe par bénéficiaire (variation stable d'un export à l'autre). */
+function seedBenef(b: Beneficiaire | null, sel: string): number {
+  const src = `${sel}|${b?.prenom || ""}|${b?.nom || ""}|${(b as any)?.email || ""}`;
+  let h = 0;
+  for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) >>> 0;
+  return h;
+}
 /**
  * Bloc de signature conforme à la MATRICE (MESSAGE 13 — partie D) :
  * rôles, tampon et date dérivés de la pièce, images issues des formulaires.
