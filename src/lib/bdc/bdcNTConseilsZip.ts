@@ -716,15 +716,15 @@ ${chk(true)} Analyse du parcours professionnel
 
 ${chk(true)} Identification des compétences
 
-${chk(true)} Exploration des métiers et secteurs
+${chk(besoinExplo)} Exploration des métiers et secteurs
 
 ${chk(true)} Construction d'un projet professionnel
 
-${chk(true)} Validation du projet
+${chk(besoinValidation)} Validation du projet
 
 ${chk(true)} Élaboration d'un plan d'action
 
-**Commentaires :** Demande cohérente avec le cadre de la prestation, le bénéficiaire est engagé dans une démarche réfléchie. Accompagnement individualisé recommandé.
+**Commentaires :** ${commentaire}
 
 **8. Modalités d'accompagnement retenues**
 
