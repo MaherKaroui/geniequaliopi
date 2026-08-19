@@ -121,8 +121,9 @@ export const CORRECTIONS_SUBSTITUTION: Array<[RegExp, string]> = [
   [/\bmes prestation\b/gi, "mes prestations"],
   [/\bdéclaration d'activité de l'[ÉE]tat\b/gi, "agrément de l'État"],
   // MESSAGE 23 — neuf corruptions résiduelles
-  [/(d'un|un|le|du)\s+prestation d'application/gi, (m: string) => m.replace(/prestation/i, "stage")],
-  [/\bbesoins? de prestation\b/gi, (m: string) => m.replace(/prestation/i, "formation")],
+  [/(d'un|un|le|du)(\s+)prestation d'application/gi, "$1$2stage d'application"],
+  [/\b(besoins?) de prestation\b/gi, "$1 de formation"],
+
   [/\bau phase du bilan\b/gi, "au cours du bilan"],
   [/\bau phase de\b/gi, "au cours de"],
   [/\bprestation initiale\b/gi, "formation initiale"],
