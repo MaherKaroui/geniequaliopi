@@ -1331,6 +1331,30 @@ export function buildFullCatalog(
     add("bdc_nt_phase_3", "CT3 - IND 10 Phase 3 – Phase de conclusion & suivi à 6 mois", 3, 10, "bdc_nt_phase", { phase: 3 });
     add("bdc_nt_contacts_handicap", "CT6 - IND 26 Contacts & suivi handicap (Excel)", 6, 26, "bdc_nt_contacts_handicap");
     add("bdc_nt_tableau_dysfonctionnements", "CT7 - IND 31 Tableau d'analyse des appréciations & réclamations (Excel)", 7, 31, "bdc_nt_tableau_dysfonctionnements");
+    // BLOC 4 — pièces obligatoires BC (synthèse R6313-8, émargements, satisfaction, RGPD…)
+    BDC_TEMPLATES_MANQUANTS.forEach((def, idx) => {
+      const ind = def.indicateur;
+      const crit = critereForIndicateur(ind);
+      const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&et]+\s*\d+)*\s*-\s*/i, "");
+      if (def.parBeneficiaire && stagiaires.length > 0) {
+        stagiaires.forEach((s, si) => {
+          add(
+            `bdc_bc_tpl_${idx}_s${si}`,
+            `CT${crit} - IND ${ind} ${titre} – ${s.prenom} ${s.nom}`,
+            crit, ind, "bdc_bc_template",
+            { templateIdx: idx, stagiaireIdx: si },
+          );
+        });
+      } else {
+        add(
+          `bdc_bc_tpl_${idx}`,
+          `CT${crit} - IND ${ind} ${titre}`,
+          crit, ind, "bdc_bc_template",
+          { templateIdx: idx },
+        );
+      }
+    });
+
     // Ressources statiques restantes (PDF non générables dynamiquement)
     BDC_NT_STATIC_ASSETS.forEach((a, idx) => {
       if (!/\.pdf$/i.test(a.src)) return;
