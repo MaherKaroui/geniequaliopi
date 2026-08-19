@@ -84,7 +84,7 @@ export function buildCahierContacts(ctx: BdcContext): string {
 export function buildContactsHandicap(ctx: BdcContext): string {
   const dep = (ctx.organisme.codePostal || "").slice(0, 2);
   const rows: string[][] = [
-    ["Référent handicap de l'organisme", ctx.organisme.representantLegal.nom, ctx.organisme.telephone || "—", ctx.organisme.email || "—", "Accueil, analyse du besoin d'adaptation, mise en relation"],
+    ["Référent handicap de l'organisme", ctx.organisme.referentHandicap.nom || ctx.organisme.representantLegal.nom, ctx.organisme.referentHandicap.telephone || ctx.organisme.telephoneContact || "—", ctx.organisme.referentHandicap.email || ctx.organisme.emailContact || "—", "Accueil, analyse du besoin d'adaptation, mise en relation"],
     [`MDPH du département ${dep || "—"}`, "Maison départementale des personnes handicapées", "—", "—", "Reconnaissance RQTH, orientation, prestation de compensation"],
     ["Agefiph", "Délégation régionale", "0 800 11 10 09", "www.agefiph.fr", "Aides à la compensation du handicap en emploi et en formation"],
     ["Cap emploi", "Organisme de placement spécialisé", "—", "www.capemploi.fr", "Accompagnement vers et dans l'emploi"],
