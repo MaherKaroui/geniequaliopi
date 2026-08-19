@@ -20,6 +20,11 @@ import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, regionFromCodePostal } from "./bdcModel";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif } from "./bdcCompliance";
+
+/** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
+function antiFabricationPour(nom: string): boolean {
+  return isDocumentDeclaratif(nom) || /synth[èe]se|[ée]margement/i.test(nom);
+}
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
 
@@ -2110,7 +2115,7 @@ export function renderBdcTemplateBCHtml(
   const md = sanitizeBdcMarkdown(def.build(ctx, ben), {
     titre: def.nom,
     categorieAction: "BC",
-    antiFabrication: false,
+    antiFabrication: antiFabricationPour(def.nom),
   });
   const body = mdToHtmlBody(md);
   const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&and]+\s*\d+)*\s*-\s*/i, "");
@@ -2357,7 +2362,7 @@ export async function buildBDCNTConseilsZip(
         const b = bdcCtx.beneficiaires[i] ?? null;
         advance(`${def.nom} — ${s.prenom} ${s.nom}`);
         try {
-          const md = sanitizeBdcMarkdown(def.build(bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: false });
+          const md = sanitizeBdcMarkdown(def.build(bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
           collect(def.nom, md, s);
           const dates = computeDates(s, org, formation);
           const html = mdToHtml(md, def.nom, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
@@ -2369,7 +2374,7 @@ export async function buildBDCNTConseilsZip(
     } else {
       advance(def.nom);
       try {
-        const md = sanitizeBdcMarkdown(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: false });
+        const md = sanitizeBdcMarkdown(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
         collect(def.nom, md, null);
         const dates = computeDates(benList[0], org, formation);
         const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
