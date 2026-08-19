@@ -401,9 +401,16 @@ export function buildBdcContext(
     },
   };
 
+  const seancesParBeneficiaire: Record<string, Seance[]> = {};
+  beneficiaires.forEach((b, i) => {
+    seancesParBeneficiaire[b.id] = buildSeances(base, b, i);
+  });
+
   return {
     organisme,
     beneficiaires,
-    prestation: { ...base, seances: buildSeances(base, beneficiaires[0]) },
+    prestation: { ...base, seances: seancesParBeneficiaire[beneficiaires[0]?.id] || buildSeances(base, beneficiaires[0], 0) },
+    seancesParBeneficiaire,
   };
+
 }
