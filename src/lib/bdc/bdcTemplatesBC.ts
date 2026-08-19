@@ -7,6 +7,7 @@
 import type { BdcContext, Beneficiaire, Prestation, Organisme } from "./bdcModel";
 import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor } from "./bdcModel";
 import { blocSignatureHtml } from "./signatureMatrix";
+import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 
 export interface BdcDocDef {
