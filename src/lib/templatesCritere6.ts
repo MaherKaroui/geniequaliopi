@@ -1356,28 +1356,57 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   if (type === "creation") {
     return [...commonDigitalLearning,
       [
-        `<a href="https://formalites.entreprises.gouv.fr/">Guichet unique des formalités</a>`,
+        `<a href="https://formalites.entreprises.gouv.fr/">Guichet unique des formalités (INPI)</a>`,
         "Dématérialisation complète des formalités d'entreprise",
-        veilleMonthYear(f, 5),
-        "Immatriculation, modification et cessation entièrement en ligne : impact direct sur le module « Démarches administratives ».",
-        "Preuve : captures du parcours en ligne. Action : mise à jour des tutoriels pas-à-pas utilisés en atelier."
+        veilleMonthYear(f, 7),
+        "Immatriculation, modification et cessation d'activité s'effectuent intégralement en ligne depuis 2023. Le parcours (rubriques, pièces justificatives, signature électronique, suivi du dossier) évolue régulièrement, ce qui impacte directement le module « Démarches administratives ».",
+        "Preuve : captures datées du parcours en ligne. Action : mise à jour des tutoriels pas-à-pas utilisés en atelier et simulation d'un dépôt de dossier complet en salle, pièces à l'appui."
       ],
       [
-        `<a href="https://www.impots.gouv.fr/professionnel">impots.gouv.fr – Espace professionnel</a>`,
-        "Facturation électronique : calendrier de généralisation",
-        veilleMonthYear(f, 3),
-        "Obligation progressive de réception et d'émission de factures électroniques pour toutes les entreprises assujetties à la TVA.",
-        "Preuve : calendrier officiel archivé. Action : ajout d'une séquence « Facturation électronique et outils de facturation » au support de cours."
+        `<a href="https://www.impots.gouv.fr/professionnel/facturation-electronique">impots.gouv.fr – Facturation électronique</a>`,
+        "Calendrier de généralisation de la facture électronique et choix d'une plateforme (PDP)",
+        veilleMonthYear(f, 5),
+        "Réception obligatoire des factures électroniques pour toutes les entreprises à compter de septembre 2026, émission par étapes jusqu'en septembre 2027 pour les PME et microentreprises, avec transmission via une plateforme de dématérialisation partenaire au format Factur-X, UBL ou CII.",
+        "Preuve : calendrier officiel et liste des PDP immatriculées archivés. Action : séquence « Choisir son outil de facturation compatible e-invoicing » ajoutée au support, avec grille de comparaison des solutions du marché."
       ],
       [
         `<a href="https://bpifrance-creation.fr/boiteaoutils">Bpifrance – Boîte à outils du créateur</a>`,
-        "Outils numériques de business plan et de prévisionnel financier",
+        "Outils numériques de business plan, de prévisionnel financier et de plan de trésorerie",
         veilleMonthYear(f, 6),
-        "Modèles de business plan, simulateurs de charges et tableurs de prévisionnel mis à disposition gratuitement.",
-        "Preuve : modèles téléchargés et datés. Action : trames Excel utilisées pour les exercices de prévisionnel et de plan de trésorerie."
+        "Modèles de business plan, simulateurs de charges sociales, calculateurs de seuil de rentabilité et tableurs de prévisionnel mis à disposition gratuitement et actualisés chaque année avec les barèmes en vigueur.",
+        "Preuve : modèles téléchargés et datés. Action : trames Excel actualisées utilisées pour les exercices de prévisionnel, de plan de financement et de trésorerie sur 12 mois."
+      ],
+      [
+        `<a href="https://www.canva.com/fr_fr/">Canva / Business Model Canvas en ligne</a>`,
+        "Outils collaboratifs de formalisation du modèle économique (BMC, Lean Canvas, pitch deck)",
+        veilleMonthYear(f, 4),
+        "Les outils collaboratifs en ligne (Canva, Miro, Figma Jam) permettent de construire un Business Model Canvas à plusieurs, en présentiel comme à distance, et de produire un pitch deck professionnel sans compétence graphique.",
+        "Preuve : gabarits créés par l'organisme et captures des ateliers. Action : atelier BMC animé sur tableau collaboratif partagé, chaque stagiaire repart avec son canvas exportable en PDF."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/entreprises/intelligence-artificielle-tpe-pme">IA générative appliquée à la création d'entreprise</a>`,
+        "Usage raisonné de l'IA générative pour l'étude de marché, la rédaction et la prospection",
+        veilleMonthYear(f, 3),
+        "Les assistants génératifs sont massivement adoptés par les créateurs pour rédiger des contenus commerciaux, structurer un business plan ou préparer une étude de marché. Leur usage suppose une vigilance sur la fiabilité des sources, la confidentialité des données et la personnalisation des productions.",
+        "Preuve : synthèse interne des usages testés et grille de vigilance. Action : séquence « IA et création d'entreprise » ajoutée au parcours (prompts types, vérification des chiffres, limites juridiques et RGPD)."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/rgpd-par-ou-commencer">CNIL – Outils de conformité pour les TPE</a>`,
+        "Modèles numériques de registre des traitements et de mentions d'information",
+        veilleMonthYear(f, 2),
+        "La CNIL met à disposition des modèles de registre simplifié, des générateurs de mentions légales et des guides sécurité adaptés aux très petites structures et aux sites vitrines de créateurs.",
+        "Preuve : modèles téléchargés et datés. Action : remise d'un kit RGPD prêt à l'emploi aux stagiaires et exercice de remplissage du registre sur leur propre projet."
+      ],
+      [
+        `<a href="https://www.francenum.gouv.fr/">France Num – Transformation numérique des TPE</a>`,
+        "Diagnostic numérique, aides et réseau des activateurs France Num",
+        veilleMonthYear(f, 4),
+        "Plateforme publique dédiée à la numérisation des petites entreprises : diagnostic en ligne, fiches pratiques (site web, référencement local, paiement en ligne, cybersécurité) et annuaire d'experts labellisés.",
+        "Preuve : fiches et diagnostic archivés. Action : intégration du diagnostic France Num en fin de parcours comme plan d'action numérique personnalisé du créateur."
       ],
     ];
   }
+
 
   if (type === "fle") {
     return [...commonDigitalLearning,
