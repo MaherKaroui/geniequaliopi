@@ -632,10 +632,8 @@ function buildFicheAnalyseBesoinMd(
     ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
     : "Aucun aménagement spécifique requis à ce jour";
   const prenomB = (s.prenom || "Le bénéficiaire").trim();
-  const nomB = (s.nom || "").trim();
-  const civiliteB = s.civilite === "Mme" ? "Mme" : "M.";
-  const jeSuis = s.civilite === "Mme" ? "je suis" : "je suis";
   const jai = "j'ai";
+
   const monProjet = pick([
     "mon projet professionnel",
     "ma reconversion",
