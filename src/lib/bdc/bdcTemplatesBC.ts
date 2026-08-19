@@ -6,6 +6,7 @@
  */
 import type { BdcContext, Beneficiaire, Prestation, Organisme } from "./bdcModel";
 import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor } from "./bdcModel";
+import { blocSignatureHtml } from "./signatureMatrix";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 
 export interface BdcDocDef {
@@ -22,10 +23,13 @@ export interface BdcDocDef {
 
 const H = (t: string) => `# ${t}\n`;
 const H2 = (t: string) => `\n## ${t}\n`;
-const SIGN = (roles: string[]) =>
-  `\n## Signatures\n\n| ${roles.join(" | ")} |\n|${roles.map(() => "---").join("|")}|\n| ${roles
-    .map(() => "Date : __/__/____<br/>Signature :")
-    .join(" | ")} |\n\n_Signature électronique horodatée ou dépôt d'un scan de signature manuscrite._\n`;
+/**
+ * Bloc de signature conforme à la MATRICE (MESSAGE 13 — partie D) :
+ * rôles, tampon et date dérivés de la pièce, images issues des formulaires.
+ * Aucun nom tapé en clair ne tient lieu de signature.
+ */
+const SIGN = (ctx: BdcContext, nomPiece: string, b: Beneficiaire | null, dateSeance?: Date) =>
+  `\n## Signatures\n\n${blocSignatureHtml(ctx, nomPiece, b, { dateSeance })}\n`;
 
 function entete(o: Organisme, b: Beneficiaire | null, p: Prestation): string {
   const lignes = [
@@ -78,7 +82,7 @@ const documentSynthese: BdcDocDef = {
       H2("5. Propriété et confidentialité"),
       "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
       "Les résultats détaillés et les documents produits au cours du bilan sont couverts par le secret professionnel et détruits à l'issue de la prestation, sauf accord écrit du bénéficiaire pour une conservation limitée à un an (art. R6313-7).",
-      SIGN(["Le bénéficiaire", "Le consultant"]),
+      SIGN(ctx, "Indicateur 11 - Document de synthèse du bilan de compétences", b),
     ].join("\n");
   },
 };
@@ -118,7 +122,7 @@ const feuillesEmargement: BdcDocDef = {
       `| **Total** |  | **${cumul} h** | **${cumul} h** |`,
       "",
       formatDuree(p),
-      SIGN(["Le bénéficiaire", "Le consultant"]),
+      SIGN(ctx, "Indicateur 11 - Feuilles d'émargement par séance", b),
     );
     return parts.join("\n");
   },
@@ -146,7 +150,7 @@ function questionnaireSatisfaction(titre: string, quand: string, questions: stri
       "_____________________________________________________________",
       "",
       p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
-      SIGN(["Le bénéficiaire"]),
+      SIGN(ctx, "Indicateur 11 - Feuilles d'émargement par séance", b),
     ].join("\n");
   };
 }
@@ -218,7 +222,7 @@ const accordConservation: BdcDocDef = {
       "Cet accord est révocable à tout moment par simple demande écrite adressée à " + (o.emailContact || "l'organisme") + ".",
       H2("Attestation de destruction"),
       `Je soussigné(e) ${p.consultant.nom}, consultant, atteste avoir procédé à la destruction de l'intégralité des documents relatifs au bilan de ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________"} le __/__/____.`,
-      SIGN(["Le bénéficiaire", "Le consultant"]),
+      SIGN(ctx, "Indicateur 9 - Accord de conservation et attestation de destruction des documents", b),
     ].join("\n");
   },
 };
@@ -247,7 +251,7 @@ const autorisationTransmission: BdcDocDef = {
       "**Destinataire autorisé** : ______________________________  \n**Qualité** : ______________________________  \n**Objet de la transmission** : ______________________________",
       "",
       "La présente autorisation est **révocable à tout moment**, sans motif, par écrit adressé à " + (o.emailContact || "l'organisme") + ". La révocation prend effet dès sa réception.",
-      SIGN(["Le bénéficiaire", "Le consultant"]),
+      SIGN(ctx, "Indicateur 9 - Autorisation de transmission du document de synthèse à un tiers", b),
     ].join("\n");
   },
 };
@@ -344,7 +348,7 @@ const planningPrevisionnel: BdcDocDef = {
       `| **Total entretiens** |  |  |  | **${seancesFor(ctx, b).reduce((a, s) => a + s.duree, 0)} h** |  |  |`,
       "",
       formatDuree(p),
-      SIGN(["Le bénéficiaire", "Le consultant"]),
+      SIGN(ctx, "Indicateur 10 - Planning prévisionnel signé (annexe à la convention)", b),
     ].join("\n");
   },
 };
