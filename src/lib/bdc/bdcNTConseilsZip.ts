@@ -18,7 +18,7 @@ import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
-import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat } from "./bdcModel";
+import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, regionFromCodePostal } from "./bdcModel";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif } from "./bdcCompliance";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
@@ -129,7 +129,11 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   const orgEmail = org.email || "contact@organisme.fr";
   const orgTel = org.telephone || "";
   const orgSiret = org.siret || "[SIRET]";
-  const orgNda = org.nda || "[NDA en cours d'attribution]";
+  const regionOrg = regionFromCodePostal(org.codePostal);
+  const orgNda = org.nda || "";
+  const phraseNda = orgNda
+    ? `Déclaration d'activité enregistrée sous le numéro ${orgNda} auprès du préfet de région ${regionOrg}. Cet enregistrement ne vaut pas agrément de l'État.`
+    : "Demande de déclaration d'activité en cours d'instruction auprès de la DREETS.";
   const dirigeant = org.dirigeant || "Le Responsable";
   const dirigeantUpper = dirigeant.toUpperCase();
 
@@ -147,8 +151,11 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     [/902\s*274\s*448/g, orgSiret.replace(/\s/g,"").slice(0,9) || orgSiret],
     [/contact\.ntconseil@gmail\.com/gi, orgEmail],
     [/Marc\.z103@gmail\.com/gi, orgEmail],
-    [/Préfet\s+de\s+la\s+région\s+ILE-DE-FRANCE/gi, `Préfet de la région ${villeOrg}`],
-    [/Préfet\s+de\s+la\s+région\s+XXX/gi, `Préfet de la région ${villeOrg}`],
+    [/Préfet\s+de\s+la\s+région\s+ILE-DE-FRANCE/gi, `Préfet de la région ${regionOrg}`],
+    [/Préfet\s+de\s+la\s+région\s+XXX/gi, `Préfet de la région ${regionOrg}`],
+    [/Préfet\s+de\s+la\s+région\s+[A-ZÀ-ÿ'\- ]{3,40}/g, `Préfet de la région ${regionOrg}`],
+    [/D[ée]claration\s+d['’]activit[ée]\s+en\s+cours\s+d['’]attribution[^.]*\./gi, phraseNda],
+    [/EN\s+COURS\s+D['’]ATTRIBUTION/gi, orgNda || "en cours d'instruction"],
     [/SIRET\s*XXX/gi, `SIRET ${orgSiret}`],
     [/Fait\s+à\s+Saint[-\s]?\s*Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${villeOrg} le ${dates.dateConvention}`],
     [/Fait\s+à\s+Saint[-\s]?\s*Denis/gi, `Fait à ${villeOrg}`],
