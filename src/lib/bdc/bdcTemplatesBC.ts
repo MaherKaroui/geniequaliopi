@@ -90,6 +90,19 @@ const documentSynthese: BdcDocDef = {
 /* ------------------------------------------------------------------ */
 /* 2. Feuilles d'émargement — une par séance + récapitulatif           */
 /* ------------------------------------------------------------------ */
+const NOM_PHASE: Record<1 | 2 | 3, string> = {
+  1: "1 — Préliminaire",
+  2: "2 — Investigation",
+  3: "3 — Conclusion",
+};
+
+/** 2.5 → « 2 h 30 », 3 → « 3 h ». */
+function heuresFR(h: number): string {
+  const entier = Math.floor(h);
+  const min = Math.round((h - entier) * 60);
+  return min ? `${entier} h ${String(min).padStart(2, "0")}` : `${entier} h`;
+}
+
 const feuillesEmargement: BdcDocDef = {
   nom: "Indicateur 11 - Feuilles d'émargement par séance",
   indicateur: 11,
@@ -99,35 +112,41 @@ const feuillesEmargement: BdcDocDef = {
     const { organisme: o, prestation: p } = ctx;
     const seances = seancesFor(ctx, b);
     const parts: string[] = [H("Feuilles d'émargement"), entete(o, b, p)];
+    parts.push(
+      "_Une feuille par séance. Les signatures sont apposées à l'ouverture et à la clôture de la séance ; toute séance non réalisée est portée en « absence » et n'est pas facturée._\n",
+    );
     let cumul = 0;
-    for (const s of seances) {
+    seances.forEach((s, i) => {
       cumul += s.duree;
       parts.push(
-        H2(`Séance n° ${s.numero} — Phase ${s.phase}`),
-        `**Date** : ${fmtDateFR(s.date)}  \n**Horaires** : ${s.heureDebut} – ${s.heureFin}  \n**Durée** : ${s.duree} h  \n**Modalité** : ${s.modalite === "distanciel" ? "distanciel synchrone" : "présentiel"}  \n**Objet** : ${s.objet}`,
+        H2(`Séance n° ${s.numero} sur ${seances.length} — Phase ${NOM_PHASE[s.phase]}`),
+        "| Date | Horaires | Durée | Modalité | Lieu |",
+        "|---|---|---|---|---|",
+        `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${s.modalite === "distanciel" ? "Visioconférence" : p.lieu || o.ville} |`,
         "",
-        // Une signature par séance, datée de la séance (matrice, ligne 2)
+        `**Objet de la séance** : ${s.objet}`,
+        `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(cumul)} sur ${heuresFR(p.dureeEntretiens ?? cumul)} d'entretiens.`,
+        "",
         blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date }),
+        i < seances.length - 1 ? "\n<div style=\"page-break-after:always\"></div>\n" : "",
       );
-    }
+    });
     parts.push(
       H2("Récapitulatif cumulé des heures réalisées"),
-      "| Séance | Date | Durée | Cumul |",
-      "|---|---|---|---|",
+      "| Séance | Date | Phase | Durée | Cumul |",
+      "|---|---|---|---|---|",
       ...seances.map((s, i) => {
         const c = seances.slice(0, i + 1).reduce((a, x) => a + x.duree, 0);
-        return `| ${s.numero} | ${fmtDateFR(s.date)} | ${s.duree} h | ${c} h |`;
+        return `| ${s.numero} | ${fmtDateFR(s.date)} | ${NOM_PHASE[s.phase]} | ${heuresFR(s.duree)} | ${heuresFR(c)} |`;
       }),
-      `| **Total** |  | **${cumul} h** | **${cumul} h** |`,
+      `| **Total** |  |  | **${heuresFR(cumul)}** | **${heuresFR(cumul)}** |`,
       "",
       formatDuree(p),
-      SIGN(ctx, "Indicateur 11 - Feuilles d'émargement par séance", b),
     );
     return parts.join("\n");
   },
 };
 
-/* ------------------------------------------------------------------ */
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
