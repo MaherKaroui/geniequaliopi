@@ -2081,6 +2081,46 @@ export function renderBdcNTProgrammePhasesHtml(
   );
 }
 
+/**
+ * Rendu HTML d'un des templates obligatoires BC (BLOC 4), identifié par son index
+ * dans BDC_TEMPLATES_MANQUANTS. Utilisé pour l'aperçu/l'export unitaire dans l'app.
+ */
+export function renderBdcTemplateBCHtml(
+  templateIdx: number,
+  org: OrganismeInfo,
+  formation: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  stagiaire?: StagiaireInfo | null,
+): string {
+  const def = BDC_TEMPLATES_MANQUANTS[templateIdx];
+  if (!def) return htmlWrap(orgHeader(org, "Document indisponible"));
+  const ctx = buildBdcContext(org, formation, stagiaires);
+  const ben = def.parBeneficiaire
+    ? (stagiaire
+        ? ctx.beneficiaires.find((b) => b.nom === stagiaire.nom && b.prenom === stagiaire.prenom) || ctx.beneficiaires[0] || null
+        : ctx.beneficiaires[0] || null)
+    : null;
+  const md = sanitizeBdcMarkdown(def.build(ctx, ben), {
+    titre: def.nom,
+    categorieAction: "BC",
+    antiFabrication: false,
+  });
+  const body = mdToHtmlBody(md);
+  const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&and]+\s*\d+)*\s*-\s*/i, "");
+  const benLine = ben
+    ? `<div style="margin:6px 0 18px;color:#475569;font-size:12px">Bénéficiaire : <strong>${ben.prenom} ${ben.nom}</strong></div>`
+    : "";
+  return htmlWrap(
+    orgHeader(org, titre) +
+    benLine +
+    `<div class="bdc-doc-body">${body}</div>` +
+    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt;table-layout:fixed;word-wrap:break-word;overflow-wrap:break-word}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left;word-wrap:break-word;overflow-wrap:break-word}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold;text-align:center}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;border-bottom:1px solid #0b254540;padding-bottom:4px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body strong{color:#0b2545}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    docFooter(org)
+  );
+}
+
+
+
 
 
 
