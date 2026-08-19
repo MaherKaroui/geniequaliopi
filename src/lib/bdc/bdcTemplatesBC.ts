@@ -178,10 +178,12 @@ const feuillesEmargement: BdcDocDef = {
         return seances.map((s) => {
           const realisee = s.date.getTime() <= aujourdhui.getTime();
           if (realisee) c += s.duree;
-          return `| ${s.numero} | ${fmtDateFR(s.date)} | ${NOM_PHASE[s.phase]} | ${heuresFR(s.duree)} | ${realisee ? "Présent(e)" : "À venir"} | ${heuresFR(c)} |`;
+          // MESSAGE 23 — aucune présence pré-cochée : la case est renseignée à la séance.
+          return `| ${s.numero} | ${fmtDateFR(s.date)} | ${NOM_PHASE[s.phase]} | ${heuresFR(s.duree)} | ☐ | ${realisee ? heuresFR(c) : "—"} |`;
         });
       })(),
       `| **Total** |  |  | **${heuresFR(cumul)}** |  | **${heuresFR(cumulRealise)}** |`,
+
       "",
       formatDuree(p),
       "",
