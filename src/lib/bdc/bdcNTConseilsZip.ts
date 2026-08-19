@@ -1504,8 +1504,6 @@ function buildSatisfactionEntrepriseMd(
   const seed = hashStr(`sat-ent|${s.prenom}|${s.nom}|${s.email}`);
   const sc = (off: number): 4 | 5 => ((seed + off) % 4 === 0 ? 4 : 5);
   const note10 = 8 + ((seed >> 2) % 3);
-  const profile = formation ? getBdcDomainProfile(formation) : null;
-  const metier = profile?.metier || "le métier visé";
   // Aucun contenu du projet du bénéficiaire ne peut figurer ici (art. L6313-4) :
   // l'entreprise n'a pas connaissance du document de synthèse.
   const commentaire = `RAS — Relation avec l'organisme fluide, informations administratives claires et transmises dans les délais. Aucun point d'insatisfaction à signaler.`;
