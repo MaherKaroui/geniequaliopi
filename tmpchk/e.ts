@@ -1,0 +1,10 @@
+(globalThis as any).localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+const { buildBdcContext } = await import("../src/lib/bdc/bdcModel");
+const { BDC_TEMPLATES_MANQUANTS } = await import("../src/lib/bdc/bdcTemplatesBC");
+const { autofillDocument } = await import("../src/lib/autofill");
+const org: any = { nom:"NT CONSEILS", adresse:"1 rue X", codePostal:"94000", ville:"Créteil", siret:"123", nda:"11941044694", dirigeant:"Sofyia B", email:"a@b.fr", telephone:"01" };
+const formation: any = { intitule:"Bilan de compétences", duree:"24", dateDebut:"2025-03-03", dateFin:"2025-05-30", tarif:"1800", modalites:"présentiel", formateur:"Yassine", lieu:"Créteil" };
+const st: any[] = [{ civilite:"Mme", nom:"CHATI", prenom:"RAHMA", email:"r@x.fr", entreprise:"" }];
+const ctx = buildBdcContext(org, formation, st);
+const def = BDC_TEMPLATES_MANQUANTS.find((d:any)=>d.nom.includes("émargement"))!;
+console.log(autofillDocument(def.build(ctx, ctx.beneficiaires[0]), ctx, ctx.beneficiaires[0]).replace(/<div class="bloc-signature[\s\S]*?<\/div>\n?<\/div>/g,"[BLOC SIGNATURE]"));
