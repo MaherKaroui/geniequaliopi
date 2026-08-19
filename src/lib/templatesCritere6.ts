@@ -1840,9 +1840,35 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
 
 export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
   const fi = f || { dateDebut: new Date().toISOString().split("T")[0] } as FormationInfo;
+  const type = f ? detectFormationType(f) : ("autre" as FormationType);
+  const specifiques: string[][] = type === "creation" ? [
+    [
+      `<a href="https://www.agefiph.fr/aides-handicap/aide-la-creation-ou-la-reprise-dentreprise">AGEFIPH – Aide à la création d'entreprise</a>`,
+      "Aide forfaitaire à la création ou reprise d'entreprise par une personne en situation de handicap",
+      veilleMonthYear(fi, 3),
+      "Subvention forfaitaire versée au créateur bénéficiaire de l'obligation d'emploi, cumulable avec les autres dispositifs (ACRE, ARCE, microcrédit), conditionnée à un apport en fonds propres et à un accompagnement du projet.",
+      "Preuve : fiche AGEFIPH datée et archivée. Action : information systématique en séquence « Financer son projet » et orientation du référent handicap vers la délégation régionale pour tout stagiaire concerné."
+    ],
+    [
+      `<a href="https://www.handicap.fr/emploi/creation-entreprise">Créateurs en situation de handicap – Accompagnement dédié</a>`,
+      "Réseaux et parcours d'accompagnement des entrepreneurs handicapés (Cap emploi, H'up entrepreneurs)",
+      veilleMonthYear(fi, 5),
+      "Cartographie des relais spécialisés : diagnostic de compatibilité entre la situation de santé et le projet, aménagement du poste de travail indépendant, adaptation du rythme d'activité et soutien par les pairs.",
+      "Preuve : annuaire des relais archivé. Action : ajout d'une fiche « Créer son entreprise en situation de handicap » au livret d'accueil et adaptation du rythme des ateliers (pauses, supports numériques accessibles)."
+    ],
+    [
+      `<a href="https://www.service-public.fr/particuliers/vosdroits/F1650">Cumul AAH et revenus d'activité indépendante</a>`,
+      "Règles de cumul entre l'AAH et les revenus tirés d'une activité non salariée",
+      veilleMonthYear(fi, 4),
+      "Modalités d'abattement et de déclaration trimestrielle des revenus d'activité indépendante pour les bénéficiaires de l'AAH : point déterminant dans le choix du statut juridique et du régime fiscal du créateur.",
+      "Preuve : fiche service-public.fr datée. Action : cas pratique chiffré « choix du statut avec maintien de l'AAH » intégré aux exercices financiers du parcours."
+    ],
+  ] : [];
   return buildDocument({ org: o, title: "Tableau de veille handicap", table: {
     headers: ["Lien", "Nom de l'article / Texte", "Date", "Commentaire – Analyse handicap", "Exploitation de veille (preuve + action Qualiopi)"],
     rows: [
+      ...specifiques,
+
       [
         `<a href="https://www.agefiph.fr/">agefiph.fr</a>`,
         "AGEFIPH – Aides et services pour l'emploi des personnes handicapées",
