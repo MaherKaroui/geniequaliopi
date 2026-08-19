@@ -33,6 +33,9 @@ function antiFabricationPour(nom: string): boolean {
   // Le test de positionnement est renseigné en séance avec le consultant :
   // il doit sortir complété (réponses, grille de notes, appréciation).
   if (/test de positionnement/i.test(nom)) return false;
+  // Fiches d'analyse / préalable au bilan : renseignées en entretien préliminaire,
+  // elles sortent complétées et datées.
+  if (/(analyse (du|de) besoin|fiche pr[ée]alable)/i.test(nom)) return false;
   return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
 
