@@ -1044,6 +1044,49 @@ function buildTestPositionnementMd(
   const besoin = pick(besoinBilanArr, seed, 4);
   const attentes = pick(attentesArr, seed, 5);
 
+  // --- Grille de notes + appréciation du consultant ---
+  const consultantNom = ((org as any).responsablePedagogique || org.dirigeant || "Le consultant").toString();
+  const datePassation = _dates?.dateOutilPrep || _dates?.dateDebut || "";
+  const critLib = [
+    "Clarté de la demande et du besoin exprimé",
+    "Connaissance de son parcours et de ses compétences",
+    "Capacité d'auto-analyse et de recul",
+    "Définition du projet professionnel",
+    "Connaissance du marché de l'emploi et des métiers visés",
+    "Implication et disponibilité dans la démarche",
+  ];
+  const obsBanque: string[][] = [
+    ["Demande exprimée de façon claire et argumentée.", "Demande formulée, à préciser sur le périmètre visé.", "Demande encore générale, à reformuler en séance."],
+    ["Parcours bien retracé, expériences illustrées par des exemples.", "Parcours retracé, compétences à formaliser davantage.", "Difficulté à nommer les compétences acquises."],
+    ["Bonne capacité de recul, analyse nuancée.", "Recul en construction, s'appuie surtout sur le ressenti.", "Auto-analyse à consolider avec des outils."],
+    ["Projet identifié et cohérent avec le parcours.", "Deux pistes envisagées, à départager.", "Projet à construire : hypothèses non stabilisées."],
+    ["Connaissance correcte du secteur et de ses exigences.", "Représentations partielles à confronter au terrain.", "Méconnaissance du marché : enquêtes métier à prévoir."],
+    ["Très impliqué(e), disponibilités confirmées.", "Impliqué(e), organisation à caler sur les séances.", "Motivation réelle, disponibilité à sécuriser."],
+  ];
+  const criteres = critLib.map((libelle, i) => {
+    const note = 2 + ((seed + i * 7) % 3); // 2 à 4
+    const obs = obsBanque[i][(4 - note) % 3];
+    return { libelle, note, obs };
+  });
+  const totalNote = criteres.reduce((a, c) => a + c.note, 0);
+  const moyenne20 = (Math.round((totalNote / (criteres.length * 5)) * 200) / 10).toFixed(1).replace(".", ",");
+  const niveau = totalNote >= 22 ? "avancé" : totalNote >= 16 ? "intermédiaire" : "à consolider";
+  const apprBanque = [
+    `${nom} aborde le bilan avec une demande construite et une réelle capacité à se projeter. Les échanges montrent une bonne connaissance de son parcours ; le travail portera surtout sur la confrontation du projet au marché${profile ? ` de ${secteur}` : ""} et sur la formalisation des compétences transférables.`,
+    `Le positionnement initial de ${nom} met en évidence une motivation solide mais un projet encore à stabiliser. La phase d'investigation s'attachera à explorer deux à trois pistes, dont ${profile ? `le métier de ${metier}` : "la piste principale évoquée"}, à l'aide de tests et d'enquêtes métier.`,
+    `${nom} présente un profil expérimenté, avec des acquis professionnels solides mais insuffisamment valorisés. L'accompagnement visera à objectiver ces acquis (tests d'intérêts et de personnalité) et à sécuriser un plan d'action réaliste sur 12 à 18 mois.`,
+    `Le test met en lumière une bonne implication et une disponibilité confirmée. Les points de vigilance portent sur la connaissance du marché et sur la faisabilité financière du projet ; ces deux points seront traités dès les premières séances d'investigation.`,
+  ];
+  const appreciation = pick(apprBanque, seed, 6);
+  const axesBanque = [
+    "formalisation des compétences transférables · enquêtes métier · étude de faisabilité (durée, coût, financement)",
+    "tests d'intérêts et de personnalité · exploration de 2 à 3 pistes · confrontation au marché local",
+    "valorisation du parcours · repérage des dispositifs de formation · construction du plan d'action daté",
+  ];
+  const axesTravail = pick(axesBanque, seed, 7);
+
+
+
   return accordCivilite(`**[${orgNom}]{.underline}**
 
 **TEST DE POSITIONNEMENT**
