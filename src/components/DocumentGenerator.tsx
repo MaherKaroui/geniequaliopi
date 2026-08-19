@@ -18,6 +18,8 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
+import BdcControleCoherence from "./BdcControleCoherence";
+
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
@@ -809,6 +811,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   // ============ Guide Prépa Qualiopi universel (AF / CFA / BDC / VAE) ============
   const [typeActionPrepa, setTypeActionPrepa] = useState<TypeActionAudit>(() => detectTypeAction(mergedOrganisme));
   const [loadingGuidePrepa, setLoadingGuidePrepa] = useState(false);
+  const [bdcControleOpen, setBdcControleOpen] = useState(false);
+
 
   const handlePreviewGuidePrepa = () => {
     const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
@@ -839,19 +843,24 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
   };
 
+  const runBdcExport = () => {
+    runJob({
+      label: "Dossier Bilan de compétences",
+      fileName: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
+      autoDownload: true,
+      run: async (reporter) => {
+        return await buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, reporter);
+      },
+    });
+  };
+
   const handleDownloadAll = () => {
-    // BDC : on génère exclusivement le dossier "NT Conseils" (51 docs + 5 trames Excel/PDF)
+    // BDC : contrôle de cohérence obligatoire avant tout export (BLOC 2)
     if (isBDCOrg) {
-      runJob({
-        label: "Dossier Bilan de compétences (NT Conseils)",
-        fileName: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
-        autoDownload: true,
-        run: async (reporter) => {
-          return await buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, reporter);
-        },
-      });
+      setBdcControleOpen(true);
       return;
     }
+
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
       fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
@@ -1480,7 +1489,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   return (
     <div className="space-y-4">
+      {isBDCOrg && (
+        <BdcControleCoherence
+          open={bdcControleOpen}
+          onOpenChange={setBdcControleOpen}
+          organisme={mergedOrganisme}
+          formation={selectedFormation}
+          beneficiaires={allStagiaires}
+          onConfirm={runBdcExport}
+        />
+      )}
       <div className="flex items-center justify-between mb-4">
+
         <div>
           <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
           <p className="text-sm text-muted-foreground">
