@@ -274,6 +274,10 @@ const accordConservation: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
+    const seed = seedBenef(b, "conservation");
+    const conserve = seed % 2 === 0;
+    const dateLimite = fmtDateFR(new Date(p.dateFin.getFullYear() + 1, p.dateFin.getMonth(), p.dateFin.getDate()));
+    const dateDestruction = conserve ? dateLimite : fmtDateFR(p.dateFin);
     return [
       H("Accord de conservation / attestation de destruction des documents"),
       "_Article R6313-7 du Code du travail._\n",
@@ -285,12 +289,16 @@ const accordConservation: BdcDocDef = {
       "",
       "| Choix du bénéficiaire | ☐ |",
       "|---|---|",
-      "| Je demande la **destruction immédiate** de l'ensemble des documents à l'issue du bilan. | ☐ |",
-      `| J'autorise la **conservation** des documents pour une durée d'un an maximum, soit jusqu'au ${fmtDateFR(new Date(p.dateFin.getFullYear() + 1, p.dateFin.getMonth(), p.dateFin.getDate()))}, à des fins exclusives de suivi. | ☐ |`,
+      `| Je demande la **destruction immédiate** de l'ensemble des documents à l'issue du bilan. | ${conserve ? "☐" : "☒"} |`,
+      `| J'autorise la **conservation** des documents pour une durée d'un an maximum, soit jusqu'au ${dateLimite}, à des fins exclusives de suivi. | ${conserve ? "☒" : "☐"} |`,
+      "",
+      `**Choix exprimé le** : ${fmtDateFR(p.dateFin)}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}.`,
       "",
       "Cet accord est révocable à tout moment par simple demande écrite adressée à " + (o.emailContact || "l'organisme") + ".",
       H2("Attestation de destruction"),
-      `Je soussigné(e) ${p.consultant.nom}, consultant, atteste avoir procédé à la destruction de l'intégralité des documents relatifs au bilan de ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________"} le __/__/____.`,
+      `Je soussigné(e) ${p.consultant.nom}, consultant, atteste que l'intégralité des documents relatifs au bilan de ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________"} ${conserve ? `sera détruite au terme de la conservation autorisée, soit le ${dateDestruction}` : `a été détruite le ${dateDestruction}`}.`,
+      "",
+      `**Fait à** ${o.ville}, **le** ${fmtDateFR(p.dateFin)}.`,
       SIGN(ctx, "Indicateur 9 - Accord de conservation et attestation de destruction des documents", b),
     ].join("\n");
   },
@@ -306,6 +314,10 @@ const autorisationTransmission: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
+    const seed = seedBenef(b, "transmission");
+    const employeur = (b as any)?.entreprise ? String((b as any).entreprise).trim() : "";
+    const autorise = !!employeur && seed % 3 === 0;
+    const dateChoix = fmtDateFR(p.dateFin);
     return [
       H("Autorisation de transmission à un tiers"),
       "_Article L6313-4 du Code du travail._\n",
@@ -314,16 +326,23 @@ const autorisationTransmission: BdcDocDef = {
       "",
       "| Décision | ☐ |",
       "|---|---|",
-      "| Je **n'autorise pas** la transmission de mon document de synthèse à un tiers. | ☐ |",
-      "| J'autorise la transmission de mon document de synthèse au destinataire désigné ci-dessous. | ☐ |",
+      `| Je **n'autorise pas** la transmission de mon document de synthèse à un tiers. | ${autorise ? "☐" : "☒"} |`,
+      `| J'autorise la transmission de mon document de synthèse au destinataire désigné ci-dessous. | ${autorise ? "☒" : "☐"} |`,
       "",
-      "**Destinataire autorisé** : ______________________________  \n**Qualité** : ______________________________  \n**Objet de la transmission** : ______________________________",
+      autorise
+        ? `**Destinataire autorisé** : ${employeur}  \n**Qualité** : employeur du bénéficiaire  \n**Objet de la transmission** : accompagnement de la mobilité interne et suivi du plan de développement des compétences.`
+        : "**Destinataire autorisé** : sans objet — aucune transmission autorisée  \n**Qualité** : sans objet  \n**Objet de la transmission** : sans objet",
+      "",
+      `**Décision exprimée le** : ${dateChoix}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}.`,
       "",
       "La présente autorisation est **révocable à tout moment**, sans motif, par écrit adressé à " + (o.emailContact || "l'organisme") + ". La révocation prend effet dès sa réception.",
+      "",
+      `**Fait à** ${o.ville}, **le** ${dateChoix}.`,
       SIGN(ctx, "Indicateur 9 - Autorisation de transmission du document de synthèse à un tiers", b),
     ].join("\n");
   },
 };
+
 
 /* ------------------------------------------------------------------ */
 /* 6. Procédure de réclamation et de médiation                         */
