@@ -2175,6 +2175,23 @@ export async function buildBDCNTConseilsZip(
     zip.file(`${mapFolderToCriterePath("Indicateur 10")}/${baseName}.docx`, blob);
   }
 
+  // === Indicateur 10 : une fiche détaillée par phase réglementaire ===
+  {
+    const dates = computeDates(benList[0], org, formation);
+    const phases: Array<{ n: 1 | 2 | 3; nom: string }> = [
+      { n: 1, nom: "Indicateur 10 - Phase 1 - Phase préliminaire" },
+      { n: 2, nom: "Indicateur 10 - Phase 2 - Phase d'investigation" },
+      { n: 3, nom: "Indicateur 10 - Phase 3 - Phase de conclusion" },
+    ];
+    for (const p of phases) {
+      advance(p.nom);
+      const md = buildPhaseMd(p.n, org, dates, formation);
+      const blob = await genDocx(md, p.nom, null);
+      zip.file(`${mapFolderToCriterePath("Indicateur 10")}/${p.nom}.docx`, blob);
+    }
+  }
+
+
 
   // Static assets — si un template automatisé existe pour la clé, on l'utilise à la place.
   for (const a of BDC_NT_STATIC_ASSETS) {
