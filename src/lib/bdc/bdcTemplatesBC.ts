@@ -106,9 +106,8 @@ const feuillesEmargement: BdcDocDef = {
         H2(`Séance n° ${s.numero} — Phase ${s.phase}`),
         `**Date** : ${fmtDateFR(s.date)}  \n**Horaires** : ${s.heureDebut} – ${s.heureFin}  \n**Durée** : ${s.duree} h  \n**Modalité** : ${s.modalite === "distanciel" ? "distanciel synchrone" : "présentiel"}  \n**Objet** : ${s.objet}`,
         "",
-        "| Signature du bénéficiaire | Signature du consultant |",
-        "|---|---|",
-        "|  |  |",
+        // Une signature par séance, datée de la séance (matrice, ligne 2)
+        blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date }),
       );
     }
     parts.push(
@@ -131,7 +130,7 @@ const feuillesEmargement: BdcDocDef = {
 /* ------------------------------------------------------------------ */
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */
-function questionnaireSatisfaction(titre: string, quand: string, questions: string[]): BdcDocDef["build"] {
+function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
   return (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
     const lignes = questions.map((q) => `| ${q} | ${ECHELLE_SATISFACTION} |`);
@@ -150,7 +149,7 @@ function questionnaireSatisfaction(titre: string, quand: string, questions: stri
       "_____________________________________________________________",
       "",
       p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
-      SIGN(ctx, "Indicateur 11 - Feuilles d'émargement par séance", b),
+      SIGN(ctx, nomPiece, b),
     ].join("\n");
   };
 }
