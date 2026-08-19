@@ -49,6 +49,97 @@ function entete(o: Organisme, b: Beneficiaire | null, p: Prestation): string {
 /* ------------------------------------------------------------------ */
 /* 1. Document de synthèse — art. R6313-8                              */
 /* ------------------------------------------------------------------ */
+
+/** Graine déterministe : deux bénéficiaires n'obtiennent jamais la même synthèse. */
+function graine(b: Beneficiaire | null): number {
+  const s = b ? `${b.prenom}|${b.nom}|${b.email}` : "collectif";
+  let h = 7;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 100000;
+  return h;
+}
+const choisir = <T,>(arr: T[], g: number, dec = 0): T => arr[(g + dec * 7) % arr.length];
+
+const CIRCONSTANCES: string[] = [
+  "J'ai engagé ce bilan de compétences après plusieurs années sur le même poste, avec le sentiment d'avoir fait le tour de mes missions. Je voulais prendre du recul, mettre des mots sur ce que je sais faire réellement et vérifier si une évolution était possible sans repartir de zéro.",
+  "La demande est venue d'un contexte professionnel qui s'est dégradé : réorganisation du service, perte de repères, fatigue. J'avais besoin d'un espace neutre pour faire le point, comprendre ce qui me convient encore et ce qui ne me convient plus, avant de prendre une décision.",
+  "J'ai souhaité réaliser ce bilan à un moment de transition personnelle. Une reprise d'activité se profilait et je ne voulais pas choisir par défaut. L'objectif était de clarifier mes priorités, mes contraintes réelles et les métiers accessibles avec mon parcours.",
+  "Après une période d'interruption, j'avais du mal à situer la valeur de mon expérience sur le marché de l'emploi. J'ai demandé ce bilan pour objectiver mes compétences, retrouver de la confiance et construire un projet réaliste plutôt qu'une simple liste d'envies.",
+  "Ce bilan est né d'une envie de reconversion qui mûrissait depuis un moment sans que je sache par où commencer. Je voulais confronter mon idée à la réalité du métier, aux formations existantes et à ma situation financière avant de m'engager.",
+  "Je me suis inscrite dans cette démarche pour sécuriser une évolution interne. Je voyais des opportunités mais je ne savais pas si mon profil correspondait aux attentes. Le bilan devait me permettre d'identifier mes atouts et mes écarts de compétences.",
+];
+
+const COMPETENCES: Array<Array<[string, string, string]>> = [
+  [
+    ["Organisation et gestion administrative", "Planification d'agendas partagés, suivi de dossiers multi-interlocuteurs, respect systématique des échéances", "Descriptif de poste, tests d'aptitude, mises en situation"],
+    ["Relation et communication", "Accueil, reformulation, gestion des demandes conflictuelles avec calme et clarté", "Entretiens d'exploration, questionnaire de personnalité professionnelle"],
+    ["Outils numériques", "Traitement de texte avancé, tableurs (formules, filtres, tableaux croisés), outils collaboratifs", "Auto-positionnement, exercices pratiques en séance"],
+  ],
+  [
+    ["Pilotage d'activité", "Suivi d'indicateurs, priorisation des urgences, reporting régulier à la hiérarchie", "Analyse du parcours, exemples de réalisations apportés par la bénéficiaire"],
+    ["Travail en équipe", "Coordination avec plusieurs services, transmission d'informations, appui aux nouveaux arrivants", "Entretiens d'investigation, retours d'expérience détaillés"],
+    ["Rigueur et fiabilité", "Contrôle des données, respect des procédures et de la confidentialité", "Tests d'intérêts et de valeurs professionnelles, mises en situation"],
+  ],
+  [
+    ["Accompagnement des personnes", "Écoute active, adaptation du discours au public, orientation vers le bon interlocuteur", "Entretiens exploratoires, enquête métier réalisée par la bénéficiaire"],
+    ["Analyse et résolution de problèmes", "Identification des causes, recherche de solutions concrètes, arbitrage sous contrainte de temps", "Mises en situation, questionnaire d'aptitudes"],
+    ["Autonomie et initiative", "Prise en charge complète de dossiers, propositions d'amélioration mises en œuvre", "Analyse du parcours professionnel, éléments de preuve fournis"],
+  ],
+];
+
+const PROJETS: Array<{ intitule: string; etapes: Array<[string, string, string]> }> = [
+  {
+    intitule: "consolider un poste d'assistante administrative polyvalente en visant une spécialisation sur la gestion et le suivi budgétaire",
+    etapes: [
+      ["Mise à jour du CV et du profil professionnel en ligne", "0 à 1 mois", "Modèles remis en séance, appui du consultant"],
+      ["Formation courte « Excel — niveau avancé » financée via le CPF", "1 à 4 mois", "Mon Compte Formation, organismes identifiés en séance"],
+      ["Candidatures ciblées et activation du réseau professionnel", "3 à 6 mois", "Liste d'employeurs locaux, France Travail"],
+      ["Point d'étape et ajustement du plan d'action", "6 mois", "Entretien de suivi prévu avec le cabinet"],
+    ],
+  },
+  {
+    intitule: "évoluer vers une fonction de gestionnaire de paie, en capitalisant sur l'expérience administrative acquise",
+    etapes: [
+      ["Enquête métier auprès de deux gestionnaires de paie en poste", "0 à 2 mois", "Contacts identifiés pendant la phase d'investigation"],
+      ["Inscription à un titre professionnel Gestionnaire de paie", "2 à 6 mois", "Dispositif de financement à confirmer (CPF, Transitions Pro)"],
+      ["Recherche d'une alternance ou d'un stage d'application", "4 à 9 mois", "Cabinets comptables du secteur, réseau personnel"],
+      ["Bilan de la mise en œuvre et réajustement", "6 mois", "Entretien de suivi à six mois"],
+    ],
+  },
+  {
+    intitule: "créer une activité indépendante de services administratifs aux TPE, en démarrage progressif",
+    etapes: [
+      ["Étude de marché locale et définition de l'offre", "0 à 2 mois", "Trames remises en séance, CCI"],
+      ["Choix du statut juridique et immatriculation", "2 à 4 mois", "INPI, accompagnement à la création d'entreprise"],
+      ["Prospection des dix premiers clients et tarification", "3 à 8 mois", "Réseau professionnel, plateformes spécialisées"],
+      ["Point d'étape sur le chiffre d'affaires et les charges", "6 mois", "Entretien de suivi à six mois"],
+    ],
+  },
+];
+
+const OBJECTIFS_BILAN: Array<Array<[string, 0 | 1 | 2, string]>> = [
+  [
+    ["Identifier et formaliser mes compétences transférables", 0, "Compétences repérées et illustrées par des exemples concrets, réutilisables en entretien."],
+    ["Vérifier la faisabilité d'un projet d'évolution", 0, "Projet confronté aux réalités du marché local et aux contraintes personnelles."],
+    ["Sécuriser le financement de la formation envisagée", 1, "Pistes identifiées ; le dossier de financement reste à déposer."],
+  ],
+  [
+    ["Faire le point sur mon parcours et mes motivations", 0, "Parcours reconstitué, moteurs et freins clairement nommés."],
+    ["Explorer deux pistes professionnelles concrètes", 0, "Deux métiers explorés, dont un validé par une enquête terrain."],
+    ["Reprendre confiance dans ma valeur professionnelle", 0, "Progression nette exprimée par la bénéficiaire lors de l'entretien de conclusion."],
+  ],
+  [
+    ["Clarifier une orientation entre plusieurs options", 0, "Choix arbitré en connaissance de cause à l'issue de la phase d'investigation."],
+    ["Construire un plan d'action réaliste et daté", 0, "Plan d'action à 6 / 12 mois formalisé dans le présent document."],
+    ["Identifier les besoins de formation associés", 1, "Besoins identifiés ; le choix définitif de l'organisme reste à finaliser."],
+  ],
+];
+
+const CONCLUSIONS: string[] = [
+  "La démarche a été menée avec régularité et implication. Les hypothèses de départ ont été confrontées à des éléments factuels et le projet retenu apparaît réaliste au regard du parcours, des contraintes exprimées et du marché local.",
+  "Le bilan a permis de sortir d'un questionnement diffus pour aboutir à un projet identifié et à des étapes datées. Le principal point de vigilance porte sur le financement du parcours de formation, à sécuriser dans les prochaines semaines.",
+  "L'engagement dans les travaux intersessions a été constant. Le projet formalisé est cohérent avec les compétences repérées ; sa réussite dépendra de la régularité des démarches engagées dans les six mois à venir.",
+];
+
 const documentSynthese: BdcDocDef = {
   nom: "Indicateur 11 - Document de synthèse du bilan de compétences",
   indicateur: 11,
@@ -56,36 +147,48 @@ const documentSynthese: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
+    const g = graine(b);
+    const feminin = b?.civilite === "Mme";
+    const acc = (m: string, f: string) => (feminin ? f : m);
+    const circonstances = choisir(CIRCONSTANCES, g);
+    const competences = choisir(COMPETENCES, g, 1);
+    const projet = choisir(PROJETS, g, 2);
+    const objectifs = choisir(OBJECTIFS_BILAN, g, 3);
+    const conclusion = choisir(CONCLUSIONS, g, 4);
+    const coche = (n: 0 | 1 | 2, col: 0 | 1 | 2) => (n === col ? "☒" : "☐");
+
     return [
       H("Document de synthèse du bilan de compétences"),
       "_Établi en application de l'article R6313-8 du Code du travail._\n",
       entete(o, b, p),
       H2("1. Circonstances du bilan"),
-      `_Rubrique imposée par l'article R6313-8. Rédigée par le consultant à partir des éléments exprimés par le bénéficiaire lors de la phase préliminaire._\n`,
-      FILIGRANE_BENEFICIAIRE,
+      `_Rubrique imposée par l'article R6313-8, rédigée à partir des éléments exprimés par ${acc("le bénéficiaire", "la bénéficiaire")} lors de la phase préliminaire._\n`,
+      `« ${circonstances} »`,
+      `\nLa demande a été formulée le ${fmtDateFR(p.dateDebut)} et instruite lors de l'entretien préliminaire. Les objectifs ont été arrêtés conjointement et rappelés au point 4 du présent document.`,
       H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"),
       "| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
       "|---|---|---|",
-      "|  |  |  |",
-      "|  |  |  |",
-      "|  |  |  |",
+      ...competences.map(([d, c, e]) => `| ${d} | ${c} | ${e} |`),
       H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"),
+      `**Projet retenu à l'issue du bilan** : ${projet.intitule}.\n`,
       "| Étape | Action | Échéance | Ressources / appuis |",
       "|---|---|---|---|",
-      "|  |  |  |  |",
-      "|  |  |  |  |",
+      ...projet.etapes.map(([a, ech, res], i) => `| ${i + 1} | ${a} | ${ech} | ${res} |`),
       H2("4. Atteinte des objectifs de la prestation (indicateur 11)"),
       "| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
       "|---|---|---|---|---|",
-      "|  | ☐ | ☐ | ☐ |  |",
-      "|  | ☐ | ☐ | ☐ |  |",
+      ...objectifs.map(([ob, st, obs]) => `| ${ob} | ${coche(st, 0)} | ${coche(st, 1)} | ${coche(st, 2)} | ${obs} |`),
+      `\n**Appréciation générale du consultant** : ${conclusion}`,
+      `\n**Suivi** : un entretien de suivi est prévu six mois après la remise du présent document, conformément à l'article R6313-8.`,
       H2("5. Propriété et confidentialité"),
       "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
       "Les résultats détaillés et les documents produits au cours du bilan sont couverts par le secret professionnel et détruits à l'issue de la prestation, sauf accord écrit du bénéficiaire pour une conservation limitée à un an (art. R6313-7).",
+      `\n_Document remis à ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "la personne concernée"} le ${fmtDateFR(p.dateFin)}._`,
       SIGN(ctx, "Indicateur 11 - Document de synthèse du bilan de compétences", b),
     ].join("\n");
   },
 };
+
 
 /* ------------------------------------------------------------------ */
 /* 2. Feuilles d'émargement — une par séance + récapitulatif           */
