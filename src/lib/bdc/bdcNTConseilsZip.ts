@@ -1119,11 +1119,6 @@ Conformément à l'article L.6313-4 du Code du travail, les résultats détaill�
 `;
 }
 
-const PROGRAMME_PHASES_KEY = "Indicateur 10/Indicateur 10 - Programme des 3 phases du bilan de compétences";
-const PHASE1_KEY = "Indicateur 10/Indicateur 10 - Phase 1 - Phase préliminaire";
-const PHASE2_KEY = "Indicateur 10/Indicateur 10 - Phase 2 - Phase d'investigation";
-const PHASE3_KEY = "Indicateur 10/Indicateur 10 - Phase 3 - Phase de conclusion";
-
 /** Fiches détaillées par phase réglementaire (1 document par phase). */
 function buildPhaseMd(
   phase: 1 | 2 | 3,
@@ -1678,10 +1673,6 @@ ${row10(note10)}
 
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
-  if (key === PROGRAMME_PHASES_KEY) return buildProgrammePhasesMd(org, dates, formation);
-  if (key === PHASE1_KEY) return buildPhaseMd(1, org, dates, formation);
-  if (key === PHASE2_KEY) return buildPhaseMd(2, org, dates, formation);
-  if (key === PHASE3_KEY) return buildPhaseMd(3, org, dates, formation);
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
   if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
