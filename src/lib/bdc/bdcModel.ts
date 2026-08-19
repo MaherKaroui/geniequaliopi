@@ -86,6 +86,8 @@ export interface BdcContext {
   prestation: Prestation;
   /** Planning propre à chaque bénéficiaire (clé = Beneficiaire.id) — jamais deux plannings identiques. */
   seancesParBeneficiaire: Record<string, Seance[]>;
+  /** Formation d'origine (intitulé, domaine) — sert à contextualiser les contenus. */
+  formation?: FormationInfo;
 }
 
 /** Retourne le planning du bénéficiaire (ou celui de la prestation à défaut). */
