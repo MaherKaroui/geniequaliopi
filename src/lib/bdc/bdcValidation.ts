@@ -297,6 +297,15 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
     collisionsBenef.length ? "Deux bénéficiaires ont un entretien à la même date et au même horaire : matériellement impossible pour un consultant unique." : undefined,
     collisionsBenef.slice(0, 5)));
 
+  // V25 — non-régression du dictionnaire de substitution (MESSAGE 17)
+  const regressions: string[] = [];
+  for (const [nom, txt] of entries) {
+    const hits = findRegressionsSubstitution(txt);
+    if (hits.length) regressions.push(`${nom} : ${hits.join(", ")}`);
+  }
+  B.push(r("V25", "Aucune substitution abusive dans les libellés réglementaires", regressions.length === 0,
+    "Libellé réglementaire corrompu par le dictionnaire de substitution", regressions.slice(0, 10)));
+
 
 
   /* ---------------- Alertes (orange) ---------------- */
