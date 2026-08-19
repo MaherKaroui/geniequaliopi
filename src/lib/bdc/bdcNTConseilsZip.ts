@@ -1957,6 +1957,17 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === Indicateur 10 : programme détaillé des 3 phases du bilan de compétences ===
+  {
+    const baseName = "Indicateur 10 - Programme des 3 phases du bilan de compétences";
+    advance(baseName);
+    const dates = computeDates(benList[0], org, formation);
+    const md = buildProgrammePhasesMd(org, dates, formation);
+    const blob = await genDocx(md, baseName, null);
+    zip.file(`${mapFolderToCriterePath("Indicateur 10")}/${baseName}.docx`, blob);
+  }
+
+
   // Static assets — si un template automatisé existe pour la clé, on l'utilise à la place.
   for (const a of BDC_NT_STATIC_ASSETS) {
     advance(a.zipPath.split("/").pop() || a.zipPath);
