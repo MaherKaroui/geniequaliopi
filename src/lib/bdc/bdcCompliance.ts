@@ -118,8 +118,15 @@ export const CORRECTIONS_SUBSTITUTION: Array<[RegExp, string]> = [
   [/\ben phase de traitement\b/gi, "en cours de traitement"],
   [/Organisme de prestation/g, "Organisme de formation"],
   [/organisme de prestation/g, "organisme de formation"],
-  [/\bmes prestation\b/gi, "mes formations"],
+  [/\bmes prestation\b/gi, "mes prestations"],
   [/\bdéclaration d'activité de l'[ÉE]tat\b/gi, "agrément de l'État"],
+  // MESSAGE 23 — neuf corruptions résiduelles
+  [/(d'un|un|le|du)\s+prestation d'application/gi, (m: string) => m.replace(/prestation/i, "stage")],
+  [/\bbesoins? de prestation\b/gi, (m: string) => m.replace(/prestation/i, "formation")],
+  [/\bau phase du bilan\b/gi, "au cours du bilan"],
+  [/\bau phase de\b/gi, "au cours de"],
+  [/\bprestation initiale\b/gi, "formation initiale"],
+  [/\balternance ou d'un prestation\b/gi, "alternance ou d'un stage"],
 ];
 
 /** MESSAGE 17 — chaînes interdites après correction (contrôle de non-régression). */
@@ -128,7 +135,11 @@ export const REGRESSIONS_INTERDITES: string[] = [
   "Organisme de prestation", "organisme de prestation", "Handicap prestation",
   "exploration des droits", "En phase ☐", "déclaration d'activité de l'État",
   "mes prestation", "une prestation, une prestation",
+  // MESSAGE 23
+  "prestation d'application", "besoins de prestation", "besoin de prestation",
+  "au phase", "En phase ☐ Soldée", "prestation initiale",
 ];
+
 
 /** Retourne les régressions de substitution présentes dans un texte rendu. */
 export function findRegressionsSubstitution(texte: string): string[] {
