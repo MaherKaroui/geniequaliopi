@@ -76,7 +76,16 @@ export interface BdcContext {
   organisme: Organisme;
   beneficiaires: Beneficiaire[];
   prestation: Prestation;
+  /** Planning propre à chaque bénéficiaire (clé = Beneficiaire.id) — jamais deux plannings identiques. */
+  seancesParBeneficiaire: Record<string, Seance[]>;
 }
+
+/** Retourne le planning du bénéficiaire (ou celui de la prestation à défaut). */
+export function seancesFor(ctx: BdcContext, b?: { id: string } | null): Seance[] {
+  if (b && ctx.seancesParBeneficiaire[b.id]?.length) return ctx.seancesParBeneficiaire[b.id];
+  return ctx.prestation.seances;
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Helpers de parsing / formatage                                      */
@@ -260,8 +269,13 @@ function buildBeneficiaire(s: StagiaireInfo, idx: number): Beneficiaire {
   };
 }
 
-/** Séquençage contraint aux 3 phases réglementaires (art. R6313-4), max 24 h. */
-export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire): Seance[] {
+/**
+ * Séquençage contraint aux 3 phases réglementaires (art. R6313-4), max 24 h.
+ * `rang` = position du bénéficiaire : il décale les dates et alterne les créneaux
+ * horaires pour qu'aucun bénéficiaire ne partage la même séance qu'un autre
+ * (un consultant unique ne peut pas conduire deux entretiens simultanés).
+ */
+export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire, rang = 0): Seance[] {
   const total = Math.min(p.dureeEntretiensH, 24);
   const repartition: Array<{ phase: 1 | 2 | 3; part: number; objet: string }> = [
     { phase: 1, part: 0.2, objet: "Phase préliminaire — analyse de la demande et du besoin, information sur les conditions de déroulement" },
@@ -271,7 +285,12 @@ export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire): 
   const jours = b?.joursDisponibles?.length ? b.joursDisponibles : (["lundi", "mardi", "mercredi", "jeudi", "vendredi"] as Jour[]);
   const seances: Seance[] = [];
   let cursor = new Date(p.dateDebut);
+  // décalage propre au bénéficiaire (0, 1, 2, 3… jours) — évite les dates identiques
+  cursor.setDate(cursor.getDate() + (rang % 4));
+  if (cursor > p.dateFin) cursor = new Date(p.dateDebut);
   const spanDays = Math.max(1, Math.round((p.dateFin.getTime() - p.dateDebut.getTime()) / 86400000));
+  // créneaux alternés : matin / début d'après-midi / fin d'après-midi
+  const debutsPossibles = [9, 14, 16];
   let numero = 1;
   for (const r of repartition) {
     let h = Math.round(total * r.part);
@@ -282,8 +301,9 @@ export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire): 
       while (!jours.includes(JOURS_FR[cursor.getDay()]) && guard < 14) {
         cursor.setDate(cursor.getDate() + 1); guard++;
       }
-      const heureDebut = "09:00";
-      const heureFin = `${String(9 + duree).padStart(2, "0")}:00`;
+      const hDeb = debutsPossibles[(rang + numero) % debutsPossibles.length];
+      const heureDebut = `${String(hDeb).padStart(2, "0")}:00`;
+      const heureFin = `${String(Math.min(20, hDeb + duree)).padStart(2, "0")}:00`;
       seances.push({
         numero: numero++,
         phase: r.phase,
@@ -304,10 +324,12 @@ export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire): 
     const delta = total - somme;
     const last = seances[seances.length - 1];
     last.duree = Math.max(1, last.duree + delta);
-    last.heureFin = `${String(9 + last.duree).padStart(2, "0")}:00`;
+    const hDeb = parseInt(last.heureDebut.slice(0, 2), 10);
+    last.heureFin = `${String(Math.min(20, hDeb + last.duree)).padStart(2, "0")}:00`;
   }
   return seances;
 }
+
 
 export function buildBdcContext(
   org: OrganismeInfo,
@@ -379,9 +401,16 @@ export function buildBdcContext(
     },
   };
 
+  const seancesParBeneficiaire: Record<string, Seance[]> = {};
+  beneficiaires.forEach((b, i) => {
+    seancesParBeneficiaire[b.id] = buildSeances(base, b, i);
+  });
+
   return {
     organisme,
     beneficiaires,
-    prestation: { ...base, seances: buildSeances(base, beneficiaires[0]) },
+    prestation: { ...base, seances: seancesParBeneficiaire[beneficiaires[0]?.id] || buildSeances(base, beneficiaires[0], 0) },
+    seancesParBeneficiaire,
   };
+
 }

@@ -166,6 +166,26 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
     duplications.length ? `Contenu identique détecté entre ${duplications[0].beneficiaireA} et ${duplications[0].beneficiaireB}. Un auditeur y verra une preuve fabriquée.` : undefined,
     duplications.slice(0, 5).map((d) => `${d.beneficiaireA} / ${d.beneficiaireB} : « ${d.extrait}… »`)));
 
+  // V24 — aucun chevauchement de séances entre bénéficiaires (un seul consultant)
+  const collisionsBenef: string[] = [];
+  const occupe = new Map<string, string>();
+  for (const b of beneficiaires) {
+    for (const s of ctx.seancesParBeneficiaire?.[b.id] || []) {
+      const key = `${fmtDateFR(s.date)} ${s.heureDebut}`;
+      const autre = occupe.get(key);
+      if (autre && autre !== b.id) {
+        collisionsBenef.push(`${key} : ${autre} et ${b.id}`);
+      } else {
+        occupe.set(key, b.id);
+      }
+    }
+  }
+  B.push(r("V24", "Aucun chevauchement de séances entre bénéficiaires", collisionsBenef.length === 0,
+    collisionsBenef.length ? "Deux bénéficiaires ont un entretien à la même date et au même horaire : matériellement impossible pour un consultant unique." : undefined,
+    collisionsBenef.slice(0, 5)));
+
+
+
   /* ---------------- Alertes (orange) ---------------- */
   const A: RegleResultat[] = [];
   A.push(r("A01", "Effectif suffisant pour publier des pourcentages", beneficiaires.length >= 5,
