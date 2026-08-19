@@ -1119,7 +1119,141 @@ Conformément à l'article L.6313-4 du Code du travail, les résultats détaill�
 `;
 }
 
+/** Fiches détaillées par phase réglementaire (1 document par phase). */
+function buildPhaseMd(
+  phase: 1 | 2 | 3,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const orgNom = org.nom || "[Organisme]";
+  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
+  const total = (() => {
+    const m = (formation?.duree || "").trim().match(/(\d+)/);
+    const v = m ? parseInt(m[1], 10) : 24;
+    return v > 0 ? v : 24;
+  })();
+  const hPrelim = Math.max(2, Math.round(total * 0.15));
+  const hConclu = Math.max(2, Math.round(total * 0.20));
+  const hInvest = Math.max(2, total - hPrelim - hConclu);
+
+  const head = (titre: string, duree: number, ref: string) => `**[${orgNom}]{.underline}**
+
+**${titre}**
+
+*Référence réglementaire : ${ref}*
+
+Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
+Durée de la phase : **${duree} heures** (sur un volume total de ${total} heures)
+Consultant référent : ${consultant}
+Modalités : prestation strictement individuelle, en présentiel dans nos locaux et/ou en visioconférence, séances de 2 à 3 heures espacées de 7 à 15 jours.
+
+---
+`;
+
+  if (phase === 1) {
+    return `${head("PHASE 1 — PHASE PRÉLIMINAIRE", hPrelim, "article R.6313-4, 1° du Code du travail")}
+**OBJECTIFS DE LA PHASE**
+
+| **Objectif** | **Résultat attendu** |
+|---|---|
+| Analyser la demande et le besoin du bénéficiaire | Demande reformulée et validée par écrit |
+| Déterminer le format le plus adapté à la situation et au besoin | Format et rythme actés dans le planning individualisé |
+| Définir conjointement les modalités de déroulement du bilan | Convention signée par les deux parties |
+| Informer sur les conditions de déroulement, les méthodes et les techniques utilisées | Attestation d'information et consentement éclairé |
+
+**DÉROULÉ SÉANCE PAR SÉANCE**
+
+| **Séance** | **Durée** | **Contenu** |
+|---|---|---|
+| Entretien préalable (gratuit et sans engagement) | 45 min | Présentation de ${orgNom}, du cadre déontologique et du financement (CPF, plan de développement, autre) |
+| Séance 1 | 2 h | Recueil de la demande, du contexte professionnel et personnel, des attentes ; vérification de l'engagement volontaire |
+| Séance 2 | ${Math.max(1, hPrelim - 2)} h | Co-construction du planning, présentation des outils et tests, signature de la convention, remise du programme |
+
+**OUTILS MOBILISÉS**
+
+Fiche préalable au bilan · Fiche d'analyse de besoin · Test de positionnement · Convention tripartite ou bilatérale · Livret d'accueil du bénéficiaire.
+
+**LIVRABLES REMIS AU BÉNÉFICIAIRE**
+
+Fiche d'analyse de besoin signée · Convention de prestation · Planning individualisé des séances · Programme détaillé des 3 phases.
+
+**ACCESSIBILITÉ ET ADAPTATION**
+
+Les besoins d'adaptation (situation de handicap, contraintes professionnelles ou familiales) sont identifiés dès cette phase et tracés dans le document « Suivi de l'adaptation à l'accompagnement ». Le référent handicap de ${orgNom} est mobilisable à tout moment.
+`;
+  }
+
+  if (phase === 2) {
+    return `${head("PHASE 2 — PHASE D'INVESTIGATION", hInvest, "article R.6313-4, 2° du Code du travail")}
+**OBJECTIFS DE LA PHASE**
+
+| **Objectif** | **Résultat attendu** |
+|---|---|
+| Construire son projet professionnel et en vérifier la pertinence | Projet formalisé et confronté à la réalité du marché |
+| Élaborer une ou plusieurs alternatives | 2 à 3 pistes hiérarchisées |
+| Identifier compétences, aptitudes, valeurs et motivations | Portefeuille de compétences complété |
+| Confronter le projet au marché du travail et à l'offre de formation | Fiches métiers, enquêtes terrain et parcours de formation identifiés |
+
+**DÉROULÉ ÉTAPE PAR ÉTAPE**
+
+| **Étape** | **Contenu** | **Outils** |
+|---|---|---|
+| Étape 1 — Rétrospective | Analyse du parcours, bilan des acquis de l'expérience | Ligne de vie professionnelle, entretien d'explicitation |
+| Étape 2 — Motivations | Diagnostic des ressources motivationnelles, valeurs, intérêts | Test d'intérêts professionnels (RIASEC), questionnaire valeurs |
+| Étape 3 — Compétences | Identification des compétences techniques et transférables | Portefeuille de compétences, référentiels métiers |
+| Étape 4 — Exploration | Exploration métiers, enquêtes terrain, analyse du marché local | France Travail, ONISEP, France Compétences, enquêtes professionnelles |
+| Étape 5 — Aide au choix | Confrontation des pistes, analyse de faisabilité, hiérarchisation | Matrice de décision, entretien de conseil |
+
+**TRAVAIL PERSONNEL GUIDÉ**
+
+Entre chaque séance, des fiches de travail sont remises par le consultant (recherche documentaire, enquête métier, auto-positionnement). Le temps de travail personnel est intégré à la durée de la phase.
+
+**ENTRETIEN INTERMÉDIAIRE**
+
+Un entretien intermédiaire de suivi est réalisé à mi-parcours (le ${dates.dateMiParcours || dates.dateDebut}) afin de vérifier l'adéquation entre le déroulé et les attentes, et d'ajuster si nécessaire le rythme, les outils ou les modalités.
+
+**LIVRABLES REMIS AU BÉNÉFICIAIRE**
+
+Portefeuille de compétences · Restitution écrite des tests · Fiches métiers et comptes rendus d'enquêtes · 2 à 3 pistes professionnelles hiérarchisées · Compte rendu de l'entretien intermédiaire.
+`;
+  }
+
+  return `${head("PHASE 3 — PHASE DE CONCLUSION", hConclu, "article R.6313-4, 3° et article R.6313-7 du Code du travail")}
+**OBJECTIFS DE LA PHASE**
+
+| **Objectif** | **Résultat attendu** |
+|---|---|
+| S'approprier les résultats détaillés de la phase d'investigation | Résultats restitués et validés par le bénéficiaire |
+| Recenser les facteurs favorisant ou non la réalisation du projet | Analyse écrite des leviers et des freins |
+| Prévoir les principales étapes de mise en œuvre du projet | Plan d'action calendaire 6 / 12 / 18 mois |
+
+**DÉROULÉ SÉANCE PAR SÉANCE**
+
+| **Séance** | **Durée** | **Contenu** |
+|---|---|---|
+| Séance de restitution | 2 h | Restitution et appropriation des résultats détaillés, analyse des leviers et des freins (financiers, mobilité, famille, santé) |
+| Séance plan d'action | ${Math.max(1, hConclu - 3)} h | Élaboration du plan d'action chiffré et calendaire, identification des dispositifs de financement et de formation |
+| Séance de clôture | 1 h | Co-rédaction et remise du document de synthèse, évaluation de la satisfaction à chaud, information sur le suivi à 6 mois |
+
+**LIVRABLES REMIS AU BÉNÉFICIAIRE**
+
+**Document de synthèse** (propriété exclusive du bénéficiaire) · Plan d'action personnalisé · Certificat de réalisation · Questionnaire de satisfaction à chaud.
+
+**SUIVI À 6 MOIS** *(hors durée réglementaire — inclus dans la prestation)*
+
+| **Objectif** | **Modalités** | **Livrable** |
+|---|---|---|
+| Évaluer la mise en œuvre effective du plan d'action et apporter un appui complémentaire | Entretien téléphonique ou en face à face, sur rendez-vous, 6 mois après la remise de la synthèse | Compte rendu de suivi à 6 mois§§BR§§Questionnaire de satisfaction à froid |
+
+**CONFIDENTIALITÉ**
+
+Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits au terme d'un an, sauf demande contraire du bénéficiaire.
+`;
+}
+
 const FICHE_PEDA_KEY = "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique";
+
 
 
 function buildFichePedagogiqueMd(
