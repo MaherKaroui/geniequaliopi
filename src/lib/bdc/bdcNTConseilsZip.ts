@@ -2033,6 +2033,48 @@ export function renderBdcNTDocHtml(
   );
 }
 
+/**
+ * Rendu HTML d'une fiche de phase du bilan (1 = préliminaire, 2 = investigation, 3 = conclusion).
+ */
+export function renderBdcNTPhaseHtml(
+  phase: 1 | 2 | 3,
+  org: OrganismeInfo,
+  formation?: FormationInfo,
+  stagiaire?: StagiaireInfo | null,
+): string {
+  const dates = computeDates(stagiaire || undefined, org, formation);
+  const titles: Record<1 | 2 | 3, string> = {
+    1: "Phase 1 — Phase préliminaire",
+    2: "Phase 2 — Phase d'investigation",
+    3: "Phase 3 — Phase de conclusion & suivi à 6 mois",
+  };
+  const body = mdToHtmlBody(buildPhaseMd(phase, org, dates, formation));
+  return htmlWrap(
+    orgHeader(org, titles[phase]) +
+    `<div class="bdc-doc-body">${body}</div>` +
+    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt;table-layout:fixed;word-wrap:break-word}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold;text-align:center}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    docFooter(org)
+  );
+}
+
+/** Rendu HTML du programme global des 3 phases. */
+export function renderBdcNTProgrammePhasesHtml(
+  org: OrganismeInfo,
+  formation?: FormationInfo,
+  stagiaire?: StagiaireInfo | null,
+): string {
+  const dates = computeDates(stagiaire || undefined, org, formation);
+  const body = mdToHtmlBody(buildProgrammePhasesMd(org, dates, formation));
+  return htmlWrap(
+    orgHeader(org, "Programme des 3 phases du bilan de compétences") +
+    `<div class="bdc-doc-body">${body}</div>` +
+    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt;table-layout:fixed}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold;text-align:center}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    docFooter(org)
+  );
+}
+
+
+
 
 /**
  * Convertit un dossier source (ex: "Indicateur 10", "Indicateur 23 & 24 & 25")

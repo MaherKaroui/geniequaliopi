@@ -1324,6 +1324,11 @@ export function buildFullCatalog(
     // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
     add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
+    // Programme réglementaire des 3 phases du bilan (Art. R.6313-4 à R.6313-8)
+    add("bdc_nt_programme_phases", "CT3 - IND 10 Programme des 3 phases du bilan de compétences", 3, 10, "bdc_nt_programme_phases");
+    add("bdc_nt_phase_1", "CT3 - IND 10 Phase 1 – Phase préliminaire", 3, 10, "bdc_nt_phase", { phase: 1 });
+    add("bdc_nt_phase_2", "CT3 - IND 10 Phase 2 – Phase d'investigation", 3, 10, "bdc_nt_phase", { phase: 2 });
+    add("bdc_nt_phase_3", "CT3 - IND 10 Phase 3 – Phase de conclusion & suivi à 6 mois", 3, 10, "bdc_nt_phase", { phase: 3 });
     add("bdc_nt_contacts_handicap", "CT6 - IND 26 Contacts & suivi handicap (Excel)", 6, 26, "bdc_nt_contacts_handicap");
     add("bdc_nt_tableau_dysfonctionnements", "CT7 - IND 31 Tableau d'analyse des appréciations & réclamations (Excel)", 7, 31, "bdc_nt_tableau_dysfonctionnements");
     // Ressources statiques restantes (PDF non générables dynamiquement)
