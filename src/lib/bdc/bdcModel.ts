@@ -86,6 +86,8 @@ export interface BdcContext {
   prestation: Prestation;
   /** Planning propre à chaque bénéficiaire (clé = Beneficiaire.id) — jamais deux plannings identiques. */
   seancesParBeneficiaire: Record<string, Seance[]>;
+  /** Formation d'origine (intitulé, domaine) — sert à contextualiser les contenus. */
+  formation?: FormationInfo;
 }
 
 /** Retourne le planning du bénéficiaire (ou celui de la prestation à défaut). */
@@ -211,8 +213,12 @@ export function formatPrix(o: Organisme, p: Prestation): string {
  * Aucun document ne doit réécrire cette phrase.
  */
 export function formatDuree(p: Prestation): string {
-  return `Durée totale : ${p.dureeTotaleH} heures, dont ${p.dureeEntretiensH} heures d'entretiens individuels avec le consultant et ${p.dureeTravailPersoH} heures de travail personnel du bénéficiaire.`;
+  if (p.dureeTravailPersoH > 0) {
+    return `Durée totale : ${p.dureeTotaleH} heures, dont ${p.dureeEntretiensH} heures d'entretiens individuels avec le consultant et ${p.dureeTravailPersoH} heures de travail personnel du bénéficiaire.`;
+  }
+  return `Durée totale : ${p.dureeTotaleH} heures d'accompagnement individuel avec le consultant (travail personnel non décompté de la durée facturée).`;
 }
+
 
 /** Type de contrat dérivé de l'origine de la demande. */
 export function typeContrat(p: Prestation): { type: "tripartite" | "bipartite"; libelle: string; base: string; delai: string } {
@@ -384,8 +390,10 @@ export function buildBdcContext(
 
   const dureeSaisie = num(formation.duree) || 24;
   const dureeTotaleH = Math.min(24, Math.max(1, dureeSaisie));
-  const dureeEntretiensH = Math.round(dureeTotaleH * 0.75);
-  const dureeTravailPersoH = dureeTotaleH - dureeEntretiensH;
+  // Le planning doit couvrir la totalité des heures vendues (24 h = 24 h de séances),
+  // sinon le dossier affiche 18 h face à une prestation de 24 h.
+  const dureeEntretiensH = dureeTotaleH;
+  const dureeTravailPersoH = 0;
 
   const prixHT = num(s0?.tarifFormation) || num(formation.tarif) || 0;
   const suivi = new Date(fin);
@@ -429,6 +437,7 @@ export function buildBdcContext(
     beneficiaires,
     prestation: { ...base, seances: seancesParBeneficiaire[beneficiaires[0]?.id] || buildSeances(base, beneficiaires[0], 0) },
     seancesParBeneficiaire,
+    formation,
   };
 
 }

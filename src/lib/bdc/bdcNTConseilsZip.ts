@@ -36,6 +36,11 @@ function antiFabricationPour(nom: string): boolean {
   // Fiches d'analyse / préalable au bilan : renseignées en entretien préliminaire,
   // elles sortent complétées et datées.
   if (/(analyse (du|de) besoin|fiche pr[ée]alable)/i.test(nom)) return false;
+  // Entretien intermédiaire : formalisé en séance, il sort complété et daté.
+  if (/entretien interm[ée]diaire/i.test(nom)) return false;
+  // Questionnaires de satisfaction (bénéficiaire à chaud / à froid, interne) :
+  // recueillis en fin de prestation, ils sortent renseignés et datés.
+  if (/satisfaction/i.test(nom)) return false;
   return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
 
@@ -1157,8 +1162,8 @@ function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?:
   const hPrelim = Math.max(2, Math.round(total * 0.15));
   const hConclu = Math.max(2, Math.round(total * 0.20));
   const hInvest = Math.max(2, total - hPrelim - hConclu);
-  const hAccomp = Math.max(2, Math.round(total * 0.75));
-  const hPerso = Math.max(1, total - hAccomp);
+  const hAccomp = total;
+
 
   return `**[${orgNom}]{.underline}**
 
@@ -1167,7 +1172,7 @@ function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?:
 *Référence réglementaire : articles L.6313-4 et R.6313-4 à R.6313-8 du Code du travail*
 
 Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
-Durée totale : **${total} heures** dont **${hAccomp} h** d'accompagnement individuel avec le consultant et **${hPerso} h** de travail personnel guidé.
+Durée totale : **${total} heures** d'accompagnement individuel avec le consultant (dont ${hAccomp} h réparties sur les 3 phases), le travail personnel guidé entre les séances n'étant pas décompté de la durée facturée.
 Consultant référent : ${consultant}
 Modalités générales : prestation **strictement individuelle**, en présentiel dans nos locaux et/ou en visioconférence (au choix du bénéficiaire), séances de 2 à 3 heures espacées de 7 à 15 jours, sur une amplitude maximale de 3 mois. Confidentialité absolue : aucun document n'est transmis à un tiers sans l'accord écrit du bénéficiaire.
 

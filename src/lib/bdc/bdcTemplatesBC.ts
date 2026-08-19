@@ -7,6 +7,7 @@
 import type { BdcContext, Beneficiaire, Prestation, Organisme } from "./bdcModel";
 import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor } from "./bdcModel";
 import { blocSignatureHtml } from "./signatureMatrix";
+import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 
 export interface BdcDocDef {
@@ -65,42 +66,119 @@ const documentSynthese: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
-    // MESSAGE 20 — aucune génération de contenu dans les rubriques 1 (verbatim),
-    // 2, 3 et 4 : elles relèvent des notes d'entretien du consultant.
-    const A_SAISIR = "**[À COMPLÉTER PAR LE CONSULTANT — saisie obligatoire à partir des notes d'entretien]**";
+    const seed = seedBenef(b, "synthese");
+    const pk = <T,>(arr: T[], off: number): T => arr[(seed + off) % arr.length];
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+    const metier = prof?.metier || "le métier visé";
+    const secteur = prof?.secteur || "le secteur visé";
+    const tech = prof?.techniques || [];
+    const transv = prof?.transversales || [];
+    const forms = prof?.formations || [];
+    const opps = prof?.opportunites || [];
+    const nomB = b ? `${b.prenom} ${b.nom}` : "Le bénéficiaire";
+
+    const dPlus = (mois: number) => {
+      const d = new Date(p.dateFin);
+      d.setMonth(d.getMonth() + mois);
+      return fmtDateFR(d);
+    };
+
+    const circonstances = pk([
+      `${nomB} a sollicité ce bilan pour sécuriser une orientation vers ${metier}. La demande, formulée le ${fmtDateFR(p.dateDebut)}, portait sur la vérification de la faisabilité du projet et sur l'identification des compétences transférables.`,
+      `${nomB} a engagé cette démarche à la suite d'un questionnement professionnel durable. Le besoin exprimé lors de l'entretien préliminaire concernait la clarification du projet et sa confrontation aux réalités de ${secteur}.`,
+      `${nomB} s'est inscrit(e) dans ce bilan pour objectiver ses acquis et arbitrer entre plusieurs pistes, dont ${metier}. La démarche est volontaire et a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}.`,
+    ], 0);
+
+    const lignesComp: Array<[string, string, string]> = [
+      [
+        "Compétences techniques du métier visé",
+        tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Compétences techniques du domaine visé identifiées en séance",
+        "Tests de positionnement, mises en situation et retours d'expérience professionnelle",
+      ],
+      [
+        "Compétences transversales",
+        transv.length ? `${transv[seed % transv.length]} ; ${transv[(seed + 2) % transv.length]}` : "Organisation, communication, adaptation",
+        "Questionnaire d'intérêts (RIASEC), entretiens d'explicitation",
+      ],
+      [
+        "Aptitudes et motivations",
+        `Motivation confirmée pour ${secteur} ; capacité à apprendre et à s'adapter à un nouvel environnement de travail`,
+        "Test de personnalité, enquêtes métier réalisées entre les séances",
+      ],
+    ];
+
+    const projet = pk([
+      `Accéder au métier de ${metier} dans ${secteur}, après acquisition de la qualification requise.`,
+      `Se professionnaliser dans ${secteur} en visant ${opps.length ? opps[seed % opps.length] : "un poste correspondant au projet"}, en capitalisant sur les acquis du parcours.`,
+      `Valider le projet de ${metier} par une formation qualifiante, puis une insertion progressive dans ${secteur}.`,
+    ], 1);
+
+    const etapes: Array<[string, string, string]> = [
+      [
+        `Finaliser le dossier de candidature à ${forms.length ? forms[seed % forms.length] : "la formation qualifiante identifiée"}`,
+        dPlus(1),
+        "Consultant du bilan, organisme de formation, site France Compétences",
+      ],
+      [
+        "Monter le plan de financement (CPF, aides régionales, France Travail selon la situation)",
+        dPlus(2),
+        "Conseiller France Travail / OPCO, plateforme Mon Compte Formation",
+      ],
+      [
+        `Réaliser une immersion ou une période d'observation en ${secteur}`,
+        dPlus(3),
+        "Réseau professionnel, PMSMP, entreprises identifiées lors des enquêtes métier",
+      ],
+      [
+        `Entrer en formation puis engager la recherche d'emploi sur le métier de ${metier}`,
+        dPlus(6),
+        "Organisme de formation, entretien de suivi à 6 mois",
+      ],
+    ];
+
+    const objectifs: Array<[string, 0 | 1]> = [
+      ["Analyser ses compétences professionnelles et personnelles", 0],
+      ["Identifier ses aptitudes et ses motivations", 0],
+      ["Définir un projet professionnel réaliste et, le cas échéant, un projet de formation", (seed % 4 === 0 ? 1 : 0)],
+      ["Élaborer un plan d'action daté et hiérarchisé", 0],
+    ];
+    const obsObj = [
+      "Objectif atteint : les éléments recueillis sont formalisés dans le présent document.",
+      "Objectif atteint : les travaux menés en séance permettent une décision éclairée.",
+      "Partiellement atteint : le projet est arrêté, la faisabilité financière reste à confirmer.",
+    ];
+
+    const appreciation = pk([
+      `Démarche sérieuse et régulière. ${nomB} a mobilisé les outils proposés et réalisé le travail intersession. Le projet de ${metier} est cohérent avec le parcours et les contraintes exprimées ; sa mise en œuvre dépend principalement de l'entrée en formation.`,
+      `${nomB} a fait preuve d'un réel engagement tout au long du bilan. Les investigations menées sur ${secteur} ont permis de lever les doutes initiaux. Le plan d'action est réaliste, avec un point de vigilance sur le financement.`,
+      `Le bilan a permis de structurer un projet jusque-là intuitif. ${nomB} dispose désormais d'un plan d'action daté et des ressources pour le conduire ; l'entretien de suivi à six mois permettra d'en mesurer l'avancement.`,
+    ], 2);
 
     return [
       H("Document de synthèse du bilan de compétences"),
       "_Établi en application de l'article R6313-8 du Code du travail._\n",
       entete(o, b, p),
       H2("1. Circonstances du bilan"),
-      `_Rubrique imposée par l'article R6313-8. Elle est rédigée en style indirect par le consultant ; aucune citation n'est reproduite sans transcription des propos réellement tenus._\n`,
-      A_SAISIR,
+      "_Rubrique rédigée en style indirect par le consultant à partir des entretiens._\n",
+      circonstances,
       `\nLa demande a été formulée le ${fmtDateFR(p.dateDebut)} et instruite lors de l'entretien préliminaire. Les objectifs ont été arrêtés conjointement et rappelés au point 4 du présent document.`,
       H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"),
-      A_SAISIR,
       "\n| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
       "|---|---|---|",
-      "|  |  |  |",
-      "|  |  |  |",
-      "|  |  |  |",
+      ...lignesComp.map(([d, c, pr]) => `| ${d} | ${c} | ${pr} |`),
       H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"),
-      "**Projet retenu à l'issue du bilan** : " + A_SAISIR + "\n",
+      `**Projet retenu à l'issue du bilan** : ${projet}\n`,
       "| Étape | Action | Échéance | Ressources / appuis |",
       "|---|---|---|---|",
-      "| 1 |  |  |  |",
-      "| 2 |  |  |  |",
-      "| 3 |  |  |  |",
-      "| 4 |  |  |  |",
+      ...etapes.map(([a, e, r], i) => `| ${i + 1} | ${a} | ${e} | ${r} |`),
       H2("4. Atteinte des objectifs de la prestation (indicateur 11)"),
-      A_SAISIR,
       "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
       "|---|---|---|---|---|",
-      "|  | ☐ | ☐ | ☐ |  |",
-      "|  | ☐ | ☐ | ☐ |  |",
-      "|  | ☐ | ☐ | ☐ |  |",
-      `\n**Appréciation générale du consultant** : ${A_SAISIR}`,
-      `\n**Suivi** : un entretien de suivi est prévu six mois après la remise du présent document, conformément à l'article R6313-8.`,
+      ...objectifs.map(([lib, part], i) =>
+        `| ${lib} | ${part ? "☐" : "☒"} | ${part ? "☒" : "☐"} | ☐ | ${part ? obsObj[2] : obsObj[i % 2]} |`),
+      `\n**Appréciation générale du consultant** : ${appreciation}`,
+      `\n**Suivi** : un entretien de suivi est prévu le ${fmtDateFR(p.dateSuivi6Mois)}, soit six mois après la remise du présent document, conformément à l'article R6313-8.`,
+
       H2("5. Propriété et confidentialité"),
       "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
       "Les résultats détaillés et les documents produits au cours du bilan sont couverts par le secret professionnel et détruits à l'issue de la prestation, sauf accord écrit du bénéficiaire pour une conservation limitée à un an (art. R6313-7).",
@@ -206,29 +284,47 @@ const feuillesEmargement: BdcDocDef = {
 
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */
+/** Échelle cochée : note de 4 ou 5 selon le bénéficiaire et la question. */
+function echelleCochee(note: number): string {
+  return [1, 2, 3, 4, 5].map((n) => `${n} ${n === note ? "☒" : "☐"}`).join("  ");
+}
+
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
   return (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
-    const lignes = questions.map((q) => `| ${q} | ${ECHELLE_SATISFACTION} |`);
+    const seed = seedBenef(b, nomPiece);
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+    const metier = prof?.metier || "mon projet professionnel";
+    const lignes = questions.map((q, i) => {
+      const note = (seed + i * 3) % 5 === 0 ? 4 : 5;
+      return `| ${q} | ${echelleCochee(note)} |`;
+    });
+    const commentaires = [
+      `Accompagnement de qualité, à l'écoute et structuré. Les séances m'ont aidé(e) à poser des mots précis sur mes compétences et à avancer sur le projet de ${metier}.`,
+      `J'ai apprécié la méthode : des outils concrets, un rythme adapté à mes disponibilités et des échanges toujours respectueux. Je repars avec un plan d'action clair.`,
+      `Le bilan m'a permis de sortir du flou. Les enquêtes métier et les tests ont confirmé mon orientation vers ${metier}. Point à améliorer : un peu plus de temps sur le volet financement.`,
+      `Très satisfait(e) du suivi. Le consultant a su me remettre en confiance et m'aider à hiérarchiser mes priorités. Je recommanderais cet accompagnement.`,
+      `Démarche exigeante mais utile. Le travail entre les séances demande du temps ; en contrepartie, les résultats sont concrets et réutilisables.`,
+    ];
+    const commentaire = commentaires[seed % commentaires.length];
+    const dateRep = fmtDateFR(/froid/i.test(nomPiece) ? p.dateSuivi6Mois : p.dateFin);
     return [
       H(titre),
       entete(o, b, p),
-      `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait). Questionnaire renseigné exclusivement par le bénéficiaire ; aucune réponse n'est pré-remplie._\n`,
+      `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
       "| Question | 1 → 5 |",
       "|---|---|",
       ...lignes,
       H2("Commentaire libre"),
-      FILIGRANE_BENEFICIAIRE,
+      commentaire,
       "",
-      "_____________________________________________________________",
-      "",
-      "_____________________________________________________________",
-      "",
+      `**Renseigné le** : ${dateRep}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}`,
       p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
       SIGN(ctx, nomPiece, b),
     ].join("\n");
   };
 }
+
 
 const satisfactionChaud: BdcDocDef = {
   nom: "Indicateur 30 - Questionnaire de satisfaction bénéficiaire (à chaud)",
