@@ -26,8 +26,12 @@ function antiFabricationPour(nom: string): boolean {
   // Les feuilles d'émargement sont des pièces factuelles (dates, horaires, durées,
   // signatures) : elles doivent être complétées et signées, jamais neutralisées.
   if (/[ée]margement/i.test(nom)) return false;
+  // Le document de synthèse est co-rédigé par le consultant à l'issue du bilan :
+  // il est produit rempli (art. R6313-8), personnalisé par bénéficiaire.
+  if (/document de synth[èe]se/i.test(nom)) return false;
   return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
+
 
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import { autofillDocument } from "../autofill";
