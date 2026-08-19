@@ -103,6 +103,20 @@ function heuresFR(h: number): string {
   return min ? `${entier} h ${String(min).padStart(2, "0")}` : `${entier} h`;
 }
 
+/** Clés techniques → libellés accentués destinés aux documents. */
+const LIB_MODALITE: Record<string, string> = {
+  presentiel: "Présentiel",
+  distanciel: "Distanciel synchrone",
+  mixte: "Mixte (présentiel et distanciel)",
+};
+const LIB_CRENEAU: Record<string, string> = {
+  matin: "matin",
+  "apres-midi": "après-midi",
+  soir: "soirée",
+};
+export const libModalite = (m: string): string => LIB_MODALITE[m] ?? m;
+export const libCreneau = (c: string): string => LIB_CRENEAU[c] ?? c;
+
 const feuillesEmargement: BdcDocDef = {
   nom: "Indicateur 11 - Feuilles d'émargement par séance",
   indicateur: 11,
@@ -349,7 +363,7 @@ const livretAccueil: BdcDocDef = {
       "",
       formatDuree(p),
       H2("3. Lieu et modalités"),
-      `**Modalité** : ${p.modalite}  \n**Lieu** : ${p.lieu}`,
+      `**Modalité** : ${libModalite(p.modalite)}  \n**Lieu** : ${p.lieu}`,
       H2("4. Accessibilité et handicap"),
       `Référent handicap : **${o.referentHandicap.nom}** — ${o.referentHandicap.email} — ${o.referentHandicap.telephone}. Toute demande d'adaptation est étudiée avant le démarrage et tracée dans votre dossier.`,
       H2("5. Confidentialité"),
@@ -377,10 +391,10 @@ const planningPrevisionnel: BdcDocDef = {
       H("Planning prévisionnel des séances"),
       "_Annexe au contrat / à la convention de prestation._\n",
       entete(o, b, p),
-      b ? `**Disponibilités déclarées** : ${b.joursDisponibles.join(", ")} — ${b.creneauxDisponibles.join(", ")}\n` : "",
+      b ? `**Disponibilités déclarées** : ${b.joursDisponibles.join(", ")} — ${b.creneauxDisponibles.map(libCreneau).join(", ")}\n` : "",
       "| Séance | Phase | Date | Horaires | Durée | Modalité | Objet |",
       "|---|---|---|---|---|---|---|",
-      ...seancesFor(ctx, b).map((s) => `| ${s.numero} | ${s.phase} | ${fmtDateFR(s.date)} | ${s.heureDebut}–${s.heureFin} | ${s.duree} h | ${s.modalite} | ${s.objet.split("—")[0].trim()} |`),
+      ...seancesFor(ctx, b).map((s) => `| ${s.numero} | ${s.phase} | ${fmtDateFR(s.date)} | ${s.heureDebut}–${s.heureFin} | ${heuresFR(s.duree)} | ${libModalite(s.modalite)} | ${s.objet.split("—")[0].trim()} |`),
       `| **Total entretiens** |  |  |  | **${seancesFor(ctx, b).reduce((a, s) => a + s.duree, 0)} h** |  |  |`,
       "",
       formatDuree(p),
@@ -400,7 +414,7 @@ const infosDistanciel: BdcDocDef = {
     const { organisme: o, prestation: p } = ctx;
     return [
       H("Informations pratiques — déroulement à distance"),
-      `**Modalité de la prestation** : ${p.modalite}`,
+      `**Modalité de la prestation** : ${libModalite(p.modalite)}`,
       H2("1. Plateforme utilisée"),
       "Entretiens en visioconférence synchrone. Un lien nominatif est adressé par courriel avant chaque séance ; il n'est pas partageable.",
       H2("2. Prérequis techniques"),

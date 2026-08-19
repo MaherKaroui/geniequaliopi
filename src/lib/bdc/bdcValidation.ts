@@ -9,7 +9,7 @@ import { fmtDateFR, formatDuree, seancesFor } from "./bdcModel";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import {
   detectDuplication, findMentionsAbrogees, findOrganismesTiers,
-  findUnresolvedMergeFields, findVocabulaireInterdit, type DuplicationHit,
+  findUnresolvedMergeFields, findVocabulaireInterdit, findRegressionsSubstitution, type DuplicationHit,
 } from "./bdcCompliance";
 
 export interface RegleResultat {
@@ -38,6 +38,22 @@ export interface RenduDocuments {
 
 const DAY = 86400000;
 
+/** Prénoms usuellement féminins : sert uniquement à demander une confirmation. */
+const PRENOMS_FEMININS = [
+  "rahma", "fatima", "sabrina", "amina", "sarah", "nadia", "leila", "maria", "sofia",
+  "yasmine", "karima", "samira", "laura", "julie", "marie", "sandrine", "aicha", "khadija",
+  "nawel", "imane", "sonia", "myriam", "hanane", "assia", "linda", "elodie", "camille",
+];
+
+/** Vrai si la civilité retenue contredit vraisemblablement le prénom. */
+function feminiteDouteuse(prenom: string, civilite: string): boolean {
+  const p = (prenom || "").trim().toLowerCase();
+  if (!p) return false;
+  const feminin = PRENOMS_FEMININS.includes(p) || /(a|ia|ah|ine|elle|ette)$/.test(p);
+  return feminin && /^m\.?$/i.test(civilite.trim());
+}
+
+
 function r(code: string, libelle: string, ok: boolean, message?: string, details?: string[]): RegleResultat {
   return { code, libelle, ok, message, details };
 }
@@ -51,25 +67,76 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   const noms = rendu?.noms || (Object.keys(docs).length ? Object.keys(docs) : BDC_TEMPLATES_MANQUANTS.map((d) => d.nom));
   const B: RegleResultat[] = [];
 
+  /* Helpers de lecture du RENDU (MESSAGE 16) : les règles scannent les fichiers
+     réellement produits, pas le modèle en mémoire. */
+  const entries = Object.entries(docs);
+  const datesDansTexte = (txt: string): Date[] =>
+    (txt.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g) || []).map((s) => {
+      const [d, m, y] = s.split("/").map(Number);
+      return new Date(y, m - 1, d);
+    });
+  const fichiersOu = (re: RegExp) => entries.filter(([nom]) => re.test(nom));
+  const joursOuvresEntre = (a: Date, b2: Date) => {
+    let n = 0;
+    const cur = new Date(Math.min(a.getTime(), b2.getTime()));
+    const fin = new Date(Math.max(a.getTime(), b2.getTime()));
+    while (cur <= fin) {
+      const j = cur.getDay();
+      if (j !== 0 && j !== 6) n++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return n;
+  };
+
   // V01
   B.push(r("V01", "Date de fin postérieure à la date de début", p.dateFin >= p.dateDebut, "Date de fin antérieure à la date de début"));
 
-  // V02 — dates de sortie / entrée sur les tableaux (séances)
+  // V02 — ordre ET vraisemblance : N heures ne tiennent pas en moins de N/6 jours ouvrés
   const sortieAvantEntree = p.seances.some((s) => s.heureFin <= s.heureDebut);
-  B.push(r("V02", "Aucune sortie antérieure à l'entrée", !sortieAvantEntree, "Sortie avant entrée"));
+  const joursNecessaires = Math.ceil(p.dureeTotaleH / 6);
+  const joursReels = joursOuvresEntre(p.dateDebut, p.dateFin);
+  const v02Ok = !sortieAvantEntree && p.dateFin >= p.dateDebut && joursReels >= joursNecessaires;
+  B.push(r("V02", "Entrée / sortie dans un ordre et un volume vraisemblables", v02Ok,
+    sortieAvantEntree
+      ? "Sortie avant entrée"
+      : `Une prestation de ${p.dureeTotaleH} h ne peut pas tenir en ${joursReels} jour(s) ouvré(s) : ${joursNecessaires} jours ouvrés au minimum.`));
 
   // V03 — convention signée avant démarrage
   const dateConvention = new Date(p.dateDebut.getTime() - 14 * DAY);
   B.push(r("V03", "Convention signée avant le démarrage", dateConvention <= p.dateDebut, "Convention signée après le démarrage"));
 
-  // V04 — suivi à 6 mois entre J+5 et J+8 mois
+  // V04 — la date ÉCRITE dans le fichier « Suivi à 6 mois »
+  const fichiersSuivi = fichiersOu(/suivi.*6\s*mois|6\s*mois/i);
+  const ecartsSuivi: string[] = [];
+  for (const [nom, txt] of fichiersSuivi) {
+    for (const d of datesDansTexte(txt)) {
+      if (d <= p.dateFin) continue;
+      const mois = (d.getFullYear() - p.dateFin.getFullYear()) * 12 + (d.getMonth() - p.dateFin.getMonth());
+      if (mois < 5 || mois > 8) ecartsSuivi.push(`${nom} : ${fmtDateFR(d)} → ${mois} mois après la fin`);
+    }
+  }
   const moisEcart = (p.dateSuivi6Mois.getFullYear() - p.dateFin.getFullYear()) * 12 + (p.dateSuivi6Mois.getMonth() - p.dateFin.getMonth());
-  B.push(r("V04", "Suivi à 6 mois cohérent (J+5 à J+8 mois)", moisEcart >= 5 && moisEcart <= 8, `Suivi « à 6 mois » incohérent (${moisEcart} mois)`));
+  B.push(r("V04", "Suivi à 6 mois cohérent dans les fichiers (J+5 à J+8 mois)",
+    ecartsSuivi.length === 0 && moisEcart >= 5 && moisEcart <= 8,
+    `Date de suivi « à 6 mois » incohérente dans le rendu`, ecartsSuivi.slice(0, 5)));
 
-  // V05 — relances
+  // V05 — relances écrites dans les fichiers vs statut écrit dans le même fichier
   const today = new Date();
-  const relancesOk = dateConvention <= today;
-  B.push(r("V05", "Aucune relance postérieure à l'action réalisée", relancesOk, "Relance postérieure à l'action déjà réalisée"));
+  const relancesKo: string[] = [];
+  for (const [nom, txt] of entries) {
+    for (const ligne of txt.split("\n")) {
+      if (!/relance/i.test(ligne)) continue;
+      const dates = datesDansTexte(ligne);
+      const realise = /r[ée]alis[ée]|effectu[ée]|clos|soldé/i.test(ligne);
+      for (const d of dates) {
+        if (realise && d > today) relancesKo.push(`${nom} : relance au ${fmtDateFR(d)} sur une action déclarée réalisée`);
+        if (d > p.dateSuivi6Mois) relancesKo.push(`${nom} : relance au ${fmtDateFR(d)} postérieure au suivi à 6 mois`);
+      }
+    }
+  }
+  B.push(r("V05", "Aucune relance postérieure à l'action réalisée", relancesKo.length === 0,
+    "Relance postérieure à l'action déjà réalisée", [...new Set(relancesKo)].slice(0, 5)));
+
 
   // V06
   B.push(r("V06", "Somme des durées cohérente", p.dureeEntretiensH + p.dureeTravailPersoH === p.dureeTotaleH,
@@ -84,15 +151,31 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V08", "Durée légale maximale du bilan respectée (24 h)", p.categorieAction !== "BC" || p.dureeTotaleH <= 24,
     "Durée légale maximale du bilan dépassée (art. R6313-4)"));
 
-  // V09
+  // V09 — disponibilités LUES dans la fiche d'analyse du besoin du bénéficiaire
   const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-  const horsDispo = beneficiaires.flatMap((b) => {
-    const dispo = b.joursDisponibles || [];
-    if (!dispo.length) return [];
-    return seancesFor(ctx, b).filter((s) => !dispo.includes(JOURS[s.date.getDay()] as never));
-  });
-  B.push(r("V09", "Séances programmées dans les disponibilités déclarées", horsDispo.length === 0,
-    "Séance programmée hors disponibilités déclarées", horsDispo.map((s) => `Séance ${s.numero} — ${fmtDateFR(s.date)}`)));
+  const dispoDeclareeDansFiche = (b: { prenom: string; nom: string }): string[] => {
+    const fiche = entries.find(([nom]) =>
+      /analyse (du|de) besoin|analyse des besoins/i.test(nom) && nom.includes(b.nom));
+    if (!fiche) return [];
+    const ligne = fiche[1].split("\n").find((l) => /disponibilit[ée]s d[ée]clar[ée]es/i.test(l));
+    if (!ligne) return [];
+    return JOURS.filter((j) => new RegExp(`\\b${j}\\b`, "i").test(ligne));
+  };
+  const horsDispo: string[] = [];
+  for (const b of beneficiaires) {
+    const declarees = dispoDeclareeDansFiche(b);
+    const reference = declarees.length ? declarees : (b.joursDisponibles || []);
+    if (!reference.length) continue;
+    for (const s of seancesFor(ctx, b)) {
+      const jour = JOURS[s.date.getDay()];
+      if (!reference.includes(jour)) {
+        horsDispo.push(`${b.prenom} ${b.nom} — séance ${s.numero} le ${fmtDateFR(s.date)} (${jour}) hors disponibilités déclarées : ${reference.join(", ")}`);
+      }
+    }
+  }
+  B.push(r("V09", "Séances programmées dans les disponibilités déclarées par le bénéficiaire", horsDispo.length === 0,
+    "Séance programmée hors disponibilités déclarées (élargir la période, jamais les disponibilités)", horsDispo.slice(0, 8)));
+
 
   // V10 — collision d'agenda entre bénéficiaires (même consultant)
   const creneaux = new Map<string, string>();
@@ -112,8 +195,23 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
     const uniques = [...new Set(valeurs.filter(Boolean))];
     return r(code, libelle, uniques.length <= 1, msg, uniques);
   };
-  B.push(coherence("V11", "Civilité cohérente dans tous les documents", "Civilité divergente",
-    beneficiaires.length === 1 ? [beneficiaires[0].civilite] : ["ok"]));
+  // V11 — uniformité ET exactitude de la civilité (une civilité fausse peut être
+  // parfaitement uniforme dans tout le dossier).
+  const civiliteKo: string[] = [];
+  for (const b of beneficiaires) {
+    const attendue = b.civilite;
+    const autre = attendue === "M." ? "Mme" : "M.";
+    for (const [nom, txt] of entries) {
+      const reAutre = new RegExp(`${autre}\\.?\\s+${b.prenom}\\b`, "i");
+      if (reAutre.test(txt)) civiliteKo.push(`${nom} : « ${autre} ${b.prenom} » alors que la fiche indique « ${attendue} »`);
+    }
+    if (feminiteDouteuse(b.prenom, attendue)) {
+      civiliteKo.push(`${b.prenom} ${b.nom} : civilité « ${attendue} » à confirmer manuellement au regard du prénom.`);
+    }
+  }
+  B.push(r("V11", "Civilité uniforme ET exacte dans tous les documents", civiliteKo.length === 0,
+    "Civilité incohérente ou à confirmer", [...new Set(civiliteKo)].slice(0, 8)));
+
   B.push(coherence("V12", "Financeur identique dans toutes les pièces", "Financeur contradictoire", [p.financeur]));
   B.push(coherence("V13", "Origine de la demande identique dans toutes les pièces", "Origine de la demande contradictoire", [p.origineDemande]));
   B.push(coherence("V14", "Niveau d'études identique dans toutes les pièces", "Niveau d'études contradictoire",
@@ -145,12 +243,21 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V18", "Feuilles d'émargement présentes", p.categorieAction !== "BC" || aEmargement,
     "Preuve de réalisation manquante : feuilles d'émargement"));
 
-  // V19 — employeur identifié
-  const employeurOk = p.origineDemande !== "employeur" || beneficiaires.every((b) => !!b.employeur?.raisonSociale);
-  B.push(r("V19", "Employeur identifié dans la convention tripartite", employeurOk, "Employeur non identifié dans une convention tripartite"));
+  // V19 — employeur identifié : sans objet si l'engagement est bipartite
+  const tripartite = p.origineDemande === "employeur";
+  const employeurOk = !tripartite || beneficiaires.every((b) => !!b.employeur?.raisonSociale);
+  B.push(r("V19", tripartite ? "Employeur identifié dans la convention tripartite" : "Employeur identifié — non applicable (contrat bipartite)",
+    employeurOk, "Employeur non identifié dans une convention tripartite",
+    tripartite ? undefined : ["Non applicable : contrat bipartite organisme / bénéficiaire."]));
 
-  // V20 — prix
-  B.push(r("V20", "Prix renseigné dans le contrat", p.prixHT > 0, "Convention sans prix (nulle)"));
+  // V20 — un montant doit être ÉCRIT dans le fichier contrat / convention
+  const fichiersContrat = fichiersOu(/convention|contrat/i);
+  const sansMontant = fichiersContrat
+    .filter(([, txt]) => !/\d[\d\s  ]*(,\d{2})?\s*(€|euros)/i.test(txt))
+    .map(([nom]) => nom);
+  B.push(r("V20", "Montant écrit dans le contrat", p.prixHT > 0 && sansMontant.length === 0,
+    p.prixHT <= 0 ? "Convention sans prix (nulle)" : "Contrat exporté sans montant lisible", sansMontant.slice(0, 5)));
+
 
   // Vocabulaire interdit et mentions abrogées (BLOC 6 / BLOC 5 — bloquants)
   const vocab: string[] = [];
@@ -189,6 +296,15 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V24", "Aucun chevauchement de séances entre bénéficiaires", collisionsBenef.length === 0,
     collisionsBenef.length ? "Deux bénéficiaires ont un entretien à la même date et au même horaire : matériellement impossible pour un consultant unique." : undefined,
     collisionsBenef.slice(0, 5)));
+
+  // V25 — non-régression du dictionnaire de substitution (MESSAGE 17)
+  const regressions: string[] = [];
+  for (const [nom, txt] of entries) {
+    const hits = findRegressionsSubstitution(txt);
+    if (hits.length) regressions.push(`${nom} : ${hits.join(", ")}`);
+  }
+  B.push(r("V25", "Aucune substitution abusive dans les libellés réglementaires", regressions.length === 0,
+    "Libellé réglementaire corrompu par le dictionnaire de substitution", regressions.slice(0, 10)));
 
 
 

@@ -130,8 +130,9 @@ export function genererPlanning(
   const pas = Math.max(1, Math.floor(spanJours / Math.max(1, decoupes.length)));
 
   const seances: Seance[] = [];
+  // La première séance démarre à la date de début déclarée : la différenciation
+  // entre bénéficiaires se fait par le créneau horaire, jamais par un décalage de jour.
   const curseur = new Date(p.dateDebut);
-  curseur.setDate(curseur.getDate() + (rang % 3));
 
   for (let i = 0; i < decoupes.length; i++) {
     const { phase, duree } = decoupes[i];
