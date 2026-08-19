@@ -19,7 +19,7 @@ import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, regionFromCodePostal } from "./bdcModel";
-import { sanitizeBdcMarkdown, isDocumentDeclaratif } from "./bdcCompliance";
+import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
 function antiFabricationPour(nom: string): boolean {
@@ -1506,7 +1506,20 @@ function buildSatisfactionEntrepriseMd(
   const note10 = 8 + ((seed >> 2) % 3);
   const profile = formation ? getBdcDomainProfile(formation) : null;
   const metier = profile?.metier || "le métier visé";
-  const commentaire = `RAS — Nous sommes globalement très satisfaits de l'accompagnement proposé à ${civ} ${s.nom || ""}. Le bilan a permis ${profile ? `de clarifier le projet d'orientation vers ${metier} et ` : ""}de structurer la suite du parcours professionnel. Échanges fluides avec l'organisme de formation.`;
+  // Aucun contenu du projet du bénéficiaire ne peut figurer ici (art. L6313-4) :
+  // l'entreprise n'a pas connaissance du document de synthèse.
+  const commentaire = `RAS — Relation avec l'organisme fluide, informations administratives claires et transmises dans les délais. Aucun point d'insatisfaction à signaler.`;
+
+  // Sans employeur au dossier, la pièce est sans objet : mention de non-applicabilité.
+  if (!entreprise) {
+    return `**QUESTIONNAIRE SATISFACTION\\
+ENTREPRISE**
+
+*${civ} ${nomComplet} a réalisé un bilan de compétences dans le cadre d'une démarche strictement individuelle, du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.*
+
+${mentionStatut("NON_APPLICABLE", { motif: "démarche individuelle : aucun employeur ni commanditaire n'est partie à la prestation", dateConstat: fmtShortDate(fin) })}
+`;
+  }
 
   return `**QUESTIONNAIRE SATISFACTION\\
 ENTREPRISE**
