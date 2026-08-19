@@ -182,7 +182,8 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   }
   B.push(r("V24", "Aucun chevauchement de séances entre bénéficiaires", collisionsBenef.length === 0,
     collisionsBenef.length ? "Deux bénéficiaires ont un entretien à la même date et au même horaire : matériellement impossible pour un consultant unique." : undefined,
-    collisions.slice(0, 5)));
+    collisionsBenef.slice(0, 5)));
+
 
 
   /* ---------------- Alertes (orange) ---------------- */
