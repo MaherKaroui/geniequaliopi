@@ -2154,10 +2154,28 @@ export async function buildBDCNTConseilsZip(
     reporter?.setMessage(msg);
   };
 
+  // BLOC 1 — source unique de vérité + collecte des rendus pour la validation (BLOC 2)
+  const bdcCtx = buildBdcContext(org, formation, benList);
+  const renduParDocument: Record<string, string> = {};
+  const renduParBeneficiaire: Record<string, string[]> = {};
+  const nomsDocuments: string[] = [];
+
+  const collect = (title: string, md: string, s: StagiaireInfo | null) => {
+    const key = s ? `${title} — ${s.prenom} ${s.nom}` : title;
+    renduParDocument[key] = md;
+    nomsDocuments.push(title);
+    if (s) {
+      const id = `${s.prenom} ${s.nom}`;
+      (renduParBeneficiaire[id] ||= []).push(md);
+    }
+  };
+
   // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
+    // BLOCS 3/5/6/9
+    md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC" });
 
     // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
@@ -2169,9 +2187,11 @@ export async function buildBDCNTConseilsZip(
       if (!/<img[^>]+Tampon/i.test(md)) md += tampon;
     }
 
+    collect(title, md, s);
     const html = mdToHtml(md, title, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
     return await htmlToWordBlob(html);
   };
+
 
   for (const key of keys) {
     const folder = key.includes("/") ? key.split("/")[0] : "";
