@@ -211,8 +211,12 @@ export function formatPrix(o: Organisme, p: Prestation): string {
  * Aucun document ne doit réécrire cette phrase.
  */
 export function formatDuree(p: Prestation): string {
-  return `Durée totale : ${p.dureeTotaleH} heures, dont ${p.dureeEntretiensH} heures d'entretiens individuels avec le consultant et ${p.dureeTravailPersoH} heures de travail personnel du bénéficiaire.`;
+  if (p.dureeTravailPersoH > 0) {
+    return `Durée totale : ${p.dureeTotaleH} heures, dont ${p.dureeEntretiensH} heures d'entretiens individuels avec le consultant et ${p.dureeTravailPersoH} heures de travail personnel du bénéficiaire.`;
+  }
+  return `Durée totale : ${p.dureeTotaleH} heures d'accompagnement individuel avec le consultant (travail personnel non décompté de la durée facturée).`;
 }
+
 
 /** Type de contrat dérivé de l'origine de la demande. */
 export function typeContrat(p: Prestation): { type: "tripartite" | "bipartite"; libelle: string; base: string; delai: string } {
