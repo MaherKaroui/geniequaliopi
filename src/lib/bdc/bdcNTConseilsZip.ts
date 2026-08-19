@@ -1979,12 +1979,16 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
 
 
 function buildFooter(org: OrganismeInfo, dates: DatesCtx): string {
+  // La date d'édition est la date réelle de génération du dossier, pas la date
+  // de version de la trame (qui reste affichée séparément).
+  const dateEdition = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const parts = [
     `<strong>${org.nom || ""}</strong>`,
     org.siret ? `SIRET ${org.siret}` : "",
     org.nda ? `NDA ${org.nda}` : "",
     org.version ? `Version ${org.version}` : "",
-    `Édition du ${dates.dateVersion}`,
+    dates.dateVersion ? `Trame du ${dates.dateVersion}` : "",
+    `Édition du ${dateEdition}`,
   ].filter(Boolean);
   return `<div class="footer">${parts.join(" · ")}</div>`;
 }
