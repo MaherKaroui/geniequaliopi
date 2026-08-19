@@ -2301,6 +2301,80 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === BLOC 4 : pièces obligatoires manquantes (document de synthèse, émargements, etc.) ===
+  for (const def of BDC_TEMPLATES_MANQUANTS) {
+    const dossier = `Critere_${critereForIndicateur(def.indicateur)}/Indicateur_${def.indicateur}`;
+    if (def.parBeneficiaire) {
+      for (let i = 0; i < benList.length; i++) {
+        const s = benList[i];
+        const b = bdcCtx.beneficiaires[i] ?? null;
+        advance(`${def.nom} — ${s.prenom} ${s.nom}`);
+        try {
+          const md = sanitizeBdcMarkdown(def.build(bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: false });
+          collect(def.nom, md, s);
+          const dates = computeDates(s, org, formation);
+          const html = mdToHtml(md, def.nom, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
+          zip.file(`${dossier}/Bénéficiaire - ${s.prenom} ${s.nom}/${def.nom}.docx`, await htmlToWordBlob(html));
+        } catch (e) {
+          console.warn("[BDC] template manquant échoué", def.nom, e);
+        }
+      }
+    } else {
+      advance(def.nom);
+      try {
+        const md = sanitizeBdcMarkdown(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: false });
+        collect(def.nom, md, null);
+        const dates = computeDates(benList[0], org, formation);
+        const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
+        zip.file(`${dossier}/${def.nom}.docx`, await htmlToWordBlob(html));
+      } catch (e) {
+        console.warn("[BDC] template manquant échoué", def.nom, e);
+      }
+    }
+  }
+
+  // === BLOC 2 + BLOC 8 : rapport de contrôle de cohérence et couverture des indicateurs ===
+  try {
+    const rapport = validerDossierBDC(bdcCtx, {
+      parDocument: renduParDocument,
+      parBeneficiaire: renduParBeneficiaire,
+      noms: nomsDocuments,
+    });
+    const couverture = calculerCouverture(nomsDocuments);
+    const applicables = couverture.filter((c) => c.statut !== "non_applicable");
+    const lignes: string[] = [
+      "CONTRÔLE DE COHÉRENCE DU DOSSIER — BILAN DE COMPÉTENCES",
+      "=======================================================",
+      `Arrêté au ${fmtDateFR(new Date())}`,
+      `Organisme : ${bdcCtx.organisme.raisonSociale} — SIRET ${bdcCtx.organisme.siret}`,
+      mentionNDA(bdcCtx.organisme),
+      `Bénéficiaires : ${bdcCtx.beneficiaires.length}`,
+      `Nature de l'engagement : ${typeContrat(bdcCtx.prestation).libelle}`,
+      `Financeur : ${bdcCtx.prestation.financeur}`,
+      `Prix : ${formatPrix(bdcCtx.organisme, bdcCtx.prestation)}`,
+      formatDuree(bdcCtx.prestation),
+      "",
+      "RÈGLES BLOQUANTES",
+      "-----------------",
+      ...rapport.bloquantes.map((x) => `[${x.ok ? "OK " : "KO "}] ${x.code} — ${x.libelle}${x.ok ? "" : ` → ${x.message || ""}`}${x.details?.length ? `\n        ${x.details.join("\n        ")}` : ""}`),
+      "",
+      "ALERTES",
+      "-------",
+      ...rapport.alertes.map((x) => `[${x.ok ? "OK " : "!! "}] ${x.code} — ${x.libelle}${x.ok ? "" : ` → ${x.message || ""}`}`),
+      "",
+      "COUVERTURE DES INDICATEURS",
+      "--------------------------",
+      `Indicateurs applicables : ${applicables.length} — non applicables en BC : ${INDICATEURS_NON_APPLICABLES_BC.join(", ")}`,
+      ...couverture.map((c) => `Indicateur ${String(c.indicateur).padStart(2, "0")} (C${c.critere}) : ${c.statut.toUpperCase()}${c.piecesAttendues.length ? ` — attendu : ${c.piecesAttendues.join(" ; ")}` : ""}`),
+      "",
+      `EXPORT ${rapport.exportAutorise ? "CONFORME" : "NON CONFORME — corriger les règles KO ci-dessus"}`,
+    ];
+    zip.file("00_CONTROLE_DE_COHERENCE.txt", lignes.join("\n"));
+  } catch (e) {
+    console.warn("[BDC] rapport de cohérence échoué", e);
+  }
+
+
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
   // STORE + streamFiles : PDF/XLSX déjà compressés → ZIP plus rapide et moins de RAM
