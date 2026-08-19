@@ -726,42 +726,71 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
   if (type === "creation") {
     return [
       [
-        `<a href="https://bpifrance-creation.fr/moment-de-vie/etude-marche">Bpifrance Création</a>`,
+        `<a href="https://bpifrance-creation.fr/moment-de-vie/etude-marche">Bpifrance Création – Étude de marché</a>`,
         "Méthodologie de l'étude de marché pour un porteur de projet",
-        veilleMonthYear(f, 5),
-        "Méthode complète : segmentation, enquête terrain, analyse concurrentielle et dimensionnement du chiffre d'affaires prévisionnel.",
-        "Preuve : guide méthodologique archivé. Action : alimentation de l'exercice « Étude de marché » et de la trame remise aux stagiaires."
+        veilleMonthYear(f, 8),
+        "Méthode complète en quatre temps : analyse du secteur et de ses tendances, segmentation de la clientèle et construction de personas, analyse concurrentielle (directe, indirecte, substituts) puis dimensionnement du chiffre d'affaires prévisionnel selon les méthodes des intentions d'achat, des références et des capacités.",
+        "Preuve : guide méthodologique daté et archivé. Action : refonte de la trame « Étude de marché » remise aux stagiaires et de l'exercice de calcul du CA prévisionnel en trois hypothèses (basse, médiane, haute)."
       ],
       [
         `<a href="https://www.insee.fr/fr/statistiques?theme=25">INSEE – Démographie des entreprises</a>`,
-        "Créations d'entreprises en France : statistiques mensuelles",
+        "Créations d'entreprises en France : statistiques mensuelles et annuelles",
         veilleMonthYear(f, 2),
-        "Volumes de créations par secteur et par région : un repère pour objectiver le potentiel de marché d'un projet.",
-        "Preuve : export des séries INSEE. Action : chiffres intégrés dans le module « Étude de marché » et dans les cas pratiques régionaux."
+        "Volumes de créations par secteur d'activité, par forme juridique et par région, part des micro-entrepreneurs, taux de pérennité à 3 et 5 ans. Ces séries permettent d'objectiver le potentiel d'un marché et de relativiser les hypothèses de chiffre d'affaires d'un créateur.",
+        "Preuve : export des séries INSEE daté. Action : chiffres intégrés dans le module « Étude de marché » et dans les cas pratiques régionaux ; les stagiaires citent au moins une source statistique officielle dans leur dossier de projet."
+      ],
+      [
+        `<a href="https://www.bpifrance-creation.fr/entrepreneur/observatoire-creation-entreprise">Observatoire de la création d'entreprise</a>`,
+        "Profil des créateurs et taux de pérennité des jeunes entreprises",
+        veilleMonthYear(f, 6),
+        "Analyse du profil des créateurs (âge, situation avant création, niveau de formation, apport initial) et des facteurs de pérennité : préparation du projet, accompagnement, montant des fonds propres, expérience du secteur.",
+        "Preuve : étude archivée. Action : séquence d'ouverture « Facteurs de réussite et causes d'échec » appuyée sur des données réelles, et renforcement du volet accompagnement post-création du parcours."
       ],
       [
         `<a href="https://www.initiative-france.fr/">Initiative France</a>`,
         "Prêts d'honneur et accompagnement des créateurs",
-        veilleMonthYear(f, 4),
-        "Réseau d'accompagnement : prêt d'honneur à taux zéro, effet de levier bancaire et parrainage des créateurs.",
-        "Preuve : fiche réseau + contact de la plateforme locale. Action : orientation systématique des stagiaires en fin de parcours (suite de parcours)."
+        veilleMonthYear(f, 5),
+        "Premier réseau associatif de financement des créateurs : prêt d'honneur à taux zéro sans garantie, effet de levier bancaire moyen constaté, parrainage par un chef d'entreprise et suivi sur les trois premières années.",
+        "Preuve : fiche réseau et coordonnées de la plateforme locale. Action : orientation systématique des stagiaires en fin de parcours (suite de parcours) et invitation d'un chargé de mission lors de la dernière séquence."
       ],
       [
         `<a href="https://www.reseau-entreprendre.org/">Réseau Entreprendre</a>`,
-        "Accompagnement des créateurs d'entreprise à potentiel",
+        "Accompagnement des créateurs d'entreprise à potentiel de création d'emplois",
         veilleMonthYear(f, 7),
-        "Critères de sélection, accompagnement par des chefs d'entreprise et financement des projets créateurs d'emplois.",
-        "Preuve : plaquette du réseau archivée. Action : présentation des relais d'accompagnement lors du module « Après la formation »."
+        "Critères de sélection des lauréats, accompagnement individuel par des chefs d'entreprise en activité, prêt d'honneur et intégration à un réseau de pairs pendant deux à trois ans.",
+        "Preuve : plaquette du réseau archivée. Action : présentation des relais d'accompagnement lors du module « Après la formation » et remise d'un annuaire local des réseaux."
+      ],
+      [
+        `<a href="https://www.adie.org/">ADIE – Microcrédit professionnel</a>`,
+        "Financement des créateurs exclus du crédit bancaire classique",
+        veilleMonthYear(f, 4),
+        "Microcrédit professionnel jusqu'à 12 000 €, prêt d'honneur complémentaire et accompagnement gratuit avant et après la création, notamment pour les demandeurs d'emploi et les bénéficiaires de minima sociaux.",
+        "Preuve : conditions d'octroi archivées. Action : ajout d'une fiche « Financer un projet sans apport » au support et orientation des stagiaires concernés vers l'antenne départementale."
       ],
       [
         `<a href="https://www.cci.fr/ressources/creation-entreprise">CCI France</a>`,
-        "Accompagnement CCI : de l'idée à l'immatriculation",
+        "Accompagnement CCI et CMA : de l'idée à l'immatriculation",
         veilleMonthYear(f, 6),
-        "Offre d'accompagnement des chambres consulaires : ateliers, permanences juridiques et suivi post-création.",
-        "Preuve : programme des ateliers CCI. Action : partenariat local mentionné dans le livret d'accueil et le catalogue."
+        "Offre des chambres consulaires : ateliers d'information, permanences juridiques, stage de préparation à l'installation pour les artisans, suivi post-création et mise en relation avec les réseaux économiques locaux.",
+        "Preuve : programme des ateliers CCI/CMA daté. Action : partenariat local mentionné dans le livret d'accueil et le catalogue, calendrier des ateliers remis en fin de formation."
+      ],
+      [
+        `<a href="https://www.francetravail.fr/candidat/mes-droits-aux-aides-et-allocations/creer-ou-reprendre-une-entreprise.html">France Travail – Créer son entreprise</a>`,
+        "Maintien de l'ARE, ARCE et accompagnement des demandeurs d'emploi créateurs",
+        veilleMonthYear(f, 3),
+        "Règles de cumul entre allocation d'aide au retour à l'emploi et revenus d'activité non salariée, alternative du versement en capital (ARCE), obligations déclaratives mensuelles et impact sur la durée d'indemnisation.",
+        "Preuve : fiche France Travail datée. Action : simulation comparative « maintien ARE vs ARCE » ajoutée aux exercices financiers, très attendue par le public demandeur d'emploi du parcours."
+      ],
+      [
+        `<a href="https://www.les-aides.fr/">Les-aides.fr (CCI)</a>`,
+        "Base nationale des aides publiques aux entreprises",
+        veilleMonthYear(f, 2),
+        "Recensement actualisé des dispositifs nationaux, régionaux et locaux mobilisables par les créateurs : subventions, prêts, exonérations, garanties et accompagnements sectoriels.",
+        "Preuve : recherches datées par région et par secteur. Action : mise à jour du tableau des aides remis en formation et exercice de recherche personnalisée par chaque stagiaire sur son propre projet."
       ],
     ];
   }
+
 
   if (type === "fle") {
     return [
@@ -1327,28 +1356,57 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   if (type === "creation") {
     return [...commonDigitalLearning,
       [
-        `<a href="https://formalites.entreprises.gouv.fr/">Guichet unique des formalités</a>`,
+        `<a href="https://formalites.entreprises.gouv.fr/">Guichet unique des formalités (INPI)</a>`,
         "Dématérialisation complète des formalités d'entreprise",
-        veilleMonthYear(f, 5),
-        "Immatriculation, modification et cessation entièrement en ligne : impact direct sur le module « Démarches administratives ».",
-        "Preuve : captures du parcours en ligne. Action : mise à jour des tutoriels pas-à-pas utilisés en atelier."
+        veilleMonthYear(f, 7),
+        "Immatriculation, modification et cessation d'activité s'effectuent intégralement en ligne depuis 2023. Le parcours (rubriques, pièces justificatives, signature électronique, suivi du dossier) évolue régulièrement, ce qui impacte directement le module « Démarches administratives ».",
+        "Preuve : captures datées du parcours en ligne. Action : mise à jour des tutoriels pas-à-pas utilisés en atelier et simulation d'un dépôt de dossier complet en salle, pièces à l'appui."
       ],
       [
-        `<a href="https://www.impots.gouv.fr/professionnel">impots.gouv.fr – Espace professionnel</a>`,
-        "Facturation électronique : calendrier de généralisation",
-        veilleMonthYear(f, 3),
-        "Obligation progressive de réception et d'émission de factures électroniques pour toutes les entreprises assujetties à la TVA.",
-        "Preuve : calendrier officiel archivé. Action : ajout d'une séquence « Facturation électronique et outils de facturation » au support de cours."
+        `<a href="https://www.impots.gouv.fr/professionnel/facturation-electronique">impots.gouv.fr – Facturation électronique</a>`,
+        "Calendrier de généralisation de la facture électronique et choix d'une plateforme (PDP)",
+        veilleMonthYear(f, 5),
+        "Réception obligatoire des factures électroniques pour toutes les entreprises à compter de septembre 2026, émission par étapes jusqu'en septembre 2027 pour les PME et microentreprises, avec transmission via une plateforme de dématérialisation partenaire au format Factur-X, UBL ou CII.",
+        "Preuve : calendrier officiel et liste des PDP immatriculées archivés. Action : séquence « Choisir son outil de facturation compatible e-invoicing » ajoutée au support, avec grille de comparaison des solutions du marché."
       ],
       [
         `<a href="https://bpifrance-creation.fr/boiteaoutils">Bpifrance – Boîte à outils du créateur</a>`,
-        "Outils numériques de business plan et de prévisionnel financier",
+        "Outils numériques de business plan, de prévisionnel financier et de plan de trésorerie",
         veilleMonthYear(f, 6),
-        "Modèles de business plan, simulateurs de charges et tableurs de prévisionnel mis à disposition gratuitement.",
-        "Preuve : modèles téléchargés et datés. Action : trames Excel utilisées pour les exercices de prévisionnel et de plan de trésorerie."
+        "Modèles de business plan, simulateurs de charges sociales, calculateurs de seuil de rentabilité et tableurs de prévisionnel mis à disposition gratuitement et actualisés chaque année avec les barèmes en vigueur.",
+        "Preuve : modèles téléchargés et datés. Action : trames Excel actualisées utilisées pour les exercices de prévisionnel, de plan de financement et de trésorerie sur 12 mois."
+      ],
+      [
+        `<a href="https://www.canva.com/fr_fr/">Canva / Business Model Canvas en ligne</a>`,
+        "Outils collaboratifs de formalisation du modèle économique (BMC, Lean Canvas, pitch deck)",
+        veilleMonthYear(f, 4),
+        "Les outils collaboratifs en ligne (Canva, Miro, Figma Jam) permettent de construire un Business Model Canvas à plusieurs, en présentiel comme à distance, et de produire un pitch deck professionnel sans compétence graphique.",
+        "Preuve : gabarits créés par l'organisme et captures des ateliers. Action : atelier BMC animé sur tableau collaboratif partagé, chaque stagiaire repart avec son canvas exportable en PDF."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/entreprises/intelligence-artificielle-tpe-pme">IA générative appliquée à la création d'entreprise</a>`,
+        "Usage raisonné de l'IA générative pour l'étude de marché, la rédaction et la prospection",
+        veilleMonthYear(f, 3),
+        "Les assistants génératifs sont massivement adoptés par les créateurs pour rédiger des contenus commerciaux, structurer un business plan ou préparer une étude de marché. Leur usage suppose une vigilance sur la fiabilité des sources, la confidentialité des données et la personnalisation des productions.",
+        "Preuve : synthèse interne des usages testés et grille de vigilance. Action : séquence « IA et création d'entreprise » ajoutée au parcours (prompts types, vérification des chiffres, limites juridiques et RGPD)."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/rgpd-par-ou-commencer">CNIL – Outils de conformité pour les TPE</a>`,
+        "Modèles numériques de registre des traitements et de mentions d'information",
+        veilleMonthYear(f, 2),
+        "La CNIL met à disposition des modèles de registre simplifié, des générateurs de mentions légales et des guides sécurité adaptés aux très petites structures et aux sites vitrines de créateurs.",
+        "Preuve : modèles téléchargés et datés. Action : remise d'un kit RGPD prêt à l'emploi aux stagiaires et exercice de remplissage du registre sur leur propre projet."
+      ],
+      [
+        `<a href="https://www.francenum.gouv.fr/">France Num – Transformation numérique des TPE</a>`,
+        "Diagnostic numérique, aides et réseau des activateurs France Num",
+        veilleMonthYear(f, 4),
+        "Plateforme publique dédiée à la numérisation des petites entreprises : diagnostic en ligne, fiches pratiques (site web, référencement local, paiement en ligne, cybersécurité) et annuaire d'experts labellisés.",
+        "Preuve : fiches et diagnostic archivés. Action : intégration du diagnostic France Num en fin de parcours comme plan d'action numérique personnalisé du créateur."
       ],
     ];
   }
+
 
   if (type === "fle") {
     return [...commonDigitalLearning,
@@ -1782,9 +1840,35 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
 
 export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
   const fi = f || { dateDebut: new Date().toISOString().split("T")[0] } as FormationInfo;
+  const type = f ? detectFormationType(f) : ("autre" as FormationType);
+  const specifiques: string[][] = type === "creation" ? [
+    [
+      `<a href="https://www.agefiph.fr/aides-handicap/aide-la-creation-ou-la-reprise-dentreprise">AGEFIPH – Aide à la création d'entreprise</a>`,
+      "Aide forfaitaire à la création ou reprise d'entreprise par une personne en situation de handicap",
+      veilleMonthYear(fi, 3),
+      "Subvention forfaitaire versée au créateur bénéficiaire de l'obligation d'emploi, cumulable avec les autres dispositifs (ACRE, ARCE, microcrédit), conditionnée à un apport en fonds propres et à un accompagnement du projet.",
+      "Preuve : fiche AGEFIPH datée et archivée. Action : information systématique en séquence « Financer son projet » et orientation du référent handicap vers la délégation régionale pour tout stagiaire concerné."
+    ],
+    [
+      `<a href="https://www.handicap.fr/emploi/creation-entreprise">Créateurs en situation de handicap – Accompagnement dédié</a>`,
+      "Réseaux et parcours d'accompagnement des entrepreneurs handicapés (Cap emploi, H'up entrepreneurs)",
+      veilleMonthYear(fi, 5),
+      "Cartographie des relais spécialisés : diagnostic de compatibilité entre la situation de santé et le projet, aménagement du poste de travail indépendant, adaptation du rythme d'activité et soutien par les pairs.",
+      "Preuve : annuaire des relais archivé. Action : ajout d'une fiche « Créer son entreprise en situation de handicap » au livret d'accueil et adaptation du rythme des ateliers (pauses, supports numériques accessibles)."
+    ],
+    [
+      `<a href="https://www.service-public.fr/particuliers/vosdroits/F1650">Cumul AAH et revenus d'activité indépendante</a>`,
+      "Règles de cumul entre l'AAH et les revenus tirés d'une activité non salariée",
+      veilleMonthYear(fi, 4),
+      "Modalités d'abattement et de déclaration trimestrielle des revenus d'activité indépendante pour les bénéficiaires de l'AAH : point déterminant dans le choix du statut juridique et du régime fiscal du créateur.",
+      "Preuve : fiche service-public.fr datée. Action : cas pratique chiffré « choix du statut avec maintien de l'AAH » intégré aux exercices financiers du parcours."
+    ],
+  ] : [];
   return buildDocument({ org: o, title: "Tableau de veille handicap", table: {
     headers: ["Lien", "Nom de l'article / Texte", "Date", "Commentaire – Analyse handicap", "Exploitation de veille (preuve + action Qualiopi)"],
     rows: [
+      ...specifiques,
+
       [
         `<a href="https://www.agefiph.fr/">agefiph.fr</a>`,
         "AGEFIPH – Aides et services pour l'emploi des personnes handicapées",
