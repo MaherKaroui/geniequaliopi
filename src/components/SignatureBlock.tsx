@@ -39,10 +39,15 @@ export default function SignatureBlock({ parties, dateSignature, lieu, avecTampo
               </p>
               {p.image ? (
                 <img src={p.image} alt={`Signature ${p.libelle}`} className="mx-auto my-1 max-h-14 object-contain" />
-              ) : (
-                <div className="my-1 rounded border border-dashed border-destructive p-3 text-center text-[10px] text-destructive">
-                  Signature manquante — {p.libelle}
+              ) : p.nom ? (
+                <div
+                  className="my-1 text-center text-primary"
+                  style={{ fontFamily: "'Brush Script MT','Lucida Handwriting','Segoe Script',cursive", fontSize: 22, lineHeight: 1.1 }}
+                >
+                  {p.nom}
                 </div>
+              ) : (
+                <div className="my-1 h-8 border-b border-border" />
               )}
               <p className="text-center text-[10px] text-muted-foreground">Signé le {dateSignature || p.date}</p>
             </div>
