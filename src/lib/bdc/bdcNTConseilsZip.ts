@@ -2364,6 +2364,19 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === MESSAGE 21 : les 4 classeurs autrefois importés sont désormais produits ===
+  for (const c of BDC_CLASSEURS) {
+    advance(c.name);
+    try {
+      const html = c.build(bdcCtx);
+      zip.file(`Critere_${critereForIndicateur(c.indicateur)}/Indicateur_${c.indicateur}/${c.name}`, htmlToXlsxBlob(html));
+      // MESSAGE 22 : le contrôle de cohérence doit lire aussi les .xlsx
+      collect(c.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
+    } catch (e) {
+      console.warn("[BDC] classeur échoué", c.name, e);
+    }
+  }
+
   // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
   const ind2Folder = mapFolderToCriterePath("Indicateur 2");
   for (const file of BDC_NT_STATS_FILES) {
@@ -2372,10 +2385,12 @@ export async function buildBDCNTConseilsZip(
       const html = file.build(org, formation, benList);
       const blob = htmlToXlsxBlob(html);
       zip.file(`${ind2Folder}/${file.name}`, blob);
+      collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
       console.warn("[BDC NT] stats xlsx failed", file.name, e);
     }
   }
+
 
   // === BLOC 4 : pièces obligatoires manquantes (document de synthèse, émargements, etc.) ===
   for (const def of BDC_TEMPLATES_MANQUANTS) {
