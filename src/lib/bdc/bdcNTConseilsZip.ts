@@ -717,11 +717,11 @@ ${chk(objet === "Identifier des pistes d'évolution")} Identifier des pistes d'�
 | **Contraintes personnelles ou familiales** | ${contraintesP} |
 | **Situation de handicap nécessitant un aménagement** | ${chk(handicap)} Oui · ${chk(!handicap)} Non${handicap ? " — voir process handicap" : ""} |
 
-**7. Analyse du besoin réalisée par le consultant**
+**7. Analyse du besoin exprimée par le bénéficiaire**
 
 **Le besoin exprimé est-il cohérent avec la prestation de bilan de compétences ?** ${chk(true)} Oui · ${chk(false)} Non
 
-**Besoins identifiés :**
+**Besoins identifiés par le bénéficiaire :**
 
 ${chk(true)} Analyse du parcours professionnel
 
@@ -735,7 +735,8 @@ ${chk(besoinValidation)} Validation du projet
 
 ${chk(true)} Élaboration d'un plan d'action
 
-**Commentaires :** ${commentaire}
+**Commentaire du bénéficiaire :** ${commentaireBeneficiaire}
+
 
 **8. Modalités d'accompagnement retenues**
 
