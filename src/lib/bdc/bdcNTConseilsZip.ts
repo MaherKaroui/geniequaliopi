@@ -26,6 +26,7 @@ function antiFabricationPour(nom: string): boolean {
   return isDocumentDeclaratif(nom) || /synth[èe]se|[ée]margement/i.test(nom);
 }
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
+import { autofillDocument } from "../autofill";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
 
 
@@ -2123,7 +2124,7 @@ export function renderBdcTemplateBCHtml(
         ? ctx.beneficiaires.find((b) => b.nom === stagiaire.nom && b.prenom === stagiaire.prenom) || ctx.beneficiaires[0] || null
         : ctx.beneficiaires[0] || null)
     : null;
-  const md = sanitizeBdcMarkdown(def.build(ctx, ben), {
+  const md = sanitizeBdcMarkdown(autofillDocument(def.build(ctx, ben), ctx, ben), {
     titre: def.nom,
     categorieAction: "BC",
     antiFabrication: antiFabricationPour(def.nom),
@@ -2373,7 +2374,7 @@ export async function buildBDCNTConseilsZip(
         const b = bdcCtx.beneficiaires[i] ?? null;
         advance(`${def.nom} — ${s.prenom} ${s.nom}`);
         try {
-          const md = sanitizeBdcMarkdown(def.build(bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+          const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
           collect(def.nom, md, s);
           const dates = computeDates(s, org, formation);
           const html = mdToHtml(md, def.nom, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
@@ -2385,7 +2386,7 @@ export async function buildBDCNTConseilsZip(
     } else {
       advance(def.nom);
       try {
-        const md = sanitizeBdcMarkdown(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
         collect(def.nom, md, null);
         const dates = computeDates(benList[0], org, formation);
         const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");

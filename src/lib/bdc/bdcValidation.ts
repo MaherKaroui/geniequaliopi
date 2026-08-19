@@ -5,7 +5,8 @@
  * Aucune exportation possible tant qu'une règle bloquante échoue.
  */
 import type { BdcContext } from "./bdcModel";
-import { fmtDateFR, formatDuree } from "./bdcModel";
+import { fmtDateFR, formatDuree, seancesFor } from "./bdcModel";
+import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import {
   detectDuplication, findMentionsAbrogees, findOrganismesTiers,
   findUnresolvedMergeFields, findVocabulaireInterdit, type DuplicationHit,
@@ -45,7 +46,9 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   const { organisme: o, prestation: p, beneficiaires } = ctx;
   const docs = rendu?.parDocument || {};
   const textes = Object.values(docs);
-  const noms = rendu?.noms || Object.keys(docs);
+  // Sans rendu fourni (contrôle a priori), les pièces attendues sont celles que
+  // l'export génère systématiquement : on valide leur présence au catalogue.
+  const noms = rendu?.noms || (Object.keys(docs).length ? Object.keys(docs) : BDC_TEMPLATES_MANQUANTS.map((d) => d.nom));
   const B: RegleResultat[] = [];
 
   // V01
@@ -83,8 +86,11 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
 
   // V09
   const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-  const dispo = beneficiaires[0]?.joursDisponibles || [];
-  const horsDispo = dispo.length ? p.seances.filter((s) => !dispo.includes(JOURS[s.date.getDay()] as never)) : [];
+  const horsDispo = beneficiaires.flatMap((b) => {
+    const dispo = b.joursDisponibles || [];
+    if (!dispo.length) return [];
+    return seancesFor(ctx, b).filter((s) => !dispo.includes(JOURS[s.date.getDay()] as never));
+  });
   B.push(r("V09", "Séances programmées dans les disponibilités déclarées", horsDispo.length === 0,
     "Séance programmée hors disponibilités déclarées", horsDispo.map((s) => `Séance ${s.numero} — ${fmtDateFR(s.date)}`)));
 
@@ -92,7 +98,7 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   const creneaux = new Map<string, string>();
   const collisions: string[] = [];
   for (const b of beneficiaires) {
-    for (const s of p.seances) {
+    for (const s of seancesFor(ctx, b)) {
       const key = `${fmtDateFR(s.date)} ${s.heureDebut}`;
       const prev = creneaux.get(key);
       if (prev && prev !== b.id) collisions.push(`${key} : ${prev} / ${b.id}`);

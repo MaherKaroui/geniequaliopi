@@ -13,6 +13,7 @@ import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualio
 import { buildBdcContext, formatDuree, formatPrix, typeContrat, mentionNDA } from "@/lib/bdc/bdcModel";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "@/lib/bdc/bdcValidation";
 import { PIECES_CONTRACTUELLES } from "@/lib/bdc/bdcTemplatesBC";
+import StatutSignatures from "./StatutSignatures";
 
 interface Props {
   open: boolean;
@@ -50,6 +51,10 @@ export default function BdcControleCoherence({ open, onOpenChange, organisme, fo
         </DialogHeader>
 
         <ScrollArea className="max-h-[55vh] pr-4">
+          <section className="mb-5">
+            <StatutSignatures ctx={ctx} />
+          </section>
+
           <section className="mb-5 rounded-md border bg-muted/40 p-3 text-sm">
             <p className="font-medium">{ctx.organisme.raisonSociale}</p>
             <p className="text-muted-foreground">{mentionNDA(ctx.organisme)}</p>
