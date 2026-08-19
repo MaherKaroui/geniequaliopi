@@ -315,17 +315,61 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V25", "Aucune substitution abusive dans les libellés réglementaires", regressions.length === 0,
     "Libellé réglementaire corrompu par le dictionnaire de substitution", regressions.slice(0, 10)));
 
-  // V26 — MESSAGE 20 : les rubriques 2, 3 et 4 du document de synthèse doivent
+  // V26 — MESSAGE 22 : les disponibilités affichées dans le planning doivent être
+  // celles déclarées dans la fiche d'analyse du besoin. Le générateur de planning
+  // lit ces disponibilités en lecture seule : il ne les élargit jamais.
+  const joursDansLigne = (ligne: string) => JOURS.filter((j) => new RegExp(`\\b${j}\\b`, "i").test(ligne));
+  const ligneDispo = (txt: string) => txt.split("\n").find((l) => /disponibilit[ée]s d[ée]clar[ée]es/i.test(l)) || "";
+  const ecartsDispo: string[] = [];
+  for (const b of beneficiaires) {
+    const fiche = entries.find(([nom]) => /analyse (du|de) besoin|analyse des besoins/i.test(nom) && nom.includes(b.nom));
+    const plannings = entries.filter(([nom]) => /planning/i.test(nom) && nom.includes(b.nom));
+    if (!fiche || !plannings.length) continue;
+    const attendus = joursDansLigne(ligneDispo(fiche[1]));
+    if (!attendus.length) continue;
+    for (const [nom, txt] of plannings) {
+      const affiches = joursDansLigne(ligneDispo(txt));
+      if (!affiches.length) continue;
+      const enTrop = affiches.filter((j) => !attendus.includes(j));
+      if (enTrop.length) {
+        ecartsDispo.push(`${nom} : planning affichant ${affiches.join(", ")} alors que la fiche de besoin déclare ${attendus.join(", ")}`);
+      }
+    }
+  }
+  B.push(r("V26", "Disponibilités du planning identiques à celles de la fiche de besoin", ecartsDispo.length === 0,
+    "Les disponibilités déclarées par le bénéficiaire ont été élargies par le générateur de planning : la contrainte doit être respectée, jamais effacée.",
+    ecartsDispo.slice(0, 8)));
+
+  // V27 — MESSAGE 20 : les rubriques 2, 3 et 4 du document de synthèse doivent
   // être renseignées par le consultant. Tant qu'elles portent le marqueur de
   // saisie, l'export est bloqué et le dossier est marqué incomplet.
   const syntheses = fichiersOu(/document de synth[èe]se/i);
   const synthesesVides = syntheses
     .filter(([, txt]) => /À COMPLÉTER PAR LE CONSULTANT/i.test(txt))
     .map(([nom]) => nom);
-  B.push(r("V26", "Document de synthèse renseigné par le consultant",
+  B.push(r("V27", "Document de synthèse renseigné par le consultant",
     syntheses.length === 0 || synthesesVides.length === 0,
     "Les rubriques 2, 3 et 4 du document de synthèse doivent être saisies à partir des notes d'entretien : elles ne peuvent pas être générées.",
     synthesesVides.slice(0, 10)));
+
+  // V28 — MESSAGE 23 : politique de datation. Aucune donnée du dossier ne peut
+  // être postérieure à la date d'édition, et la trame précède la première séance.
+  const edition = new Date();
+  const futures: string[] = [];
+  for (const [nom, txt] of entries) {
+    for (const d of datesDansTexte(txt)) {
+      if (d.getTime() > edition.getTime() && d.getTime() > p.dateFin.getTime()) {
+        // Les échéances prévisionnelles (suivi à 6 mois, destruction) restent licites.
+        if (Math.abs(d.getTime() - p.dateSuivi6Mois.getTime()) < 60 * DAY) continue;
+        futures.push(`${nom} : donnée datée du ${fmtDateFR(d)}, postérieure à l'édition du ${fmtDateFR(edition)}`);
+      }
+    }
+  }
+  B.push(r("V28", "Aucune donnée postérieure à la date d'édition", futures.length === 0,
+    "Une donnée du dossier est postérieure à la date d'édition : un auditeur y verra un antidatage.",
+    [...new Set(futures)].slice(0, 8)));
+
+
 
 
   /* ---------------- Alertes (orange) ---------------- */
