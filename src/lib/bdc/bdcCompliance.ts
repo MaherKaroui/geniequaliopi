@@ -381,11 +381,17 @@ export function findUnresolvedMergeFields(text: string): string[] {
 }
 
 /** Détecte le nom d'un organisme tiers dans un rendu (V16). */
-const ORGANISMES_TIERS = ["NT CONSEILS", "BAKERY SOFYIA", "SELECT FORMATION", "IZIBUSINESS", "FORMAT SPHERE", "VISIONNAIRE INSTITUTE"];
+const ORGANISMES_TIERS = [
+  "NT CONSEILS", "NT CONSEIL", "TRAME NT CONSEILS", "NTCONSEIL",
+  "CONTACT.NTCONSEIL@GMAIL.COM", "PAS A PAS", "PAS À PAS", "FORMALERTE",
+  "BAKERY SOFYIA", "SELECT FORMATION", "IZIBUSINESS", "FORMAT SPHERE", "VISIONNAIRE INSTITUTE",
+];
 export function findOrganismesTiers(text: string, raisonSociale: string): string[] {
   const self = raisonSociale.trim().toUpperCase();
   const up = text.toUpperCase();
-  return ORGANISMES_TIERS.filter((o) => o !== self && up.includes(o));
+  const hits = ORGANISMES_TIERS.filter((o) => !self.includes(o) && o !== self && up.includes(o));
+  // Un nom court déjà couvert par un nom long n'est pas remonté deux fois.
+  return hits.filter((o) => !hits.some((autre) => autre !== o && autre.includes(o)));
 }
 
 /** Détecte le vocabulaire interdit en catégorie BC. */
@@ -398,15 +404,19 @@ export function findVocabulaireInterdit(text: string): string[] {
 export function findMentionsAbrogees(text: string): string[] {
   const hits: string[] = [];
   const checks: Array<[RegExp, string]> = [
-    [/\bCIF\b/, "CIF"], [/\bOPCA\b/, "OPCA"], [/\bFONGECIF\b/i, "FONGECIF"],
-    [/\bOPACIF\b/i, "OPACIF"], [/\bDIF\b/, "DIF"], [/pôle\s*emploi/i, "Pôle emploi"],
+    [/\bCIF\b/, "CIF"], [/congé individuel de formation/i, "congé individuel de formation"],
+    [/\bOPCA\b/, "OPCA"], [/\bFONGECIF\b/i, "FONGECIF"],
+    [/\bOPACIF\b/i, "OPACIF"], [/\bDIF\b(\s+portable)?/, "DIF portable"],
+    [/p[ôo]le\s*emploi/i, "Pôle emploi"],
     [/datadock/i, "Datadock"], [/plan de formation/i, "plan de formation"],
     [/attestation de (présence|fin de formation)/i, "attestation de présence/fin de formation"],
-    [/R\.?\s*6322-/, "articles R6322-*"], [/organisme agréé/i, "organisme agréé"],
+    [/R\.?\s*6322-\d+/, "articles R6322-*"], [/organisme agréé/i, "organisme agréé"],
+    [/92-478/, "décret 92-478"],
   ];
   for (const [re, label] of checks) if (re.test(text)) hits.push(label);
   return hits;
 }
+
 
 /** Contexte non utilisé directement mais exporté pour cohérence de signature. */
 export type { BdcContext };
