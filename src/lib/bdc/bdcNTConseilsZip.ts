@@ -26,6 +26,7 @@ function antiFabricationPour(nom: string): boolean {
   return isDocumentDeclaratif(nom) || /synth[èe]se|[ée]margement/i.test(nom);
 }
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
+import { autofillDocument } from "../autofill";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
 
 
@@ -2123,7 +2124,7 @@ export function renderBdcTemplateBCHtml(
         ? ctx.beneficiaires.find((b) => b.nom === stagiaire.nom && b.prenom === stagiaire.prenom) || ctx.beneficiaires[0] || null
         : ctx.beneficiaires[0] || null)
     : null;
-  const md = sanitizeBdcMarkdown(def.build(ctx, ben), {
+  const md = sanitizeBdcMarkdown(autofillDocument(def.build(ctx, ben), ctx, ben), {
     titre: def.nom,
     categorieAction: "BC",
     antiFabrication: antiFabricationPour(def.nom),
