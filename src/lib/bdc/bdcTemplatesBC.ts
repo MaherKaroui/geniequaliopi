@@ -111,41 +111,57 @@ const feuillesEmargement: BdcDocDef = {
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
     const seances = seancesFor(ctx, b);
+    const aujourdhui = new Date();
     const parts: string[] = [H("Feuilles d'émargement"), entete(o, b, p)];
     parts.push(
       "_Une feuille par séance. Les signatures sont apposées à l'ouverture et à la clôture de la séance ; toute séance non réalisée est portée en « absence » et n'est pas facturée._\n",
     );
     let cumul = 0;
+    let cumulRealise = 0;
     seances.forEach((s, i) => {
       cumul += s.duree;
+      const realisee = s.date.getTime() <= aujourdhui.getTime();
+      if (realisee) cumulRealise += s.duree;
+      const lieu = s.modalite === "distanciel" ? "Visioconférence" : p.lieu || o.ville;
       parts.push(
         H2(`Séance n° ${s.numero} sur ${seances.length} — Phase ${NOM_PHASE[s.phase]}`),
-        "| Date | Horaires | Durée | Modalité | Lieu |",
-        "|---|---|---|---|---|",
-        `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${s.modalite === "distanciel" ? "Visioconférence" : p.lieu || o.ville} |`,
+        "| Date | Horaires | Durée | Modalité | Lieu | Présence |",
+        "|---|---|---|---|---|---|",
+        `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${lieu} | ${realisee ? "Présent(e) ☒  Absent(e) ☐" : "Présent(e) ☐  Absent(e) ☐"} |`,
         "",
         `**Objet de la séance** : ${s.objet}`,
-        `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(cumul)} sur ${heuresFR(p.dureeEntretiensH ?? cumul)} d'entretiens.`,
+        `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(realisee ? cumulRealise : cumul)} sur ${heuresFR(p.dureeEntretiensH ?? seances.reduce((a, x) => a + x.duree, 0))} d'entretiens.`,
         "",
-        blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date }),
+        realisee
+          ? blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date, lieu })
+          : `<div class="bloc-signature" style="margin-top:18px;"><div style="font-size:11px;font-weight:bold;color:#0b2545;margin-bottom:4px;">Signatures — séance à venir</div><table style="border-collapse:collapse;width:100%;"><tr><td style="border:1px solid #94a3b8;padding:8px;width:50%;"><div style="font-size:10.5px;font-weight:bold;color:#0b2545;">Le bénéficiaire</div><div style="border-bottom:1px solid #94a3b8;height:38px;"></div></td><td style="border:1px solid #94a3b8;padding:8px;width:50%;"><div style="font-size:10.5px;font-weight:bold;color:#0b2545;">Le consultant</div><div style="border-bottom:1px solid #94a3b8;height:38px;"></div></td></tr></table></div>`,
         i < seances.length - 1 ? "\n<div style=\"page-break-after:always\"></div>\n" : "",
       );
     });
     parts.push(
       H2("Récapitulatif cumulé des heures réalisées"),
-      "| Séance | Date | Phase | Durée | Cumul |",
-      "|---|---|---|---|---|",
-      ...seances.map((s, i) => {
-        const c = seances.slice(0, i + 1).reduce((a, x) => a + x.duree, 0);
-        return `| ${s.numero} | ${fmtDateFR(s.date)} | ${NOM_PHASE[s.phase]} | ${heuresFR(s.duree)} | ${heuresFR(c)} |`;
-      }),
-      `| **Total** |  |  | **${heuresFR(cumul)}** | **${heuresFR(cumul)}** |`,
+      "| Séance | Date | Phase | Durée | Présence | Cumul réalisé |",
+      "|---|---|---|---|---|---|",
+      ...(() => {
+        let c = 0;
+        return seances.map((s) => {
+          const realisee = s.date.getTime() <= aujourdhui.getTime();
+          if (realisee) c += s.duree;
+          return `| ${s.numero} | ${fmtDateFR(s.date)} | ${NOM_PHASE[s.phase]} | ${heuresFR(s.duree)} | ${realisee ? "Présent(e)" : "À venir"} | ${heuresFR(c)} |`;
+        });
+      })(),
+      `| **Total** |  |  | **${heuresFR(cumul)}** |  | **${heuresFR(cumulRealise)}** |`,
       "",
       formatDuree(p),
+      "",
+      blocSignatureHtml(ctx, "Feuille d'émargement", b, {
+        dateSeance: seances.length ? seances[seances.length - 1].date : undefined,
+      }),
     );
     return parts.join("\n");
   },
 };
+
 
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */

@@ -23,8 +23,12 @@ import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcC
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
 function antiFabricationPour(nom: string): boolean {
-  return isDocumentDeclaratif(nom) || /synth[èe]se|[ée]margement/i.test(nom);
+  // Les feuilles d'émargement sont des pièces factuelles (dates, horaires, durées,
+  // signatures) : elles doivent être complétées et signées, jamais neutralisées.
+  if (/[ée]margement/i.test(nom)) return false;
+  return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
+
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import { autofillDocument } from "../autofill";
 import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
