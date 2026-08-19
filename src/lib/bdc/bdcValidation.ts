@@ -342,7 +342,10 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   const maj = p.dateFin;
   A.push(r("A05", "Dossier actualisé depuis moins de 12 mois", (Date.now() - maj.getTime()) / DAY < 365,
     "Dossier non actualisé depuis plus de 12 mois."));
-  A.push(r("A06", "CV du consultant joint", p.consultant.cvJoint, "Le CV du consultant n'est pas joint au dossier."));
+  // A06 — MESSAGE 22 : la règle porte sur la présence effective du fichier CV.
+  const cvPresent = noms.some((n) => /\bCV\b|curriculum/i.test(n));
+  A.push(r("A06", "CV du consultant joint", cvPresent,
+    "Aucun CV de consultant ne figure dans l'archive exportée."));
   A.push(r("A07", "Phrase de durée unique", true, formatDuree(p)));
 
   const bloquantes = B;
