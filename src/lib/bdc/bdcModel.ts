@@ -76,7 +76,16 @@ export interface BdcContext {
   organisme: Organisme;
   beneficiaires: Beneficiaire[];
   prestation: Prestation;
+  /** Planning propre à chaque bénéficiaire (clé = Beneficiaire.id) — jamais deux plannings identiques. */
+  seancesParBeneficiaire: Record<string, Seance[]>;
 }
+
+/** Retourne le planning du bénéficiaire (ou celui de la prestation à défaut). */
+export function seancesFor(ctx: BdcContext, b?: { id: string } | null): Seance[] {
+  if (b && ctx.seancesParBeneficiaire[b.id]?.length) return ctx.seancesParBeneficiaire[b.id];
+  return ctx.prestation.seances;
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Helpers de parsing / formatage                                      */
