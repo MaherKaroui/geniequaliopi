@@ -51,25 +51,76 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   const noms = rendu?.noms || (Object.keys(docs).length ? Object.keys(docs) : BDC_TEMPLATES_MANQUANTS.map((d) => d.nom));
   const B: RegleResultat[] = [];
 
+  /* Helpers de lecture du RENDU (MESSAGE 16) : les règles scannent les fichiers
+     réellement produits, pas le modèle en mémoire. */
+  const entries = Object.entries(docs);
+  const datesDansTexte = (txt: string): Date[] =>
+    (txt.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g) || []).map((s) => {
+      const [d, m, y] = s.split("/").map(Number);
+      return new Date(y, m - 1, d);
+    });
+  const fichiersOu = (re: RegExp) => entries.filter(([nom]) => re.test(nom));
+  const joursOuvresEntre = (a: Date, b2: Date) => {
+    let n = 0;
+    const cur = new Date(Math.min(a.getTime(), b2.getTime()));
+    const fin = new Date(Math.max(a.getTime(), b2.getTime()));
+    while (cur <= fin) {
+      const j = cur.getDay();
+      if (j !== 0 && j !== 6) n++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return n;
+  };
+
   // V01
   B.push(r("V01", "Date de fin postérieure à la date de début", p.dateFin >= p.dateDebut, "Date de fin antérieure à la date de début"));
 
-  // V02 — dates de sortie / entrée sur les tableaux (séances)
+  // V02 — ordre ET vraisemblance : N heures ne tiennent pas en moins de N/6 jours ouvrés
   const sortieAvantEntree = p.seances.some((s) => s.heureFin <= s.heureDebut);
-  B.push(r("V02", "Aucune sortie antérieure à l'entrée", !sortieAvantEntree, "Sortie avant entrée"));
+  const joursNecessaires = Math.ceil(p.dureeTotaleH / 6);
+  const joursReels = joursOuvresEntre(p.dateDebut, p.dateFin);
+  const v02Ok = !sortieAvantEntree && p.dateFin >= p.dateDebut && joursReels >= joursNecessaires;
+  B.push(r("V02", "Entrée / sortie dans un ordre et un volume vraisemblables", v02Ok,
+    sortieAvantEntree
+      ? "Sortie avant entrée"
+      : `Une prestation de ${p.dureeTotaleH} h ne peut pas tenir en ${joursReels} jour(s) ouvré(s) : ${joursNecessaires} jours ouvrés au minimum.`));
 
   // V03 — convention signée avant démarrage
   const dateConvention = new Date(p.dateDebut.getTime() - 14 * DAY);
   B.push(r("V03", "Convention signée avant le démarrage", dateConvention <= p.dateDebut, "Convention signée après le démarrage"));
 
-  // V04 — suivi à 6 mois entre J+5 et J+8 mois
+  // V04 — la date ÉCRITE dans le fichier « Suivi à 6 mois »
+  const fichiersSuivi = fichiersOu(/suivi.*6\s*mois|6\s*mois/i);
+  const ecartsSuivi: string[] = [];
+  for (const [nom, txt] of fichiersSuivi) {
+    for (const d of datesDansTexte(txt)) {
+      if (d <= p.dateFin) continue;
+      const mois = (d.getFullYear() - p.dateFin.getFullYear()) * 12 + (d.getMonth() - p.dateFin.getMonth());
+      if (mois < 5 || mois > 8) ecartsSuivi.push(`${nom} : ${fmtDateFR(d)} → ${mois} mois après la fin`);
+    }
+  }
   const moisEcart = (p.dateSuivi6Mois.getFullYear() - p.dateFin.getFullYear()) * 12 + (p.dateSuivi6Mois.getMonth() - p.dateFin.getMonth());
-  B.push(r("V04", "Suivi à 6 mois cohérent (J+5 à J+8 mois)", moisEcart >= 5 && moisEcart <= 8, `Suivi « à 6 mois » incohérent (${moisEcart} mois)`));
+  B.push(r("V04", "Suivi à 6 mois cohérent dans les fichiers (J+5 à J+8 mois)",
+    ecartsSuivi.length === 0 && moisEcart >= 5 && moisEcart <= 8,
+    `Date de suivi « à 6 mois » incohérente dans le rendu`, ecartsSuivi.slice(0, 5)));
 
-  // V05 — relances
+  // V05 — relances écrites dans les fichiers vs statut écrit dans le même fichier
   const today = new Date();
-  const relancesOk = dateConvention <= today;
-  B.push(r("V05", "Aucune relance postérieure à l'action réalisée", relancesOk, "Relance postérieure à l'action déjà réalisée"));
+  const relancesKo: string[] = [];
+  for (const [nom, txt] of entries) {
+    for (const ligne of txt.split("\n")) {
+      if (!/relance/i.test(ligne)) continue;
+      const dates = datesDansTexte(ligne);
+      const realise = /r[ée]alis[ée]|effectu[ée]|clos|soldé/i.test(ligne);
+      for (const d of dates) {
+        if (realise && d > today) relancesKo.push(`${nom} : relance au ${fmtDateFR(d)} sur une action déclarée réalisée`);
+        if (d > p.dateSuivi6Mois) relancesKo.push(`${nom} : relance au ${fmtDateFR(d)} postérieure au suivi à 6 mois`);
+      }
+    }
+  }
+  B.push(r("V05", "Aucune relance postérieure à l'action réalisée", relancesKo.length === 0,
+    "Relance postérieure à l'action déjà réalisée", [...new Set(relancesKo)].slice(0, 5)));
+
 
   // V06
   B.push(r("V06", "Somme des durées cohérente", p.dureeEntretiensH + p.dureeTravailPersoH === p.dureeTotaleH,
