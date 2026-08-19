@@ -135,20 +135,23 @@ function celluleHtml(pa: PartieSignature, tampon?: string): string {
   const fond = tampon
     ? `background-image:url('${tampon}');background-repeat:no-repeat;background-position:center;background-size:contain;`
     : "";
+  // MESSAGE 23 — « Signé le » n'apparaît que si une image de signature existe.
   const visuel = pa.image
     ? `<img src="${pa.image}" alt="Signature ${pa.libelle}" style="max-height:58px;max-width:170px;object-fit:contain;display:block;margin:2px auto;" />`
-    : pa.nom
-      ? `<div style="font-family:'Brush Script MT','Lucida Handwriting','Segoe Script',cursive;font-size:22px;color:#1a3a8c;text-align:center;line-height:1.1;padding:10px 4px 6px;">${pa.nom}</div>`
-      : `<div style="border-bottom:1px solid #94a3b8;height:34px;"></div>`;
+    : `<div style="border:1px dashed #b91c1c;color:#b91c1c;font-size:9.5px;text-align:center;padding:12px 4px;">Signature manquante</div>`;
+  const pied = pa.image
+    ? `<div style="font-size:9.5px;color:#475569;text-align:center;margin-top:4px;">Signé le ${pa.date}</div>`
+    : `<div style="font-size:9.5px;color:#475569;text-align:center;margin-top:4px;">Signé le ____/____/________</div>`;
   return (
     `<td style="border:1px solid #94a3b8;padding:8px;vertical-align:top;width:33%;${fond}">` +
     `<div style="font-size:10.5px;font-weight:bold;color:#0b2545;">${pa.libelle}</div>` +
     `<div style="font-size:10px;color:#475569;margin-bottom:4px;">${pa.nom || "—"}${pa.qualite ? ` · ${pa.qualite}` : ""}</div>` +
     visuel +
-    `<div style="font-size:9.5px;color:#475569;text-align:center;margin-top:4px;">Signé le ${pa.date}</div>` +
+    pied +
     `</td>`
   );
 }
+
 
 /**
  * Bloc de signature conforme à la matrice, rendu en HTML brut
