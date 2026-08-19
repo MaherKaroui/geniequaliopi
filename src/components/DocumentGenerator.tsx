@@ -1487,7 +1487,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   return (
     <div className="space-y-4">
+      {isBDCOrg && (
+        <BdcControleCoherence
+          open={bdcControleOpen}
+          onOpenChange={setBdcControleOpen}
+          organisme={mergedOrganisme}
+          formation={selectedFormation}
+          beneficiaires={allStagiaires}
+          onConfirm={runBdcExport}
+        />
+      )}
       <div className="flex items-center justify-between mb-4">
+
         <div>
           <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
           <p className="text-sm text-muted-foreground">
