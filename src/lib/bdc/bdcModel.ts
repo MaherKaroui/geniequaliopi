@@ -384,8 +384,10 @@ export function buildBdcContext(
 
   const dureeSaisie = num(formation.duree) || 24;
   const dureeTotaleH = Math.min(24, Math.max(1, dureeSaisie));
-  const dureeEntretiensH = Math.round(dureeTotaleH * 0.75);
-  const dureeTravailPersoH = dureeTotaleH - dureeEntretiensH;
+  // Le planning doit couvrir la totalité des heures vendues (24 h = 24 h de séances),
+  // sinon le dossier affiche 18 h face à une prestation de 24 h.
+  const dureeEntretiensH = dureeTotaleH;
+  const dureeTravailPersoH = 0;
 
   const prixHT = num(s0?.tarifFormation) || num(formation.tarif) || 0;
   const suivi = new Date(fin);
