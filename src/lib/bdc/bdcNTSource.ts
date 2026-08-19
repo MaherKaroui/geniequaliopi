@@ -3182,9 +3182,7 @@ Le présent règlement intérieur entre en application à compter du {DATE_REGLE
 
 export const BDC_NT_STATIC_ASSETS: { src: string; zipPath: string }[] = [
   { src: '/pdfs/bdc_nt/calendrier_annuel.xlsx', zipPath: 'Indicateur 1/1. Calendrier annuel.xlsx' },
-  { src: '/pdfs/bdc_nt/cahier_contacts_analyse_besoin.xlsx', zipPath: 'Indicateur 4/Indicateur 4 - Cahier de contacts et analyse du besoin.xlsx' },
-  { src: '/pdfs/bdc_nt/suivi_adaptation.xlsx', zipPath: 'Indicateur 10/Indicateur 10 - Suivi de l\'adaptation à l\'accompagnement.xlsx' },
-  { src: '/pdfs/bdc_nt/contacts_suivi_handicap.xlsx', zipPath: 'Indicateur 26/Indicateur 26 - Contacts et suivi handicap.xlsx' },
   { src: '/pdfs/bdc_nt/contacts_agefiph.pdf', zipPath: 'Indicateur 26/Indicateur 26 - Contacts AGEFIPH.pdf' },
-  { src: '/pdfs/bdc_nt/tableau_dysfonctionnements.xlsx', zipPath: 'Indicateur 31 - Tableau des dysfonctionnements.xlsx' },
+  // MESSAGE 21 — les 4 classeurs suivants ne sont plus importés : ils sont
+  // produits par src/lib/bdc/bdcClasseursXlsx.ts à partir du BdcContext.
 ];

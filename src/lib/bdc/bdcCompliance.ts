@@ -20,6 +20,7 @@ import type { BdcContext } from "./bdcModel";
 export const PHRASES_PROTEGEES: string[] = [
   "Mon Compte Formation",
   "formation professionnelle continue",
+  "Formation professionnelle continue",
   "la formation professionnelle",
   "ne vaut pas agrément de l'État",
   "agrément de l'État",
@@ -36,11 +37,28 @@ export const PHRASES_PROTEGEES: string[] = [
   "Exercice des droits",
   "en cours",
   "En cours",
+  "au cours",
+  "Au cours",
   "compte personnel de formation",
   "Compte personnel de formation",
   "certificat de réalisation",
   "Certificat de réalisation",
+  // MESSAGE 23 — libellés corrompus par les substitutions en sous-chaîne
+  "stage d'application",
+  "Stage d'application",
+  "stage pratique",
+  "besoins de formation",
+  "Besoins de formation",
+  "besoin de formation",
+  "formation initiale",
+  "Formation initiale",
+  "mes formations",
+  "mes prestations",
+  "actions de formation",
+  "action de formation",
+  "organisme de formation professionnelle",
 ];
+
 
 const TOKEN = (i: number) => `\u0001PROT${i}\u0001`;
 
@@ -100,8 +118,16 @@ export const CORRECTIONS_SUBSTITUTION: Array<[RegExp, string]> = [
   [/\ben phase de traitement\b/gi, "en cours de traitement"],
   [/Organisme de prestation/g, "Organisme de formation"],
   [/organisme de prestation/g, "organisme de formation"],
-  [/\bmes prestation\b/gi, "mes formations"],
+  [/\bmes prestation\b/gi, "mes prestations"],
   [/\bdéclaration d'activité de l'[ÉE]tat\b/gi, "agrément de l'État"],
+  // MESSAGE 23 — neuf corruptions résiduelles
+  [/(d'un|un|le|du)(\s+)prestation d'application/gi, "$1$2stage d'application"],
+  [/\b(besoins?) de prestation\b/gi, "$1 de formation"],
+
+  [/\bau phase du bilan\b/gi, "au cours du bilan"],
+  [/\bau phase de\b/gi, "au cours de"],
+  [/\bprestation initiale\b/gi, "formation initiale"],
+  [/\balternance ou d'un prestation\b/gi, "alternance ou d'un stage"],
 ];
 
 /** MESSAGE 17 — chaînes interdites après correction (contrôle de non-régression). */
@@ -110,7 +136,11 @@ export const REGRESSIONS_INTERDITES: string[] = [
   "Organisme de prestation", "organisme de prestation", "Handicap prestation",
   "exploration des droits", "En phase ☐", "déclaration d'activité de l'État",
   "mes prestation", "une prestation, une prestation",
+  // MESSAGE 23
+  "prestation d'application", "besoins de prestation", "besoin de prestation",
+  "au phase", "En phase ☐ Soldée", "prestation initiale",
 ];
+
 
 /** Retourne les régressions de substitution présentes dans un texte rendu. */
 export function findRegressionsSubstitution(texte: string): string[] {

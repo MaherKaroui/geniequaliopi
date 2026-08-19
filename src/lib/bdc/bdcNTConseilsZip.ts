@@ -17,6 +17,7 @@ import { BDC_TEMPLATES, renderBdcTemplateIfMapped } from "./bdcTemplateMap";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
+import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, regionFromCodePostal } from "./bdcModel";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
@@ -2203,24 +2204,9 @@ export async function buildBDCNTConseilsZip(
     entreprise: "", poste: "", dateNaissance: "",
   } as StagiaireInfo];
 
-  // README global
-  const totalDocs = keys.length + BDC_NT_STATIC_ASSETS.length;
-  const readme = [
-    "DOSSIER BILAN DE COMPÉTENCES — TRAME NT CONSEILS",
-    "================================================",
-    "",
-    `Organisme : ${org.nom}`,
-    `SIRET : ${org.siret}    NDA : ${org.nda}`,
-    `Bénéficiaires : ${benList.length}`,
-    "",
-    "Structure :",
-    "  - Critere_X / Indicateur_Y / documents collectifs",
-    "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+  // MESSAGE 23 — le LISEZMOI est écrit en fin de génération, avec le décompte
+  // réel des fichiers et le nom de l'organisme du dossier (jamais celui d'un tiers).
 
-    "",
-    `Total documents : ${totalDocs} par bénéficiaire pour les nominatifs.`,
-  ].join("\n");
-  zip.file("LISEZMOI.txt", readme);
 
   let step = 0;
   const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length;
@@ -2364,6 +2350,19 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === MESSAGE 21 : les 4 classeurs autrefois importés sont désormais produits ===
+  for (const c of BDC_CLASSEURS) {
+    advance(c.name);
+    try {
+      const html = c.build(bdcCtx);
+      zip.file(`Critere_${critereForIndicateur(c.indicateur)}/Indicateur_${c.indicateur}/${c.name}`, htmlToXlsxBlob(html));
+      // MESSAGE 22 : le contrôle de cohérence doit lire aussi les .xlsx
+      collect(c.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
+    } catch (e) {
+      console.warn("[BDC] classeur échoué", c.name, e);
+    }
+  }
+
   // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
   const ind2Folder = mapFolderToCriterePath("Indicateur 2");
   for (const file of BDC_NT_STATS_FILES) {
@@ -2372,10 +2371,12 @@ export async function buildBDCNTConseilsZip(
       const html = file.build(org, formation, benList);
       const blob = htmlToXlsxBlob(html);
       zip.file(`${ind2Folder}/${file.name}`, blob);
+      collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
       console.warn("[BDC NT] stats xlsx failed", file.name, e);
     }
   }
+
 
   // === BLOC 4 : pièces obligatoires manquantes (document de synthèse, émargements, etc.) ===
   for (const def of BDC_TEMPLATES_MANQUANTS) {
@@ -2407,6 +2408,33 @@ export async function buildBDCNTConseilsZip(
         console.warn("[BDC] template manquant échoué", def.nom, e);
       }
     }
+  }
+
+  // === LISEZMOI — décompte réel, organisme du dossier (MESSAGE 23) ===
+  {
+    const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((f) => !f.endsWith("/"));
+    const nominatifs = fichiers.filter((f) => /Bénéficiaire - /.test(f)).length;
+    const readme = [
+      `DOSSIER BILAN DE COMPÉTENCES — ${(org.nom || "").toUpperCase()}`,
+      "=".repeat(40),
+      "",
+      `Organisme : ${org.nom}`,
+      `SIRET : ${org.siret}    NDA : ${org.nda}`,
+      `Bénéficiaires : ${benList.length}`,
+      `Édition du ${fmtDateFR(new Date())}`,
+      "",
+      "Structure :",
+      "  - Critere_X / Indicateur_Y / documents collectifs",
+      "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+      "",
+      `Fichiers du dossier : ${fichiers.length + 2}`,
+      `Dont pièces nominatives : ${nominatifs} (${benList.length ? Math.round(nominatifs / benList.length) : 0} par bénéficiaire)`,
+      "",
+      "Le fichier 00_CONTROLE_DE_COHERENCE.txt liste les règles bloquantes et les alertes.",
+      "Aucune donnée du dossier ne doit être postérieure à la date d'édition ci-dessus.",
+    ].join("\n");
+    zip.file("LISEZMOI.txt", readme);
+    collect("LISEZMOI", readme, null);
   }
 
   // === BLOC 2 + BLOC 8 : rapport de contrôle de cohérence et couverture des indicateurs ===
