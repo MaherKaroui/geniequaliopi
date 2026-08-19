@@ -147,38 +147,41 @@ const documentSynthese: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
-    const g = graine(b);
-    const feminin = b?.civilite === "Mme";
-    const acc = (m: string, f: string) => (feminin ? f : m);
-    const circonstances = choisir(CIRCONSTANCES, g);
-    const competences = choisir(COMPETENCES, g, 1);
-    const projet = choisir(PROJETS, g, 2);
-    const objectifs = choisir(OBJECTIFS_BILAN, g, 3);
-    const conclusion = choisir(CONCLUSIONS, g, 4);
-    const coche = (n: 0 | 1 | 2, col: 0 | 1 | 2) => (n === col ? "☒" : "☐");
+    // MESSAGE 20 — aucune génération de contenu dans les rubriques 1 (verbatim),
+    // 2, 3 et 4 : elles relèvent des notes d'entretien du consultant.
+    const A_SAISIR = "**[À COMPLÉTER PAR LE CONSULTANT — saisie obligatoire à partir des notes d'entretien]**";
 
     return [
       H("Document de synthèse du bilan de compétences"),
       "_Établi en application de l'article R6313-8 du Code du travail._\n",
       entete(o, b, p),
       H2("1. Circonstances du bilan"),
-      `_Rubrique imposée par l'article R6313-8, rédigée à partir des éléments exprimés par ${acc("le bénéficiaire", "la bénéficiaire")} lors de la phase préliminaire._\n`,
-      `« ${circonstances} »`,
+      `_Rubrique imposée par l'article R6313-8. Elle est rédigée en style indirect par le consultant ; aucune citation n'est reproduite sans transcription des propos réellement tenus._\n`,
+      A_SAISIR,
       `\nLa demande a été formulée le ${fmtDateFR(p.dateDebut)} et instruite lors de l'entretien préliminaire. Les objectifs ont été arrêtés conjointement et rappelés au point 4 du présent document.`,
       H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"),
-      "| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
+      A_SAISIR,
+      "\n| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
       "|---|---|---|",
-      ...competences.map(([d, c, e]) => `| ${d} | ${c} | ${e} |`),
+      "|  |  |  |",
+      "|  |  |  |",
+      "|  |  |  |",
       H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"),
-      `**Projet retenu à l'issue du bilan** : ${projet.intitule}.\n`,
+      "**Projet retenu à l'issue du bilan** : " + A_SAISIR + "\n",
       "| Étape | Action | Échéance | Ressources / appuis |",
       "|---|---|---|---|",
-      ...projet.etapes.map(([a, ech, res], i) => `| ${i + 1} | ${a} | ${ech} | ${res} |`),
+      "| 1 |  |  |  |",
+      "| 2 |  |  |  |",
+      "| 3 |  |  |  |",
+      "| 4 |  |  |  |",
       H2("4. Atteinte des objectifs de la prestation (indicateur 11)"),
-      "| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
+      A_SAISIR,
+      "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
       "|---|---|---|---|---|",
-      ...objectifs.map(([ob, st, obs]) => `| ${ob} | ${coche(st, 0)} | ${coche(st, 1)} | ${coche(st, 2)} | ${obs} |`),
-      `\n**Appréciation générale du consultant** : ${conclusion}`,
+      "|  | ☐ | ☐ | ☐ |  |",
+      "|  | ☐ | ☐ | ☐ |  |",
+      "|  | ☐ | ☐ | ☐ |  |",
+      `\n**Appréciation générale du consultant** : ${A_SAISIR}`,
       `\n**Suivi** : un entretien de suivi est prévu six mois après la remise du présent document, conformément à l'article R6313-8.`,
       H2("5. Propriété et confidentialité"),
       "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
@@ -188,6 +191,7 @@ const documentSynthese: BdcDocDef = {
     ].join("\n");
   },
 };
+
 
 
 /* ------------------------------------------------------------------ */
