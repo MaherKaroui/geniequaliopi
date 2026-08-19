@@ -2374,7 +2374,7 @@ export async function buildBDCNTConseilsZip(
         const b = bdcCtx.beneficiaires[i] ?? null;
         advance(`${def.nom} — ${s.prenom} ${s.nom}`);
         try {
-          const md = sanitizeBdcMarkdown(def.build(bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+          const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
           collect(def.nom, md, s);
           const dates = computeDates(s, org, formation);
           const html = mdToHtml(md, def.nom, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
@@ -2386,7 +2386,7 @@ export async function buildBDCNTConseilsZip(
     } else {
       advance(def.nom);
       try {
-        const md = sanitizeBdcMarkdown(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
         collect(def.nom, md, null);
         const dates = computeDates(benList[0], org, formation);
         const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
