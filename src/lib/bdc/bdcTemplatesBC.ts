@@ -125,7 +125,7 @@ const feuillesEmargement: BdcDocDef = {
         `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${s.modalite === "distanciel" ? "Visioconférence" : p.lieu || o.ville} |`,
         "",
         `**Objet de la séance** : ${s.objet}`,
-        `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(cumul)} sur ${heuresFR(p.dureeEntretiens ?? cumul)} d'entretiens.`,
+        `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(cumul)} sur ${heuresFR(p.dureeEntretiensH ?? cumul)} d'entretiens.`,
         "",
         blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date }),
         i < seances.length - 1 ? "\n<div style=\"page-break-after:always\"></div>\n" : "",
