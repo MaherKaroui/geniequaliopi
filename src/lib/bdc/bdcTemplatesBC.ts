@@ -158,7 +158,7 @@ const feuillesEmargement: BdcDocDef = {
         H2(`Séance n° ${s.numero} sur ${seances.length} — Phase ${NOM_PHASE[s.phase]}`),
         "| Date | Horaires | Durée | Modalité | Lieu | Présence |",
         "|---|---|---|---|---|---|",
-        `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${lieu} | ${realisee ? "Présent(e) ☒  Absent(e) ☐" : "Présent(e) ☐  Absent(e) ☐"} |`,
+        `| ${fmtDateFR(s.date)} | ${s.heureDebut} – ${s.heureFin} | ${heuresFR(s.duree)} | ${s.modalite === "distanciel" ? "Distanciel synchrone" : "Présentiel"} | ${lieu} | Présent(e) ☐  Absent(e) ☐ |`,
         "",
         `**Objet de la séance** : ${s.objet}`,
         `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(realisee ? cumulRealise : cumul)} sur ${heuresFR(p.dureeEntretiensH ?? seances.reduce((a, x) => a + x.duree, 0))} d'entretiens.`,
