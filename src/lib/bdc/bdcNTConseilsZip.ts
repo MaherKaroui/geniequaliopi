@@ -2410,6 +2410,33 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === LISEZMOI — décompte réel, organisme du dossier (MESSAGE 23) ===
+  {
+    const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((f) => !f.endsWith("/"));
+    const nominatifs = fichiers.filter((f) => /Bénéficiaire - /.test(f)).length;
+    const readme = [
+      `DOSSIER BILAN DE COMPÉTENCES — ${(org.nom || "").toUpperCase()}`,
+      "=".repeat(40),
+      "",
+      `Organisme : ${org.nom}`,
+      `SIRET : ${org.siret}    NDA : ${org.nda}`,
+      `Bénéficiaires : ${benList.length}`,
+      `Édition du ${fmtDateFR(new Date())}`,
+      "",
+      "Structure :",
+      "  - Critere_X / Indicateur_Y / documents collectifs",
+      "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+      "",
+      `Fichiers du dossier : ${fichiers.length + 2}`,
+      `Dont pièces nominatives : ${nominatifs} (${benList.length ? Math.round(nominatifs / benList.length) : 0} par bénéficiaire)`,
+      "",
+      "Le fichier 00_CONTROLE_DE_COHERENCE.txt liste les règles bloquantes et les alertes.",
+      "Aucune donnée du dossier ne doit être postérieure à la date d'édition ci-dessus.",
+    ].join("\n");
+    zip.file("LISEZMOI.txt", readme);
+    collect("LISEZMOI", readme, null);
+  }
+
   // === BLOC 2 + BLOC 8 : rapport de contrôle de cohérence et couverture des indicateurs ===
   try {
     const rapport = validerDossierBDC(bdcCtx, {
