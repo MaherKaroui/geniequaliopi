@@ -839,19 +839,24 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
   };
 
+  const runBdcExport = () => {
+    runJob({
+      label: "Dossier Bilan de compétences",
+      fileName: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
+      autoDownload: true,
+      run: async (reporter) => {
+        return await buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, reporter);
+      },
+    });
+  };
+
   const handleDownloadAll = () => {
-    // BDC : on génère exclusivement le dossier "NT Conseils" (51 docs + 5 trames Excel/PDF)
+    // BDC : contrôle de cohérence obligatoire avant tout export (BLOC 2)
     if (isBDCOrg) {
-      runJob({
-        label: "Dossier Bilan de compétences (NT Conseils)",
-        fileName: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
-        autoDownload: true,
-        run: async (reporter) => {
-          return await buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, reporter);
-        },
-      });
+      setBdcControleOpen(true);
       return;
     }
+
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
       fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
