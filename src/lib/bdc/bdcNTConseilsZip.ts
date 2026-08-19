@@ -631,6 +631,20 @@ function buildFicheAnalyseBesoinMd(
   const amenagements = handicap
     ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
     : "Aucun aménagement spécifique requis à ce jour";
+  const prenomB = (s.prenom || "Le bénéficiaire").trim();
+  const commentaire = pick([
+    `${prenomB} exprime une demande claire, en lien direct avec le champ du bilan de compétences. Le discours est structuré et la démarche volontaire : l'accompagnement portera prioritairement sur la formalisation du projet et la vérification de sa faisabilité.`,
+    `La demande relève bien du bilan de compétences. ${prenomB} a besoin de prendre du recul sur son parcours avant de s'engager : nous privilégierons un travail approfondi sur les intérêts professionnels et les valeurs, puis une confrontation au marché du travail.`,
+    `Besoin identifié : sécuriser une hypothèse de reconversion. ${prenomB} dispose déjà de pistes, mais celles-ci n'ont pas été confrontées à la réalité du terrain. Des enquêtes métier et une étude des parcours de formation seront intégrées au déroulé.`,
+    `${prenomB} se situe dans une logique d'évolution plutôt que de rupture. L'accompagnement s'orientera vers l'identification des compétences transférables et la construction d'arguments mobilisables auprès de l'employeur.`,
+    `La demande est cohérente avec la prestation. Point de vigilance : la contrainte de temps exprimée (${contraintesH.toLowerCase()}) impose de caler un calendrier réaliste dès la première séance et de prévoir des travaux intersessions courts.`,
+    `${prenomB} arrive avec une motivation forte mais des attentes encore larges. Le premier travail consistera à hiérarchiser les priorités et à définir des critères de choix objectifs avant l'exploration des pistes.`,
+    `Démarche réfléchie et mûrie depuis plusieurs mois. ${prenomB} a besoin d'un cadre méthodologique et d'un tiers neutre pour objectiver ses choix : nous appuierons l'accompagnement sur des tests de personnalité et d'intérêts professionnels.`,
+    `Le besoin exprimé relève pleinement du bilan. ${prenomB} manque surtout de visibilité sur les débouchés et les modalités de financement d'une éventuelle formation : un temps spécifique sera consacré à l'ingénierie financière du projet.`,
+  ], seed, 11);
+  const besoinExplo = /reconvers|pistes|projet/i.test(objet);
+  const besoinValidation = !/pistes d'évolution/i.test(objet);
+
 
   return `**FICHE D'ANALYSE DU BESOIN**
 
