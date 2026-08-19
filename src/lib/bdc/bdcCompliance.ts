@@ -322,11 +322,26 @@ function normalizeBlock(s: string): string {
 
 /** Rubriques déclaratives : seules zones où une duplication est suspecte (V23). */
 const RUBRIQUES_DECLARATIVES =
-  /(commentaire|verbatim|réponse|remarque|observation|compte rendu|attentes?|motivation|projet|ressenti|appréciation|analyse du besoin|synthèse de l'entretien)/i;
+  /(commentaire|verbatim|réponse|remarque|observation|compte rendu|attentes?|motivation|projet professionnel|projet retenu|ressenti|appréciation|analyse du besoin|synthèse de l'entretien|compétences et aptitudes identifiées|éléments constitutifs du projet|atteinte des objectifs|plan d'action)/i;
+
+/**
+ * Rubriques du document de synthèse (art. R6313-8) où toute duplication est
+ * rédhibitoire : compétences identifiées, projet et étapes, atteinte des objectifs.
+ */
+const RUBRIQUES_SYNTHESE_CRITIQUES =
+  /^#{1,6}\s*(2|3|4)\.\s|^\*\*?(2|3|4)\.\s/;
 
 /** Titres, en-têtes, clauses types et mentions légales : identiques par nature. */
 const BLOCS_NON_DECLARATIFS =
-  /^(#|\*\*|\||article|clause|conform|le présent|conditions|art\.|organisme|siret|nda|adresse|consultant|bénéficiaire|période|durée|entre les soussignés|signatures?|fait à|version|édition)/i;
+  /^(#|\*\*|\||article|clause|conform|le présent|conditions|art\.|organisme|siret|nda|adresse|consultant|bénéficiaire|période|durée|entre les soussignés|signatures?|fait à|version|édition|_)/i;
+
+/**
+ * Texte de trame légitime, identique par construction d'un dossier à l'autre :
+ * descriptions de phases, objets de séance, clauses types, mentions légales.
+ * Ces blocs ne doivent jamais déclencher V23.
+ */
+const TRAME_LEGITIME =
+  /(cadre déontologique|modalités du bilan|phase préliminaire|phase d'investigation|phase de conclusion|objet de la séance|objectifs de la phase|déroulé de la séance|rubrique imposée|à compléter par le consultant|code du travail|r6313|l6313|secret professionnel|règlement intérieur|conditions générales|protection des données|rgpd|présent document|présente convention|modalités d'accès|délais d'accès|voies de recours|réclamation)/i;
 
 /** Compare les champs déclaratifs entre bénéficiaires : bloc identique > 40 caractères = blocage. */
 export function detectDuplication(docsParBeneficiaire: Record<string, string[]>): DuplicationHit[] {
@@ -336,16 +351,25 @@ export function detectDuplication(docsParBeneficiaire: Record<string, string[]>)
     const set = new Set<string>();
     for (const doc of docsParBeneficiaire[n]) {
       const paras = doc.split(/\n{2,}/);
+      // Rubrique courante : un titre « 2. / 3. / 4. » du document de synthèse
+      // rend déclaratifs tous les blocs qui le suivent jusqu'au titre suivant.
+      let rubriqueCritique = false;
       paras.forEach((para, idx) => {
         const brut = para.trim();
+        if (/^#{1,6}\s|^\*\*\d/.test(brut)) {
+          rubriqueCritique = RUBRIQUES_SYNTHESE_CRITIQUES.test(brut);
+        }
         const norm = normalizeBlock(para);
         if (norm.length <= 40) return;
-        if (BLOCS_NON_DECLARATIFS.test(brut)) return;
         if (/<[a-z]/i.test(brut)) return; // blocs HTML (signatures, tampons)
-        // Le bloc n'est retenu que s'il relève d'une rubrique déclarative :
-        // soit par son propre libellé, soit par le titre qui le précède.
-        const contexte = `${paras[idx - 1] || ""} ${brut}`;
-        if (!RUBRIQUES_DECLARATIVES.test(contexte)) return;
+        if (TRAME_LEGITIME.test(brut)) return; // trame réglementaire, jamais fabriquée
+        if (!rubriqueCritique) {
+          if (BLOCS_NON_DECLARATIFS.test(brut)) return;
+          const contexte = `${paras[idx - 1] || ""} ${brut}`;
+          if (!RUBRIQUES_DECLARATIVES.test(contexte)) return;
+        } else if (/^\|/.test(brut) && !/[a-zà-ÿ]{4}/i.test(brut.replace(/[|\s☐☒-]/g, ""))) {
+          return; // grille vide (uniquement des séparateurs ou des cases)
+        }
         set.add(norm);
       });
     }
@@ -365,6 +389,7 @@ export function detectDuplication(docsParBeneficiaire: Record<string, string[]>)
   }
   return hits;
 }
+
 
 /* ================================================================== */
 /* Pipeline principal                                                  */
