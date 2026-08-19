@@ -36,6 +36,8 @@ function antiFabricationPour(nom: string): boolean {
   // Fiches d'analyse / préalable au bilan : renseignées en entretien préliminaire,
   // elles sortent complétées et datées.
   if (/(analyse (du|de) besoin|fiche pr[ée]alable)/i.test(nom)) return false;
+  // Entretien intermédiaire : formalisé en séance, il sort complété et daté.
+  if (/entretien interm[ée]diaire/i.test(nom)) return false;
   return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
 
