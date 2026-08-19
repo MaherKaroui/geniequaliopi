@@ -2331,7 +2331,18 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === Indicateur 1 : programme de la prestation bilan de compétences (auto selon la formation) ===
+  {
+    const baseName = "Indicateur 1 - Programme du bilan de compétences";
+    advance(baseName);
+    const dates = computeDates(benList[0], org, formation);
+    const md = buildProgrammeBDCMd(org, dates, formation);
+    const blob = await genDocx(md, baseName, null);
+    zip.file(`${mapFolderToCriterePath("Indicateur 1")}/${baseName}.docx`, blob);
+  }
+
   // === Indicateur 10 : programme détaillé des 3 phases du bilan de compétences ===
+
   {
     const baseName = "Indicateur 10 - Programme des 3 phases du bilan de compétences";
     advance(baseName);
