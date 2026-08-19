@@ -632,16 +632,27 @@ function buildFicheAnalyseBesoinMd(
     ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
     : "Aucun aménagement spécifique requis à ce jour";
   const prenomB = (s.prenom || "Le bénéficiaire").trim();
-  const commentaire = pick([
-    `${prenomB} exprime une demande claire, en lien direct avec le champ du bilan de compétences. Le discours est structuré et la démarche volontaire : l'accompagnement portera prioritairement sur la formalisation du projet et la vérification de sa faisabilité.`,
-    `La demande relève bien du bilan de compétences. ${prenomB} a besoin de prendre du recul sur son parcours avant de s'engager : nous privilégierons un travail approfondi sur les intérêts professionnels et les valeurs, puis une confrontation au marché du travail.`,
-    `Besoin identifié : sécuriser une hypothèse de reconversion. ${prenomB} dispose déjà de pistes, mais celles-ci n'ont pas été confrontées à la réalité du terrain. Des enquêtes métier et une étude des parcours de formation seront intégrées au déroulé.`,
-    `${prenomB} se situe dans une logique d'évolution plutôt que de rupture. L'accompagnement s'orientera vers l'identification des compétences transférables et la construction d'arguments mobilisables auprès de l'employeur.`,
-    `La demande est cohérente avec la prestation. Point de vigilance : la contrainte de temps exprimée (${contraintesH.toLowerCase()}) impose de caler un calendrier réaliste dès la première séance et de prévoir des travaux intersessions courts.`,
-    `${prenomB} arrive avec une motivation forte mais des attentes encore larges. Le premier travail consistera à hiérarchiser les priorités et à définir des critères de choix objectifs avant l'exploration des pistes.`,
-    `Démarche réfléchie et mûrie depuis plusieurs mois. ${prenomB} a besoin d'un cadre méthodologique et d'un tiers neutre pour objectiver ses choix : nous appuierons l'accompagnement sur des tests de personnalité et d'intérêts professionnels.`,
-    `Le besoin exprimé relève pleinement du bilan. ${prenomB} manque surtout de visibilité sur les débouchés et les modalités de financement d'une éventuelle formation : un temps spécifique sera consacré à l'ingénierie financière du projet.`,
+  const nomB = (s.nom || "").trim();
+  const civiliteB = s.civilite === "Mme" ? "Mme" : "M.";
+  const jeSuis = s.civilite === "Mme" ? "je suis" : "je suis";
+  const jai = "j'ai";
+  const monProjet = pick([
+    "mon projet professionnel",
+    "ma reconversion",
+    "mon évolution de carrière",
+    "mon orientation professionnelle",
+  ], seed, 12);
+  const commentaireBeneficiaire = pick([
+    `Je viens vers vous parce que ${monProjet} n'est pas encore assez clair. ${jai.charAt(0).toUpperCase() + jai.slice(1)} besoin de poser des mots sur ce que je sais faire et sur ce qui me motive vraiment. Je compte sur cet accompagnement pour m'aider à y voir plus clair et à construire la suite étape par étape.`,
+    `Ce qui m'importe aujourd'hui, c'est de comprendre mon parcours autrement. ${jai.charAt(0).toUpperCase() + jai.slice(1)} acquis de l'expérience, mais je ne sais pas toujours comment la valoriser. Je souhaite identifier mes compétences transférables et trouver des pistes qui me ressemblent.`,
+    `Je ressens le besoin de faire le point. Mon métier actuel ne me satisfait plus complètement et j'aimerais explorer d'autres horizons sans me précipiter. Je veux un projet réaliste, construit avec du recul et de la méthode.`,
+    `J'ai déjà une idée de la direction à prendre, mais il me manque la confiance et les arguments pour avancer sereinement. Je compte sur ce bilan pour objectiver mon projet et vérifier qu'il est bien en phase avec le marché et mes contraintes.`,
+    `Pour moi, ce bilan est une opportunité de prendre du temps pour moi. Entre le travail et les obligations personnelles, je n'ai pas eu le temps de réfléchir vraiment. Je veux repartir avec un plan d'action concret et des décisions éclairées.`,
+    `Je suis prêt(e) à m'investir dans une démarche structurée. Ce que j'attends surtout, c'est un cadre bienveillant qui me permette d'explorer librement, de tester mes idées et d'obtenir un retour honnête sur mes hypothèses.`,
+    `J'ai longtemps repoussé cette démarche par manque de temps. Aujourd'hui, je suis décidé(e) à avancer. Je veux comprendre quels métiers correspondent à mon profil et quels sont les financements ou les formations possibles pour y parvenir.`,
+    `Mon objectif est simple : ne plus avancer à tâtons. Je veux que mon projet soit clair, motivant et réaliste. ${jai.charAt(0).toUpperCase() + jai.slice(1)} hâte de commencer ce travail et de bénéficier de votre regard extérieur pour avancer sereinement.`,
   ], seed, 11);
+
   const besoinExplo = /reconvers|pistes|projet/i.test(objet);
   const besoinValidation = !/pistes d'évolution/i.test(objet);
 
