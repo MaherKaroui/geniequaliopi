@@ -1046,7 +1046,81 @@ ${attentes}
 `, s.civilite);
 }
 
+/** Programme détaillé des 3 phases réglementaires du bilan (art. R.6313-4 à R.6313-8 du Code du travail). */
+function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string {
+  const orgNom = org.nom || "[Organisme]";
+  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
+  const dureeStr = (formation?.duree || "").trim();
+  const total = (() => {
+    const m = dureeStr.match(/(\d+)/);
+    const v = m ? parseInt(m[1], 10) : 24;
+    return v > 0 ? v : 24;
+  })();
+  const hPrelim = Math.max(2, Math.round(total * 0.15));
+  const hConclu = Math.max(2, Math.round(total * 0.20));
+  const hInvest = Math.max(2, total - hPrelim - hConclu);
+  const hAccomp = Math.max(2, Math.round(total * 0.75));
+  const hPerso = Math.max(1, total - hAccomp);
+
+  return `**[${orgNom}]{.underline}**
+
+**PROGRAMME DÉTAILLÉ DU BILAN DE COMPÉTENCES — LES 3 PHASES**
+
+*Référence réglementaire : articles L.6313-4 et R.6313-4 à R.6313-8 du Code du travail*
+
+Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
+Durée totale : **${total} heures** dont **${hAccomp} h** d'accompagnement individuel avec le consultant et **${hPerso} h** de travail personnel guidé.
+Consultant référent : ${consultant}
+Modalités générales : prestation **strictement individuelle**, en présentiel dans nos locaux et/ou en visioconférence (au choix du bénéficiaire), séances de 2 à 3 heures espacées de 7 à 15 jours, sur une amplitude maximale de 3 mois. Confidentialité absolue : aucun document n'est transmis à un tiers sans l'accord écrit du bénéficiaire.
+
+---
+
+**PHASE 1 — PHASE PRÉLIMINAIRE** *(${hPrelim} heures — soit environ ${Math.max(1, Math.round(hPrelim / 2))} séance(s))*
+
+| **Objectifs (art. R.6313-4)** | **Contenu / Déroulé** | **Modalités & outils** | **Livrables** |
+|---|---|---|---|
+| • Analyser la demande et le besoin du bénéficiaire§§BR§§• Déterminer le format le plus adapté à la situation et au besoin§§BR§§• Définir conjointement les modalités de déroulement du bilan§§BR§§• Informer sur les conditions de déroulement, méthodes et techniques utilisées | • Accueil, présentation de l'organisme et du cadre déontologique§§BR§§• Recueil de la demande, du contexte et des attentes§§BR§§• Vérification de l'engagement et du consentement§§BR§§• Co-construction du planning des séances§§BR§§• Information sur le financement (CPF, plan de développement, autre) | Entretien individuel en face à face ou visio (1 à 2 séances de 2 h)§§BR§§Fiche préalable au bilan§§BR§§Fiche d'analyse de besoin§§BR§§Test de positionnement§§BR§§Convention tripartite ou bilatérale | Fiche d'analyse de besoin signée§§BR§§Convention de prestation§§BR§§Planning individualisé des séances |
+
+---
+
+**PHASE 2 — PHASE D'INVESTIGATION** *(${hInvest} heures — accompagnement + travail personnel)*
+
+| **Objectifs (art. R.6313-4)** | **Contenu / Déroulé** | **Modalités & outils** | **Livrables** |
+|---|---|---|---|
+| • Construire son projet professionnel et en vérifier la pertinence§§BR§§• Élaborer une ou plusieurs alternatives§§BR§§• Identifier ses compétences, aptitudes et motivations§§BR§• Confronter le projet au marché du travail | **Étape 1 :** rétrospective du parcours, bilan des acquis§§BR§§**Étape 2 :** diagnostic des ressources motivationnelles, valeurs, intérêts§§BR§§**Étape 3 :** portefeuille de compétences et compétences transférables§§BR§§**Étape 4 :** exploration métiers, enquêtes terrain, analyse du marché§§BR§§**Étape 5 :** aide au choix, hiérarchisation de 2 à 3 pistes | Entretiens individuels d'explicitation et de conseil§§BR§§Tests d'intérêts professionnels (RIASEC)§§BR§§Test de personnalité (type MBTI)§§BR§§Questionnaires valeurs / motivations§§BR§§Recherche documentaire (France Travail, ONISEP, France Compétences)§§BR§§Enquêtes métier auprès de professionnels§§BR§§Travail personnel entre les séances (fiches remises par le consultant) | Portefeuille de compétences§§BR§§Restitution écrite des tests§§BR§§Fiches métiers et comptes rendus d'enquêtes§§BR§§2 à 3 pistes professionnelles hiérarchisées§§BR§§Entretien intermédiaire formalisé |
+
+*Un entretien intermédiaire de suivi est réalisé à mi-parcours (le ${dates.dateMiParcours || dates.dateDebut}) afin de vérifier l'adéquation entre le déroulé et les attentes, et d'adapter si nécessaire le rythme, les outils ou les modalités.*
+
+---
+
+**PHASE 3 — PHASE DE CONCLUSION** *(${hConclu} heures)*
+
+| **Objectifs (art. R.6313-4)** | **Contenu / Déroulé** | **Modalités & outils** | **Livrables** |
+|---|---|---|---|
+| • S'approprier les résultats détaillés de la phase d'investigation§§BR§§• Recenser les facteurs favorisant ou non la réalisation du projet§§BR§§• Prévoir les principales étapes de mise en œuvre du projet | • Restitution et appropriation des résultats§§BR§§• Analyse des leviers et des freins (financiers, familiaux, mobilité, santé)§§BR§§• Élaboration du plan d'action chiffré et calendaire (6 / 12 / 18 mois)§§BR§§• Co-rédaction et remise du document de synthèse§§BR§§• Évaluation de la satisfaction à chaud | Entretiens individuels de conseil§§BR§§Plan d'action personnalisé§§BR§§Document de synthèse co-rédigé§§BR§§Questionnaire de satisfaction | **Document de synthèse** (propriété exclusive du bénéficiaire)§§BR§§Plan d'action§§BR§§Certificat de réalisation§§BR§§Questionnaire de satisfaction à chaud |
+
+---
+
+**SUIVI À 6 MOIS** *(hors durée réglementaire — inclus dans la prestation)*
+
+| **Objectif** | **Modalités** | **Livrable** |
+|---|---|---|
+| Évaluer la mise en œuvre effective du plan d'action et apporter un appui complémentaire | Entretien téléphonique ou en face à face, sur rendez-vous, 6 mois après la remise de la synthèse | Compte rendu de suivi à 6 mois§§BR§§Questionnaire de satisfaction à froid |
+
+---
+
+**ADAPTATION ET ACCESSIBILITÉ**
+
+Le déroulé, le rythme, la durée des séances et les supports sont adaptés à la situation de chaque bénéficiaire (contraintes professionnelles, familiales, situation de handicap). Toute adaptation est tracée dans le document « Suivi de l'adaptation à l'accompagnement ». Le référent handicap de ${orgNom} est mobilisable à tout moment de la prestation.
+
+**CONFIDENTIALITÉ**
+
+Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits au terme d'un an, sauf demande contraire du bénéficiaire.
+`;
+}
+
 const FICHE_PEDA_KEY = "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique";
+
 
 function buildFichePedagogiqueMd(
   s: StagiaireInfo,
