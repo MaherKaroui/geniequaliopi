@@ -191,9 +191,20 @@ const documentSynthese: BdcDocDef = {
       "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
       "|---|---|---|---|---|",
       ...objectifs.map(([lib, part], i) =>
-        `| ${lib} | ${part ? "☐" : "☒"} | ${part ? "☒" : "☐"} | ☐ | ${part ? obsObj[2] : obsObj[i % 2]} |`),
+        `| ${lib} | ${part ? "☐" : "☒"} | ${part ? "☒" : "☐"} | ☐ | ${part ? obsObj[2] : obsObj[[0, 1, 3][i % 3]]} |`),
+      "\n**Indicateurs de réalisation de la prestation**\n",
+      "| Indicateur | Constat |",
+      "|---|---|",
+      ...indicateursReal.map(([k, v]) => `| ${k} | ${v} |`),
+      `\n**Niveau d'atteinte global** : ${niveauGlobal}`,
       `\n**Appréciation générale du consultant** : ${appreciation}`,
+      `\n**Suites données** : ${pk([
+        `Entrée en formation visée pour ${dPlus(3)}, puis recherche d'emploi sur ${metier}.`,
+        `Dépôt du dossier de financement engagé ; démarrage du parcours envisagé à compter du ${dPlus(2)}.`,
+        `Poursuite des démarches de manière autonome, avec un point d'étape au ${dPlus(3)}.`,
+      ], 4)}`,
       `\n**Suivi** : un entretien de suivi est prévu le ${fmtDateFR(p.dateSuivi6Mois)}, soit six mois après la remise du présent document, conformément à l'article R6313-8.`,
+
 
       H2("5. Propriété et confidentialité"),
       "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
