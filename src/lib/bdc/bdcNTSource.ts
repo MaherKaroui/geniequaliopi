@@ -337,320 +337,610 @@ portable (Droit individuel à la formation). Enfin, il est également
 possible de mobiliser son Compte personnel de formation (CPF) pour
 réaliser un bilan de compétences.
 `,
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences {ORG_NOM}**
+  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `# PROGRAMME DE BILAN DE COMPÉTENCES
 
-**Intitulé : {BDC_INTITULE}**
+**{ORG_NOM}**
 
+**Durée totale : 24 heures sur 1 mois maximum**
 
+# 1. PRÉSENTATION
 
-**PUBLIC CONCERNE :**
+Le bilan de compétences permet au bénéficiaire d'analyser ses compétences professionnelles et personnelles, ses aptitudes, ses motivations et ses aspirations afin de définir un projet professionnel cohérent, réaliste et réalisable.
 
-{BDC_PUBLIC}
+La démarche est individualisée et adaptée à la situation, au parcours, aux attentes et aux besoins du bénéficiaire.
 
-**PRE-REQUIS :**
+Le bilan peut notamment permettre d'étudier une évolution professionnelle, une reconversion, une mobilité, un projet entrepreneurial ou un besoin de développement des compétences.
 
-{BDC_PREREQUIS}
+Les pistes professionnelles ne sont pas déterminées à l'avance. Elles sont progressivement identifiées et étudiées au cours du bilan en fonction des résultats de l'investigation et des choix du bénéficiaire.
 
-**OBJECTIFS DU BILAN DE COMPÉTENCES :**
+# 2. PUBLIC CONCERNÉ
 
-{BDC_OBJECTIFS}
+Le bilan de compétences s'adresse notamment :
 
-**DUREE ET HORAIRES :**
+- Aux salariés.
 
-{BDC_DUREE_HORAIRES}
+- Aux demandeurs d'emploi.
 
-**LIEU :**
+- Aux travailleurs indépendants.
 
-{BDC_LIEU}
+- Aux chefs d'entreprise.
 
-**MODALITES ET DELAIS D'ACCES :**
+- Aux personnes en réflexion sur leur évolution professionnelle.
 
-Pour chaque demande de prestation, notre service réalise un entretien
-téléphonique ou un échange via mail ou en présentiel, afin d\\'établir
-une prestation personnalisée qui prend en compte les attentes, les
-préférences et les contraintes.
+- Aux personnes souhaitant préparer une reconversion.
 
-Une proposition commerciale et un programme adapté sont transmis.
+- Aux personnes souhaitant identifier et valoriser leurs compétences.
 
-A réception du devis signé l\\'organisation logistique, technique,
-pédagogique et financière est établie.
+- Aux personnes souhaitant construire ou sécuriser un projet professionnel.
 
-Le délai d\\'accès aux formations tient compte de ces différentes
-formalités afin d\\'être accessible dans {BDC_DELAI_ACCES}
-avant le début de l\\'action.
+# 3. PRÉREQUIS
 
-**TARIFS :**
+Aucun niveau de diplôme spécifique n'est exigé.
 
-{BDC_TARIF}
+Le bénéficiaire doit :
 
-**MOYENS PEDAGOGIQUES :**
+- Être volontaire et engagé dans une démarche de réflexion professionnelle.
 
-- [Méthodes pédagogiques :]{.underline}
+- Être disponible pour les entretiens et travaux prévus.
 
-> Alternance d'exposés théoriques et de mises en situation pratiques
-> (exercices d'analyse, travail collectif et/ou individuel sur cas
-> concrets issus de l'entreprise, QCM...)
+- Disposer d'une adresse électronique et d'un moyen de communication.
 
-- [Moyens techniques :]{.underline}
+- Pour les séquences réalisées à distance, disposer d'un ordinateur ou équipement adapté ainsi que d'une connexion Internet.
 
-> Support remis à l'apprenant
+# 4. OBJECTIFS DU BILAN DE COMPÉTENCES
 
-- [Outils pédagogiques :]{.underline}
+Le bilan de compétences permet au bénéficiaire :
 
-<!-- -->
+- D'analyser son parcours personnel et professionnel.
 
-- Chaque apprenant prépare un ordinateur avec accès internet.
+- D'identifier ses compétences professionnelles et personnelles.
 
-- Plateforme Google Classroom
+- D'identifier ses savoirs, savoir-faire et savoir-être.
 
-- Accès personnalisé et sécurisé.
+- De mettre en évidence ses compétences transférables.
 
-<!-- -->
+- D'identifier ses aptitudes et ressources.
 
-- [Dispositions d'accueil nécessaires en cas d'intervention sur site
-  :]{.underline}
+- D'analyser ses motivations, intérêts et valeurs professionnelles.
 
-> Salle de formation, vidéoprojecteur, support de projection.
+- De mieux connaître ses priorités professionnelles.
 
-**MODALITES D'EVALUATION** :
+- D'identifier différentes pistes d'évolution ou de reconversion.
+
+- D'explorer les métiers et secteurs correspondant à son profil.
+
+- De confronter les pistes envisagées aux réalités professionnelles.
+
+- D'identifier les compétences restant éventuellement à acquérir.
+
+- D'étudier les besoins éventuels de formation ou de certification.
+
+- D'évaluer la faisabilité des projets envisagés.
+
+- De définir un projet professionnel principal et, si nécessaire, une ou plusieurs alternatives.
+
+- D'élaborer un plan d'action permettant la mise en œuvre du projet retenu.
+
+# 5. DURÉE ET ORGANISATION
+
+**Durée totale : 24 heures réparties sur 1 mois maximum.**
+
+Un entretien préalable à l'inscription, gratuit et sans engagement, peut être réalisé afin d'analyser la demande, de présenter la prestation et de vérifier son adéquation avec les attentes du bénéficiaire.
+
+Cet entretien préalable n'est pas comptabilisé dans les 24 heures du bilan.
+
+### Répartition des 24 heures
+
+- **18 heures d'entretiens individuels avec le consultant**
+
+- **6 heures de travail personnel guidé**
+
+Le calendrier est individualisé et défini avec le bénéficiaire.
+
+# 6. PHASE 1 – PHASE PRÉLIMINAIRE
+
+## Durée : 2 heures
+
+Cette première phase permet d'analyser la demande du bénéficiaire et de définir les modalités de déroulement du bilan.
+
+### Contenu
+
+- Présentation du cadre et des objectifs du bilan de compétences.
+
+- Analyse de la situation actuelle.
+
+- Recueil de la demande.
+
+- Identification des attentes et besoins.
+
+- Analyse des premières interrogations professionnelles.
+
+- Présentation de la méthodologie.
+
+- Présentation des outils susceptibles d'être utilisés.
+
+- Définition des objectifs individualisés du bilan.
+
+- Détermination du format d'accompagnement.
+
+- Validation de l'engagement du bénéficiaire.
+
+- Élaboration du calendrier prévisionnel.
+
+### Résultat de la phase
+
+Formalisation des besoins et des objectifs individualisés du bénéficiaire.
+
+**Durée : 2 heures d'entretien individuel**
+
+# 7. PHASE 2 – PHASE D'INVESTIGATION
+
+## Durée totale : 18 heures
+
+La phase d'investigation constitue la partie principale du bilan.
+
+Elle comprend : **12 heures d'entretiens individuels + 6 heures de travail personnel guidé.**
+
+## Module 1 – Analyse du parcours personnel et professionnel
+
+**Durée : 2 heures**
+
+### Contenu
+
+- Analyse du parcours de formation.
+
+- Analyse des expériences professionnelles.
+
+- Identification des principales fonctions exercées.
+
+- Analyse des missions et responsabilités.
+
+- Identification des réalisations significatives.
+
+- Analyse des réussites et difficultés rencontrées.
+
+- Identification des expériences particulièrement motivantes.
+
+- Repérage des connaissances et compétences développées.
+
+### Résultat
+
+Première cartographie du parcours et des acquis du bénéficiaire.
+
+## Module 2 – Motivations, intérêts et valeurs professionnelles
+
+**Durée : 2 heures**
+
+### Contenu
+
+- Identification des centres d'intérêt.
+
+- Analyse des motivations professionnelles.
+
+- Identification des valeurs professionnelles.
+
+- Analyse des sources de satisfaction et d'insatisfaction.
+
+- Identification des environnements professionnels recherchés.
+
+- Analyse des conditions de travail souhaitées.
+
+- Identification des priorités professionnelles.
+
+- Repérage des facteurs d'épanouissement.
+
+### Outils possibles
+
+Selon les besoins du bénéficiaire :
+
+- Questionnaires d'intérêts.
+
+- Questionnaires de motivation.
+
+- Exercices sur les valeurs professionnelles.
+
+- Exercices d'auto-positionnement.
+
+- Entretiens d'explicitation.
+
+Les outils réellement utilisés sont adaptés au bénéficiaire et tracés dans son dossier.
+
+## Module 3 – Identification et analyse des compétences
+
+**Durée : 2 heures**
+
+### Contenu
+
+- Identification des connaissances.
+
+- Identification des savoir-faire.
+
+- Identification des savoir-être.
+
+- Analyse des compétences professionnelles.
+
+- Identification des compétences transférables.
+
+- Repérage des aptitudes personnelles.
+
+- Analyse des compétences mobilisables dans d'autres environnements.
+
+- Identification des points forts.
+
+- Identification des axes de développement.
+
+### Résultat
+
+Élaboration progressive d'un portefeuille de compétences personnalisé.
+
+## Module 4 – Exploration des pistes professionnelles
+
+**Durée : 2 heures**
+
+Les pistes étudiées sont déterminées en fonction des éléments identifiés au cours des étapes précédentes et ne sont pas imposées à l'avance.
+
+### Contenu
+
+- Identification de plusieurs pistes professionnelles.
+
+- Exploration des métiers correspondants.
+
+- Analyse des activités et missions.
+
+- Identification des compétences nécessaires.
+
+- Analyse des conditions d'exercice.
+
+- Étude des possibilités d'emploi.
+
+- Exploration des possibilités d'évolution.
+
+- Étude d'une éventuelle création ou reprise d'activité lorsque cette possibilité correspond au projet du bénéficiaire.
+
+- Identification des formations ou certifications éventuellement nécessaires.
+
+### Résultat
+
+Sélection argumentée de pistes professionnelles à approfondir.
+
+## Module 5 – Enquête et confrontation des projets à la réalité
+
+**Durée : 2 heures**
+
+### Contenu
+
+- Recherche documentaire.
+
+- Analyse du marché de l'emploi.
+
+- Analyse des offres correspondant aux pistes envisagées.
+
+- Étude des conditions d'accès aux métiers.
+
+- Recherche d'informations sur les secteurs concernés.
+
+- Identification des opportunités et contraintes.
+
+- Réalisation, lorsque cela est pertinent, d'enquêtes métiers.
+
+- Recherche de formations ou certifications.
+
+- Analyse des écarts entre les compétences détenues et celles requises.
+
+- Vérification de la faisabilité des différentes pistes.
+
+### Ressources possibles
+
+- France Travail.
+
+- France Compétences.
+
+- Fiches métiers.
+
+- Sites institutionnels.
+
+- Organismes professionnels.
+
+- Offres d'emploi.
+
+- Organismes de formation.
+
+- Échanges avec des professionnels.
+
+## Module 6 – Construction et validation du projet professionnel
+
+**Durée : 2 heures**
+
+### Contenu
+
+- Comparaison des pistes explorées.
+
+- Analyse des avantages et contraintes.
+
+- Analyse de la faisabilité.
+
+- Hiérarchisation des différentes possibilités.
+
+- Identification du projet professionnel principal.
+
+- Identification, si nécessaire, d'une ou plusieurs alternatives.
+
+- Identification des compétences à renforcer.
+
+- Identification des éventuels besoins de formation.
+
+- Définition des premières étapes de mise en œuvre.
+
+### Résultat
+
+Formalisation d'un projet professionnel principal et, lorsque cela est pertinent, d'une ou plusieurs solutions alternatives.
+
+# 8. TRAVAIL PERSONNEL GUIDÉ
+
+## Durée : 6 heures
+
+Le bénéficiaire réalise **6 heures de travail personnel guidé**, réparties sur la durée du bilan.
+
+Selon les besoins identifiés, ce travail peut comprendre :
+
+- Exercices d'analyse du parcours.
+
+- Questionnaires d'intérêts.
+
+- Questionnaires de motivation.
+
+- Travail sur les valeurs professionnelles.
+
+- Auto-évaluation des compétences.
+
+- Constitution du portefeuille de compétences.
+
+- Recherches documentaires.
+
+- Recherches sur les métiers et secteurs envisagés.
+
+- Analyse d'offres d'emploi.
+
+- Recherche de formations ou certifications.
+
+- Enquêtes auprès de professionnels.
+
+- Analyse du marché du travail.
+
+- Comparaison des différentes pistes professionnelles.
+
+- Préparation du projet professionnel.
+
+- Préparation du plan d'action.
+
+Le consultant donne les consignes et ressources nécessaires. Les travaux réalisés sont exploités au cours des entretiens.
+
+# 9. PHASE 3 – PHASE DE CONCLUSION
+
+## Durée : 4 heures
+
+La phase de conclusion permet au bénéficiaire de s'approprier les résultats détaillés de la phase d'investigation et de formaliser son projet.
+
+### Contenu
+
+- Restitution des principaux résultats.
+
+- Synthèse des compétences identifiées.
+
+- Analyse des motivations et aptitudes.
+
+- Présentation des pistes étudiées.
+
+- Identification du projet professionnel retenu.
+
+- Identification, si nécessaire, d'alternatives.
+
+- Analyse des facteurs favorisant la réalisation du projet.
+
+- Analyse des éventuels freins.
+
+- Identification des compétences restant à développer.
+
+- Identification des formations ou certifications éventuellement nécessaires.
+
+- Élaboration d'un plan d'action.
+
+- Définition des étapes et échéances.
+
+- Remise du document de synthèse au bénéficiaire.
+
+- Organisation du suivi post-bilan.
+
+**Durée : 4 heures d'entretien individuel**
+
+# 10. RÉPARTITION DES 24 HEURES
+
+| **Phase** | **Entretiens individuels** | **Travail personnel** | **Total** |
+|---|---|---|---|
+| Phase préliminaire | 2 h | – | **2 h** |
+| Phase d'investigation | 12 h | 6 h | **18 h** |
+| Phase de conclusion | 4 h | – | **4 h** |
+| **TOTAL** | **18 h** | **6 h** | **24 h** |
+
+**Durée totale : 24 heures sur 1 mois maximum.**
+
+# 11. MÉTHODES ET MOYENS PÉDAGOGIQUES
+
+L'accompagnement repose principalement sur une démarche individualisée comprenant :
 
 - Entretiens individuels.
 
-- Questionnaires d'auto-évaluation.
+- Entretiens d'explicitation.
 
-- Tests de positionnement.
+- Questionnaires et outils d'investigation adaptés.
 
-- Travaux personnels.
+- Exercices d'auto-évaluation.
 
-- Validation du projet professionnel.
+- Analyse du parcours.
 
-- Remise de la synthèse finale.
+- Analyse des compétences.
 
-- Questionnaire de satisfaction à chaud.
+- Recherches documentaires.
 
-- Questionnaire de satisfaction à froid.
+- Enquêtes métiers lorsque pertinentes.
 
-**HANDICAP :**
+- Analyse du marché du travail.
 
-Lors de l'inscription à nos formations, nous étudions avec vous et à
-travers un questionnaire les différents aménagements et adaptations que
-nous pouvons mettre en œuvre pour favoriser votre apprentissage.
+- Travail personnel guidé.
 
-Pour cela, nous pouvons également nous appuyer sur un réseau de
-partenaires nationaux préalablement identifiés.
+- Restitutions individuelles.
 
-Si vous êtes en situation de handicap, merci de contacter notre référent
+Les méthodes et outils sont sélectionnés en fonction des objectifs et besoins propres à chaque bénéficiaire.
 
-**Si vous êtes en situation de handicap, merci de contacter notre
-référent**
+# 12. MODALITÉS DE RÉALISATION
 
-**Abdoulhalik Anttoisse\\
-[[contact.ntconseil@gmail.com]{.underline}](mailto:contact.ntconseil@gmail.com)**
+Le bilan peut être réalisé :
 
-**CONTENU**
+- En présentiel.
 
-## PHASE 1 : PHASE PRÉLIMINAIRE (2 HEURES)
+- À distance par visioconférence.
 
-### Analyse de la demande et contractualisation (2h)
+- En format mixte présentiel/distanciel.
 
-1.  Présentation du bilan de compétences.
+Les modalités sont déterminées avec le bénéficiaire en fonction de ses besoins et contraintes.
 
-2.  Analyse de la situation professionnelle actuelle.
+# 13. MODALITÉS DE SUIVI
 
-3.  Identification des attentes et besoins.
+La réalisation du bilan peut être tracée notamment par :
 
-4.  Présentation de la méthodologie.
+- Planning individualisé.
 
-5.  Définition des objectifs du bilan.
+- Comptes rendus ou traces des entretiens.
 
-6.  Validation de l'engagement du bénéficiaire.
+- Feuilles d'émargement ou justificatifs de réalisation adaptés à la modalité.
 
-7.  Élaboration du calendrier d'accompagnement.
+- Travaux personnels réalisés.
 
-# PHASE 2 : PHASE D'INVESTIGATION (12 HEURES)
+- Outils d'investigation effectivement utilisés.
 
-## Module 1 : Analyse du parcours personnel et professionnel (2h)
+- Documents produits au cours de l'accompagnement.
 
-1.  Analyse du parcours de formation.
+- Document de synthèse.
 
-2.  Analyse des expériences professionnelles.
+# 14. ÉVALUATION DE L'ATTEINTE DES OBJECTIFS
 
-3.  Identification des réalisations significatives.
+L'atteinte des objectifs est appréciée progressivement au cours du bilan à partir :
 
-4.  Mise en évidence des compétences développées.
+- Des entretiens individuels.
 
-### Livrable :
+- Des travaux réalisés.
 
-Première cartographie des compétences.
+- De l'analyse des compétences.
 
-## Module 2 : Identification des motivations et valeurs professionnelles (2h)
+- Des résultats des outils effectivement utilisés.
 
-1.  Analyse des centres d'intérêt.
+- De la progression du bénéficiaire.
 
-2.  Identification des motivations professionnelles.
+- De la capacité à identifier et argumenter les pistes professionnelles.
 
-3.  Analyse des valeurs au travail.
+- De la formalisation du projet.
 
-4.  Identification des facteurs d'épanouissement professionnel.
+- De la construction du plan d'action.
 
-### Outils :
+Un questionnaire de satisfaction est proposé à l'issue de la prestation.
 
-1.  Questionnaires motivationnels.
+# 15. DOCUMENT DE SYNTHÈSE
 
-2.  Tests d'intérêts professionnels.
+À l'issue du bilan, un document de synthèse est élaboré avec le bénéficiaire.
 
-## Module 3 : Portefeuille de compétences (2h)
+Il reprend notamment :
 
-1.  Identification des savoirs.
+- Les circonstances du bilan.
 
-2.  Identification des savoir-faire.
+- Les compétences et aptitudes identifiées.
 
-3.  Identification des savoir-être.
+- Les éléments constitutifs du projet professionnel.
 
-4.  Repérage des compétences transférables.
+- Les principales étapes prévues pour sa réalisation.
 
-5.  Valorisation des acquis professionnels.
+- Les éventuelles alternatives étudiées lorsque cela est pertinent.
 
-### Livrable :
+Le document de synthèse est remis au bénéficiaire dans le respect des règles applicables de confidentialité.
 
-Portefeuille de compétences personnalisé.
+# 16. SUIVI POST-BILAN
 
-## Module 4 : Positionnement et besoins en anglais professionnel (2h)
+Un entretien de suivi est proposé au bénéficiaire dans les mois suivant la fin du bilan afin de faire le point sur la mise en œuvre de son projet professionnel.
 
-1.  Analyse des besoins linguistiques liés au projet professionnel.
+Ce suivi permet notamment :
 
-2.  Évaluation des situations professionnelles nécessitant l'anglais.
+- D'évaluer l'avancement du plan d'action.
 
-3.  Positionnement sur :
+- D'identifier les démarches réalisées.
 
-    a.  Compréhension orale
+- D'analyser les difficultés éventuellement rencontrées.
 
-    b.  Compréhension écrite
+- D'évaluer les évolutions intervenues depuis la fin du bilan.
 
-    c.  Expression orale
+- D'ajuster, lorsque cela est nécessaire, certaines étapes du plan d'action.
 
-    d.  Expression écrite
+Le suivi post-bilan n'est pas comptabilisé dans les **24 heures du bilan de compétences**.
 
-4.  Analyse de l'opportunité d'une certification VTest Business English.
+# 17. CONFIDENTIALITÉ ET NEUTRALITÉ
 
-### Livrable :
+Le bilan de compétences est réalisé dans le respect de la confidentialité des informations communiquées par le bénéficiaire.
 
-Diagnostic linguistique professionnel.
+Le consultant adopte une posture d'écoute, d'objectivité et de neutralité.
 
-## Module 5 : Exploration des métiers et étude du marché (2h)
+Aucun métier, secteur, formation ou organisme de formation n'est imposé au bénéficiaire.
 
-1.  Recherche documentaire.
+Les différentes pistes sont étudiées à partir :
 
-2.  Analyse des métiers ciblés.
+- De son parcours.
 
-3.  Étude des conditions d'accès.
+- De ses compétences.
 
-4.  Analyse du marché de l'emploi.
+- De ses motivations.
 
-5.  Identification des formations complémentaires.
+- De ses intérêts.
 
-### Outils :
+- De ses valeurs.
 
-1.  Fiches métiers.
+- De ses contraintes.
 
-2.  France Travail.
+- De ses aspirations.
 
-3.  France Compétences.
+- Des résultats de l'investigation.
 
-4.  OPCO.
+- Des réalités du marché professionnel.
 
-## Module 6 : Construction du projet professionnel (2h)
+Le choix final appartient au bénéficiaire.
 
-1.  Analyse de faisabilité.
+# 18. ACCESSIBILITÉ AUX PERSONNES EN SITUATION DE HANDICAP
 
-2.  Sélection des pistes professionnelles.
+Les besoins spécifiques du bénéficiaire sont étudiés afin d'identifier, lorsque cela est possible, les adaptations nécessaires au bon déroulement du bilan.
 
-3.  Validation du projet retenu.
+Le référent handicap peut être sollicité afin d'étudier les aménagements adaptés et, lorsque nécessaire, orienter le bénéficiaire vers les partenaires compétents.
 
-4.  Définition des compétences à développer.
+# 19. RÉSULTATS ATTENDUS
 
-5.  Identification des étapes de réalisation.
+À l'issue du bilan de compétences, le bénéficiaire doit notamment être en mesure de :
 
-### Livrable :
+- Mieux connaître ses compétences, aptitudes et motivations.
 
-Projet professionnel validé.
+- Identifier et valoriser ses compétences transférables.
 
-**Phase de Conclusion -- Formaliser son projet et son plan d'action
-(4h)**
+- Mieux comprendre ses priorités professionnelles.
 
-Recensement des facteurs susceptibles de favoriser ou non la réalisation
-du/des projet(s) professionnels, de formation ou de validation des
-acquis. Remise au bénéficiaire du document de synthèse co-construit,
-document qui demeure la seule propriété du bénéficiaire.
+- Identifier des perspectives d'évolution réalistes.
 
-SUIVI
+- Explorer différentes pistes professionnelles.
 
-Dans les 6 mois suivants l'issue du Bilan de Compétences, le consultant
-reprend contact avec le salarié, soit par téléphone, soit lors d'un
-entretien en face à face, afin d'apporter ses conseils dans la mise en
-œuvre des projets.
+- Évaluer leur pertinence et leur faisabilité.
 
-**Le bilan est intégralement individuel et soumis aux règles de
-confidentialité. La satisfaction du bénéficiaire est évaluée au travers
-d'un questionnaire à chaud et à froid lors du suivi à 6 mois.**
+- Identifier les éventuels besoins de développement des compétences.
 
-**PROGRAMME DÉTAILLÉ**
+- Définir un projet professionnel cohérent et réalisable.
 
-**▪ Une phase préliminaire :** *Contractualiser un parcours adapté et individualisé*
+- Identifier, si nécessaire, une ou plusieurs alternatives.
 
-| **Méthodologie** | **Outils** |
-|---|---|
-| Entretien individuel§§BR§§Recueil et analyse de la demande§§BR§§Validation de l'engagement du bénéficiaire§§BR§§Présentation de la méthodologie, des outils et des modalités d'accompagnement et de restitution du bilan de compétences | Formalisation et contractualisation des circonstances, attentes et objectifs du bilan de compétences |
-
-**▪ Une phase d'investigation :** *Identifier ses champs de compétences et ressources motivationnelles pour déterminer des voies d'évolution potentielles*
-
-| **Méthodologie** | **Outils** |
-|---|---|
-| Entretiens individuels (explicitation, conseil)§§BR§§**Étape 1 :** Rétrospective du parcours§§BR§§Bilan des acquis personnel et professionnel§§BR§§Identification des difficultés rencontrées§§BR§§**Étape 2 :** Diagnostic des ressources motivationnelles§§BR§§Connaissance de soi, points forts, axes de vigilance§§BR§§**Étape 3 :** Définition des axes de compétences§§BR§§Analyse et exploration des compétences transférables§§BR§§**Étape 4 :** Confrontation au marché de l'emploi et à ses offres réelles§§BR§§**Étape 5 :** Aide au choix et à la prise de décision§§BR§§Hiérarchisation des projets | Bilan du parcours de formation et professionnel§§BR§§Bilan personnel§§BR§§Courbes de satisfaction§§BR§§Tests d'intérêts professionnels (RIASEC)§§BR§§Tests de personnalité (MBTI)§§BR§§Questionnaires sur les valeurs, les motivations§§BR§§Portefeuille de compétences§§BR§§Plateforme Transférence : identifier les compétences individuelles et les traduire en métiers§§BR§§Recherche documentaire (métiers/formations)§§BR§§Analyse du marché du travail§§BR§§Enquête(s) professionnelle(s) ciblée(s) |
-
-**▪ Une phase de conclusion :** *Formaliser son projet et un plan d'action*
-
-| **Méthodologie** | **Outils** |
-|---|---|
-| Entretiens individuels de conseil§§BR§§Définition du projet personnel/professionnel et de l'évolution professionnelle envisagée§§BR§§Recensement de tous les facteurs susceptibles de favoriser ou non la mise en œuvre de ce(s) projet(s)§§BR§§Élaboration du plan d'action à mettre en œuvre§§BR§§Restitution d'un document de synthèse corédigé avec le bénéficiaire§§BR§§Planification du RDV post suivi à 6 mois. | Plan d'action personnalisé§§BR§§Document de synthèse§§BR§§Questionnaire de satisfaction§§BR§§Attestation de présence§§BR§§Attestation de fin de formation |
-
-**▪ Une phase post-suivi :** *Évaluer et soutenir la mise en œuvre des actions*
-
-| **Méthodologie** | **Outils** |
-|---|---|
-| Suivi et évaluation des démarches entreprises | Entretien de suivi sur RDV ou selon le mode convenu avec le bénéficiaire§§BR§§Questionnaire d'évaluation à froid |
-
-**INTERVENANT :**
-
-Formateur et consultant spécialisé en management de la qualité et
-expérimenté auprès des organismes de formation.
-
-**CONTACTS :**
-
-**Contact.ntconseil@gmail.com**
-
-# RÉSULTATS ATTENDUS
-
-À l'issue du bilan de compétences, le bénéficiaire sera capable de :
-
-1.  Mieux connaître ses compétences et aptitudes.
-
-2.  Valoriser son parcours professionnel.
-
-3.  Identifier des perspectives d'évolution réalistes.
-
-4.  Définir un projet professionnel cohérent.
-
-5.  Élaborer un plan d'action concret.
-
-6.  Identifier les compétences linguistiques nécessaires à son évolution
-    professionnelle.
-
-**QUELQUES CHIFFRES :**
-
-| **1**§§BR§§Bénéficiaire | Taux de satisfaction bénéficiaires :§§BR§§**100 %** |
-|---|---|
+- Disposer d'un plan d'action concret et planifié pour mettre en œuvre son projet.
 `,
+
   "Indicateur 10/Indicateur 10 - Adaptation de l_accompagnement": `**NT CONSEILS**
 
 **ADAPTATION DE L'ACCOMPAGNEMENT**
