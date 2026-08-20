@@ -38,6 +38,8 @@ function antiFabricationPour(nom: string): boolean {
   if (/(analyse (du|de) besoin|fiche pr[ée]alable)/i.test(nom)) return false;
   // Entretien intermédiaire : formalisé en séance, il sort complété et daté.
   if (/entretien interm[ée]diaire/i.test(nom)) return false;
+  // Test de personnalité : outil d'investigation complété et restitué en séance.
+  if (/test de personnalit[ée]/i.test(nom)) return false;
   // Questionnaires de satisfaction (bénéficiaire à chaud / à froid, interne) :
   // recueillis en fin de prestation, ils sortent renseignés et datés.
   if (/satisfaction/i.test(nom)) return false;
