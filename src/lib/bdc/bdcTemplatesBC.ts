@@ -936,6 +936,8 @@ const attestationsStatuts: BdcDocDef = {
   },
 };
 
+import { supportCoursPatisserie } from "./bdcSupportCoursPatisserie";
+
 export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   documentSynthese,
   feuillesEmargement,
@@ -953,6 +955,7 @@ export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   tableauAmeliorationContinue,
   clausesBC,
   attestationsStatuts,
+  supportCoursPatisserie,
 ];
 
 /** Pièces contractuelles dont la signature conditionne l'export (BLOC 7). */

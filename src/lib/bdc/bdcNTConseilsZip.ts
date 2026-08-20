@@ -43,6 +43,8 @@ function antiFabricationPour(nom: string): boolean {
   // Questionnaires de satisfaction (bénéficiaire à chaud / à froid, interne) :
   // recueillis en fin de prestation, ils sortent renseignés et datés.
   if (/satisfaction/i.test(nom)) return false;
+  // Supports de cours / ressources pédagogiques (indicateur 19) : contenus de formation.
+  if (/support de cours|ressources p[ée]dagogiques/i.test(nom)) return false;
   return isDocumentDeclaratif(nom) || /synth[èe]se/i.test(nom);
 }
 
