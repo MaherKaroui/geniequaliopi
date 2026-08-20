@@ -7,6 +7,7 @@
 import type { BdcContext } from "./bdcModel";
 import { fmtDateFR, formatDuree, seancesFor } from "./bdcModel";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
+import { calculerDatesDossier } from "../moteurDates";
 import {
   detectDuplication, findMentionsAbrogees, findOrganismesTiers,
   findUnresolvedMergeFields, findVocabulaireInterdit, findRegressionsSubstitution, type DuplicationHit,
