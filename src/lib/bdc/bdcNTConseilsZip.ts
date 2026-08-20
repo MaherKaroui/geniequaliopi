@@ -342,6 +342,10 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     if (!t) return "- Tarif communiqué sur devis personnalisé";
     return `- ${t}`;
   })());
+  txt = txt.replace(/\{BDC_TARIF_RAW\}/g, (() => {
+    const t = (formation?.tarif || "").trim();
+    return t || "Tarif communiqué sur devis personnalisé";
+  })());
   txt = txt.replace(/\{BDC_DELAI_ACCES\}/g, (() => {
     const d = (formation?.delaiAcces || "").trim();
     if (!d) return "un temps minimum d'un mois";
