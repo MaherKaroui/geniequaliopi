@@ -940,6 +940,7 @@ const attestationsStatuts: BdcDocDef = {
 export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   documentSynthese,
   feuillesEmargement,
+  testPersonnalite,
   satisfactionChaud,
   satisfactionFroid,
   accordConservation,
