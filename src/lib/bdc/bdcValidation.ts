@@ -369,10 +369,161 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
     "Une donnée du dossier est postérieure à la date d'édition : un auditeur y verra un antidatage.",
     [...new Set(futures)].slice(0, 8)));
 
+  /* ================================================================== */
+  /* R1 → R12 — Chaîne chronologique et clôture du parcours              */
+  /* ================================================================== */
 
+  const dj = calculerDatesDossier({
+    dateDebut: p.dateDebut,
+    dateFin: p.dateFin,
+    dureeTotaleH: p.dureeTotaleH,
+    typeContrat: p.origineDemande === "employeur" ? "tripartite" : p.financeur === "CPF" ? "cpf" : "individuel",
+  });
+  /** Délai de rétractation : UN SEUL paramètre pour toute l'application. */
+  const delaiRetractJours = o.delaiRetractationJours ?? dj.delaiRetractationJours;
+  const addJ = (d0: Date, n: number) => new Date(d0.getTime() + n * DAY);
 
+  const toutesSeances = beneficiaires.flatMap((b) => seancesFor(ctx, b));
+  const seancesTriees = [...toutesSeances].sort((a, b2) => a.date.getTime() - b2.date.getTime());
+  const premiereSeance = seancesTriees[0]?.date ?? p.dateDebut;
+  const derniereSeance = seancesTriees[seancesTriees.length - 1]?.date ?? p.dateFin;
+
+  // R1 — chaîne chronologique complète
+  const finRetractation = addJ(dj.contractualisation, delaiRetractJours);
+  const chaine: Array<[string, Date]> = [
+    ["premier contact", dj.entretienPrealable],
+    ["analyse du besoin", dj.analyseBesoin],
+    ["signature de la convention", dj.contractualisation],
+    ["fin du délai de rétractation", finRetractation],
+    ["début de la prestation", p.dateDebut],
+    ["1re séance", premiereSeance],
+  ];
+  const rupturesR1 = chaine
+    .slice(1)
+    .map((c, i) => (chaine[i][1].getTime() > c[1].getTime()
+      ? `${chaine[i][0]} (${fmtDateFR(chaine[i][1])}) postérieur à ${c[0]} (${fmtDateFR(c[1])})` : ""))
+    .filter(Boolean);
+  B.push(r("R1", "Chaîne chronologique respectée (contact → analyse → convention → rétractation → début → 1re séance)",
+    rupturesR1.length === 0, "Ordre chronologique du dossier rompu.", rupturesR1));
+
+  // R2 — fin de rétractation = signature + délai paramétré (valeur unique)
+  const delaisEcrits = new Set<number>();
+  for (const [, txt] of entries) {
+    for (const m of txt.matchAll(/d[ée]lai[^.\n]{0,60}?(\d{1,2})\s*jours?/gi)) {
+      if (/r[ée]tractation|acceptation/i.test(m[0])) delaisEcrits.add(Number(m[1]));
+    }
+  }
+  const delaisIncoherents = [...delaisEcrits].filter((v) => v !== delaiRetractJours);
+  B.push(r("R2", `Délai de rétractation unique (${delaiRetractJours} jours) appliqué partout`,
+    delaisIncoherents.length === 0,
+    "Deux valeurs de délai de rétractation coexistent dans le dossier : un seul délai doit être paramétré au niveau de l'organisme.",
+    delaisIncoherents.map((v) => `${v} jours trouvés au lieu de ${delaiRetractJours}`)));
+
+  // R3 — aucune séance hors de la période
+  const horsPeriode = toutesSeances
+    .filter((s) => s.date < p.dateDebut || s.date > p.dateFin)
+    .map((s) => `Séance ${s.numero} du ${fmtDateFR(s.date)} hors période ${fmtDateFR(p.dateDebut)} → ${fmtDateFR(p.dateFin)}`);
+  B.push(r("R3", "Toutes les séances tombent entre la date de début et la date de fin",
+    horsPeriode.length === 0, "Séance datée hors de la période de la prestation.", horsPeriode.slice(0, 8)));
+
+  // R4 — date de fin = dernière séance réalisée (jamais saisie à la main)
+  const memeJour = (a: Date, b2: Date) => fmtDateFR(a) === fmtDateFR(b2);
+  B.push(r("R4", "Date de fin égale à la dernière séance réalisée", memeJour(p.dateFin, derniereSeance),
+    `La date de fin (${fmtDateFR(p.dateFin)}) doit être celle de la dernière séance (${fmtDateFR(derniereSeance)}) : elle est calculée, jamais saisie.`));
+
+  // R5 — remise de la synthèse après la dernière séance
+  B.push(r("R5", "Document de synthèse remis après la dernière séance",
+    dj.remiseDocumentSynthese.getTime() >= derniereSeance.getTime(),
+    `Remise du document de synthèse (${fmtDateFR(dj.remiseDocumentSynthese)}) antérieure à la dernière séance (${fmtDateFR(derniereSeance)}).`));
+
+  // R6 — suivi à 6 mois entre 5 et 7 mois après la remise
+  const joursSuivi = Math.round((p.dateSuivi6Mois.getTime() - dj.remiseDocumentSynthese.getTime()) / DAY);
+  B.push(r("R6", "Suivi à 6 mois daté entre 5 et 7 mois après la remise",
+    joursSuivi >= 150 && joursSuivi <= 214,
+    `Un suivi à 6 mois ne peut pas être daté à ${joursSuivi} jours de la remise.`));
+
+  // R7 — aucune relance postérieure à la réponse
+  const relancesApresReponse: string[] = [];
+  for (const [nom, txt] of entries) {
+    const lignes = txt.split("\n");
+    const dateReponse = lignes
+      .filter((l) => /r[ée]ponse|retour du b[ée]n[ée]ficiaire/i.test(l))
+      .flatMap(datesDansTexte)
+      .sort((a, b2) => a.getTime() - b2.getTime())[0];
+    if (!dateReponse) continue;
+    for (const l of lignes.filter((x) => /relance/i.test(x))) {
+      for (const d0 of datesDansTexte(l)) {
+        if (d0 > dateReponse) relancesApresReponse.push(`${nom} : relance du ${fmtDateFR(d0)} après la réponse du ${fmtDateFR(dateReponse)}`);
+      }
+    }
+  }
+  B.push(r("R7", "Aucune relance datée après la réponse du bénéficiaire", relancesApresReponse.length === 0,
+    "Une relance est datée après la réponse obtenue.", [...new Set(relancesApresReponse)].slice(0, 5)));
+
+  // R8 — plafond légal de 24 h d'accompagnement
+  const depassements = beneficiaires
+    .map((b) => ({ b, h: seancesFor(ctx, b).reduce((a, s) => a + s.duree, 0) }))
+    .filter((x) => x.h > 24)
+    .map((x) => `${x.b.prenom} ${x.b.nom} : ${x.h} h d'accompagnement`);
+  B.push(r("R8", "Plafond légal de 24 h d'accompagnement respecté", depassements.length === 0,
+    "Le bilan de compétences ne peut pas dépasser 24 h d'accompagnement (art. R6313-4).", depassements));
+
+  // R9 — répartition réelle par phase vs programme de référence (20 / 55 / 25 %)
+  const refPhases: Record<1 | 2 | 3, number> = { 1: 0.2, 2: 0.55, 3: 0.25 };
+  const ecartsPhase: string[] = [];
+  for (const b of beneficiaires) {
+    const ss = seancesFor(ctx, b);
+    const tot = ss.reduce((a, s) => a + s.duree, 0);
+    ([1, 2, 3] as const).forEach((ph) => {
+      const reel = ss.filter((s) => s.phase === ph).reduce((a, s) => a + s.duree, 0);
+      const attendu = tot * refPhases[ph];
+      if (Math.abs(reel - attendu) > 1) {
+        ecartsPhase.push(`${b.prenom} ${b.nom} — phase ${ph} : ${reel} h réalisées pour ${attendu.toFixed(1)} h annoncées`);
+      }
+    });
+  }
+  B.push(r("R9", "Répartition par phase conforme au programme annoncé", ecartsPhase.length === 0,
+    "Le parcours réalisé ne correspond pas au programme annoncé — corrigez le programme ou le séquençage.",
+    ecartsPhase.slice(0, 8)));
+
+  // R10 — conditions de clôture (présence, signature, atteinte des objectifs)
+  const clotureKo: string[] = [];
+  const dossierTermine = derniereSeance.getTime() <= Date.now();
+  if (dossierTermine) {
+    for (const [nom, txt] of fichiersOu(/[ée]margement/i)) {
+      if (!/pr[ée]sent/i.test(txt)) clotureKo.push(`${nom} : présence non renseignée`);
+      else if (!/signature|signé/i.test(txt)) clotureKo.push(`${nom} : séance présente sans signature`);
+    }
+    for (const [nom, txt] of fichiersOu(/objectif|synth[èe]se/i)) {
+      if (/objectif/i.test(txt) && /☐/.test(txt) && !/☒/.test(txt)) {
+        clotureKo.push(`${nom} : objectif sans niveau d'atteinte coché`);
+      }
+    }
+  }
+  B.push(r("R10", "Parcours clôturable (présences, signatures, atteinte des objectifs)", clotureKo.length === 0,
+    "Le parcours ne peut pas être clôturé : présence, signature ou atteinte d'objectif manquante.",
+    [...new Set(clotureKo)].slice(0, 8)));
+
+  // R11 — convention tripartite obligatoire si la demande vient de l'employeur
+  const aTripartite = noms.some((n) => /tripartite/i.test(n)) || textes.some((t) => /convention tripartite/i.test(t));
+  B.push(r("R11", tripartite ? "Convention tripartite présente au dossier" : "Convention tripartite — non applicable (demande du bénéficiaire)",
+    !tripartite || aTripartite,
+    "Demande à l'initiative de l'employeur : la convention tripartite est obligatoire au dossier."));
+
+  // R12 — aucun taux saisi à la main : tous les taux sont calculés
+  const tauxManuels: string[] = [];
+  for (const [nom, txt] of entries) {
+    for (const l of txt.split("\n")) {
+      if (!/taux|%/i.test(l)) continue;
+      if (/(_{2,}|\.{3,}|\bà compl[ée]ter\b|\[\s*\]|…\s*%)/i.test(l)) tauxManuels.push(`${nom} : « ${l.trim().slice(0, 80)} »`);
+    }
+  }
+  B.push(r("R12", "Tous les taux sont calculés, aucun n'est saisi à la main", tauxManuels.length === 0,
+    "Un taux est laissé à la saisie manuelle : les taux doivent être calculés à partir des données du dossier.",
+    [...new Set(tauxManuels)].slice(0, 8)));
 
   /* ---------------- Alertes (orange) ---------------- */
+
   const A: RegleResultat[] = [];
   A.push(r("A01", "Effectif suffisant pour publier des pourcentages", beneficiaires.length >= 5,
     `Effectif de ${beneficiaires.length} bénéficiaire(s) : tout pourcentage publié doit être accompagné de son volume et de sa date d'arrêté.`));
