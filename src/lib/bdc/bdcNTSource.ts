@@ -437,6 +437,8 @@ Cet entretien préalable n'est pas comptabilisé dans les 24 heures du bilan.
 
 Le calendrier est individualisé et défini avec le bénéficiaire.
 
+Pour les inscriptions réalisées via EDOF, un délai minimum de 14 jours est appliqué avant le démarrage de la prestation.
+
 # 6. PHASE 1 – PHASE PRÉLIMINAIRE
 
 ## Durée : 2 heures
