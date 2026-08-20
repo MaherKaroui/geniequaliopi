@@ -453,7 +453,6 @@ const testPersonnalite: BdcDocDef = {
       "",
       H2("6. Validation"),
       `Test de personnalité passé le ${fmtDateFR(datePassation)} dans le cadre du bilan de compétences de ${nomB}. Les résultats sont restitués à titre indicatif et intégrés au document de synthèse.`,
-      SIGN(ctx, "Indicateur 11 - Test de personnalité", b, datePassation),
     ].join("\n");
   },
 };
