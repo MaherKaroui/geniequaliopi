@@ -705,6 +705,7 @@ const SOMMAIRE = `
 12. Se former et progresser
 13. Exercices d'application
 14. Corrigés et lexique
+${SOMMAIRE_SUITE}
 `;
 
 export const supportCoursPatisserie: BdcDocDef = {
@@ -713,14 +714,17 @@ export const supportCoursPatisserie: BdcDocDef = {
   parBeneficiaire: false,
   build: (ctx) => {
     const { organisme: o, prestation: p } = ctx;
-    const chapitres = [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12, ch13, ch14];
+    const chapitres = [
+      ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12, ch13, ch14,
+      ...CHAPITRES_SUITE,
+    ];
     return [
       `# Support de cours — Pâtisserie & Cake design\n`,
       `_Ressource pédagogique remise dans le cadre du bilan de compétences — Indicateur 19._\n`,
       `**Organisme** : ${o.raisonSociale} — SIRET ${o.siret}  `,
       `**Consultant référent** : ${p.consultant.nom}  `,
-      `**Version** : 1.0 — mise à jour du ${fmtDateFR(new Date())}  `,
-      `**Volume** : 14 chapitres — exercices et corrigés inclus`,
+      `**Version** : 2.0 — mise à jour du ${fmtDateFR(new Date())}  `,
+      `**Volume** : ${chapitres.length} chapitres — exercices et corrigés inclus`,
       "",
       `Ce support accompagne l'exploration du projet professionnel en pâtisserie et cake design. Il couvre
 les fondamentaux techniques du métier, le cadre réglementaire et sanitaire, l'organisation de la
@@ -732,3 +736,4 @@ de travail personnel entre les séances d'accompagnement.`,
     ].join("\n");
   },
 };
+
