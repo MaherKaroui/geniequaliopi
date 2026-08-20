@@ -1238,6 +1238,14 @@ Le paiement sera dû à réception de la facture.
 peuvent être réglés à l'amiable, le tribunal de NANTERRE sera seul
 compétent pour régler le litige.
 
+**10. CONFIDENTIALITÉ ET NEUTRALITÉ**
+
+Le consultant s'engage à respecter la confidentialité des informations recueillies tout au long du bilan de compétences. Les échanges, documents et données personnels du bénéficiaire sont protégés et ne sont communiqués à aucun tiers sans son accord express et préalable. Le consultant exerce sa mission dans une stricte neutralité, sans parti pris, en faveur de la libre expression et de l'autonomie du bénéficiaire.
+
+**11. CONSENTEMENT**
+
+Le bénéficiaire déclare avoir été informé des objectifs, modalités et déroulement de la prestation de bilan de compétences. Il donne son consentement libre et éclairé à la réalisation du bilan, à la collecte et au traitement des informations nécessaires à son accompagnement, et au respect des présentes conditions.
+
 Fait à {VILLE_ORG}, le {DATE_CONVENTION} en double exemplaires.
 
 {SIGNATURES_ORG_STAGIAIRE}
