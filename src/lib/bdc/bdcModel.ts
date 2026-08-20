@@ -28,6 +28,8 @@ export interface Organisme {
   referentHandicap: { nom: string; email: string; telephone: string };
   mediateurConsommation: { nom: string; adresse: string; urlSaisine: string };
   tribunalCompetent: string;
+  /** Délai de rétractation en jours — paramètre UNIQUE pour toute l'application (R2). */
+  delaiRetractationJours?: number;
   /** Signature du représentant légal (PNG transparent, stockée en base) */
   signatureUrl?: string;
   /** Tampon de l'organisme (PNG transparent, téléversé une seule fois) */
