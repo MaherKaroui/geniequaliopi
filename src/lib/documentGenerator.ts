@@ -2712,14 +2712,15 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>14. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
-      <p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
+      <p>La formation est accessible aux personnes en situation de handicap (PSH).</p>
       <p>Des aménagements spécifiques peuvent être mis en place selon les besoins identifiés :</p>
       <ul>
-        <li>Adaptation des supports pédagogiques (police agrandie, contrastes renforcés)</li>
+        <li>Adaptation des supports pédagogiques (police agrandie, contrastes renforcés, format accessible)</li>
         <li>Aménagement des horaires et des pauses</li>
         <li>Temps supplémentaire pour les évaluations</li>
-        <li>Salle accessible PMR</li>
         <li>Accompagnement individualisé renforcé</li>
+        <li>Transcription ou sous-titrage des vidéos pédagogiques sur demande</li>
+        <li>Adaptation des modalités de visioconférence aux besoins du stagiaire</li>
       </ul>
       <p style="margin-top:10px"><strong>Merci de contacter le référent handicap en amont de la formation.</strong></p>
       <p><strong>Référent handicap :</strong> ${o.referentHandicap || o.dirigeant}</p>
