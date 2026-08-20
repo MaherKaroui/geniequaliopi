@@ -416,11 +416,12 @@ const testPersonnalite: BdcDocDef = {
     ];
     const conseil = conseils[seed % conseils.length];
 
-    const appreciation = [
+    const appreciationBanque = [
       `${nomB} a complété le test de personnalité de manière cohérente et réflexive. Le profil ${dominant}${secondaire} est stable et aligné avec les éléments recueillis lors de la phase préliminaire. Ce résultat constitue un appui utile pour la suite de la phase d'investigation.`,
       `Les résultats obtenus par ${nomB} confirment une personnalité structurée autour de la dimension ${dom.label.toLowerCase()}. Le profil secondaire ${sec.label.toLowerCase()} apporte une nuance importante qui sera à prendre en compte dans la définition du projet professionnel.`,
       `Le test de personnalité révèle un profil équilibré et mobilisable pour ${metier}. Les échanges avec le consultant permettront de confronter ces résultats aux contraintes et aux opportunités du marché de ${secteur}.`,
-    ][seed % appreciation.length];
+    ];
+    const appreciation = appreciationBanque[seed % appreciationBanque.length];
 
     return [
       H("Test de personnalité"),
