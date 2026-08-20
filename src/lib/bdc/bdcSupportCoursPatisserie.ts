@@ -7,6 +7,8 @@
  */
 import type { BdcDocDef } from "./bdcTemplatesBC";
 import { fmtDateFR } from "./bdcModel";
+import { CHAPITRES_SUITE, SOMMAIRE_SUITE } from "./bdcSupportCoursPatisserieSuite";
+
 
 const PB = `\n<div style="page-break-after:always"></div>\n`;
 
