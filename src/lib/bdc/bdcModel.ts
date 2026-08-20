@@ -410,6 +410,7 @@ export function buildBdcContext(
       urlSaisine: "https://cnpm-mediation-consommation.eu",
     },
     tribunalCompetent: tribunalFromCodePostal(cp),
+    delaiRetractationJours: 14,
     signatureUrl: org.signatureUrl || "",
     tamponUrl: org.tamponUrl || "",
   };
