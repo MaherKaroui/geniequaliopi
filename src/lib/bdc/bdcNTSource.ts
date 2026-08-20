@@ -1188,15 +1188,15 @@ méthodologie développée par le **NT CONSEILS**
 **4.** Les modalités de déroulement de la prestation sont les
 suivantes :
 
-- Moyens utilisés :
+- Moyens utilisés : Entretiens individuels, questionnaires et outils d'investigation, outils d'auto-évaluation, supports de restitution.
 
-- Outils utilisés :
+- Outils utilisés : Fiche d'analyse de besoin, tests de positionnement, grille d'analyse de compétences, outils d'exploration des métiers.
 
-- Méthodes utilisées :
+- Méthodes utilisées : Entretiens individuels, questionnaires et outils d'investigation adaptés, exploration d'auto-évaluation, analyse du parcours, analyse des compétences, enquêtes métiers lorsque pertinentes, travail personnel guidé, restitutions individuelles.
 
-- Modalités pédagogiques :
+- Modalités pédagogiques : L'accompagnement repose principalement sur une démarche individualisée comprenant : entretiens individuels, questionnaires et outils d'investigation adaptés, exploration d'auto-évaluation, analyse du parcours, analyse des compétences, enquêtes métiers lorsque pertinentes, travail personnel guidé et restitutions individuelles. Les méthodes et outils sont sélectionnés en fonction des objectifs et besoins propres à chaque bénéficiaire.
 
-- Postures utilisées :
+- Postures utilisées : Écoute active, bienveillance, neutralité, confidentialité et posture d'accompagnement à l'autonomie.
 
 **5.** La mission de **NT CONSEILS**
 
