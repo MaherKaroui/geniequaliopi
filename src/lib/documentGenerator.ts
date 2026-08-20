@@ -2591,7 +2591,65 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>12. Méthodes pédagogiques et moyens pédagogiques</h2>
     <div class="section">
+      ${(() => {
+        const isDist = hasDistanciel(f) && !hasPresentiel(f);
+        const isMix = isMixte(f);
+        if (isDist) {
+          return `<p>La formation se déroule à distance, en classe virtuelle, via une solution de visioconférence sécurisée (Google Meet ou Zoom). L'animation pédagogique repose sur des sessions interactives et participatives.</p>
       <h3>Méthodes pédagogiques</h3>
+      <ul>
+        <li>Apports théoriques progressifs et structurés par le formateur</li>
+        <li>Démonstrations et partages d'écran en direct</li>
+        <li>Exercices pratiques réalisés par le stagiaire sur son poste, sous la supervision du formateur</li>
+        <li>Mises en situation professionnelle et études de cas concrets</li>
+        <li>Accompagnement individualisé et différencié</li>
+        <li>Échanges interactifs, questions-réponses et retours d'expérience</li>
+        <li>Travaux personnels guidés à réaliser entre les sessions</li>
+      </ul>
+      <h3>Moyens pédagogiques et outils mobilisés</h3>
+      <ul>
+        <li>Ordinateur ou équipement numérique adapté par stagiaire</li>
+        <li>Connexion Internet stable (ADSL, fibre ou 4G/5G)</li>
+        <li>Solution de visioconférence (Google Meet ou Zoom)</li>
+        <li>Supports pédagogiques numériques (diaporamas, fiches pratiques, pas-à-pas)</li>
+        <li>Exercices et fichiers pratiques transmis avant ou pendant la session</li>
+        <li>Plateforme ou espace de partage de documents</li>
+        <li>Outil de chat et de messagerie instantanée pour les échanges</li>
+        <li>Assistance technique et pédagogique en ligne</li>
+      </ul>
+      <h3>Conditions de réussite à distance</h3>
+      <ul>
+        <li>Connexion Internet stable et bande passante suffisante</li>
+        <li>Environnement calme et propice à la concentration</li>
+        <li>Webcam et micro fonctionnels</li>
+        <li>Connexion 5 minutes avant le début de chaque session</li>
+        <li>Assiduité et participation active pendant les échanges</li>
+      </ul>`;
+        }
+        if (isMix) {
+          return `<p>La formation se déroule en format mixte : alternance de sessions en présentiel et de sessions à distance en classe virtuelle (Google Meet ou Zoom). Les méthodes et moyens pédagogiques sont adaptés à chaque modalité.</p>
+      <h3>Méthodes pédagogiques</h3>
+      <ul>
+        <li>Apports théoriques progressifs et structurés</li>
+        <li>Démonstrations en direct (présentiel) et partages d'écran (distanciel)</li>
+        <li>Exercices pratiques guidés puis en autonomie</li>
+        <li>Mises en situation professionnelle</li>
+        <li>Études de cas concrets tirés du terrain</li>
+        <li>Accompagnement individualisé et différencié</li>
+        <li>Échanges, questions-réponses et retours d'expérience</li>
+      </ul>
+      <h3>Moyens pédagogiques et outils mobilisés</h3>
+      <ul>
+        <li>Ordinateur individuel par stagiaire</li>
+        <li>Vidéoprojecteur ou écran de projection (sessions en présentiel)</li>
+        <li>Solution de visioconférence sécurisée : Google Meet ou Zoom (sessions à distance)</li>
+        <li>Supports pédagogiques numériques (fiches pratiques, pas-à-pas)</li>
+        <li>Exercices pratiques fournis par le formateur</li>
+        <li>Connexion Internet</li>
+        <li>Assistance pédagogique continue</li>
+      </ul>`;
+        }
+        return `<h3>Méthodes pédagogiques</h3>
       <ul>
         <li>Apports théoriques progressifs et structurés</li>
         <li>Démonstrations en direct par le formateur</li>
@@ -2602,7 +2660,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <li>Échanges, questions-réponses et retours d'expérience</li>
       </ul>
       <h3>Moyens pédagogiques et outils mobilisés</h3>
-      ${moyensHtml}
+      ${moyensHtml}`;
+      })()}
     </div>
 
     <h2>13. Modalités d'évaluation</h2>
@@ -2653,14 +2712,15 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>14. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
-      <p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
+      <p>La formation est accessible aux personnes en situation de handicap (PSH).</p>
       <p>Des aménagements spécifiques peuvent être mis en place selon les besoins identifiés :</p>
       <ul>
-        <li>Adaptation des supports pédagogiques (police agrandie, contrastes renforcés)</li>
+        <li>Adaptation des supports pédagogiques (police agrandie, contrastes renforcés, format accessible)</li>
         <li>Aménagement des horaires et des pauses</li>
         <li>Temps supplémentaire pour les évaluations</li>
-        <li>Salle accessible PMR</li>
         <li>Accompagnement individualisé renforcé</li>
+        <li>Transcription ou sous-titrage des vidéos pédagogiques sur demande</li>
+        <li>Adaptation des modalités de visioconférence aux besoins du stagiaire</li>
       </ul>
       <p style="margin-top:10px"><strong>Merci de contacter le référent handicap en amont de la formation.</strong></p>
       <p><strong>Référent handicap :</strong> ${o.referentHandicap || o.dirigeant}</p>
