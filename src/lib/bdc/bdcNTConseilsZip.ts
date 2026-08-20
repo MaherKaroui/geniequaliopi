@@ -342,6 +342,10 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     if (!t) return "- Tarif communiqué sur devis personnalisé";
     return `- ${t}`;
   })());
+  txt = txt.replace(/\{BDC_TARIF_RAW\}/g, (() => {
+    const t = (formation?.tarif || "").trim();
+    return t || "Tarif communiqué sur devis personnalisé";
+  })());
   txt = txt.replace(/\{BDC_DELAI_ACCES\}/g, (() => {
     const d = (formation?.delaiAcces || "").trim();
     if (!d) return "un temps minimum d'un mois";
@@ -354,7 +358,8 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_ADRESSE_COMPLETE\}/g, orgAdresse || "[Adresse de l'organisme]")
     .replace(/\{VILLE_ORG\}/g, villeOrg)
     .replace(/\{ORG_EMAIL\}/g, orgEmail)
-    .replace(/\{ORG_TEL_LINE\}/g, orgTelLine);
+    .replace(/\{ORG_TEL_LINE\}/g, orgTelLine)
+    .replace(/\{ORG_TELEPHONE\}/g, orgTel || "");
 
   // Placeholders Entretien annuel / recrutement (IND 21) — alimentés depuis l'organisme + la formation
   const profileBdc = formation ? getBdcDomainProfile(formation) : null;
