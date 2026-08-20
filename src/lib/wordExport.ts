@@ -6,16 +6,33 @@
 /**
  * Convert HTML to .docx Blob using TurboDocx (lazy-loaded)
  */
+/**
+ * html-to-docx n'embarque les images que si la balise <img> porte des attributs
+ * width/height explicites. Sans ça, les tampons et signatures (data URI)
+ * disparaissent du .docx (donc du Drive). On les ajoute à partir du style.
+ */
+function normalizeImagesForDocx(html: string): string {
+  return html.replace(/<img\b[^>]*>/gi, (tag) => {
+    if (/\swidth\s*=/.test(tag) && /\sheight\s*=/.test(tag)) return tag;
+    const maxW = tag.match(/max-width\s*:\s*(\d+(?:\.\d+)?)px/i);
+    const maxH = tag.match(/max-height\s*:\s*(\d+(?:\.\d+)?)px/i);
+    const w = Math.round(parseFloat(maxW?.[1] || "180"));
+    const h = Math.round(parseFloat(maxH?.[1] || "70"));
+    return tag.replace(/\s*\/?>$/, ` width="${w}" height="${h}" />`);
+  });
+}
+
 async function htmlToDocxBlob(htmlContent: string): Promise<Blob> {
   const { default: HTMLtoDOCX } = await import("@turbodocx/html-to-docx");
 
   const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  const bodyContent = bodyMatch?.[1] || htmlContent;
+  const bodyContent = normalizeImagesForDocx(bodyMatch?.[1] || htmlContent);
 
   const styleMatch = htmlContent.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
   const styles = styleMatch ? styleMatch.join("\n") : "";
 
   const htmlForDocx = `<!DOCTYPE html><html><head><meta charset="utf-8">${styles}</head><body>${bodyContent}</body></html>`;
+
 
   const result = await HTMLtoDOCX(htmlForDocx, null, {
     table: { row: { cantSplit: true } },

@@ -2060,19 +2060,17 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
 
 
 function buildFooter(org: OrganismeInfo, dates: DatesCtx): string {
-  // La date d'édition est la date réelle de génération du dossier, pas la date
-  // de version de la trame (qui reste affichée séparément).
-  const dateEdition = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+  // Pied de page : pas de date d'édition, uniquement la date de mise à jour de la trame.
   const parts = [
     `<strong>${org.nom || ""}</strong>`,
     org.siret ? `SIRET ${org.siret}` : "",
     org.nda ? `NDA ${org.nda}` : "",
     org.version ? `Version ${org.version}` : "",
-    dates.dateVersion ? `Trame du ${dates.dateVersion}` : "",
-    `Édition du ${dateEdition}`,
+    dates.dateVersion ? `Mise à jour du ${dates.dateVersion}` : "",
   ].filter(Boolean);
   return `<div class="footer">${parts.join(" · ")}</div>`;
 }
+
 
 function slugBen(s: StagiaireInfo): string {
   return `${s.prenom}_${s.nom}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\-]+/g,"_").replace(/_+/g,"_").slice(0, 60);
