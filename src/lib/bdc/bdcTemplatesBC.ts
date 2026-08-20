@@ -309,6 +309,155 @@ const feuillesEmargement: BdcDocDef = {
 };
 
 
+/* ------------------------------------------------------------------ */
+/* 2b. Test de personnalité — passé à mi-parcours, IND 11               */
+/* ------------------------------------------------------------------ */
+
+const PROFILS_RIASEC: Record<string, { label: string; traits: string; projets: string[] }> = {
+  R: {
+    label: "Réaliste",
+    traits: "concret, pragmatique, technique, orienté action et résolution de problèmes matériels",
+    projets: ["métiers de terrain", "techniques opérationnelles", "maintenance", "production"],
+  },
+  I: {
+    label: "Investigateur",
+    traits: "analytique, curieux, méthodique, à l'aise avec l'abstraction et la recherche",
+    projets: ["recherche et développement", "analyse de données", "ingénierie", "conseil technique"],
+  },
+  A: {
+    label: "Artistique",
+    traits: "créatif, original, sensible, autonome dans son mode de pensée et d'expression",
+    projets: ["design", "communication créative", "artisanat d'art", "médiation culturelle"],
+  },
+  S: {
+    label: "Social",
+    traits: "relationnel, empathique, à l'écoute, motivé par l'accompagnement et le service",
+    projets: ["accompagnement client", "formation", "soins et services à la personne", "ressources humaines"],
+  },
+  E: {
+    label: "Entreprendant",
+    traits: "dynamique, persuasif, leader, orienté vers les résultats et la prise de décision",
+    projets: ["management", "commercial", "entrepreneuriat", "direction de projet"],
+  },
+  C: {
+    label: "Conventionnel",
+    traits: "organisé, rigoureux, méthodique, à l'aise avec les procédures et la gestion",
+    projets: ["administration", "gestion", "comptabilité", "contrôle de gestion"],
+  },
+};
+
+const LETTRES_RIASEC = ["R", "I", "A", "S", "E", "C"];
+
+function dateMiParcours(ctx: BdcContext, b?: Beneficiaire | null): Date {
+  const seances = seancesFor(ctx, b);
+  if (seances.length > 0) {
+    const idx = Math.floor((seances.length - 1) / 2);
+    return new Date(seances[idx].date);
+  }
+  return new Date((ctx.prestation.dateDebut.getTime() + ctx.prestation.dateFin.getTime()) / 2);
+}
+
+function scoreRiasec(seed: number, dim: string, dominant?: string, secondaire?: string): number {
+  let base = 5 + ((seed + dim.charCodeAt(0) * 13) % 4); // 5 à 8
+  if (dim === dominant) base += 2;
+  if (dim === secondaire) base += 1;
+  return Math.min(10, Math.max(3, base));
+}
+
+const testPersonnalite: BdcDocDef = {
+  nom: "Indicateur 11 - Test de personnalité",
+  indicateur: 11,
+  parBeneficiaire: true,
+  build: (ctx, b) => {
+    const { organisme: o, prestation: p } = ctx;
+    const datePassation = dateMiParcours(ctx, b);
+    const seed = seedBenef(b, "personnalite");
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+    const metier = prof?.metier || "le métier visé";
+    const secteur = prof?.secteur || "le secteur visé";
+    const nomB = b ? `${b.prenom} ${b.nom}` : "Le bénéficiaire";
+    const civ = b?.civilite === "Mme" ? "Mme" : "M.";
+
+    // Profil déterministe mais distinct par bénéficiaire
+    const ordre = [...LETTRES_RIASEC].sort((a, b) => {
+      const sa = (seed + a.charCodeAt(0) * 31) % 1000;
+      const sb = (seed + b.charCodeAt(0) * 31) % 1000;
+      return sb - sa;
+    });
+    const dominant = ordre[0];
+    const secondaire = ordre[1];
+    const dom = PROFILS_RIASEC[dominant];
+    const sec = PROFILS_RIASEC[secondaire];
+
+    const scores = LETTRES_RIASEC.map((l) => ({
+      lettre: l,
+      label: PROFILS_RIASEC[l].label,
+      score: scoreRiasec(seed, l, dominant, secondaire),
+    })).sort((a, b) => b.score - a.score);
+
+    const interps = [
+      `Le profil dominant **${dom.label}** (${dominant}) de ${nomB} traduit une personnalité ${dom.traits}. Ce profil est un atout pour envisager ${metier}, dans la mesure où ce métier mobilise des compétences concrètes et une approche factuelle de la résolution de problèmes.`,
+      `La dominante **${dom.label}** (${dominant}) indique une préférence pour l'action structurée et l'efficacité opérationnelle. Cette orientation est cohérente avec ${secteur} et les exigences de rigueur liées à ${metier}.`,
+      `Avec un profil **${dom.label}** (${dominant}) en tête, ${nomB} a un fonctionnement privilégiant la clarté, l'objectivité et le résultat concret. Cette base de personnalité soutient une transition vers ${metier} à condition d'intégrer les dimensions relationnelles et créatives du métier.`,
+    ];
+    const interp = interps[seed % interps.length];
+
+    const liens = [
+      `La combinaison ${dominant}${secondaire} suggère une affinité particulière avec ${sec.projets[seed % sec.projets.length]}, ce qui permet d'envisager ${metier} sous l'angle ${dominant === "S" || secondaire === "S" ? "de l'accompagnement et de la relation" : "de la technique et de la méthode"}.`,
+      `Le profil secondaire **${sec.label}** (${secondaire}) renforce la capacité d'${nomB} à s'adapter aux exigences de ${secteur}, notamment sur les aspects ${sec.traits}.`,
+      `Le binôme ${dominant}${secondaire} constitue un profil équilibré pour ${metier} : il associe les forces de ${dom.label.toLowerCase()} à celles de ${sec.label.toLowerCase()}, deux dimensions fréquemment recherchées dans ${secteur}.`,
+    ];
+    const lien = liens[seed % liens.length];
+
+    const conseils = [
+      `Poursuivre l'exploration de ${metier} en valorisant le côté ${dom.label.toLowerCase()} du profil, tout en travaillant les situations où le registre ${sec.label.toLowerCase()} sera attendu.`,
+      `Prévoir des mises en situation concrètes dans ${secteur} pour confirmer que les préférences ${dominant}${secondaire} se traduisent bien dans la pratique quotidienne de ${metier}.`,
+      `Intégrer dans le plan d'action des étapes de rencontre avec des professionnels exerçant ${metier}, afin de valider l'adéquation entre le profil de personnalité et les réalités du terrain.`,
+    ];
+    const conseil = conseils[seed % conseils.length];
+
+    const appreciation = [
+      `${nomB} a complété le test de personnalité de manière cohérente et réflexive. Le profil ${dominant}${secondaire} est stable et aligné avec les éléments recueillis lors de la phase préliminaire. Ce résultat constitue un appui utile pour la suite de la phase d'investigation.`,
+      `Les résultats obtenus par ${nomB} confirment une personnalité structurée autour de la dimension ${dom.label.toLowerCase()}. Le profil secondaire ${sec.label.toLowerCase()} apporte une nuance importante qui sera à prendre en compte dans la définition du projet professionnel.`,
+      `Le test de personnalité révèle un profil équilibré et mobilisable pour ${metier}. Les échanges avec le consultant permettront de confronter ces résultats aux contraintes et aux opportunités du marché de ${secteur}.`,
+    ][seed % appreciation.length];
+
+    return [
+      H("Test de personnalité"),
+      `_Outil d'investigation de la phase d'investigation — passé à mi-parcours._\n`,
+      entete(o, b, p),
+      `**Date de passation** : ${fmtDateFR(datePassation)}`,
+      `**Bénéficiaire** : ${civ} ${nomB}`,
+      `**Consultant** : ${p.consultant.nom}`,
+      "",
+      H2("1. Profil de personnalité dominant"),
+      `**Profil dominant** : ${dom.label} (${dominant})`,
+      `**Profil secondaire** : ${sec.label} (${secondaire})`,
+      "",
+      interp,
+      "",
+      H2("2. Résultats détaillés par dimension"),
+      "| Dimension | Score / 10 | Interprétation |",
+      "|---|---|---|",
+      ...scores.map((s) => `| **${s.label}** (${s.lettre}) | ${s.score}/10 | ${s.lettre === dominant ? "Dominante forte" : s.lettre === secondaire ? "Dominante secondaire" : "Présente à un niveau modéré"} |`),
+      "",
+      H2("3. Lien avec le projet professionnel"),
+      lien,
+      "",
+      H2("4. Conseils personnalisés"),
+      conseil,
+      "",
+      H2("5. Appréciation du consultant"),
+      appreciation,
+      "",
+      H2("6. Validation"),
+      `Test de personnalité passé le ${fmtDateFR(datePassation)} dans le cadre du bilan de compétences de ${nomB}. Les résultats sont restitués à titre indicatif et intégrés au document de synthèse.`,
+      SIGN(ctx, "Indicateur 11 - Test de personnalité", b, datePassation),
+    ].join("\n");
+  },
+};
+
+
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */
 /** Échelle cochée : note de 4 ou 5 selon le bénéficiaire et la question. */
