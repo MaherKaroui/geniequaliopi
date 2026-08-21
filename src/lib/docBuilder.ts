@@ -1260,6 +1260,36 @@ export function isStagiaireFormationTerminee(s: StagiaireInfo, f: FormationInfo)
   } catch { return false; }
 }
 
+/** Parse une date FR (jj/mm/aaaa) ou ISO */
+function parseAnyDate(dateStr?: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * Le bilan à froid n'est renseigné que si la fin de formation remonte à
+ * au moins 5 mois. Sinon le document doit rester vide.
+ */
+export function isBilanFroidDisponible(dateFin?: string): boolean {
+  const fin = parseAnyDate(dateFin);
+  if (!fin) return false;
+  const seuil = new Date(fin);
+  seuil.setMonth(seuil.getMonth() + 5);
+  return new Date() >= seuil;
+}
+
+/** Variante stagiaire (dates individuelles prioritaires) */
+export function isBilanFroidDisponibleStagiaire(s: StagiaireInfo, f: FormationInfo): boolean {
+  return isBilanFroidDisponible(s?.dateFinFormation || f?.dateFin);
+}
+
+
 /** Get formation progress ratio (0 to 1) based on today vs dateDebut/dateFin */
 export function getFormationProgress(f: FormationInfo): number {
   if (!f.dateDebut || !f.dateFin) return 0;
