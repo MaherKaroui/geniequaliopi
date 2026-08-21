@@ -627,6 +627,49 @@ function normalizeDate(dateStr: string): string {
   return dateStr;
 }
 
+/* ------------------------------------------------------------------ */
+/* Date de mise à jour du dossier (date de MAJ)                        */
+/* Aucun document (analyse des besoins, contrat, CGV, RI, convocation)  */
+/* ne peut être daté AVANT la date de MAJ du dossier.                   */
+/* ------------------------------------------------------------------ */
+
+let docRefDateISO: string | null = null;
+
+/** Définit la date de MAJ du dossier (ISO yyyy-mm-dd). */
+export function setDocRefDate(dateStr?: string | null): void {
+  if (!dateStr) { docRefDateISO = null; return; }
+  const iso = normalizeDate(String(dateStr));
+  const d = new Date(iso);
+  docRefDateISO = isNaN(d.getTime()) ? null : toISO(d);
+}
+
+export function getDocRefDate(): string | null {
+  return docRefDateISO;
+}
+
+function toISO(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function isNonWorkingDay(d: Date, holidays: Set<string>): boolean {
+  const dow = d.getDay();
+  return dow === 0 || dow === 6 || holidays.has(toISO(d));
+}
+
+/** Add N business days to a date (skips weekends + French holidays) */
+export function addBusinessDays(dateStr: string, businessDays: number): string {
+  if (!dateStr) return dateStr;
+  const d = new Date(normalizeDate(dateStr));
+  if (isNaN(d.getTime())) return dateStr;
+  const holidays = new Set([...getFrenchHolidays(d.getFullYear()), ...getFrenchHolidays(d.getFullYear() + 1)]);
+  let remaining = businessDays;
+  while (remaining > 0) {
+    d.setDate(d.getDate() + 1);
+    if (!isNonWorkingDay(d, holidays)) remaining--;
+  }
+  return toISO(d);
+}
+
 /** Subtract N business days from a date (skips weekends + French holidays) */
 export function subtractBusinessDays(dateStr: string, businessDays: number): string {
   if (!dateStr) return dateStr;
@@ -640,12 +683,23 @@ export function subtractBusinessDays(dateStr: string, businessDays: number): str
   while (remaining > 0) {
     d.setDate(d.getDate() - 1);
     const dow = d.getDay(); // 0=Sun, 6=Sat
-    const iso = d.toISOString().slice(0, 10);
+    const iso = toISO(d);
     if (dow !== 0 && dow !== 6 && !allHolidays.has(iso)) {
       remaining--;
     }
   }
-  return d.toISOString().slice(0, 10);
+  let result = toISO(d);
+
+  // Cohérence avec la date de MAJ du dossier : un document préparatoire
+  // (analyse des besoins, contrat, CGV, RI, convocation…) ne peut pas être
+  // daté avant la date de MAJ lorsque l'évènement de référence est postérieur
+  // à celle-ci. Dans ce cas on décale à MAJ + 3 jours ouvrés (WE et fériés exclus),
+  // sans jamais dépasser la date de référence.
+  if (docRefDateISO && normalized > docRefDateISO && result < docRefDateISO) {
+    const shifted = addBusinessDays(docRefDateISO, 3);
+    result = shifted > normalized ? normalized : shifted;
+  }
+  return result;
 }
 
 export function htmlWrap(content: string, landscape = false): string {
@@ -1205,6 +1259,36 @@ export function isStagiaireFormationTerminee(s: StagiaireInfo, f: FormationInfo)
     return !isNaN(d.getTime()) && d < new Date();
   } catch { return false; }
 }
+
+/** Parse une date FR (jj/mm/aaaa) ou ISO */
+function parseAnyDate(dateStr?: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * Le bilan à froid n'est renseigné que si la fin de formation remonte à
+ * au moins 5 mois. Sinon le document doit rester vide.
+ */
+export function isBilanFroidDisponible(dateFin?: string): boolean {
+  const fin = parseAnyDate(dateFin);
+  if (!fin) return false;
+  const seuil = new Date(fin);
+  seuil.setMonth(seuil.getMonth() + 5);
+  return new Date() >= seuil;
+}
+
+/** Variante stagiaire (dates individuelles prioritaires) */
+export function isBilanFroidDisponibleStagiaire(s: StagiaireInfo, f: FormationInfo): boolean {
+  return isBilanFroidDisponible(s?.dateFinFormation || f?.dateFin);
+}
+
 
 /** Get formation progress ratio (0 to 1) based on today vs dateDebut/dateFin */
 export function getFormationProgress(f: FormationInfo): number {

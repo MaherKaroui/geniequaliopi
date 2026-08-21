@@ -1,7 +1,7 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 
@@ -812,7 +812,7 @@ export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagi
 // ========== DOCUMENTS QUALITÉ AF ==========
 
 export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const termine = isFormationTerminee(f);
+  const termine = isBilanFroidDisponible(f.dateFin);
   if (!termine) {
     return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, stagiaires,
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction à froid sera réalisée 3 mois après la fin de la formation.</em></p></div>` });
