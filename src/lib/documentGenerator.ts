@@ -5,7 +5,7 @@ import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTSt
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -6188,7 +6188,7 @@ function genVAEPresentationNouvelEntrant(o: OrganismeInfo, f: FormationInfo) {
 function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
-  const dateAnalyse = subtractBusinessDays(dateDebut, 20);
+  const dateAnalyse = getDateAnalyseBesoins(dateDebut);
   return buildDocument({ org: o, title: "DIAGNOSTIC DE FAISABILITÉ VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
     { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Date de l'analyse :</strong> ${formatDate(dateAnalyse)}</p>` },
     { heading: "Expérience en lien avec la certification", content: `<p><strong>Durée d'expérience totale :</strong> 8 ans<br><strong>Durée en lien direct :</strong> 6 ans<br><br><strong>Activités principales identifiées :</strong><br>• Gestion opérationnelle du domaine visé<br>• Encadrement et coordination d'équipe<br>• Mise en place de procédures qualité<br>• Reporting et analyse de performance<br>• Formation et accompagnement de collaborateurs</p>` },
@@ -6714,7 +6714,7 @@ function genVAEProcessAnalyseBesoin(o: OrganismeInfo) {
 function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
-  const dateAnalyse = subtractBusinessDays(dateDebut, 20);
+  const dateAnalyse = getDateAnalyseBesoins(dateDebut);
   const entreprise = s.entreprise || "Entreprise non renseignée";
   const responsable = s.responsableEntreprise || "Responsable non renseigné";
   const poste = s.poste || "Poste non renseigné";
@@ -9902,9 +9902,9 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
-<p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
+<p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(f.dateDebut))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
-<p>LE : ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
+<p>LE : ${formatDate(getDateAnalyseBesoins(f.dateDebut))}</p>
 ` });
 }
 
@@ -9962,9 +9962,9 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
-<p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
+<p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
-<p>LE : ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
+<p>LE : ${formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)))}</p>
 ` });
 }
 
@@ -10011,9 +10011,9 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 
 <p style="margin-top:20px"><strong>Signature du tuteur / représentant entreprise :</strong> ${tuteurNom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
-<p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
+<p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
-<p>LE : ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
+<p>LE : ${formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)))}</p>
 ` });
 }
 
@@ -10047,7 +10047,7 @@ function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiair
     ? QUESTION_FINANCEMENT_ALTERNANCE
     : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
   const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
-  const dateAnalyse = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20));
+  const dateAnalyse = formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)));
 
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">

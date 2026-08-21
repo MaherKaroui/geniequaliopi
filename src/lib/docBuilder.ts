@@ -702,6 +702,40 @@ export function subtractBusinessDays(dateStr: string, businessDays: number): str
   return result;
 }
 
+/**
+ * Date de signature des pièces contractuelles (contrat, CGV, RI, convocation) :
+ * 14 jours ouvrés avant le démarrage, avec respect de la date de MAJ.
+ */
+export function getDateSignatureDossier(dateRef: string): string {
+  return subtractBusinessDays(dateRef, 14);
+}
+
+/**
+ * Date de l'évaluation / analyse des besoins : elle doit toujours précéder
+ * de 2 jours ouvrés la signature des pièces contractuelles.
+ * Ne descend jamais en dessous de la date de MAJ du dossier.
+ */
+export function getDateAnalyseBesoins(dateRef: string): string {
+  if (!dateRef) return dateRef;
+  const signature = getDateSignatureDossier(dateRef);
+  const d = new Date(normalizeDate(signature));
+  if (isNaN(d.getTime())) return signature;
+  const allHolidays = new Set([
+    ...getFrenchHolidays(d.getFullYear()),
+    ...getFrenchHolidays(d.getFullYear() - 1),
+  ]);
+  let remaining = 2;
+  while (remaining > 0) {
+    d.setDate(d.getDate() - 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6 && !allHolidays.has(toISO(d))) remaining--;
+  }
+  let result = toISO(d);
+  if (docRefDateISO && result < docRefDateISO) result = docRefDateISO;
+  return result;
+}
+
+
 export function htmlWrap(content: string, landscape = false): string {
   const pageMeta = landscape
     ? `<meta name="pdf-page-size" content="297x210"><style>@page{size:A4 landscape;margin:0}</style>`
