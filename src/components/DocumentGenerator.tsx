@@ -176,6 +176,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   }, []);
 
   const mergedOrganisme = useMemo(() => mergeOrganisme(organisme), [organisme]);
+
+  // La date de MAJ du dossier borne les dates des documents préparatoires
+  useEffect(() => {
+    setDocRefDate(mergedOrganisme?.dateMaj);
+  }, [mergedOrganisme?.dateMaj]);
   const selectedFormation = useMemo(() => (
     formation.intitule
       ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(formation).filter(([, value]) => value && String(value).trim())) }
