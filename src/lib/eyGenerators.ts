@@ -5,7 +5,7 @@
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfaction } from "./satisfactionComments";
-import { buildDocument, formatDate, getDocStyle, linkUrl, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, getSessionDates, isStagiaireFormationTerminee } from "./docBuilder";
+import { buildDocument, formatDate, getDocStyle, linkUrl, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, getSessionDates, isStagiaireFormationTerminee, isBilanFroidDisponibleStagiaire } from "./docBuilder";
 import { SAMPLE_FORMATEURS, FormateurInfo, parseDuree, getFormationDays } from "./sampleData";
 
 function today(): string { return new Date().toISOString().slice(0, 10); }
@@ -924,7 +924,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
   const deb = s.dateDebutFormation || f.dateDebut || "";
   const fin = s.dateFinFormation || f.dateFin || "";
   const titre = f.intitule || "Formation";
-  const termine = isStagiaireFormationTerminee(s, f);
+  const termine = isBilanFroidDisponibleStagiaire(s, f);
 
   const questions = [
     "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans votre travail ?",
