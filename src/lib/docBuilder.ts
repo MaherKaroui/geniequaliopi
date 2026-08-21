@@ -627,6 +627,49 @@ function normalizeDate(dateStr: string): string {
   return dateStr;
 }
 
+/* ------------------------------------------------------------------ */
+/* Date de mise à jour du dossier (date de MAJ)                        */
+/* Aucun document (analyse des besoins, contrat, CGV, RI, convocation)  */
+/* ne peut être daté AVANT la date de MAJ du dossier.                   */
+/* ------------------------------------------------------------------ */
+
+let docRefDateISO: string | null = null;
+
+/** Définit la date de MAJ du dossier (ISO yyyy-mm-dd). */
+export function setDocRefDate(dateStr?: string | null): void {
+  if (!dateStr) { docRefDateISO = null; return; }
+  const iso = normalizeDate(String(dateStr));
+  const d = new Date(iso);
+  docRefDateISO = isNaN(d.getTime()) ? null : toISO(d);
+}
+
+export function getDocRefDate(): string | null {
+  return docRefDateISO;
+}
+
+function toISO(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function isNonWorkingDay(d: Date, holidays: Set<string>): boolean {
+  const dow = d.getDay();
+  return dow === 0 || dow === 6 || holidays.has(toISO(d));
+}
+
+/** Add N business days to a date (skips weekends + French holidays) */
+export function addBusinessDays(dateStr: string, businessDays: number): string {
+  if (!dateStr) return dateStr;
+  const d = new Date(normalizeDate(dateStr));
+  if (isNaN(d.getTime())) return dateStr;
+  const holidays = new Set([...getFrenchHolidays(d.getFullYear()), ...getFrenchHolidays(d.getFullYear() + 1)]);
+  let remaining = businessDays;
+  while (remaining > 0) {
+    d.setDate(d.getDate() + 1);
+    if (!isNonWorkingDay(d, holidays)) remaining--;
+  }
+  return toISO(d);
+}
+
 /** Subtract N business days from a date (skips weekends + French holidays) */
 export function subtractBusinessDays(dateStr: string, businessDays: number): string {
   if (!dateStr) return dateStr;
