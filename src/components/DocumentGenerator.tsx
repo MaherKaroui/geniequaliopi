@@ -8,7 +8,7 @@ import { generateBookQualiopiCFA } from "@/lib/bookQualiopiCFA";
 import { generateFeuilleRouteQualiopiCFA } from "@/lib/feuilleRouteQualiopiCFA";
 import { generateGuideAuditCFA } from "@/lib/guideAuditCFA";
 import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type TypeActionAudit } from "@/lib/guideAuditUniversal";
-import { setDocStyle } from "@/lib/docBuilder";
+import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
