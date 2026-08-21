@@ -6754,7 +6754,7 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 function genVAELivret1Recevabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
-  const dateSignature = getDateAnalyseBesoins(dateDebut);
+  const dateSignature = subtractBusinessDays(dateDebut, 20);
   return buildDocument({ org: o, title: "LIVRET 1 – DOSSIER DE RECEVABILITÉ VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
     { heading: "1. Identification du candidat", content: `<p><strong>Civilité :</strong> ${s.civilite || "Mme"}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance || "___"}<br><strong>Adresse :</strong> ${s.adresse || "___"}<br><strong>Code postal :</strong> ${s.codePostal || "___"}<br><strong>Commune :</strong> ${s.commune || "___"}<br>${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br><strong>Email :</strong> ${s.email}</p>` },
     { heading: "2. Certification visée", content: `<p><strong>Intitulé de la certification :</strong> ${f.intitule}<br><strong>Code RNCP :</strong> ${f.codeRNCP || "___"}<br><strong>Organisme certificateur :</strong> ${o.nom}<br><strong>Niveau de qualification :</strong> Niveau 3 à 7 selon certification</p>` },
