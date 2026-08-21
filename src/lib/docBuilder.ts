@@ -683,12 +683,23 @@ export function subtractBusinessDays(dateStr: string, businessDays: number): str
   while (remaining > 0) {
     d.setDate(d.getDate() - 1);
     const dow = d.getDay(); // 0=Sun, 6=Sat
-    const iso = d.toISOString().slice(0, 10);
+    const iso = toISO(d);
     if (dow !== 0 && dow !== 6 && !allHolidays.has(iso)) {
       remaining--;
     }
   }
-  return d.toISOString().slice(0, 10);
+  let result = toISO(d);
+
+  // Cohérence avec la date de MAJ du dossier : un document préparatoire
+  // (analyse des besoins, contrat, CGV, RI, convocation…) ne peut pas être
+  // daté avant la date de MAJ lorsque l'évènement de référence est postérieur
+  // à celle-ci. Dans ce cas on décale à MAJ + 3 jours ouvrés (WE et fériés exclus),
+  // sans jamais dépasser la date de référence.
+  if (docRefDateISO && normalized > docRefDateISO && result < docRefDateISO) {
+    const shifted = addBusinessDays(docRefDateISO, 3);
+    result = shifted > normalized ? normalized : shifted;
+  }
+  return result;
 }
 
 export function htmlWrap(content: string, landscape = false): string {
