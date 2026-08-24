@@ -283,6 +283,16 @@ function appreciationFin(score: number, debut: number, s: BahoStagiaire, si: num
   return pool[seedOf(s, si, 2609) % pool.length];
 }
 
+/** Ré-attribue les mauvaises réponses avec une graine propre au stagiaire (score inchangé) */
+function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, salt: number): number[] {
+  return answers.map((a, qi) => {
+    const q = qcm[qi];
+    if (a === q.correctIndex) return a;
+    const wrong = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
+    return wrong[seedOf(s, si, salt + qi * 97) % wrong.length];
+  });
+}
+
 function renderQCMTable(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, filled: boolean): string {
   return qcm
     .map((q, qi) => {
@@ -323,7 +333,7 @@ function buildTestHTML(
   const finished = !!e.dateFin && new Date(e.dateFin).getTime() <= Date.now();
   const filled = mode === "debut" ? true : finished;
 
-  const answers = answersForQCM(qcm, si, asStagiaireInfo(s), mode, false, target);
+  const answers = diversifyWrong(qcm, answersForQCM(qcm, si, asStagiaireInfo(s), mode, false, target), s, si, mode === "debut" ? 5501 : 7703);
   const obtained = answers.reduce((acc, a, qi) => acc + (a === qcm[qi].correctIndex ? 1 : 0), 0);
 
   const fullName = `${civiliteOf(s)} ${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim();
@@ -415,8 +425,8 @@ export function auditBahoTests(): Array<{
   for (const e of getBahoEntreprises() as BahoEntreprise[]) {
     e.stagiaires.forEach((s, si) => {
       const sc = bahoScores(s, si);
-      const ad = answersForQCM(BAHO_QCM_DEBUT, si, asStagiaireInfo(s), "debut", false, sc.debut);
-      const af = answersForQCM(BAHO_QCM_FIN, si, asStagiaireInfo(s), "fin", false, sc.fin);
+      const ad = diversifyWrong(BAHO_QCM_DEBUT, answersForQCM(BAHO_QCM_DEBUT, si, asStagiaireInfo(s), "debut", false, sc.debut), s, si, 5501);
+      const af = diversifyWrong(BAHO_QCM_FIN, answersForQCM(BAHO_QCM_FIN, si, asStagiaireInfo(s), "fin", false, sc.fin), s, si, 7703);
       out.push({
         entreprise: e.nom,
         stagiaire: `${s.nom} ${s.prenom}`.trim(),
