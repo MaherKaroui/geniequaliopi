@@ -20,30 +20,55 @@ export function normalizeStagiaire(s: BahoStagiaire): BahoStagiaire {
   return s;
 }
 
-/** Recule de n jours ouvrés (weekends exclus). */
-function backWorkingDays(iso: string, n: number): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  let left = n;
-  while (left > 0) {
-    d.setUTCDate(d.getUTCDate() - 1);
-    const day = d.getUTCDay();
-    if (day !== 0 && day !== 6) left--;
-  }
-  return d.toISOString().slice(0, 10);
+/** Délai réglementaire minimum entre l'évaluation des besoins et le démarrage. */
+export const DELAI_MINIMUM_BESOINS_JOURS = 15;
+
+/**
+ * Date de la fiche : au moins 15 jours calendaires AVANT le début de formation.
+ * Si la date obtenue tombe un samedi, un dimanche ou un jour férié français,
+ * on recule (jamais vers l'avant) jusqu'au jour ouvré précédent — l'écart
+ * réel reste donc toujours ≥ 15 jours.
+ */
+export function dateEvaluationBesoins(e: BahoEntreprise): string {
+  const debut = new Date(e.dateDebut);
+  if (isNaN(debut.getTime())) return "";
+  debut.setUTCDate(debut.getUTCDate() - DELAI_MINIMUM_BESOINS_JOURS);
+  return jourOuvrePrecedent(debut.toISOString().slice(0, 10));
+}
+
+/** Écart réel en jours calendaires entre l'évaluation et le début de formation. */
+export function ecartJoursBesoins(e: BahoEntreprise): number {
+  const d = dateEvaluationBesoins(e);
+  if (!d) return 0;
+  return Math.round((new Date(e.dateDebut).getTime() - new Date(d).getTime()) / 86400000);
 }
 
 /**
- * Date de la fiche : 2 jours ouvrés AVANT la date de convention
- * (donc largement antérieure au démarrage de la formation).
+ * Cas particulier : la date calculée est antérieure à aujourd'hui (dossier créé
+ * trop tard pour respecter le délai). Renvoie la liste des stagiaires concernés.
  */
-export function dateEvaluationBesoins(e: BahoEntreprise): string {
-  const fromConv = e.dateConvention ? backWorkingDays(e.dateConvention, 2) : "";
-  const fromDebut = backWorkingDays(e.dateDebut, 12);
-  // toujours antérieure au démarrage : on retient la plus ancienne des deux références
-  if (!fromConv) return fromDebut;
-  return new Date(fromConv).getTime() <= new Date(fromDebut).getTime() ? fromConv : fromDebut;
+export function anomaliesDelaiBesoins(
+  entreprises: BahoEntreprise[],
+  aujourdhui: Date = new Date()
+): Array<{ stagiaire: string; entreprise: string; dateDebut: string; dateEvaluation: string }> {
+  const today = aujourdhui.toISOString().slice(0, 10);
+  const out: Array<{ stagiaire: string; entreprise: string; dateDebut: string; dateEvaluation: string }> = [];
+  for (const e of entreprises) {
+    const dateEval = dateEvaluationBesoins(e);
+    if (!dateEval || dateEval >= today) continue;
+    for (const raw of e.stagiaires) {
+      const s = normalizeStagiaire(raw);
+      out.push({
+        stagiaire: `${s.prenom} ${s.nom}`.trim(),
+        entreprise: e.nom,
+        dateDebut: e.dateDebut,
+        dateEvaluation: dateEval,
+      });
+    }
+  }
+  return out;
 }
+
 
 function pick<T>(pool: T[], s: BahoStagiaire, si: number, salt: number, ctx: string): T {
   return pool[seedOf(s, si, salt, ctx) % pool.length];
