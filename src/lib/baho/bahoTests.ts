@@ -235,6 +235,11 @@ function seedOf(s: BahoStagiaire, si: number, salt: number): number {
   return Math.abs(h + salt);
 }
 
+/** Index pseudo-aléatoire stable : diversifie les questions ratées d'un stagiaire à l'autre */
+function pseudoIndex(s: BahoStagiaire, si: number): number {
+  return seedOf(s, si, 3313) % 977;
+}
+
 export interface BahoTestScore {
   debut: number;
   fin: number;
@@ -289,7 +294,8 @@ function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiair
     const q = qcm[qi];
     if (a === q.correctIndex) return a;
     const wrong = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
-    return wrong[seedOf(s, si, salt + qi * 97) % wrong.length];
+    const origIdx = Math.max(0, wrong.indexOf(a));
+    return wrong[(origIdx + seedOf(s, si, salt + qi * 97)) % wrong.length];
   });
 }
 
@@ -333,7 +339,7 @@ function buildTestHTML(
   const finished = !!e.dateFin && new Date(e.dateFin).getTime() <= Date.now();
   const filled = mode === "debut" ? true : finished;
 
-  const answers = diversifyWrong(qcm, answersForQCM(qcm, si, asStagiaireInfo(s), mode, false, target), s, si, mode === "debut" ? 5501 : 7703);
+  const answers = diversifyWrong(qcm, answersForQCM(qcm, pseudoIndex(s, si), asStagiaireInfo(s), mode, false, target), s, si, mode === "debut" ? 5501 : 7703);
   const obtained = answers.reduce((acc, a, qi) => acc + (a === qcm[qi].correctIndex ? 1 : 0), 0);
 
   const fullName = `${civiliteOf(s)} ${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim();
@@ -425,8 +431,8 @@ export function auditBahoTests(): Array<{
   for (const e of getBahoEntreprises() as BahoEntreprise[]) {
     e.stagiaires.forEach((s, si) => {
       const sc = bahoScores(s, si);
-      const ad = diversifyWrong(BAHO_QCM_DEBUT, answersForQCM(BAHO_QCM_DEBUT, si, asStagiaireInfo(s), "debut", false, sc.debut), s, si, 5501);
-      const af = diversifyWrong(BAHO_QCM_FIN, answersForQCM(BAHO_QCM_FIN, si, asStagiaireInfo(s), "fin", false, sc.fin), s, si, 7703);
+      const ad = diversifyWrong(BAHO_QCM_DEBUT, answersForQCM(BAHO_QCM_DEBUT, pseudoIndex(s, si), asStagiaireInfo(s), "debut", false, sc.debut), s, si, 5501);
+      const af = diversifyWrong(BAHO_QCM_FIN, answersForQCM(BAHO_QCM_FIN, pseudoIndex(s, si), asStagiaireInfo(s), "fin", false, sc.fin), s, si, 7703);
       out.push({
         entreprise: e.nom,
         stagiaire: `${s.nom} ${s.prenom}`.trim(),
