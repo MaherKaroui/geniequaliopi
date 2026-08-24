@@ -249,7 +249,8 @@ export interface BahoTestScore {
 export function bahoScores(s: BahoStagiaire, si: number): BahoTestScore {
   const debut = 3 + (seedOf(s, si, 4211) % 5); // 3..7
   const gain = 2 + (seedOf(s, si, 8317) % 3); // +2..+4
-  const fin = Math.min(10, Math.max(7, debut + gain, debut + 1));
+  // plafond à 9/10 : une copie 10/10 serait strictement identique pour tous (signal de fabrication)
+  const fin = Math.min(9, Math.max(7, debut + gain, debut + 1));
   return { debut, fin };
 }
 
