@@ -197,6 +197,24 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
+      // 7e/7f/7g. Exercices jour 1 & 2 + évaluation finale
+      const extras: Array<[string, string, () => string]> = [
+        ["Exercice jour 1", `Exercice_jour1_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour1HTML(e, s, si, customFsStamp)],
+        ["Exercice jour 2", `Exercice_jour2_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour2HTML(e, s, si, customFsStamp)],
+        ["Évaluation finale", `Evaluation_finale_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getEvaluationFinaleHTML(e, s, si, customFsStamp)],
+      ];
+      for (const [label, fileName, render] of extras) {
+        try {
+          reporter?.setMessage(`${e.nom} – ${label} ${s.prenom} ${s.nom}…`);
+          const pdf = await htmlToPdfBlob(render());
+          stagFolder.file(fileName, pdf);
+        } catch (err) {
+          console.error(`${label} error:`, err);
+          stagFolder.file(`ERREUR_${fileName.replace(/\.pdf$/, "")}.txt`, `Erreur: ${(err as Error).message}`);
+        }
+        step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+      }
+
 
       // GC pause every 3 stagiaires
       if (si % 3 === 2) await new Promise((r) => setTimeout(r, 30));
