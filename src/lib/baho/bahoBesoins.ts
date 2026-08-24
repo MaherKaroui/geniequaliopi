@@ -349,7 +349,7 @@ export function getEvaluationBesoinsHTML(
 
 /** Audit : vérifie remplissage, OPCO, antériorité de la date et diversité des réponses. */
 export function auditBahoBesoins(entreprises: BahoEntreprise[]) {
-  const rows: Array<{ nom: string; entreprise: string; date: string; avantDebut: boolean; opco: boolean; entrepriseRemplie: boolean }> = [];
+  const rows: Array<{ nom: string; entreprise: string; date: string; avantDebut: boolean; ecartJours: number; jourNonOuvre: boolean; opco: boolean; entrepriseRemplie: boolean }> = [];
   const seen = new Set<string>();
   let duplicates = 0;
   entreprises.forEach((e) =>
@@ -363,10 +363,14 @@ export function auditBahoBesoins(entreprises: BahoEntreprise[]) {
         entreprise: e.nom,
         date: c.date,
         avantDebut: new Date(c.date).getTime() < new Date(e.dateDebut).getTime(),
+        ecartJours: ecartJoursBesoins(e),
+        jourNonOuvre: estJourNonOuvre(c.date),
         opco: /opco/i.test(c.financement),
         entrepriseRemplie: !!c.attentes && !!c.missions && !!c.strategie,
       });
     })
   );
-  return { rows, duplicates };
+  const annees = Array.from(new Set(entreprises.map((e) => Number(e.dateDebut.slice(0, 4))).filter(Boolean)));
+  const feries = annees.flatMap((y) => Array.from(getFrenchHolidays(y)).sort());
+  return { rows, duplicates, feries, anomaliesDelai: anomaliesDelaiBesoins(entreprises) };
 }
