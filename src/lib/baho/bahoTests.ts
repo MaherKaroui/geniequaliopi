@@ -300,7 +300,7 @@ function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiair
   });
 }
 
-function renderQCMTable(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, filled: boolean): string {
+function renderQCMTable(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, filled: boolean, ctxSeed = ""): string {
   return qcm
     .map((q, qi) => {
       const chosen = answers[qi];
@@ -317,7 +317,7 @@ function renderQCMTable(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiair
         <td style="width:52%;"><strong>${q.question}</strong><div style="margin-top:6px;">${opts}</div></td>
         <td style="width:14%; text-align:center;">${filled ? letter(chosen) : "—"}</td>
         <td style="width:10%; text-align:center; font-weight:bold; color:${filled ? (ok ? "#1a6e3a" : "#a12a2a") : "#888"};">${filled ? (ok ? "1" : "0") : "—"}</td>
-        <td style="width:20%; font-size:10pt; font-style:italic;">${filled ? humanizedQCMComment(ok, asStagiaireInfo(s), si, qi) : "À compléter"}</td>
+        <td style="width:20%; font-size:10pt; font-style:italic;">${filled ? humanizedQCMComment(ok, asStagiaireInfo(s, ctxSeed), si, qi) : "À compléter"}</td>
       </tr>`;
     })
     .join("");
@@ -390,7 +390,7 @@ function buildTestHTML(
       </tr>
     </thead>
     <tbody>
-      ${renderQCMTable(qcm, answers, s, si, filled)}
+      ${renderQCMTable(qcm, answers, s, si, filled, ctx)}
     </tbody>
   </table>
 
@@ -398,7 +398,7 @@ function buildTestHTML(
     <p><strong>Score total :</strong> ${filled ? `${obtained}/10` : "…… / 10"}</p>
     ${extra}
     <p><strong>Appréciation du formateur :</strong> ${feedback}</p>
-    ${filled ? `<p style="font-size:10pt; font-style:italic;">${humanizedTeacherFeedback(obtained, 10, asStagiaireInfo(s), si, mode === "fin" ? 3 : 1)}</p>` : ""}
+    ${filled ? `<p style="font-size:10pt; font-style:italic;">${humanizedTeacherFeedback(obtained, 10, asStagiaireInfo(s, ctx), si, mode === "fin" ? 3 : 1)}</p>` : ""}
   </div>
 
   <p style="margin-top:20px;"><strong>Fait à ${(e.adresse || "").split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(dateTest)}</strong></p>
