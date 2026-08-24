@@ -52,6 +52,10 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     " - Certificat de réalisation individuel",
     " - Test de positionnement de début (score plafonné à 7/10)",
     " - Test de positionnement de fin (score minimum 7/10, progression positive)",
+    " - Exercice pratique du jour 1 (daté du 1er jour de formation)",
+    " - Exercice pratique du jour 2 (daté du 2e jour de formation)",
+    " - Évaluation finale (datée du dernier jour de formation)",
+
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
