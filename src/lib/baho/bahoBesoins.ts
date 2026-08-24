@@ -4,7 +4,7 @@
  * Données : conventions BAHO (bahoData) — rien n'est inventé côté coordonnées.
  */
 import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
-import { BASE_CSS, header, footer, stampsBlock, formatDateLong } from "./bahoStaticDocs";
+import { BASE_CSS, header, footer, stampsBlock, formatDateLong, jourOuvrePrecedent, estJourNonOuvre, getFrenchHolidays } from "./bahoStaticDocs";
 import { BAHO_INTITULE, seedOf, civiliteOf, bahoScores } from "./bahoTests";
 
 /* ------------------------------------------------------------------ */
