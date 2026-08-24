@@ -7,6 +7,7 @@ import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getConvocationHTML, getCertificatRealisationHTML } from "./bahoStaticDocs";
 import { getBahoStagiaireDocs, BAHO_STAGIAIRE_DOCS_COUNT } from "./bahoStagiaireDocs";
+import { anomaliesDelaiBesoins } from "./bahoBesoins";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -49,7 +50,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     "Pour chaque stagiaire (PDF tamponné) :",
     " - Convocation individuelle",
     " - Certificat de réalisation individuel",
-    " - Évaluation des besoins (datée avant le début de formation)",
+    " - Évaluation des besoins (au moins 15 jours avant le début, jour ouvré)",
     " - Test de positionnement de début (score plafonné à 7/10)",
     " - Test de positionnement de fin (score minimum 7/10, progression positive)",
     " - Exercice pratique du jour 1 (daté du 1er jour de formation)",
@@ -60,6 +61,19 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
   ];
+  // Délai réglementaire de 15 jours sur l'évaluation des besoins : signaler les sessions non conformes
+  const anomalies = anomaliesDelaiBesoins(entreprises);
+  if (anomalies.length) {
+    readmeLines.push(
+      "",
+      "ATTENTION – délai de 15 jours non tenable pour les stagiaires suivants :",
+      ...anomalies.map(
+        (a) => ` - ${a.stagiaire} (${a.entreprise}) : début ${a.dateDebut}, évaluation des besoins calculée au ${a.dateEvaluation} (date passée)`
+      )
+    );
+    console.warn("[BAHO] Délai 15 jours non respecté :", anomalies);
+  }
+
   zip.file("README.txt", readmeLines.join("\n"));
 
   let invoiceCounter = 1;

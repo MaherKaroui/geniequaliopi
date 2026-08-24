@@ -55,7 +55,8 @@ export function anomaliesDelaiBesoins(
   const out: Array<{ stagiaire: string; entreprise: string; dateDebut: string; dateEvaluation: string }> = [];
   for (const e of entreprises) {
     const dateEval = dateEvaluationBesoins(e);
-    if (!dateEval || dateEval >= today) continue;
+    // Ne concerne que les sessions à venir : une session déjà passée n'est pas une anomalie.
+    if (!dateEval || e.dateDebut < today || dateEval >= today) continue;
     for (const raw of e.stagiaires) {
       const s = normalizeStagiaire(raw);
       out.push({
