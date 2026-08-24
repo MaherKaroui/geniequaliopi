@@ -12,7 +12,7 @@ export function formatDateLong(iso: string): string {
 }
 
 /** Calcule les jours fériés français (métropole) pour une année donnée */
-function getFrenchHolidays(year: number): Set<string> {
+export function getFrenchHolidays(year: number): Set<string> {
   const fixed = [
     `${year}-01-01`, // Jour de l'an
     `${year}-05-01`, // Fête du travail
@@ -48,6 +48,26 @@ function getFrenchHolidays(year: number): Set<string> {
   fixed.push(addDays(easter, 39));  // Ascension
   fixed.push(addDays(easter, 50));  // Lundi de Pentecôte
   return new Set(fixed);
+}
+
+/** true si la date ISO tombe un samedi, un dimanche ou un jour férié français */
+export function estJourNonOuvre(iso: string): boolean {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return false;
+  const day = d.getUTCDay();
+  return day === 0 || day === 6 || getFrenchHolidays(d.getUTCFullYear()).has(iso.slice(0, 10));
+}
+
+/** Recule la date jusqu'au jour ouvré précédent (jamais vers l'avant) */
+export function jourOuvrePrecedent(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  let guard = 0;
+  while (estJourNonOuvre(d.toISOString().slice(0, 10)) && guard < 30) {
+    d.setUTCDate(d.getUTCDate() - 1);
+    guard++;
+  }
+  return d.toISOString().slice(0, 10);
 }
 
 /** Soustrait N jours ouvrés (hors weekends + jours fériés FR) à une date ISO */
