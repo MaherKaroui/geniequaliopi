@@ -4,7 +4,7 @@
 import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
 import { getHotelStampSvg, getFormatSphereStampSvg, svgToDataUri } from "./bahoStamps";
 
-function formatDateLong(iso: string): string {
+export function formatDateLong(iso: string): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
@@ -71,7 +71,7 @@ function subtractWorkingDays(iso: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-const BASE_CSS = `
+export const BASE_CSS = `
 <style>
   body { font-family: 'Calibri', Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.5; padding: 30px; }
   h1 { color: #1a3a6e; font-size: 18pt; border-bottom: 2px solid #1a3a6e; padding-bottom: 6px; }
@@ -87,7 +87,7 @@ const BASE_CSS = `
   .total-row { font-weight: bold; background: #f4f4f4; }
 </style>`;
 
-function header(): string {
+export function header(): string {
   return `
   <div class="header">
     <div class="org-block">
@@ -101,7 +101,7 @@ function header(): string {
   </div>`;
 }
 
-function footer(): string {
+export function footer(): string {
   return `
   <div class="footer">
     <strong>${FORMAT_SPHERE_ORG.nom}</strong> – ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}<br/>
@@ -200,7 +200,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
 }
 
 /** Build a stamps signature block (FORMAT SPHERE + hotel) used in all PDFs */
-function stampsBlock(e: BahoEntreprise, customFsStamp?: string): string {
+export function stampsBlock(e: BahoEntreprise, customFsStamp?: string): string {
   const hotelStamp = svgToDataUri(getHotelStampSvg(e));
   const fsStamp = customFsStamp || svgToDataUri(getFormatSphereStampSvg());
   return `
@@ -729,7 +729,7 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
 }
 
 /** Calcule les 3 jours consécutifs de formation à partir d'une date de début (saute weekends + fériés) */
-function getThreeWorkingDays(startIso: string): string[] {
+export function getThreeWorkingDays(startIso: string): string[] {
   if (!startIso) return ["", "", ""];
   const d = new Date(startIso);
   if (isNaN(d.getTime())) return ["", "", ""];
