@@ -8,7 +8,9 @@ import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, Chevro
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
 import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML, getConvocationHTML, getCertificatRealisationHTML } from "@/lib/baho/bahoStaticDocs";
+import { getBahoStagiaireDocs, type BahoStagiaireDocKind } from "@/lib/baho/bahoStagiaireDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { saveAs } from "file-saver";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
 
@@ -17,7 +19,13 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "convocation" | "certificat";
+type DocKind =
+  | "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "convocation" | "certificat"
+  | BahoStagiaireDocKind;
+
+const STAGIAIRE_DOC_KINDS: BahoStagiaireDocKind[] = [
+  "besoins", "positionnement_debut", "exercice_j1", "exercice_j2", "evaluation_finale", "positionnement_fin",
+];
 
 interface PreviewState {
   entreprise: BahoEntreprise;
@@ -25,6 +33,7 @@ interface PreviewState {
   docKind: DocKind;
   pdfUrl: string;
   loading: boolean;
+  fileName?: string;
 }
 
 export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
@@ -73,6 +82,17 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     setPreview({ entreprise, stagiaire, docKind, pdfUrl: "", loading: true });
     try {
       let html = "";
+      let fileName: string | undefined;
+      if ((STAGIAIRE_DOC_KINDS as string[]).includes(docKind)) {
+        if (!stagiaire) throw new Error("Stagiaire requis");
+        const si = entreprise.stagiaires.findIndex((x) => x.codeStagiaire === stagiaire.codeStagiaire);
+        const doc = getBahoStagiaireDocs(entreprise, stagiaire, Math.max(0, si)).find((d) => d.kind === docKind)!;
+        html = doc.render(fsStamp ?? undefined);
+        fileName = doc.fileName;
+        const blobS = await htmlToPdfBlob(html);
+        setPreview({ entreprise, stagiaire, docKind, pdfUrl: URL.createObjectURL(blobS), loading: false, fileName });
+        return;
+      }
       switch (docKind) {
         case "convention":
           html = getConventionHTML(entreprise, fsStamp ?? undefined);
@@ -120,6 +140,18 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     ri: "Règlement intérieur",
     convocation: "Convocation",
     certificat: "Certificat de réalisation",
+    besoins: "Évaluation des besoins",
+    positionnement_debut: "Test de positionnement – début",
+    exercice_j1: "Exercice du jour 1",
+    exercice_j2: "Exercice du jour 2",
+    evaluation_finale: "Évaluation finale",
+    positionnement_fin: "Test de positionnement – fin",
+  };
+
+  const handleDownloadPreview = async () => {
+    if (!preview || preview.loading || !preview.pdfUrl) return;
+    const blob = await fetch(preview.pdfUrl).then((r) => r.blob());
+    saveAs(blob, preview.fileName || `${docLabels[preview.docKind]}.pdf`);
   };
 
   const handleGenerate = async () => {
@@ -149,7 +181,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture (avec liste participants + présentiel), CGV, RI par hôtel + <strong>Convocation et Certificat de réalisation par stagiaire</strong> ({totalStagiaires * 2} docs individuels) — tous tamponnés (hôtel + FORMAT SPHERE).
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture (avec liste participants + présentiel), CGV, RI par hôtel + <strong>Convocation et Certificat de réalisation par stagiaire</strong> ({totalStagiaires * 8} docs individuels : convocation, certificat, évaluation des besoins, 2 tests de positionnement, 2 exercices, évaluation finale) — tous tamponnés (hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
@@ -268,6 +300,32 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                           <span className="truncate">Certificat – {s.prenom} {s.nom}</span>
                         </button>
                       ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">
+                        Évaluations &amp; exercices (6 par stagiaire)
+                      </div>
+                      {e.stagiaires.map((s, si) =>
+                        getBahoStagiaireDocs(e, s, si).map((doc) => (
+                          <button
+                            key={`${doc.kind}-${s.codeStagiaire}`}
+                            onClick={() => handlePreview(e, s, doc.kind)}
+                            className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                              preview?.entreprise.siret === e.siret &&
+                              preview?.stagiaire?.codeStagiaire === s.codeStagiaire &&
+                              preview?.docKind === doc.kind
+                                ? "bg-primary/10 text-primary"
+                                : ""
+                            }`}
+                          >
+                            <FileText className="w-3 h-3 shrink-0" />
+                            <span className="truncate">
+                              {docLabels[doc.kind]} – {s.prenom} {s.nom}
+                            </span>
+                            <span className="text-muted-foreground shrink-0">
+                              {new Date(doc.date).toLocaleDateString("fr-FR")}
+                            </span>
+                          </button>
+                        ))
+                      )}
                     </div>
                   )}
                 </div>
@@ -284,9 +342,14 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                     <strong>{docLabels[preview.docKind]}</strong> – {preview.entreprise.nom}
                     {preview.stagiaire && ` – ${preview.stagiaire.prenom} ${preview.stagiaire.nom}`}
                   </span>
-                  <button onClick={() => setPreview(null)} className="hover:text-destructive shrink-0 ml-2">
-                    <X className="w-4 h-4" />
-                  </button>
+                  <span className="flex items-center gap-1 shrink-0 ml-2">
+                    <Button variant="outline" size="sm" className="h-6 gap-1 text-[11px]" disabled={preview.loading} onClick={handleDownloadPreview}>
+                      <Download className="w-3 h-3" /> Télécharger
+                    </Button>
+                    <button onClick={() => setPreview(null)} className="hover:text-destructive">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
                 </div>
                 {preview.loading ? (
                   <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
@@ -356,7 +419,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           </Button>
           <Button onClick={handleGenerate} disabled={generating} className="gap-2">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires * 2} docs)`}
+            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires * 8} docs)`}
           </Button>
         </div>
       </DialogContent>
