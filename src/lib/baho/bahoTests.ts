@@ -228,16 +228,16 @@ export const BAHO_THEMES = [
   "Amélioration continue et indicateurs de coordination",
 ];
 
-function seedOf(s: BahoStagiaire, si: number, salt: number): number {
-  const base = `${s.nom || ""}${s.prenom || ""}${s.codeStagiaire || ""}${si}`;
+function seedOf(s: BahoStagiaire, si: number, salt: number, ctx = ""): number {
+  const base = `${s.nom || ""}${s.prenom || ""}${s.codeStagiaire || ""}${ctx}${si}`;
   let h = 0;
   for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
   return Math.abs(h + salt);
 }
 
 /** Index pseudo-aléatoire stable : diversifie les questions ratées d'un stagiaire à l'autre */
-function pseudoIndex(s: BahoStagiaire, si: number): number {
-  return seedOf(s, si, 3313) % 977;
+function pseudoIndex(s: BahoStagiaire, si: number, ctx = ""): number {
+  return seedOf(s, si, 3313, ctx) % 977;
 }
 
 export interface BahoTestScore {
@@ -246,17 +246,17 @@ export interface BahoTestScore {
 }
 
 /** Scores déterministes : début 3→7 (plafond strict 7), fin ≥ 7 et > début */
-export function bahoScores(s: BahoStagiaire, si: number): BahoTestScore {
-  const debut = 3 + (seedOf(s, si, 4211) % 5); // 3..7
-  const gain = 2 + (seedOf(s, si, 8317) % 3); // +2..+4
+export function bahoScores(s: BahoStagiaire, si: number, ctx = ""): BahoTestScore {
+  const debut = 3 + (seedOf(s, si, 4211, ctx) % 5); // 3..7
+  const gain = 2 + (seedOf(s, si, 8317, ctx) % 3); // +2..+4
   // plafond à 9/10 : une copie 10/10 serait strictement identique pour tous (signal de fabrication)
   const fin = Math.min(9, Math.max(7, debut + gain, debut + 1));
   return { debut, fin };
 }
 
-function asStagiaireInfo(s: BahoStagiaire): StagiaireInfo {
+function asStagiaireInfo(s: BahoStagiaire, ctx = ""): StagiaireInfo {
   // le code stagiaire entre dans la graine pour garantir des copies distinctes
-  return { nom: s.nom, prenom: `${s.prenom || ""}${s.codeStagiaire || ""}` } as unknown as StagiaireInfo;
+  return { nom: s.nom, prenom: `${s.prenom || ""}${s.codeStagiaire || ""}${ctx}` } as unknown as StagiaireInfo;
 }
 
 function civiliteOf(s: BahoStagiaire): string {
@@ -290,13 +290,13 @@ function appreciationFin(score: number, debut: number, s: BahoStagiaire, si: num
 }
 
 /** Ré-attribue les mauvaises réponses avec une graine propre au stagiaire (score inchangé) */
-function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, salt: number): number[] {
+function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, salt: number, ctx = ""): number[] {
   return answers.map((a, qi) => {
     const q = qcm[qi];
     if (a === q.correctIndex) return a;
     const wrong = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
     const origIdx = Math.max(0, wrong.indexOf(a));
-    return wrong[(origIdx + seedOf(s, si, salt + qi * 97)) % wrong.length];
+    return wrong[(origIdx + seedOf(s, si, salt + qi * 97, ctx)) % wrong.length];
   });
 }
 
@@ -332,7 +332,8 @@ function buildTestHTML(
 ): string {
   const days = getThreeWorkingDays(e.dateDebut);
   const dateTest = mode === "debut" ? days[0] || e.dateDebut : days[2] || e.dateFin;
-  const scores = bahoScores(s, si);
+  const ctx = e.siret || e.nom;
+  const scores = bahoScores(s, si, ctx);
   const target = mode === "debut" ? scores.debut : scores.fin;
   const qcm = mode === "debut" ? BAHO_QCM_DEBUT : BAHO_QCM_FIN;
 
@@ -340,7 +341,7 @@ function buildTestHTML(
   const finished = !!e.dateFin && new Date(e.dateFin).getTime() <= Date.now();
   const filled = mode === "debut" ? true : finished;
 
-  const answers = diversifyWrong(qcm, answersForQCM(qcm, pseudoIndex(s, si), asStagiaireInfo(s), mode, false, target), s, si, mode === "debut" ? 5501 : 7703);
+  const answers = diversifyWrong(qcm, answersForQCM(qcm, pseudoIndex(s, si, ctx), asStagiaireInfo(s, ctx), mode, false, target), s, si, mode === "debut" ? 5501 : 7703, ctx);
   const obtained = answers.reduce((acc, a, qi) => acc + (a === qcm[qi].correctIndex ? 1 : 0), 0);
 
   const fullName = `${civiliteOf(s)} ${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim();
@@ -431,9 +432,10 @@ export function auditBahoTests(): Array<{
   const out: any[] = [];
   for (const e of getBahoEntreprises() as BahoEntreprise[]) {
     e.stagiaires.forEach((s, si) => {
-      const sc = bahoScores(s, si);
-      const ad = diversifyWrong(BAHO_QCM_DEBUT, answersForQCM(BAHO_QCM_DEBUT, pseudoIndex(s, si), asStagiaireInfo(s), "debut", false, sc.debut), s, si, 5501);
-      const af = diversifyWrong(BAHO_QCM_FIN, answersForQCM(BAHO_QCM_FIN, pseudoIndex(s, si), asStagiaireInfo(s), "fin", false, sc.fin), s, si, 7703);
+      const ctx = e.siret || e.nom;
+      const sc = bahoScores(s, si, ctx);
+      const ad = diversifyWrong(BAHO_QCM_DEBUT, answersForQCM(BAHO_QCM_DEBUT, pseudoIndex(s, si, ctx), asStagiaireInfo(s, ctx), "debut", false, sc.debut), s, si, 5501, ctx);
+      const af = diversifyWrong(BAHO_QCM_FIN, answersForQCM(BAHO_QCM_FIN, pseudoIndex(s, si, ctx), asStagiaireInfo(s, ctx), "fin", false, sc.fin), s, si, 7703, ctx);
       out.push({
         entreprise: e.nom,
         stagiaire: `${s.nom} ${s.prenom}`.trim(),
