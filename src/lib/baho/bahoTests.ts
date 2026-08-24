@@ -4,7 +4,7 @@
  * - Début : score plafonné à 7/10 ; Fin : plancher 7/10 et progression stricte
  * - Réponses / commentaires humanisés via la logique existante (src/lib/aiEvalPack.ts)
  */
-import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
+import { FORMAT_SPHERE_ORG, getBahoEntreprises, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
 import { BASE_CSS, header, footer, stampsBlock, formatDateLong, getThreeWorkingDays } from "./bahoStaticDocs";
 import { answersForQCM, humanizedQCMComment, humanizedTeacherFeedback, type AIQCMQuestion } from "@/lib/aiEvalPack";
 import type { StagiaireInfo } from "@/types/qualiopi";
@@ -410,8 +410,6 @@ export function auditBahoTests(): Array<{
   reponsesDebut: string[];
   reponsesFin: string[];
 }> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { getBahoEntreprises } = require("./bahoData");
   const out: any[] = [];
   for (const e of getBahoEntreprises() as BahoEntreprise[]) {
     e.stagiaires.forEach((s, si) => {
