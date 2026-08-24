@@ -38,8 +38,11 @@ function backWorkingDays(iso: string, n: number): string {
  * (donc largement antérieure au démarrage de la formation).
  */
 export function dateEvaluationBesoins(e: BahoEntreprise): string {
-  const base = e.dateConvention || backWorkingDays(e.dateDebut, 10);
-  return backWorkingDays(base, 2);
+  const fromConv = e.dateConvention ? backWorkingDays(e.dateConvention, 2) : "";
+  const fromDebut = backWorkingDays(e.dateDebut, 12);
+  // toujours antérieure au démarrage : on retient la plus ancienne des deux références
+  if (!fromConv) return fromDebut;
+  return new Date(fromConv).getTime() <= new Date(fromDebut).getTime() ? fromConv : fromDebut;
 }
 
 function pick<T>(pool: T[], s: BahoStagiaire, si: number, salt: number, ctx: string): T {
@@ -218,12 +221,12 @@ export function buildBesoinsContent(e: BahoEntreprise, raw: BahoStagiaire, si: n
         ? `Le positionnement d'entrée (${debut}/10) situe ${civ === "M." ? "l'intéressé" : "l'intéressée"} à un niveau intermédiaire`
         : `Le positionnement d'entrée (${debut}/10) montre des bases déjà solides`;
   const suites = [
-    `Le parcours de 21 heures répond à la demande exprimée : ${objectif.toLowerCase().replace(/^j['e]|^mon |^je /, "")}`,
+    `Le parcours de 21 heures répond à la demande exprimée par ${prenom || "le stagiaire"} : « ${objectif} »`,
     `La demande porte clairement sur la méthode plutôt que sur les gestes métier, déjà maîtrisés au poste de ${s.emploi || "l'établissement"}.`,
     `L'attente de l'employeur (${attentes.split(".")[0].toLowerCase()}) rejoint celle ${accord(civ, "exprimé")} par ${civ === "M." ? "le" : "la"} ${accord(civ, "salarié")}.`,
   ];
   const analyse = [
-    `${niveau} sur ${missions.split(",")[0]}.`,
+    `${prenom ? `${prenom}, ${s.emploi || "salarié(e)"} de l'établissement. ` : ""}${niveau} sur ${missions.split(",")[0]}.`,
     pick(suites, s, si, 4909, ctx),
     pick(
       [
