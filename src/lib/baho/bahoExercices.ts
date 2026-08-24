@@ -244,6 +244,46 @@ function band(note: number): "faible" | "moyen" | "bon" | "tresbon" {
   return "tresbon";
 }
 
+/** Observations concrètes ajoutées en fin d'appréciation : le ton suit la note */
+const DETAILS: Record<string, string[]> = {
+  faible: [
+    "Participation en retrait pendant la mise en situation ; les réponses restent au niveau du constat.",
+    "Le vocabulaire professionnel (point de contact, dysfonctionnement, traçabilité) est encore employé de façon approximative.",
+    "Travail à reprendre avec le support de cours, partie « circulation de l'information ».",
+    "Rendu incomplet : la deuxième mise en situation n'a été traitée qu'en partie.",
+    "S'appuie beaucoup sur l'habitude du poste, peu sur la méthode vue en salle.",
+    "Un accompagnement du responsable de service sera utile lors du retour au poste.",
+  ],
+  moyen: [
+    "Bonne participation orale, mais l'écrit reste moins structuré que le raisonnement exprimé en séance.",
+    "Les exemples cités sont tirés de l'établissement, ce qui rend l'analyse concrète ; la formalisation reste à développer.",
+    "Raisonnement juste dans l'ensemble, avec une justification parfois trop courte.",
+    "A su corriger sa réponse après échange avec le groupe.",
+    "Le lien entre la cause et l'effet est posé, la solution proposée manque encore de précision opérationnelle.",
+    "Rythme de travail régulier, rendu dans le temps imparti.",
+  ],
+  bon: [
+    "Rendu clair, structuré en étapes, directement exploitable par un collègue.",
+    "A pris l'initiative de proposer un support de traçabilité non demandé dans la consigne.",
+    "Contribution utile au travail de groupe : a reformulé la consigne pour l'ensemble de la table.",
+    "Les exemples mobilisés (check-in, petit-déjeuner, lingerie) montrent une bonne connaissance de l'exploitation.",
+    "Argumentation appuyée sur les échanges de la matinée, sans se contenter de recopier le support.",
+    "Rendu dans les délais, écriture professionnelle et synthétique.",
+  ],
+  tresbon: [
+    "Sert de référence au groupe : sa trame a été reprise lors de la restitution collective.",
+    "Sait passer du cas particulier à la règle générale applicable à toute l'équipe.",
+    "Propose spontanément un indicateur de suivi pour vérifier l'effet de l'action.",
+    "Rendu remarquable de rigueur : chaque étape est associée à un responsable et à un délai.",
+  ],
+};
+
+function withDetail(text: string, note: number, s: BahoStagiaire, si: number, ctx: string, salt: number): string {
+  const pool = DETAILS[band(note)];
+  return `${text} ${pool[seedOf(s, si, salt, ctx) % pool.length]}`;
+}
+
+
 function appreciation(
   kind: BahoDocKind,
   note: number,
