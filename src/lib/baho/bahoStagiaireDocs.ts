@@ -9,7 +9,7 @@ import { getTestPositionnementDebutHTML, getTestPositionnementFinHTML } from "./
 import { getExerciceJour1HTML, getExerciceJour2HTML, getEvaluationFinaleHTML } from "./bahoExercices";
 import { getEvaluationBesoinsHTML, dateEvaluationBesoins, normalizeStagiaire } from "./bahoBesoins";
 import { buildPerStagiairePdfFileName } from "@/lib/eyExport";
-import type { StagiaireInfo } from "@/lib/types";
+import type { StagiaireInfo } from "@/types/qualiopi";
 
 export type BahoStagiaireDocKind =
   | "besoins"

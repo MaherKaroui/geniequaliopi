@@ -6,9 +6,7 @@
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getConvocationHTML, getCertificatRealisationHTML } from "./bahoStaticDocs";
-import { getTestPositionnementDebutHTML, getTestPositionnementFinHTML } from "./bahoTests";
-import { getEvaluationBesoinsHTML } from "./bahoBesoins";
-import { getExerciceJour1HTML, getExerciceJour2HTML, getEvaluationFinaleHTML } from "./bahoExercices";
+import { getBahoStagiaireDocs, BAHO_STAGIAIRE_DOCS_COUNT } from "./bahoStagiaireDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -22,7 +20,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
   // 6 docs par entreprise + 7 docs par stagiaire (convocation, certificat, 2 tests, 2 exercices, évaluation finale)
-  const totalSteps = entreprises.length * 6 + totalStagiaires * 8;
+  const totalSteps = entreprises.length * 6 + totalStagiaires * (2 + BAHO_STAGIAIRE_DOCS_COUNT);
 
   let step = 0;
 
@@ -175,60 +173,18 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-      // 7b-bis. Évaluation des besoins (point de départ chronologique du parcours)
-      try {
-        reporter?.setMessage(`${e.nom} – Évaluation des besoins ${s.prenom} ${s.nom}…`);
-        const html = getEvaluationBesoinsHTML(e, s, si, customFsStamp);
-        const pdf = await htmlToPdfBlob(html);
-        stagFolder.file(`Evaluation_des_besoins_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
-      } catch (err) {
-        console.error("Évaluation des besoins error:", err);
-        stagFolder.file(`ERREUR_Evaluation_des_besoins.txt`, `Erreur: ${(err as Error).message}`);
-      }
-      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-
-      // 7c. Test de positionnement — début
-      try {
-        reporter?.setMessage(`${e.nom} – Test positionnement début ${s.prenom} ${s.nom}…`);
-        const html = getTestPositionnementDebutHTML(e, s, si, customFsStamp);
-        const pdf = await htmlToPdfBlob(html);
-        stagFolder.file(`Test_positionnement_debut_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
-      } catch (err) {
-        console.error("Test debut error:", err);
-        stagFolder.file(`ERREUR_Test_debut.txt`, `Erreur: ${(err as Error).message}`);
-      }
-      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-
-      // 7d. Test de positionnement — fin
-      try {
-        reporter?.setMessage(`${e.nom} – Test positionnement fin ${s.prenom} ${s.nom}…`);
-        const html = getTestPositionnementFinHTML(e, s, si, customFsStamp);
-        const pdf = await htmlToPdfBlob(html);
-        stagFolder.file(`Test_positionnement_fin_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
-      } catch (err) {
-        console.error("Test fin error:", err);
-        stagFolder.file(`ERREUR_Test_fin.txt`, `Erreur: ${(err as Error).message}`);
-      }
-      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-
-      // 7e/7f/7g. Exercices jour 1 & 2 + évaluation finale
-      const extras: Array<[string, string, () => string]> = [
-        ["Exercice jour 1", `Exercice_jour1_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour1HTML(e, s, si, customFsStamp)],
-        ["Exercice jour 2", `Exercice_jour2_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour2HTML(e, s, si, customFsStamp)],
-        ["Évaluation finale", `Evaluation_finale_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getEvaluationFinaleHTML(e, s, si, customFsStamp)],
-      ];
-      for (const [label, fileName, render] of extras) {
+      // 7c → 7h. Six documents individuels (registre commun ZIP / aperçu plateforme)
+      for (const doc of getBahoStagiaireDocs(e, s, si)) {
         try {
-          reporter?.setMessage(`${e.nom} – ${label} ${s.prenom} ${s.nom}…`);
-          const pdf = await htmlToPdfBlob(render());
-          stagFolder.file(fileName, pdf);
+          reporter?.setMessage(`${e.nom} – ${doc.label} ${s.prenom} ${s.nom}…`);
+          const pdf = await htmlToPdfBlob(doc.render(customFsStamp));
+          stagFolder.file(doc.fileName, pdf);
         } catch (err) {
-          console.error(`${label} error:`, err);
-          stagFolder.file(`ERREUR_${fileName.replace(/\.pdf$/, "")}.txt`, `Erreur: ${(err as Error).message}`);
+          console.error(`${doc.label} error:`, err);
+          stagFolder.file(`ERREUR_${doc.kind}.txt`, `Erreur: ${(err as Error).message}`);
         }
         step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
       }
-
 
       // GC pause every 3 stagiaires
       if (si % 3 === 2) await new Promise((r) => setTimeout(r, 30));
