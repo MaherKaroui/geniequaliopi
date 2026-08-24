@@ -7,6 +7,7 @@ import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getConvocationHTML, getCertificatRealisationHTML } from "./bahoStaticDocs";
 import { getTestPositionnementDebutHTML, getTestPositionnementFinHTML } from "./bahoTests";
+import { getEvaluationBesoinsHTML } from "./bahoBesoins";
 import { getExerciceJour1HTML, getExerciceJour2HTML, getEvaluationFinaleHTML } from "./bahoExercices";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
@@ -21,7 +22,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
   // 6 docs par entreprise + 7 docs par stagiaire (convocation, certificat, 2 tests, 2 exercices, évaluation finale)
-  const totalSteps = entreprises.length * 6 + totalStagiaires * 7;
+  const totalSteps = entreprises.length * 6 + totalStagiaires * 8;
 
   let step = 0;
 
@@ -50,6 +51,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     "Pour chaque stagiaire (PDF tamponné) :",
     " - Convocation individuelle",
     " - Certificat de réalisation individuel",
+    " - Évaluation des besoins (datée avant le début de formation)",
     " - Test de positionnement de début (score plafonné à 7/10)",
     " - Test de positionnement de fin (score minimum 7/10, progression positive)",
     " - Exercice pratique du jour 1 (daté du 1er jour de formation)",
@@ -170,6 +172,18 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       } catch (err) {
         console.error("Certificat error:", err);
         stagFolder.file(`ERREUR_Certificat.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7b-bis. Évaluation des besoins (point de départ chronologique du parcours)
+      try {
+        reporter?.setMessage(`${e.nom} – Évaluation des besoins ${s.prenom} ${s.nom}…`);
+        const html = getEvaluationBesoinsHTML(e, s, si, customFsStamp);
+        const pdf = await htmlToPdfBlob(html);
+        stagFolder.file(`Evaluation_des_besoins_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
+      } catch (err) {
+        console.error("Évaluation des besoins error:", err);
+        stagFolder.file(`ERREUR_Evaluation_des_besoins.txt`, `Erreur: ${(err as Error).message}`);
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
