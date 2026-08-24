@@ -9,7 +9,7 @@
  *   (début plafonné à 7/10, fin ≥ 7/10, progression globalement croissante)
  */
 import { FORMAT_SPHERE_ORG, getBahoEntreprises, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
-import { BASE_CSS, header, footer, stampsBlock, formatDateLong, getThreeWorkingDays } from "./bahoStaticDocs";
+import { BASE_CSS, header, footer, formatDateLong, getThreeWorkingDays } from "./bahoStaticDocs";
 import {
   BAHO_INTITULE,
   bahoScores,
@@ -514,8 +514,6 @@ function buildHTML(e: BahoEntreprise, s: BahoStagiaire, si: number, kind: BahoDo
   </div>
 
   <p style="margin-top:20px;"><strong>Fait à ${(e.adresse || "").split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(date)}</strong></p>
-
-  ${stampsBlock(e, customFsStamp)}
 
   ${footer()}
   </body></html>`;

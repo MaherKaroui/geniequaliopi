@@ -4,7 +4,7 @@
  * Données : conventions BAHO (bahoData) — rien n'est inventé côté coordonnées.
  */
 import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
-import { BASE_CSS, header, footer, stampsBlock, formatDateLong, jourOuvrePrecedent, estJourNonOuvre, getFrenchHolidays } from "./bahoStaticDocs";
+import { BASE_CSS, header, footer, formatDateLong, jourOuvrePrecedent, estJourNonOuvre, getFrenchHolidays } from "./bahoStaticDocs";
 import { BAHO_INTITULE, seedOf, civiliteOf, bahoScores } from "./bahoTests";
 
 /* ------------------------------------------------------------------ */
@@ -342,8 +342,6 @@ export function getEvaluationBesoinsHTML(
   <div class="analyse">${c.analyse}</div>
 
   <p style="margin-top:20px;"><strong>FAIT A ${FORMAT_SPHERE_ORG.ville.toUpperCase()}</strong> &nbsp;&nbsp; <strong>LE : ${formatDateLong(c.date)}</strong></p>
-
-  ${stampsBlock(e, customFsStamp)}
   ${footer()}
   </body></html>`;
 }
