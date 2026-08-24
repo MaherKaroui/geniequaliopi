@@ -249,7 +249,8 @@ export function bahoScores(s: BahoStagiaire, si: number): BahoTestScore {
 }
 
 function asStagiaireInfo(s: BahoStagiaire): StagiaireInfo {
-  return { nom: s.nom, prenom: s.prenom } as unknown as StagiaireInfo;
+  // le code stagiaire entre dans la graine pour garantir des copies distinctes
+  return { nom: s.nom, prenom: `${s.prenom || ""}${s.codeStagiaire || ""}` } as unknown as StagiaireInfo;
 }
 
 function civiliteOf(s: BahoStagiaire): string {
