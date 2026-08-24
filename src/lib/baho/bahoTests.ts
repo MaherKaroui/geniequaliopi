@@ -5,7 +5,7 @@
  * - Réponses / commentaires humanisés via la logique existante (src/lib/aiEvalPack.ts)
  */
 import { FORMAT_SPHERE_ORG, getBahoEntreprises, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
-import { BASE_CSS, header, footer, stampsBlock, formatDateLong, getThreeWorkingDays } from "./bahoStaticDocs";
+import { BASE_CSS, header, footer, formatDateLong, getThreeWorkingDays } from "./bahoStaticDocs";
 import { answersForQCM, humanizedQCMComment, humanizedTeacherFeedback, type AIQCMQuestion } from "@/lib/aiEvalPack";
 import type { StagiaireInfo } from "@/types/qualiopi";
 
@@ -403,8 +403,6 @@ function buildTestHTML(
   </div>
 
   <p style="margin-top:20px;"><strong>Fait à ${(e.adresse || "").split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(dateTest)}</strong></p>
-
-  ${stampsBlock(e, customFsStamp)}
 
   ${footer()}
   </body></html>`;
