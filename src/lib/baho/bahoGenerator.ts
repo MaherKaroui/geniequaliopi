@@ -167,6 +167,31 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
+      // 7c. Test de positionnement — début
+      try {
+        reporter?.setMessage(`${e.nom} – Test positionnement début ${s.prenom} ${s.nom}…`);
+        const html = getTestPositionnementDebutHTML(e, s, si, customFsStamp);
+        const pdf = await htmlToPdfBlob(html);
+        stagFolder.file(`Test_positionnement_debut_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
+      } catch (err) {
+        console.error("Test debut error:", err);
+        stagFolder.file(`ERREUR_Test_debut.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7d. Test de positionnement — fin
+      try {
+        reporter?.setMessage(`${e.nom} – Test positionnement fin ${s.prenom} ${s.nom}…`);
+        const html = getTestPositionnementFinHTML(e, s, si, customFsStamp);
+        const pdf = await htmlToPdfBlob(html);
+        stagFolder.file(`Test_positionnement_fin_${stagNameSafe}_${s.codeStagiaire}.pdf`, pdf);
+      } catch (err) {
+        console.error("Test fin error:", err);
+        stagFolder.file(`ERREUR_Test_fin.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+
       // GC pause every 3 stagiaires
       if (si % 3 === 2) await new Promise((r) => setTimeout(r, 30));
     }
