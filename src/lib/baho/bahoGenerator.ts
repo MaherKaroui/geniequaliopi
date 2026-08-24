@@ -7,6 +7,7 @@ import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getConvocationHTML, getCertificatRealisationHTML } from "./bahoStaticDocs";
 import { getTestPositionnementDebutHTML, getTestPositionnementFinHTML } from "./bahoTests";
+import { getExerciceJour1HTML, getExerciceJour2HTML, getEvaluationFinaleHTML } from "./bahoExercices";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -19,8 +20,9 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
-  // 6 docs par entreprise + 4 docs par stagiaire (convocation, certificat, 2 tests de positionnement)
-  const totalSteps = entreprises.length * 6 + totalStagiaires * 4;
+  // 6 docs par entreprise + 7 docs par stagiaire (convocation, certificat, 2 tests, 2 exercices, évaluation finale)
+  const totalSteps = entreprises.length * 6 + totalStagiaires * 7;
+
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
@@ -50,6 +52,10 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     " - Certificat de réalisation individuel",
     " - Test de positionnement de début (score plafonné à 7/10)",
     " - Test de positionnement de fin (score minimum 7/10, progression positive)",
+    " - Exercice pratique du jour 1 (daté du 1er jour de formation)",
+    " - Exercice pratique du jour 2 (daté du 2e jour de formation)",
+    " - Évaluation finale (datée du dernier jour de formation)",
+
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
@@ -190,6 +196,24 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
         stagFolder.file(`ERREUR_Test_fin.txt`, `Erreur: ${(err as Error).message}`);
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7e/7f/7g. Exercices jour 1 & 2 + évaluation finale
+      const extras: Array<[string, string, () => string]> = [
+        ["Exercice jour 1", `Exercice_jour1_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour1HTML(e, s, si, customFsStamp)],
+        ["Exercice jour 2", `Exercice_jour2_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getExerciceJour2HTML(e, s, si, customFsStamp)],
+        ["Évaluation finale", `Evaluation_finale_${stagNameSafe}_${s.codeStagiaire}.pdf`, () => getEvaluationFinaleHTML(e, s, si, customFsStamp)],
+      ];
+      for (const [label, fileName, render] of extras) {
+        try {
+          reporter?.setMessage(`${e.nom} – ${label} ${s.prenom} ${s.nom}…`);
+          const pdf = await htmlToPdfBlob(render());
+          stagFolder.file(fileName, pdf);
+        } catch (err) {
+          console.error(`${label} error:`, err);
+          stagFolder.file(`ERREUR_${fileName.replace(/\.pdf$/, "")}.txt`, `Erreur: ${(err as Error).message}`);
+        }
+        step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+      }
 
 
       // GC pause every 3 stagiaires

@@ -228,7 +228,7 @@ export const BAHO_THEMES = [
   "Amélioration continue et indicateurs de coordination",
 ];
 
-function seedOf(s: BahoStagiaire, si: number, salt: number, ctx = ""): number {
+export function seedOf(s: BahoStagiaire, si: number, salt: number, ctx = ""): number {
   const base = `${s.nom || ""}${s.prenom || ""}${s.codeStagiaire || ""}${ctx}${si}`;
   let h = 0;
   for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
@@ -236,9 +236,10 @@ function seedOf(s: BahoStagiaire, si: number, salt: number, ctx = ""): number {
 }
 
 /** Index pseudo-aléatoire stable : diversifie les questions ratées d'un stagiaire à l'autre */
-function pseudoIndex(s: BahoStagiaire, si: number, ctx = ""): number {
+export function pseudoIndex(s: BahoStagiaire, si: number, ctx = ""): number {
   return seedOf(s, si, 3313, ctx) % 977;
 }
+
 
 export interface BahoTestScore {
   debut: number;
@@ -254,18 +255,18 @@ export function bahoScores(s: BahoStagiaire, si: number, ctx = ""): BahoTestScor
   return { debut, fin };
 }
 
-function asStagiaireInfo(s: BahoStagiaire, ctx = ""): StagiaireInfo {
+export function asStagiaireInfo(s: BahoStagiaire, ctx = ""): StagiaireInfo {
   // le code stagiaire entre dans la graine pour garantir des copies distinctes
   return { nom: s.nom, prenom: `${s.prenom || ""}${s.codeStagiaire || ""}${ctx}` } as unknown as StagiaireInfo;
 }
 
-function civiliteOf(s: BahoStagiaire): string {
+export function civiliteOf(s: BahoStagiaire): string {
   const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc", "Jeremy", "Bruno", "Franck"];
   const isM = prenomsM.some((p) => (s.prenom || "").toLowerCase().startsWith(p.toLowerCase()));
   return isM ? "M." : "Mme";
 }
 
-function letter(i: number): string {
+export function letter(i: number): string {
   return ["A", "B", "C", "D"][i] || "?";
 }
 
@@ -290,7 +291,7 @@ function appreciationFin(score: number, debut: number, s: BahoStagiaire, si: num
 }
 
 /** Ré-attribue les mauvaises réponses avec une graine propre au stagiaire (score inchangé) */
-function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, salt: number, ctx = ""): number[] {
+export function diversifyWrong(qcm: AIQCMQuestion[], answers: number[], s: BahoStagiaire, si: number, salt: number, ctx = ""): number[] {
   return answers.map((a, qi) => {
     const q = qcm[qi];
     if (a === q.correctIndex) return a;
