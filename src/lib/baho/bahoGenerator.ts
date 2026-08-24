@@ -20,8 +20,9 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
-  // 6 docs par entreprise + 4 docs par stagiaire (convocation, certificat, 2 tests de positionnement)
-  const totalSteps = entreprises.length * 6 + totalStagiaires * 4;
+  // 6 docs par entreprise + 7 docs par stagiaire (convocation, certificat, 2 tests, 2 exercices, évaluation finale)
+  const totalSteps = entreprises.length * 6 + totalStagiaires * 7;
+
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
