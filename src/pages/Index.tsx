@@ -207,7 +207,10 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
               <GraduationCap className="w-5 h-5" /> Génération VAE
             </Button>
-            {/* Archivés : BAHO, VI – Visionnaire Institute */}
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => setBahoOpen(true)}>
+              <Building2 className="w-5 h-5" /> BAHO
+            </Button>
+
           </div>
         </div>
         <BahoModal open={bahoOpen} onOpenChange={setBahoOpen} />
