@@ -211,7 +211,7 @@ export function bahoTrajectoire(s: BahoStagiaire, si: number, ctx = ""): BahoTra
   // Jour 2 : appuie sur les acquis du J1 → +1 à +2, plafonné par le niveau de fin
   const ex2 = Math.max(ex1, Math.min(fin, ex1 + 1 + (r2 === 0 ? 1 : 0)));
   // Évaluation finale : au niveau de fin, avec parfois un point de moins (variation naturelle)
-  const final = Math.max(ex2, Math.min(fin, fin - (r3 === 0 ? 1 : 0)));
+  const final = Math.max(ex2, Math.min(fin, ex2 + 2, fin - (r3 === 0 ? 1 : 0)));
 
   return { posDebut: debut, ex1, ex2, final, posFin: fin };
 }
@@ -314,7 +314,7 @@ function appreciation(
         `${note}/10. Maîtrise déjà nette de la lecture organisationnelle : le cas de la chambre non prête est traité comme un défaut de circulation d'information, avec une solution opérationnelle immédiatement applicable. Seul axe résiduel : ${pf}.`,
       ],
     };
-    return pool[b][seedOf(s, si, 8101, ctx) % pool[b].length];
+    return withDetail(pool[b][seedOf(s, si, 8101, ctx) % pool[b].length], note, s, si, ctx, 8111);
   }
 
   if (kind === "ex2") {
@@ -339,7 +339,7 @@ function appreciation(
         `${note}/10. ${rappel} Exercice traité avec méthode : hiérarchisation argumentée, standard d'accueil complet avec délais chiffrés et indicateur de contrôle proposé. ${pf} n'est plus un point de blocage.`,
       ],
     };
-    return pool[b][seedOf(s, si, 8203, ctx) % pool[b].length];
+    return withDetail(pool[b][seedOf(s, si, 8203, ctx) % pool[b].length], note, s, si, ctx, 8213);
   }
 
   // Évaluation finale : le point faible est soit levé, soit signalé comme persistant
@@ -363,7 +363,7 @@ function appreciation(
       `${note}/10. Évaluation finale maîtrisée : méthode en 4 étapes appliquée avec rigueur, traçabilité de l'incident, deux actions correctives avec indicateur (nombre de réclamations liées à une information non transmise) et procédure de sécurisation complète (qui, quoi, quand, quelle trace). ${echo}`,
     ],
   };
-  return pool[b][seedOf(s, si, 8307, ctx) % pool[b].length];
+  return withDetail(pool[b][seedOf(s, si, 8307, ctx) % pool[b].length], note, s, si, ctx, 8317);
 }
 
 /* ------------------------------------------------------------------ */
