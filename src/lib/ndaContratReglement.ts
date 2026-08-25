@@ -305,6 +305,7 @@ export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: Stagiai
     ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : "";
 
   const body = `
+${headerHtml(o)}
 <h1>Règlement intérieur</h1>
 <h2>${escapeHtml(o.nom || "")}</h2>
 <div class="meta">Établi à ${ville}, le ${dateStr}</div>
