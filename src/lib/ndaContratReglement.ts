@@ -91,12 +91,18 @@ export function buildCSS(): string {
   .signatures .box .title { font-family: ${headingFont}; font-weight: 700; margin-bottom: 8px; color: ${primary}; text-transform: uppercase; font-size: ${fsBody - 0.5}pt; letter-spacing: 0.5px; }
   .signatures .box .mention { font-style: italic; color: #555; font-size: ${fsBody - 1}pt; margin-top: 8px; }
   .signatures .box .sig-img { display: block; max-height: 95px; max-width: 220px; margin: 10px 0 4px 0; }
+  .header { text-align: center; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid ${primary}; }
+  .header img { max-height: 80px; max-width: 200px; object-fit: contain; margin-bottom: 8px; }
+  .header .org-name { font-family: ${headingFont}; font-size: ${fsBody + 6}pt; font-weight: 700; color: ${primary}; text-transform: uppercase; letter-spacing: 1px; }
+  .header .subtitle { font-size: ${fsBody - 1.5}pt; color: #555; margin-top: 4px; }
   .footer { margin-top: 26px; padding-top: 8px; border-top: 2px solid ${primary}; font-size: ${fsBody - 2}pt; color: #333; text-align: center; line-height: 1.5; }
   .footer strong { display: block; font-family: ${headingFont}; font-size: ${fsBody - 1}pt; color: ${primary}; margin-bottom: 2px; }
+  .footer p { margin: 0 0 3px; text-align: center; }
   .page-break { page-break-before: always; }
 </style>
 `;
 }
+
 
 /** Convertit #RRGGBB en rgba(r,g,b,a) */
 function hexToRgba(hex: string, alpha: number): string {
