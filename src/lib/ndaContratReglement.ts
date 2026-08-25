@@ -210,6 +210,7 @@ export function genContratNDA(
       : "";
 
     return `${pageBreak}
+${headerHtml(o)}
 <h1>Contrat de formation professionnelle</h1>
 <h2>(Articles L.6353-3 et suivants du Code du travail)</h2>
 <div class="meta">Fait à ${lieuSignature}, le ${dateSignIndiv}</div>
