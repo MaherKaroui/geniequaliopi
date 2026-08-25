@@ -118,15 +118,39 @@ function hexToRgba(hex: string, alpha: number): string {
 export const CSS = "";
 
 
+/** En-tête identique aux documents Qualiopi AF / CFA (logo + identité organisme). */
+export function headerHtml(o: OrganismeInfo, subtitle?: string): string {
+  const logo = (o as any).logoUrl
+    ? `<div><img src="${(o as any).logoUrl}" alt="Logo ${escapeHtml(o.nom || "")}" /></div>`
+    : "";
+  const ndaLine = o.nda
+    ? `Organisme de formation – NDA : ${escapeHtml(o.nda)}${o.siret ? ` – SIRET : ${escapeHtml(o.siret)}` : ""}`
+    : (o.siret ? `Organisme de formation – SIRET : ${escapeHtml(o.siret)}` : "Organisme de formation");
+  return `<div class="header">
+    ${logo}
+    <div class="org-name">${escapeHtml(o.nom || "")}</div>
+    <div class="subtitle">${ndaLine}</div>
+    ${subtitle ? `<div class="subtitle" style="font-weight:600;">${escapeHtml(subtitle)}</div>` : ""}
+  </div>`;
+}
+
 export function footerHtml(o: OrganismeInfo): string {
-  const infos = [
-    o.siret ? `SIRET ${escapeHtml(o.siret)}` : "",
-    o.nda ? `Déclaration d'activité n° ${escapeHtml(o.nda)}` : "",
-  ].filter(Boolean).join(" — ");
-  return `<div class="footer"><strong>${escapeHtml(o.nom || "")}</strong>${infos}</div>`;
+  const version = (o as any).version || "1";
+  const dateMaj = (o as any).dateMaj
+    ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const adresse = adresseComplete(o.adresse, o.codePostal, o.ville);
+  return `<div class="footer">
+    <strong>${escapeHtml(o.nom || "")}</strong>
+    ${adresse !== DOTS ? `<p>Adresse : ${escapeHtml(adresse)}</p>` : ""}
+    ${o.siret ? `<p>Siret : ${escapeHtml(o.siret)}</p>` : ""}
+    ${o.nda ? `<p>Nda : ${escapeHtml(o.nda)} — cet enregistrement ne vaut pas agrément de l'État</p>` : ""}
+    <p>V${escapeHtml(String(version))} ${dateMaj}</p>
+  </div>`;
 }
 
 export { escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS };
+
 
 /* =========================================================================
  * DOCUMENT 1 : CONTRAT DE FORMATION PROFESSIONNELLE
