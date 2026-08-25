@@ -92,34 +92,13 @@ export function buildCSS(): string {
 }
 
 
-/** Convertit #RRGGBB en rgba(r,g,b,a) */
-function hexToRgba(hex: string, alpha: number): string {
-  const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map(c => c + c).join("") : h;
-  const r = parseInt(full.slice(0, 2), 16) || 0;
-  const g = parseInt(full.slice(2, 4), 16) || 0;
-  const b = parseInt(full.slice(4, 6), 16) || 0;
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
 /** @deprecated — utilise buildCSS() pour profiter du thème en cours */
 export const CSS = "";
 
 
-/** En-tête identique aux documents Qualiopi AF / CFA (logo + identité organisme). */
+/** En-tête identique aux documents Qualiopi AF / CFA (styles d'en-tête du thème). */
 export function headerHtml(o: OrganismeInfo, subtitle?: string): string {
-  const logo = (o as any).logoUrl
-    ? `<div><img src="${(o as any).logoUrl}" alt="Logo ${escapeHtml(o.nom || "")}" /></div>`
-    : "";
-  const ndaLine = o.nda
-    ? `Organisme de formation – NDA : ${escapeHtml(o.nda)}${o.siret ? ` – SIRET : ${escapeHtml(o.siret)}` : ""}`
-    : (o.siret ? `Organisme de formation – SIRET : ${escapeHtml(o.siret)}` : "Organisme de formation");
-  return `<div class="header">
-    ${logo}
-    <div class="org-name">${escapeHtml(o.nom || "")}</div>
-    <div class="subtitle">${ndaLine}</div>
-    ${subtitle ? `<div class="subtitle" style="font-weight:600;">${escapeHtml(subtitle)}</div>` : ""}
-  </div>`;
+  return orgHeader(o, subtitle);
 }
 
 export function footerHtml(o: OrganismeInfo): string {
