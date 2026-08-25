@@ -9,7 +9,7 @@
  * Les champs vides apparaissent en pointillés "..........".
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { subtractBusinessDays, getDocStyle } from "@/lib/docBuilder";
+import { subtractBusinessDays, getDocStyle, baseStyle, orgHeader } from "@/lib/docBuilder";
 
 
 const DOTS = "..........";
