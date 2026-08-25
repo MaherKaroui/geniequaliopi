@@ -91,12 +91,18 @@ export function buildCSS(): string {
   .signatures .box .title { font-family: ${headingFont}; font-weight: 700; margin-bottom: 8px; color: ${primary}; text-transform: uppercase; font-size: ${fsBody - 0.5}pt; letter-spacing: 0.5px; }
   .signatures .box .mention { font-style: italic; color: #555; font-size: ${fsBody - 1}pt; margin-top: 8px; }
   .signatures .box .sig-img { display: block; max-height: 95px; max-width: 220px; margin: 10px 0 4px 0; }
+  .header { text-align: center; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid ${primary}; }
+  .header img { max-height: 80px; max-width: 200px; object-fit: contain; margin-bottom: 8px; }
+  .header .org-name { font-family: ${headingFont}; font-size: ${fsBody + 6}pt; font-weight: 700; color: ${primary}; text-transform: uppercase; letter-spacing: 1px; }
+  .header .subtitle { font-size: ${fsBody - 1.5}pt; color: #555; margin-top: 4px; }
   .footer { margin-top: 26px; padding-top: 8px; border-top: 2px solid ${primary}; font-size: ${fsBody - 2}pt; color: #333; text-align: center; line-height: 1.5; }
   .footer strong { display: block; font-family: ${headingFont}; font-size: ${fsBody - 1}pt; color: ${primary}; margin-bottom: 2px; }
+  .footer p { margin: 0 0 3px; text-align: center; }
   .page-break { page-break-before: always; }
 </style>
 `;
 }
+
 
 /** Convertit #RRGGBB en rgba(r,g,b,a) */
 function hexToRgba(hex: string, alpha: number): string {
@@ -112,15 +118,39 @@ function hexToRgba(hex: string, alpha: number): string {
 export const CSS = "";
 
 
+/** En-tête identique aux documents Qualiopi AF / CFA (logo + identité organisme). */
+export function headerHtml(o: OrganismeInfo, subtitle?: string): string {
+  const logo = (o as any).logoUrl
+    ? `<div><img src="${(o as any).logoUrl}" alt="Logo ${escapeHtml(o.nom || "")}" /></div>`
+    : "";
+  const ndaLine = o.nda
+    ? `Organisme de formation – NDA : ${escapeHtml(o.nda)}${o.siret ? ` – SIRET : ${escapeHtml(o.siret)}` : ""}`
+    : (o.siret ? `Organisme de formation – SIRET : ${escapeHtml(o.siret)}` : "Organisme de formation");
+  return `<div class="header">
+    ${logo}
+    <div class="org-name">${escapeHtml(o.nom || "")}</div>
+    <div class="subtitle">${ndaLine}</div>
+    ${subtitle ? `<div class="subtitle" style="font-weight:600;">${escapeHtml(subtitle)}</div>` : ""}
+  </div>`;
+}
+
 export function footerHtml(o: OrganismeInfo): string {
-  const infos = [
-    o.siret ? `SIRET ${escapeHtml(o.siret)}` : "",
-    o.nda ? `Déclaration d'activité n° ${escapeHtml(o.nda)}` : "",
-  ].filter(Boolean).join(" — ");
-  return `<div class="footer"><strong>${escapeHtml(o.nom || "")}</strong>${infos}</div>`;
+  const version = (o as any).version || "1";
+  const dateMaj = (o as any).dateMaj
+    ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+    : new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const adresse = adresseComplete(o.adresse, o.codePostal, o.ville);
+  return `<div class="footer">
+    <strong>${escapeHtml(o.nom || "")}</strong>
+    ${adresse !== DOTS ? `<p>Adresse : ${escapeHtml(adresse)}</p>` : ""}
+    ${o.siret ? `<p>Siret : ${escapeHtml(o.siret)}</p>` : ""}
+    ${o.nda ? `<p>Nda : ${escapeHtml(o.nda)} — cet enregistrement ne vaut pas agrément de l'État</p>` : ""}
+    <p>V${escapeHtml(String(version))} ${dateMaj}</p>
+  </div>`;
 }
 
 export { escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS };
+
 
 /* =========================================================================
  * DOCUMENT 1 : CONTRAT DE FORMATION PROFESSIONNELLE
@@ -180,6 +210,7 @@ export function genContratNDA(
       : "";
 
     return `${pageBreak}
+${headerHtml(o)}
 <h1>Contrat de formation professionnelle</h1>
 <h2>(Articles L.6353-3 et suivants du Code du travail)</h2>
 <div class="meta">Fait à ${lieuSignature}, le ${dateSignIndiv}</div>
@@ -274,6 +305,7 @@ export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: Stagiai
     ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : "";
 
   const body = `
+${headerHtml(o)}
 <h1>Règlement intérieur</h1>
 <h2>${escapeHtml(o.nom || "")}</h2>
 <div class="meta">Établi à ${ville}, le ${dateStr}</div>

@@ -6,7 +6,7 @@
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { CVData } from "@/lib/cvGenerator";
-import { buildCSS, footerHtml, escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS } from "@/lib/ndaContratReglement";
+import { buildCSS, headerHtml, footerHtml, escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS } from "@/lib/ndaContratReglement";
 
 function wrap(body: string): string {
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${buildCSS()}</head><body><div class="doc">${body}</div></body></html>`;
@@ -33,11 +33,10 @@ export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const programmeHtml = (f.programme || DOTS).split(/\r?\n/).map(escapeHtml).join("<br>");
 
   const body = `
-<h1>${escapeHtml(o.nom || "")}</h1>
-<h2>Organisme de formation – SIRET : ${escapeHtml(o.siret || "")}</h2>
+${headerHtml(o)}
 <div class="meta"><strong>${escapeHtml(f.intitule || "")}</strong></div>
 
-<h1 style="margin-top:18px;">Programme de formation</h1>
+<h1>Programme de formation</h1>
 
 <h3>1. Organisme de formation</h3>
 <p><strong>Nom :</strong> ${escapeHtml(o.nom || "")}<br>
@@ -213,6 +212,7 @@ export function genDevisNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stag
 <p>Validité du devis : 30 jours. Règlement à 30 jours à réception de facture.</p>`;
 
   const body = `
+${headerHtml(o)}
 <h1>${titre}</h1>
 <h2>N° ${numDoc} — ${today()}</h2>
 
@@ -292,6 +292,7 @@ export function genEmargementNDA(o: OrganismeInfo, f: FormationInfo, stagiaires:
       : "";
 
     return `${idx > 0 ? '<div class="page-break"></div>' : ''}
+${headerHtml(o)}
 <h1>Feuille d'émargement</h1>
 <h2>${escapeHtml(f.intitule || "")}</h2>
 <div class="meta">Journée du ${fmtDateLong(iso)} — ${v(f.lieu)}</div>
@@ -374,6 +375,7 @@ export function genListeFormateursNDA(o: OrganismeInfo, cv: CVData | null, _stag
   const dirigQualites = dirigParts.length ? dirigParts.join("<br><br>") : DOTS;
 
   const body = `
+${headerHtml(o)}
 <h1>Liste des formateurs</h1>
 <h2>Intervenant dans l'organisme de formation à la date de la déclaration d'activité</h2>
 
