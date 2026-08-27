@@ -42,6 +42,7 @@ const App = () => (
           <Route path="/generateur-cv" element={<GenerateurCV />} />
           <Route path="/generateur-tampon" element={<GenerateurTampon />} />
           <Route path="/opco-mobilites" element={<OPCOMobilites />} />
+          <Route path="/gotrm" element={<GOTRMPage />} />
           <Route path="/musee" element={<MuseeDossier />} />
           <Route path="/audit-live" element={<QualiopiCheck />} />
           <Route path="/vae" element={<VAEPage />} />
