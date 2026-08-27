@@ -93,6 +93,25 @@ export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DIAGOURAGA", prenom: "Moussa", email: "moussadiagouragara93belr@gmail.com", telephone: "06 19 63 90 79", entreprise: "", poste: "", dateNaissance: "", adresse: "06 RUE ROSA PARKS", codePostal: "93100", commune: "MONTREUIL", dateDebutFormation: "2025-09-21", dateFinFormation: "2025-09-25", tarifFormation: "1500" },
 ];
 
+// ───────────────────────────────────────────────────────────────────────────
+// GOTRM – Session d'examen SEPTEMBRE (01 au 03) – 10 candidats
+// Source : GOTRM_SESSION_SEPTEMBRE_STAGIAIRES.xlsx (TP-01329 / RNCP40990)
+// Jurés : HAMMOUTI Mimoune / MAATOUG Amar
+// ───────────────────────────────────────────────────────────────────────────
+export const STAGIAIRES_GOTRM_SEPTEMBRE: StagiaireInfo[] = [
+  { civilite: "M.", nom: "ATASOY", prenom: "Dilovan", email: "dilovan.atasoy@gmail.com", telephone: "06 24 71 90 33", entreprise: "", poste: "", dateNaissance: "1993-02-14", adresse: "12 rue Jean Jaurès", codePostal: "93200", commune: "SAINT-DENIS", numeroAction: "GOTRM-0925-01", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "BOUZZAOUI", prenom: "Yassine", email: "yassine.bouzzaoui@outlook.fr", telephone: "07 58 12 44 87", entreprise: "", poste: "", dateNaissance: "1990-06-05", adresse: "8 avenue de la République", codePostal: "94400", commune: "VITRY-SUR-SEINE", numeroAction: "GOTRM-0925-02", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DAHOUM", prenom: "Anis", email: "anis.dahoum@gmail.com", telephone: "06 77 39 15 62", entreprise: "", poste: "", dateNaissance: "1995-11-22", adresse: "34 boulevard Voltaire", codePostal: "92000", commune: "NANTERRE", numeroAction: "GOTRM-0925-03", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "GIMENEZ", prenom: "Jessica", email: "jessica.gimenez@gmail.com", telephone: "06 15 88 27 41", entreprise: "", poste: "", dateNaissance: "1992-04-09", adresse: "5 rue des Lilas", codePostal: "91100", commune: "CORBEIL-ESSONNES", numeroAction: "GOTRM-0925-04", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "HACHMI", prenom: "Lina", email: "lina.hachmi@outlook.fr", telephone: "07 61 05 73 28", entreprise: "", poste: "", dateNaissance: "1997-08-17", adresse: "21 rue Paul Vaillant-Couturier", codePostal: "93100", commune: "MONTREUIL", numeroAction: "GOTRM-0925-05", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "HOUARI", prenom: "Hicham", email: "hicham.houari@gmail.com", telephone: "06 43 92 56 10", entreprise: "", poste: "", dateNaissance: "1988-01-30", adresse: "17 rue de Verdun", codePostal: "95100", commune: "ARGENTEUIL", numeroAction: "GOTRM-0925-06", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "KACIMI", prenom: "Lahcen", email: "lahcen.kacimi@gmail.com", telephone: "07 82 34 66 05", entreprise: "", poste: "", dateNaissance: "1986-03-12", adresse: "3 place du Marché", codePostal: "77500", commune: "CHELLES", numeroAction: "GOTRM-0925-07", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "LEMAITRE", prenom: "Alexandre", email: "alexandre.lemaitre@outlook.fr", telephone: "06 68 47 21 39", entreprise: "", poste: "", dateNaissance: "1994-09-26", adresse: "45 rue Gabriel Péri", codePostal: "92230", commune: "GENNEVILLIERS", numeroAction: "GOTRM-0925-08", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "MANSEUR", prenom: "Mehdi", email: "mehdi.manseur@gmail.com", telephone: "07 45 19 80 74", entreprise: "", poste: "", dateNaissance: "1991-12-03", adresse: "9 rue de la Gare", codePostal: "13003", commune: "MARSEILLE", numeroAction: "GOTRM-0925-09", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "SELHAOUI", prenom: "Ilyes", email: "ilyes.selhaoui@gmail.com", telephone: "06 31 74 52 96", entreprise: "", poste: "", dateNaissance: "1996-05-19", adresse: "27 avenue Aristide Briand", codePostal: "94110", commune: "ARCUEIL", numeroAction: "GOTRM-0925-10", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+];
+
+
 // ═══════════════════════════════════════════════════════════════════════════
 // MAISON HSY BEAUTÉ – Organisme + 6 stagiaires Maquilleur Professionnel
 // Session passée : 01 → 05 juin 2026 (5 jours consécutifs)
