@@ -19,6 +19,8 @@ import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, 
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
 import { genDeroulePedagogique, genFactureOPCO } from "./templatesAF";
+import { genECFGotrm, genDPGotrm } from "./gotrm/ecfDp";
+
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
@@ -312,6 +314,15 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genCGVStagiaire(o, f, stagiaires, si);
     }
+    case "ecf_livret_gotrm": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genECFGotrm(o, f, stagiaires, si);
+    }
+    case "dossier_professionnel_gotrm": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genDPGotrm(o, f, stagiaires, si);
+    }
+
     case "mentions_legales": return genMentionsLegales(o);
     case "catalogue_formation": return genCatalogue(o, f);
     case "fiche_info_formation": return genFicheInfoFormation(o, f);

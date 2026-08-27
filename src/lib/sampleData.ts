@@ -93,6 +93,25 @@ export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DIAGOURAGA", prenom: "Moussa", email: "moussadiagouragara93belr@gmail.com", telephone: "06 19 63 90 79", entreprise: "", poste: "", dateNaissance: "", adresse: "06 RUE ROSA PARKS", codePostal: "93100", commune: "MONTREUIL", dateDebutFormation: "2025-09-21", dateFinFormation: "2025-09-25", tarifFormation: "1500" },
 ];
 
+// ───────────────────────────────────────────────────────────────────────────
+// GOTRM – Session d'examen SEPTEMBRE (01 au 03) – 10 candidats
+// Source : GOTRM_SESSION_SEPTEMBRE_STAGIAIRES.xlsx (TP-01329 / RNCP40990)
+// Jurés : HAMMOUTI Mimoune / MAATOUG Amar
+// ───────────────────────────────────────────────────────────────────────────
+export const STAGIAIRES_GOTRM_SEPTEMBRE: StagiaireInfo[] = [
+  { civilite: "M.", nom: "ATASOY", prenom: "Dilovan", email: "dilovan.atasoy@gmail.com", telephone: "06 24 71 90 33", entreprise: "", poste: "", dateNaissance: "1993-02-14", adresse: "12 rue Jean Jaurès", codePostal: "93200", commune: "SAINT-DENIS", numeroAction: "GOTRM-0925-01", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "BOUZZAOUI", prenom: "Yassine", email: "yassine.bouzzaoui@outlook.fr", telephone: "07 58 12 44 87", entreprise: "", poste: "", dateNaissance: "1990-06-05", adresse: "8 avenue de la République", codePostal: "94400", commune: "VITRY-SUR-SEINE", numeroAction: "GOTRM-0925-02", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DAHOUM", prenom: "Anis", email: "anis.dahoum@gmail.com", telephone: "06 77 39 15 62", entreprise: "", poste: "", dateNaissance: "1995-11-22", adresse: "34 boulevard Voltaire", codePostal: "92000", commune: "NANTERRE", numeroAction: "GOTRM-0925-03", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "GIMENEZ", prenom: "Jessica", email: "jessica.gimenez@gmail.com", telephone: "06 15 88 27 41", entreprise: "", poste: "", dateNaissance: "1992-04-09", adresse: "5 rue des Lilas", codePostal: "91100", commune: "CORBEIL-ESSONNES", numeroAction: "GOTRM-0925-04", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "HACHMI", prenom: "Lina", email: "lina.hachmi@outlook.fr", telephone: "07 61 05 73 28", entreprise: "", poste: "", dateNaissance: "1997-08-17", adresse: "21 rue Paul Vaillant-Couturier", codePostal: "93100", commune: "MONTREUIL", numeroAction: "GOTRM-0925-05", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "HOUARI", prenom: "Hicham", email: "hicham.houari@gmail.com", telephone: "06 43 92 56 10", entreprise: "", poste: "", dateNaissance: "1988-01-30", adresse: "17 rue de Verdun", codePostal: "95100", commune: "ARGENTEUIL", numeroAction: "GOTRM-0925-06", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "KACIMI", prenom: "Lahcen", email: "lahcen.kacimi@gmail.com", telephone: "07 82 34 66 05", entreprise: "", poste: "", dateNaissance: "1986-03-12", adresse: "3 place du Marché", codePostal: "77500", commune: "CHELLES", numeroAction: "GOTRM-0925-07", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "LEMAITRE", prenom: "Alexandre", email: "alexandre.lemaitre@outlook.fr", telephone: "06 68 47 21 39", entreprise: "", poste: "", dateNaissance: "1994-09-26", adresse: "45 rue Gabriel Péri", codePostal: "92230", commune: "GENNEVILLIERS", numeroAction: "GOTRM-0925-08", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "MANSEUR", prenom: "Mehdi", email: "mehdi.manseur@gmail.com", telephone: "07 45 19 80 74", entreprise: "", poste: "", dateNaissance: "1991-12-03", adresse: "9 rue de la Gare", codePostal: "13003", commune: "MARSEILLE", numeroAction: "GOTRM-0925-09", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+  { civilite: "M.", nom: "SELHAOUI", prenom: "Ilyes", email: "ilyes.selhaoui@gmail.com", telephone: "06 31 74 52 96", entreprise: "", poste: "", dateNaissance: "1996-05-19", adresse: "27 avenue Aristide Briand", codePostal: "94110", commune: "ARCUEIL", numeroAction: "GOTRM-0925-10", dateDebutFormation: "2025-09-01", dateFinFormation: "2025-09-03", tarifFormation: "1500" },
+];
+
+
 // ═══════════════════════════════════════════════════════════════════════════
 // MAISON HSY BEAUTÉ – Organisme + 6 stagiaires Maquilleur Professionnel
 // Session passée : 01 → 05 juin 2026 (5 jours consécutifs)
@@ -821,6 +840,26 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     rythmeAlternance: "Sessions hebdomadaires en présentiel (lundi au vendredi, 7h/jour)",
     codeRNCP: "RNCP40990",
   },
+  {
+    intitule: "TP GOTRM – Session d'examen SEPTEMBRE (10 candidats)",
+    objectifs: "Préparer et présenter la session d'examen du Titre professionnel TP-01329 « Gestionnaire des opérations de transport routier de marchandises » (RNCP40990, millésime 03, niveau 5, arrêté du 03/06/2025 publié au JO du 14/06/2025, date d'effet 24/08/2025). La session se déroule du 01 au 03 septembre pour 10 candidats et comprend : la mise en situation professionnelle (10h00 en 2 parties de 5h00 sur 2 jours distincts), l'entretien technique (1h00 dont 20 min de préparation), le questionnement à partir de production(s) (30 min) et l'entretien final (30 min). Chaque candidat dispose d'un livret d'évaluations passées en cours de formation (ECF) et d'un dossier professionnel (DP).",
+    prerequis: "Dossier d'inscription complet (pièce d'identité, CV, attestations d'expérience), dossier professionnel (DP) renseigné et signé, livret ECF complété par l'organisme de formation, maîtrise des outils bureautiques Word® et Excel®.",
+    duree: "12h00 d'épreuves par candidat – session collective sur 3 jours",
+    modalites: "presentiel",
+    tarif: "1 500 € HT par candidat (TVA 0 % – exonération article 261-4-4° du CGI)",
+    programme: "JOUR 1 (01/09) – Mise en situation professionnelle, partie 1 (5h00) : périmètre CCP1 – étude de faisabilité et tarification, affectation/affrètement/planification, encadrement de conducteurs, coordination et suivi des opérations. Production d'un dossier technique sous Word® incluant des travaux sous Excel®, sous surveillance, accès internet limité aux textes législatifs et réglementaires, fichiers personnels interdits.\n\nJOUR 2 (02/09) – Mise en situation professionnelle, partie 2 (5h00) : périmètre CCP2 + CCP3 – négociation et contractualisation de la sous-traitance, supervision traction/groupage/dégroupage/camionnage, service après-vente, animation du service exploitation, indicateurs de performance et mesures correctives.\n\nJOUR 3 (03/09) – Entretien technique (1h00, dont 20 min de préparation non décomptées), questionnement à partir de production(s) (30 min), entretien final (30 min) devant le jury (HAMMOUTI Mimoune / MAATOUG Amar), puis délibération.",
+    methodesEvaluation: "Évaluation par le jury sur la base : (1) des résultats de la mise en situation professionnelle en deux parties, (2) du dossier professionnel (DP) renseigné par le candidat, (3) des résultats des évaluations passées en cours de formation (livret ECF), (4) de l'entretien final. Grille d'évaluation jury reprenant les 50 critères de performance des 9 compétences professionnelles des 3 CCP.",
+    moyensPedagogiques: "Salle d'examen équipée de postes informatiques individuels (Word®, Excel®), accès internet restreint aux textes législatifs et réglementaires, surveillants de salle, matrice des fichiers AC1/AC2, documentation réglementaire (Code des transports, contrats types, Convention CMR).",
+    publicVise: "Candidats issus d'un parcours de formation continue, candidats VAE et candidats en capitalisation de CCP dans le domaine du transport routier de marchandises.",
+    delaiAcces: "Inscription clôturée 14 jours avant la date de session – convocation adressée à chaque candidat au minimum 15 jours avant l'épreuve.",
+    dateDebut: "2025-09-01",
+    dateFin: "2025-09-03",
+    lieu: "HEXAGONE FORMATION – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
+    nombreParticipants: "10",
+    formateur: "Mesbah Morad",
+    codeRNCP: "RNCP40990",
+  },
+
   {
     intitule: "Bac Professionnel Pilote de Ligne de Production (PLP)",
     objectifs: "Former des techniciens capables de préparer, conduire et réguler une ligne de production automatisée ou semi-automatisée dans les secteurs industriels (agroalimentaire, pharmacie, cosmétique, papier-carton, électronique, métallurgie, automobile, textile, céramique, traitement des déchets). À l'issue de la formation, le titulaire sera capable de : organiser la production (A1), conduire l'équipement de production (A2), intervenir et réguler durant les opérations (A3), appliquer et faire appliquer les règles QSSE – Qualité, Santé, Sécurité, Environnement (A4) et participer à l'optimisation des opérations (A5). Le diplôme prépare également au premier encadrement d'atelier et fait le lien entre la production, la maintenance et la gestion de production.",
