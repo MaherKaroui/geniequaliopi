@@ -19,6 +19,8 @@ import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, 
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
 import { genDeroulePedagogique, genFactureOPCO } from "./templatesAF";
+import { genECFGotrm, genDPGotrm } from "./gotrm/ecfDp";
+
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
