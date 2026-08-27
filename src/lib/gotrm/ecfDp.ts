@@ -591,10 +591,75 @@ export function genDPGotrm(
   </table>
   <p style="margin-top:12px;font-size:10pt">Outils et environnement de travail mobilisés : ${outils}.</p>`);
 
-  // ── Annexes
-  pages.push(`<h2>ANNEXES</h2>
-  <p><em>(si le RC le prévoit)</em></p>
-  <p>Sans objet pour la présente session.</p>`);
+  // ── Annexes — bordereau des pièces de preuve
+  const refDossier = `DP-${GOTRM_TITRE.codeTitre}-${anneeFin}-${String((seed % 900) + 100)}`;
+  const preuves: { code: string; intitule: string; nature: string; at: string; periode: string }[] = [];
+  const naturesPreuve = [
+    "Document professionnel anonymisé",
+    "Extrait d'outil métier (copie d'écran)",
+    "Attestation employeur",
+    "Production personnelle du candidat",
+  ];
+  const piecesParAT: Record<number, string[]> = {
+    1: [
+      "Offre commerciale et grille tarifaire remises à un client chargeur",
+      "Fiche de calcul du prix de revient kilométrique d'un trafic",
+      "Contrat de transport type et confirmation d'affrètement",
+    ],
+    2: [
+      "Extrait de planning hebdomadaire d'affectation conducteurs / véhicules",
+      "Lettre de voiture CMR et bordereau de livraison renseignés",
+      "Relevé de suivi des temps de conduite et de repos (chronotachygraphe)",
+    ],
+    3: [
+      "Tableau de bord mensuel d'exploitation (coûts, ratios, marge par trafic)",
+      "Cahier des charges de sous-traitance et attestation d'assurance du sous-traitant",
+      "Compte rendu de traitement d'un litige client avec plan d'action",
+    ],
+  };
+  GOTRM_CCP.forEach((ccp, ci) => {
+    const items = piecesParAT[ci + 1] || [];
+    items.forEach((it, j) => {
+      preuves.push({
+        code: `A${ci + 1}.${j + 1}`,
+        intitule: it,
+        nature: naturesPreuve[(seed + ci * 3 + j) % naturesPreuve.length],
+        at: `Activité-type n° ${ci + 1}`,
+        periode: pick(periodes, seed + ci * 4 + j),
+      });
+    });
+  });
+
+  pages.push(`<h2>ANNEXES — Bordereau des pièces de preuve</h2>
+  <p><em>(annexes au dossier professionnel — pièces justificatives de la pratique professionnelle)</em></p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:26%">Référence du dossier</th><td>${refDossier}</td></tr>
+    <tr><th>Candidat</th><td>${s?.prenom || ""} ${s?.nom || ""}</td></tr>
+    <tr><th>Entreprise / service concerné</th><td>${ent.nom}${ent.service ? ` – ${ent.service}` : ""}</td></tr>
+    <tr><th>Nombre de pièces annexées</th><td>${preuves.length}</td></tr>
+  </table>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:12px">
+    <tr>
+      <th style="width:8%">Réf.</th>
+      <th style="width:34%">Intitulé de la pièce</th>
+      <th style="width:20%">Nature</th>
+      <th style="width:19%">Activité-type concernée</th>
+      <th style="width:19%">Période</th>
+    </tr>
+    ${preuves
+      .map(
+        (p) =>
+          `<tr><td>${p.code}</td><td>${p.intitule}</td><td>${p.nature}</td><td>${p.at}</td><td>${p.periode}</td></tr>`,
+      )
+      .join("")}
+  </table>
+  <p style="margin-top:12px;font-size:10pt"><strong>Mentions relatives aux pièces annexées :</strong> l'ensemble des documents est anonymisé (noms de clients, coordonnées, montants sensibles et données personnelles masqués) conformément aux obligations de confidentialité et au RGPD. Les pièces sont produites à seule fin d'illustrer la pratique professionnelle devant le jury et ne peuvent être diffusées.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
+    <tr><th style="width:50%">Visa ${g(s, "du candidat", "de la candidate")} — pièces annexées certifiées conformes</th><th style="width:50%">Visa du centre organisateur</th></tr>
+    <tr><td style="height:70px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td><td style="height:70px">${org.nom}</td></tr>
+  </table>
+  <p style="margin-top:10px;font-size:10pt">Fait à ${villeDecl}, le ${dateDeclaration}.</p>`);
+
 
   const total = pages.length;
   const body = pages
