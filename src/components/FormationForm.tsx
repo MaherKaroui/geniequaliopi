@@ -212,15 +212,19 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
       }
       // Auto-import organisme + stagiaires + caches IA pour HEXAGONE GOTRM et TP GOTRM
       if (selected.intitule.toUpperCase().includes("HEXAGONE") || selected.intitule.toLowerCase().includes("gotrm") || selected.intitule.toLowerCase().includes("gestionnaire des opérations de transport")) {
+        const isSessionSeptembre = selected.intitule.toLowerCase().includes("session d'examen septembre");
         if (onApplyOrganisme) {
           onApplyOrganisme({ ...HEXAGONE_FORMATION_ORG });
         }
         if (onImportStagiaires) {
-          onImportStagiaires([...STAGIAIRES_HEXAGONE_GOTRM]);
+          onImportStagiaires(isSessionSeptembre ? [...STAGIAIRES_GOTRM_SEPTEMBRE] : [...STAGIAIRES_HEXAGONE_GOTRM]);
         }
         seedGOTRMAICaches();
-        toast.success(`Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM + contenus IA (besoins, tests, exercices, veille) pré-remplis`);
+        toast.success(isSessionSeptembre
+          ? `Organisme HEXAGONE FORMATION + 10 candidats session SEPTEMBRE (ECF + DP disponibles dans EDOF) pré-remplis`
+          : `Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM + contenus IA (besoins, tests, exercices, veille) pré-remplis`);
       }
+
       // Auto-import organisme + 6 stagiaires pour Maquilleur Professionnel (Maison HSY)
       if (selected.intitule.toLowerCase().includes("maquilleur")) {
         if (onApplyOrganisme) {
