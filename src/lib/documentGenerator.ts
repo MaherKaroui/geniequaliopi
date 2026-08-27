@@ -312,6 +312,15 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genCGVStagiaire(o, f, stagiaires, si);
     }
+    case "ecf_livret_gotrm": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genECFGotrm(o, f, stagiaires, si);
+    }
+    case "dossier_professionnel_gotrm": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genDPGotrm(o, f, stagiaires, si);
+    }
+
     case "mentions_legales": return genMentionsLegales(o);
     case "catalogue_formation": return genCatalogue(o, f);
     case "fiche_info_formation": return genFicheInfoFormation(o, f);
