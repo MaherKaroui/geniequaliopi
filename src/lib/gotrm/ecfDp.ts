@@ -187,46 +187,48 @@ export function genECFGotrm(
     : org.referentQualite || org.dirigeant || "";
   const lieu = f.lieu || `${org.adresse}, ${org.codePostal} ${org.ville}`;
 
-  // ── Pied de page officiel (identique à la trame « Livret ECF-EPR »)
-  const nbPages = GOTRM_CCP.length + 3;
-  const pied = (p: number) => `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px">
+  // ── Pied de page officiel (identique à la trame « Livret ECF »)
+  const pied = (p: number, total: number) => `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px">
     <tr><th>SIGLE</th><th>Type de document</th><th>Code titre</th><th>Millésime</th><th>Date JO</th><th>Date de mise à jour</th><th>Page</th></tr>
-    <tr><td>EPR</td><td>Livret d'évaluations passées en cours de formation</td><td>${GOTRM_TITRE.codeTitre}</td><td>${GOTRM_TITRE.millesime}</td><td>14/06/2025</td><td>${formatDate(org.dateMaj || "")}</td><td>${p}/${nbPages}</td></tr>
+    <tr><td>${GOTRM_TITRE.sigle}</td><td>Livret d'évaluations passées en cours de formation</td><td>${GOTRM_TITRE.codeTitre}</td><td>${GOTRM_TITRE.millesime}</td><td>${GOTRM_TITRE.jo.replace(/^J\.?O\.?\s*du\s*:?\s*/i, "")}</td><td>${formatDate(org.dateMaj || "")}</td><td>${p}/${total}</td></tr>
   </table>`;
 
   const pages: string[] = [];
 
   // ── Page 1 : page de garde officielle
   pages.push(`<div style="text-align:center">
-    <p style="font-size:11pt;letter-spacing:2px;margin-bottom:2px">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
+    <p style="font-size:11pt;letter-spacing:1px;margin-bottom:2px">MINISTÈRE DU TRAVAIL, DE L'EMPLOI ET DE L'INSERTION</p>
     <p style="font-size:9pt;font-style:italic;margin-top:0">Liberté • Égalité • Fraternité</p>
-    <h1 style="margin-bottom:2px">Titre professionnel</h1>
-    <h2 style="margin-top:0">${GOTRM_TITRE.intitule}</h2>
-    <p><strong>${GOTRM_TITRE.niveau}</strong></p>
+    <h1 style="margin:18px 0 12px">LIVRET D'ÉVALUATIONS PASSÉES EN COURS DE FORMATION</h1>
+    <h2 style="margin-bottom:2px">Titre professionnel</h2>
+    <h2 style="margin-top:0">${GOTRM_TITRE.intitule} – ${GOTRM_TITRE.niveau}</h2>
   </div>
-  <table style="width:60%;margin:0 auto;border-collapse:collapse;font-size:10pt">
+  <table style="width:62%;margin:14px auto;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:50%">Arrêté du :</th><td>${GOTRM_TITRE.arrete.replace(/^Arrêté du\s*:?\s*/i, "")}</td></tr>
     <tr><th>J.O. du :</th><td>${GOTRM_TITRE.jo.replace(/^J\.?O\.?\s*du\s*:?\s*/i, "")}</td></tr>
     <tr><th>Date d'effet au :</th><td>${GOTRM_TITRE.dateEffet}</td></tr>
   </table>
-  <p style="margin-top:22px"><em>Organisme de formation – Lieu de formation</em><br>${org.nom}<br>${lieu}</p>
-  <p style="margin-top:18px"><strong><em>Candidat(e) :</em></strong> Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</p>
-  <p><em>Nom</em> : <strong>${s?.nom || ""}</strong><br>
-  <em>Prénom</em> : <strong>${s?.prenom || ""}</strong><br>
-  <em>Date de naissance</em> : ${s?.dateNaissance ? formatDate(s.dateNaissance) : ""}</p>
-  <p><em>Période de formation</em> : du ${formatDate(debut)} au ${formatDate(fin)}</p>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:22px">
+    <tr><th style="width:32%">Organisme de formation</th><td>${org.nom}</td></tr>
+    <tr><th>Lieu de formation</th><td>${lieu}</td></tr>
+    <tr><th>Candidat(e)</th><td>Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</td></tr>
+    <tr><th>Nom</th><td><strong>${s?.nom || ""}</strong></td></tr>
+    <tr><th>Prénom</th><td><strong>${s?.prenom || ""}</strong></td></tr>
+    <tr><th>Date de naissance</th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : ""}</td></tr>
+    <tr><th>Période de formation</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
+  </table>`);
 
   // ── Page 2 : présentation du dossier (texte officiel)
   pages.push(`<h2>Présentation du dossier</h2>
   <p>Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
   <p>Le <strong><em>Guide de mise en œuvre</em></strong> des évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : http://travail-emploi.gouv.fr/ (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>`);
 
-  // ── Fiches de résultats des évaluations (une page par activité-type)
+  // ── Fiches de résultats des évaluations (par activité-type)
   GOTRM_CCP.forEach((ccp, ci) => {
     const numAT = ci + 1;
     const evals = ECF_EVALS[ccp.code] || [];
     let p = `<h2>Fiche de résultats des évaluations</h2>
-    <p><strong>Activité-type ${numAT} ${ccp.libelle}</strong></p>
+    <p><strong>Activité-type ${numAT}</strong> ${ccp.libelle}</p>
     <p><strong>Compétences :</strong></p>
     <ol>${ccp.competences.map(c => `<li>${c.libelle}</li>`).join("")}</ol>`;
 
@@ -242,42 +244,72 @@ export function genECFGotrm(
       <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
       ${rows.join("")}
     </table>`;
-    p += `<p style="margin-top:12px"><strong>Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</strong></p>
+    p += `<p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
       <p>${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-      ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
-      <p><strong>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</strong><br>Néant.</p>
-      <p><strong>Compétences à réévaluer :</strong> néant.</p>`;
-    p += `<p style="margin-top:10px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
-    <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      <tr><th style="width:12%"><em>Nom</em></th><td style="width:33%">${evaluateur1}</td><th style="width:12%"><em>Date</em></th><td style="width:18%">${dateVisa}</td><td style="height:44px"></td></tr>
-      <tr><th><em>Nom</em></th><td>${evaluateur2}</td><th><em>Date</em></th><td>${dateVisa}</td><td style="height:44px"></td></tr>
-    </table>`;
+      ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>`;
     pages.push(p);
+
+    // Page « points d'attention » + visas de la fiche
+    pages.push(`<p>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
+    <p><strong>Compétences à réévaluer :</strong> <em>(Voir évaluations complémentaires ci-après.)</em></p>
+    <p>Néant : l'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.</p>
+    <p style="margin-top:14px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
+    <table style="width:100%;border-collapse:collapse;font-size:10pt">
+      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="height:46px"></td></tr>
+      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td style="height:46px"></td></tr>
+    </table>`);
+
+    // Page « Évaluations complémentaires (si nécessaire) » — trame officielle vierge
+    const ligneComp = ccp.competences.map((_, n) => `${n + 1} ☐`).join(" &nbsp;&nbsp; ");
+    pages.push(`<h2>Évaluations complémentaires <em>(si nécessaire)</em></h2>
+    <p><em>Activité-type ${numAT} – ${ccp.libelle}</em></p>
+    <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+      <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
+      ${[1, 2, 3, 4].map(n => `<tr><td style="height:30px"><strong>${n}</strong></td><td></td><td>${ligneComp}</td></tr>`).join("")}
+    </table>
+    <p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
+    <p>☐ Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ☐ Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+    <p><strong>Observations</strong></p>
+    <p>Sans objet : aucune évaluation complémentaire n'a été nécessaire pour cette activité-type.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:10pt">
+      <tr><th style="width:12%">Nom</th><td style="width:33%"></td><th style="width:12%">Date</th><td style="width:18%"></td><td style="height:44px">Visa</td></tr>
+      <tr><th>Nom</th><td></td><th>Date</th><td></td><td style="height:44px">Visa</td></tr>
+    </table>`);
   });
 
-  // ── Dernière page : synthèse des résultats
-  let syn = `<h2>Synthèse des résultats obtenus par ${g(s, "le candidat", "la candidate")} à l'issue du parcours de formation</h2>
+  // ── Synthèse des résultats
+  pages.push(`<h2>Synthèse des résultats obtenus par ${g(s, "le candidat", "la candidate")} à l'issue du parcours de formation</h2>
   <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
-    <tr><th style="width:42%">Intitulé de l'activité-type</th><th style="width:40%">Compétences professionnelles</th><th>Activité maîtrisée</th></tr>
-    ${GOTRM_CCP.map((ccp, i) => `<tr><td><strong>Activité-type ${i + 1}</strong> – ${ccp.libelle}</td><td>• ${ccp.competences.map(c => c.libelle).join("<br>• ")}</td><td>OUI ${CHK(true)} &nbsp; NON ${CHK(false)}</td></tr>`).join("")}
-  </table>
-  <p style="margin-top:12px"><strong>Observations :</strong></p>
-  <p>${pick(ECF_OBSERVATIONS, seed + 5)}</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><th style="width:40%">Formateur(s) / Évaluateur(s)</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td style="height:44px"></td></tr>
-    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td style="height:44px"></td></tr>
-    <tr><td><strong>Représentant de l'organisme de formation</strong><br>${org.dirigeant || ""}</td><td>${dateVisa}</td><td style="height:44px">${org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon ${org.nom}" style="max-height:70px" />` : ""}</td></tr>
-  </table>
-  <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature, le ${dateVisa}.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td style="height:70px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td></tr></table>`;
-  pages.push(syn);
+    <tr><th style="width:45%">Intitulé de l'activité-type</th><th>Compétences professionnelles</th></tr>
+    ${GOTRM_CCP.map((ccp, i) => `<tr><td><strong>Activité-type ${i + 1}</strong> – ${ccp.libelle}</td><td>• ${ccp.competences.map(c => c.libelle).join("<br>• ")}</td></tr>
+    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(true)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`).join("")}
+  </table>`);
 
+  // ── Observations et visas finaux
+  pages.push(`<h2>Observations</h2>
+  <p>${pick(ECF_OBSERVATIONS, seed + 5)}</p>
+  <p style="margin-top:14px"><strong>Formateur(s) / Évaluateur(s)</strong></p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
+    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
+    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
+  </table>
+  <p style="margin-top:14px"><strong>Représentant de l'organisme de formation</strong></p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
+    <tr><td>${org.dirigeant || ""}</td><td>${dateVisa}</td><td style="height:70px">${org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon ${org.nom}" style="max-height:70px" />` : ""}</td></tr>
+  </table>
+  <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature le ${dateVisa}.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td style="height:76px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td></tr></table>`);
+
+  const total = pages.length;
   const body = pages
-    .map((p, i) => `${p}${pied(i + 1)}`)
+    .map((p, i) => `${p}${pied(i + 1, total)}`)
     .join(`<div class="page-break"></div>`);
   return htmlWrap(body);
 }
+
 
 
 // ───────────────────────────────────────────── DP
