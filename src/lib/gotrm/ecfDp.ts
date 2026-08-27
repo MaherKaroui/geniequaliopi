@@ -577,9 +577,24 @@ export function genDPGotrm(
   pages.push(`<h2>Déclaration sur l'honneur</h2>
   <p>Je ${g(s, "soussigné", "soussignée")} <strong>${s?.prenom || ""} ${s?.nom || ""}</strong>, déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis ${g(s, "l'auteur", "l'auteure")} des réalisations jointes.</p>
   <p>Fait à ${villeDecl}, le ${dateDeclaration}, pour faire valoir ce que de droit.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>
-  <p style="margin-top:14px;font-size:10pt"><strong>Documents illustrant la pratique professionnelle</strong> <em>(facultatif)</em> : offres commerciales et calculs de prix de revient anonymisés, extraits de plannings d'exploitation, cahier des charges de sous-traitance, tableau de bord d'exploitation.</p>
-  <p style="font-size:10pt">Outils et environnement de travail mobilisés : ${outils}.</p>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>`);
+
+  // ── Documents illustrant la pratique professionnelle (facultatif)
+  pages.push(`<h2>Documents illustrant la pratique professionnelle</h2>
+  <p><em>(facultatif)</em></p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:22%">Intitulé</th><th>Description</th></tr>
+    <tr><td>Offre commerciale</td><td>Proposition tarifaire anonymisée avec calcul du prix de revient kilométrique.</td></tr>
+    <tr><td>Planning d'exploitation</td><td>Extrait de planning hebdomadaire d'affectation des moyens et des sous-traitants.</td></tr>
+    <tr><td>Cahier des charges</td><td>Cahier des charges de sous-traitance d'un trafic régulier.</td></tr>
+    <tr><td>Tableau de bord</td><td>Tableau de bord mensuel d'exploitation (coûts, ratios, marge par trafic).</td></tr>
+  </table>
+  <p style="margin-top:12px;font-size:10pt">Outils et environnement de travail mobilisés : ${outils}.</p>`);
+
+  // ── Annexes
+  pages.push(`<h2>ANNEXES</h2>
+  <p><em>(si le RC le prévoit)</em></p>
+  <p>Sans objet pour la présente session.</p>`);
 
   const total = pages.length;
   const body = pages
