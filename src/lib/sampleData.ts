@@ -53,34 +53,35 @@ export const STAGIAIRES_BAC_PRO_LOGISTIQUE: StagiaireInfo[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HEXAGONE FORMATION – Organisme + 10 stagiaires TP GOTRM (issus des factures)
+// HAYB FORMATIONS – Organisme + 10 stagiaires TP GOTRM
+// Source : https://www.pappers.fr/entreprise/hayb-formations-935061358
 // ═══════════════════════════════════════════════════════════════════════════
-export const HEXAGONE_FORMATION_ORG: OrganismeInfo = {
-  nom: "HEXAGONE FORMATION",
-  siret: "931 115 521 00011",
+export const HAYB_FORMATIONS_ORG: OrganismeInfo = {
+  nom: "HAYB FORMATIONS",
+  siret: "935 061 358 00013",
   adresse: "32 RUE DE PARIS",
   codePostal: "92100",
   ville: "BOULOGNE-BILLANCOURT",
-  telephone: "06 79 93 25 62",
-  email: "hexagone.formation@outlook.fr",
+  telephone: "",
+  email: "",
   siteWeb: "",
   nda: "",
-  dirigeant: "Benhamida Wahid",
-  responsablePedagogique: "Mesbah Morad",
-  referentHandicap: "Benhamida Wahid",
-  referentQualite: "Mesbah Morad",
-  poleAdministratif: "Benhamida Wahid",
+  dirigeant: "Benbida Yaniss",
+  responsablePedagogique: "",
+  referentHandicap: "",
+  referentQualite: "",
+  poleAdministratif: "Benbida Yaniss",
   relationEntreprises: "",
   referentMobilite: "",
   domainesFormation: "Transport routier de marchandises – Préparation au TP-01329 Gestionnaire des Opérations de Transport Routier de Marchandises",
   typesActions: ["actions-formation"],
-  certifications: "TP-01329 (RNCP40990)",
+  certifications: "TP-01329 (RNCP40990) – Organisme certifié Qualiopi (spécialité Formations générales)",
   outilsUtilises: "Word, Excel, plateformes pédagogiques transport, simulateurs TMS",
   version: "1",
-  dateMaj: "2025-01-06",
+  dateMaj: "2026-08-27",
 };
 
-export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
+export const STAGIAIRES_HAYB_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DEBOUBA", prenom: "Mongi", email: "mongi.debouba@gmail.com", telephone: "06 82 65 25 82", entreprise: "", poste: "", dateNaissance: "", adresse: "4 allée des Framboisiers", codePostal: "91160", commune: "LA VILLE DU BOIS", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
   { civilite: "M.", nom: "DABOUBA", prenom: "Khaled", email: "daboubakhaled@hotmail.com", telephone: "06 68 63 70 05", entreprise: "", poste: "", dateNaissance: "", adresse: "45 RUE LUCIEN SAMPAIX", codePostal: "92320", commune: "CHATILLON", dateDebutFormation: "2025-04-07", dateFinFormation: "2025-04-11", tarifFormation: "1500" },
   { civilite: "M.", nom: "RIAHI", prenom: "Ismahel", email: "ismahelr@gmail.com", telephone: "06 66 18 82 42", entreprise: "", poste: "", dateNaissance: "", adresse: "132 Boulevard Stalingrad", codePostal: "94200", commune: "IVRY-SUR-SEINE", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },

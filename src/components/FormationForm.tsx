@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -210,19 +210,19 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         onImportStagiaires([...STAGIAIRES_BAC_PRO_LOGISTIQUE]);
         toast.success(`9 stagiaires Bac Pro Logistique importés automatiquement`);
       }
-      // Auto-import organisme + stagiaires + caches IA pour HEXAGONE GOTRM et TP GOTRM
-      if (selected.intitule.toUpperCase().includes("HEXAGONE") || selected.intitule.toLowerCase().includes("gotrm") || selected.intitule.toLowerCase().includes("gestionnaire des opérations de transport")) {
+      // Auto-import organisme + stagiaires + caches IA pour HAYB FORMATIONS GOTRM et TP GOTRM
+      if (selected.intitule.toUpperCase().includes("HAYB") || selected.intitule.toLowerCase().includes("gotrm") || selected.intitule.toLowerCase().includes("gestionnaire des opérations de transport")) {
         const isSessionSeptembre = selected.intitule.toLowerCase().includes("session d'examen septembre");
         if (onApplyOrganisme) {
-          onApplyOrganisme({ ...HEXAGONE_FORMATION_ORG });
+          onApplyOrganisme({ ...HAYB_FORMATIONS_ORG });
         }
         if (onImportStagiaires) {
-          onImportStagiaires(isSessionSeptembre ? [...STAGIAIRES_GOTRM_SEPTEMBRE] : [...STAGIAIRES_HEXAGONE_GOTRM]);
+          onImportStagiaires(isSessionSeptembre ? [...STAGIAIRES_GOTRM_SEPTEMBRE] : [...STAGIAIRES_HAYB_GOTRM]);
         }
         seedGOTRMAICaches();
         toast.success(isSessionSeptembre
-          ? `Organisme HEXAGONE FORMATION + 10 candidats session SEPTEMBRE (ECF + DP disponibles dans EDOF) pré-remplis`
-          : `Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM + contenus IA (besoins, tests, exercices, veille) pré-remplis`);
+          ? `Organisme HAYB FORMATIONS + 10 candidats session SEPTEMBRE (ECF + DP disponibles dans EDOF) pré-remplis`
+          : `Organisme HAYB FORMATIONS + 10 stagiaires GOTRM + contenus IA (besoins, tests, exercices, veille) pré-remplis`);
       }
 
       // Auto-import organisme + 6 stagiaires pour Maquilleur Professionnel (Maison HSY)
