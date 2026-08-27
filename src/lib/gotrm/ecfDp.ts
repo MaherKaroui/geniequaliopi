@@ -660,6 +660,146 @@ export function genDPGotrm(
   </table>
   <p style="margin-top:10px;font-size:10pt">Fait à ${villeDecl}, le ${dateDeclaration}.</p>`);
 
+  // ── Pièces de preuve réelles (documents annexés, anonymisés)
+  const entetePreuve = (code: string, titre: string) => `
+    <p style="font-size:8.5pt;color:#555;margin-bottom:2px">Annexe ${code} au dossier ${refDossier} — ${titre}</p>
+    <p style="font-size:8.5pt;color:#555;margin-bottom:10px">Candidat : ${s?.prenom || ""} ${s?.nom || ""} — Document anonymisé conformément au RGPD (noms de clients, immatriculations et montants sensibles masqués).</p>`;
+  const conduc = ["M. LEROY", "Mme BENALI", "M. COSTA", "Mme PERRIN", "M. DIOP", "M. FABRE", "Mme NAVA", "M. ROLLET"];
+  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+  const villesT = ["Lyon", "Marseille", "Lille", "Toulouse", "Bordeaux", "Rennes", "Metz", "Avignon", "Orléans", "Clermont-Fd"];
+  const sem = `S${String(12 + (seed % 30)).padStart(2, "0")}/${anneeFin}`;
+
+  // A1.1 Offre commerciale
+  const pk = 1.15 + (seed % 6) * 0.04;
+  const kmJ = 420 + (seed % 8) * 35;
+  pages.push(`${entetePreuve("A1.1", "Offre commerciale et grille tarifaire")}
+  <h2>OFFRE COMMERCIALE N° OC-${anneeFin}-${200 + (seed % 700)}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:35%">Émetteur</th><td>${ent.nom} — Service commercial${ent.ville ? `, ${ent.ville}` : ""}</td></tr>
+    <tr><th>Client</th><td>[chargeur — nom anonymisé]</td></tr>
+    <tr><th>Objet</th><td>Transport régional de lots partiels — trafic régulier ${pick(villesT, seed)} ↔ ${pick(villesT, seed + 3)}</td></tr>
+    <tr><th>Validité de l'offre</th><td>30 jours calendaires</td></tr>
+  </table>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:10px">
+    <tr><th>Prestation</th><th>Unité</th><th>Tarif HT</th><th>Conditions</th></tr>
+    <tr><td>Affrètement 19 t tautliner, lot complet</td><td>jour</td><td>${(pk * kmJ).toFixed(2)} €</td><td>Attente offerte 2 h</td></tr>
+    <tr><td>Transport lot partiel (≤ 3 t / 4 palettes)</td><td>palette</td><td>${(pk * 52).toFixed(2)} €</td><td>Hors accès difficile</td></tr>
+    <tr><td>Surcharge attente (au-delà de 2 h)</td><td>heure</td><td>38,00 €</td><td>Facturée par quart d'heure</td></tr>
+    <tr><td>Indemnité de retour à vide</td><td>km</td><td>0,85 €</td><td>Si &gt; 80 km</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt"><strong>Conditions :</strong> paiement à 45 jours date d'émission, gazole indexé sur CNR, garantie ad valorem selon contrat type LOTI.</p>
+  <p style="font-size:9.5pt">Rédigée par ${s?.prenom || ""} ${s?.nom || ""} — le ${dateDeclaration}.</p>`);
+
+  // A1.2 Prix de revient kilométrique
+  const cfKm = 0.62 + (seed % 4) * 0.03, cvKm = 0.48 + (seed % 5) * 0.02, salKm = 0.42 + (seed % 3) * 0.03;
+  pages.push(`${entetePreuve("A1.2", "Fiche de calcul du prix de revient kilométrique")}
+  <h2>FICHE DE CALCUL — PRIX DE REVIENT KILOMÉTRIQUE</h2>
+  <p style="font-size:9.5pt">Trafic analysé : ${pick(villesT, seed + 1)} ↔ ${pick(villesT, seed + 4)} — parc annuel 96 000 km — véhicule 19 t.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th>Composante</th><th style="width:18%">€ / km</th><th>Détail du calcul</th></tr>
+    <tr><td>Charges de structure (assurances, location, gestion)</td><td>${cfKm.toFixed(2)}</td><td>Coûts fixes annuels ÷ km parcourus</td></tr>
+    <tr><td>Charges variables (gazole, péages, entretien, pneus)</td><td>${cvKm.toFixed(2)}</td><td>Consommation 26 l/100 + pneus 0,06 €/km</td></tr>
+    <tr><td>Personnel roulant (salaire + cotisations + frais)</td><td>${salKm.toFixed(2)}</td><td>Coût chargé annuel ÷ km parcourus</td></tr>
+    <tr><td><strong>Prix de revient au km</strong></td><td><strong>${(cfKm + cvKm + salKm).toFixed(2)}</strong></td><td>Somme des trois composantes</td></tr>
+    <tr><td>Marge commerciale visée (7 %)</td><td>${((cfKm + cvKm + salKm) * 0.07).toFixed(2)}</td><td>Objectif rentabilité trafic</td></tr>
+    <tr><td><strong>Prix de vente conseillé</strong></td><td><strong>${((cfKm + cvKm + salKm) * 1.07).toFixed(2)}</strong></td><td>Base de l'offre commerciale</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt">Calcul établi et vérifié par ${s?.prenom || ""} ${s?.nom || ""} sur la base des comptes d'exploitation ${anneeFin - 1}.</p>`);
+
+  // A1.3 Confirmation d'affrètement
+  pages.push(`${entetePreuve("A1.3", "Contrat de transport type et confirmation d'affrètement")}
+  <h2>CONFIRMATION D'AFFRÈTEMENT N° AF-${anneeFin}-${400 + (seed % 500)}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th style="width:30%">Donneur d'ordre</th><td>[client — anonymisé]</td><th style="width:22%">Transporteur</th><td>${ent.nom}</td></tr>
+    <tr><th>Chargement</th><td>${pick(villesT, seed + 2)}, ${jours[seed % 5]} 07 h 30</td><th>Livraison</th><td>${pick(villesT, seed + 6)}, lendemain avant 11 h 00</td></tr>
+    <tr><th>Marchandise</th><td>12 palettes — marchandises diverses (${3 + (seed % 6)} t)</td><th>Véhicule</th><td>19 t tautliner, hayon</td></tr>
+    <tr><th>Prix convenu</th><td>${(pk * 610).toFixed(2)} € HT</td><th>Document</th><td>Lettre de voiture CMR</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt"><strong>Conditions :</strong> contrat type LOTI applicable ; présentation aux quais à l'heure convenue ; arrêtés de quai signés à chaque manutention ; indemnisation des pertes/avaries selon barème contractuel.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:8px">
+    <tr><th style="width:50%">Pour le donneur d'ordre</th><th>Pour le transporteur — ${ent.nom}</th></tr>
+    <tr><td style="height:50px;font-style:italic;color:#777">[anonymisé]</td><td style="height:50px">${s?.prenom || ""} ${s?.nom || ""}<br/><em>affréteur-euse</em></td></tr>
+  </table>`);
+
+  // A2.1 Planning hebdo
+  const tournees = () => `${pick(villesT, seed + 2)} → ${pick(villesT, seed + 5)} (${120 + (seed % 6) * 40} km)`;
+  pages.push(`${entetePreuve("A2.1", "Extrait de planning hebdomadaire d'affectation conducteurs / véhicules")}
+  <h2>PLANNING D'EXPLOITATION — SEMAINE ${sem}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9pt">
+    <tr><th style="width:16%">Conducteur</th><th style="width:10%">Véhicule</th>${jours.map(j => `<th>${j}</th>`).join("")}</tr>
+    ${conduc.slice(0, 5).map((c, i) => `<tr><td>${c}</td><td>P-${11 + i}</td>${jours.map((_, d) => `<td style="text-align:center">${(i + d + seed) % 7 === 6 ? "Repos" : (i + d + seed) % 9 === 8 ? "Formation" : tournees()}</td>`).join("")}</tr>`).join("")}
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt"><strong>Sous-traitants positionnés :</strong> transporteur partenaire [anonymisé] sur la tournée ${pick(villesT, seed + 7)} (mercredi–jeudi), attestation d'assurance vérifiée.</p>
+  <p style="font-size:9.5pt">Planning établi par ${s?.prenom || ""} ${s?.nom || ""}, validé par l'exploitation — semaine ${sem}.</p>`);
+
+  // A2.2 CMR
+  pages.push(`${entetePreuve("A2.2", "Lettre de voiture CMR et bordereau de livraison renseignés")}
+  <h2>LETTRE DE VOITURE CMR N° CMR-${anneeFin}-${700 + (seed % 250)}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th style="width:30%">Expéditeur</th><td>[anonymisé]</td><th style="width:25%">Destinataire</th><td>[anonymisé]</td></tr>
+    <tr><th>Lieu / date d'enlèvement</th><td>${pick(villesT, seed + 1)} — ${jours[seed % 5]}</td><th>Lieu de livraison</th><td>${pick(villesT, seed + 8)}</td></tr>
+    <tr><th>Nature / nombre de colis</th><td>${8 + (seed % 5)} palettes filmées</td><th>Poids brut</th><td>${(3.4 + (seed % 6) * 0.8).toFixed(1)} t</td></tr>
+    <tr><th>Transporteur</th><td>${ent.nom}</td><th>Immatriculation</th><td>[anonymisée]</td></tr>
+    <tr><th>Réserves à la livraison</th><td colspan="3">${seed % 3 === 0 ? "1 palette écrasée sur angle — signalée, photos jointes" : "Néant — livraison conforme"}</td></tr>
+  </table>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:8px">
+    <tr><th style="width:33%">Expéditeur</th><th style="width:33%">Transporteur (${ent.nom})</th><th>Destinataire</th></tr>
+    <tr><td style="height:45px;font-style:italic;color:#777">[anonymisé]</td><td style="height:45px">${s?.prenom || ""} ${s?.nom || ""}</td><td style="height:45px;font-style:italic;color:#777">[anonymisé]</td></tr>
+  </table>`);
+
+  // A2.3 Relevé temps de conduite
+  pages.push(`${entetePreuve("A2.3", "Relevé de suivi des temps de conduite et de repos (chronotachygraphe)")}
+  <h2>RELEVÉ TACHYGRAPHE — CONDUCTEUR ${conduc[seed % 5]} — SEMAINE ${sem}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th>Jour</th><th>Conduite</th><th>Autre travail</th><th>Disponibilité</th><th>Amplitude</th><th>Repos journalier</th></tr>
+    ${jours.map((j, i) => { const c = 6.5 + ((seed + i) % 3); const a = 1.2 + ((seed + i) % 2) * 0.5; return `<tr><td>${j}</td><td>${c.toFixed(1)} h</td><td>${a.toFixed(1)} h</td><td>1,0 h</td><td>${(c + a + 1.8).toFixed(1)} h</td><td>${i < 3 ? "11 h (normal)" : "9 h (réduit)"}</td></tr>`; }).join("")}
+    <tr><td><strong>Total semaine</strong></td><td colspan="2"><strong>${(6.5 * 3 + ((seed % 3) + 7.5) * 2).toFixed(0)} h de conduite — conforme au plafond hebdomadaire</strong></td><td colspan="3">Repos hebdo : 45 h</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt">Contrôle RSE effectué par ${s?.prenom || ""} ${s?.nom || ""} — aucune infraction constatée, carte conducteur téléchargée le dernier vendredi du mois.</p>`);
+
+  // A3.1 Tableau de bord mensuel
+  const caM = 62000 + (seed % 9) * 4500;
+  pages.push(`${entetePreuve("A3.1", "Tableau de bord mensuel d'exploitation (coûts, ratios, marge par trafic)")}
+  <h2>TABLEAU DE BORD D'EXPLOITATION — ${["Mars", "Avril", "Mai", "Juin", "Septembre", "Octobre"][seed % 6]} ${anneeFin - 1}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th>Indicateur</th><th style="width:20%">Réalisé</th><th style="width:20%">Objectif</th><th>Écart / commentaire</th></tr>
+    <tr><td>Chiffre d'affaires transport</td><td>${caM.toLocaleString("fr-FR")} €</td><td>${(caM * 0.95).toLocaleString("fr-FR")} €</td><td>+5 % — trafic régional dynamique</td></tr>
+    <tr><td>Prix de revient au km (moyenne flotte)</td><td>${(cfKm + cvKm + salKm).toFixed(2)} €</td><td>${((cfKm + cvKm + salKm) * 0.97).toFixed(2)} €</td><td>Gazole au-dessus de l'indice CNR</td></tr>
+    <tr><td>Taux de remplissage moyen</td><td>${78 + (seed % 10)} %</td><td>80 %</td><td>Retours à vide à optimiser</td></tr>
+    <tr><td>Ponctualité livraisons</td><td>${93 + (seed % 5)} %</td><td>95 %</td><td>2 retards liés aux travaux A${1 + (seed % 8)}</td></tr>
+    <tr><td>Marge nette par trafic (moyenne)</td><td>${5.5 + (seed % 3)} %</td><td>7 %</td><td>Action : renégociation du trafic ${pick(villesT, seed + 4)}</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt">Tableau construit et présenté en réunion d'exploitation par ${s?.prenom || ""} ${s?.nom || ""}.</p>`);
+
+  // A3.2 Cahier des charges sous-traitance
+  pages.push(`${entetePreuve("A3.2", "Cahier des charges de sous-traitance")}
+  <h2>CAHIER DES CHARGES — SOUS-TRAITANCE TRAFIC ${pick(villesT, seed + 3).toUpperCase()}</h2>
+  <p style="font-size:9.5pt"><strong>Donneur d'ordre :</strong> ${ent.nom} — <strong>Sous-traitant :</strong> [transporteur partenaire, anonymisé].</p>
+  <ol style="font-size:9.5pt;margin:6px 0 0 18px">
+    <li><strong>Périmètre :</strong> enlèvement quotidien 17 h, livraison le lendemain avant 10 h, 8 à 12 palettes, véhicule 19 t.</li>
+    <li><strong>Obligations :</strong> licence de transport en cours de validité, attestation d'assurance marchandises à jour, respect du contrat type LOTI.</li>
+    <li><strong>Suivi :</strong> transmission des CMR sous 48 h, signalement immédiat de tout incident, reporting qualité mensuel.</li>
+    <li><strong>Rémunération :</strong> forfait ${(pk * 480).toFixed(2)} € HT par rotation, paiement à 45 jours.</li>
+    <li><strong>Résiliation :</strong> préavis de 30 jours ou faute grave constatée.</li>
+  </ol>
+  <p style="margin-top:8px;font-size:9.5pt">Rédigé par ${s?.prenom || ""} ${s?.nom || ""}, relu par la direction — attestation d'assurance du sous-traitant vérifiée et classée.</p>`);
+
+  // A3.3 Compte rendu litige
+  pages.push(`${entetePreuve("A3.3", "Compte rendu de traitement d'un litige client avec plan d'action")}
+  <h2>COMPTE RENDU DE LITIGE — DOSSIER LIT-${anneeFin}-${50 + (seed % 900)}</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+    <tr><th style="width:28%">Client</th><td>[chargeur — anonymisé]</td></tr>
+    <tr><th>Nature du litige</th><td>${seed % 2 === 0 ? "Avarie partielle signalée à la livraison : 2 cartons écrasés sur palette n° 6" : "Retard de livraison de 3 h sur le site destinataire"}</td></tr>
+    <tr><th>Faits constatés</th><td>Réserves émises sur la CMR, photos d'appui, arrêté de quai signé.</td></tr>
+    <tr><th>Analyse</th><td>${seed % 2 === 0 ? "Gerbage non conforme au plan de chargement validé — arrimage insuffisant en rangée arrière." : "Retard imputable à une fermeture exceptionnelle d'autoroute — itinéraire de contournement non anticipé."}</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:9.5pt"><strong>Plan d'action :</strong></p>
+  <ul style="font-size:9.5pt;margin:4px 0 0 18px">
+    <li>${seed % 2 === 0 ? "Rappel au conducteur sur l'arrimage + contrôle visuel avant fermeture des portes (check-list). Déclaration au transporteur d'assurance sous 7 jours." : "Veille Bison Futé quotidienne et départ avancé de 45 min sur ce trafic. Information proactive du client en cas de risque."}</li>
+    <li>Proposition au client : ${seed % 2 === 0 ? "indemnisation selon barème LOTI (23 €/kg)" : "geste commercial de 5 % sur la prochaine rotation"}.</li>
+    <li>Point de suivi à 30 jours avec le client — responsable : ${s?.prenom || ""} ${s?.nom || ""}.</li>
+  </ul>
+  <p style="margin-top:8px;font-size:9.5pt">Client rappelé sous 24 h — incident soldé à l'amiable, relation commerciale maintenue.</p>`);
 
   const total = pages.length;
   const body = pages
