@@ -462,8 +462,10 @@ export function genDPGotrm(
 
   // ── Page 1 : page de garde officielle du DP
   pages.push(`<div style="text-align:center">
-    <p style="font-size:11pt;letter-spacing:2px;margin-bottom:2px">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
-    <h1 style="margin-top:6px">DOSSIER PROFESSIONNEL (DP)</h1>
+    <p style="font-size:9pt;font-style:italic;margin-bottom:0">Liberté • Égalité • Fraternité</p>
+    <p style="font-size:10pt;letter-spacing:1px;margin:2px 0">RÉPUBLIQUE FRANÇAISE</p>
+    <p style="font-size:11pt;letter-spacing:2px;margin:2px 0">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
+    <h1 style="margin-top:14px">DOSSIER PROFESSIONNEL (DP)</h1>
   </div>
   <table style="width:80%;margin:22px auto;border-collapse:collapse">
     <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
