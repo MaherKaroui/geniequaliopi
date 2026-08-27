@@ -22,7 +22,13 @@ import {
   Upload,
   Users,
 } from "lucide-react";
-import { GOTRM_CCP, GOTRM_PARCOURS, GOTRM_TITRE, type GotrmParcours } from "@/data/gotrm";
+import {
+  GOTRM_CCP,
+  GOTRM_DUREE_TOTALE,
+  GOTRM_PARCOURS,
+  GOTRM_TITRE,
+  type GotrmParcours,
+} from "@/data/gotrm";
 import {
   buildConvocation,
   buildEmargement,
@@ -39,10 +45,11 @@ import {
   type GotrmCandidat,
   type GotrmSession,
 } from "@/lib/gotrm/gotrmTypes";
+import { genECFGotrm, genDPGotrm } from "@/lib/gotrm/ecfDp";
 import { buildGenericFileName } from "@/lib/fileNaming";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
-import type { OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -123,6 +130,51 @@ const GOTRMPage = () => {
     () => ({ intitule, dateDebut, dateFin, lieu, jury, surveillants, organisme, candidats }),
     [intitule, dateDebut, dateFin, lieu, jury, surveillants, organisme, candidats],
   );
+
+  /** Formation GOTRM déduite de la session, pour l'ECF et le DP */
+  const formation: FormationInfo = useMemo(
+    () => ({
+      intitule: `${GOTRM_TITRE.intitule} (${GOTRM_TITRE.sigle})`,
+      objectifs: GOTRM_CCP.map((c) => c.libelle).join(" ; "),
+      prerequis: "",
+      duree: GOTRM_DUREE_TOTALE,
+      modalites: "Présentiel — session d'examen du titre professionnel",
+      tarif: "",
+      programme: GOTRM_CCP.map(
+        (c) => `${c.code} — ${c.libelle}\n${c.competences.map((cp) => `• ${cp.libelle}`).join("\n")}`,
+      ).join("\n\n"),
+      methodesEvaluation:
+        "Mise en situation professionnelle (10h00 en 2 parties), entretien technique, questionnement à partir de production(s), entretien final",
+      moyensPedagogiques: "Plateau technique d'évaluation, poste informatique, Word®, Excel®, TMS",
+      publicVise: "Candidats au titre professionnel GOTRM",
+      delaiAcces: "",
+      dateDebut: dateDebut,
+      dateFin: dateFin,
+      lieu: lieu,
+      nombreParticipants: String(candidats.length),
+      formateur: organisme.responsablePedagogique || organisme.dirigeant || "",
+      codeRNCP: GOTRM_TITRE.rncp,
+    }),
+    [dateDebut, dateFin, lieu, candidats.length, organisme],
+  );
+
+  /** Convertit un candidat GOTRM en stagiaire pour les générateurs ECF / DP */
+  const toStagiaire = (c: GotrmCandidat): StagiaireInfo => ({
+    civilite: (c.civilite === "Mme" ? "Mme" : "M.") as StagiaireInfo["civilite"],
+    nom: c.nom,
+    prenom: c.prenom,
+    email: "",
+    telephone: "",
+    entreprise: "",
+    poste: "",
+    dateNaissance: c.dateNaissance,
+    dateDebutFormation: c.msp1Date || dateDebut,
+    dateFinFormation: c.msp2Date || dateFin,
+    commune: organisme.ville,
+  });
+
+  const buildEcf = (c: GotrmCandidat) => genECFGotrm(organisme, formation, [toStagiaire(c)], 0);
+  const buildDp = (c: GotrmCandidat) => genDPGotrm(organisme, formation, [toStagiaire(c)], 0);
 
   const conflits = candidats.filter(mspConflit);
 
@@ -219,6 +271,8 @@ const GOTRMPage = () => {
             await htmlToPdfBlob(buildGrilleEvaluation(snapshot, c)),
           );
           step(`Grille jury — ${c.nom}`);
+          folder.file(fileName(`ECF ${c.nom}`), await htmlToPdfBlob(buildEcf(c)));
+          folder.file(fileName(`Dossier professionnel ${c.nom}`), await htmlToPdfBlob(buildDp(c)));
           if (c.parcours === "Capitalisation de CCP") {
             folder.file(
               fileName(`Livret de certification ${c.nom}`),
@@ -246,6 +300,8 @@ const GOTRMPage = () => {
     { label: "Convocation", build: (c) => buildConvocation(session, c) },
     { label: "Grille jury", build: (c) => buildGrilleEvaluation(session, c) },
     { label: "Livret de certification", build: (c) => buildLivretCertification(session, c) },
+    { label: "ECF", build: (c) => buildEcf(c) },
+    { label: "DP", build: (c) => buildDp(c) },
   ];
 
   return (
