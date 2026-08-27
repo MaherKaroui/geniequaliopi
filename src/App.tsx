@@ -10,6 +10,7 @@ import DemandeNDA from "./pages/DemandeNDA";
 import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
 import OPCOMobilites from "./pages/OPCOMobilites";
+import GOTRMPage from "./pages/GOTRM";
 import MuseeDossier from "./pages/MuseeDossier";
 import QualiopiCheck from "./pages/QualiopiCheck";
 import VAEPage from "./pages/VAE";
