@@ -53,34 +53,35 @@ export const STAGIAIRES_BAC_PRO_LOGISTIQUE: StagiaireInfo[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HEXAGONE FORMATION – Organisme + 10 stagiaires TP GOTRM (issus des factures)
+// HAYB FORMATIONS – Organisme + 10 stagiaires TP GOTRM
+// Source : https://www.pappers.fr/entreprise/hayb-formations-935061358
 // ═══════════════════════════════════════════════════════════════════════════
-export const HEXAGONE_FORMATION_ORG: OrganismeInfo = {
-  nom: "HEXAGONE FORMATION",
-  siret: "931 115 521 00011",
+export const HAYB_FORMATIONS_ORG: OrganismeInfo = {
+  nom: "HAYB FORMATIONS",
+  siret: "935 061 358 00013",
   adresse: "32 RUE DE PARIS",
   codePostal: "92100",
   ville: "BOULOGNE-BILLANCOURT",
-  telephone: "06 79 93 25 62",
-  email: "hexagone.formation@outlook.fr",
+  telephone: "",
+  email: "",
   siteWeb: "",
   nda: "",
-  dirigeant: "Benhamida Wahid",
-  responsablePedagogique: "Mesbah Morad",
-  referentHandicap: "Benhamida Wahid",
-  referentQualite: "Mesbah Morad",
-  poleAdministratif: "Benhamida Wahid",
+  dirigeant: "Benbida Yaniss",
+  responsablePedagogique: "",
+  referentHandicap: "",
+  referentQualite: "",
+  poleAdministratif: "Benbida Yaniss",
   relationEntreprises: "",
   referentMobilite: "",
   domainesFormation: "Transport routier de marchandises – Préparation au TP-01329 Gestionnaire des Opérations de Transport Routier de Marchandises",
   typesActions: ["actions-formation"],
-  certifications: "TP-01329 (RNCP40990)",
+  certifications: "TP-01329 (RNCP40990) – Organisme certifié Qualiopi (spécialité Formations générales)",
   outilsUtilises: "Word, Excel, plateformes pédagogiques transport, simulateurs TMS",
   version: "1",
-  dateMaj: "2025-01-06",
+  dateMaj: "2026-08-27",
 };
 
-export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
+export const STAGIAIRES_HAYB_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DEBOUBA", prenom: "Mongi", email: "mongi.debouba@gmail.com", telephone: "06 82 65 25 82", entreprise: "", poste: "", dateNaissance: "", adresse: "4 allée des Framboisiers", codePostal: "91160", commune: "LA VILLE DU BOIS", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
   { civilite: "M.", nom: "DABOUBA", prenom: "Khaled", email: "daboubakhaled@hotmail.com", telephone: "06 68 63 70 05", entreprise: "", poste: "", dateNaissance: "", adresse: "45 RUE LUCIEN SAMPAIX", codePostal: "92320", commune: "CHATILLON", dateDebutFormation: "2025-04-07", dateFinFormation: "2025-04-11", tarifFormation: "1500" },
   { civilite: "M.", nom: "RIAHI", prenom: "Ismahel", email: "ismahelr@gmail.com", telephone: "06 66 18 82 42", entreprise: "", poste: "", dateNaissance: "", adresse: "132 Boulevard Stalingrad", codePostal: "94200", commune: "IVRY-SUR-SEINE", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
@@ -821,7 +822,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     codeRNCP: "RNCP40990",
   },
   {
-    intitule: "HEXAGONE FORMATION – TP GOTRM (Session intensive 5 jours)",
+    intitule: "HAYB FORMATIONS – TP GOTRM (Session intensive 5 jours)",
     objectifs: "Préparer la session d'examen du Titre Professionnel TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises » (RNCP40990, niveau 5, arrêté du 03/06/2025 publié au JO du 14/06/2025). Session intensive de 5 jours destinée aux candidats déjà professionnels du transport souhaitant valider le titre par capitalisation des 3 CCP ou par session globale. À l'issue, le candidat sera prêt à présenter : (1) la mise en situation professionnelle (10h en deux parties indépendantes sur deux jours, dossier sous Word® et Excel®), (2) l'entretien technique (1h00), (3) le questionnement à partir de productions (30 min, document de 8 à 12 pages), (4) l'entretien final (30 min). Le titre procure par équivalence l'attestation de capacité professionnelle en transport routier de marchandises (>3,5 t) et de commissionnaire de transport.",
     prerequis: "Justifier d'une expérience professionnelle dans le transport routier de marchandises ou la logistique (minimum 1 an souhaité). Maîtrise du français écrit et oral. Maîtrise des outils bureautiques (Word, Excel, navigation web). Aisance avec les chiffres (PRK, marges, indices CNR). Permis B souhaité. Avoir rédigé en amont (ou s'engager à finaliser pendant la session) le document support du Questionnement à partir de productions (8 à 12 pages, 10 000 à 17 000 caractères).",
     duree: "35 heures sur 5 jours consécutifs (lundi au vendredi, 7h/jour)",
@@ -834,7 +835,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     delaiAcces: "14 jours après signature de la convention de formation et règlement de la facture (1 500 € HT par virement bancaire).",
     dateDebut: "2025-01-13",
     dateFin: "2025-09-26",
-    lieu: "HEXAGONE FORMATION – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
+    lieu: "HAYB FORMATIONS – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
     nombreParticipants: "10",
     formateur: "Mesbah Morad",
     rythmeAlternance: "Sessions hebdomadaires en présentiel (lundi au vendredi, 7h/jour)",
@@ -854,7 +855,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     delaiAcces: "Inscription clôturée 14 jours avant la date de session – convocation adressée à chaque candidat au minimum 15 jours avant l'épreuve.",
     dateDebut: "2025-09-01",
     dateFin: "2025-09-03",
-    lieu: "HEXAGONE FORMATION – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
+    lieu: "HAYB FORMATIONS – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
     nombreParticipants: "10",
     formateur: "Mesbah Morad",
     codeRNCP: "RNCP40990",

@@ -17,7 +17,7 @@ import type { PaieModuleExercises } from "./paiePreset";
 // ---------------------------------------------------------------------------
 const TITLES = [
   "TP Gestionnaire des Opérations de Transport Routier de Marchandises (GOTRM)",
-  "HEXAGONE FORMATION – TP GOTRM (Session intensive 5 jours)",
+  "HAYB FORMATIONS – TP GOTRM (Session intensive 5 jours)",
 ];
 
 // ---------------------------------------------------------------------------
