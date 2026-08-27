@@ -12,7 +12,6 @@
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import {
-  htmlWrap,
 
   htmlWrap,
   formatDate,
