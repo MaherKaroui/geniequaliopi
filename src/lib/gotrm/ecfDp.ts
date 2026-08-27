@@ -424,53 +424,83 @@ export function genDPGotrm(
     `Du 15 avril ${anneeFin - 3} au 30 novembre ${anneeFin - 1}`,
   ];
 
-  let body = orgHeader(org, "MINISTÈRE CHARGÉ DE L'EMPLOI – Liberté • Égalité • Fraternité");
-  body += `<h1>Dossier professionnel (DP)</h1>`;
-  body += `<table style="width:100%;border-collapse:collapse">
-    <tr><th style="width:32%">Nom de naissance</th><td>${s?.nom || ""}</td></tr>
-    <tr><th>Nom d'usage</th><td>${s?.nom || ""}</td></tr>
-    <tr><th>Prénom</th><td>${s?.prenom || ""}</td></tr>
-    <tr><th>Adresse</th><td>${[s?.adresse, s?.codePostal, s?.commune].filter(Boolean).join(", ")}</td></tr>
-    <tr><th>Titre professionnel visé</th><td>${GOTRM_TITRE.intitule} – ${GOTRM_TITRE.codeTitre} (${GOTRM_TITRE.rncp}) – ${GOTRM_TITRE.niveau}</td></tr>
-    <tr><th>Modalité d'accès</th><td>${CHK(true)} Parcours de formation &nbsp;&nbsp; ${CHK(false)} Validation des acquis de l'expérience (VAE)</td></tr>
-  </table>`;
+  const pied = (p: number, total: number) =>
+    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – Version du 01/06/2016</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
 
-  body += `<h2>Présentation du dossier</h2>`;
-  body += `<div class="section"><p>Le dossier professionnel (DP) constitue un élément du système de validation du titre professionnel délivré par le ministère chargé de l'emploi. Il appartient ${g(s, "au candidat", "à la candidate")}, qui le conserve, l'actualise durant son parcours et le présente obligatoirement à chaque session d'examen. Il est consulté par le jury au moment de la session d'examen.</p>
-  <p>Ce dossier comporte, pour chaque activité-type du titre visé, un à trois exemples de pratique professionnelle, un tableau des titres et diplômes détenus, une déclaration sur l'honneur ainsi que, le cas échéant, des documents illustrant la pratique professionnelle.</p></div>`;
+  const pages: string[] = [];
 
-  body += `<h2>Sommaire</h2><ol>${GOTRM_CCP.map((ccp, i) => `<li><strong>Activité-type n° ${i + 1}</strong> – ${ccp.libelle}<ul>${(DP_EXEMPLES[ccp.code] || []).map((e, j) => `<li>Exemple n° ${j + 1} : ${e.titre}</li>`).join("")}</ul></li>`).join("")}</ol>
-  <p>Titres, diplômes, CQP, attestations de formation – Déclaration sur l'honneur.</p>`;
+  // ── Page 1 : page de garde officielle du DP
+  pages.push(`<div style="text-align:center">
+    <p style="font-size:11pt;letter-spacing:2px;margin-bottom:2px">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
+    <h1 style="margin-top:6px">DOSSIER PROFESSIONNEL (DP)</h1>
+  </div>
+  <table style="width:80%;margin:22px auto;border-collapse:collapse">
+    <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
+    <tr><th><em>Nom d'usage</em></th><td>${s?.nom || ""}</td></tr>
+    <tr><th><em>Prénom</em></th><td>${s?.prenom || ""}</td></tr>
+    <tr><th><em>Adresse</em></th><td>${[s?.adresse, `${s?.codePostal || ""} ${s?.commune || ""}`.trim()].filter(Boolean).join("<br>")}</td></tr>
+  </table>
+  <div style="text-align:center;margin-top:18px">
+    <p><strong>Titre professionnel visé</strong></p>
+    <p>${GOTRM_TITRE.intitule}</p>
+  </div>
+  <p style="margin-top:22px"><strong>MODALITÉ D'ACCÈS :</strong></p>
+  <p>${CHK(true)} Parcours de formation<br>${CHK(false)} Validation des Acquis de l'Expérience (VAE)</p>`);
 
+  // ── Page 2 : présentation du dossier (texte officiel)
+  pages.push(`<h2>Présentation du dossier</h2>
+  <p>Le dossier professionnel (DP) constitue un élément du système de validation du titre professionnel. <strong>Ce titre est délivré par le Ministère chargé de l'emploi.</strong> Le DP appartient au candidat. Il le conserve, l'actualise durant son parcours et le présente <strong>obligatoirement à chaque session d'examen</strong>. Pour rédiger le DP, le candidat peut être aidé par un formateur ou par un accompagnateur VAE. Il est consulté par le jury au moment de la session d'examen.</p>
+  <p><strong>Pour prendre sa décision, le jury dispose :</strong></p>
+  <ol>
+    <li>des résultats de la mise en situation professionnelle complétés, éventuellement, du questionnaire professionnel ou de l'entretien professionnel ou de l'entretien technique ou du questionnement à partir de productions ;</li>
+    <li>du <strong>Dossier Professionnel</strong> (DP) dans lequel le candidat a consigné les preuves de sa pratique professionnelle ;</li>
+    <li>des résultats des évaluations passées en cours de formation lorsque le candidat évalué est issu d'un parcours de formation ;</li>
+    <li>de l'entretien final (dans le cadre de la session titre).</li>
+  </ol>
+  <p><em>[Arrêté du 22 décembre 2015, relatif aux conditions de délivrance des titres professionnels du ministère chargé de l'Emploi]</em></p>
+  <p><strong>Ce dossier comporte :</strong></p>
+  <p>▶ pour chaque activité-type du titre visé, un à trois exemples de pratique professionnelle ;<br>
+  ▶ un tableau à renseigner si le candidat souhaite porter à la connaissance du jury la détention d'un titre, d'un diplôme, d'un certificat de qualification professionnelle (CQP) ou des attestations de formation ;<br>
+  ▶ une déclaration sur l'honneur à compléter et à signer ;<br>
+  ▶ des documents illustrant la pratique professionnelle du candidat (facultatif) ;<br>
+  ▶ des annexes, si nécessaire.</p>`);
+
+  // ── Page 3 : sommaire officiel
+  pages.push(`<h2>Sommaire</h2>
+  <p><strong>Exemples de pratique professionnelle</strong></p>
+  ${GOTRM_CCP.map((ccp, i) => `<p><strong>Intitulé de l'activité-type n° ${i + 1}</strong> – ${ccp.libelle}<br>${(DP_EXEMPLES[ccp.code] || []).map((e, j) => `▶ Intitulé de l'exemple n° ${j + 1} : ${e.titre}`).join("<br>")}</p>`).join("")}
+  <p><strong>Titres, diplômes, CQP, attestations de formation</strong> <em>(facultatif)</em></p>
+  <p><strong>Déclaration sur l'honneur</strong></p>
+  <p><strong>Documents illustrant la pratique professionnelle</strong> <em>(facultatif)</em></p>`);
+
+  // ── Exemples de pratique professionnelle (une page par exemple, trame officielle)
   GOTRM_CCP.forEach((ccp, ci) => {
     const exemples = DP_EXEMPLES[ccp.code] || [];
-    body += `<div class="page-break"></div>`;
-    body += `<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>`;
     exemples.forEach((ex, ej) => {
       const tache = pick(ex.taches, seed + ci * 7 + ej * 3);
       const moyen = pick(ex.moyens, seed + ci * 5 + ej);
       const compl = pick(ex.complement, seed + ci * 11 + ej);
       const periode = pick(periodes, seed + ci * 2 + ej);
-      body += `<h3>Exemple n° ${ej + 1} – ${ex.titre}</h3>`;
-      body += `<div class="section">
-        <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
-        <p>${tache}</p>
-        <p><strong>2. Précisez les moyens utilisés :</strong></p>
-        <p>${moyen}</p>
-        <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
-        <p>J'ai travaillé ${collegues}.</p>
-        <p><strong>4. Contexte</strong></p>
-        <p>Nom de l'entreprise, organisme ou association : <strong>${ent.nom}</strong>${ent.ville ? ` – ${ent.ville}` : ""}<br>
-        Chantier, atelier, service : <strong>${ent.service}</strong><br>
-        Période d'exercice : <strong>${periode}</strong></p>
-        <p><strong>5. Informations complémentaires (facultatif)</strong></p>
-        <p>${compl}</p>
-      </div>`;
+      pages.push(`<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>
+      <p><strong><em>Exemple n° ${ej + 1}</em></strong> ▶ ${ex.titre}</p>
+      <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
+      <p>${tache}</p>
+      <p><strong>2. Précisez les moyens utilisés :</strong></p>
+      <p>${moyen}</p>
+      <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
+      <p>J'ai travaillé ${collegues}.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
+        <tr><th colspan="2" style="text-align:left">4. Contexte</th></tr>
+        <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${ent.nom}${ent.ville ? ` – ${ent.ville}` : ""}</td></tr>
+        <tr><th>Chantier, atelier, service ▶</th><td>${ent.service}</td></tr>
+        <tr><th>Période d'exercice ▶</th><td>${periode}</td></tr>
+      </table>
+      <p style="margin-top:10px"><strong>5. Informations complémentaires</strong> <em>(facultatif)</em></p>
+      <p>${compl}</p>`);
     });
   });
 
-  body += `<div class="page-break"></div>`;
-  body += `<h2>Titres, diplômes, CQP, attestations de formation</h2>`;
+  // ── Titres, diplômes, CQP
   const diplomes = [
     ["Baccalauréat professionnel Transport", "Ministère de l'Éducation nationale", `${anneeFin - 8}`],
     ["Attestation de formation à la sécurité (SST)", "Organisme habilité INRS", `${anneeFin - 2}`],
@@ -482,20 +512,25 @@ export function genDPGotrm(
     ["Attestation de formation – Utilisation d'un TMS", org.nom, `${anneeFin - 1}`],
   ];
   const listeDip = seed % 2 === 0 ? diplomes : diplomesAlt;
-  body += `<table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><th>Intitulé</th><th>Autorité ou organisme</th><th>Date</th></tr>
+  pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
+  <p><em>(facultatif)</em></p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th><strong>Intitulé</strong></th><th><strong>Autorité ou organisme</strong></th><th><strong>Date</strong></th></tr>
     ${listeDip.map(d => `<tr><td>${d[0]}</td><td>${d[1]}</td><td>${d[2]}</td></tr>`).join("")}
-  </table>`;
+  </table>`);
 
-  body += `<h2>Déclaration sur l'honneur</h2>`;
-  body += `<div class="section">
-    <p>Je ${g(s, "soussigné", "soussignée")} <strong>${s?.prenom || ""} ${s?.nom || ""}</strong>, déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis ${g(s, "l'auteur", "l'auteure")} des réalisations jointes.</p>
-    <p>Fait à ${villeDecl}, le ${dateDeclaration}, pour faire valoir ce que de droit.</p>
-  </div>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>`;
+  // ── Déclaration sur l'honneur (trame officielle)
+  pages.push(`<h2>Déclaration sur l'honneur</h2>
+  <p>Je ${g(s, "soussigné", "soussignée")} <strong>${s?.prenom || ""} ${s?.nom || ""}</strong>, déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis ${g(s, "l'auteur", "l'auteure")} des réalisations jointes.</p>
+  <p>Fait à ${villeDecl}, le ${dateDeclaration}, pour faire valoir ce que de droit.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>
+  <p style="margin-top:14px;font-size:10pt"><strong>Documents illustrant la pratique professionnelle</strong> <em>(facultatif)</em> : offres commerciales et calculs de prix de revient anonymisés, extraits de plannings d'exploitation, cahier des charges de sous-traitance, tableau de bord d'exploitation.</p>
+  <p style="font-size:10pt">Outils et environnement de travail mobilisés : ${outils}.</p>`);
 
-  body += `<p style="margin-top:14px;font-size:10pt;color:#555">Documents illustrant la pratique professionnelle (facultatif) : offres commerciales et calculs de prix de revient anonymisés, extraits de plannings d'exploitation, cahier des charges de sous-traitance, tableau de bord d'exploitation.</p>`;
-  body += `<p style="font-size:10pt;color:#555">Outils et environnement de travail mobilisés : ${outils}.</p>`;
-  body += footer(org);
+  const total = pages.length;
+  const body = pages
+    .map((p, i) => `${p}${pied(i + 1, total)}`)
+    .join(`<div class="page-break"></div>`);
   return htmlWrap(body);
 }
+
