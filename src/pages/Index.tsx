@@ -204,6 +204,9 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/gotrm")}>
+              <Truck className="w-5 h-5" /> GOTRM
+            </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
               <GraduationCap className="w-5 h-5" /> Génération VAE
             </Button>
