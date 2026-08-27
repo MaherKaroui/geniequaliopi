@@ -498,13 +498,34 @@ export function genDPGotrm(
   ▶ des documents illustrant la pratique professionnelle du candidat (facultatif) ;<br>
   ▶ des annexes, si nécessaire.</p>`);
 
-  // ── Page 3 : sommaire officiel
+  // ── Page 3 : sommaire officiel (avec pagination réelle)
+  let cursor = 5; // p.1 garde, p.2 présentation, p.3 sommaire, p.4 intercalaire
+  const sommaireAT = GOTRM_CCP.map((ccp, i) => {
+    const exs = DP_EXEMPLES[ccp.code] || [];
+    const pAT = cursor;
+    const lignes = exs
+      .map((e, j) => `▶ Intitulé de l'exemple n° ${j + 1} : ${e.titre}&nbsp;&nbsp;<em>p. ${cursor + j}</em>`)
+      .join("<br>");
+    cursor += exs.length;
+    return `<p><strong>Intitulé de l'activité-type n° ${i + 1}</strong> – ${ccp.libelle}&nbsp;&nbsp;<em>p. ${pAT}</em><br>${lignes}</p>`;
+  }).join("");
+  const pTitres = cursor;
+  const pDeclaration = cursor + 1;
+  const pDocuments = cursor + 2;
+  const pAnnexes = cursor + 3;
+
   pages.push(`<h2>Sommaire</h2>
   <p><strong>Exemples de pratique professionnelle</strong></p>
-  ${GOTRM_CCP.map((ccp, i) => `<p><strong>Intitulé de l'activité-type n° ${i + 1}</strong> – ${ccp.libelle}<br>${(DP_EXEMPLES[ccp.code] || []).map((e, j) => `▶ Intitulé de l'exemple n° ${j + 1} : ${e.titre}`).join("<br>")}</p>`).join("")}
-  <p><strong>Titres, diplômes, CQP, attestations de formation</strong> <em>(facultatif)</em></p>
-  <p><strong>Déclaration sur l'honneur</strong></p>
-  <p><strong>Documents illustrant la pratique professionnelle</strong> <em>(facultatif)</em></p>`);
+  ${sommaireAT}
+  <p><strong>Titres, diplômes, CQP, attestations de formation</strong> <em>(facultatif)</em>&nbsp;&nbsp;<em>p. ${pTitres}</em></p>
+  <p><strong>Déclaration sur l'honneur</strong>&nbsp;&nbsp;<em>p. ${pDeclaration}</em></p>
+  <p><strong>Documents illustrant la pratique professionnelle</strong> <em>(facultatif)</em>&nbsp;&nbsp;<em>p. ${pDocuments}</em></p>
+  <p><strong>Annexes</strong> <em>(si le RC le prévoit)</em>&nbsp;&nbsp;<em>p. ${pAnnexes}</em></p>`);
+
+  // ── Page 4 : intercalaire officiel
+  pages.push(`<div style="text-align:center;margin-top:120px">
+    <h1>EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
+  </div>`);
 
   // ── Exemples de pratique professionnelle (une page par exemple, trame officielle)
   GOTRM_CCP.forEach((ccp, ci) => {
