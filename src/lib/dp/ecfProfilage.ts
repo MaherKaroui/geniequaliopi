@@ -143,7 +143,14 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
   // Le NOMBRE de compétences non acquises varie lui aussi selon le profil :
   // deux candidats ne peuvent pas sortir avec des livrets superposables.
   const k = Math.min(4, Math.max(2, negatives === 0 ? 2 + (empreinte % 3) : Math.min(negatives, 2 + (empreinte % 3))));
-  const nonAcquis = new Set(ordre.slice(0, k).map((l) => `${l.ci}-${l.i}`));
+  // Sélection dans un vivier légèrement plus large, avec une rotation propre au
+  // profil : deux candidats faibles sur le même champ ne retiennent pas
+  // exactement les mêmes compétences, et les livrets cessent d'être superposables.
+  const vivier = ordre.slice(0, Math.min(ordre.length, k + 2));
+  const nonAcquis = new Set(
+    Array.from({ length: k }, (_, n) => vivier[(n * 1 + (empreinte % vivier.length) * (n + 1)) % vivier.length])
+      .map((l) => `${l.ci}-${l.i}`),
+  );
 
   const parAT: EcfCompetence[][] = ref.activitesTypes.map(() => []);
   lignes.forEach((l) => {
