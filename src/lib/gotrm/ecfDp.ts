@@ -766,9 +766,8 @@ export function genDPUnifie(
   <p style="margin-top:12px;font-size:10pt"><strong>Mentions relatives aux pièces annexées :</strong> l'ensemble des documents est anonymisé (noms de clients, coordonnées, montants sensibles et données personnelles masqués) conformément aux obligations de confidentialité et au RGPD. Les pièces sont produites à seule fin d'illustrer la pratique professionnelle devant le jury.</p>
   <p style="margin-top:10px;font-size:10pt">Les pièces sont à joindre par le candidat au moment du dépôt du dossier.${domaine === "transport" ? " Pour l'exploitation transport, joindre notamment les lettres de voiture, plannings et relevés d'activité correspondants." : ""}</p>`);
 
-  const total = pages.length;
-  const body = pages.map((p, i) => `${p}${pied(i + 1, total)}`).join(`<div class="page-break"></div>`);
-  return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>`);
+  const body = pages.join(`<div class="page-break"></div>`);
+  return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>${piedDp}`);
 }
 
 // ───────────────────────────────────────────── alias historiques
