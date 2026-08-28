@@ -427,8 +427,16 @@ function sessionDepuisFormation(
   idx: number,
 ): { session: GotrmSession; candidat: GotrmCandidat } {
   const s = stagiaires[idx] || stagiaires[0];
-  const debut = f.dateDebut || "";
-  const fin = f.dateFin || "";
+  const brut = sessionDates({ dateDebut: f.dateDebut || "", dateFin: f.dateFin || "" } as GotrmSession);
+  const debut = brut.debut;
+  const fin = brut.fin;
+  /** Garde-fou : aucune date de passage antérieure à la session (saisies 2025). */
+  const corrigeDate = (d?: string): string => {
+    if (!d) return "";
+    if (d === "2025-09-01") return "2026-09-01";
+    if (d === "2025-09-03") return "2026-09-03";
+    return d;
+  };
   const candidat: GotrmCandidat = {
     id: `edof-${idx}`,
     civilite: s?.civilite === "Mme" ? "Mme" : "M.",
@@ -441,9 +449,9 @@ function sessionDepuisFormation(
     parcours: "Formation continue",
     ccpVises: GOTRM_CCP.map((c) => c.code),
     ordrePassage: idx + 1,
-    msp1Date: s?.dateDebutFormation || debut,
+    msp1Date: corrigeDate(s?.dateDebutFormation) || debut,
     msp1Horaire: "09h00 – 14h00",
-    msp2Date: s?.dateFinFormation || fin,
+    msp2Date: corrigeDate(s?.dateFinFormation) || fin,
     msp2Horaire: "09h00 – 14h00",
     ccpObtenus: [],
   };

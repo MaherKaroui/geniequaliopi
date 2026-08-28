@@ -119,7 +119,7 @@ export const STYLE_MINISTERE = `<style>
   .doc-officiel .cbx i.b2{transform:rotate(-45deg)}
   .doc-officiel .verdict{margin:10px 0;padding:8px 0;line-height:1.7}
   .doc-officiel .bloc-avoid{break-inside:avoid;page-break-inside:avoid}
-  .doc-officiel .page-break{page-break-after:always;break-after:page}
+  .doc-officiel .page-break{page-break-after:always;break-after:page;border:0!important;margin:0!important;height:0;padding:0}
   /* Pied ancré (rendu hors flux par le moteur d'export, une fois par page physique) */
   .footer.pied-dp{padding:6px 26px 0;border-top:2px solid ${MAGENTA};display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:8pt;line-height:1.6;color:#555;min-height:26px}
   .footer.pied-dp .pied-dp-t{flex:1 1 auto;text-align:left;font-variant:small-caps;letter-spacing:.5px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

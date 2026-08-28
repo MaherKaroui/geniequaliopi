@@ -417,6 +417,19 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           current.content.appendChild(splitWrapper);
 
           for (const child of getRenderableChildNodes(clone)) {
+            // Les marqueurs de saut de page internes (ex. <div class="page-break">)
+            // doivent être respectés même lorsque le document entier est découpé.
+            const childBreak = getPageBreakBehavior(child);
+            if (childBreak.markerOnly && (childBreak.after || childBreak.before)) {
+              if (current.content.textContent?.trim() || current.content.querySelector("img,table")) {
+                current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                pages.push(current.page);
+                splitWrapper = makeShell(clone);
+                current.content.appendChild(splitWrapper);
+                oversizedTableStarted = false;
+              }
+              continue;
+            }
             if (child instanceof HTMLElement && child.tagName === "TABLE") {
               if (nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
                 const wholeTable = child.cloneNode(true);
