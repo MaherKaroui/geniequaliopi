@@ -21,6 +21,8 @@ import {
   g,
 } from "@/lib/docBuilder";
 import { GOTRM_TITRE, GOTRM_CCP } from "@/data/gotrm";
+import { getGotrmProfile } from "@/lib/gotrm/cvProfiles";
+
 
 // ───────────────────────────────────────────── utils
 
