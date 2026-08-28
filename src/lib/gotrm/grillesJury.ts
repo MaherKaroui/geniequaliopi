@@ -144,6 +144,36 @@ function pick2(arr: string[], n: number): string {
   return a === b ? a : `${a} ${b}`;
 }
 
+/**
+ * Réponse oui/non explicitement renseignée : la réponse retenue est entourée
+ * et mise en évidence, l'autre est barrée. Aucune case ne reste vide.
+ */
+function ON(oui: boolean): string {
+  const sel = `font-weight:bold;color:#E5007D;border:1px solid #E5007D;border-radius:9px;padding:0 5px`;
+  const nonSel = `color:#999;text-decoration:line-through`;
+  return `<span style="white-space:nowrap"><span style="${oui ? sel : nonSel}">oui</span> / <span style="${oui ? nonSel : sel}">non</span></span>`;
+}
+
+/** Observations courtes pour les lignes de grille (jamais vides). */
+const OBS_LIGNE = [
+  "Constaté tout au long de l'épreuve.",
+  "Élément vérifié sur les livrables remis.",
+  "Confirmé par les explications données au jury.",
+  "Attendu satisfait, sans réserve.",
+  "Point conforme aux exigences du référentiel.",
+  "Réponse précise, appuyée sur la pratique professionnelle.",
+  "Démarche cohérente avec le contexte d'exploitation.",
+];
+
+const OBS_LIGNE_RESERVE = [
+  "Réponse complétée après reformulation du jury.",
+  "Élément traité de façon partielle, consolidé pendant l'échange.",
+  "Point nécessitant encore de la pratique, sans incidence sur la maîtrise globale.",
+  "Réponse hésitante au départ, précisée en fin d'échange.",
+];
+
+
+
 
 /**
  * Grille d'évaluation d'une activité-type : critères, modalités d'évaluation
