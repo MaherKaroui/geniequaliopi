@@ -633,7 +633,7 @@ export function genDPGotrm(
   pages.push(`<h2>Déclaration sur l'honneur</h2>
   <p>Je ${g(s, "soussigné", "soussignée")} <strong>${s?.prenom || ""} ${s?.nom || ""}</strong>, déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis ${g(s, "l'auteur", "l'auteure")} des réalisations jointes.</p>
   <p>Fait à ${villeDecl}, le ${dateDeclaration}, pour faire valoir ce que de droit.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateDeclaration, s?.signatureUrl)}</td></tr></table>`);
 
   // ── Documents illustrant la pratique professionnelle (facultatif)
   pages.push(`<h2>Documents illustrant la pratique professionnelle</h2>
