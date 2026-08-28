@@ -585,8 +585,8 @@ export function genDPUnifie(
   const entService = ent.service || (ent.connue ? "" : A_RENSEIGNER);
   const domaine = detectDomaine(f);
 
-  const pied = (p: number, total: number) =>
-    `<div class="pied-dp"><span class="pied-dp-t">Dossier professionnel${ref.codeTitre ? ` – ${ref.codeTitre}` : ""} – ${`${s?.prenom || ""} ${s?.nom || ""}`.trim()}</span><span class="pied-dp-v">Version du ${DP_TRAME_VERSION}</span><span class="pied-dp-p">Page ${p}/${total}</span></div>`;
+  // Pied ancré en bas de chaque page physique par le moteur d'export.
+  const piedDp = `<div class="footer pied-dp"><span class="pied-dp-t">Dossier professionnel${ref.codeTitre ? ` – ${ref.codeTitre}` : ""} – ${`${s?.prenom || ""} ${s?.nom || ""}`.trim()}</span><span class="pied-dp-v">Version du ${DP_TRAME_VERSION}</span><span class="pied-dp-p">Page {{PAGE}}/{{PAGES}}</span></div>`;
 
   const pages: string[] = [];
 
