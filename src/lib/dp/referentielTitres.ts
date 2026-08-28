@@ -36,6 +36,8 @@ export interface DpReferentiel {
   dateArrete?: string;
   /** Date de publication au J.O. (JJ/MM/AAAA). */
   dateJo?: string;
+  /** Date d'effet du titre (JJ/MM/AAAA). */
+  dateEffet?: string;
   /** Date de mise à jour du référentiel (JJ/MM/AAAA). */
   dateMaj?: string;
   niveau?: string;
