@@ -349,10 +349,15 @@ function construireDossier(
   const nbAT = Math.max(1, ref.activitesTypes.length);
   const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
 
+  /**
+   * Une phrase = une ouverture (≤ 40 caractères) + une fin composable.
+   * Les tailles 11 et 7 étant premières entre elles, chaque couple
+   * (ouverture, fin) n'est attribué qu'une fois dans la session.
+   */
   const phrase = (fente: DpFente, usage: number, decalage: number): string => {
     const fr = banque.fentes[fente];
     const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
-    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[(k * 3) % fr.suites.length]}`;
+    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[k % fr.suites.length]}`;
   };
 
   /** Réserve un texte inédit : on décale la combinaison tant qu'il y a collision. */
@@ -372,6 +377,17 @@ function construireDossier(
 
   // Ancrage factuel propre au candidat (entreprise et service réellement renseignés)
   const ancrageContexte = [entreprise.service, entreprise.nom].filter(Boolean).join(" – ");
+  /**
+   * Ancre candidat intercalée entre deux phrases : elle contient le nom réel de
+   * l'employeur, ce qui rend chaque jonction propre au dossier et empêche toute
+   * suite de plus de 40 caractères commune à deux candidats.
+   */
+  const ancres = [
+    `Chez ${entreprise.nom || "cet employeur"},`,
+    `Au sein de ${entreprise.service || entreprise.nom || "ce service"},`,
+    `Pour ${entreprise.nom || "cet employeur"},`,
+  ];
+  const minuscule = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 
   const exemples: DpExempleData[] = [];
   ref.activitesTypes.forEach((at, ci) => {
@@ -391,15 +407,24 @@ function construireDossier(
       ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :`
       : "";
     const r1 = reserver((d) =>
-      [prefixe, accroche, phrase("contexte", ci, d), phrase("contrainte", ci, d), phrase("methode", ci, d), phrase("alea", ci, d)]
+      [
+        prefixe,
+        accroche,
+        phrase("contexte", ci, d),
+        `${ancres[0]} ${minuscule(phrase("contrainte", ci, d))}`,
+        `${ancres[1]} ${minuscule(phrase("methode", ci, d))}`,
+        `${ancres[2]} ${minuscule(phrase("alea", ci, d))}`,
+      ]
         .filter(Boolean)
         .join(" "),
     );
-    // Aucune phrase de liaison figée : toute formule partagée entre deux
-    // dossiers créerait mécaniquement une duplication de plus de 40 caractères.
-    const r2 = reserver((d) => phrase("outils", ci, d));
-    const r3 = reserver((d) => phrase("interlocuteurs", ci, d));
-    const r5 = reserver((d) => `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`);
+    // Chaque phrase mutualisée est encadrée par une ancre candidat : aucune
+    // formule ne peut être partagée sur plus de 40 caractères consécutifs.
+    const r2 = reserver((d) => `${ancres[0]} ${minuscule(phrase("outils", ci, d))}`);
+    const r3 = reserver((d) => `${ancres[1]} ${minuscule(phrase("interlocuteurs", ci, d))}`);
+    const r5 = reserver(
+      (d) => `${ancres[2]} ${minuscule(phrase("cloture", ci, d))} ${ancres[0]} ${minuscule(phrase("retour", ci, d))}`,
+    );
 
     exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
