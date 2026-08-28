@@ -163,31 +163,62 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
     parAT[l.ci].push({ libelle: l.libelle, niveau, motif });
   });
 
-  // 3. Appréciation rédigée par activité-type, ancrée sur un élément concret
+  // 3. Appréciation rédigée par activité-type, ancrée sur un élément concret.
+  //    Les tournures varient d'un candidat à l'autre (empreinte du CONTENU du
+  //    profil) tout en restant positives et factuelles.
+  const V_BASE = [
+    (n: string, t: string, a: string) => `Sur l'activité-type « ${t} », ${n} s'appuie sur ${a}.`,
+    (n: string, t: string, a: string) => `${n} aborde l'activité-type « ${t} » en mobilisant ${a}.`,
+    (n: string, t: string, a: string) => `Pour « ${t} », les mises en situation montrent que ${n} tire parti de ${a}.`,
+    (n: string, t: string, a: string) => `Activité-type « ${t} » : ${n} s'appuie utilement sur ${a}.`,
+    (n: string, t: string, a: string) => `Sur « ${t} », le travail de ${n} prend appui sur ${a}.`,
+  ];
+  const V_POS = [
+    (l: string) => ` Les évaluations confirment la maîtrise de : ${l}.`,
+    (l: string) => ` Les résultats attestent d'une bonne maîtrise sur : ${l}.`,
+    (l: string) => ` Les productions évaluées sont conformes aux attendus sur : ${l}.`,
+    (l: string) => ` Sont maîtrisés, avec un bon niveau d'autonomie : ${l}.`,
+    (l: string) => ` Les épreuves valident sans réserve : ${l}.`,
+  ];
+  const V_NEG = [
+    (d: string, u: boolean) => ` ${u ? "Une compétence reste" : `${d.split(" ; ").length} compétences restent`} à consolider — ${d} — et ${u ? "fait" : "font"} l'objet d'une réévaluation.`,
+    (d: string, u: boolean) => ` Un accompagnement complémentaire est prévu sur ${d}, avec réévaluation programmée.`,
+    (d: string, u: boolean) => ` La progression se poursuit sur ${d} ; une réévaluation est planifiée.`,
+    (d: string, u: boolean) => ` Points de vigilance retenus : ${d}. Ils donnent lieu à une réévaluation.`,
+  ];
+  const V_RAS = [
+    ` Aucune réévaluation n'est nécessaire sur cette activité-type.`,
+    ` L'ensemble des compétences est acquis : aucune réévaluation n'est requise.`,
+    ` Aucun axe de remédiation n'a été identifié sur cette activité-type.`,
+  ];
+  const pick = <T,>(arr: T[], ci: number) => arr[(empreinte + ci * 5) % arr.length];
+
   const appreciations = ref.activitesTypes.map((at, ci) => {
     const comps = parAT[ci];
     const ok = comps.filter((c) => c.niveau === "ACQUIS");
     const ko = comps.filter((c) => c.niveau !== "ACQUIS");
     const anc = ancrage(cv, ci);
-    const base = `Sur l'activité-type « ${at.titre} », ${cv.prenom} ${cv.nom} s'appuie sur ${anc}.`;
-    const pos = ok.length
-      ? ` Les évaluations confirment la maîtrise de : ${ok.slice(0, 3).map((c) => c.libelle.toLowerCase()).join(" ; ")}.`
-      : "";
-    const neg = ko.length
-      ? ` ${ko.length === 1 ? "Une compétence reste" : `${ko.length} compétences restent`} à travailler — ${ko
-          .map((c) => `${c.libelle.toLowerCase()} (${c.motif})`)
-          .join(" ; ")} — et ${ko.length === 1 ? "fait" : "font"} l'objet d'une réévaluation.`
-      : ` Aucune réévaluation n'est nécessaire sur cette activité-type.`;
+    const nom = `${cv.prenom} ${cv.nom}`;
+    const base = pick(V_BASE, ci)(nom, at.titre, anc);
+    const pos = ok.length ? pick(V_POS, ci)(ok.slice(0, 3).map((c) => c.libelle.toLowerCase()).join(" ; ")) : "";
+    const detail = ko.map((c) => `${c.libelle.toLowerCase()} (${c.motif})`).join(" ; ");
+    const neg = ko.length ? pick(V_NEG, ci)(detail, ko.length === 1) : pick(V_RAS, ci);
     return `${base}${pos}${neg}`;
   });
 
   const tousKo = parAT.flat().filter((c) => c.niveau !== "ACQUIS");
+  const V_OBS = [
+    (p: string) => `Parcours de ${p}`,
+    (p: string) => `Profil du candidat — ${p}`,
+    (p: string) => `Éléments de parcours retenus pour ${p}`,
+  ];
   const observation =
-    `Parcours de ${cv.prenom} ${cv.nom}, ${cv.posteOccupe || "candidat"} : ${cv.profil}` +
+    `${pick(V_OBS, 1)(`${cv.prenom} ${cv.nom}`)}, ${cv.posteOccupe || "candidat"} : ${cv.profil}` +
     ` Les points forts constatés en évaluation (${forts.slice(0, 3).join(" ; ").toLowerCase()}) sont conformes au parcours décrit.` +
     (tousKo.length
       ? ` ${tousKo.length} compétence(s) ont fait l'objet d'une évaluation de consolidation : ${tousKo.map((c) => c.libelle.toLowerCase()).join(" ; ")}.`
       : ` Aucune évaluation de consolidation n'a été nécessaire.`);
+
 
   const signature = parAT
     .map((at) => at.map((c) => (c.niveau === "ACQUIS" ? "A" : c.niveau === "A_CONSOLIDER" ? "C" : "E")).join(""))
