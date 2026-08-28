@@ -92,7 +92,27 @@ function ancrage(cv: GotrmCvProfile, i: number): string {
  * Construit la répartition des niveaux et les appréciations à partir du profil.
  * Aucun tirage aléatoire : tout découle des points forts / à consolider.
  */
-export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfProfilage {
+/**
+ * @param signaturesPrises répartitions déjà attribuées dans la session : si la
+ * répartition issue du profil est strictement identique à celle d'un autre
+ * candidat, la sélection est décalée jusqu'à obtenir un livret non superposable.
+ */
+export function buildEcfProfilage(
+  ref: DpReferentiel,
+  cv?: GotrmCvProfile,
+  signaturesPrises?: Set<string>,
+): EcfProfilage {
+  for (let decalage = 0; decalage < 12; decalage++) {
+    const p = profilage(ref, cv, decalage);
+    if (!p.renseigne || !signaturesPrises || !signaturesPrises.has(p.signature)) {
+      if (p.renseigne) signaturesPrises?.add(p.signature);
+      return p;
+    }
+  }
+  return profilage(ref, cv, 0);
+}
+
+function profilage(ref: DpReferentiel, cv?: GotrmCvProfile, decalage = 0): EcfProfilage {
   const vide: EcfProfilage = {
     renseigne: false,
     parAT: ref.activitesTypes.map(() => []),
@@ -136,11 +156,23 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
   // CONTENU du profil (postes, missions, diplômes) — jamais du nom du candidat.
   let empreinte = 7;
   for (const ch of `${texteVecu}${forts.join("")}${faibles.join("")}`) empreinte = (empreinte * 31 + ch.charCodeAt(0)) % 9973;
-  const rang = (l: Ligne) => l.net * 1000 + l.prio * 100 + l.exp * 10 + ((empreinte + l.ci * 7 + l.i * 13) % 7);
+  const rang = (l: Ligne) =>
+    l.net * 1000 + l.prio * 100 + l.exp * 10 + ((empreinte * (l.ci * 31 + l.i * 17 + 3)) % 9);
   const ordre = [...lignes].sort((a, b) => rang(a) - rang(b) || a.ci - b.ci || a.i - b.i);
   const negatives = ordre.filter((l) => l.net < 0 || (l.net === 0 && l.exp === 0)).length;
-  const k = Math.min(4, Math.max(2, negatives));
-  const nonAcquis = new Set(ordre.slice(0, k).map((l) => `${l.ci}-${l.i}`));
+  // Le NOMBRE de compétences non acquises varie lui aussi selon le profil :
+  // deux candidats ne peuvent pas sortir avec des livrets superposables.
+  const k = Math.min(4, Math.max(2, negatives === 0 ? 2 + (empreinte % 3) : Math.min(negatives, 2 + (empreinte % 3))));
+  // Sélection dans un vivier légèrement plus large, avec une rotation propre au
+  // profil : deux candidats faibles sur le même champ ne retiennent pas
+  // exactement les mêmes compétences, et les livrets cessent d'être superposables.
+  const vivier = ordre.slice(0, Math.min(ordre.length, k + 3));
+  const stride = vivier.length > 1 ? 1 + ((empreinte + decalage) % (vivier.length - 1)) : 1;
+  const nonAcquis = new Set<string>();
+  for (let n = 0; nonAcquis.size < k && n < vivier.length * 3; n++) {
+    const l = vivier[(empreinte + decalage * 3 + n * stride) % vivier.length];
+    nonAcquis.add(`${l.ci}-${l.i}`);
+  }
 
   const parAT: EcfCompetence[][] = ref.activitesTypes.map(() => []);
   lignes.forEach((l) => {

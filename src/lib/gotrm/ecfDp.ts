@@ -219,6 +219,15 @@ export interface DpExempleData {
   r2: string;
   r3: string;
   r5: string;
+  /**
+   * Contexte PROPRE À CET EXEMPLE : un même dossier peut mêler une expérience
+   * salariée réelle et la pratique acquise en centre de formation.
+   */
+  ctxNom?: string;
+  ctxService?: string;
+  ctxPeriode?: string;
+  /** true = exemple ancré sur la pratique acquise en formation. */
+  ctxParcours?: boolean;
 }
 
 export interface DpDossierData {
@@ -298,6 +307,21 @@ function resolvePeriodeExercice(cv: GotrmCvProfile | undefined, entreprise: DpCo
   return periodeDepuisExperience(exp.periode || "");
 }
 
+/**
+ * Amorce de phrase adaptée à la désignation de l'employeur : un nom propre se
+ * dit « Chez X », une désignation en nom commun (commerce en gérance) se dit
+ * « Dans ma X ». Aucun nom d'entreprise n'est inventé ici.
+ */
+function amorcerEmployeur(emp: string, k: number): string {
+  const e = emp.replace(/\s*\([^)]*\)\s*/g, " ").replace(/\s+/g, " ").trim();
+  const commun = /\(gérance\)/i.test(emp) || /^(boulangerie|boutique|h[ôo]tel|centre commercial|particuliers|postes successifs)/i.test(e);
+  const l = `${e.charAt(0).toLowerCase()}${e.slice(1)}`;
+  const base = commun
+    ? [`Dans ma ${l},`, `Au sein de ma ${l},`, `Pour ma ${l},`]
+    : [`Chez ${e},`, `À ${e},`, `Pour ${e},`];
+  return base[k % base.length];
+}
+
 /** Fenêtres de 41 caractères d'un texte : outil de détection des duplications. */
 function fenetres41(texte: string): string[] {
   const n = texte.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
@@ -312,20 +336,39 @@ function fenetres41(texte: string): string[] {
  * candidat au niveau de la collision.
  */
 function reparer(texte: string, employeur: string, registre: Set<string>): string {
-  let out = texte;
-  for (let garde = 0; garde < 30; garde++) {
-    const n = out.replace(/\s+/g, " ").trim();
-    let position = -1;
-    for (let i = 0; i + 41 <= n.length; i++) {
-      if (registre.has(n.slice(i, i + 41).toLowerCase())) {
-        position = i;
-        break;
+  // Ancre courte : une ancre longue réinjectée plusieurs fois créerait
+  // elle-même des suites identiques d'un dossier à l'autre.
+  const ancre = employeur.length > 28 ? `${employeur.slice(0, 26).trim()}…` : employeur;
+  let out = texte.replace(/\s+/g, " ").trim();
+  let inserts = 0;
+  // Plusieurs passes : un rappel inséré peut créer, à sa jonction, une nouvelle
+  // suite déjà employée ; on rebalaye donc le texte depuis le début.
+  for (let passe = 0; passe < 4; passe++) {
+    // Progression stricte à l'intérieur d'une passe : chaque rappel est inséré
+    // après le précédent, ce qui interdit toute réécriture au même endroit.
+    let depuis = 0;
+    let propre = true;
+    for (let garde = 0; garde < 12; garde++) {
+      let position = -1;
+      for (let i = depuis; i + 41 <= out.length; i++) {
+        if (registre.has(out.slice(i, i + 41).toLowerCase())) {
+          position = i;
+          break;
+        }
       }
+      if (position < 0) break;
+      propre = false;
+      let coupe = out.indexOf(" ", Math.min(position + 18, out.length - 1));
+      if (coupe < 0 || coupe > position + 40) coupe = out.lastIndexOf(" ", position + 40);
+      if (coupe <= position) return `${out} (${ancre})`;
+      // Formes de rappel alternées : deux rappels consécutifs ne peuvent pas
+      // reformer entre eux une suite identique d'un dossier à l'autre.
+      const formes = [` (${ancre})`, ` — ${ancre} —`, `, ${ancre},`, ` [${ancre}]`];
+      const rappel = formes[inserts++ % formes.length];
+      out = `${out.slice(0, coupe)}${rappel}${out.slice(coupe)}`;
+      depuis = coupe + rappel.length;
     }
-    if (position < 0) return out;
-    const coupe = out.indexOf(" ", Math.min(position + 20, out.length - 1));
-    if (coupe < 0) return `${out} (${employeur})`;
-    out = `${out.slice(0, coupe)} (${employeur})${out.slice(coupe)}`;
+    if (propre) return out;
   }
   return out;
 }
@@ -424,15 +467,18 @@ function construireDossier(
    * Les tailles 11 et 7 étant premières entre elles, chaque couple
    * (ouverture, fin) n'est attribué qu'une fois dans la session.
    */
-  const phrase = (fente: DpFente, usage: number, decalage: number): string => {
+  const phrase = (fente: DpFente, usage: number, decalage: number, emp = employeur): string => {
     const fr = banque.fentes[fente];
     const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
     // Chaque phrase s'ouvre sur un ancrage propre au candidat : aucune suite de
     // plus de 40 caractères ne peut donc être commune à deux dossiers.
-    const base = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`];
-    const amorce = base[k % base.length];
+    const amorce = amorcerEmployeur(emp, k);
     const ouv = fr.ouvertures[k % fr.ouvertures.length];
-    return `${amorce} ${ouv.charAt(0).toLowerCase()}${ouv.slice(1)} ${fr.suites[k % fr.suites.length]}`;
+    // Indices décorrélés : les 8 ouvertures × 8 suites sont réellement toutes
+    // atteignables, ce qui évite l'épuisement de la banque sur une session de
+    // dix dossiers et rend inutile toute réécriture artificielle.
+    const suite = fr.suites[(k * 5 + Math.floor(k / fr.ouvertures.length)) % fr.suites.length];
+    return `${amorce} ${ouv.charAt(0).toLowerCase()}${ouv.slice(1)} ${suite}`;
   };
 
   /**
@@ -463,16 +509,41 @@ function construireDossier(
    */
 
   const exemples: DpExempleData[] = [];
+  /** Contexte de l'exemple précédent : le rappel n'est écrit qu'au changement de source. */
+  let ctxPrecedent = "";
   ref.activitesTypes.forEach((at, ci) => {
+    /**
+     * SOURCE PROPRE À CET EXEMPLE. Un candidat peut adosser un exemple à une
+     * expérience salariée réelle et un autre à la pratique acquise en centre
+     * lorsque son parcours ne couvre pas l'activité-type.
+     */
+    const srcAT = cv?.experienceParAT?.[ci];
+    const expAT =
+      srcAT && srcAT !== "PARCOURS"
+        ? (cv?.experiences || []).find((e) => {
+            const a = normEnt(e.employeur || "");
+            const b = normEnt(srcAT);
+            return a && b && (a === b || a.includes(b) || b.includes(a));
+          })
+        : undefined;
+    const parcoursEx = voieParcours || srcAT === "PARCOURS";
+    const ctxNom = parcoursEx
+      ? "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS"
+      : expAT?.employeur || entreprise.nom;
+    const ctxService = parcoursEx
+      ? "Plateau technique exploitation transport"
+      : expAT?.poste || entreprise.service;
+    const ctxPeriode = parcoursEx
+      ? periodeFormationFr(s, f)
+      : (expAT ? periodeDepuisExperience(expAT.periode || "") : "") || periodeExercice;
+
     // Intitulés STRICTEMENT rattachés à l'activité-type (AT1 ≠ AT2 ≠ AT3)
     const banqueAT = intitulesPourAT(banque, ci, nbAT);
     // Voie parcours : l'intitulé est le dossier réellement travaillé en centre,
     // choisi de façon à ce que deux candidats ne traitent pas le même sujet.
     const dossiersAT = DOSSIERS_PARCOURS[ci] || [];
-    const dossierParcours =
-      voieParcours && dossiersAT.length
-        ? dossiersAT[(Math.max(0, rangParcours) + ci) % dossiersAT.length]
-        : "";
+    const rangDossier = voieParcours ? Math.max(0, rangParcours) : stagiaireIdx;
+    const dossierParcours = parcoursEx && dossiersAT.length ? dossiersAT[(rangDossier + ci) % dossiersAT.length] : "";
     const intitule =
       dossierParcours ||
       banqueAT[(stagiaireIdx + ci) % Math.max(1, banqueAT.length)] ||
@@ -485,12 +556,10 @@ function construireDossier(
 
     const accroche = cv?.accroches?.[ci] || "";
     const court = dossierParcours ? dossierParcours.split(",")[0] : "";
-    const rp = Math.max(0, rangParcours) % 3;
+    const rp = (voieParcours ? Math.max(0, rangParcours) : stagiaireIdx) % 3;
     // Ancre de réparation : propre au candidat (son propre dossier), jamais un employeur inventé.
-    const ancre = voieParcours ? `dossier suivi par ${s?.prenom || ""} ${s?.nom || ""}`.trim() : employeur;
-    const periodeMin = periodeExercice
-      ? `${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)}`
-      : "";
+    const ancre = parcoursEx ? `dossier suivi par ${s?.prenom || ""} ${s?.nom || ""}`.trim() : ctxNom || employeur;
+    const periodeMin = ctxPeriode ? `${ctxPeriode.charAt(0).toLowerCase()}${ctxPeriode.slice(1)}` : "";
     // Voie parcours : cadre pédagogique explicite (jamais un emploi), tournures
     // propres au candidat et au dossier réellement travaillé en centre.
     const prefixesParcours = [
@@ -498,46 +567,52 @@ function construireDossier(
       `Dossier « ${court} » — application réalisée en plateau technique, entreprise pédagogique support TRANS OCCITANE SAS.`,
       `Dossier « ${court} », traité pendant la formation sur l'entreprise pédagogique TRANS OCCITANE.`,
     ];
-    const prefixe = voieParcours
+    const ancrageEx = [ctxService, ctxNom].filter(Boolean).join(" – ") || ancrageContexte;
+    const montrerPrefixe = ci === 0 || ctxNom !== ctxPrecedent;
+    const prefixe = !montrerPrefixe
+      ? ""
+      : parcoursEx
       ? prefixesParcours[rp]
-      : ancrageContexte
-        ? `Au sein de ${ancrageContexte}${periodeMin ? ` (${periodeMin})` : ""} :`
+      : ancrageEx
+        ? `Au sein de ${ancrageEx}${periodeMin ? ` (${periodeMin})` : ""} :`
         : "";
 
     const pp = (fente: ParcoursFente) => phraseParcours(fente, rp, ci, court);
+    const ph = (fente: DpFente, d: number) => phrase(fente, ci, d, ctxNom || employeur);
 
     const r1 = reserver(
       (d) =>
-        voieParcours
-          ? [ci === 0 ? prefixe : "", accroche, pp("contexte"), pp("contrainte"), pp("methode"), pp("alea")]
-              .filter(Boolean)
-              .join(" ")
-          : [
-              ci === 0 ? prefixe : "",
-              accroche,
-              phrase("contexte", ci, d),
-              phrase("contrainte", ci, d),
-              phrase("methode", ci, d),
-              phrase("alea", ci, d),
-            ]
+        parcoursEx
+          ? [prefixe, accroche, pp("contexte"), pp("contrainte"), pp("methode"), pp("alea")].filter(Boolean).join(" ")
+          : [prefixe, accroche, ph("contexte", d), ph("contrainte", d), ph("methode", d), ph("alea", d)]
               .filter(Boolean)
               .join(" "),
       ancre,
     );
     // Chaque phrase mutualisée est encadrée par une ancre candidat : aucune
     // formule ne peut être partagée sur plus de 40 caractères consécutifs.
-    const r2 = reserver((d) => (voieParcours ? pp("outils") : phrase("outils", ci, d)), ancre);
-    const r3 = reserver((d) => (voieParcours ? pp("interlocuteurs") : phrase("interlocuteurs", ci, d)), ancre);
+    const r2 = reserver((d) => (parcoursEx ? pp("outils") : ph("outils", d)), ancre);
+    const r3 = reserver((d) => (parcoursEx ? pp("interlocuteurs") : ph("interlocuteurs", d)), ancre);
     const r5 = reserver(
-      (d) =>
-        voieParcours
-          ? `${pp("cloture")} ${pp("retour")}`
-          : `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`,
+      (d) => (parcoursEx ? `${pp("cloture")} ${pp("retour")}` : `${ph("cloture", d)} ${ph("retour", d)}`),
       ancre,
     );
 
-
-    exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
+    exemples.push({
+      atIndex: ci + 1,
+      atTitre: at.titre,
+      numero: 1,
+      intitule,
+      r1,
+      r2,
+      r3,
+      r5,
+      ctxNom,
+      ctxService,
+      ctxPeriode,
+      ctxParcours: parcoursEx,
+    });
+    ctxPrecedent = ctxNom;
   });
 
 
@@ -643,7 +718,11 @@ export function genECFUnifie(
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const ref = resolveReferentiel(f);
   const cv = profilCandidat(s);
-  const prof = buildEcfProfilage(ref, cv);
+  // Répartitions déjà attribuées aux candidats précédents : deux livrets d'une
+  // même session ne peuvent pas être superposables.
+  const prises = new Set<string>();
+  for (let i = 0; i < stagiaireIdx; i++) buildEcfProfilage(ref, profilCandidat(stagiaires[i]), prises);
+  const prof = buildEcfProfilage(ref, cv, prises);
   // Le 45B reprend la période du formulaire Formation, jamais une ancienne
   // période individuelle mémorisée sur la fiche stagiaire. Corrige aussi la
   // saisie historique erronée de cette session GOTRM (01–03/09/2025).
@@ -1009,6 +1088,10 @@ export function genDPUnifie(
 
   // ── Exemples de pratique professionnelle
   d.exemples.forEach((ex) => {
+    // Contexte propre à l'exemple : expérience réelle ou pratique acquise en centre.
+    const exNom = ex.ctxNom ? `${ex.ctxNom}${!ex.ctxParcours && ent.ville && ex.ctxNom === ent.nom ? ` – ${ent.ville}` : ""}` : entNom;
+    const exService = ex.ctxService || entService || A_RENSEIGNER;
+    const exPeriode = ex.ctxPeriode || periode;
     pages.push(`<h2>Activité-type n° ${ex.atIndex} – ${ex.atTitre}</h2>
     <p><strong><em>Exemple n° ${ex.numero}</em></strong> ▶ ${ex.intitule}</p>
     <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
@@ -1019,9 +1102,9 @@ export function genDPUnifie(
     <p>${ex.r3 || A_RENSEIGNER}</p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
       <tr><th colspan="2" style="text-align:left">4. Contexte</th></tr>
-      <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${entNom}</td></tr>
-      <tr><th>Chantier, atelier, service ▶</th><td>${entService || A_RENSEIGNER}</td></tr>
-      <tr><th>Période d'exercice ▶</th><td>${periode}</td></tr>
+      <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${exNom}</td></tr>
+      <tr><th>Chantier, atelier, service ▶</th><td>${exService}</td></tr>
+      <tr><th>Période d'exercice ▶</th><td>${exPeriode}</td></tr>
     </table>
     <p style="margin-top:10px"><strong>5. Informations complémentaires</strong> <em>(facultatif)</em></p>
     <p>${ex.r5 || A_RENSEIGNER}</p>`);

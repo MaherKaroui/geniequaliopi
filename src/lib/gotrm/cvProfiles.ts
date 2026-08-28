@@ -46,6 +46,14 @@ export interface GotrmCvProfile {
   pointsForts: string[];
   /** Compétences à consolider, exprimées en compétences du référentiel. */
   pointsAConsolider: string[];
+  /**
+   * Source de CHAQUE exemple, activité-type par activité-type (index 0 = AT1).
+   * Valeur = nom de l'employeur réel (repris d'une expérience du CV) ou
+   * « PARCOURS » lorsque l'exemple s'ancre sur la pratique acquise en centre
+   * de formation (cas d'entreprise support). Absent = employeur de référence
+   * du dossier pour tous les exemples.
+   */
+  experienceParAT?: (string | "PARCOURS")[];
 }
 
 const P: GotrmCvProfile[] = [
@@ -245,33 +253,83 @@ const P: GotrmCvProfile[] = [
     nom: "GIMENEZ",
     prenom: "Jessica",
     entreprise: {
-      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
-      service: "Plateau technique exploitation transport",
+      nom: "Boulangerie – glacier – crêperie (gérance)",
+      service: "Gérance – production, vente et encadrement de l'équipe",
       ville: "",
     },
-    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    posteOccupe: "Gérante de commerce",
     profil:
-      "Mon dossier s'appuie sur la voie du parcours de formation : les situations ont été conduites en centre, sur le cas d'entreprise support TRANS OCCITANE SAS, en plateau technique exploitation.",
-    experiences: [],
-    outils: "TMS pédagogique du plateau, tableur de coût kilométrique, contrat type de transport",
-    collegues: "Formateur évaluateur du plateau technique et binômes de promotion",
-    diplomes: [],
-    permis: "",
-    periodeExercice: "",
-    accroches: [
-      "Les travaux du plateau ont porté sur la prise de commandes hebdomadaire du cas support.",
-      "La partie exploitation a été traitée sous forme de plan de tournées à optimiser.",
-      "Le volet contrôle a été abordé à partir des relevés sociaux fournis en centre.",
+      "J'ai dirigé pendant cinq ans deux commerces de détail : une boutique de vêtements, bijoux fantaisie et chaussures, puis une boulangerie-glacier-crêperie. J'y ai encadré une équipe, géré les achats et la caisse et suivi l'activité au quotidien. Mon parcours ne comporte pas d'expérience dans le transport : les situations relevant de l'exploitation transport ont été travaillées en centre de formation, sur le cas d'entreprise support.",
+    experiences: [
+      {
+        periode: "2024 – 2024",
+        poste: "Employée d'hôtel (ménage, repassage, réception)",
+        employeur: "Hôtel à Lloret de Mar (Espagne)",
+        missions: ["Entretien des chambres et repassage", "Accueil et réception des clients"],
+      },
+      {
+        periode: "2019 – 2019",
+        poste: "Agent d'entretien de bureaux",
+        employeur: "Centre commercial",
+        missions: ["Entretien des bureaux et des espaces communs"],
+      },
+      {
+        periode: "2018 – 2018",
+        poste: "Assistante de vie à domicile",
+        employeur: "Particuliers employeurs",
+        missions: ["Accompagnement des personnes à domicile"],
+      },
+      {
+        periode: "2015 – 2018",
+        poste: "Gérante de boulangerie / glacier / crêperie",
+        employeur: "Boulangerie – glacier – crêperie (gérance)",
+        missions: [
+          "Élaboration et vente des produits",
+          "Gestion de l'équipe et organisation du service",
+          "Gestion des achats, des approvisionnements et de la caisse",
+        ],
+      },
+      {
+        periode: "2013 – 2015",
+        poste: "Gérante de boutique de vêtements, bijoux fantaisie et chaussures",
+        employeur: "Boutique de prêt-à-porter et accessoires (gérance)",
+        missions: [
+          "Accueil et conseil client",
+          "Gestion de la caisse et des achats",
+          "Présentation et mise en valeur des produits",
+        ],
+      },
     ],
-    source: "Parcours de formation",
+    outils:
+      "Logiciel de caisse et suivi des ventes, tableur de suivi des achats et des marges, bons de commande fournisseurs, planning de l'équipe",
+    collegues:
+      "avec mon équipe de vente et de production, mes fournisseurs et ma clientèle de proximité",
+    diplomes: [],
+    permis: "Permis B",
+    periodeExercice: "Du 1er janvier 2015 au 31 décembre 2018",
+    accroches: [
+      "À la tête de mon commerce, j'organisais le travail de l'équipe et je répartissais les tâches de la journée.",
+      "Le champ de l'exploitation transport a été travaillé en centre de formation, sur le cas d'entreprise support.",
+      "En gérance de boutique, je suivais mes achats, ma caisse et mes résultats pour ajuster mes décisions.",
+    ],
+    source: "CV transmis",
     pointsForts: [
-      "Étude de faisabilité d'un portefeuille de commandes",
-      "Construction d'un plan de tournées et taux de remplissage",
-      "Contrôle des données sociales et des temps de conduite",
+      "Gestion d'un commerce",
+      "Encadrement d'équipe",
+      "Gestion des achats et de la caisse",
+      "Relation et conseil client",
+      "Organisation du travail au quotidien",
     ],
     pointsAConsolider: [
-      "Tarification des prestations et coût de revient",
-      "Traitement des litiges sous convention CMR",
+      "Réglementation du transport routier de marchandises",
+      "Exploitation et planification des moyens de transport",
+      "Affrètement et sous-traitance",
+      "Tarification des prestations de transport",
+    ],
+    experienceParAT: [
+      "Boulangerie – glacier – crêperie (gérance)",
+      "PARCOURS",
+      "Boutique de prêt-à-porter et accessoires (gérance)",
     ],
   },
 
@@ -471,68 +529,168 @@ const P: GotrmCvProfile[] = [
   {
     nom: "LEMAITRE",
     prenom: "Alexandre",
+    adresse: "93700 Drancy",
     entreprise: {
-      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
-      service: "Plateau technique exploitation transport",
-      ville: "",
+      nom: "LSR LOGISTIC / K.D.S / BUSINESS CORE",
+      service: "Direction – transport et logistique, exploitation et développement commercial",
+      ville: "Drancy (93)",
     },
-    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    posteOccupe: "Chef d'entreprise – transport et logistique",
     profil:
-      "Je présente mon dossier au titre du parcours de formation : l'ensemble des situations décrites a été réalisé en centre, sur le cas d'entreprise support TRANS OCCITANE SAS.",
-    experiences: [],
-    outils: "Tableur de coût de revient, grille de coût horaire et journalier, dossier de sous-traitance",
-    collegues: "Formateur évaluateur du plateau technique et groupe de travail de la promotion",
-    diplomes: [],
-    permis: "",
-    periodeExercice: "",
-    accroches: [
-      "Le cas support a été abordé par la construction d'une offre chiffrée en centre.",
-      "L'application en plateau a porté sur une commande frigorifique confiée en sous-traitance.",
-      "La partie gestion a consisté à reconstituer un coût de revient sur le cas support.",
+      "Conducteur livreur devenu chef d'équipe puis chef d'entreprise, j'ai encadré au quotidien des équipes de conducteurs, organisé les tournées et leur continuité, géré les remplacements et transporté des matières sensibles soumises à réglementation. Je dirige aujourd'hui trois structures de transport et de logistique.",
+    experiences: [
+      {
+        periode: "2024 – 2026",
+        poste: "Chef d'entreprise, fondateur et dirigeant",
+        employeur: "LSR LOGISTIC / K.D.S / BUSINESS CORE",
+        missions: [
+          "Développement commercial et relation avec les donneurs d'ordres",
+          "Organisation des tournées et affectation des moyens",
+          "Encadrement des équipes et pilotage de l'activité",
+        ],
+      },
+      {
+        periode: "2019 – 2024",
+        poste: "Chauffeur livreur matières radioactives",
+        employeur: "ISOVITAL-ISOLIFE",
+        missions: [
+          "Livraison de produits radioactifs auprès des établissements hospitaliers sur toute la France",
+          "Application des procédures de sécurité et de la réglementation du transport de matières sensibles",
+          "Tenue des documents de transport et des relevés d'activité",
+        ],
+      },
+      {
+        periode: "Avril 2019 – Mai 2019",
+        poste: "Livreur en carburant",
+        employeur: "THANK YOU",
+        missions: ["Livraison de carburant", "Respect des consignes de sécurité au dépotage"],
+      },
+      {
+        periode: "2017 – 2019",
+        poste: "Chauffeur livreur puis chef d'équipe",
+        employeur: "GEODIS EUROMATIC",
+        missions: [
+          "Supervision de la logistique quotidienne",
+          "Suivi de l'activité de l'équipe de conducteurs",
+          "Organisation des remplacements des chauffeurs absents et continuité des tournées",
+        ],
+      },
+      {
+        periode: "2011 – 2016",
+        poste: "Chauffeur livreur matières radioactives",
+        employeur: "ISOVITAL-ISOLIFE",
+        missions: [
+          "Livraison de produits radioactifs auprès des établissements de santé",
+          "Contrôle des colis et respect des procédures de sûreté",
+        ],
+      },
     ],
-    source: "Parcours de formation",
+    outils:
+      "Planning d'exploitation et feuilles de tournée, chronotachygraphe et cartes conducteurs, documents de transport de matières sensibles, Excel® pour le suivi d'activité, téléphone d'exploitation",
+    collegues:
+      "avec mon équipe de conducteurs, les clients hospitaliers et industriels, les services de sûreté des sites livrés et mes partenaires transporteurs",
+    diplomes: [
+      ["BAC+1", "École de Richeval, Morne-à-l'Eau (Guadeloupe)", "2012"],
+      ["BEP Finition", "École de Richeval, Morne-à-l'Eau (Guadeloupe)", "2009"],
+    ],
+    permis: "Permis B, C",
+    periodeExercice: "Du 1er janvier 2024 au 31 décembre 2026",
+    accroches: [
+      "Comme chef d'équipe, j'encadrais au quotidien les conducteurs, j'organisais les remplacements et j'assurais la continuité des tournées.",
+      "Sur le transport de matières sensibles, je conduisais les livraisons hospitalières dans un cadre réglementaire strict.",
+      "À la tête de mes structures, je développe le portefeuille clients et je pilote l'exécution des tournées.",
+    ],
+    source: "CV transmis",
     pointsForts: [
-      "Tarification à partir des coûts kilométrique et horaire",
-      "Recours à la sous-traitance et contrôle des pièces obligatoires",
-      "Reconstitution d'un coût de revient et mesures correctives",
+      "Encadrement au quotidien d'une équipe de conducteurs",
+      "Organisation et continuité des tournées",
+      "Gestion des remplacements de conducteurs",
+      "Transport de matières sensibles et réglementation associée",
+      "Développement commercial",
+      "Direction d'une entreprise de transport",
     ],
     pointsAConsolider: [
-      "Planification hebdomadaire sous contrainte de temps de repos",
-      "Communication professionnelle en anglais",
+      "Tarification et calcul du prix de revient",
+      "Contractualisation de la sous-traitance",
+      "Reconstitution des indicateurs de performance",
     ],
+    experienceParAT: ["GEODIS EUROMATIC", "ISOVITAL-ISOLIFE", "LSR LOGISTIC / K.D.S / BUSINESS CORE"],
   },
   {
     nom: "MANSEUR",
     prenom: "Mehdi",
+    adresse: "3 traverse Beaulieu, Les Résidences de Bompard, 13007 Marseille",
     entreprise: {
-      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
-      service: "Plateau technique exploitation transport",
-      ville: "",
+      nom: "Chantier Naval de Marseille",
+      service: "Coordination logistique – planning, arrivages et expéditions",
+      ville: "Marseille (13)",
     },
-    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    posteOccupe: "Coordinateur logistique – CACES 1-3-4-5",
     profil:
-      "Mon dossier relève de la voie du parcours de formation : les travaux relatés ont été menés en centre de formation, sur le cas d'entreprise support TRANS OCCITANE SAS.",
-    experiences: [],
-    outils: "Planning d'exploitation du plateau, convention CMR, contrat type et documents en anglais",
-    collegues: "Formateur évaluateur du plateau technique et binôme d'exploitation",
-    diplomes: [],
-    permis: "",
-    periodeExercice: "",
-    accroches: [
-      "Le travail en centre a démarré par l'affectation des moyens sur une semaine type.",
-      "Le cas support comportait une offre reçue en anglais à analyser en plateau.",
-      "Le volet litige a été instruit à partir d'une avarie signalée sur le cas support.",
+      "Coordinateur logistique titulaire des CACES 1-3-4-5, j'ai organisé et animé le travail d'une équipe, réalisé les plannings, organisé les arrivages, les réceptions et les expéditions, suivi l'état des stocks et établi les devis et coûts de manutention et de transport. Je pratique l'espagnol, l'anglais et l'arabe.",
+    experiences: [
+      {
+        periode: "2017 – 2019",
+        poste: "Coordinateur logistique",
+        employeur: "Chantier Naval de Marseille",
+        missions: [
+          "Organisation et animation du travail de l'équipe, réalisation du planning",
+          "Organisation des arrivages, de la réception et de l'expédition des marchandises",
+          "Gestion des imprévus et anticipation des anomalies, suivi de l'état des stocks",
+          "Établissement des devis et des coûts de manutention et de transport",
+        ],
+      },
+      {
+        periode: "2015 – 2017",
+        poste: "Cariste de production",
+        employeur: "Saint-Gobain PAM, Brasserie de Champigneulles, usine Coca-Cola",
+        missions: [
+          "Préparation et exécution des commandes de production",
+          "Contrôle de l'état des chargements et des règles liées",
+          "Application des techniques du transport et de leur réglementation",
+        ],
+      },
+      {
+        periode: "2006 – 2015",
+        poste: "Cariste, agent de quai, magasinier puis commercial",
+        employeur: "Postes successifs en logistique et en distribution",
+        missions: [
+          "Réception, quai et magasinage",
+          "Préparation de commandes et contrôle des chargements",
+          "Relation client et vente",
+        ],
+      },
     ],
-    source: "Parcours de formation",
+    outils:
+      "Logiciels de gestion de stocks, tableur de devis et de coûts de manutention, planning d'équipe, bons de réception et d'expédition, chariots CACES 1-3-4-5",
+    collegues:
+      "avec l'équipe de caristes et d'agents de quai, le service achats, les transporteurs livreurs et les clients internes du chantier",
+    diplomes: [
+      ["CACES catégories 1, 3, 4 et 5", "Organisme agréé", "2015"],
+      ["Attestation de coordination logistique", "Chantier Naval de Marseille", "2019"],
+    ],
+    permis: "Permis B, CACES 1-3-4-5",
+    periodeExercice: "Du 1er janvier 2017 au 31 décembre 2019",
+    accroches: [
+      "Comme coordinateur logistique, je réalisais le planning et j'affectais les moyens de manutention et de transport à la charge de la semaine.",
+      "J'animais et supervisais l'équipe de quai et de caristes sur les arrivages et les expéditions.",
+      "Je suivais l'état des stocks, les devis et les coûts de manutention pour préconiser des mesures correctives.",
+    ],
+    source: "CV transmis",
     pointsForts: [
-      "Affectation des moyens et planification d'une semaine d'exploitation",
-      "Traitement d'une réclamation client sous convention CMR",
-      "Analyse d'une offre reçue en anglais et repérage des clauses",
+      "Réalisation du planning et affectation des moyens",
+      "Animation et supervision d'une équipe",
+      "Organisation des arrivages, réceptions et expéditions",
+      "Contrôle de l'état des chargements",
+      "Gestion des imprévus et anticipation des anomalies",
+      "Établissement des devis et des coûts de manutention et de transport",
     ],
     pointsAConsolider: [
-      "Optimisation du taux de remplissage des tournées",
-      "Repérage des infractions à la réglementation sociale",
+      "Affrètement",
+      "Contractualisation de la sous-traitance",
+      "Réglementation sociale des conducteurs",
     ],
+    experienceParAT: ["Chantier Naval de Marseille", "Saint-Gobain PAM", "Chantier Naval de Marseille"],
   },
 
   {
