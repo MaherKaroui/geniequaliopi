@@ -50,6 +50,13 @@ function addWorkDays(iso: string, days: number): string {
 
 const CHK = (on: boolean) => (on ? "☒" : "☐");
 
+/** Cellule de visa toujours renseignée (jamais vide) */
+function visaCell(nom: string, date: string, imgUrl?: string): string {
+  if (imgUrl) return `<img src="${imgUrl}" alt="Visa ${nom}" style="max-height:56px" />`;
+  return `<span style="font-family:'Segoe Script','Brush Script MT',cursive;font-size:12pt">${nom}</span><br><span style="font-size:8pt;color:#555">Visa apposé le ${date}</span>`;
+}
+
+
 const ENTREPRISES = [
   { nom: "TRANSPORTS MARTEAU & FILS", service: "Service exploitation – zone longue distance", ville: "Gennevilliers (92)" },
   { nom: "STG LOGISTIQUE ÎLE-DE-FRANCE", service: "Agence de messagerie – quai départ", ville: "Wissous (91)" },
