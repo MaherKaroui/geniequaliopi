@@ -599,12 +599,13 @@ export function genDPGotrm(
       const moyen = pick(ex.moyens, seed + ci * 5 + ej);
       const compl = pick(ex.complement, seed + ci * 11 + ej);
       const periode = pick(periodes, seed + ci * 2 + ej);
+      const accroche = cv.accroches[ci] || cv.accroches[0] || "";
       pages.push(`<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>
       <p><strong><em>Exemple n° ${ej + 1}</em></strong> ▶ ${ex.titre}</p>
       <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
-      <p>${tache}</p>
+      <p>${accroche} ${tache}</p>
       <p><strong>2. Précisez les moyens utilisés :</strong></p>
-      <p>${moyen}</p>
+      <p>${moyen} J'utilisais également ${outils}.</p>
       <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
       <p>J'ai travaillé ${collegues}.</p>
       <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
@@ -619,17 +620,8 @@ export function genDPGotrm(
   });
 
   // ── Titres, diplômes, CQP
-  const diplomes = [
-    ["Baccalauréat professionnel Transport", "Ministère de l'Éducation nationale", `${anneeFin - 8}`],
-    ["Attestation de formation à la sécurité (SST)", "Organisme habilité INRS", `${anneeFin - 2}`],
-    ["Attestation de suivi – Réglementation sociale européenne (RSE)", org.nom, `${anneeFin - 1}`],
-  ];
-  const diplomesAlt = [
-    ["Titre professionnel Conducteur routier de marchandises", "Ministère chargé de l'emploi", `${anneeFin - 9}`],
-    ["FCO Marchandises", "Centre de formation agréé", `${anneeFin - 2}`],
-    ["Attestation de formation – Utilisation d'un TMS", org.nom, `${anneeFin - 1}`],
-  ];
-  const listeDip = seed % 2 === 0 ? diplomes : diplomesAlt;
+  const listeDip = cv.diplomes.map((d) => [d.intitule, d.autorite, d.annee]);
+
   pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
   <p><em>(facultatif)</em></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
