@@ -85,7 +85,7 @@ export function controlerPeriode(d: DpDossierData, f: FormationInfo): DpAnomalie
     return out;
   }
   const jours = Math.round((p.fin.getTime() - p.debut.getTime()) / 86400000);
-  if (jours < 7) {
+  if (jours < 7 && d.cv?.source !== "Parcours de formation") {
     out.push({
       candidat: nom,
       regle: "Période d'exercice",
@@ -94,7 +94,10 @@ export function controlerPeriode(d: DpDossierData, f: FormationInfo): DpAnomalie
   }
   const dSession = getStagiaireDateDebut(d.stagiaire, f);
   const fSession = getStagiaireDateFin(d.stagiaire, f);
-  if (dSession && fSession) {
+  // Voie « parcours de formation » : la période d'exercice EST la période de
+  // formation du candidat, ce recouvrement est donc légitime.
+  const voieParcours = d.cv?.source === "Parcours de formation";
+  if (!voieParcours && dSession && fSession) {
     const ds = new Date(dSession);
     const fs = new Date(fSession);
     if (!isNaN(ds.getTime()) && !isNaN(fs.getTime()) && memeJour(ds, p.debut) && memeJour(fs, p.fin)) {

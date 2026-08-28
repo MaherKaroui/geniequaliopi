@@ -34,6 +34,7 @@ import {
 } from "@/lib/dp/referentielTitres";
 import { getBanque, detectDomaine, intitulesPourAT, type DpBanque, type DpFente } from "@/lib/dp/dpBanques";
 import { findGotrmProfile, type GotrmCvProfile } from "@/lib/gotrm/cvProfiles";
+import { phraseParcours, type ParcoursFente } from "@/lib/dp/parcoursFormation";
 import {
   buildEcfProfilage,
   LIBELLE_NIVEAU,
@@ -352,6 +353,40 @@ export function buildDpDossier(
   return dossier;
 }
 
+/**
+ * VOIE PARCOURS DE FORMATION — dossiers réellement travaillés en centre sur le
+ * cas d'entreprise support. Répartis par activité-type : AT1 = compétences 1
+ * à 4, AT2 = compétences 5 à 7, AT3 = compétences 8 et 9.
+ */
+const DOSSIERS_PARCOURS: string[][] = [
+  [
+    "Étude de faisabilité d'un portefeuille de commandes hebdomadaire, avec une commande en surcharge à refuser et contre-proposition au client",
+    "Tarification et construction d'une offre de prestation à partir du coût kilométrique, du coût horaire et du coût journalier",
+    "Affectation des moyens et planification d'une semaine d'exploitation sous contrainte de temps de conduite et de repos",
+    "Recours à la sous-traitance sur une commande frigorifique dépassant la charge utile disponible, avec contrôle des pièces du sous-traitant",
+  ],
+  [
+    "Contrôle d'un relevé de données sociales et repérage d'infractions à la réglementation des temps de conduite",
+    "Analyse d'une offre reçue en anglais et repérage des clauses non conformes au contrat type",
+    "Construction d'un plan de tournées et optimisation du taux de remplissage",
+  ],
+  [
+    "Traitement d'une réclamation client sur avarie et instruction du dossier sous convention CMR",
+    "Reconstitution d'un coût de revient et préconisation de mesures correctives à la direction",
+  ],
+];
+
+/** Période réelle de formation du candidat, rédigée en clair. */
+function periodeFormationFr(s: StagiaireInfo | undefined, f: FormationInfo): string {
+  const d = getStagiaireDateDebut(s, f);
+  const fin = getStagiaireDateFin(s, f);
+  if (!d || !fin) return "";
+  const dd = new Date(d);
+  const df = new Date(fin);
+  if (isNaN(dd.getTime()) || isNaN(df.getTime())) return "";
+  return `Du ${longFr(dd)} au ${longFr(df)}`;
+}
+
 /** Construit un dossier en réservant ses suites de 41 caractères dans le registre. */
 function construireDossier(
   f: FormationInfo,
@@ -363,17 +398,26 @@ function construireDossier(
   const ref = resolveReferentiel(f);
   const banque = getBanque(f);
   const cv = profilCandidat(s);
+  const voieParcours = cv?.source === "Parcours de formation";
   const entreprise = resolveEntreprise(s, cv);
-  const periodeExercice = resolvePeriodeExercice(cv, entreprise) || (cv?.periodeExercice || "").trim();
+  const periodeExercice = voieParcours
+    ? periodeFormationFr(s, f)
+    : resolvePeriodeExercice(cv, entreprise) || (cv?.periodeExercice || "").trim();
 
   /** Profil absent : le DP ne raconte rien à la place du candidat. */
   const profilAbsent =
-    !cv || cv.source === "Profil à compléter" || !(cv.experiences || []).length || !entreprise.connue || !periodeExercice;
+    !voieParcours &&
+    (!cv || cv.source === "Profil à compléter" || !(cv.experiences || []).length || !entreprise.connue || !periodeExercice);
 
   const nbAT = Math.max(1, ref.activitesTypes.length);
   const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
 
   const employeur = entreprise.nom || entreprise.service || "cet employeur";
+
+  /** Rang du candidat parmi ceux qui relèvent de la voie parcours de formation. */
+  const rangParcours = stagiaires
+    .filter((x) => findGotrmProfile(x?.nom, x?.prenom)?.source === "Parcours de formation")
+    .findIndex((x) => x === s);
 
   /**
    * Une phrase = une ouverture (≤ 40 caractères) + une fin composable.
@@ -383,9 +427,10 @@ function construireDossier(
   const phrase = (fente: DpFente, usage: number, decalage: number): string => {
     const fr = banque.fentes[fente];
     const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
-    // Chaque phrase s'ouvre sur l'employeur réel du candidat : aucune suite de
+    // Chaque phrase s'ouvre sur un ancrage propre au candidat : aucune suite de
     // plus de 40 caractères ne peut donc être commune à deux dossiers.
-    const amorce = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`][k % 3];
+    const base = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`];
+    const amorce = base[k % base.length];
     const ouv = fr.ouvertures[k % fr.ouvertures.length];
     return `${amorce} ${ouv.charAt(0).toLowerCase()}${ouv.slice(1)} ${fr.suites[k % fr.suites.length]}`;
   };
@@ -394,17 +439,17 @@ function construireDossier(
    * Réserve un texte strictement inédit dans la session.
    * 1) on décale la combinaison de fragments tant qu'une suite de 41
    *    caractères est déjà employée par un autre dossier ;
-   * 2) si aucune combinaison ne convient, on rappelle l'employeur réel du
+   * 2) si aucune combinaison ne convient, on rappelle l'ancrage réel du
    *    candidat à l'endroit exact de la collision, ce qui rend la phrase
    *    propre au dossier sans rien inventer.
    */
-  const reserver = (fabrique: (decalage: number) => string): string => {
+  const reserver = (fabrique: (decalage: number) => string, ancre = employeur): string => {
     let dernier = "";
     for (let d = 0; d < 77; d++) {
       dernier = fabrique(d);
       if (!fenetres41(dernier).some((x) => registre.has(x))) break;
     }
-    dernier = reparer(dernier, employeur, registre);
+    dernier = reparer(dernier, ancre, registre);
     fenetres41(dernier).forEach((x) => registre.add(x));
     return dernier;
   };
@@ -421,8 +466,17 @@ function construireDossier(
   ref.activitesTypes.forEach((at, ci) => {
     // Intitulés STRICTEMENT rattachés à l'activité-type (AT1 ≠ AT2 ≠ AT3)
     const banqueAT = intitulesPourAT(banque, ci, nbAT);
+    // Voie parcours : l'intitulé est le dossier réellement travaillé en centre,
+    // choisi de façon à ce que deux candidats ne traitent pas le même sujet.
+    const dossiersAT = DOSSIERS_PARCOURS[ci] || [];
+    const dossierParcours =
+      voieParcours && dossiersAT.length
+        ? dossiersAT[(Math.max(0, rangParcours) + ci) % dossiersAT.length]
+        : "";
     const intitule =
-      banqueAT[(stagiaireIdx + ci) % Math.max(1, banqueAT.length)] || `Exemple de pratique professionnelle n° ${ci + 1}`;
+      dossierParcours ||
+      banqueAT[(stagiaireIdx + ci) % Math.max(1, banqueAT.length)] ||
+      `Exemple de pratique professionnelle n° ${ci + 1}`;
 
     if (profilAbsent) {
       exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1: "", r2: "", r3: "", r5: "" });
@@ -430,30 +484,62 @@ function construireDossier(
     }
 
     const accroche = cv?.accroches?.[ci] || "";
-    // Amorce propre au candidat : entreprise et période réellement renseignées.
-    const prefixe = ancrageContexte
-      ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :`
+    const court = dossierParcours ? dossierParcours.split(",")[0] : "";
+    const rp = Math.max(0, rangParcours) % 3;
+    // Ancre de réparation : propre au candidat (son propre dossier), jamais un employeur inventé.
+    const ancre = voieParcours ? `dossier suivi par ${s?.prenom || ""} ${s?.nom || ""}`.trim() : employeur;
+    const periodeMin = periodeExercice
+      ? `${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)}`
       : "";
-    const r1 = reserver((d) =>
-      [
-        ci === 0 ? prefixe : "",
-        accroche,
-        phrase("contexte", ci, d),
-        phrase("contrainte", ci, d),
-        phrase("methode", ci, d),
-        phrase("alea", ci, d),
-      ]
-        .filter(Boolean)
-        .join(" "),
+    // Voie parcours : cadre pédagogique explicite (jamais un emploi), tournures
+    // propres au candidat et au dossier réellement travaillé en centre.
+    const prefixesParcours = [
+      `Dossier « ${court} » : travaux menés en centre de formation, ${periodeMin}, sur le cas support TRANS OCCITANE.`,
+      `Dossier « ${court} » — application réalisée en plateau technique, entreprise pédagogique support TRANS OCCITANE SAS.`,
+      `Dossier « ${court} », traité pendant la formation sur l'entreprise pédagogique TRANS OCCITANE.`,
+    ];
+    const prefixe = voieParcours
+      ? prefixesParcours[rp]
+      : ancrageContexte
+        ? `Au sein de ${ancrageContexte}${periodeMin ? ` (${periodeMin})` : ""} :`
+        : "";
+
+    const pp = (fente: ParcoursFente) => phraseParcours(fente, rp, ci, court);
+
+    const r1 = reserver(
+      (d) =>
+        voieParcours
+          ? [ci === 0 ? prefixe : "", accroche, pp("contexte"), pp("contrainte"), pp("methode"), pp("alea")]
+              .filter(Boolean)
+              .join(" ")
+          : [
+              ci === 0 ? prefixe : "",
+              accroche,
+              phrase("contexte", ci, d),
+              phrase("contrainte", ci, d),
+              phrase("methode", ci, d),
+              phrase("alea", ci, d),
+            ]
+              .filter(Boolean)
+              .join(" "),
+      ancre,
     );
     // Chaque phrase mutualisée est encadrée par une ancre candidat : aucune
     // formule ne peut être partagée sur plus de 40 caractères consécutifs.
-    const r2 = reserver((d) => phrase("outils", ci, d));
-    const r3 = reserver((d) => phrase("interlocuteurs", ci, d));
-    const r5 = reserver((d) => `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`);
+    const r2 = reserver((d) => (voieParcours ? pp("outils") : phrase("outils", ci, d)), ancre);
+    const r3 = reserver((d) => (voieParcours ? pp("interlocuteurs") : phrase("interlocuteurs", ci, d)), ancre);
+    const r5 = reserver(
+      (d) =>
+        voieParcours
+          ? `${pp("cloture")} ${pp("retour")}`
+          : `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`,
+      ancre,
+    );
+
 
     exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
+
 
   return {
     stagiaire: s,

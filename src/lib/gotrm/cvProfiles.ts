@@ -30,8 +30,13 @@ export interface GotrmCvProfile {
   periodeExercice: string;
   /** Phrase d'accroche contextuelle par activité-type (AT1 / AT2 / AT3) */
   accroches: [string, string, string];
-  /** Source du profil */
-  source: "CV transmis" | "Profil reconstitué" | "Profil à compléter";
+  /**
+   * Source du profil.
+   * « Parcours de formation » = aucun CV transmis : le DP se rédige sur la voie
+   * du parcours de formation (cas d'entreprise support en plateau technique),
+   * sans jamais fabriquer d'employeur ni de période d'emploi.
+   */
+  source: "CV transmis" | "Profil reconstitué" | "Profil à compléter" | "Parcours de formation";
   /** Adresse personnelle telle qu'indiquée sur le CV */
   adresse?: string;
   /**
@@ -239,20 +244,37 @@ const P: GotrmCvProfile[] = [
   {
     nom: "GIMENEZ",
     prenom: "Jessica",
-    entreprise: { nom: "", service: "", ville: "" },
-    posteOccupe: "",
-    profil: "",
+    entreprise: {
+      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
+      service: "Plateau technique exploitation transport",
+      ville: "",
+    },
+    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    profil:
+      "Mon dossier s'appuie sur la voie du parcours de formation : les situations ont été conduites en centre, sur le cas d'entreprise support TRANS OCCITANE SAS, en plateau technique exploitation.",
     experiences: [],
-    outils: "",
-    collegues: "",
+    outils: "TMS pédagogique du plateau, tableur de coût kilométrique, contrat type de transport",
+    collegues: "Formateur évaluateur du plateau technique et binômes de promotion",
     diplomes: [],
     permis: "",
     periodeExercice: "",
-    accroches: ["", "", ""],
-    source: "Profil à compléter",
-    pointsForts: [],
-    pointsAConsolider: [],
+    accroches: [
+      "Les travaux du plateau ont porté sur la prise de commandes hebdomadaire du cas support.",
+      "La partie exploitation a été traitée sous forme de plan de tournées à optimiser.",
+      "Le volet contrôle a été abordé à partir des relevés sociaux fournis en centre.",
+    ],
+    source: "Parcours de formation",
+    pointsForts: [
+      "Étude de faisabilité d'un portefeuille de commandes",
+      "Construction d'un plan de tournées et taux de remplissage",
+      "Contrôle des données sociales et des temps de conduite",
+    ],
+    pointsAConsolider: [
+      "Tarification des prestations et coût de revient",
+      "Traitement des litiges sous convention CMR",
+    ],
   },
+
   {
     nom: "HACHMI",
     prenom: "Lina",
@@ -449,37 +471,70 @@ const P: GotrmCvProfile[] = [
   {
     nom: "LEMAITRE",
     prenom: "Alexandre",
-    entreprise: { nom: "", service: "", ville: "" },
-    posteOccupe: "",
-    profil: "",
+    entreprise: {
+      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
+      service: "Plateau technique exploitation transport",
+      ville: "",
+    },
+    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    profil:
+      "Je présente mon dossier au titre du parcours de formation : l'ensemble des situations décrites a été réalisé en centre, sur le cas d'entreprise support TRANS OCCITANE SAS.",
     experiences: [],
-    outils: "",
-    collegues: "",
+    outils: "Tableur de coût de revient, grille de coût horaire et journalier, dossier de sous-traitance",
+    collegues: "Formateur évaluateur du plateau technique et groupe de travail de la promotion",
     diplomes: [],
     permis: "",
     periodeExercice: "",
-    accroches: ["", "", ""],
-    source: "Profil à compléter",
-    pointsForts: [],
-    pointsAConsolider: [],
+    accroches: [
+      "Le cas support a été abordé par la construction d'une offre chiffrée en centre.",
+      "L'application en plateau a porté sur une commande frigorifique confiée en sous-traitance.",
+      "La partie gestion a consisté à reconstituer un coût de revient sur le cas support.",
+    ],
+    source: "Parcours de formation",
+    pointsForts: [
+      "Tarification à partir des coûts kilométrique et horaire",
+      "Recours à la sous-traitance et contrôle des pièces obligatoires",
+      "Reconstitution d'un coût de revient et mesures correctives",
+    ],
+    pointsAConsolider: [
+      "Planification hebdomadaire sous contrainte de temps de repos",
+      "Communication professionnelle en anglais",
+    ],
   },
   {
     nom: "MANSEUR",
     prenom: "Mehdi",
-    entreprise: { nom: "", service: "", ville: "" },
-    posteOccupe: "",
-    profil: "",
+    entreprise: {
+      nom: "HAYB — plateau technique, entreprise pédagogique TRANS OCCITANE SAS",
+      service: "Plateau technique exploitation transport",
+      ville: "",
+    },
+    posteOccupe: "Parcours de formation TP GOTRM – plateau technique exploitation transport",
+    profil:
+      "Mon dossier relève de la voie du parcours de formation : les travaux relatés ont été menés en centre de formation, sur le cas d'entreprise support TRANS OCCITANE SAS.",
     experiences: [],
-    outils: "",
-    collegues: "",
+    outils: "Planning d'exploitation du plateau, convention CMR, contrat type et documents en anglais",
+    collegues: "Formateur évaluateur du plateau technique et binôme d'exploitation",
     diplomes: [],
     permis: "",
     periodeExercice: "",
-    accroches: ["", "", ""],
-    source: "Profil à compléter",
-    pointsForts: [],
-    pointsAConsolider: [],
+    accroches: [
+      "Le travail en centre a démarré par l'affectation des moyens sur une semaine type.",
+      "Le cas support comportait une offre reçue en anglais à analyser en plateau.",
+      "Le volet litige a été instruit à partir d'une avarie signalée sur le cas support.",
+    ],
+    source: "Parcours de formation",
+    pointsForts: [
+      "Affectation des moyens et planification d'une semaine d'exploitation",
+      "Traitement d'une réclamation client sous convention CMR",
+      "Analyse d'une offre reçue en anglais et repérage des clauses",
+    ],
+    pointsAConsolider: [
+      "Optimisation du taux de remplissage des tournées",
+      "Repérage des infractions à la réglementation sociale",
+    ],
   },
+
   {
     nom: "SELHAOUI",
     prenom: "Ilyes",
