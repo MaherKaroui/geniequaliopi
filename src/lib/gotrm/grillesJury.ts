@@ -19,6 +19,9 @@ import { findGotrmProfile } from "@/lib/gotrm/cvProfiles";
 import type { GotrmCandidat, GotrmSession } from "./gotrmTypes";
 import { buildGotrmIdentifiant } from "./gotrmTypes";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import sigJury1 from "@/assets/signature-jury-1.png.asset.json";
+import sigJury2 from "@/assets/signature-jury-2.png.asset.json";
+
 
 const MAJ_TRAME = "21/08/2025";
 
