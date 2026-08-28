@@ -137,8 +137,9 @@ const STYLE_ECF = `<style>
 </style>`;
 
 /** Case à cocher dessinée en CSS (bordure + croix), jamais un caractère Unicode. */
-const CHK = (on: boolean) =>
+export const CHK = (on: boolean) =>
   on ? `<span class="cbx"><i class="b1"></i><i class="b2"></i></span>` : `<span class="cbx"></span>`;
+
 
 /**
  * Cellule de visa : uniquement l'image de signature réellement fournie dans
