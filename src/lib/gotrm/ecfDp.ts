@@ -246,7 +246,7 @@ export function genECFGotrm(
     <tr><th>Candidat(e)</th><td>Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</td></tr>
     <tr><th>Nom</th><td><strong>${s?.nom || ""}</strong></td></tr>
     <tr><th>Prénom</th><td><strong>${s?.prenom || ""}</strong></td></tr>
-    <tr><th>Date de naissance</th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : ""}</td></tr>
+    <tr><th>Date de naissance</th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : "—"}</td></tr>
     <tr><th>Période de formation</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
   </table>`);
 
