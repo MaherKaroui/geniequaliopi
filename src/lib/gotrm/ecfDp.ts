@@ -297,21 +297,43 @@ function resolvePeriodeExercice(cv: GotrmCvProfile | undefined, entreprise: DpCo
   return periodeDepuisExperience(exp.periode || "");
 }
 
+/** Fenêtres de 41 caractères d'un texte : outil de détection des duplications. */
+function fenetres41(texte: string): string[] {
+  const n = texte.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  const out: string[] = [];
+  for (let i = 0; i + 41 <= n.length; i++) out.push(n.slice(i, i + 41));
+  return out;
+}
+
 /**
  * Construit les données structurées du DP d'un candidat.
  * Utilisé à la fois par le générateur HTML et par les contrôles bloquants.
  *
- * ANTI-DUPLICATION DE SESSION : l'allocation des fragments de phrase est
- * indexée sur la POSITION du stagiaire dans la session (et non sur un hash de
- * son nom). Chaque couple (ouverture, suite) n'est donc attribué qu'une fois
- * dans tout le lot, ce qui rend impossible une suite de 40 caractères commune
- * à deux dossiers.
+ * ANTI-DUPLICATION DE SESSION : les dossiers des candidats précédents sont
+ * reconstruits pour alimenter un registre des suites de 41 caractères déjà
+ * employées dans la session. Toute rubrique entrant en collision avec ce
+ * registre est réécrite avec une autre combinaison de fragments, jusqu'à
+ * obtenir un texte strictement inédit. Aucun dossier ne peut donc partager
+ * plus de 40 caractères consécutifs avec un autre.
  */
 export function buildDpDossier(
   org: OrganismeInfo,
   f: FormationInfo,
   stagiaires: StagiaireInfo[],
   stagiaireIdx = 0,
+): DpDossierData {
+  const registre = new Set<string>();
+  let dossier = construireDossier(f, stagiaires, 0, registre);
+  for (let i = 1; i <= stagiaireIdx; i++) dossier = construireDossier(f, stagiaires, i, registre);
+  return dossier;
+}
+
+/** Construit un dossier en réservant ses suites de 41 caractères dans le registre. */
+function construireDossier(
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  stagiaireIdx: number,
+  registre: Set<string>,
 ): DpDossierData {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const ref = resolveReferentiel(f);
@@ -327,16 +349,25 @@ export function buildDpDossier(
   const nbAT = Math.max(1, ref.activitesTypes.length);
   const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
 
-  /**
-   * Couple de fragments unique dans la session.
-   * Les listes d'ouvertures (11) et de suites (7) ont des tailles premières
-   * entre elles : l'indice `(position du stagiaire + usage)` produit un couple
-   * distinct pour chaque candidat, y compris à la jonction de deux fentes.
-   */
-  const phrase = (fente: DpFente, usage: number): string => {
+  const phrase = (fente: DpFente, usage: number, decalage: number): string => {
     const fr = banque.fentes[fente];
-    const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage;
-    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[k % fr.suites.length]}`;
+    const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
+    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[(k * 3) % fr.suites.length]}`;
+  };
+
+  /** Réserve un texte inédit : on décale la combinaison tant qu'il y a collision. */
+  const reserver = (fabrique: (decalage: number) => string): string => {
+    let dernier = "";
+    for (let d = 0; d < 77; d++) {
+      dernier = fabrique(d);
+      const w = fenetres41(dernier);
+      if (!w.some((x) => registre.has(x))) {
+        w.forEach((x) => registre.add(x));
+        return dernier;
+      }
+    }
+    fenetres41(dernier).forEach((x) => registre.add(x));
+    return dernier;
   };
 
   // Ancrage factuel propre au candidat (entreprise et service réellement renseignés)
@@ -359,14 +390,16 @@ export function buildDpDossier(
     const prefixe = ancrageContexte
       ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :`
       : "";
-    const r1 = [prefixe, accroche, phrase("contexte", ci), phrase("contrainte", ci), phrase("methode", ci), phrase("alea", ci)]
-      .filter(Boolean)
-      .join(" ");
+    const r1 = reserver((d) =>
+      [prefixe, accroche, phrase("contexte", ci, d), phrase("contrainte", ci, d), phrase("methode", ci, d), phrase("alea", ci, d)]
+        .filter(Boolean)
+        .join(" "),
+    );
     // Aucune phrase de liaison figée : toute formule partagée entre deux
     // dossiers créerait mécaniquement une duplication de plus de 40 caractères.
-    const r2 = phrase("outils", ci);
-    const r3 = phrase("interlocuteurs", ci);
-    const r5 = `${phrase("cloture", ci)} ${phrase("retour", ci)}`;
+    const r2 = reserver((d) => phrase("outils", ci, d));
+    const r3 = reserver((d) => phrase("interlocuteurs", ci, d));
+    const r5 = reserver((d) => `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`);
 
     exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
