@@ -161,7 +161,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "Un changement de priorité",
     ],
     suites: [
-      "m'a fait reprendre une partie du travail.",
+      "m'a fait reprendre un peu de travail.",
       "a entraîné un signalement immédiat.",
       "est resté tracé par écrit.",
       "relevait d'un arbitrage hiérarchique.",
