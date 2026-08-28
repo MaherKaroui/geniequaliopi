@@ -152,6 +152,7 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
       .map((l) => `${l.ci}-${l.i}`),
   );
 
+  console.log("EMPR", cv.nom, empreinte, k, [...nonAcquis].join(","));
   const parAT: EcfCompetence[][] = ref.activitesTypes.map(() => []);
   lignes.forEach((l) => {
     const cle = `${l.ci}-${l.i}`;
