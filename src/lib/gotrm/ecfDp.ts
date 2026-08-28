@@ -205,6 +205,9 @@ export function buildDpDossier(
     return f[i % f.length];
   };
 
+  // Ancrage factuel propre au candidat (entreprise et service réellement renseignés)
+  const ancrageContexte = [entreprise.service, entreprise.nom].filter(Boolean).join(" – ");
+
   const exemples: DpExempleData[] = [];
   ref.activitesTypes.forEach((at, ci) => {
     const nbEx = Math.min(2, Math.max(1, Math.floor(intitules.length / Math.max(1, ref.activitesTypes.length))));
@@ -214,15 +217,14 @@ export function buildDpDossier(
 
       // L'accroche issue du profil n'est utilisée qu'une fois par activité-type
       const accroche = ej === 0 ? cv?.accroches?.[ci] || "" : "";
-      const r1 = [accroche, next("contexte"), next("contrainte"), next("methode"), next("alea")].filter(Boolean).join(" ");
+      const prefixe = ancrageContexte ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :` : "";
+      const r1 = [prefixe, accroche, next("contexte"), next("contrainte"), next("methode"), next("alea")].filter(Boolean).join(" ");
       // Les outils du profil ne sont cités que sur le premier exemple du dossier
       const outilsProfil = cv?.outils && exemples.length === 0 ? ` J'utilisais également ${cv.outils}.` : "";
-      // L'ancrage sur l'entreprise et le service réels du candidat garantit que
-      // deux dossiers d'une même session ne peuvent pas produire la même rubrique.
-      const ancrage = [entreprise.service, entreprise.nom].filter(Boolean).join(" – ");
+      const ancrage = ancrageContexte;
       const r2 = `Pour cette opération, j'ai utilisé ${next("outils")}.${outilsProfil}${ancrage ? ` Les documents produits ont été classés dans le dossier d'exploitation de ${ancrage}.` : ""}`;
       const r3 = `J'ai travaillé ${next("interlocuteurs")}${ancrage ? `, au sein de ${ancrage}` : ""}.`;
-      const r5 = `${next("cloture")} ${next("retour")}`;
+      const r5 = `${next("cloture")} ${next("retour")}${ancrage ? ` Ce dossier est conservé dans les archives d'exploitation de ${ancrage}.` : ""}`;
 
       exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: ej + 1, intitule, r1, r2, r3, r5 });
     }
