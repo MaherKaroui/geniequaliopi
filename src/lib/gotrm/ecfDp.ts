@@ -364,6 +364,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
   CCP1: [
     {
       titre: "Traitement d'une demande de transport de lot complet et remise d'une offre chiffrée",
+      avecQui: "J'ai travaillé en lien direct avec le donneur d'ordres et son service achats pour cadrer la demande, avec mon responsable d'exploitation qui validait le niveau de marge, et avec le conducteur affecté que j'ai briefé sur les contraintes de rendez-vous.",
       taches: [
         "J'ai reçu par mail une demande d'un client industriel pour un lot complet de 22 palettes au départ de la région parisienne vers Marseille, avec un rendez-vous de livraison imposé à 8 h le lendemain. J'ai commencé par reprendre point par point la demande : poids, nombre de palettes, hauteur, marchandise non dangereuse, horaires de chargement et de livraison. J'ai appelé le client pour confirmer deux informations qui manquaient (hayon nécessaire ou non, et heure limite de mise à quai). Ensuite j'ai vérifié la faisabilité : distance, temps de conduite réglementaire, coupure obligatoire, disponibilité d'un véhicule de 24 t. Comme le délai imposait un départ le soir même, j'ai calculé le coût avec un conducteur en découché. J'ai monté mon prix de revient sur Excel (coût kilométrique, coût horaire de conduite, frais de déplacement, péages, gazole), j'ai appliqué la marge demandée par mon responsable, puis j'ai rédigé l'offre sous Word en détaillant les moyens, le déroulé et les conditions. Le client a validé l'offre le jour même.",
         "Un donneur d'ordres du secteur agroalimentaire m'a sollicité pour un transport sous température dirigée (+2/+4 °C) de 14 palettes. J'ai d'abord vérifié que nous disposions d'un véhicule sous ATP en cours de validité et que le conducteur avait bien la sensibilisation au respect de la chaîne du froid. J'ai contrôlé les contraintes : prise de température au chargement, relevé à la livraison, obligation de traçabilité. Comme le trajet dépassait ce que je pouvais couvrir en propre cette semaine-là, j'ai consulté deux sous-traitants réguliers et une bourse de fret. J'ai comparé les prix et les délais, j'ai retenu la solution la plus fiable même si elle n'était pas la moins chère, en l'expliquant par écrit à mon responsable. J'ai ensuite tarifé la prestation en intégrant la marge d'affrètement et j'ai envoyé une proposition technique détaillée qui reprenait les températures, les documents à fournir et les conditions de responsabilité prévues par la CMR.",
@@ -380,6 +381,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
     },
     {
       titre: "Affectation des moyens, affrètement et planification d'une semaine d'exploitation",
+      avecQui: "J'ai travaillé au quotidien avec les conducteurs pour caler les prises de service, avec le chef de quai pour les priorités de chargement, avec les sous-traitants réguliers pour les débords, et avec l'assistante administrative qui suivait les pièces des affrétés.",
       taches: [
         "Chaque vendredi, je préparais le planning de la semaine suivante. Je partais des commandes fermes saisies dans le TMS, je les classais par zone géographique et par créneau de rendez-vous, puis j'affectais nos véhicules en tenant compte des temps de conduite, des repos, des congés et des visites périodiques des camions. Pour les commandes que nous ne pouvions pas absorber, je passais par nos sous-traitants réguliers puis, en dernier recours, par la bourse de fret. Avant de confirmer un nouveau sous-traitant, je contrôlais systématiquement sa licence de transport, son attestation d'assurance RC, son attestation de vigilance URSSAF et le K-bis. Une fois, un sous-traitant m'a transmis une attestation périmée : j'ai suspendu la commande et j'ai prévenu mon responsable avant de la réaffecter à un autre confrère.",
         "J'ai été chargé de la planification de 11 ordres de transport sur trois jours avec seulement six véhicules disponibles. J'ai commencé par identifier les ordres réellement contraints par un rendez-vous et ceux qui pouvaient glisser d'une journée. J'ai ensuite regroupé deux livraisons proches sur une même tournée, ce qui m'a libéré un véhicule. Pour les trois ordres restants, j'ai affrété deux confrères sur des trajets qu'ils faisaient déjà à vide au retour, ce qui m'a permis d'obtenir un bon prix. J'ai reporté toutes les affectations sur le planning partagé pour que le quai et la facturation aient la même information que moi.",
@@ -398,6 +400,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
   CCP2: [
     {
       titre: "Négociation et contractualisation d'un trafic régulier sous-traité",
+      avecQui: "J'ai travaillé avec mon responsable qui fixait le cadre de la négociation, avec les trois transporteurs consultés, avec le service comptable pour les délais de paiement, et avec le client donneur d'ordres pour valider les exigences du cahier des charges.",
       taches: [
         "Nous avons gagné un trafic régulier de trois rotations hebdomadaires vers la région lyonnaise et la direction a décidé de le sous-traiter. J'ai été chargé de la partie négociation. J'ai d'abord chiffré ce que le trafic nous coûterait en propre pour savoir jusqu'où je pouvais aller. J'ai consulté trois transporteurs, je leur ai transmis un cahier des charges avec les volumes, les horaires, le type de matériel, les exigences qualité du client et les pénalités. Après deux tours de négociation, j'ai retenu celui qui proposait le meilleur rapport prix / fiabilité. Nous avons formalisé un contrat conforme au contrat type de sous-traitance, avec la clause d'indexation gazole, les délais de paiement, les obligations d'assurance et les indicateurs de suivi. J'ai relu le contrat avec mon responsable avant signature.",
         "J'ai repris la renégociation annuelle d'un contrat de traction existant. Le sous-traitant demandait une hausse de 6 % à cause du carburant et des salaires. J'ai repris les indices professionnels et j'ai montré, chiffres à l'appui, que la hausse justifiée était plutôt de l'ordre de 3,5 %. Nous nous sommes accordés sur une revalorisation de 4 % avec une indexation gazole automatique trimestrielle, ce qui a évité de refaire la discussion tous les mois. J'ai mis à jour le cahier des charges et fait signer l'avenant.",
@@ -414,6 +417,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
     },
     {
       titre: "Supervision des opérations de traction, groupage et camionnage, et traitement d'un litige",
+      avecQui: "J'ai travaillé avec le chef de quai et les conducteurs de distribution le matin, avec la cellule litiges et l'assureur pour le dossier d'avarie, et avec le service client à qui je transmettais les réponses écrites.",
       taches: [
         "Le matin, je supervisais l'arrivage messagerie : je récupérais les positions annoncées, je les affectais aux véhicules de distribution selon les secteurs, et j'ajustais quand un volume était plus important que prévu. J'optimisais les tournées de livraison et de ramasse pour limiter les kilomètres à vide, tout en respectant les amplitudes des conducteurs. Je contrôlais les bordereaux de groupage au départ pour vérifier que chaque envoi était bien affecté à la bonne traction et que rien ne restait sur le quai.",
         "J'ai eu à traiter une réclamation client pour une palette avariée à la livraison. J'ai récupéré la lettre de voiture avec les réserves du destinataire, les photos prises sur place et le relevé de température. J'ai ouvert le dossier litige, informé le service concerné et le sous-traitant, et j'ai fait la déclaration à l'assurance dans les délais. J'ai tenu le client informé par écrit à chaque étape. Le dossier s'est réglé par une indemnisation partielle conforme à la limitation CMR, et j'ai expliqué le calcul au client pour qu'il comprenne le montant retenu.",
@@ -432,6 +436,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
   CCP3: [
     {
       titre: "Animation de l'équipe d'exploitation et suivi des obligations sociales",
+      avecQui: "J'ai travaillé avec l'équipe d'exploitation lors des points hebdomadaires, avec le service RH et le service paie pour les éléments variables, avec l'organisme de formation pour planifier les FCO et ADR, et avec la direction pour arbitrer les rotations.",
       taches: [
         "J'animais un point hebdomadaire avec les conducteurs et l'équipe d'exploitation : retour sur les incidents de la semaine, rappel des consignes de sécurité, préparation de la semaine suivante. J'ai construit un tableau de suivi des formations réglementaires (FCO, ADR, SST) avec les dates d'échéance, pour anticiper les recyclages au lieu de les subir. J'ai proposé à ma hiérarchie un plan de formation sur l'éco-conduite, en argumentant sur l'économie de carburant attendue.",
         "J'ai participé à la préparation des éléments variables de paie : à partir des relevés d'activité et des données du chronotachygraphe, j'ai reconstitué les heures de service, les découchés, les repas et les heures supplémentaires de chaque conducteur, puis j'ai transmis le tableau au service paie en signalant deux écarts à vérifier avec les intéressés.",
@@ -448,6 +453,7 @@ const DP_EXEMPLES: Record<string, DpExemple[]> = {
     },
     {
       titre: "Construction d'un tableau de bord d'exploitation et préconisation de mesures correctives",
+      avecQui: "J'ai travaillé avec le contrôleur de gestion pour fiabiliser les données de coûts, avec les exploitants qui alimentaient les indicateurs, et avec la direction à qui je présentais le tableau de bord mensuel et les mesures correctives.",
       taches: [
         "J'ai construit sous Excel un tableau de bord mensuel de l'exploitation : chiffre d'affaires par client, coût kilométrique réel, consommation moyenne, taux de remplissage, taux de retour à vide, marge brute par trafic. J'ai comparé nos coûts aux indices professionnels de référence pour situer l'entreprise. L'analyse a montré qu'un trafic régulier était en dessous du seuil de rentabilité à cause de retours à vide systématiques.",
         "À partir de ce constat, j'ai préconisé trois mesures à ma direction : rechercher un fret retour sur la zone concernée, renégocier le tarif client avec un argumentaire chiffré, et regrouper deux départs par semaine au lieu de trois. Les deux premières mesures ont été retenues. Le trafic est repassé positif au bout de deux mois, avec un taux de retour à vide réduit d'environ un tiers.",
@@ -487,7 +493,6 @@ export function genDPGotrm(
   // Période d'exercice professionnelle (issue du parcours réel du candidat)
   const periodeDebut = debut ? new Date(debut) : new Date();
   const anneeFin = periodeDebut.getFullYear();
-  const periodes = [cv.periodeExercice, ...cv.experiences.map((e) => e.periode)];
 
   const pied = (p: number, total: number) =>
     `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – ${GOTRM_TITRE.sigle} ${GOTRM_TITRE.codeTitre} – ${s?.prenom || ""} ${s?.nom || ""}</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
@@ -595,7 +600,9 @@ export function genDPGotrm(
       const tache = pick(ex.taches, seed + ci * 7 + ej * 3);
       const moyen = pick(ex.moyens, seed + ci * 5 + ej);
       const compl = pick(ex.complement, seed + ci * 11 + ej);
-      const periode = pick(periodes, seed + ci * 2 + ej);
+      // Période d'exercice : période réelle d'emploi dans l'entreprise de référence
+      // (jamais les dates de la session d'examen)
+      const periode = cv.periodeExercice;
       const accroche = cv.accroches[ci] || cv.accroches[0] || "";
       pages.push(`<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>
       <p><strong><em>Exemple n° ${ej + 1}</em></strong> ▶ ${ex.titre}</p>
@@ -604,7 +611,7 @@ export function genDPGotrm(
       <p><strong>2. Précisez les moyens utilisés :</strong></p>
       <p>${moyen} J'utilisais également ${outils}.</p>
       <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
-      <p>J'ai travaillé ${collegues}.</p>
+      <p>${ex.avecQui || `J'ai travaillé ${collegues}.`}</p>
       <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
         <tr><th colspan="2" style="text-align:left">4. Contexte</th></tr>
         <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${ent.nom}${ent.ville ? ` – ${ent.ville}` : ""}</td></tr>
@@ -617,7 +624,19 @@ export function genDPGotrm(
   });
 
   // ── Titres, diplômes, CQP
-  const listeDip = cv.diplomes;
+  const listeDip: [string, string, string][] = [
+    ...cv.diplomes,
+    [
+      `Attestation de fin de formation – Parcours préparatoire au TP ${GOTRM_TITRE.sigle} (${GOTRM_TITRE.codeTitre})`,
+      org.nom,
+      formatDate(fin || debut),
+    ],
+    [
+      "Attestation d'évaluations passées en cours de formation (livret ECF)",
+      org.nom,
+      formatDate(fin || debut),
+    ],
+  ];
 
   pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
   <p><em>(facultatif)</em></p>
@@ -625,6 +644,7 @@ export function genDPGotrm(
     <tr><th><strong>Intitulé</strong></th><th><strong>Autorité ou organisme</strong></th><th><strong>Date</strong></th></tr>
     ${listeDip.map(d => `<tr><td>${d[0]}</td><td>${d[1]}</td><td>${d[2]}</td></tr>`).join("")}
   </table>`);
+
 
   // ── Déclaration sur l'honneur (trame officielle)
   pages.push(`<h2>Déclaration sur l'honneur</h2>
@@ -678,7 +698,7 @@ export function genDPGotrm(
         intitule: it,
         nature: naturesPreuve[(seed + ci * 3 + j) % naturesPreuve.length],
         at: `Activité-type n° ${ci + 1}`,
-        periode: pick(periodes, seed + ci * 4 + j),
+        periode: cv.periodeExercice,
       });
     });
   });
