@@ -110,7 +110,13 @@ const STYLE_MINISTERE = `<style>
   .doc-officiel table.contexte caption{caption-side:top;text-align:left;font-weight:bold;background:#E4E4E4;color:#222;padding:6px 8px;border:1px solid #9A9A9A;border-bottom:0}
   .doc-officiel .grille-comp{display:inline-block}
   .doc-officiel table.grille-comp td{border:0;padding:1px 8px 1px 0;font-size:9pt;white-space:nowrap}
+  /* Case à cocher dessinée en CSS : survit à l'export PDF (aucun glyphe Unicode) */
+  .doc-officiel .cbx{display:inline-block;position:relative;width:11px;height:11px;border:1px solid #333;background:#fff;vertical-align:-1px;margin:0 2px}
+  .doc-officiel .cbx i{display:block;position:absolute;left:0;top:4px;width:11px;height:2px;background:#111}
+  .doc-officiel .cbx i.b1{transform:rotate(45deg)}
+  .doc-officiel .cbx i.b2{transform:rotate(-45deg)}
   .doc-officiel .verdict{margin:10px 0;padding:8px 0;line-height:1.7}
+  .doc-officiel .bloc-avoid{break-inside:avoid;page-break-inside:avoid}
   .doc-officiel .page-break{page-break-after:always;break-after:page}
   /* Pied ancré (rendu hors flux par le moteur d'export, une fois par page physique) */
   .footer.pied-dp{padding:6px 26px 0;border-top:2px solid ${MAGENTA};display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:8pt;line-height:1.6;color:#555;min-height:26px}
@@ -128,12 +134,18 @@ const STYLE_ECF = `<style>
   .doc-officiel .mention-prerenseigne{margin-top:18px;padding:8px 12px;border-left:4px solid ${MAGENTA};background:#FDF2F6;font-size:9.5pt;font-style:italic;color:#333}
 </style>`;
 
-const CHK = (on: boolean) => (on ? "☒" : "☐");
+/** Case à cocher dessinée en CSS (bordure + croix), jamais un caractère Unicode. */
+const CHK = (on: boolean) =>
+  on ? `<span class="cbx"><i class="b1"></i><i class="b2"></i></span>` : `<span class="cbx"></span>`;
 
-/** Cellule de visa : image si fournie, sinon mention manuscrite attendue. */
-function visaCell(nom: string, date: string, imgUrl?: string): string {
+/**
+ * Cellule de visa : uniquement l'image de signature réellement fournie dans
+ * l'application. Aucune signature manuscrite n'est synthétisée : à défaut, la
+ * cellule reste vide pour un visa manuscrit.
+ */
+function visaCell(nom: string, _date: string, imgUrl?: string): string {
   if (imgUrl) return `<img src="${imgUrl}" alt="Visa ${nom}" style="max-height:56px" />`;
-  return `<span style="font-family:'Segoe Script','Brush Script MT',cursive;font-size:12pt">${nom}</span><br><span style="font-size:8pt;color:#555">Visa apposé le ${date}</span>`;
+  return `<div style="height:44px"></div>`;
 }
 
 /**
@@ -342,22 +354,38 @@ const ECF_CONSOLIDATION_PAR_AT = [
   "Évaluation de consolidation : production d'un tableau de bord commenté et d'un plan d'actions correctives, présenté à l'oral.",
 ];
 
-/** Date d'évaluation : répartie sur le calendrier réel, jamais dans le futur. */
+/**
+ * Date d'une évaluation passée EN COURS DE FORMATION.
+ *
+ * Les ECF se déroulent pendant le parcours de formation, jamais pendant la
+ * session d'examen. Lorsque la période saisie est une session d'examen courte
+ * (moins de dix jours), les évaluations sont réparties sur le calendrier de
+ * formation qui la précède, toutes antérieures au premier jour de session.
+ * Sinon, elles sont réparties à l'intérieur de la période de formation.
+ */
 function dateEvaluation(debut: string, fin: string, position: number, total: number): string {
   if (!debut) return "";
   const d0 = new Date(debut);
   if (isNaN(d0.getTime())) return "";
-  const aujourdhui = new Date();
-  let borne = fin ? new Date(fin) : aujourdhui;
-  if (isNaN(borne.getTime())) borne = aujourdhui;
-  if (borne > aujourdhui) borne = aujourdhui;
-  if (borne <= d0) return debut;
-  const joursTotal = Math.max(1, Math.round((borne.getTime() - d0.getTime()) / 86400000));
-  // Réparties de 15 % à 95 % de la période effective
-  const frac = 0.15 + (0.8 * (position + 1)) / (total + 1);
-  const d = new Date(d0.getTime() + Math.round(joursTotal * frac) * 86400000);
+  const dFin = fin ? new Date(fin) : d0;
+  const dureeJours = isNaN(dFin.getTime()) ? 0 : Math.round((dFin.getTime() - d0.getTime()) / 86400000);
+
+  let borneBasse: Date;
+  let borneHaute: Date;
+  if (dureeJours < 10) {
+    // Session d'examen : le parcours de formation se situe en amont.
+    borneBasse = new Date(d0.getTime() - 18 * 7 * 86400000);
+    borneHaute = new Date(d0.getTime() - 7 * 86400000);
+  } else {
+    borneBasse = d0;
+    borneHaute = isNaN(dFin.getTime()) ? d0 : dFin;
+  }
+  const span = Math.max(1, Math.round((borneHaute.getTime() - borneBasse.getTime()) / 86400000));
+  const frac = 0.1 + (0.85 * (position + 1)) / (total + 1);
+  const d = new Date(borneBasse.getTime() + Math.round(span * frac) * 86400000);
   while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
-  if (d < d0) return debut;
+  if (d > borneHaute) return borneHaute.toISOString().slice(0, 10);
+  if (d < borneBasse) return borneBasse.toISOString().slice(0, 10);
   return d.toISOString().slice(0, 10);
 }
 
@@ -424,7 +452,7 @@ export function genECFUnifie(
   <table style="width:72%;margin:10px 0 10px auto;border-collapse:collapse;font-size:10.5pt">
     <tr><th style="width:48%">Arrêté du :</th><td>${ref.dateArrete || ""}</td></tr>
     <tr><th>J.O. du :</th><td>${ref.dateJo || ""}</td></tr>
-    <tr><th>Date d'effet au :</th><td>${ref.dateJo || ""}</td></tr>
+    <tr><th>Date d'effet au :</th><td>${ref.dateEffet || ""}</td></tr>
   </table>
   <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:18px">
     <tr><th style="width:32%">Organisme de formation</th><td>${org.nom}</td></tr>
@@ -446,26 +474,57 @@ export function genECFUnifie(
   <p>Le <strong><em>Guide de mise en œuvre</em></strong> des évaluations passées en cours de formation est à télécharger sur le site du ministère chargé de l'emploi. Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>`);
 
   /**
-   * Grille officielle des compétences évaluées : cases numérotées 1 à 9,
-   * disposées en 3 colonnes × 3 lignes. On coche les compétences couvertes.
+   * Grille officielle des compétences évaluées : cases numérotées de 1 au
+   * nombre réel de compétences de l'activité-type, disposées en 3 colonnes.
+   * Aucun numéro inexistant n'est affiché ni coché.
    */
   const grilleComp = (cochees: Set<number>, actives: number): string => {
-    const cell = (n: number) =>
-      n <= actives ? `<td>${n} ${CHK(cochees.has(n - 1))}</td>` : `<td>&nbsp;</td>`;
-    return `<table class="grille-comp"><tr>${cell(1)}${cell(2)}${cell(3)}</tr><tr>${cell(4)}${cell(5)}${cell(6)}</tr><tr>${cell(7)}${cell(8)}${cell(9)}</tr></table>`;
+    const cells: string[] = [];
+    for (let n = 1; n <= 9; n++) {
+      cells.push(n <= actives ? `<td>${n} ${CHK(cochees.has(n - 1))}</td>` : `<td>&nbsp;</td>`);
+    }
+    const lignes = [0, 3, 6]
+      .filter((o) => o < Math.max(3, Math.ceil(actives / 3) * 3))
+      .map((o) => `<tr>${cells.slice(o, o + 3).join("")}</tr>`)
+      .join("");
+    return `<table class="grille-comp">${lignes}</table>`;
+  };
+
+  /**
+   * Sélection des compétences cochées pour une évaluation donnée.
+   * Règle : 3 à 4 cases lorsque l'activité-type compte au moins 4 compétences,
+   * sinon la totalité des compétences disponibles. Jamais de numéro hors AT.
+   */
+  const cochesEvaluation = (nbComp: number, indexEval: number, salt: number): Set<number> => {
+    const set = new Set<number>();
+    if (nbComp <= 0) return set;
+    const cible = nbComp >= 4 ? ((indexEval + salt) % 2 === 0 ? 3 : 4) : nbComp;
+    const depart = (indexEval * 2 + salt) % nbComp;
+    for (let k = 0; k < Math.min(cible, nbComp); k++) set.add((depart + k) % nbComp);
+    return set;
   };
 
   /** Bloc « Observations » de la trame : tiret magenta, filet, zone encadrée. */
-  const blocObservations = (texte: string) => `<h3 style="border-bottom:2px solid ${MAGENTA};padding-bottom:4px;margin-top:16px">Observations</h3>
-  <div class="cadre-reponse">${texte || "&nbsp;"}</div>`;
+  const blocObservations = (texte: string) => `<div class="bloc-avoid"><h3 style="border-bottom:2px solid ${MAGENTA};padding-bottom:4px;margin-top:16px">Observations</h3>
+  <div class="cadre-reponse">${texte || "&nbsp;"}</div></div>`;
 
-  /** Bloc « Formateur(s) évaluateur(s) » : Nom | Date | Visa, deux lignes. */
-  const blocFormateurs = (date: string) => `<h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
+  /** Bloc « Formateur(s) évaluateur(s) » : une ligne par évaluateur renseigné. */
+  const evaluateurs = [
+    { nom: evaluateur1, visa: s?.formateurSignatureUrl },
+    { nom: evaluateur2, visa: undefined as string | undefined },
+  ].filter((e) => e.nom);
+  const blocFormateurs = (date: string) => `<div class="bloc-avoid"><h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
-    <tr><td>${evaluateur1 || ""}</td><td>${evaluateur1 ? date : ""}</td><td>${evaluateur1 ? visaCell(evaluateur1, date, s?.formateurSignatureUrl) : "&nbsp;"}</td></tr>
-    <tr><td>${evaluateur2 || ""}</td><td>${evaluateur2 ? date : ""}</td><td>${evaluateur2 ? visaCell(evaluateur2, date) : "&nbsp;"}</td></tr>
-  </table>`;
+    ${evaluateurs.length
+      ? evaluateurs.map((e) => `<tr><td>${e.nom}</td><td>${date}</td><td>${visaCell(e.nom, date, e.visa)}</td></tr>`).join("")
+      : `<tr><td>&nbsp;</td><td>&nbsp;</td><td>${visaCell("", date)}</td></tr>`}
+  </table></div>`;
+
+  /** Bloc verdict : cases dessinées, l'une des deux options toujours marquée. */
+  const blocVerdict = (satisfait: boolean, intro: string) => `<div class="bloc-avoid"><p class="verdict">${intro}<br>
+    ${CHK(satisfait)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ${CHK(!satisfait)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p></div>`;
 
   // Verdict final par activité-type : utilisé dans la synthèse globale.
   const satisfaitParAT: boolean[] = [];
@@ -477,22 +536,16 @@ export function genECFUnifie(
     const libelles = at.competences;
     const mods = modalitesAT(ci);
 
-    // Quatre lignes d'évaluation numérotées 1 à 4 ; seules les évaluations
-    // réellement mises en œuvre sont décrites, les autres restent vierges.
+    // Une ligne par évaluation réellement mise en œuvre : aucune ligne vierge.
     const nbEval = prof.renseigne ? Math.min(4, Math.max(2, libelles.length)) : 0;
-    const rows = [0, 1, 2, 3].map((ei) => {
-      if (ei >= nbEval) {
-        return `<tr><td><strong>${ei + 1}</strong>&nbsp;</td><td>&nbsp;</td><td>${grilleComp(new Set(), libelles.length)}</td></tr>`;
-      }
+    let derniereDateEval = "";
+    const rows = Array.from({ length: nbEval }, (_, ei) => {
       const compEval = comps[ei % Math.max(1, comps.length)];
       const modalite = mods[ei % mods.length](compEval?.libelle || libelles[ei % libelles.length], at.titre);
       const jour = dateEvaluation(debut, fin, offsetAT[ci] + ei, totalEval);
-      // Cases cochées : la compétence travaillée sur la ligne, plus la compétence
-      // connexe non acquise lorsque l'évaluation est transversale.
-      const cochees = new Set<number>();
-      cochees.add(ei % Math.max(1, comps.length));
-      const connexe = comps.findIndex((x, n) => n !== ei % Math.max(1, comps.length) && x.niveau !== "ACQUIS");
-      if (connexe >= 0 && ei % 2 === 1) cochees.add(connexe);
+      if (jour) derniereDateEval = jour;
+      // 3 à 4 compétences cochées si l'AT en compte au moins 4, sinon toutes.
+      const cochees = cochesEvaluation(libelles.length, ei, seedOf(s, ci));
       return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${grilleComp(cochees, libelles.length)}</td></tr>`;
     });
 
@@ -502,38 +555,46 @@ export function genECFUnifie(
     pages.push(`<h2>Activité-type ${numAT} – ${at.titre}</h2>
     <p><strong>Compétences professionnelles évaluées :</strong></p>
     <ol>${libelles.map((c) => `<li>${c}</li>`).join("")}</ol>
+    <div class="bloc-avoid">
     <h3>Évaluations complémentaires <em>(si nécessaire)</em></h3>
     <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
       <tr><th style="width:56%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
       ${rows.join("")}
-    </table>
+    </table></div>
     ${prof.renseigne
-      ? `<p class="verdict">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :<br>
-    ${CHK(satisfait)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-    ${CHK(!satisfait)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>`
+      ? blocVerdict(
+          satisfait,
+          `Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :`,
+        )
       : `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>`}
     ${blocObservations(prof.renseigne ? prof.appreciations[ci] || "" : "")}
-    ${blocFormateurs(prof.renseigne ? dateVisa : "")}`);
+    ${blocFormateurs(prof.renseigne ? (derniereDateEval ? formatDate(derniereDateEval) : dateVisa) : "")}`);
 
-    // Réévaluation : uniquement si des compétences restent à travailler
+    // Réévaluation : générée uniquement si des compétences restent à travailler,
+    // et alors toujours renseignée (description, date postérieure, cases cochées).
     if (prof.renseigne && aConsolider.length) {
       const consolidation = ECF_CONSOLIDATION_PAR_AT[ci] || ECF_CONSOLIDATION_PAR_AT[0];
-      const dateCons = dateEvaluation(debut, fin, totalEval - 1, totalEval);
+      const dateCons = derniereDateEval ? addWorkDays(derniereDateEval, 10) : "";
       const dateConsFr = dateCons ? formatDate(dateCons) : dateVisa;
       const cochees = new Set<number>();
       libelles.forEach((l, n) => {
         if (aConsolider.some((c) => c.libelle === l)) cochees.add(n);
       });
+      const complement = aConsolider
+        .map(
+          (c, k) =>
+            `<tr><td><strong>${k + 2}</strong> Entretien technique de réévaluation portant sur « ${c.libelle} » : reprise de la production initiale, argumentation des choix professionnels et vérification des critères non atteints.</td><td>${formatDate(addWorkDays(dateCons || derniereDateEval, k + 1))}</td><td>${grilleComp(new Set([libelles.findIndex((l) => l === c.libelle)].filter((n) => n >= 0)), libelles.length)}</td></tr>`,
+        )
+        .join("");
       pages.push(`<h2>Activité-type ${numAT} – Réévaluation</h2>
-      <h3>Évaluations complémentaires <em>(si nécessaire)</em></h3>
+      <div class="bloc-avoid">
+      <h3>Évaluations complémentaires</h3>
       <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
         <tr><th style="width:56%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
         <tr><td><strong>1</strong> ${consolidation}</td><td>${dateConsFr}</td><td>${grilleComp(cochees, libelles.length)}</td></tr>
-        ${[2, 3, 4].map((n) => `<tr><td><strong>${n}</strong>&nbsp;</td><td>&nbsp;</td><td>${grilleComp(new Set(), libelles.length)}</td></tr>`).join("")}
-      </table>
-      <p class="verdict">À l'issue de la réévaluation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :<br>
-      ${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-      ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+        ${complement}
+      </table></div>
+      ${blocVerdict(true, `À l'issue de la réévaluation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :`)}
       ${blocObservations(`La réévaluation portait sur ${aConsolider.map((c) => `${c.libelle} — ${c.motif}`).join(" ; ")}. Les productions remises lors de cette évaluation de consolidation sont conformes aux attendus : ${aConsolider.length === 1 ? "la compétence concernée est désormais maîtrisée" : "les compétences concernées sont désormais maîtrisées"}.`)}
       ${blocFormateurs(dateConsFr)}`);
     }
