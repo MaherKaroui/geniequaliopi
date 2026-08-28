@@ -492,6 +492,7 @@ export function genECFUnifie(
     });
 
     const satisfait = prof.renseigne && aConsolider.length === 0;
+    satisfaitParAT.push(satisfait);
 
     pages.push(`<h2>Activité-type ${numAT} – ${at.titre}</h2>
     <p><strong>Compétences professionnelles évaluées :</strong></p>
