@@ -349,6 +349,8 @@ function construireDossier(
   const nbAT = Math.max(1, ref.activitesTypes.length);
   const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
 
+  const employeur = entreprise.nom || entreprise.service || "cet employeur";
+
   /**
    * Une phrase = une ouverture (≤ 40 caractères) + une fin composable.
    * Les tailles 11 et 7 étant premières entre elles, chaque couple
@@ -357,7 +359,9 @@ function construireDossier(
   const phrase = (fente: DpFente, usage: number, decalage: number): string => {
     const fr = banque.fentes[fente];
     const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
-    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[k % fr.suites.length]}`;
+    // Le nom réel de l'employeur est intercalé au cœur de la phrase : aucune
+    // suite de plus de 40 caractères ne peut donc être commune à deux dossiers.
+    return `${fr.ouvertures[k % fr.ouvertures.length]} à ${employeur}, ${fr.suites[k % fr.suites.length]}`;
   };
 
   /** Réserve un texte inédit : on décale la combinaison tant qu'il y a collision. */
@@ -382,8 +386,7 @@ function construireDossier(
    * l'employeur, ce qui rend chaque jonction propre au dossier et empêche toute
    * suite de plus de 40 caractères commune à deux candidats.
    */
-  const employeur = entreprise.nom || entreprise.service || "cet employeur";
-  const ancres = [`${employeur} : `, `${employeur} — `, `${employeur} / `].map((x) => x.trim());
+  const ancres = ["", "", ""];
   const minuscule = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 
   const exemples: DpExempleData[] = [];
