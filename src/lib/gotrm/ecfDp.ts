@@ -698,7 +698,7 @@ export function genDPGotrm(
         intitule: it,
         nature: naturesPreuve[(seed + ci * 3 + j) % naturesPreuve.length],
         at: `Activité-type n° ${ci + 1}`,
-        periode: pick(periodes, seed + ci * 4 + j),
+        periode: cv.periodeExercice,
       });
     });
   });
