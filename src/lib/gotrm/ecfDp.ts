@@ -134,12 +134,18 @@ const STYLE_ECF = `<style>
   .doc-officiel .mention-prerenseigne{margin-top:18px;padding:8px 12px;border-left:4px solid ${MAGENTA};background:#FDF2F6;font-size:9.5pt;font-style:italic;color:#333}
 </style>`;
 
-const CHK = (on: boolean) => (on ? "☒" : "☐");
+/** Case à cocher dessinée en CSS (bordure + croix), jamais un caractère Unicode. */
+const CHK = (on: boolean) =>
+  on ? `<span class="cbx"><i class="b1"></i><i class="b2"></i></span>` : `<span class="cbx"></span>`;
 
-/** Cellule de visa : image si fournie, sinon mention manuscrite attendue. */
-function visaCell(nom: string, date: string, imgUrl?: string): string {
+/**
+ * Cellule de visa : uniquement l'image de signature réellement fournie dans
+ * l'application. Aucune signature manuscrite n'est synthétisée : à défaut, la
+ * cellule reste vide pour un visa manuscrit.
+ */
+function visaCell(nom: string, _date: string, imgUrl?: string): string {
   if (imgUrl) return `<img src="${imgUrl}" alt="Visa ${nom}" style="max-height:56px" />`;
-  return `<span style="font-family:'Segoe Script','Brush Script MT',cursive;font-size:12pt">${nom}</span><br><span style="font-size:8pt;color:#555">Visa apposé le ${date}</span>`;
+  return `<div style="height:44px"></div>`;
 }
 
 /**
