@@ -462,6 +462,9 @@ export function genECFUnifie(
     <tr><td>${evaluateur2 || ""}</td><td>${evaluateur2 ? date : ""}</td><td>${evaluateur2 ? visaCell(evaluateur2, date) : "&nbsp;"}</td></tr>
   </table>`;
 
+  // Verdict final par activité-type : utilisé dans la synthèse globale.
+  const satisfaitParAT: boolean[] = [];
+
   ref.activitesTypes.forEach((at, ci) => {
     const numAT = ci + 1;
     const comps = prof.parAT[ci] || [];
