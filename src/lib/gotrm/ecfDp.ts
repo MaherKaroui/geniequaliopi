@@ -462,6 +462,9 @@ export function genECFUnifie(
     <tr><td>${evaluateur2 || ""}</td><td>${evaluateur2 ? date : ""}</td><td>${evaluateur2 ? visaCell(evaluateur2, date) : "&nbsp;"}</td></tr>
   </table>`;
 
+  // Verdict final par activité-type : utilisé dans la synthèse globale.
+  const satisfaitParAT: boolean[] = [];
+
   ref.activitesTypes.forEach((at, ci) => {
     const numAT = ci + 1;
     const comps = prof.parAT[ci] || [];
@@ -489,6 +492,7 @@ export function genECFUnifie(
     });
 
     const satisfait = prof.renseigne && aConsolider.length === 0;
+    satisfaitParAT.push(satisfait);
 
     pages.push(`<h2>Activité-type ${numAT} – ${at.titre}</h2>
     <p><strong>Compétences professionnelles évaluées :</strong></p>
@@ -537,8 +541,9 @@ export function genECFUnifie(
     ${ref.activitesTypes
       .map((at, i) => {
         const detail = at.competences.join("<br>• ");
+        const satisfait = prof.renseigne ? satisfaitParAT[i] ?? false : false;
         return `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${detail}</td></tr>
-    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(prof.renseigne)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`;
+    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(satisfait)} &nbsp;&nbsp;&nbsp; NON ${CHK(!satisfait)}</td></tr>`;
       })
       .join("")}
   </table>`);
