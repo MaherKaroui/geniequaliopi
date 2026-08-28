@@ -144,6 +144,36 @@ function pick2(arr: string[], n: number): string {
   return a === b ? a : `${a} ${b}`;
 }
 
+/**
+ * Réponse oui/non explicitement renseignée : la réponse retenue est entourée
+ * et mise en évidence, l'autre est barrée. Aucune case ne reste vide.
+ */
+function ON(oui: boolean): string {
+  const sel = `font-weight:bold;color:#E5007D;border:1px solid #E5007D;border-radius:9px;padding:0 5px`;
+  const nonSel = `color:#999;text-decoration:line-through`;
+  return `<span style="white-space:nowrap"><span style="${oui ? sel : nonSel}">oui</span> / <span style="${oui ? nonSel : sel}">non</span></span>`;
+}
+
+/** Observations courtes pour les lignes de grille (jamais vides). */
+const OBS_LIGNE = [
+  "Constaté tout au long de l'épreuve.",
+  "Élément vérifié sur les livrables remis.",
+  "Confirmé par les explications données au jury.",
+  "Attendu satisfait, sans réserve.",
+  "Point conforme aux exigences du référentiel.",
+  "Réponse précise, appuyée sur la pratique professionnelle.",
+  "Démarche cohérente avec le contexte d'exploitation.",
+];
+
+const OBS_LIGNE_RESERVE = [
+  "Réponse complétée après reformulation du jury.",
+  "Élément traité de façon partielle, consolidé pendant l'échange.",
+  "Point nécessitant encore de la pratique, sans incidence sur la maîtrise globale.",
+  "Réponse hésitante au départ, précisée en fin d'échange.",
+];
+
+
+
 
 /**
  * Grille d'évaluation d'une activité-type : critères, modalités d'évaluation
@@ -183,7 +213,7 @@ function grilleActivite(ccpIndex: number, c: GotrmCandidat): string {
         <td style="width:8%;text-align:center">${msp ? CHK(true) : '<span style="color:#888">—</span>'}</td>
         <td style="width:8%;text-align:center">${et ? CHK(true) : '<span style="color:#888">—</span>'}</td>
         <td style="width:8%;text-align:center">${qp ? CHK(true) : '<span style="color:#888">—</span>'}</td>
-        <td style="width:8%;text-align:center;white-space:nowrap">oui ${CHK(true)}<br>non ${CHK(false)}</td>
+        <td style="width:8%;text-align:center">${ON(true)}</td>
       </tr>`;
     })
     .join("");
@@ -196,7 +226,7 @@ function grilleActivite(ccpIndex: number, c: GotrmCandidat): string {
     <tr><th>Mise en situation professionnelle</th><th>Entretien technique</th><th>Questionnement à partir d'une production</th></tr>
     ${lignes}
     <tr><td colspan="5" style="text-align:right"><strong>L'activité est-elle maîtrisée ?</strong></td>
-      <td style="text-align:center;white-space:nowrap">oui ${CHK(true)}<br>non ${CHK(false)}</td></tr>
+      <td style="text-align:center">${ON(true)}</td></tr>
   </table>`;
 }
 
@@ -246,7 +276,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     </table>
     <h3>Points d'observation</h3>
     <table>
-      <tr><th style="width:70%">Le candidat</th><th style="width:30%">Observé</th></tr>
+      <tr><th style="width:52%">Le candidat</th><th style="width:16%">Observé</th><th style="width:32%">Observations</th></tr>
       ${[
         "respecte les consignes de passation et le temps imparti",
         "utilise les ressources autorisées (textes réglementaires) sans support personnel",
@@ -254,7 +284,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
         "produit des livrables identifiés, datés et exploitables",
         "adopte une posture professionnelle pendant toute la durée de l'épreuve",
       ]
-        .map((l) => `<tr><td>${l}</td><td style="text-align:center">oui ${CHK(true)} &nbsp; non ${CHK(false)}</td></tr>`)
+        .map((l, li) => `<tr><td>${l}</td><td style="text-align:center">${ON(true)}</td><td style="font-size:9.5pt">${esc(pick(OBS_LIGNE, sd + i * 5 + li))}</td></tr>`)
         .join("")}
     </table>
     <h3>Observations du jury</h3>
@@ -289,7 +319,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ${GOTRM_CCP.map(
       (ccp, i) =>
         `<tr><td style="width:72%"><strong>Activité ${i + 1}</strong> — ${esc(ccp.libelle)}</td>
-        <td style="text-align:center;white-space:nowrap">maîtrisée : oui ${CHK(true)} &nbsp; non ${CHK(false)}</td></tr>`,
+        <td style="text-align:center;white-space:nowrap">maîtrisée : ${ON(true)}</td></tr>`,
     ).join("")}
   </table>
   <h3>Observations générales du jury</h3>
@@ -394,16 +424,16 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
               ? `Appui constaté : ${forts[(sd + idx) % forts.length]}.`
               : k === b.items.length - 1 && consolider.length
                 ? `Réponse consolidée pendant l'échange sur : ${consolider[(sd + idx) % consolider.length]}.`
-                : "";
+                : pick(OBS_LIGNE, sd + idx * 2);
           return `<tr class="bloc-avoid">${k === 0 ? `<td rowspan="${b.items.length}"><strong>${esc(b.champ)}</strong></td>` : ""}
             <td>${esc(it)}</td>
-            <td style="text-align:center;white-space:nowrap">${CHK(true)} oui &nbsp; ${CHK(false)} non</td>
+            <td style="text-align:center">${ON(true)}</td>
             <td style="font-size:9.5pt">${esc(obs)}</td></tr>`;
         })
         .join(""),
     ).join("")}
     <tr><td colspan="2"><strong>Conclusion : lors de l'entretien final, le candidat a-t-il démontré une maîtrise globale suffisante pour la tenue de l'emploi ?</strong></td>
-      <td style="text-align:center;white-space:nowrap">${CHK(true)} oui &nbsp; ${CHK(false)} non</td>
+      <td style="text-align:center">${ON(true)}</td>
       <td style="font-size:9.5pt">${esc(pick2(OBS_ENTRETIEN, sd + 4))}</td></tr>
   </table>
   ${blocSignaturesJury(s)}`);
