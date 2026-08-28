@@ -1,4 +1,11 @@
 import { SAMPLE_FORMATIONS, SAMPLE_ORGANISME, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
-const f = SAMPLE_FORMATIONS.find((x:any)=>/40990/.test(x.codeRNCP||""));
-console.log(SAMPLE_FORMATIONS.map((x:any)=>[x.intitule,x.codeRNCP,x.dateDebut,x.dateFin]));
-console.log(SAMPLE_STAGIAIRES.slice(0,3).map((s:any)=>[s.nom,s.prenom,s.dateDebut,s.dateFin]));
+import { genECFUnifie } from "@/lib/gotrm/ecfDp";
+const f:any = SAMPLE_FORMATIONS.find((x:any)=>x.dateDebut==="2026-09-01" && /40990/.test(x.codeRNCP||""));
+const i = SAMPLE_STAGIAIRES.findIndex((s:any)=>/ATASOY/i.test(s.nom));
+const html = genECFUnifie(SAMPLE_ORGANISME as any, f, SAMPLE_STAGIAIRES as any, i>=0?i:0);
+console.log("stagiaire", (SAMPLE_STAGIAIRES as any)[i]?.nom);
+console.log("dates:", [...html.matchAll(/\d{2}\/\d{2}\/20\d\d/g)].map(m=>m[0]).join(" "));
+console.log("unicode:", (html.match(/[☐☒]/g)||[]).length, "cases:", (html.match(/class="cbx"/g)||[]).length, "cochées:", (html.match(/b1/g)||[]).length);
+console.log("cursive:", /cursive/.test(html), "reeval:", /Réévaluation/.test(html));
+const at1 = html.split("Activité-type 1 –")[1]?.split("Activité-type 2")[0]||"";
+console.log("AT1 lignes eval:", (at1.match(/grille-comp/g)||[]).length);
