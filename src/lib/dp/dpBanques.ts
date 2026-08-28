@@ -74,7 +74,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "en pleine mise en place d'une procédure.",
     ],
   },
-    contrainte: {
+  contrainte: {
     ouvertures: [
       "La difficulté principale portait",
       "Je devais composer",
@@ -98,7 +98,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "car le dossier pouvait être contrôlé.",
     ],
   },
-    methode: {
+  methode: {
     ouvertures: [
       "J'ai repris la demande point par point",
       "J'ai construit un tableau comparatif",
@@ -122,7 +122,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "validée avant de lancer l'exécution.",
     ],
   },
-    outils: {
+  outils: {
     ouvertures: [
       "J'ai utilisé un tableur de calcul et de suivi,",
       "J'ai utilisé l'outil métier interne,",
@@ -132,9 +132,9 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "J'ai utilisé les procédures qualité,",
       "J'ai utilisé un agenda partagé,",
       "J'ai utilisé un tableau de pilotage,",
-      "J'ai utilisé un tableur de suivi,",
-      "J'ai utilisé l'outil métier interne,",
-      "J'ai utilisé les trames validées,",
+      "J'ai utilisé le registre de suivi du service,",
+      "J'ai utilisé un modèle de note interne,",
+      "J'ai utilisé la fiche de procédure dédiée,",
     ],
     suites: [
       "un traitement de texte et la messagerie.",
@@ -146,7 +146,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "la messagerie et un tableur de synthèse.",
     ],
   },
-    alea: {
+  alea: {
     ouvertures: [
       "En cours d'exécution, la demande a changé",
       "Un retard imprévu est survenu",
@@ -170,7 +170,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "et je l'ai signalé par écrit.",
     ],
   },
-    cloture: {
+  cloture: {
     ouvertures: [
       "À la fin, j'ai vérifié chaque engagement",
       "J'ai rédigé un compte rendu court",
@@ -194,7 +194,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "dans le classement prévu par la procédure.",
     ],
   },
-    interlocuteurs: {
+  interlocuteurs: {
     ouvertures: [
       "J'ai travaillé avec mon responsable direct,",
       "J'ai travaillé avec deux collègues du service,",
@@ -218,7 +218,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "chargée du suivi des pièces.",
     ],
   },
-    retour: {
+  retour: {
     ouvertures: [
       "Ce que je retiens, c'est qu'une question",
       "J'ai gardé l'habitude de confirmer",
@@ -271,7 +271,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "avec peu de retours de fret possibles.",
     ],
   },
-    contrainte: {
+  contrainte: {
     ouvertures: [
       "Le rendez-vous de livraison imposé",
       "La chaîne du froid devait être tracée",
@@ -295,7 +295,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "et un conducteur formé à la manutention.",
     ],
   },
-    methode: {
+  methode: {
     ouvertures: [
       "J'ai rappelé le client",
       "J'ai actualisé le prix de revient au km",
@@ -319,7 +319,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "partagé avec le quai et les conducteurs.",
     ],
   },
-    outils: {
+  outils: {
     ouvertures: [
       "J'ai utilisé le TMS d'exploitation,",
       "J'ai utilisé une bourse de fret,",
@@ -329,9 +329,9 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "J'ai utilisé le planning hebdomadaire partagé,",
       "J'ai utilisé le dossier photos du litige,",
       "J'ai utilisé le tableur de suivi des affrétés,",
-      "J'ai utilisé le TMS d'exploitation,",
-      "J'ai utilisé la bourse de fret,",
-      "J'ai utilisé le tableur de suivi,",
+      "J'ai utilisé le relevé du chronotachygraphe,",
+      "J'ai utilisé la grille tarifaire interne,",
+      "J'ai utilisé le carnet de suivi des palettes,",
     ],
     suites: [
       "un tableur de prix de revient et Word.",
@@ -343,7 +343,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "les réserves écrites et le suivi assurance.",
     ],
   },
-    alea: {
+  alea: {
     ouvertures: [
       "Une panne en cours de tournée",
       "Une attestation d'affrété périmée",
@@ -367,7 +367,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "a été signalé par écrit à ma hiérarchie.",
     ],
   },
-    cloture: {
+  cloture: {
     ouvertures: [
       "À la clôture, j'ai contrôlé les CMR",
       "J'ai renseigné les indicateurs du dossier",
@@ -391,7 +391,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "après rapprochement des bons signés.",
     ],
   },
-    interlocuteurs: {
+  interlocuteurs: {
     ouvertures: [
       "J'ai travaillé avec mon responsable d'exploitation,",
       "J'ai travaillé avec le chef de quai,",
@@ -415,7 +415,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "informé du plan de marche avant départ.",
     ],
   },
-    retour: {
+  retour: {
     ouvertures: [
       "J'ai appris à garder une marge de moyens :",
       "Le contrôle des affrétés est un réflexe :",
