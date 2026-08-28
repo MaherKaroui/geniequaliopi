@@ -712,7 +712,7 @@ export function genDPGotrm(
   <p style="margin-top:12px;font-size:10pt"><strong>Mentions relatives aux pièces annexées :</strong> l'ensemble des documents est anonymisé (noms de clients, coordonnées, montants sensibles et données personnelles masqués) conformément aux obligations de confidentialité et au RGPD. Les pièces sont produites à seule fin d'illustrer la pratique professionnelle devant le jury et ne peuvent être diffusées.</p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
     <tr><th style="width:50%">Visa ${g(s, "du candidat", "de la candidate")} — pièces annexées certifiées conformes</th><th style="width:50%">Visa du centre organisateur</th></tr>
-    <tr><td style="height:70px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td><td style="height:70px">${org.nom}</td></tr>
+    <tr><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateDeclaration, s?.signatureUrl)}</td><td>${visaCell(org.dirigeant || org.nom, dateDeclaration, org.tamponUrl)}</td></tr>
   </table>
   <p style="margin-top:10px;font-size:10pt">Fait à ${villeDecl}, le ${dateDeclaration}.</p>`);
 
