@@ -258,32 +258,37 @@ export function genECFGotrm(
 
     // Page « points d'attention » + visas de la fiche
     pages.push(`<p>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-    <p><strong>Compétences à réévaluer :</strong> <em>(Voir évaluations complémentaires ci-après.)</em></p>
-    <p>Néant : l'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.</p>
+    <p><strong>Compétences à réévaluer :</strong> Néant — aucune compétence de l'activité-type ${numAT} n'a nécessité de réévaluation.</p>
+    <p><strong>Points d'attention :</strong> ${pick(ECF_POINTS_ATTENTION, seed + numAT)}</p>
+    <p>L'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.</p>
     <p style="margin-top:14px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="height:46px"></td></tr>
-      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td style="height:46px"></td></tr>
+      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateVisa)}</td></tr>
+      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>
     </table>`);
 
-    // Page « Évaluations complémentaires (si nécessaire) » — trame officielle vierge
-    const ligneComp = ccp.competences.map((_, n) => `${n + 1} ☐`).join(" &nbsp;&nbsp; ");
-    pages.push(`<h2>Évaluations complémentaires <em>(si nécessaire)</em></h2>
+    // Page « Évaluations complémentaires » — renseignée (évaluation de consolidation)
+    const consolidation = pick(ECF_CONSOLIDATION, seed + numAT * 4);
+    const dateCons = addWorkDays(debut, ci * 3 + evals.length + 1);
+    const ligneComp = ccp.competences.map((_, n) => `${n + 1} ☒`).join(" &nbsp;&nbsp; ");
+    pages.push(`<h2>Évaluations complémentaires</h2>
     <p><em>Activité-type ${numAT} – ${ccp.libelle}</em></p>
     <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
       <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
-      ${[1, 2, 3, 4].map(n => `<tr><td style="height:30px"><strong>${n}</strong></td><td></td><td>${ligneComp}</td></tr>`).join("")}
+      <tr><td><strong>1</strong> ${consolidation}</td><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${ligneComp}</td></tr>
+      <tr><td colspan="3"><em>Aucune autre évaluation complémentaire n'a été nécessaire pour cette activité-type.</em></td></tr>
     </table>
     <p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
-    <p>☐ Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-    ☐ Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+    <p>${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
     <p><strong>Observations</strong></p>
-    <p>Sans objet : aucune évaluation complémentaire n'a été nécessaire pour cette activité-type.</p>
+    <p>${pick(ECF_OBS_COMPLEMENT, seed + numAT * 2)}</p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      <tr><th style="width:12%">Nom</th><td style="width:33%"></td><th style="width:12%">Date</th><td style="width:18%"></td><td style="height:44px">Visa</td></tr>
-      <tr><th>Nom</th><td></td><th>Date</th><td></td><td style="height:44px">Visa</td></tr>
+      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateCons ? formatDate(dateCons) : dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>
+      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${visaCell(evaluateur2, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>
     </table>`);
   });
+
 
   // ── Synthèse des résultats
   pages.push(`<h2>Synthèse des résultats obtenus par ${g(s, "le candidat", "la candidate")} à l'issue du parcours de formation</h2>
