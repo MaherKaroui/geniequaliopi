@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { controlerSessionDp } from "@/lib/dp/dpControles";
+import { controlerSessionDp, type DpAnomalie } from "@/lib/dp/dpControles";
 
 interface Props {
   organisme: OrganismeInfo;
@@ -41,14 +41,26 @@ export function DPControleCoherence({
 }: Props) {
   const [open, setOpen] = useState(false);
   const resultat = useMemo(
-    () => (open ? controlerSessionDp(organisme, formation, stagiaires) : { anomalies: [], exportAutorise: false }),
+    () =>
+      open
+        ? controlerSessionDp(organisme, formation, stagiaires)
+        : { anomalies: [] as DpAnomalie[], exportAutorise: false, rapport: "" },
     [open, organisme, formation, stagiaires],
   );
 
-  const parRegle = resultat.anomalies.reduce<Record<string, typeof resultat.anomalies>>((acc, a) => {
+  const parRegle = resultat.anomalies.reduce<Record<string, DpAnomalie[]>>((acc, a) => {
     (acc[a.regle] ||= []).push(a);
     return acc;
   }, {});
+
+  const telechargerRapport = () => {
+    const url = URL.createObjectURL(new Blob([resultat.rapport], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Rapport_controle_DP_ECF.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -98,6 +110,11 @@ export function DPControleCoherence({
         )}
 
         <DialogFooter>
+          {resultat.anomalies.length > 0 && (
+            <Button variant="secondary" onClick={telechargerRapport}>
+              Télécharger le rapport
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setOpen(false)}>
             Fermer
           </Button>

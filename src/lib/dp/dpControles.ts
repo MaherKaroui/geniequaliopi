@@ -29,10 +29,26 @@ function norm(s: string): string {
 }
 
 /**
- * Bloc comparable : la rubrique rédigée dans son ensemble. Une rubrique
- * dépassant 40 caractères et strictement identique à celle d'un autre exemple
- * ou d'un autre dossier constitue une duplication bloquante.
+ * Toutes les suites de plus de 40 caractères d'un texte (fenêtre glissante).
+ * Deux textes partageant une seule de ces fenêtres partagent, par définition,
+ * plus de 40 caractères consécutifs identiques : c'est une duplication.
  */
+function fenetres(texte: string): Set<string> {
+  const n = norm(texte);
+  const out = new Set<string>();
+  const taille = SEUIL_DUPLICATION + 1;
+  for (let i = 0; i + taille <= n.length; i++) out.add(n.slice(i, i + taille));
+  return out;
+}
+
+/** Fenêtres de duplication de tous les blocs rédigés d'un dossier. */
+function fenetresDossier(textes: string[]): Set<string> {
+  const out = new Set<string>();
+  for (const t of textes) for (const w of fenetres(t)) out.add(w);
+  return out;
+}
+
+/** Conservé pour les comparaisons d'appréciations courtes (bloc entier). */
 function blocs(texte: string): string[] {
   const n = norm(texte);
   return n.length > SEUIL_DUPLICATION ? [n] : [];
@@ -115,27 +131,32 @@ export function controlerDuplicationInterne(d: DpDossierData): DpAnomalie[] {
       });
     }
     intitules.add(cle);
-    for (const b of [...blocs(ex.r1), ...blocs(ex.r2), ...blocs(ex.r3), ...blocs(ex.r5)]) {
+    for (const b of fenetresDossier([ex.r1, ex.r2, ex.r3, ex.r5])) {
       const ori = vus.get(b);
       const ref = `AT${ex.atIndex} / exemple ${ex.numero}`;
       if (ori && ori !== ref) {
         out.push({
           candidat: nom,
           regle: "Duplication interne",
-          message: `Bloc identique entre ${ori} et ${ref} : « ${b.slice(0, 90)}… »`,
+          message: `Suite de plus de ${SEUIL_DUPLICATION} caractères identique entre ${ori} et ${ref} : « ${b} »`,
         });
-      } else vus.set(b, ref);
+        break;
+      }
+      vus.set(b, ref);
     }
   }
   return out;
 }
 
-/** Duplication entre les dossiers d'une même session. */
+/**
+ * Duplication entre les dossiers d'une même session.
+ * Toute suite de plus de 40 caractères commune à deux candidats est bloquante.
+ */
 export function controlerDuplicationSession(dossiers: DpDossierData[]): DpAnomalie[] {
   const out: DpAnomalie[] = [];
   const parCandidat = dossiers.map((d) => ({
     nom: nomCandidat(d.stagiaire),
-    blocs: new Set(d.exemples.flatMap((e) => [...blocs(e.r1), ...blocs(e.r2), ...blocs(e.r3), ...blocs(e.r5)])),
+    blocs: fenetresDossier(d.exemples.flatMap((e) => [e.r1, e.r2, e.r3, e.r5])),
   }));
   for (let i = 0; i < parCandidat.length; i++) {
     for (let j = i + 1; j < parCandidat.length; j++) {
@@ -144,7 +165,7 @@ export function controlerDuplicationSession(dossiers: DpDossierData[]): DpAnomal
           out.push({
             candidat: `${parCandidat[i].nom} / ${parCandidat[j].nom}`,
             regle: "Duplication entre candidats",
-            message: `Bloc identique dans les deux dossiers : « ${b.slice(0, 90)}… »`,
+            message: `Suite de plus de ${SEUIL_DUPLICATION} caractères identique dans les deux dossiers : « ${b} »`,
           });
           break;
         }
@@ -221,6 +242,8 @@ export function controlerEcfSession(f: FormationInfo, stagiaires: StagiaireInfo[
 export interface DpControleResultat {
   anomalies: DpAnomalie[];
   exportAutorise: boolean;
+  /** Rapport texte listant chaque anomalie, diagnosticable sans ouvrir les PDF. */
+  rapport: string;
 }
 
 /** Contrôle complet d'une session avant export ZIP. */
@@ -236,5 +259,13 @@ export function controlerSessionDp(
     ...controlerDuplicationSession(dossiers),
     ...controlerEcfSession(f, stagiaires),
   ];
-  return { anomalies, exportAutorise: anomalies.length === 0 };
+  const rapport = [
+    `Contrôle de cohérence DP (45A) / ECF (45B)`,
+    `Formation : ${f.intitule || "-"}`,
+    `Session : ${stagiaires.length} candidat(s)`,
+    `Anomalies : ${anomalies.length}`,
+    "",
+    ...anomalies.map((a) => `[${a.regle}] ${a.candidat} : ${a.message}`),
+  ].join("\n");
+  return { anomalies, exportAutorise: anomalies.length === 0, rapport };
 }
