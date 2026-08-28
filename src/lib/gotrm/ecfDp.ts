@@ -501,7 +501,7 @@ export function genDPGotrm(
 
   // ── Page 1 : page de garde officielle du DP (trame Ministère)
   pages.push(`<div style="text-align:center;margin-bottom:18px">
-    <img src="/__l5e/assets-v1/e274f437-8af3-4410-b05a-376db7494215/dp-header.png" alt="République Française – Dossier Professionnel (DP) – Ministère chargé de l'Emploi" style="width:100%;max-width:640px;height:auto;border:1px solid #ccc" />
+    <img src="/__l5e/assets-v1/8eb30e71-1ecc-45e5-a0c2-80298a246489/dp-header-officiel.png" alt="République Française – Dossier Professionnel (DP) – Ministère chargé de l'Emploi" style="width:100%;max-width:640px;height:auto;border:1px solid #ccc" />
   </div>
   <table style="width:86%;margin:22px auto;border-collapse:collapse">
     <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
