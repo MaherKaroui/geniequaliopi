@@ -34,6 +34,12 @@ import {
 } from "@/lib/dp/referentielTitres";
 import { getBanque, detectDomaine, type DpBanque } from "@/lib/dp/dpBanques";
 import { findGotrmProfile, type GotrmCvProfile } from "@/lib/gotrm/cvProfiles";
+import {
+  buildEcfProfilage,
+  LIBELLE_NIVEAU,
+  MENTION_PRE_RENSEIGNE,
+  MARQUEUR_SANS_PROFIL,
+} from "@/lib/dp/ecfProfilage";
 
 // ───────────────────────────────────────────── utils
 
@@ -98,6 +104,11 @@ const STYLE_MINISTERE = `<style>
   .doc-officiel .pied-dp .pied-dp-v{flex:0 0 auto;text-align:center;font-style:italic;white-space:nowrap}
   .doc-officiel .pied-dp .pied-dp-p{flex:0 0 auto;text-align:right;white-space:nowrap;color:#C2185B;font-weight:bold}
   .doc-officiel .page-break{page-break-after:always;break-after:page}
+</style>`;
+
+const STYLE_ECF = `<style>
+  .doc-officiel .marqueur-attente{border:1.5px dashed #b00020;color:#b00020;font-weight:600;padding:8px 12px;margin:12px 0}
+  .doc-officiel .mention-prerenseigne{margin-top:18px;padding:8px 12px;border-left:4px solid #C2185B;background:#FDF2F6;font-size:9.5pt;font-style:italic;color:#333}
 </style>`;
 
 const CHK = (on: boolean) => (on ? "☒" : "☐");
@@ -271,58 +282,66 @@ export function buildDpDossier(
 
 // ───────────────────────────────────────────── ECF
 
-/** Libellés d'évaluation différenciés par activité-type. */
-const ECF_MODALITES = [
-  (c: string, at: string) => `Étude de cas contextualisée « ${at} » : analyse de la demande, production écrite et argumentation de la solution retenue — compétence évaluée : ${c}`,
-  (c: string, at: string) => `Mise en situation professionnelle reconstituée sur le poste de travail (activité-type « ${at} ») avec production du dossier attendu — compétence évaluée : ${c}`,
-  (c: string, at: string) => `Questionnement à partir de productions réalisées en centre, portant sur « ${at} » — compétence évaluée : ${c}`,
-  (c: string, at: string) => `Entretien technique avec le formateur évaluateur sur les choix professionnels opérés dans l'activité « ${at} » — compétence évaluée : ${c}`,
+/**
+ * Modalités d'évaluation, différenciées PAR ACTIVITÉ-TYPE.
+ * Chaque activité-type dispose de ses propres libellés : les quatre lignes
+ * d'une fiche de résultats ne peuvent pas être identiques d'une AT à l'autre.
+ */
+const ECF_MODALITES_PAR_AT: ((c: string, at: string) => string)[][] = [
+  [
+    (c, at) => `Étude de cas « ${at} » : analyse d'une demande client réelle, étude de faisabilité et rédaction de l'offre chiffrée — compétence évaluée : ${c}`,
+    (c) => `Production écrite : construction d'un devis argumenté (prix de revient, marge, conditions d'exécution) et présentation orale des hypothèses retenues — compétence évaluée : ${c}`,
+    (c) => `Mise en situation : réception d'une demande urgente, arbitrage coût / délai et rédaction de la réponse au donneur d'ordres — compétence évaluée : ${c}`,
+    (c) => `Entretien technique portant sur la contractualisation de la prestation et les mentions obligatoires du contrat de transport — compétence évaluée : ${c}`,
+  ],
+  [
+    (c, at) => `Mise en situation professionnelle reconstituée « ${at} » : affectation des moyens, construction du plan de marche et respect du règlement (CE) 561/2006 — compétence évaluée : ${c}`,
+    (c) => `Exercice sur poste informatisé : saisie et suivi des ordres dans le TMS, édition des documents de transport et contrôle des pièces — compétence évaluée : ${c}`,
+    (c) => `Gestion d'aléa en temps contraint : panne / retard signalé en cours de tournée, replanification et information du client — compétence évaluée : ${c}`,
+    (c) => `Étude de dossier de sous-traitance : contrôle des pièces de l'affrété et traçabilité de l'opération — compétence évaluée : ${c}`,
+  ],
+  [
+    (c, at) => `Étude de cas de pilotage « ${at} » : construction et lecture d'un tableau de bord d'exploitation, analyse des écarts — compétence évaluée : ${c}`,
+    (c) => `Production écrite : compte rendu d'activité mensuel assorti de préconisations chiffrées à la direction — compétence évaluée : ${c}`,
+    (c) => `Mise en situation d'animation d'équipe : conduite d'un point d'exploitation et traitement d'un litige client — compétence évaluée : ${c}`,
+    (c) => `Entretien technique sur les obligations réglementaires de l'entreprise (licence, temps de travail, sécurité) — compétence évaluée : ${c}`,
+  ],
 ];
 
-const ECF_OBSERVATIONS = [
-  "Candidat sérieux et régulier tout au long du parcours. Les productions écrites sont soignées et la posture professionnelle en situation d'entretien est convaincante.",
-  "Progression nette entre les premières évaluations et les dernières. Le cadre réglementaire est désormais solide et les outils de suivi sont exploités avec pertinence.",
-  "Bonne aisance sur l'outil informatique et sur les applications métier. Le candidat argumente ses choix et sait alerter sa hiérarchie au bon moment.",
-  "Travail rigoureux sur les dossiers et le contrôle documentaire. Les productions sont conformes aux attendus du référentiel.",
-  "Candidat autonome, à l'écoute des remarques du formateur. Les préconisations formulées sont concrètes et réalistes.",
+const MODALITES_GENERIQUES: ((c: string, at: string) => string)[] = [
+  (c, at) => `Étude de cas contextualisée « ${at} » : analyse de la demande, production écrite et argumentation de la solution retenue — compétence évaluée : ${c}`,
+  (c, at) => `Mise en situation professionnelle reconstituée sur le poste de travail (activité-type « ${at} ») avec production du dossier attendu — compétence évaluée : ${c}`,
+  (c, at) => `Questionnement à partir de productions réalisées en centre, portant sur « ${at} » — compétence évaluée : ${c}`,
+  (c, at) => `Entretien technique avec le formateur évaluateur sur les choix professionnels opérés dans l'activité « ${at} » — compétence évaluée : ${c}`,
 ];
 
-const ECF_POINTS_ATTENTION = [
-  "Veiller à conserver la même rigueur de contrôle documentaire en période de forte activité.",
-  "Poursuivre l'effort de formalisation écrite : les éléments chiffrés doivent toujours être accompagnés des conditions d'exécution.",
-  "Continuer à justifier systématiquement les choix retenus, notamment sur les arbitrages coût / délai.",
-  "Maintenir la vigilance sur le respect des délais lors des replanifications de dernière minute.",
-  "Poursuivre l'appropriation des références professionnelles pour fiabiliser les analyses.",
-];
-
-const ECF_CONSOLIDATION = [
-  "Évaluation de consolidation : reprise d'un dossier complet en autonomie, avec restitution orale devant le formateur évaluateur.",
-  "Évaluation de consolidation : traitement d'un cas transversal combinant contrainte réglementaire et arbitrage, avec argumentation écrite.",
-  "Évaluation de consolidation : mise en situation de synthèse avec production d'un dossier écrit et d'un tableau de suivi.",
-  "Évaluation de consolidation : entretien technique blanc portant sur les compétences non acquises, suivi d'un débriefing individualisé.",
-];
-
-interface CompStatut {
-  libelle: string;
-  acquise: boolean;
+function modalitesAT(ci: number): ((c: string, at: string) => string)[] {
+  return ECF_MODALITES_PAR_AT[ci] || MODALITES_GENERIQUES;
 }
 
-/** Répartition déterministe acquis / à consolider (les livrets ne sont pas superposables). */
-function statutsCompetences(seed: number, ref: DpReferentiel): CompStatut[][] {
-  const res = ref.activitesTypes.map((at, ci) =>
-    at.competences.map((c, i) => ({
-      libelle: c,
-      acquise: (seed + ci * 7 + i * 13) % 5 !== 0,
-    })),
-  );
-  const total = res.flat();
-  // Au moins une compétence à consolider pour une partie des candidats
-  if (seed % 3 === 0 && total.every((c) => c.acquise) && res[0]?.length) res[0][0].acquise = false;
-  // …et à l'inverse, aucun candidat ne doit être intégralement en échec
-  res.forEach((at) => {
-    if (at.length && at.every((c) => !c.acquise)) at[0].acquise = true;
-  });
-  return res;
+const ECF_CONSOLIDATION_PAR_AT = [
+  "Évaluation de consolidation : reprise complète d'une demande client, du calcul du prix de revient à la remise de l'offre, avec restitution orale devant le formateur évaluateur.",
+  "Évaluation de consolidation : construction d'un plan de marche conforme à la réglementation sociale européenne, suivi d'un débriefing individualisé.",
+  "Évaluation de consolidation : production d'un tableau de bord commenté et d'un plan d'actions correctives, présenté à l'oral.",
+];
+
+/** Date d'évaluation : répartie sur le calendrier réel, jamais dans le futur. */
+function dateEvaluation(debut: string, fin: string, position: number, total: number): string {
+  if (!debut) return "";
+  const d0 = new Date(debut);
+  if (isNaN(d0.getTime())) return "";
+  const aujourdhui = new Date();
+  let borne = fin ? new Date(fin) : aujourdhui;
+  if (isNaN(borne.getTime())) borne = aujourdhui;
+  if (borne > aujourdhui) borne = aujourdhui;
+  if (borne <= d0) return debut;
+  const joursTotal = Math.max(1, Math.round((borne.getTime() - d0.getTime()) / 86400000));
+  // Réparties de 15 % à 95 % de la période effective
+  const frac = 0.15 + (0.8 * (position + 1)) / (total + 1);
+  const d = new Date(d0.getTime() + Math.round(joursTotal * frac) * 86400000);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+  if (d < d0) return debut;
+  return d.toISOString().slice(0, 10);
 }
 
 export function genECFUnifie(
@@ -332,8 +351,9 @@ export function genECFUnifie(
   stagiaireIdx = 0,
 ): string {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const seed = seedOf(s);
   const ref = resolveReferentiel(f);
+  const cv = profilCandidat(s);
+  const prof = buildEcfProfilage(ref, cv);
   const debut = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   const dateVisa = fin ? formatDate(fin) : formatDate(f.dateFin || "");
@@ -345,11 +365,13 @@ export function genECFUnifie(
         ? org.referentQualite
         : "";
   const lieu = f.lieu || [org.adresse, `${org.codePostal || ""} ${org.ville || ""}`.trim()].filter(Boolean).join(", ");
-  const statuts = statutsCompetences(seed, ref);
+
+  // Nombre total d'évaluations planifiées, pour répartir les dates
+  const nbEvalParAT = ref.activitesTypes.map((at) => Math.min(4, Math.max(1, at.competences.length)));
+  const totalEval = nbEvalParAT.reduce((a, b) => a + b, 0);
+  const offsetAT = nbEvalParAT.map((_, i) => nbEvalParAT.slice(0, i).reduce((a, b) => a + b, 0));
 
   // Date de mise à jour du livret : jamais antérieure à la fin de formation
-  // (sinon le pied affiche une année incohérente avec la session, ex. 2025 pour
-  // une formation se terminant le 03/09/2026).
   const finDoc = fin || f.dateFin || "";
   const majDoc =
     org.dateMaj && finDoc && new Date(org.dateMaj) >= new Date(finDoc)
@@ -382,7 +404,8 @@ export function genECFUnifie(
     <tr><th>Prénom</th><td><strong>${s?.prenom || ""}</strong></td></tr>
     ${rowIf("Date de naissance", s?.dateNaissance ? formatDate(s.dateNaissance) : "")}
     <tr><th>Période de formation</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
-  </table>`);
+  </table>
+  ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}`);
 
   // ── Présentation du dossier
   pages.push(`<h2>Présentation du dossier</h2>
@@ -391,41 +414,65 @@ export function genECFUnifie(
 
   ref.activitesTypes.forEach((at, ci) => {
     const numAT = ci + 1;
-    const comps = statuts[ci] || [];
-    const aConsolider = comps.filter((c) => !c.acquise);
+    const comps = prof.parAT[ci] || [];
+    const aConsolider = comps.filter((c) => c.niveau !== "ACQUIS");
+    const libelles = at.competences;
+    const mods = modalitesAT(ci);
 
-    // Fiche de résultats — 4 modalités différenciées par activité-type
-    const rows = comps.slice(0, 4).map((c, ei) => {
-      const modalite = ECF_MODALITES[(ci + ei) % ECF_MODALITES.length](c.libelle, at.titre);
-      const jour = addWorkDays(debut, ci * 3 + ei + 1);
-      // Cases cochées variables par stagiaire et par évaluation (1 à 2 cases)
-      const nb = comps.length;
-      const first = (seed + ci * 5 + ei * 2) % nb;
-      const double = nb > 2 && (seed + ci + ei) % 3 === 0;
-      const second = (first + 1 + ((seed + ei * 3) % (nb - 1))) % nb;
-      const compsCells = comps.map((_, n) => `${n + 1} ${CHK(n === first || (double && n === second))}`).join(" &nbsp;&nbsp; ");
-      return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${compsCells}</td></tr>`;
-    });
+    // Fiche de résultats : une ligne par compétence évaluée (max 4)
+    const rows = (prof.renseigne ? comps : libelles.map((l) => ({ libelle: l, niveau: "ACQUIS" as const, motif: "" })))
+      .slice(0, 4)
+      .map((c, ei) => {
+        const modalite = mods[ei % mods.length](c.libelle, at.titre);
+        const jour = prof.renseigne
+          ? dateEvaluation(debut, fin, offsetAT[ci] + ei, totalEval)
+          : "";
+        // Les cases cochées suivent la compétence réellement évaluée sur la ligne :
+        // une évaluation transversale coche en plus la compétence connexe non acquise.
+        const cochees = new Set<number>();
+        if (prof.renseigne) {
+          cochees.add(ei % comps.length);
+          const connexe = comps.findIndex((x, n) => n !== ei % comps.length && x.niveau !== "ACQUIS");
+          if (connexe >= 0 && ei % 2 === 1) cochees.add(connexe);
+        }
+        const compsCells = libelles
+          .map((_, n) => `${n + 1} ${CHK(cochees.has(n))}`)
+          .join(" &nbsp;&nbsp; ");
+        return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${compsCells}</td></tr>`;
+      });
 
     pages.push(`<h2>Fiche de résultats des évaluations</h2>
     <p><strong>Activité-type ${numAT}</strong> ${at.titre}</p>
     <p><strong>Compétences :</strong></p>
-    <ol>${comps.map((c) => `<li>${c.libelle}</li>`).join("")}</ol>
+    <ol>${libelles.map((c) => `<li>${c}</li>`).join("")}</ol>
     <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
       <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
       ${rows.join("")}
     </table>
+    ${prof.renseigne
+      ? `<table style="width:100%;border-collapse:collapse;font-size:9.5pt">
+      <tr><th style="width:55%">Compétence</th><th style="width:18%">Niveau atteint</th><th>Réévaluation</th></tr>
+      ${comps
+        .map(
+          (c) => `<tr><td>${c.libelle}</td><td>${LIBELLE_NIVEAU[c.niveau]}</td><td>${c.niveau === "ACQUIS" ? "Non" : "Oui"}</td></tr>`,
+        )
+        .join("")}
+    </table>
     <p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
     <p>${CHK(aConsolider.length === 0)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-    ${CHK(aConsolider.length > 0)} Ne pas avoir satisfait à l'ensemble des critères issus des référentiels du titre professionnel.</p>`);
+    ${CHK(aConsolider.length > 0)} Ne pas avoir satisfait à l'ensemble des critères issus des référentiels du titre professionnel.</p>`
+      : `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>`}`);
 
-    // Points d'attention + visas
+    // Appréciation + visas
     pages.push(`<p>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-    <p><strong>Compétences à réévaluer :</strong> ${aConsolider.length ? aConsolider.map((c) => c.libelle).join(" ; ") : "Néant pour cette activité-type."}</p>
-    <p><strong>Points d'attention :</strong> ${pick(ECF_POINTS_ATTENTION, seed + numAT)}</p>
-    <p>${aConsolider.length
-      ? `Une évaluation de consolidation est programmée sur ${aConsolider.length === 1 ? "la compétence" : "les compétences"} ci-dessus avant la fin du parcours.`
-      : `L'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.`}</p>
+    <p><strong>Compétences à réévaluer :</strong> ${prof.renseigne ? (aConsolider.length ? aConsolider.map((c) => c.libelle).join(" ; ") : "Néant pour cette activité-type.") : ""}</p>
+    <p><strong>Appréciation du formateur évaluateur :</strong> ${prof.renseigne ? prof.appreciations[ci] : ""}</p>
+    ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}
+    <p>${!prof.renseigne
+      ? ""
+      : aConsolider.length
+        ? `Une évaluation de consolidation est programmée sur ${aConsolider.length === 1 ? "la compétence" : "les compétences"} ci-dessus avant la fin du parcours.`
+        : `L'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.`}</p>
     <p style="margin-top:14px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt">
       ${evaluateur1 ? `<tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateVisa, s?.formateurSignatureUrl)}</td></tr>` : ""}
@@ -433,10 +480,12 @@ export function genECFUnifie(
     </table>`);
 
     // Évaluations complémentaires — uniquement si consolidation nécessaire
-    if (aConsolider.length) {
-      const consolidation = pick(ECF_CONSOLIDATION, seed + numAT * 4);
-      const dateCons = addWorkDays(debut, ci * 3 + 6);
-      const ligneComp = comps.map((c, n) => `${n + 1} ${CHK(!c.acquise)}`).join(" &nbsp;&nbsp; ");
+    if (prof.renseigne && aConsolider.length) {
+      const consolidation = ECF_CONSOLIDATION_PAR_AT[ci] || ECF_CONSOLIDATION_PAR_AT[0];
+      const dateCons = dateEvaluation(debut, fin, totalEval - 1, totalEval);
+      const ligneComp = libelles
+        .map((l, n) => `${n + 1} ${CHK(aConsolider.some((c) => c.libelle === l))}`)
+        .join(" &nbsp;&nbsp; ");
       pages.push(`<h2>Évaluations complémentaires</h2>
       <p><em>Activité-type ${numAT} – ${at.titre}</em></p>
       <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
@@ -446,7 +495,7 @@ export function genECFUnifie(
       <p style="margin-top:12px">À l'issue de la réévaluation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
       <p>${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
       <p><strong>Observations</strong></p>
-      <p>La réévaluation portait sur ${aConsolider.map((c) => c.libelle).join(" ; ")}. Les productions remises lors de cette évaluation de consolidation sont conformes aux attendus : la ou les compétences concernées sont désormais acquises.</p>
+      <p>La réévaluation portait sur ${aConsolider.map((c) => `${c.libelle} — ${c.motif}`).join(" ; ")}. Les productions remises lors de cette évaluation de consolidation sont conformes aux attendus : ${aConsolider.length === 1 ? "la compétence concernée est désormais acquise" : "les compétences concernées sont désormais acquises"}.</p>
       <table style="width:100%;border-collapse:collapse;font-size:10pt">
         ${evaluateur1 ? `<tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateCons ? formatDate(dateCons) : dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateCons ? formatDate(dateCons) : dateVisa, s?.formateurSignatureUrl)}</td></tr>` : ""}
         ${evaluateur2 ? `<tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${visaCell(evaluateur2, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>` : ""}
@@ -459,22 +508,23 @@ export function genECFUnifie(
   <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
     <tr><th style="width:45%">Intitulé de l'activité-type</th><th>Compétences professionnelles</th></tr>
     ${ref.activitesTypes
-      .map(
-        (at, i) => `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${(statuts[i] || [])
-          .map((c) => `${c.libelle}${c.acquise ? "" : " <em>(acquise après consolidation)</em>"}`)
-          .join("<br>• ")}</td></tr>
-    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(true)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`,
-      )
+      .map((at, i) => {
+        const comps = prof.parAT[i] || [];
+        const detail = prof.renseigne
+          ? comps
+              .map((c) => `${c.libelle} — <em>${LIBELLE_NIVEAU[c.niveau]}${c.niveau !== "ACQUIS" ? ", acquise après consolidation" : ""}</em>`)
+              .join("<br>• ")
+          : at.competences.join("<br>• ");
+        return `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${detail}</td></tr>
+    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(prof.renseigne)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`;
+      })
       .join("")}
   </table>`);
 
   // ── Observations et visas finaux
-  const aConsoliderGlobal = statuts.flat().filter((c) => !c.acquise);
   pages.push(`<h2>Observations</h2>
-  <p>${pick(ECF_OBSERVATIONS, seed + 5)}</p>
-  ${aConsoliderGlobal.length
-      ? `<p>Le parcours a comporté ${aConsoliderGlobal.length === 1 ? "une évaluation de consolidation" : `${aConsoliderGlobal.length} évaluations de consolidation`}, dont les résultats sont conformes aux attendus du référentiel.</p>`
-      : `<p>Aucune évaluation de consolidation n'a été nécessaire sur ce parcours.</p>`}
+  <p>${prof.renseigne ? prof.observation : ""}</p>
+  ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}
   <p style="margin-top:14px"><strong>Formateur(s) / Évaluateur(s)</strong></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
@@ -489,11 +539,12 @@ export function genECFUnifie(
   </table>`
       : ""}
   <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature le ${dateVisa}.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td>${cadreSignature(s?.signatureUrl)}</td></tr></table>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td>${cadreSignature(s?.signatureUrl)}</td></tr></table>
+  <p class="mention-prerenseigne">${MENTION_PRE_RENSEIGNE}</p>`);
 
   const total = pages.length;
   const body = pages.map((p, i) => `${p}${pied(i + 1, total)}`).join(`<div class="page-break"></div>`);
-  return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>`);
+  return htmlWrap(`${STYLE_MINISTERE}${STYLE_ECF}<div class="doc-officiel">${body}</div>`);
 }
 
 // ───────────────────────────────────────────── DP
