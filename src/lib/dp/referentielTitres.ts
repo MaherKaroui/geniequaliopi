@@ -14,8 +14,10 @@ import { GOTRM_TITRE, GOTRM_CCP } from "@/data/gotrm";
 /** Version de la trame officielle du DP (constante de référentiel, jamais en dur dans le générateur). */
 export const DP_TRAME_VERSION = "01/06/2016";
 
-/** Sigle officiel du livret ECF selon la trame ministérielle. */
-export const ECF_SIGLE = "EPR";
+/**
+ * Le sigle du pied de page ECF est celui du TITRE (ex. GOTRM). Aucun sigle
+ * générique n'est écrit en dur : s'il est inconnu, la cellule reste vide.
+ */
 export const ECF_TYPE_DOC = "Livret d'évaluations passées en cours de formation";
 
 export interface DpActiviteType {
@@ -30,12 +32,18 @@ export interface DpReferentiel {
   codeTitre?: string;
   millesime?: string;
   rncp?: string;
-  /** Date de l'arrêté (JJ/MM/AAAA). */
+  /** Date de l'arrêté (JJ/MM/AAAA). Jamais déduite de la date J.O. */
   dateArrete?: string;
   /** Date de publication au J.O. (JJ/MM/AAAA). */
   dateJo?: string;
+  /** Date de mise à jour du référentiel (JJ/MM/AAAA). */
+  dateMaj?: string;
   niveau?: string;
   sigle?: string;
+  /** Code NSF du titre (ex. 311n). */
+  codeNsf?: string;
+  /** Codes ROME rattachés au titre. */
+  codesRome?: string[];
   activitesTypes: DpActiviteType[];
 }
 
@@ -101,10 +109,14 @@ export function resolveReferentiel(f: FormationInfo): DpReferentiel {
       codeTitre: GOTRM_TITRE.codeTitre,
       millesime: GOTRM_TITRE.millesime,
       rncp: GOTRM_TITRE.rncp,
-      dateArrete: GOTRM_TITRE.arrete.replace(/^Arrêté du\s*:?\s*/i, ""),
-      dateJo: GOTRM_TITRE.jo.replace(/^J\.?O\.?\s*du\s*:?\s*/i, ""),
+      // Date d'arrêté non confirmée par le référentiel millésime 03 : ligne laissée vide.
+      dateArrete: undefined,
+      dateJo: "14/06/2025",
+      dateMaj: "16/06/2025",
       niveau: GOTRM_TITRE.niveau,
       sigle: GOTRM_TITRE.sigle,
+      codeNsf: GOTRM_TITRE.nsf,
+      codesRome: GOTRM_TITRE.rome,
       activitesTypes: GOTRM_CCP.map((c) => ({
         titre: c.libelle,
         competences: c.competences.map((cp) => cp.libelle),
