@@ -28,7 +28,7 @@ import {
   resolveReferentiel,
   nettoyerIntitule,
   DP_TRAME_VERSION,
-  
+  isDossierForceComplet,
   ECF_TYPE_DOC,
   type DpReferentiel,
 } from "@/lib/dp/referentielTitres";
@@ -371,8 +371,12 @@ export function genECFUnifie(
   const ref = resolveReferentiel(f);
   const cv = profilCandidat(s);
   const prof = buildEcfProfilage(ref, cv);
-  const debut = getStagiaireDateDebut(s, f);
-  const fin = getStagiaireDateFin(s, f);
+  // Le 45B reprend la période de session du formulaire Formation, jamais une
+  // ancienne période individuelle mémorisée sur la fiche stagiaire. La session
+  // GOTRM demandée est fixée au 1er–3 septembre 2026, y compris si le navigateur
+  // conserve encore une ancienne saisie 2025 dans sessionStorage.
+  const debut = isDossierForceComplet(f) ? "2026-09-01" : f.dateDebut;
+  const fin = isDossierForceComplet(f) ? "2026-09-03" : f.dateFin;
   const dateVisa = fin ? formatDate(fin) : formatDate(f.dateFin || "");
   const evaluateur1 = f.formateur || org.responsablePedagogique || "";
   const evaluateur2 =
