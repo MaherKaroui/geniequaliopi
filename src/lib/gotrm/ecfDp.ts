@@ -110,7 +110,13 @@ const STYLE_MINISTERE = `<style>
   .doc-officiel table.contexte caption{caption-side:top;text-align:left;font-weight:bold;background:#E4E4E4;color:#222;padding:6px 8px;border:1px solid #9A9A9A;border-bottom:0}
   .doc-officiel .grille-comp{display:inline-block}
   .doc-officiel table.grille-comp td{border:0;padding:1px 8px 1px 0;font-size:9pt;white-space:nowrap}
+  /* Case à cocher dessinée en CSS : survit à l'export PDF (aucun glyphe Unicode) */
+  .doc-officiel .cbx{display:inline-block;position:relative;width:11px;height:11px;border:1px solid #333;background:#fff;vertical-align:-1px;margin:0 2px}
+  .doc-officiel .cbx i{display:block;position:absolute;left:0;top:4px;width:11px;height:2px;background:#111}
+  .doc-officiel .cbx i.b1{transform:rotate(45deg)}
+  .doc-officiel .cbx i.b2{transform:rotate(-45deg)}
   .doc-officiel .verdict{margin:10px 0;padding:8px 0;line-height:1.7}
+  .doc-officiel .bloc-avoid{break-inside:avoid;page-break-inside:avoid}
   .doc-officiel .page-break{page-break-after:always;break-after:page}
   /* Pied ancré (rendu hors flux par le moteur d'export, une fois par page physique) */
   .footer.pied-dp{padding:6px 26px 0;border-top:2px solid ${MAGENTA};display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:8pt;line-height:1.6;color:#555;min-height:26px}
