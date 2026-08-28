@@ -544,6 +544,12 @@ export function fallbackGotrmProfile(nom: string, prenom: string): GotrmCvProfil
   return { ...base, nom: nom.toUpperCase(), prenom, source: "Profil reconstitué" };
 }
 
+/** Recherche stricte : retourne `undefined` si aucun profil n'a été transmis. */
+export function findGotrmProfile(nom?: string, prenom?: string): GotrmCvProfile | undefined {
+  void prenom;
+  return BY_NOM.get((nom || "").toUpperCase());
+}
+
 export function getGotrmProfile(nom?: string, prenom?: string): GotrmCvProfile {
   const p = BY_NOM.get((nom || "").toUpperCase());
   if (p) return p;
