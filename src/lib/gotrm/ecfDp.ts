@@ -471,28 +471,24 @@ export function genDPGotrm(
 ): string {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const seed = seedOf(s);
+  const cv = getGotrmProfile(s?.nom, s?.prenom);
   const ent = s?.entreprise?.trim()
-    ? { nom: s.entreprise!, service: s.poste?.trim() || "Service exploitation transport", ville: s.commune || "" }
-    : pick(ENTREPRISES, seed);
+    ? { nom: s.entreprise!, service: s.poste?.trim() || cv.entreprise.service, ville: s.commune || cv.entreprise.ville }
+    : cv.entreprise;
   const debut = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   const dateDeclaration = debut ? formatDate(subtractBusinessDays(debut, 3)) : formatDate(f.dateDebut || "");
   const villeDecl = s?.commune || org.ville || "";
-  const outils = pick(OUTILS, seed + 1);
-  const collegues = pick(COLLEGUES, seed + 2);
+  const outils = cv.outils;
+  const collegues = cv.collegues;
 
-  // Période d'exercice professionnelle (antérieure à la formation)
+  // Période d'exercice professionnelle (issue du parcours réel du candidat)
   const periodeDebut = debut ? new Date(debut) : new Date();
   const anneeFin = periodeDebut.getFullYear();
-  const periodes = [
-    `Du 1er mars ${anneeFin - 3} au 31 décembre ${anneeFin - 1}`,
-    `Du 1er septembre ${anneeFin - 4} au 30 juin ${anneeFin - 1}`,
-    `Du 2 janvier ${anneeFin - 2} au ${fin ? formatDate(fin) : "ce jour"}`,
-    `Du 15 avril ${anneeFin - 3} au 30 novembre ${anneeFin - 1}`,
-  ];
+  const periodes = [cv.periodeExercice, ...cv.experiences.map((e) => e.periode)];
 
   const pied = (p: number, total: number) =>
-    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – Version du 01/06/2016</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
+    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – ${GOTRM_TITRE.sigle} ${GOTRM_TITRE.codeTitre} – ${s?.prenom || ""} ${s?.nom || ""}</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
 
   const pages: string[] = [];
 
@@ -503,18 +499,27 @@ export function genDPGotrm(
     <p style="font-size:11pt;letter-spacing:2px;margin:2px 0">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
     <h1 style="margin-top:14px">DOSSIER PROFESSIONNEL (DP)</h1>
   </div>
-  <table style="width:80%;margin:22px auto;border-collapse:collapse">
+  <table style="width:86%;margin:22px auto;border-collapse:collapse">
     <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
     <tr><th><em>Nom d'usage</em></th><td>${s?.nom || ""}</td></tr>
     <tr><th><em>Prénom</em></th><td>${s?.prenom || ""}</td></tr>
-    <tr><th><em>Adresse</em></th><td>${[s?.adresse, `${s?.codePostal || ""} ${s?.commune || ""}`.trim()].filter(Boolean).join("<br>")}</td></tr>
+    <tr><th><em>Date de naissance</em></th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : "—"}</td></tr>
+    <tr><th><em>Adresse</em></th><td>${[s?.adresse, `${s?.codePostal || ""} ${s?.commune || ""}`.trim()].filter(Boolean).join("<br>") || villeDecl}</td></tr>
+    <tr><th><em>Téléphone</em></th><td>${s?.telephone || "—"}</td></tr>
+    <tr><th><em>Courriel</em></th><td>${s?.email || "—"}</td></tr>
+    <tr><th><em>Permis détenus</em></th><td>${cv.permis}</td></tr>
   </table>
   <div style="text-align:center;margin-top:18px">
     <p><strong>Titre professionnel visé</strong></p>
-    <p>${GOTRM_TITRE.intitule}</p>
+    <p>${GOTRM_TITRE.intitule} — ${GOTRM_TITRE.niveau} (${GOTRM_TITRE.codeTitre} / ${GOTRM_TITRE.rncp})</p>
   </div>
   <p style="margin-top:22px"><strong>MODALITÉ D'ACCÈS :</strong></p>
-  <p>${CHK(true)} Parcours de formation<br>${CHK(false)} Validation des Acquis de l'Expérience (VAE)</p>`);
+  <p>${CHK(true)} Parcours de formation<br>${CHK(false)} Validation des Acquis de l'Expérience (VAE)</p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:16px">
+    <tr><th style="width:34%">Organisme accompagnateur</th><td>${org.nom}</td></tr>
+    <tr><th>Session visée</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
+  </table>`);
+
 
   // ── Page 2 : présentation du dossier (texte officiel)
   pages.push(`<h2>Présentation du dossier</h2>
