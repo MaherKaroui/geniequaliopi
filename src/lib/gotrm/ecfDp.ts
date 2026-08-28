@@ -541,8 +541,29 @@ export function genDPGotrm(
   ▶ des documents illustrant la pratique professionnelle du candidat (facultatif) ;<br>
   ▶ des annexes, si nécessaire.</p>`);
 
-  // ── Page 3 : sommaire officiel (avec pagination réelle)
-  let cursor = 5; // p.1 garde, p.2 présentation, p.3 sommaire, p.4 intercalaire
+  // ── Page 3 : parcours professionnel du candidat (issu de son CV)
+  pages.push(`<h2>Parcours professionnel ${g(s, "du candidat", "de la candidate")}</h2>
+  <p>${cv.profil}</p>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:8px">
+    <tr><th style="width:20%">Période</th><th style="width:26%">Emploi occupé</th><th style="width:22%">Entreprise</th><th>Principales missions</th></tr>
+    ${cv.experiences
+      .map(
+        (e) =>
+          `<tr><td>${e.periode}</td><td>${e.poste}</td><td>${e.employeur}</td><td>• ${e.missions.join("<br>• ")}</td></tr>`,
+      )
+      .join("")}
+  </table>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
+    <tr><th style="width:32%">Entreprise de référence du dossier</th><td>${ent.nom}${ent.ville ? ` – ${ent.ville}` : ""}</td></tr>
+    <tr><th>Service concerné</th><td>${ent.service}</td></tr>
+    <tr><th>Emploi de référence</th><td>${cv.posteOccupe}</td></tr>
+    <tr><th>Période d'exercice retenue</th><td>${cv.periodeExercice}</td></tr>
+    <tr><th>Permis et habilitations</th><td>${cv.permis}</td></tr>
+  </table>`);
+
+  // ── Page 4 : sommaire officiel (avec pagination réelle)
+  let cursor = 6; // p.1 garde, p.2 présentation, p.3 parcours, p.4 sommaire, p.5 intercalaire
+
   const sommaireAT = GOTRM_CCP.map((ccp, i) => {
     const exs = DP_EXEMPLES[ccp.code] || [];
     const pAT = cursor;
