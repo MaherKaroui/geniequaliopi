@@ -125,3 +125,15 @@ export function resolveReferentiel(f: FormationInfo): DpReferentiel {
     activitesTypes: fiche && fiche.blocsCompetences.length > 0 ? fromRncpFiche(fiche) : ACTIVITES_FALLBACK,
   };
 }
+
+/**
+ * Formations pour lesquelles les pièces officielles (PV de session, livret ECF,
+ * DP) doivent être livrées complètes dès aujourd'hui, même si la session n'est
+ * pas encore terminée. Exception explicitement demandée pour le TP GOTRM.
+ * Partout ailleurs, la règle générale reste inchangée : contenu vide tant que
+ * `isStagiaireFormationTerminee` est faux.
+ */
+export function isDossierForceComplet(f: FormationInfo): boolean {
+  const ref = resolveReferentiel(f);
+  return ref.codeTitre === "TP-01329" || /40990/.test(f.codeRNCP || "");
+}

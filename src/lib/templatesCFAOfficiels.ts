@@ -6,7 +6,7 @@
 
 import { genDPUnifie, genECFUnifie } from "@/lib/gotrm/ecfDp";
 import { detectDomaine } from "@/lib/dp/dpBanques";
-import { resolveReferentiel } from "@/lib/dp/referentielTitres";
+import { resolveReferentiel, isDossierForceComplet } from "@/lib/dp/referentielTitres";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
 import { formatDate, isFormationTerminee, isStagiaireFormationTerminee } from "./docBuilder";
@@ -236,7 +236,8 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   const sessionNum = String(hashStr(`${o.nom}-${f.intitule}-${f.dateDebut || ""}`)).slice(0, 6);
 
   // Statut de la formation : si non terminée, dates de session, observations et résultats restent vides
-  const termine = isFormationTerminee(f, stagiaires);
+  const forceComplet = isDossierForceComplet(f);
+  const termine = forceComplet || isFormationTerminee(f, stagiaires);
 
   // Dates de session : priorité au formulaire de formation, fallback sur dates individuelles stagiaires
   const allDebuts = [f.dateDebut, ...stagiaires.map(s => s.dateDebutFormation)].filter(Boolean) as string[];
@@ -344,7 +345,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       </tr>
       ${stagiaires.map((s) => {
         const ident = String(2597000 + (hashStr(`${s.nom}-${s.prenom}`) % 999)).padStart(7, "0");
-        const sTermine = isStagiaireFormationTerminee(s, f);
+        const sTermine = forceComplet || isStagiaireFormationTerminee(s, f);
         // Si la formation du stagiaire n'est pas terminée → résultats vides (en attente de session)
         return `<tr>
           <td>${(s.nom || "").toUpperCase()}</td>
