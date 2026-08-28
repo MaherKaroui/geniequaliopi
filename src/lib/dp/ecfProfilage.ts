@@ -136,10 +136,13 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
   // CONTENU du profil (postes, missions, diplômes) — jamais du nom du candidat.
   let empreinte = 7;
   for (const ch of `${texteVecu}${forts.join("")}${faibles.join("")}`) empreinte = (empreinte * 31 + ch.charCodeAt(0)) % 9973;
-  const rang = (l: Ligne) => l.net * 1000 + l.prio * 100 + l.exp * 10 + ((empreinte + l.ci * 7 + l.i * 13) % 7);
+  const rang = (l: Ligne) =>
+    l.net * 1000 + l.prio * 100 + l.exp * 10 + ((empreinte * (l.ci * 31 + l.i * 17 + 3)) % 9);
   const ordre = [...lignes].sort((a, b) => rang(a) - rang(b) || a.ci - b.ci || a.i - b.i);
   const negatives = ordre.filter((l) => l.net < 0 || (l.net === 0 && l.exp === 0)).length;
-  const k = Math.min(4, Math.max(2, negatives));
+  // Le NOMBRE de compétences non acquises varie lui aussi selon le profil :
+  // deux candidats ne peuvent pas sortir avec des livrets superposables.
+  const k = Math.min(4, Math.max(2, negatives === 0 ? 2 + (empreinte % 3) : Math.min(negatives, 2 + (empreinte % 3))));
   const nonAcquis = new Set(ordre.slice(0, k).map((l) => `${l.ci}-${l.i}`));
 
   const parAT: EcfCompetence[][] = ref.activitesTypes.map(() => []);
