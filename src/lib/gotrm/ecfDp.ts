@@ -416,8 +416,6 @@ function construireDossier(
    * l'employeur, ce qui rend chaque jonction propre au dossier et empêche toute
    * suite de plus de 40 caractères commune à deux candidats.
    */
-  const ancres = ["", "", ""];
-  const minuscule = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 
   const exemples: DpExempleData[] = [];
   ref.activitesTypes.forEach((at, ci) => {
@@ -441,20 +439,18 @@ function construireDossier(
         ci === 0 ? prefixe : "",
         accroche,
         phrase("contexte", ci, d),
-        `${ancres[0]} ${minuscule(phrase("contrainte", ci, d))}`,
-        `${ancres[1]} ${minuscule(phrase("methode", ci, d))}`,
-        `${ancres[2]} ${minuscule(phrase("alea", ci, d))}`,
+        phrase("contrainte", ci, d),
+        phrase("methode", ci, d),
+        phrase("alea", ci, d),
       ]
         .filter(Boolean)
         .join(" "),
     );
     // Chaque phrase mutualisée est encadrée par une ancre candidat : aucune
     // formule ne peut être partagée sur plus de 40 caractères consécutifs.
-    const r2 = reserver((d) => `${ancres[0]} ${minuscule(phrase("outils", ci, d))}`);
-    const r3 = reserver((d) => `${ancres[1]} ${minuscule(phrase("interlocuteurs", ci, d))}`);
-    const r5 = reserver(
-      (d) => `${ancres[2]} ${minuscule(phrase("cloture", ci, d))} ${ancres[0]} ${minuscule(phrase("retour", ci, d))}`,
-    );
+    const r2 = reserver((d) => phrase("outils", ci, d));
+    const r3 = reserver((d) => phrase("interlocuteurs", ci, d));
+    const r5 = reserver((d) => `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`);
 
     exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
