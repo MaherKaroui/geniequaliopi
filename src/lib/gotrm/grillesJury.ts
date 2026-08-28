@@ -19,6 +19,9 @@ import { findGotrmProfile } from "@/lib/gotrm/cvProfiles";
 import type { GotrmCandidat, GotrmSession } from "./gotrmTypes";
 import { buildGotrmIdentifiant } from "./gotrmTypes";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import sigJury1 from "@/assets/signature-jury-1.png.asset.json";
+import sigJury2 from "@/assets/signature-jury-2.png.asset.json";
+
 
 const MAJ_TRAME = "21/08/2025";
 
@@ -87,6 +90,21 @@ const OBS_POSITIVES = [
   "Le candidat conduit son travail sans sollicitation du surveillant et priorise correctement les dossiers à traiter.",
   "Le candidat structure sa production, numérote ses annexes et justifie par écrit ses choix d'organisation.",
   "Le candidat mobilise les textes réglementaires consultés en ligne pour étayer ses décisions d'exploitation.",
+  "Le candidat planifie l'ordre de traitement des dossiers puis s'y tient jusqu'à la remise des travaux.",
+  "Le candidat repère rapidement les données utiles dans les documents fournis et écarte les informations non pertinentes.",
+  "Le candidat garde une trace écrite de ses hypothèses de travail, ce qui rend sa démarche facile à suivre.",
+  "Le candidat gère les aléas introduits dans le sujet sans perdre le fil de son organisation initiale.",
+  "Le candidat contrôle une seconde fois ses calculs de coûts avant de clore son dossier.",
+];
+
+const OBS_COMPLEMENT = [
+  "Le rythme de travail reste régulier sur l'ensemble de la partie.",
+  "L'utilisation du tableur est fluide et adaptée aux calculs demandés.",
+  "Les documents de sortie sont datés et identifiés au nom du candidat.",
+  "Les échanges avec le surveillant se limitent aux questions d'organisation matérielle.",
+  "Le temps restant est employé à la relecture des livrables.",
+  "La démarche suivie est cohérente d'un dossier à l'autre.",
+  "Le candidat annote son sujet pour sécuriser les points de contrôle.",
 ];
 
 const OBS_PRODUCTION = [
@@ -95,6 +113,11 @@ const OBS_PRODUCTION = [
   "Le raisonnement est apparent : hypothèses posées, calculs détaillés puis conclusion formulée pour le donneur d'ordres.",
   "La mise en forme des livrables respecte les usages professionnels attendus en exploitation transport.",
   "Les écrits transmis au donneur d'ordres sont clairs et conformes aux mentions prévues par le code des transports.",
+  "Les plannings de tournée remis sont réalistes au regard des temps de conduite et de repos applicables.",
+  "Le calcul du prix de revient est détaillé poste par poste et aboutit à une proposition argumentée.",
+  "Les documents de transport renseignés comportent les mentions obligatoires attendues.",
+  "Le dossier remis distingue clairement les éléments d'analyse et les documents opérationnels.",
+  "Les écarts constatés entre prévisionnel et réalisé sont expliqués dans la note de synthèse.",
 ];
 
 const OBS_ENTRETIEN = [
@@ -102,11 +125,25 @@ const OBS_ENTRETIEN = [
   "Le candidat répond avec un vocabulaire professionnel maîtrisé et illustre ses réponses par son expérience de terrain.",
   "Le candidat argumente ses arbitrages coût / délai et situe correctement les responsabilités de chaque intervenant.",
   "Le candidat démontre une bonne connaissance de la réglementation sociale et de ses conséquences en exploitation.",
+  "Le candidat replace ses décisions dans la relation client et mesure l'impact d'un retard sur le donneur d'ordres.",
+  "Le candidat distingue nettement le rôle du commissionnaire de celui du transporteur et l'illustre par un cas vécu.",
+  "Le candidat évoque les leviers d'optimisation du remplissage et de réduction de l'empreinte carbone.",
+  "Le candidat prend le temps de reformuler la question avant de répondre, ce qui rend l'échange précis.",
+  "Le candidat s'appuie sur les outils d'exploitation qu'il a pratiqués pour justifier ses réponses.",
+  "Le candidat sait dire ce qu'il maîtrise moins et indique la démarche qu'il suivrait pour se sécuriser.",
 ];
 
 function pick<T>(arr: T[], n: number): T {
-  return arr[n % arr.length];
+  return arr[((n % arr.length) + arr.length) % arr.length];
 }
+
+/** Deux phrases distinctes issues d'une même banque : diversité entre candidats. */
+function pick2(arr: string[], n: number): string {
+  const a = pick(arr, n);
+  const b = pick(arr, n + 1 + (n % (arr.length - 1)));
+  return a === b ? a : `${a} ${b}`;
+}
+
 
 /**
  * Grille d'évaluation d'une activité-type : critères, modalités d'évaluation
@@ -165,17 +202,24 @@ function grilleActivite(ccpIndex: number, c: GotrmCandidat): string {
 
 function blocSignaturesJury(s: GotrmSession): string {
   const membres = s.jury.filter((j) => j.nom.trim());
-  const cols = (membres.length ? membres : [{ nom: "", qualite: "Membre du jury" }, { nom: "", qualite: "Membre du jury" }])
+  const base = membres.length ? membres : [{ nom: "", qualite: "Membre du jury" }, { nom: "", qualite: "Membre du jury" }];
+  const signatures = [sigJury1.url, sigJury2.url];
+  const cols = base
     .map(
-      (j) => `<td style="width:${Math.floor(100 / Math.max(2, membres.length || 2))}%">
+      (j, i) => `<td style="width:${Math.floor(100 / Math.max(2, base.length))}%">
         <div><strong>${esc(j.nom)}</strong></div>
         <div style="font-size:9.5pt;color:#555">${esc(j.qualite)}</div>
-        <div style="height:58px"></div></td>`,
+        <div style="height:58px;display:flex;align-items:center;justify-content:center">${
+          i < signatures.length
+            ? `<img src="${signatures[i]}" alt="Signature du membre du jury" style="max-height:56px;max-width:150px;object-fit:contain" />`
+            : ""
+        }</div></td>`,
     )
     .join("");
   return `<p style="margin-top:14px"><strong>Signature des membres du jury :</strong></p>
   <table class="bloc-avoid"><tr>${cols}</tr></table>`;
 }
+
 
 /** GJ1 — Grilles d'évaluation de l'épreuve (guides d'observation + grilles). */
 export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
@@ -214,7 +258,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
         .join("")}
     </table>
     <h3>Observations du jury</h3>
-    <div class="cadre-reponse">${esc(pick(OBS_POSITIVES, sd + i))}${
+    <div class="cadre-reponse">${esc(pick2(OBS_POSITIVES, sd + i * 3))} ${esc(pick(OBS_COMPLEMENT, sd + i))}${
       forts.length ? ` ${esc(`Points d'appui relevés : ${forts.slice(0, 2).join(" ; ")}.`)}` : ""
     }</div>`);
   });
@@ -232,7 +276,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
       .join("")}
   </table>
   <h3>Observations du jury sur la production</h3>
-  <div class="cadre-reponse">${esc(pick(OBS_PRODUCTION, sd))}${
+  <div class="cadre-reponse">${esc(pick2(OBS_PRODUCTION, sd))}${
     consolider.length ? ` ${esc(`Points approfondis à l'entretien technique : ${consolider.slice(0, 2).join(" ; ")}.`)}` : ""
   }</div>`);
 
@@ -249,7 +293,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ).join("")}
   </table>
   <h3>Observations générales du jury</h3>
-  <div class="cadre-reponse">${esc(pick(OBS_ENTRETIEN, sd))}</div>
+  <div class="cadre-reponse">${esc(pick2(OBS_ENTRETIEN, sd))}</div>
   ${blocSignaturesJury(s)}`);
 
   const body = pages.join(`<div class="page-break"></div>`);
@@ -360,7 +404,7 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ).join("")}
     <tr><td colspan="2"><strong>Conclusion : lors de l'entretien final, le candidat a-t-il démontré une maîtrise globale suffisante pour la tenue de l'emploi ?</strong></td>
       <td style="text-align:center;white-space:nowrap">${CHK(true)} oui &nbsp; ${CHK(false)} non</td>
-      <td style="font-size:9.5pt">${esc(pick(OBS_ENTRETIEN, sd + 1))}</td></tr>
+      <td style="font-size:9.5pt">${esc(pick2(OBS_ENTRETIEN, sd + 4))}</td></tr>
   </table>
   ${blocSignaturesJury(s)}`);
 
