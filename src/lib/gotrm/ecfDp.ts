@@ -183,43 +183,45 @@ export function buildDpDossier(
   const entreprise = resolveEntreprise(s, cv);
   const periodeExercice = (cv?.periodeExercice || "").trim();
 
-  // Tirage sans remise des intitulés sur l'ensemble du dossier
+  // Tirage sans remise sur l'ensemble du dossier : intitulés ET fentes de phrases.
+  // Un même intitulé ou un même fragment ne peut donc pas réapparaître deux fois.
   const intitules = shuffle(banque.intitules, seed);
   let curseurIntitule = 0;
+  const files: Record<string, string[]> = {
+    contexte: shuffle(banque.contexte, seed + 11),
+    contrainte: shuffle(banque.contrainte, seed + 23),
+    methode: shuffle(banque.methode, seed + 37),
+    outils: shuffle(banque.outils, seed + 41),
+    alea: shuffle(banque.alea, seed + 53),
+    cloture: shuffle(banque.cloture, seed + 67),
+    interlocuteurs: shuffle(banque.interlocuteurs, seed + 71),
+    retour: shuffle(banque.retour, seed + 83),
+  };
+  const curseurs: Record<string, number> = {};
+  const next = (slot: string): string => {
+    const f = files[slot];
+    const i = curseurs[slot] || 0;
+    curseurs[slot] = i + 1;
+    return f[i % f.length];
+  };
 
   const exemples: DpExempleData[] = [];
   ref.activitesTypes.forEach((at, ci) => {
     const nbEx = Math.min(2, Math.max(1, Math.floor(intitules.length / Math.max(1, ref.activitesTypes.length))));
     for (let ej = 0; ej < nbEx; ej++) {
-      const k = seed + ci * 101 + ej * 37;
       const intitule = intitules[curseurIntitule % intitules.length] || `Exemple de pratique professionnelle n° ${curseurIntitule + 1}`;
       curseurIntitule++;
 
-      const accroche = cv?.accroches?.[ci] || cv?.accroches?.[0] || "";
-      const r1 = [
-        accroche,
-        pick(banque.contexte, k * 3 + 1),
-        pick(banque.contrainte, k * 5 + 2),
-        pick(banque.methode, k * 7 + 3),
-        pick(banque.alea, k * 11 + 4),
-      ]
-        .filter(Boolean)
-        .join(" ");
-      const outilsProfil = cv?.outils ? ` J'utilisais également ${cv.outils}.` : "";
-      const r2 = `Pour cette opération, j'ai utilisé ${pick(banque.outils, k * 13 + 5)}.${outilsProfil}`;
-      const r3 = `J'ai travaillé ${pick(banque.interlocuteurs, k * 17 + 6)}.`;
-      const r5 = `${pick(banque.cloture, k * 19 + 7)} ${pick(banque.retour, k * 23 + 8)}`;
+      // L'accroche issue du profil n'est utilisée qu'une fois par activité-type
+      const accroche = ej === 0 ? cv?.accroches?.[ci] || "" : "";
+      const r1 = [accroche, next("contexte"), next("contrainte"), next("methode"), next("alea")].filter(Boolean).join(" ");
+      // Les outils du profil ne sont cités que sur le premier exemple du dossier
+      const outilsProfil = cv?.outils && exemples.length === 0 ? ` J'utilisais également ${cv.outils}.` : "";
+      const r2 = `Pour cette opération, j'ai utilisé ${next("outils")}.${outilsProfil}`;
+      const r3 = `J'ai travaillé ${next("interlocuteurs")}.`;
+      const r5 = `${next("cloture")} ${next("retour")}`;
 
-      exemples.push({
-        atIndex: ci + 1,
-        atTitre: at.titre,
-        numero: ej + 1,
-        intitule,
-        r1,
-        r2,
-        r3,
-        r5,
-      });
+      exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: ej + 1, intitule, r1, r2, r3, r5 });
     }
   });
 

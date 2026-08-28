@@ -25,12 +25,14 @@ function norm(s: string): string {
   return s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
-/** Découpe un texte en fenêtres normalisées de plus de 40 caractères. */
+/**
+ * Bloc comparable : la rubrique rédigée dans son ensemble. Une rubrique
+ * dépassant 40 caractères et strictement identique à celle d'un autre exemple
+ * ou d'un autre dossier constitue une duplication bloquante.
+ */
 function blocs(texte: string): string[] {
-  return norm(texte)
-    .split(/(?<=[.!?])\s+/)
-    .map((x) => x.trim())
-    .filter((x) => x.length > SEUIL_DUPLICATION);
+  const n = norm(texte);
+  return n.length > SEUIL_DUPLICATION ? [n] : [];
 }
 
 function nomCandidat(s: StagiaireInfo): string {
