@@ -5,6 +5,8 @@
 // =============================================================================
 
 import { genDPUnifie, genECFUnifie } from "@/lib/gotrm/ecfDp";
+import { detectDomaine } from "@/lib/dp/dpBanques";
+import { resolveReferentiel } from "@/lib/dp/referentielTitres";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
 import { formatDate, isFormationTerminee, isStagiaireFormationTerminee } from "./docBuilder";
@@ -236,7 +238,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 // =============================================================================
 
 export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const codeTitre = getCodeTitre(f);
+  const codeTitre = resolveReferentiel(f).codeTitre || "";
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
   const dateMaj = getDateMajOrg(o);
