@@ -354,22 +354,38 @@ const ECF_CONSOLIDATION_PAR_AT = [
   "Évaluation de consolidation : production d'un tableau de bord commenté et d'un plan d'actions correctives, présenté à l'oral.",
 ];
 
-/** Date d'évaluation : répartie sur le calendrier réel, jamais dans le futur. */
+/**
+ * Date d'une évaluation passée EN COURS DE FORMATION.
+ *
+ * Les ECF se déroulent pendant le parcours de formation, jamais pendant la
+ * session d'examen. Lorsque la période saisie est une session d'examen courte
+ * (moins de dix jours), les évaluations sont réparties sur le calendrier de
+ * formation qui la précède, toutes antérieures au premier jour de session.
+ * Sinon, elles sont réparties à l'intérieur de la période de formation.
+ */
 function dateEvaluation(debut: string, fin: string, position: number, total: number): string {
   if (!debut) return "";
   const d0 = new Date(debut);
   if (isNaN(d0.getTime())) return "";
-  const aujourdhui = new Date();
-  let borne = fin ? new Date(fin) : aujourdhui;
-  if (isNaN(borne.getTime())) borne = aujourdhui;
-  if (borne > aujourdhui) borne = aujourdhui;
-  if (borne <= d0) return debut;
-  const joursTotal = Math.max(1, Math.round((borne.getTime() - d0.getTime()) / 86400000));
-  // Réparties de 15 % à 95 % de la période effective
-  const frac = 0.15 + (0.8 * (position + 1)) / (total + 1);
-  const d = new Date(d0.getTime() + Math.round(joursTotal * frac) * 86400000);
+  const dFin = fin ? new Date(fin) : d0;
+  const dureeJours = isNaN(dFin.getTime()) ? 0 : Math.round((dFin.getTime() - d0.getTime()) / 86400000);
+
+  let borneBasse: Date;
+  let borneHaute: Date;
+  if (dureeJours < 10) {
+    // Session d'examen : le parcours de formation se situe en amont.
+    borneBasse = new Date(d0.getTime() - 18 * 7 * 86400000);
+    borneHaute = new Date(d0.getTime() - 7 * 86400000);
+  } else {
+    borneBasse = d0;
+    borneHaute = isNaN(dFin.getTime()) ? d0 : dFin;
+  }
+  const span = Math.max(1, Math.round((borneHaute.getTime() - borneBasse.getTime()) / 86400000));
+  const frac = 0.1 + (0.85 * (position + 1)) / (total + 1);
+  const d = new Date(borneBasse.getTime() + Math.round(span * frac) * 86400000);
   while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
-  if (d < d0) return debut;
+  if (d > borneHaute) return borneHaute.toISOString().slice(0, 10);
+  if (d < borneBasse) return borneBasse.toISOString().slice(0, 10);
   return d.toISOString().slice(0, 10);
 }
 
