@@ -449,9 +449,9 @@ function sessionDepuisFormation(
     parcours: "Formation continue",
     ccpVises: GOTRM_CCP.map((c) => c.code),
     ordrePassage: idx + 1,
-    msp1Date: s?.dateDebutFormation || debut,
+    msp1Date: corrigeDate(s?.dateDebutFormation) || debut,
     msp1Horaire: "09h00 – 14h00",
-    msp2Date: s?.dateFinFormation || fin,
+    msp2Date: corrigeDate(s?.dateFinFormation) || fin,
     msp2Horaire: "09h00 – 14h00",
     ccpObtenus: [],
   };
