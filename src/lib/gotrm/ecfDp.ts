@@ -87,7 +87,8 @@ function addWorkDays(iso: string, days: number): string {
  * Aucun bleu : ce n'est pas la couleur des trames.
  */
 const MAGENTA = "#E5007D";
-const STYLE_MINISTERE = `<style>
+export const STYLE_MINISTERE = `<style>
+
   .doc-officiel{font-family:'Calibri','Arial',sans-serif;color:#1a1a1a;font-size:11pt;line-height:1.4}
   .doc-officiel h1{text-align:center;font-size:17pt;font-weight:bold;margin:24px 0 16px;letter-spacing:1.5px;color:#333;text-transform:uppercase}
   .doc-officiel h2{font-size:12pt;font-weight:bold;margin:20px 0 10px;color:#222;padding:0 0 5px 12px;border-left:5px solid ${MAGENTA};border-bottom:2px solid ${MAGENTA}}
@@ -136,8 +137,9 @@ const STYLE_ECF = `<style>
 </style>`;
 
 /** Case à cocher dessinée en CSS (bordure + croix), jamais un caractère Unicode. */
-const CHK = (on: boolean) =>
+export const CHK = (on: boolean) =>
   on ? `<span class="cbx"><i class="b1"></i><i class="b2"></i></span>` : `<span class="cbx"></span>`;
+
 
 /**
  * Cellule de visa : uniquement l'image de signature réellement fournie dans
