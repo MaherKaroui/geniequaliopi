@@ -382,11 +382,8 @@ function construireDossier(
    * l'employeur, ce qui rend chaque jonction propre au dossier et empêche toute
    * suite de plus de 40 caractères commune à deux candidats.
    */
-  const ancres = [
-    `Chez ${entreprise.nom || "cet employeur"},`,
-    `Au sein de ${entreprise.service || entreprise.nom || "ce service"},`,
-    `Pour ${entreprise.nom || "cet employeur"},`,
-  ];
+  const employeur = entreprise.nom || entreprise.service || "cet employeur";
+  const ancres = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`];
   const minuscule = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 
   const exemples: DpExempleData[] = [];
@@ -408,7 +405,7 @@ function construireDossier(
       : "";
     const r1 = reserver((d) =>
       [
-        prefixe,
+        ci === 0 ? prefixe : "",
         accroche,
         phrase("contexte", ci, d),
         `${ancres[0]} ${minuscule(phrase("contrainte", ci, d))}`,
