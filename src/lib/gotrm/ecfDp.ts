@@ -93,6 +93,10 @@ const STYLE_MINISTERE = `<style>
   .doc-officiel table th{background:#E8EEF7;font-weight:bold;font-size:9pt}
   .doc-officiel .resultat-final{padding:12px;border:2px solid #0055A4;background:#E8EEF7;text-align:center;font-weight:bold;margin:14px 0}
   .doc-officiel table.pied-officiel th,.doc-officiel table.pied-officiel td{border:1px solid #999;padding:3px 5px;text-align:center;background:#F0F0F0;font-size:8pt}
+  .doc-officiel .pied-dp{margin-top:26px;padding-top:5px;border-top:2px solid #C2185B;display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:7.5pt;color:#555;letter-spacing:.2px}
+  .doc-officiel .pied-dp .pied-dp-t{flex:1 1 auto;text-align:left;font-variant:small-caps;letter-spacing:.5px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .doc-officiel .pied-dp .pied-dp-v{flex:0 0 auto;text-align:center;font-style:italic;white-space:nowrap}
+  .doc-officiel .pied-dp .pied-dp-p{flex:0 0 auto;text-align:right;white-space:nowrap;color:#C2185B;font-weight:bold}
   .doc-officiel .page-break{page-break-after:always;break-after:page}
 </style>`;
 
@@ -503,7 +507,7 @@ export function genDPUnifie(
   const domaine = detectDomaine(f);
 
   const pied = (p: number, total: number) =>
-    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL${ref.codeTitre ? ` – ${ref.codeTitre}` : ""} – ${s?.prenom || ""} ${s?.nom || ""}</td><td style="text-align:center">Version du ${DP_TRAME_VERSION}</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
+    `<div class="pied-dp"><span class="pied-dp-t">Dossier professionnel${ref.codeTitre ? ` – ${ref.codeTitre}` : ""} – ${`${s?.prenom || ""} ${s?.nom || ""}`.trim()}</span><span class="pied-dp-v">Version du ${DP_TRAME_VERSION}</span><span class="pied-dp-p">Page ${p}/${total}</span></div>`;
 
   const pages: string[] = [];
 
