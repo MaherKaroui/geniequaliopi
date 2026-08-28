@@ -177,6 +177,29 @@ const ECF_OBSERVATIONS = [
   "Candidat autonome, à l'écoute des remarques du formateur. Les préconisations de mesures correctives sont chiffrées et réalistes.",
 ];
 
+const ECF_POINTS_ATTENTION = [
+  "Veiller à conserver la même rigueur de contrôle des pièces administratives des sous-traitants en période de forte activité.",
+  "Poursuivre l'effort de formalisation écrite des offres : les éléments chiffrés doivent toujours être accompagnés des conditions d'exécution.",
+  "Continuer à justifier systématiquement les choix organisationnels retenus, notamment sur les arbitrages coût / délai.",
+  "Maintenir la vigilance sur les temps de conduite et de repos lors des replanifications de dernière minute.",
+  "Poursuivre l'appropriation des indices professionnels de référence pour fiabiliser les analyses de rentabilité.",
+];
+
+const ECF_CONSOLIDATION = [
+  "Évaluation de consolidation : reprise d'un dossier complet (demande client, tarification, affectation des moyens, clôture) en autonomie, avec restitution orale devant le formateur.",
+  "Évaluation de consolidation : traitement d'un cas transversal combinant contrainte réglementaire, aléa d'exploitation et arbitrage de rentabilité, avec argumentation écrite.",
+  "Évaluation de consolidation : mise en situation de synthèse sur TMS pédagogique avec production d'un dossier écrit et d'un tableau de bord.",
+  "Évaluation de consolidation : entretien technique blanc portant sur l'ensemble des compétences de l'activité-type, suivi d'un débriefing individualisé.",
+];
+
+const ECF_OBS_COMPLEMENT = [
+  "L'évaluation de consolidation confirme la maîtrise de l'activité-type : les productions sont conformes aux attendus et les explications orales sont précises.",
+  "Les résultats de l'évaluation de consolidation sont conformes aux critères du référentiel ; aucune réévaluation n'est nécessaire.",
+  "L'évaluation de consolidation confirme la progression observée : autonomie, rigueur documentaire et argumentation professionnelle acquises.",
+  "Résultats satisfaisants sur l'ensemble des compétences de l'activité-type lors de l'évaluation de consolidation.",
+];
+
+
 export function genECFGotrm(
   org: OrganismeInfo,
   f: FormationInfo,
