@@ -146,13 +146,14 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
   // Sélection dans un vivier légèrement plus large, avec une rotation propre au
   // profil : deux candidats faibles sur le même champ ne retiennent pas
   // exactement les mêmes compétences, et les livrets cessent d'être superposables.
-  const vivier = ordre.slice(0, Math.min(ordre.length, k + 2));
-  const nonAcquis = new Set(
-    Array.from({ length: k }, (_, n) => vivier[(n * 1 + (empreinte % vivier.length) * (n + 1)) % vivier.length])
-      .map((l) => `${l.ci}-${l.i}`),
-  );
+  const vivier = ordre.slice(0, Math.min(ordre.length, k + 3));
+  const stride = vivier.length > 1 ? 1 + (empreinte % (vivier.length - 1)) : 1;
+  const nonAcquis = new Set<string>();
+  for (let n = 0; nonAcquis.size < k && n < vivier.length * 3; n++) {
+    const l = vivier[(empreinte + n * stride) % vivier.length];
+    nonAcquis.add(`${l.ci}-${l.i}`);
+  }
 
-  console.log("EMPR", cv.nom, empreinte, k, [...nonAcquis].join(","));
   const parAT: EcfCompetence[][] = ref.activitesTypes.map(() => []);
   lignes.forEach((l) => {
     const cle = `${l.ci}-${l.i}`;
