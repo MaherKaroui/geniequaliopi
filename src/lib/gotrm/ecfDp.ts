@@ -327,13 +327,16 @@ export function buildDpDossier(
   const nbAT = Math.max(1, ref.activitesTypes.length);
   const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
 
-  /** Couple de fragments unique dans la session pour une fente donnée. */
+  /**
+   * Couple de fragments unique dans la session.
+   * Les listes d'ouvertures (11) et de suites (7) ont des tailles premières
+   * entre elles : l'indice `(position du stagiaire + usage)` produit un couple
+   * distinct pour chaque candidat, y compris à la jonction de deux fentes.
+   */
   const phrase = (fente: DpFente, usage: number): string => {
     const fr = banque.fentes[fente];
-    const g = stagiaireIdx * USAGES_PAR_DOSSIER + usage;
-    const ouv = fr.ouvertures[g % fr.ouvertures.length];
-    const suite = fr.suites[(Math.floor(g / fr.ouvertures.length) + usage) % fr.suites.length];
-    return `${ouv} ${suite}`;
+    const k = stagiaireIdx + usage;
+    return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[k % fr.suites.length]}`;
   };
 
   // Ancrage factuel propre au candidat (entreprise et service réellement renseignés)
@@ -352,17 +355,18 @@ export function buildDpDossier(
     }
 
     const accroche = cv?.accroches?.[ci] || "";
+    // Amorce propre au candidat : entreprise et période réellement renseignées.
     const prefixe = ancrageContexte
       ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :`
       : "";
     const r1 = [prefixe, accroche, phrase("contexte", ci), phrase("contrainte", ci), phrase("methode", ci), phrase("alea", ci)]
       .filter(Boolean)
       .join(" ");
-    const outilsProfil = cv?.outils && ci === 0 ? ` J'utilisais également ${cv.outils}.` : "";
-    const ancrage = ancrageContexte;
-    const r2 = `Pour cette opération, j'ai utilisé ${phrase("outils", ci)}${outilsProfil}${ancrage ? ` Les documents produits ont été classés dans le dossier d'exploitation de ${ancrage}.` : ""}`;
-    const r3 = `J'ai travaillé ${phrase("interlocuteurs", ci)}${ancrage ? `, au sein de ${ancrage}` : ""}.`;
-    const r5 = `${phrase("cloture", ci)} ${phrase("retour", ci)}${ancrage ? ` Ce dossier est conservé dans les archives d'exploitation de ${ancrage}.` : ""}`;
+    // Aucune phrase de liaison figée : toute formule partagée entre deux
+    // dossiers créerait mécaniquement une duplication de plus de 40 caractères.
+    const r2 = phrase("outils", ci);
+    const r3 = phrase("interlocuteurs", ci);
+    const r5 = `${phrase("cloture", ci)} ${phrase("retour", ci)}`;
 
     exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
