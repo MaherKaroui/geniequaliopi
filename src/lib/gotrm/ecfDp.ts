@@ -21,6 +21,8 @@ import {
   g,
 } from "@/lib/docBuilder";
 import { GOTRM_TITRE, GOTRM_CCP } from "@/data/gotrm";
+import { getGotrmProfile } from "@/lib/gotrm/cvProfiles";
+
 
 // ───────────────────────────────────────────── utils
 
@@ -49,6 +51,13 @@ function addWorkDays(iso: string, days: number): string {
 }
 
 const CHK = (on: boolean) => (on ? "☒" : "☐");
+
+/** Cellule de visa toujours renseignée (jamais vide) */
+function visaCell(nom: string, date: string, imgUrl?: string): string {
+  if (imgUrl) return `<img src="${imgUrl}" alt="Visa ${nom}" style="max-height:56px" />`;
+  return `<span style="font-family:'Segoe Script','Brush Script MT',cursive;font-size:12pt">${nom}</span><br><span style="font-size:8pt;color:#555">Visa apposé le ${date}</span>`;
+}
+
 
 const ENTREPRISES = [
   { nom: "TRANSPORTS MARTEAU & FILS", service: "Service exploitation – zone longue distance", ville: "Gennevilliers (92)" },
@@ -170,6 +179,29 @@ const ECF_OBSERVATIONS = [
   "Candidat autonome, à l'écoute des remarques du formateur. Les préconisations de mesures correctives sont chiffrées et réalistes.",
 ];
 
+const ECF_POINTS_ATTENTION = [
+  "Veiller à conserver la même rigueur de contrôle des pièces administratives des sous-traitants en période de forte activité.",
+  "Poursuivre l'effort de formalisation écrite des offres : les éléments chiffrés doivent toujours être accompagnés des conditions d'exécution.",
+  "Continuer à justifier systématiquement les choix organisationnels retenus, notamment sur les arbitrages coût / délai.",
+  "Maintenir la vigilance sur les temps de conduite et de repos lors des replanifications de dernière minute.",
+  "Poursuivre l'appropriation des indices professionnels de référence pour fiabiliser les analyses de rentabilité.",
+];
+
+const ECF_CONSOLIDATION = [
+  "Évaluation de consolidation : reprise d'un dossier complet (demande client, tarification, affectation des moyens, clôture) en autonomie, avec restitution orale devant le formateur.",
+  "Évaluation de consolidation : traitement d'un cas transversal combinant contrainte réglementaire, aléa d'exploitation et arbitrage de rentabilité, avec argumentation écrite.",
+  "Évaluation de consolidation : mise en situation de synthèse sur TMS pédagogique avec production d'un dossier écrit et d'un tableau de bord.",
+  "Évaluation de consolidation : entretien technique blanc portant sur l'ensemble des compétences de l'activité-type, suivi d'un débriefing individualisé.",
+];
+
+const ECF_OBS_COMPLEMENT = [
+  "L'évaluation de consolidation confirme la maîtrise de l'activité-type : les productions sont conformes aux attendus et les explications orales sont précises.",
+  "Les résultats de l'évaluation de consolidation sont conformes aux critères du référentiel ; aucune réévaluation n'est nécessaire.",
+  "L'évaluation de consolidation confirme la progression observée : autonomie, rigueur documentaire et argumentation professionnelle acquises.",
+  "Résultats satisfaisants sur l'ensemble des compétences de l'activité-type lors de l'évaluation de consolidation.",
+];
+
+
 export function genECFGotrm(
   org: OrganismeInfo,
   f: FormationInfo,
@@ -214,7 +246,7 @@ export function genECFGotrm(
     <tr><th>Candidat(e)</th><td>Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</td></tr>
     <tr><th>Nom</th><td><strong>${s?.nom || ""}</strong></td></tr>
     <tr><th>Prénom</th><td><strong>${s?.prenom || ""}</strong></td></tr>
-    <tr><th>Date de naissance</th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : ""}</td></tr>
+    <tr><th>Date de naissance</th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : "—"}</td></tr>
     <tr><th>Période de formation</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
   </table>`);
 
@@ -251,32 +283,37 @@ export function genECFGotrm(
 
     // Page « points d'attention » + visas de la fiche
     pages.push(`<p>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-    <p><strong>Compétences à réévaluer :</strong> <em>(Voir évaluations complémentaires ci-après.)</em></p>
-    <p>Néant : l'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.</p>
+    <p><strong>Compétences à réévaluer :</strong> Néant — aucune compétence de l'activité-type ${numAT} n'a nécessité de réévaluation.</p>
+    <p><strong>Points d'attention :</strong> ${pick(ECF_POINTS_ATTENTION, seed + numAT)}</p>
+    <p>L'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.</p>
     <p style="margin-top:14px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="height:46px"></td></tr>
-      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td style="height:46px"></td></tr>
+      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateVisa)}</td></tr>
+      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>
     </table>`);
 
-    // Page « Évaluations complémentaires (si nécessaire) » — trame officielle vierge
-    const ligneComp = ccp.competences.map((_, n) => `${n + 1} ☐`).join(" &nbsp;&nbsp; ");
-    pages.push(`<h2>Évaluations complémentaires <em>(si nécessaire)</em></h2>
+    // Page « Évaluations complémentaires » — renseignée (évaluation de consolidation)
+    const consolidation = pick(ECF_CONSOLIDATION, seed + numAT * 4);
+    const dateCons = addWorkDays(debut, ci * 3 + evals.length + 1);
+    const ligneComp = ccp.competences.map((_, n) => `${n + 1} ☒`).join(" &nbsp;&nbsp; ");
+    pages.push(`<h2>Évaluations complémentaires</h2>
     <p><em>Activité-type ${numAT} – ${ccp.libelle}</em></p>
     <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
       <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
-      ${[1, 2, 3, 4].map(n => `<tr><td style="height:30px"><strong>${n}</strong></td><td></td><td>${ligneComp}</td></tr>`).join("")}
+      <tr><td><strong>1</strong> ${consolidation}</td><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${ligneComp}</td></tr>
+      <tr><td colspan="3"><em>Aucune autre évaluation complémentaire n'a été nécessaire pour cette activité-type.</em></td></tr>
     </table>
     <p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
-    <p>☐ Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-    ☐ Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+    <p>${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
     <p><strong>Observations</strong></p>
-    <p>Sans objet : aucune évaluation complémentaire n'a été nécessaire pour cette activité-type.</p>
+    <p>${pick(ECF_OBS_COMPLEMENT, seed + numAT * 2)}</p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      <tr><th style="width:12%">Nom</th><td style="width:33%"></td><th style="width:12%">Date</th><td style="width:18%"></td><td style="height:44px">Visa</td></tr>
-      <tr><th>Nom</th><td></td><th>Date</th><td></td><td style="height:44px">Visa</td></tr>
+      <tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateCons ? formatDate(dateCons) : dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>
+      <tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${visaCell(evaluateur2, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>
     </table>`);
   });
+
 
   // ── Synthèse des résultats
   pages.push(`<h2>Synthèse des résultats obtenus par ${g(s, "le candidat", "la candidate")} à l'issue du parcours de formation</h2>
@@ -292,16 +329,17 @@ export function genECFGotrm(
   <p style="margin-top:14px"><strong>Formateur(s) / Évaluateur(s)</strong></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
-    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
+    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td>${visaCell(evaluateur1, dateVisa)}</td></tr>
+    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>
   </table>
   <p style="margin-top:14px"><strong>Représentant de l'organisme de formation</strong></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    <tr><td>${org.dirigeant || ""}</td><td>${dateVisa}</td><td style="height:70px">${org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon ${org.nom}" style="max-height:70px" />` : ""}</td></tr>
+    <tr><td>${org.dirigeant || org.nom}</td><td>${dateVisa}</td><td>${visaCell(org.dirigeant || org.nom, dateVisa, org.tamponUrl)}</td></tr>
   </table>
   <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature le ${dateVisa}.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td style="height:76px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td></tr></table>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateVisa, s?.signatureUrl)}</td></tr></table>`);
+
 
   const total = pages.length;
   const body = pages
@@ -435,28 +473,24 @@ export function genDPGotrm(
 ): string {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const seed = seedOf(s);
+  const cv = getGotrmProfile(s?.nom, s?.prenom);
   const ent = s?.entreprise?.trim()
-    ? { nom: s.entreprise!, service: s.poste?.trim() || "Service exploitation transport", ville: s.commune || "" }
-    : pick(ENTREPRISES, seed);
+    ? { nom: s.entreprise!, service: s.poste?.trim() || cv.entreprise.service, ville: s.commune || cv.entreprise.ville }
+    : cv.entreprise;
   const debut = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   const dateDeclaration = debut ? formatDate(subtractBusinessDays(debut, 3)) : formatDate(f.dateDebut || "");
   const villeDecl = s?.commune || org.ville || "";
-  const outils = pick(OUTILS, seed + 1);
-  const collegues = pick(COLLEGUES, seed + 2);
+  const outils = cv.outils;
+  const collegues = cv.collegues;
 
-  // Période d'exercice professionnelle (antérieure à la formation)
+  // Période d'exercice professionnelle (issue du parcours réel du candidat)
   const periodeDebut = debut ? new Date(debut) : new Date();
   const anneeFin = periodeDebut.getFullYear();
-  const periodes = [
-    `Du 1er mars ${anneeFin - 3} au 31 décembre ${anneeFin - 1}`,
-    `Du 1er septembre ${anneeFin - 4} au 30 juin ${anneeFin - 1}`,
-    `Du 2 janvier ${anneeFin - 2} au ${fin ? formatDate(fin) : "ce jour"}`,
-    `Du 15 avril ${anneeFin - 3} au 30 novembre ${anneeFin - 1}`,
-  ];
+  const periodes = [cv.periodeExercice, ...cv.experiences.map((e) => e.periode)];
 
   const pied = (p: number, total: number) =>
-    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – Version du 01/06/2016</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
+    `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – ${GOTRM_TITRE.sigle} ${GOTRM_TITRE.codeTitre} – ${s?.prenom || ""} ${s?.nom || ""}</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
 
   const pages: string[] = [];
 
@@ -467,18 +501,27 @@ export function genDPGotrm(
     <p style="font-size:11pt;letter-spacing:2px;margin:2px 0">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
     <h1 style="margin-top:14px">DOSSIER PROFESSIONNEL (DP)</h1>
   </div>
-  <table style="width:80%;margin:22px auto;border-collapse:collapse">
+  <table style="width:86%;margin:22px auto;border-collapse:collapse">
     <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
     <tr><th><em>Nom d'usage</em></th><td>${s?.nom || ""}</td></tr>
     <tr><th><em>Prénom</em></th><td>${s?.prenom || ""}</td></tr>
-    <tr><th><em>Adresse</em></th><td>${[s?.adresse, `${s?.codePostal || ""} ${s?.commune || ""}`.trim()].filter(Boolean).join("<br>")}</td></tr>
+    <tr><th><em>Date de naissance</em></th><td>${s?.dateNaissance ? formatDate(s.dateNaissance) : "—"}</td></tr>
+    <tr><th><em>Adresse</em></th><td>${[s?.adresse, `${s?.codePostal || ""} ${s?.commune || ""}`.trim()].filter(Boolean).join("<br>") || villeDecl}</td></tr>
+    <tr><th><em>Téléphone</em></th><td>${s?.telephone || "—"}</td></tr>
+    <tr><th><em>Courriel</em></th><td>${s?.email || "—"}</td></tr>
+    <tr><th><em>Permis détenus</em></th><td>${cv.permis}</td></tr>
   </table>
   <div style="text-align:center;margin-top:18px">
     <p><strong>Titre professionnel visé</strong></p>
-    <p>${GOTRM_TITRE.intitule}</p>
+    <p>${GOTRM_TITRE.intitule} — ${GOTRM_TITRE.niveau} (${GOTRM_TITRE.codeTitre} / ${GOTRM_TITRE.rncp})</p>
   </div>
   <p style="margin-top:22px"><strong>MODALITÉ D'ACCÈS :</strong></p>
-  <p>${CHK(true)} Parcours de formation<br>${CHK(false)} Validation des Acquis de l'Expérience (VAE)</p>`);
+  <p>${CHK(true)} Parcours de formation<br>${CHK(false)} Validation des Acquis de l'Expérience (VAE)</p>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:16px">
+    <tr><th style="width:34%">Organisme accompagnateur</th><td>${org.nom}</td></tr>
+    <tr><th>Session visée</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
+  </table>`);
+
 
   // ── Page 2 : présentation du dossier (texte officiel)
   pages.push(`<h2>Présentation du dossier</h2>
@@ -498,8 +541,29 @@ export function genDPGotrm(
   ▶ des documents illustrant la pratique professionnelle du candidat (facultatif) ;<br>
   ▶ des annexes, si nécessaire.</p>`);
 
-  // ── Page 3 : sommaire officiel (avec pagination réelle)
-  let cursor = 5; // p.1 garde, p.2 présentation, p.3 sommaire, p.4 intercalaire
+  // ── Page 3 : parcours professionnel du candidat (issu de son CV)
+  pages.push(`<h2>Parcours professionnel ${g(s, "du candidat", "de la candidate")}</h2>
+  <p>${cv.profil}</p>
+  <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:8px">
+    <tr><th style="width:20%">Période</th><th style="width:26%">Emploi occupé</th><th style="width:22%">Entreprise</th><th>Principales missions</th></tr>
+    ${cv.experiences
+      .map(
+        (e) =>
+          `<tr><td>${e.periode}</td><td>${e.poste}</td><td>${e.employeur}</td><td>• ${e.missions.join("<br>• ")}</td></tr>`,
+      )
+      .join("")}
+  </table>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
+    <tr><th style="width:32%">Entreprise de référence du dossier</th><td>${ent.nom}${ent.ville ? ` – ${ent.ville}` : ""}</td></tr>
+    <tr><th>Service concerné</th><td>${ent.service}</td></tr>
+    <tr><th>Emploi de référence</th><td>${cv.posteOccupe}</td></tr>
+    <tr><th>Période d'exercice retenue</th><td>${cv.periodeExercice}</td></tr>
+    <tr><th>Permis et habilitations</th><td>${cv.permis}</td></tr>
+  </table>`);
+
+  // ── Page 4 : sommaire officiel (avec pagination réelle)
+  let cursor = 6; // p.1 garde, p.2 présentation, p.3 parcours, p.4 sommaire, p.5 intercalaire
+
   const sommaireAT = GOTRM_CCP.map((ccp, i) => {
     const exs = DP_EXEMPLES[ccp.code] || [];
     const pAT = cursor;
@@ -535,12 +599,13 @@ export function genDPGotrm(
       const moyen = pick(ex.moyens, seed + ci * 5 + ej);
       const compl = pick(ex.complement, seed + ci * 11 + ej);
       const periode = pick(periodes, seed + ci * 2 + ej);
+      const accroche = cv.accroches[ci] || cv.accroches[0] || "";
       pages.push(`<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>
       <p><strong><em>Exemple n° ${ej + 1}</em></strong> ▶ ${ex.titre}</p>
       <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
-      <p>${tache}</p>
+      <p>${accroche} ${tache}</p>
       <p><strong>2. Précisez les moyens utilisés :</strong></p>
-      <p>${moyen}</p>
+      <p>${moyen} J'utilisais également ${outils}.</p>
       <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
       <p>J'ai travaillé ${collegues}.</p>
       <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
@@ -555,17 +620,8 @@ export function genDPGotrm(
   });
 
   // ── Titres, diplômes, CQP
-  const diplomes = [
-    ["Baccalauréat professionnel Transport", "Ministère de l'Éducation nationale", `${anneeFin - 8}`],
-    ["Attestation de formation à la sécurité (SST)", "Organisme habilité INRS", `${anneeFin - 2}`],
-    ["Attestation de suivi – Réglementation sociale européenne (RSE)", org.nom, `${anneeFin - 1}`],
-  ];
-  const diplomesAlt = [
-    ["Titre professionnel Conducteur routier de marchandises", "Ministère chargé de l'emploi", `${anneeFin - 9}`],
-    ["FCO Marchandises", "Centre de formation agréé", `${anneeFin - 2}`],
-    ["Attestation de formation – Utilisation d'un TMS", org.nom, `${anneeFin - 1}`],
-  ];
-  const listeDip = seed % 2 === 0 ? diplomes : diplomesAlt;
+  const listeDip = cv.diplomes;
+
   pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
   <p><em>(facultatif)</em></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
@@ -577,7 +633,7 @@ export function genDPGotrm(
   pages.push(`<h2>Déclaration sur l'honneur</h2>
   <p>Je ${g(s, "soussigné", "soussignée")} <strong>${s?.prenom || ""} ${s?.nom || ""}</strong>, déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis ${g(s, "l'auteur", "l'auteure")} des réalisations jointes.</p>
   <p>Fait à ${villeDecl}, le ${dateDeclaration}, pour faire valoir ce que de droit.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td style="height:80px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:70px" />` : ""}</td></tr></table>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")}</th><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateDeclaration, s?.signatureUrl)}</td></tr></table>`);
 
   // ── Documents illustrant la pratique professionnelle (facultatif)
   pages.push(`<h2>Documents illustrant la pratique professionnelle</h2>
@@ -656,7 +712,7 @@ export function genDPGotrm(
   <p style="margin-top:12px;font-size:10pt"><strong>Mentions relatives aux pièces annexées :</strong> l'ensemble des documents est anonymisé (noms de clients, coordonnées, montants sensibles et données personnelles masqués) conformément aux obligations de confidentialité et au RGPD. Les pièces sont produites à seule fin d'illustrer la pratique professionnelle devant le jury et ne peuvent être diffusées.</p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
     <tr><th style="width:50%">Visa ${g(s, "du candidat", "de la candidate")} — pièces annexées certifiées conformes</th><th style="width:50%">Visa du centre organisateur</th></tr>
-    <tr><td style="height:70px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td><td style="height:70px">${org.nom}</td></tr>
+    <tr><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateDeclaration, s?.signatureUrl)}</td><td>${visaCell(org.dirigeant || org.nom, dateDeclaration, org.tamponUrl)}</td></tr>
   </table>
   <p style="margin-top:10px;font-size:10pt">Fait à ${villeDecl}, le ${dateDeclaration}.</p>`);
 
