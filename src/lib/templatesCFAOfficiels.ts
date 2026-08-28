@@ -448,11 +448,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // ===== PAGE 1 - Couverture =====
   const nomUsage = (s.nom || "").toUpperCase();
   html += `<div class="page" style="page-break-before:always;break-before:page">
-    <div style="text-align:center;font-size:10pt;margin-bottom:8px">
-      <p style="font-style:italic;color:#555">Liberté • Égalité • Fraternité</p>
-      <p style="font-weight:bold;letter-spacing:1px">RÉPUBLIQUE FRANÇAISE</p>
+    <div style="text-align:center;margin-bottom:18px">
+      <img src="/__l5e/assets-v1/8eb30e71-1ecc-45e5-a0c2-80298a246489/dp-header-officiel.png" alt="République Française – Dossier Professionnel (DP) – Ministère chargé de l'Emploi" style="width:100%;max-width:640px;height:auto" />
     </div>
-    ${ministereHeader("DOSSIER PROFESSIONNEL (DP)", "MINISTÈRE CHARGÉ DE L'EMPLOI")}
     <div style="margin-top:40px">
       <div class="dp-cover-field"><span class="lbl">Nom de naissance ▶</span><span class="val">${nomUsage}</span></div>
       <div class="dp-cover-field"><span class="lbl">Nom d'usage ▶</span><span class="val">${nomUsage}</span></div>
