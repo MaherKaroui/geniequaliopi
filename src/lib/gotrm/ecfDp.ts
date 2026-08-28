@@ -452,7 +452,7 @@ export function genECFUnifie(
   <table style="width:72%;margin:10px 0 10px auto;border-collapse:collapse;font-size:10.5pt">
     <tr><th style="width:48%">Arrêté du :</th><td>${ref.dateArrete || ""}</td></tr>
     <tr><th>J.O. du :</th><td>${ref.dateJo || ""}</td></tr>
-    <tr><th>Date d'effet au :</th><td>${ref.dateJo || ""}</td></tr>
+    <tr><th>Date d'effet au :</th><td>${ref.dateEffet || ""}</td></tr>
   </table>
   <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:18px">
     <tr><th style="width:32%">Organisme de formation</th><td>${org.nom}</td></tr>
