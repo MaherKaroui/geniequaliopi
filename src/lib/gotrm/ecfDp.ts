@@ -620,7 +620,7 @@ export function genDPGotrm(
   });
 
   // ── Titres, diplômes, CQP
-  const listeDip = cv.diplomes.map((d) => [d.intitule, d.autorite, d.annee]);
+  const listeDip = cv.diplomes;
 
   pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
   <p><em>(facultatif)</em></p>
