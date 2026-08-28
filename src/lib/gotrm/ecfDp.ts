@@ -32,7 +32,7 @@ import {
   ECF_TYPE_DOC,
   type DpReferentiel,
 } from "@/lib/dp/referentielTitres";
-import { getBanque, detectDomaine, type DpBanque } from "@/lib/dp/dpBanques";
+import { getBanque, detectDomaine, intitulesPourAT, type DpBanque, type DpFente } from "@/lib/dp/dpBanques";
 import { findGotrmProfile, type GotrmCvProfile } from "@/lib/gotrm/cvProfiles";
 import {
   buildEcfProfilage,
@@ -232,9 +232,113 @@ export interface DpDossierData {
   exemples: DpExempleData[];
 }
 
+/** Normalisation légère pour rapprocher un employeur du CV et l'entreprise retenue. */
+function normEnt(x: string): string {
+  return (x || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\b(sarl|sas|sasu|eurl|sa|société|societe|transports?|group[e]?)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+const MOIS_COURTS = ["janv", "fevr", "mars", "avri", "mai", "juin", "juil", "aout", "sept", "octo", "nove", "dece"];
+function moisIndex(txt: string): number {
+  const t = txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").slice(0, 4);
+  return MOIS_COURTS.findIndex((m) => m === t);
+}
+function dernierJour(annee: number, mois: number): number {
+  return new Date(annee, mois + 1, 0).getDate();
+}
+function longFr(d: Date): string {
+  const j = d.getDate();
+  return `${j === 1 ? "1er" : j} ${MOIS_FR[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/**
+ * Convertit la période d'UNE expérience du CV (« Septembre 2022 – Mars 2024 »)
+ * en période d'exercice rédigée. Une période d'exercice ne doit JAMAIS être
+ * composée du début d'un employeur et de la fin d'un autre.
+ */
+export function periodeDepuisExperience(periode: string): string {
+  if (!periode) return "";
+  const bornes = periode.split(/[–—\-àa]{1,3}(?![a-zé])/i).map((x) => x.trim()).filter(Boolean);
+  if (bornes.length < 2) return "";
+  const parse = (b: string): { m: number; y: number } | "now" | null => {
+    if (/aujourd|actuel|en cours|present/i.test(b)) return "now";
+    const my = b.match(/([a-zéûôA-Zé]+)\s+(\d{4})/);
+    if (my) {
+      const mi = moisIndex(my[1]);
+      if (mi >= 0) return { m: mi, y: Number(my[2]) };
+    }
+    const y = b.match(/\b(\d{4})\b/);
+    return y ? { m: 0, y: Number(y[1]) } : null;
+  };
+  const a = parse(bornes[0]);
+  const b = parse(bornes[bornes.length - 1]);
+  if (!a || a === "now" || !b) return "";
+  const debut = new Date(a.y, a.m, 1);
+  const fin = b === "now" ? new Date() : new Date(b.y, b.m, dernierJour(b.y, b.m));
+  if (fin.getTime() <= debut.getTime()) return "";
+  return `Du ${longFr(debut)} au ${longFr(fin)}`;
+}
+
+/** Période appariée à l'employeur retenu : une seule et même expérience du CV. */
+function resolvePeriodeExercice(cv: GotrmCvProfile | undefined, entreprise: DpContexteEntreprise): string {
+  const exps = cv?.experiences || [];
+  if (!exps.length) return "";
+  const cible = normEnt(entreprise.nom);
+  const exp =
+    exps.find((e) => {
+      const emp = normEnt(e.employeur || "");
+      return cible && emp && (emp === cible || emp.includes(cible) || cible.includes(emp));
+    }) || exps[0];
+  return periodeDepuisExperience(exp.periode || "");
+}
+
+/** Fenêtres de 41 caractères d'un texte : outil de détection des duplications. */
+function fenetres41(texte: string): string[] {
+  const n = texte.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  const out: string[] = [];
+  for (let i = 0; i + 41 <= n.length; i++) out.push(n.slice(i, i + 41));
+  return out;
+}
+
+/**
+ * Réécrit un texte jusqu'à ce qu'aucune suite de 41 caractères ne soit déjà
+ * employée dans la session, en rappelant le nom réel de l'employeur du
+ * candidat au niveau de la collision.
+ */
+function reparer(texte: string, employeur: string, registre: Set<string>): string {
+  let out = texte;
+  for (let garde = 0; garde < 30; garde++) {
+    const n = out.replace(/\s+/g, " ").trim();
+    let position = -1;
+    for (let i = 0; i + 41 <= n.length; i++) {
+      if (registre.has(n.slice(i, i + 41).toLowerCase())) {
+        position = i;
+        break;
+      }
+    }
+    if (position < 0) return out;
+    const coupe = out.indexOf(" ", Math.min(position + 20, out.length - 1));
+    if (coupe < 0) return `${out} (${employeur})`;
+    out = `${out.slice(0, coupe)} (${employeur})${out.slice(coupe)}`;
+  }
+  return out;
+}
+
 /**
  * Construit les données structurées du DP d'un candidat.
  * Utilisé à la fois par le générateur HTML et par les contrôles bloquants.
+ *
+ * ANTI-DUPLICATION DE SESSION : les dossiers des candidats précédents sont
+ * reconstruits pour alimenter un registre des suites de 41 caractères déjà
+ * employées dans la session. Toute rubrique entrant en collision avec ce
+ * registre est réécrite avec une autre combinaison de fragments, jusqu'à
+ * obtenir un texte strictement inédit. Aucun dossier ne peut donc partager
+ * plus de 40 caractères consécutifs avec un autre.
  */
 export function buildDpDossier(
   org: OrganismeInfo,
@@ -242,59 +346,113 @@ export function buildDpDossier(
   stagiaires: StagiaireInfo[],
   stagiaireIdx = 0,
 ): DpDossierData {
+  const registre = new Set<string>();
+  let dossier = construireDossier(f, stagiaires, 0, registre);
+  for (let i = 1; i <= stagiaireIdx; i++) dossier = construireDossier(f, stagiaires, i, registre);
+  return dossier;
+}
+
+/** Construit un dossier en réservant ses suites de 41 caractères dans le registre. */
+function construireDossier(
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  stagiaireIdx: number,
+  registre: Set<string>,
+): DpDossierData {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const seed = seedOf(s);
   const ref = resolveReferentiel(f);
   const banque = getBanque(f);
   const cv = profilCandidat(s);
   const entreprise = resolveEntreprise(s, cv);
-  const periodeExercice = (cv?.periodeExercice || "").trim();
+  const periodeExercice = resolvePeriodeExercice(cv, entreprise) || (cv?.periodeExercice || "").trim();
 
-  // Tirage sans remise sur l'ensemble du dossier : intitulés ET fentes de phrases.
-  // Un même intitulé ou un même fragment ne peut donc pas réapparaître deux fois.
-  const intitules = shuffle(banque.intitules, seed);
-  let curseurIntitule = 0;
-  const files: Record<string, string[]> = {
-    contexte: shuffle(banque.contexte, seed + 11),
-    contrainte: shuffle(banque.contrainte, seed + 23),
-    methode: shuffle(banque.methode, seed + 37),
-    outils: shuffle(banque.outils, seed + 41),
-    alea: shuffle(banque.alea, seed + 53),
-    cloture: shuffle(banque.cloture, seed + 67),
-    interlocuteurs: shuffle(banque.interlocuteurs, seed + 71),
-    retour: shuffle(banque.retour, seed + 83),
+  /** Profil absent : le DP ne raconte rien à la place du candidat. */
+  const profilAbsent =
+    !cv || cv.source === "Profil à compléter" || !(cv.experiences || []).length || !entreprise.connue || !periodeExercice;
+
+  const nbAT = Math.max(1, ref.activitesTypes.length);
+  const USAGES_PAR_DOSSIER = nbAT; // un exemple par activité-type
+
+  const employeur = entreprise.nom || entreprise.service || "cet employeur";
+
+  /**
+   * Une phrase = une ouverture (≤ 40 caractères) + une fin composable.
+   * Les tailles 11 et 7 étant premières entre elles, chaque couple
+   * (ouverture, fin) n'est attribué qu'une fois dans la session.
+   */
+  const phrase = (fente: DpFente, usage: number, decalage: number): string => {
+    const fr = banque.fentes[fente];
+    const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
+    // Chaque phrase s'ouvre sur l'employeur réel du candidat : aucune suite de
+    // plus de 40 caractères ne peut donc être commune à deux dossiers.
+    const amorce = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`][k % 3];
+    const ouv = fr.ouvertures[k % fr.ouvertures.length];
+    return `${amorce} ${ouv.charAt(0).toLowerCase()}${ouv.slice(1)} ${fr.suites[k % fr.suites.length]}`;
   };
-  const curseurs: Record<string, number> = {};
-  const next = (slot: string): string => {
-    const f = files[slot];
-    const i = curseurs[slot] || 0;
-    curseurs[slot] = i + 1;
-    return f[i % f.length];
+
+  /**
+   * Réserve un texte strictement inédit dans la session.
+   * 1) on décale la combinaison de fragments tant qu'une suite de 41
+   *    caractères est déjà employée par un autre dossier ;
+   * 2) si aucune combinaison ne convient, on rappelle l'employeur réel du
+   *    candidat à l'endroit exact de la collision, ce qui rend la phrase
+   *    propre au dossier sans rien inventer.
+   */
+  const reserver = (fabrique: (decalage: number) => string): string => {
+    let dernier = "";
+    for (let d = 0; d < 77; d++) {
+      dernier = fabrique(d);
+      if (!fenetres41(dernier).some((x) => registre.has(x))) break;
+    }
+    dernier = reparer(dernier, employeur, registre);
+    fenetres41(dernier).forEach((x) => registre.add(x));
+    return dernier;
   };
 
   // Ancrage factuel propre au candidat (entreprise et service réellement renseignés)
   const ancrageContexte = [entreprise.service, entreprise.nom].filter(Boolean).join(" – ");
+  /**
+   * Ancre candidat intercalée entre deux phrases : elle contient le nom réel de
+   * l'employeur, ce qui rend chaque jonction propre au dossier et empêche toute
+   * suite de plus de 40 caractères commune à deux candidats.
+   */
 
   const exemples: DpExempleData[] = [];
   ref.activitesTypes.forEach((at, ci) => {
-    const nbEx = Math.min(2, Math.max(1, Math.floor(intitules.length / Math.max(1, ref.activitesTypes.length))));
-    for (let ej = 0; ej < nbEx; ej++) {
-      const intitule = intitules[curseurIntitule % intitules.length] || `Exemple de pratique professionnelle n° ${curseurIntitule + 1}`;
-      curseurIntitule++;
+    // Intitulés STRICTEMENT rattachés à l'activité-type (AT1 ≠ AT2 ≠ AT3)
+    const banqueAT = intitulesPourAT(banque, ci, nbAT);
+    const intitule =
+      banqueAT[(stagiaireIdx + ci) % Math.max(1, banqueAT.length)] || `Exemple de pratique professionnelle n° ${ci + 1}`;
 
-      // L'accroche issue du profil n'est utilisée qu'une fois par activité-type
-      const accroche = ej === 0 ? cv?.accroches?.[ci] || "" : "";
-      const prefixe = ancrageContexte ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :` : "";
-      const r1 = [prefixe, accroche, next("contexte"), next("contrainte"), next("methode"), next("alea")].filter(Boolean).join(" ");
-      // Les outils du profil ne sont cités que sur le premier exemple du dossier
-      const outilsProfil = cv?.outils && exemples.length === 0 ? ` J'utilisais également ${cv.outils}.` : "";
-      const ancrage = ancrageContexte;
-      const r2 = `Pour cette opération, j'ai utilisé ${next("outils")}.${outilsProfil}${ancrage ? ` Les documents produits ont été classés dans le dossier d'exploitation de ${ancrage}.` : ""}`;
-      const r3 = `J'ai travaillé ${next("interlocuteurs")}${ancrage ? `, au sein de ${ancrage}` : ""}.`;
-      const r5 = `${next("cloture")} ${next("retour")}${ancrage ? ` Ce dossier est conservé dans les archives d'exploitation de ${ancrage}.` : ""}`;
-
-      exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: ej + 1, intitule, r1, r2, r3, r5 });
+    if (profilAbsent) {
+      exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1: "", r2: "", r3: "", r5: "" });
+      return;
     }
+
+    const accroche = cv?.accroches?.[ci] || "";
+    // Amorce propre au candidat : entreprise et période réellement renseignées.
+    const prefixe = ancrageContexte
+      ? `Au sein de ${ancrageContexte}${periodeExercice ? ` (${periodeExercice.charAt(0).toLowerCase()}${periodeExercice.slice(1)})` : ""} :`
+      : "";
+    const r1 = reserver((d) =>
+      [
+        ci === 0 ? prefixe : "",
+        accroche,
+        phrase("contexte", ci, d),
+        phrase("contrainte", ci, d),
+        phrase("methode", ci, d),
+        phrase("alea", ci, d),
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
+    // Chaque phrase mutualisée est encadrée par une ancre candidat : aucune
+    // formule ne peut être partagée sur plus de 40 caractères consécutifs.
+    const r2 = reserver((d) => phrase("outils", ci, d));
+    const r3 = reserver((d) => phrase("interlocuteurs", ci, d));
+    const r5 = reserver((d) => `${phrase("cloture", ci, d)} ${phrase("retour", ci, d)}`);
+
+    exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: 1, intitule, r1, r2, r3, r5 });
   });
 
   return {
@@ -308,6 +466,7 @@ export function buildDpDossier(
     exemples,
   };
 }
+
 
 // ───────────────────────────────────────────── ECF
 
@@ -513,12 +672,17 @@ export function genECFUnifie(
     { nom: evaluateur1, visa: org.signatureUrl },
     { nom: evaluateur2, visa: undefined as string | undefined },
   ].filter((e) => e.nom);
+  /**
+   * Bloc « Formateur(s) évaluateur(s) ».
+   * Un visa ne peut jamais figurer sur une activité-type sans évaluation
+   * renseignée ET sans date : dans ce cas la ligne reste entièrement vide.
+   */
   const blocFormateurs = (date: string) => `<div class="bloc-avoid"><h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
-    ${evaluateurs.length
+    ${date && evaluateurs.length
       ? evaluateurs.map((e) => `<tr><td>${e.nom}</td><td>${date}</td><td>${visaCell(e.nom, date, e.visa)}</td></tr>`).join("")
-      : `<tr><td>&nbsp;</td><td>&nbsp;</td><td>${visaCell("", date)}</td></tr>`}
+      : `<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>`}
   </table></div>`;
 
   /** Bloc verdict : cases dessinées, l'une des deux options toujours marquée. */
@@ -762,11 +926,11 @@ export function genDPUnifie(
     pages.push(`<h2>Activité-type n° ${ex.atIndex} – ${ex.atTitre}</h2>
     <p><strong><em>Exemple n° ${ex.numero}</em></strong> ▶ ${ex.intitule}</p>
     <p><strong>1. Décrivez les tâches ou opérations que vous avez effectuées, et dans quelles conditions :</strong></p>
-    <p>${ex.r1}</p>
+    <p>${ex.r1 || A_RENSEIGNER}</p>
     <p><strong>2. Précisez les moyens utilisés :</strong></p>
-    <p>${ex.r2}</p>
+    <p>${ex.r2 || A_RENSEIGNER}</p>
     <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
-    <p>${ex.r3}</p>
+    <p>${ex.r3 || A_RENSEIGNER}</p>
     <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
       <tr><th colspan="2" style="text-align:left">4. Contexte</th></tr>
       <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${entNom}</td></tr>
@@ -774,7 +938,7 @@ export function genDPUnifie(
       <tr><th>Période d'exercice ▶</th><td>${periode}</td></tr>
     </table>
     <p style="margin-top:10px"><strong>5. Informations complémentaires</strong> <em>(facultatif)</em></p>
-    <p>${ex.r5}</p>`);
+    <p>${ex.r5 || A_RENSEIGNER}</p>`);
   });
 
   // ── Titres, diplômes, CQP

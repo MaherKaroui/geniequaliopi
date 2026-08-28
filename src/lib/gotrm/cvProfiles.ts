@@ -95,7 +95,7 @@ const P: GotrmCvProfile[] = [
     periodeExercice: "Du 1er septembre 2019 au 31 décembre 2024",
     accroches: [
       "Dans le cadre de la gestion des approvisionnements de mon établissement, j'ai régulièrement traité des demandes de transport pour mes fournisseurs et pour mes propres flux.",
-      "Sur la partie logistique amont, j'ai piloté des livraisons régulières confiées à des transporteurs sous contrat.",
+      "Côté logistique amont, j'organisais les approvisionnements réguliers assurés par nos transporteurs contractuels.",
       "En tant que gérant, j'ai animé une équipe de dix personnes et suivi mes indicateurs de gestion au quotidien.",
     ],
     source: "CV transmis",
@@ -153,8 +153,8 @@ const P: GotrmCvProfile[] = [
     permis: "Permis B, C, CE",
     periodeExercice: "Du 1er janvier 2021 au 31 juillet 2025",
     accroches: [
-      "Depuis le terrain puis en appui de l'exploitation, j'ai été associé au chiffrage et à l'organisation des transports de bennes et de matériel de chantier.",
-      "J'ai suivi les rotations régulières confiées à des sous-traitants sur les chantiers de la région parisienne.",
+      "Venu du terrain puis passé en appui exploitation, je chiffrais et j'organisais les rotations de bennes et de matériel de chantier.",
+      "Je pilotais les rotations récurrentes de nos partenaires affrétés sur les chantiers franciliens.",
       "Avec le responsable d'exploitation, j'ai participé au suivi des coûts et des consommations de la flotte.",
     ],
     source: "CV transmis",
@@ -219,7 +219,7 @@ const P: GotrmCvProfile[] = [
     periodeExercice: "Du 1er juin 2020 au 31 octobre 2023",
     accroches: [
       "Dans un environnement très réglementé (matières dangereuses, plate-forme aéroportuaire), j'ai participé à l'étude de faisabilité et au chiffrage des prestations.",
-      "J'ai suivi les prestations régulières confiées à des sous-traitants sur la plate-forme et en messagerie.",
+      "Je supervisais les navettes récurrentes de nos affrétés entre la plate-forme et la messagerie.",
       "J'ai été associé au suivi des indicateurs d'activité et des obligations réglementaires de l'équipe.",
     ],
     source: "CV transmis",
@@ -528,7 +528,7 @@ const P: GotrmCvProfile[] = [
     permis: "Permis B, A2",
     periodeExercice: "Du 1er septembre 2025 au 31 juillet 2026",
     accroches: [
-      "Sur des livraisons sous contraintes strictes (pharmaceutique, alimentaire), j'ai été associé au chiffrage et à l'organisation des prestations.",
+      "Sur des flux pharmaceutiques et alimentaires très contraints, je participais au calcul des prix et au montage des tournées.",
       "J'ai suivi les tournées régulières et les prestataires intervenant sur notre périmètre.",
       "En gestion de parc, j'ai suivi les coûts d'entretien, la disponibilité des véhicules et les échéances réglementaires.",
     ],
