@@ -209,7 +209,7 @@ const FENTES_GENERIQUES: Record<DpFente, DpFragments> = {
       "Un prestataire complétait le dispositif,",
     ],
     suites: [
-      "qui validait les arbitrages.",
+      "et les arbitrages ont été validés.",
       "et le service administratif.",
       "sous la supervision du responsable.",
       "et les interlocuteurs externes.",
@@ -329,7 +329,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "Le relevé chronotachygraphe a été lu,",
       "La grille tarifaire a servi de base,",
       "Le carnet palettes a été tenu à jour,",
-      "Les lettres de voiture ont été vérifiées,",
+      "Les lettres de voiture ont été vues,",
       "Le tableau de marge a été actualisé,",
       "Le registre de sécurité a été contrôlé,",
     ],
@@ -406,7 +406,7 @@ const FENTES_TRANSPORT: Record<DpFente, DpFragments> = {
       "Le transporteur affrété était engagé,",
     ],
     suites: [
-      "qui validait le niveau de marge.",
+      "et le niveau de marge a été validé.",
       "et les conducteurs concernés.",
       "ainsi que le service facturation.",
       "et les sous-traitants réguliers.",

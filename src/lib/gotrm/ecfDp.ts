@@ -383,7 +383,7 @@ function construireDossier(
    * suite de plus de 40 caractères commune à deux candidats.
    */
   const employeur = entreprise.nom || entreprise.service || "cet employeur";
-  const ancres = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`];
+  const ancres = [`${employeur} : `, `${employeur} — `, `${employeur} / `].map((x) => x.trim());
   const minuscule = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 
   const exemples: DpExempleData[] = [];
