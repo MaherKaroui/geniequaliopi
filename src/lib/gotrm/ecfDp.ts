@@ -327,16 +327,17 @@ export function genECFGotrm(
   <p style="margin-top:14px"><strong>Formateur(s) / Évaluateur(s)</strong></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
-    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td style="height:46px"></td></tr>
+    <tr><td>${evaluateur1}</td><td>${dateVisa}</td><td>${visaCell(evaluateur1, dateVisa)}</td></tr>
+    <tr><td>${evaluateur2}</td><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>
   </table>
   <p style="margin-top:14px"><strong>Représentant de l'organisme de formation</strong></p>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    <tr><td>${org.dirigeant || ""}</td><td>${dateVisa}</td><td style="height:70px">${org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon ${org.nom}" style="max-height:70px" />` : ""}</td></tr>
+    <tr><td>${org.dirigeant || org.nom}</td><td>${dateVisa}</td><td>${visaCell(org.dirigeant || org.nom, dateVisa, org.tamponUrl)}</td></tr>
   </table>
   <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature le ${dateVisa}.</p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td style="height:76px">${s?.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:60px" />` : ""}</td></tr></table>`);
+  <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td>${visaCell(`${s?.prenom || ""} ${s?.nom || ""}`.trim(), dateVisa, s?.signatureUrl)}</td></tr></table>`);
+
 
   const total = pages.length;
   const body = pages
