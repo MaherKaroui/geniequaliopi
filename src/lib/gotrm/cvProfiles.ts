@@ -442,9 +442,8 @@ const P: GotrmCvProfile[] = [
       "Communication professionnelle en anglais",
     ],
     pointsAConsolider: [
-      "Réglementation sociale européenne",
-      "Exploitation technique et affectation des moyens",
-      "Calcul des coûts de revient",
+      "Encadrement au quotidien d'une équipe de conducteurs",
+      "Supervision des opérations de traction, groupage et camionnage",
     ],
   },
   {
