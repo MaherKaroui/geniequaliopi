@@ -541,8 +541,9 @@ export function genECFUnifie(
     ${ref.activitesTypes
       .map((at, i) => {
         const detail = at.competences.join("<br>• ");
+        const satisfait = prof.renseigne ? satisfaitParAT[i] ?? false : false;
         return `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${detail}</td></tr>
-    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(prof.renseigne)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`;
+    <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(satisfait)} &nbsp;&nbsp;&nbsp; NON ${CHK(!satisfait)}</td></tr>`;
       })
       .join("")}
   </table>`);
