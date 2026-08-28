@@ -70,22 +70,6 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     perStagiaire: true,
     category: "administratif",
   },
-  {
-    code: "71",
-    label: "ECF – Livret d'évaluations passées en cours de formation (GOTRM)",
-    description: "Livret officiel ECF (Ministère chargé de l'emploi) pour le TP-01329 GOTRM : fiches de résultats par activité-type (CCP1, CCP2, CCP3), compétences cochées, visas formateurs et synthèse. Un livret par candidat, contenus d'évaluation différents pour chaque stagiaire.",
-    autoTemplates: ["ecf_livret_gotrm"],
-    perStagiaire: true,
-    category: "certification",
-  },
-  {
-    code: "72",
-    label: "DP – Dossier professionnel (GOTRM)",
-    description: "Dossier professionnel officiel (trame Ministère chargé de l'emploi) : exemples de pratique professionnelle rédigés à la première personne par le candidat, contexte entreprise, moyens, titres et diplômes, déclaration sur l'honneur. Réponses humanisées et différentes pour chaque candidat.",
-    autoTemplates: ["dossier_professionnel_gotrm"],
-    perStagiaire: true,
-    category: "certification",
-  },
 
   {
     code: "2",
