@@ -17,6 +17,8 @@ import { STYLE_MINISTERE, CHK } from "@/lib/gotrm/ecfDp";
 import { GOTRM_CCP, GOTRM_TITRE, GOTRM_MSP_PARTIES } from "@/data/gotrm";
 import { findGotrmProfile } from "@/lib/gotrm/cvProfiles";
 import type { GotrmCandidat, GotrmSession } from "./gotrmTypes";
+import { buildGotrmIdentifiant } from "./gotrmTypes";
+import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
 const MAJ_TRAME = "21/08/2025";
 
@@ -364,4 +366,74 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
 
   const body = pages.join(`<div class="page-break"></div>`);
   return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>${pied("Grille 2 jury", "v01")}`);
+}
+
+// ───────────────────────────────────────────── adaptateurs EDOF / contrôle EY
+
+/**
+ * Construit une session GOTRM minimale à partir des données de l'application
+ * (organisme + formation + stagiaire), pour générer les grilles jury depuis
+ * le module EDOF sans passer par la page Session GOTRM.
+ * Aucun membre du jury n'est inventé : les visas restent vierges.
+ */
+function sessionDepuisFormation(
+  org: OrganismeInfo,
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  idx: number,
+): { session: GotrmSession; candidat: GotrmCandidat } {
+  const s = stagiaires[idx] || stagiaires[0];
+  const debut = f.dateDebut || "";
+  const fin = f.dateFin || "";
+  const candidat: GotrmCandidat = {
+    id: `edof-${idx}`,
+    civilite: s?.civilite === "Mme" ? "Mme" : "M.",
+    nom: s?.nom || "",
+    prenom: s?.prenom || "",
+    dateNaissance: (s as { dateNaissance?: string } | undefined)?.dateNaissance || "",
+    identifiant: buildGotrmIdentifiant(debut, idx),
+    dossierComplet: true,
+    motifIncomplet: "",
+    parcours: "Formation continue",
+    ccpVises: GOTRM_CCP.map((c) => c.code),
+    ordrePassage: idx + 1,
+    msp1Date: s?.dateDebutFormation || debut,
+    msp1Horaire: "09h00 – 14h00",
+    msp2Date: s?.dateFinFormation || fin,
+    msp2Horaire: "09h00 – 14h00",
+    ccpObtenus: [],
+  };
+  const session: GotrmSession = {
+    intitule: f.intitule || GOTRM_TITRE.intitule,
+    dateDebut: debut,
+    dateFin: fin,
+    lieu: f.lieu || [org.adresse, `${org.codePostal || ""} ${org.ville || ""}`.trim()].filter(Boolean).join(", "),
+    jury: [],
+    surveillants: [],
+    organisme: org,
+    candidats: [candidat],
+  };
+  return { session, candidat };
+}
+
+/** GJ1 — pièce EDOF 45D (1 par stagiaire). */
+export function genGJ1Officiel(
+  org: OrganismeInfo,
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  idx = 0,
+): string {
+  const { session, candidat } = sessionDepuisFormation(org, f, stagiaires, idx);
+  return genGJ1Gotrm(session, candidat);
+}
+
+/** GJ2 — pièce EDOF 45E (1 par stagiaire). */
+export function genGJ2Officiel(
+  org: OrganismeInfo,
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  idx = 0,
+): string {
+  const { session, candidat } = sessionDepuisFormation(org, f, stagiaires, idx);
+  return genGJ2Gotrm(session, candidat);
 }
