@@ -258,7 +258,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
         .join("")}
     </table>
     <h3>Observations du jury</h3>
-    <div class="cadre-reponse">${esc(pick(OBS_POSITIVES, sd + i))}${
+    <div class="cadre-reponse">${esc(pick2(OBS_POSITIVES, sd + i * 3))} ${esc(pick(OBS_COMPLEMENT, sd + i))}${
       forts.length ? ` ${esc(`Points d'appui relevés : ${forts.slice(0, 2).join(" ; ")}.`)}` : ""
     }</div>`);
   });
@@ -276,7 +276,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
       .join("")}
   </table>
   <h3>Observations du jury sur la production</h3>
-  <div class="cadre-reponse">${esc(pick(OBS_PRODUCTION, sd))}${
+  <div class="cadre-reponse">${esc(pick2(OBS_PRODUCTION, sd))}${
     consolider.length ? ` ${esc(`Points approfondis à l'entretien technique : ${consolider.slice(0, 2).join(" ; ")}.`)}` : ""
   }</div>`);
 
@@ -293,7 +293,7 @@ export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ).join("")}
   </table>
   <h3>Observations générales du jury</h3>
-  <div class="cadre-reponse">${esc(pick(OBS_ENTRETIEN, sd))}</div>
+  <div class="cadre-reponse">${esc(pick2(OBS_ENTRETIEN, sd))}</div>
   ${blocSignaturesJury(s)}`);
 
   const body = pages.join(`<div class="page-break"></div>`);
@@ -404,7 +404,7 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ).join("")}
     <tr><td colspan="2"><strong>Conclusion : lors de l'entretien final, le candidat a-t-il démontré une maîtrise globale suffisante pour la tenue de l'emploi ?</strong></td>
       <td style="text-align:center;white-space:nowrap">${CHK(true)} oui &nbsp; ${CHK(false)} non</td>
-      <td style="font-size:9.5pt">${esc(pick(OBS_ENTRETIEN, sd + 1))}</td></tr>
+      <td style="font-size:9.5pt">${esc(pick2(OBS_ENTRETIEN, sd + 4))}</td></tr>
   </table>
   ${blocSignaturesJury(s)}`);
 
