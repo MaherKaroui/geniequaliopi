@@ -61,7 +61,7 @@ export function DPControleCoherence({
         <DialogHeader>
           <DialogTitle>Contrôle de cohérence — Dossiers professionnels</DialogTitle>
           <DialogDescription>
-            Vérification bloquante des périodes d'exercice et des duplications entre dossiers avant génération.
+            Vérification bloquante des périodes d'exercice, des duplications entre dossiers et de la différenciation des livrets ECF (répartition des compétences, appréciations, profils manquants) avant génération.
           </DialogDescription>
         </DialogHeader>
 
@@ -70,7 +70,7 @@ export function DPControleCoherence({
             <CheckCircle2 className="h-4 w-4" />
             <AlertTitle>Aucune anomalie détectée</AlertTitle>
             <AlertDescription>
-              Les {stagiaires.length} dossier(s) présentent des périodes d'exercice valides et des contenus distincts.
+              Les {stagiaires.length} dossier(s) présentent des périodes d'exercice valides, des contenus distincts et des livrets ECF différenciés.
             </AlertDescription>
           </Alert>
         ) : (
