@@ -96,9 +96,6 @@ function splitFormateur(full: string): { prenom: string; nom: string } {
 }
 
 
-function getStagAdresse(s: StagiaireInfo): string {
-  return s.adresse ? `${s.adresse}${s.codePostal ? `<br>${s.codePostal} ${s.commune || ""}` : ""}` : "Adresse non renseignée";
-}
 
 function getDateDebut(f: FormationInfo, s?: StagiaireInfo): string {
   return s?.dateDebutFormation || f.dateDebut || "";
@@ -208,16 +205,6 @@ export async function preloadDPAIPack(f: FormationInfo, s: StagiaireInfo): Promi
 }
 
 
-/**
- * Footer officiel du DP (Version du 01/06/2016).
- * Le PDF ministériel n'utilise pas le tableau tabulaire mais une ligne discrète.
- */
-function footerDPOfficiel(pageLabel: string): string {
-  return `<div class="footer-dp">
-    <span>▶ DOSSIER PROFESSIONNEL — Version du 01/06/2016</span>
-    <span>Page ${pageLabel}</span>
-  </div>`;
-}
 
 export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number = 0): string {
   // Moteur unique : voir src/lib/gotrm/ecfDp.ts
