@@ -12,6 +12,9 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDpDossier, parsePeriodeFr, type DpDossierData } from "@/lib/gotrm/ecfDp";
 import { getStagiaireDateDebut, getStagiaireDateFin } from "@/lib/docBuilder";
+import { resolveReferentiel } from "@/lib/dp/referentielTitres";
+import { findGotrmProfile } from "@/lib/gotrm/cvProfiles";
+import { buildEcfProfilage } from "@/lib/dp/ecfProfilage";
 
 export interface DpAnomalie {
   candidat: string;
@@ -151,6 +154,70 @@ export function controlerDuplicationSession(dossiers: DpDossierData[]): DpAnomal
   return out;
 }
 
+/**
+ * Contrôles propres au livret ECF (45B) :
+ *  - deux livrets d'une même session ne peuvent pas avoir la même répartition
+ *    de compétences (livrets superposables) ;
+ *  - aucune appréciation ne peut être dupliquée entre deux candidats ;
+ *  - un candidat sans profil transmis ne doit jamais ressortir avec un livret
+ *    rempli automatiquement.
+ */
+export function controlerEcfSession(f: FormationInfo, stagiaires: StagiaireInfo[]): DpAnomalie[] {
+  const out: DpAnomalie[] = [];
+  const ref = resolveReferentiel(f);
+  const livrets = stagiaires.map((s) => {
+    const cv = findGotrmProfile(s?.nom, s?.prenom);
+    return { nom: nomCandidat(s), cv, prof: buildEcfProfilage(ref, cv) };
+  });
+
+  for (const l of livrets) {
+    const sansProfil = !l.cv || l.cv.source === "Profil à compléter" || !l.cv.pointsForts.length;
+    if (sansProfil && l.prof.renseigne) {
+      out.push({
+        candidat: l.nom,
+        regle: "Livret sans profil",
+        message: "Le livret a été rempli automatiquement alors qu'aucun profil candidat n'a été transmis.",
+      });
+    }
+    if (sansProfil) {
+      out.push({
+        candidat: l.nom,
+        regle: "Profil candidat manquant",
+        message: "Aucun profil (CV) transmis : le livret sort vide, en attente du profil candidat. Renseignez le profil avant l'export.",
+      });
+    }
+  }
+
+  const parSignature = new Map<string, string>();
+  const parAppreciation = new Map<string, string>();
+  for (const l of livrets) {
+    if (!l.prof.renseigne) continue;
+    const sig = l.prof.signature;
+    const deja = parSignature.get(sig);
+    if (deja) {
+      out.push({
+        candidat: `${deja} / ${l.nom}`,
+        regle: "Livrets superposables",
+        message: `Répartition de compétences strictement identique (${sig}). Les livrets doivent découler de profils distincts.`,
+      });
+    } else parSignature.set(sig, l.nom);
+
+    for (const a of l.prof.appreciations) {
+      for (const b of blocs(a)) {
+        const ori = parAppreciation.get(b);
+        if (ori && ori !== l.nom) {
+          out.push({
+            candidat: `${ori} / ${l.nom}`,
+            regle: "Appréciation dupliquée",
+            message: `Appréciation identique dans deux livrets : « ${b.slice(0, 90)}… »`,
+          });
+        } else parAppreciation.set(b, l.nom);
+      }
+    }
+  }
+  return out;
+}
+
 export interface DpControleResultat {
   anomalies: DpAnomalie[];
   exportAutorise: boolean;
@@ -167,6 +234,7 @@ export function controlerSessionDp(
     ...dossiers.flatMap((d) => controlerPeriode(d, f)),
     ...dossiers.flatMap((d) => controlerDuplicationInterne(d)),
     ...controlerDuplicationSession(dossiers),
+    ...controlerEcfSession(f, stagiaires),
   ];
   return { anomalies, exportAutorise: anomalies.length === 0 };
 }

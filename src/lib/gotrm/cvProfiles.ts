@@ -31,7 +31,16 @@ export interface GotrmCvProfile {
   /** Phrase d'accroche contextuelle par activité-type (AT1 / AT2 / AT3) */
   accroches: [string, string, string];
   /** Source du profil */
-  source: "CV transmis" | "Profil reconstitué";
+  source: "CV transmis" | "Profil reconstitué" | "Profil à compléter";
+  /** Adresse personnelle telle qu'indiquée sur le CV */
+  adresse?: string;
+  /**
+   * Points forts exprimés en compétences du référentiel.
+   * Vide = aucune donnée : le générateur ECF ne doit RIEN inventer.
+   */
+  pointsForts: string[];
+  /** Compétences à consolider, exprimées en compétences du référentiel. */
+  pointsAConsolider: string[];
 }
 
 const P: GotrmCvProfile[] = [
@@ -90,6 +99,18 @@ const P: GotrmCvProfile[] = [
       "En tant que gérant, j'ai animé une équipe de dix personnes et suivi mes indicateurs de gestion au quotidien.",
     ],
     source: "CV transmis",
+    adresse: "4 Allée Louis Jouvet, 94500 Champigny-sur-Marne",
+    pointsForts: [
+      "Encadrement et animation d'une équipe",
+      "Gestion budgétaire et suivi du chiffre d'affaires",
+      "Suivi d'indicateurs d'activité",
+      "Contrôle des flux de marchandises",
+    ],
+    pointsAConsolider: [
+      "Réglementation du transport routier de marchandises",
+      "Tarification et calcul du prix de revient",
+      "Affrètement et sous-traitance",
+    ],
   },
   {
     nom: "BOUZZAOUI",
@@ -137,6 +158,18 @@ const P: GotrmCvProfile[] = [
       "Avec le responsable d'exploitation, j'ai participé au suivi des coûts et des consommations de la flotte.",
     ],
     source: "CV transmis",
+    adresse: "Le Blanc-Mesnil (93)",
+    pointsForts: [
+      "Sécurité des opérations de chargement et de déchargement",
+      "Arrimage et sécurisation des charges",
+      "Entretien et contrôle du véhicule",
+      "Gestion d'itinéraire et respect des délais",
+    ],
+    pointsAConsolider: [
+      "Conception d'une prestation de transport",
+      "Calcul des coûts de revient",
+      "Recours à la sous-traitance et à l'affrètement",
+    ],
   },
   {
     nom: "DAHOUM",
@@ -190,53 +223,35 @@ const P: GotrmCvProfile[] = [
       "J'ai été associé au suivi des indicateurs d'activité et des obligations réglementaires de l'équipe.",
     ],
     source: "CV transmis",
+    adresse: "7 rue Louise Michel, 93440 Dugny",
+    pointsForts: [
+      "Transport de matières dangereuses (ADR, citerne)",
+      "Application des procédures réglementaires",
+      "Tenue des documents de bord et de transport",
+      "Travail en environnement sous contrainte",
+    ],
+    pointsAConsolider: [
+      "Tarification des prestations",
+      "Relation avec les donneurs d'ordres",
+      "Pilotage d'un trafic et suivi d'exploitation",
+    ],
   },
   {
     nom: "GIMENEZ",
     prenom: "Jessica",
-    entreprise: { nom: "TRANSPORTS DELAHAYE", service: "Cellule affrètement national et administration des transports", ville: "Rungis (94)" },
-    posteOccupe: "Assistante d'exploitation transport puis affréteuse",
-    profil:
-      "Après plusieurs années en administration des ventes, je me suis orientée vers l'exploitation transport : saisie des ordres, affrètement, suivi des sous-traitants et traitement des litiges.",
-    experiences: [
-      {
-        periode: "Janvier 2022 – Juin 2025",
-        poste: "Affréteuse",
-        employeur: "Transports Delahaye, Rungis",
-        missions: [
-          "Recherche et négociation de sous-traitants sur bourse de fret",
-          "Contrôle des pièces administratives des affrétés (licence, assurance, vigilance URSSAF)",
-          "Suivi des ordres de transport et facturation client",
-        ],
-      },
-      {
-        periode: "Septembre 2018 – Décembre 2021",
-        poste: "Assistante d'exploitation",
-        employeur: "Groupe de messagerie régionale, Corbeil-Essonnes",
-        missions: [
-          "Saisie des commandes et édition des documents de transport",
-          "Suivi des livraisons et information des clients",
-          "Traitement de premier niveau des réclamations",
-        ],
-      },
-    ],
-    outils:
-      "TMS Akanea Transport, bourse de fret B2P et Teleroute, Excel® (tarification et tableaux de bord), Word® pour les offres et les courriers, messagerie Outlook",
-    collegues:
-      "avec la responsable affrètement, deux exploitants, le service facturation, les sous-traitants réguliers et les donneurs d'ordres",
-    diplomes: [
-      ["BTS Gestion de la PME", "Ministère de l'Éducation nationale", "2017"],
-      ["Attestation de formation – Réglementation sociale européenne", "Organisme agréé", "2023"],
-      ["Attestation de formation – Utilisation d'un TMS", "Éditeur Akanea", "2024"],
-    ],
-    permis: "Permis B",
-    periodeExercice: "Du 3 janvier 2022 au 30 juin 2025",
-    accroches: [
-      "Sur la cellule affrètement, j'ai traité quotidiennement les demandes de transport, de l'étude de faisabilité à la remise de l'offre.",
-      "J'ai suivi les trafics réguliers sous-traités et la relation avec les affrétés.",
-      "J'ai contribué au suivi administratif de l'équipe et au reporting mensuel de l'agence.",
-    ],
-    source: "Profil reconstitué",
+    entreprise: { nom: "", service: "", ville: "" },
+    posteOccupe: "",
+    profil: "",
+    experiences: [],
+    outils: "",
+    collegues: "",
+    diplomes: [],
+    permis: "",
+    periodeExercice: "",
+    accroches: ["", "", ""],
+    source: "Profil à compléter",
+    pointsForts: [],
+    pointsAConsolider: [],
   },
   {
     nom: "HACHMI",
@@ -289,6 +304,18 @@ const P: GotrmCvProfile[] = [
       "J'ai participé au suivi des indicateurs de l'agence et à la préparation des éléments transmis à la direction.",
     ],
     source: "CV transmis",
+    adresse: "1 Allée la Boétie, 93270 Sevran",
+    pointsForts: [
+      "Administration des dossiers de transport",
+      "Facturation et contrôle des pièces",
+      "Relation client et traitement des appels",
+      "Classement, archivage et traçabilité documentaire",
+    ],
+    pointsAConsolider: [
+      "Exploitation et affectation des moyens",
+      "Réglementation sociale européenne",
+      "Calcul des coûts d'une prestation",
+    ],
   },
   {
     nom: "HOUARI",
@@ -341,141 +368,117 @@ const P: GotrmCvProfile[] = [
       "J'ai contribué au suivi de la consommation, de la ponctualité et des coûts de la flotte.",
     ],
     source: "CV transmis",
+    adresse: "95390 Louvres",
+    pointsForts: [
+      "Réglementation des temps de conduite et de repos",
+      "Respect de la chaîne du froid (ATP)",
+      "Arrimage et sécurisation des charges",
+      "Adaptation des matériels et des remorques à la marchandise",
+    ],
+    pointsAConsolider: [
+      "Conception d'une prestation de transport",
+      "Tarification et remise d'offre",
+      "Suivi des indicateurs de rentabilité",
+    ],
   },
   {
     nom: "KACIMI",
     prenom: "Lahcen",
-    entreprise: { nom: "GROUPE HÔTELIER SOFITEL – SERVICES LOGISTIQUES", service: "Coordination des flux véhicules, bagages et livraisons", ville: "Paris / Vétraz-Monthoux (74)" },
-    posteOccupe: "Coordinateur logistique et gestion de véhicules",
+    adresse: "74100 Vétraz-Monthoux",
+    entreprise: { nom: "GIANT TRANSPORTS", service: "Service commercial et exploitation – relation clients et litiges", ville: "Paris" },
+    posteOccupe: "Responsable commercial transport",
     profil:
-      "Passionné par l'excellence du service, doté d'une expertise en gestion des bagages et des véhicules dans l'hôtellerie de luxe, j'ai développé le sens de l'organisation, de la relation client et du respect des délais.",
+      "Titulaire d'un BTS Gestion des transports et logistique associée, j'ai exercé comme responsable commercial dans le transport et le déménagement : construction du planning commercial, réponse aux demandes clients, résolution des litiges et visites en clientèle. Je pratique couramment l'anglais et l'espagnol.",
     experiences: [
       {
-        periode: "Novembre 2022 – Mars 2024",
-        poste: "Voiturier / bagagiste / concierge",
-        employeur: "Sofitel Baltimore, Sofitel Arc de Triomphe, Échiquier Opéra – Paris",
+        periode: "Septembre 2022 – Mars 2024",
+        poste: "Responsable commercial",
+        employeur: "GIANT TRANSPORTS, Paris",
         missions: [
-          "Gestion des véhicules et des mouvements de parc",
-          "Gestion des bagages et coordination des livraisons",
-          "Réservations et relation client haut de gamme",
+          "Élaboration et suivi du planning commercial",
+          "Réponse aux demandes des clients et remise des offres",
+          "Résolution des litiges et suivi de la satisfaction",
+          "Visites commerciales et prospection",
         ],
       },
       {
-        periode: "Juillet 2024 – Août 2024",
-        poste: "Employé drive",
-        employeur: "Leclerc, Ville-la-Grand",
-        missions: ["Préparation des commandes", "Gestion des flux du drive"],
+        periode: "Février 2021 – Septembre 2022",
+        poste: "Responsable commercial puis déménageur",
+        employeur: "ANK Déménagement",
+        missions: [
+          "Devis et organisation des prestations de déménagement",
+          "Coordination des équipes et des moyens sur les chantiers",
+        ],
+      },
+      {
+        periode: "2022 – 2024",
+        poste: "Voiturier-bagagiste",
+        employeur: "Sofitel, Paris",
+        missions: ["Gestion des mouvements de véhicules", "Relation client haut de gamme"],
       },
     ],
     outils:
-      "Logiciel de gestion des mouvements de véhicules, Excel® pour les plannings et les états de suivi, Word® pour les comptes rendus, messagerie et téléphonie de service",
+      "TMS d'exploitation, Excel® (planning commercial, suivi des litiges, tarifs), Word® pour les offres et les courriers, messagerie Outlook, téléphonie professionnelle",
     collegues:
-      "avec le chef de service, l'équipe de voituriers et bagagistes, les prestataires de livraison et les fournisseurs de l'établissement",
+      "avec la direction commerciale, les exploitants, le service facturation, les clients donneurs d'ordres et les transporteurs partenaires",
     diplomes: [
-      ["Baccalauréat professionnel", "Ministère de l'Éducation nationale", "2015"],
-      ["Attestation de formation à la sécurité (SST)", "Organisme habilité INRS", "2023"],
-      ["Attestation de formation – Accueil et relation client", "Groupe hôtelier", "2023"],
+      ["BTS Gestion des transports et logistique associée", "Lycée Martin Nadaud", "2022"],
+      ["Baccalauréat", "Ministère de l'Éducation nationale", "2020"],
+      ["Attestation de formation – Anglais professionnel", "Organisme agréé", "2023"],
     ],
     permis: "Permis B",
-    periodeExercice: "Du 1er novembre 2022 au 31 mars 2024",
+    periodeExercice: "Du 1er février 2021 au 31 mars 2024",
     accroches: [
-      "Sur la coordination des flux de l'établissement, j'ai traité des demandes de transport et de livraison et comparé les offres des prestataires.",
-      "J'ai suivi les prestations régulières confiées à des transporteurs partenaires.",
-      "J'ai organisé le travail de l'équipe et suivi les indicateurs de qualité de service.",
+      "Au service commercial, j'ai traité les demandes clients de l'étude de faisabilité jusqu'à la remise de l'offre chiffrée.",
+      "J'ai suivi les prestations confiées à nos transporteurs partenaires et traité les litiges associés.",
+      "J'ai construit le planning commercial et suivi les indicateurs de satisfaction et de réclamation.",
     ],
     source: "CV transmis",
+    pointsForts: [
+      "Relation avec les donneurs d'ordres et prospection",
+      "Traitement des litiges et des réclamations",
+      "Construction et suivi d'un planning",
+      "Élaboration d'une offre commerciale de transport",
+      "Communication professionnelle en anglais",
+    ],
+    pointsAConsolider: [
+      "Encadrement au quotidien d'une équipe de conducteurs",
+      "Supervision des opérations de traction, groupage et camionnage",
+    ],
   },
   {
     nom: "LEMAITRE",
     prenom: "Alexandre",
-    entreprise: { nom: "XPO LOGISTICS EUROPE", service: "Planning conducteurs et plans de marche – lot complet", ville: "Gennevilliers (92)" },
-    posteOccupe: "Exploitant transport lot complet",
-    profil:
-      "Exploitant transport, j'organise au quotidien l'affectation des moyens, la construction des plans de marche et le suivi des opérations jusqu'à la clôture des dossiers.",
-    experiences: [
-      {
-        periode: "Mars 2021 – Juillet 2025",
-        poste: "Exploitant transport lot complet",
-        employeur: "XPO Logistics Europe, Gennevilliers",
-        missions: [
-          "Affectation quotidienne de 25 à 30 ordres de transport",
-          "Construction des plans de marche conformes au règlement (CE) 561/2006",
-          "Suivi des aléas et information des donneurs d'ordres",
-        ],
-      },
-      {
-        periode: "Septembre 2018 – Février 2021",
-        poste: "Agent d'exploitation",
-        employeur: "Transporteur régional, Bonneuil-sur-Marne",
-        missions: [
-          "Saisie et suivi des ordres dans le TMS",
-          "Contrôle des documents de transport et des retours de tournée",
-        ],
-      },
-    ],
-    outils:
-      "TMS Akanea, planning partagé, logiciel de téléchargement des cartes conducteurs, Excel® (taux de remplissage, retour à vide), Word®, bourse de fret",
-    collegues:
-      "avec mon responsable d'exploitation, deux collègues exploitants, une assistante administrative et une quinzaine de conducteurs",
-    diplomes: [
-      ["BTS Gestion des transports et logistique associée", "Ministère de l'Éducation nationale", "2018"],
-      ["Attestation de formation – Réglementation sociale européenne", "Organisme agréé", "2023"],
-      ["Attestation de formation – Sécurité et arrimage des charges", "Organisme agréé", "2024"],
-    ],
-    permis: "Permis B",
-    periodeExercice: "Du 1er mars 2021 au 31 juillet 2025",
-    accroches: [
-      "Au service exploitation lot complet, j'ai traité les demandes clients de l'étude de faisabilité jusqu'à la remise de l'offre chiffrée.",
-      "J'ai piloté les trafics réguliers confiés à nos sous-traitants habituels.",
-      "J'ai construit et suivi les indicateurs d'exploitation présentés chaque mois à la direction.",
-    ],
-    source: "Profil reconstitué",
+    entreprise: { nom: "", service: "", ville: "" },
+    posteOccupe: "",
+    profil: "",
+    experiences: [],
+    outils: "",
+    collegues: "",
+    diplomes: [],
+    permis: "",
+    periodeExercice: "",
+    accroches: ["", "", ""],
+    source: "Profil à compléter",
+    pointsForts: [],
+    pointsAConsolider: [],
   },
   {
     nom: "MANSEUR",
     prenom: "Mehdi",
-    entreprise: { nom: "TRANSPORTS SIMONNET", service: "Exploitation frigorifique (ATP) et distribution régionale", ville: "Marseille (13)" },
-    posteOccupe: "Exploitant transport frigorifique",
-    profil:
-      "Issu de la conduite puis passé à l'exploitation, je gère des flux sous température dirigée et la distribution régionale, avec une forte exigence sur la traçabilité et la qualité de service.",
-    experiences: [
-      {
-        periode: "Janvier 2022 – Juin 2025",
-        poste: "Exploitant transport frigorifique",
-        employeur: "Transports Simonnet, Marseille",
-        missions: [
-          "Affectation des tournées sous température dirigée et contrôle ATP",
-          "Suivi des relevés de température et des réserves à la livraison",
-          "Traitement des litiges et des retours de marchandises",
-        ],
-      },
-      {
-        periode: "Septembre 2017 – Décembre 2021",
-        poste: "Conducteur routier puis chef d'équipe quai",
-        employeur: "Distributeur agroalimentaire régional",
-        missions: [
-          "Livraisons régionales en frigorifique",
-          "Encadrement de l'équipe de quai au départ",
-        ],
-      },
-    ],
-    outils:
-      "TMS d'exploitation, enregistreurs de température et logiciel de traçabilité ATP, logiciel de tournées, Excel® pour les tableaux de bord, lettres de voiture CMR",
-    collegues:
-      "avec le chef de quai, les conducteurs de distribution, le service commercial et la cellule litiges",
-    diplomes: [
-      ["Titre professionnel Conducteur routier de marchandises", "Ministère chargé de l'emploi", "2016"],
-      ["FCO Marchandises", "Centre de formation agréé", "2024"],
-      ["Attestation de formation – Hygiène et chaîne du froid (ATP)", "Organisme agréé", "2023"],
-    ],
-    permis: "Permis B, C, CE",
-    periodeExercice: "Du 3 janvier 2022 au 30 juin 2025",
-    accroches: [
-      "Sur des flux sous température dirigée, j'ai étudié la faisabilité des demandes et chiffré les prestations.",
-      "J'ai supervisé les tournées de distribution et les trafics confiés à des sous-traitants réguliers.",
-      "J'ai suivi les coûts, la ponctualité et la qualité de service de mon périmètre.",
-    ],
-    source: "Profil reconstitué",
+    entreprise: { nom: "", service: "", ville: "" },
+    posteOccupe: "",
+    profil: "",
+    experiences: [],
+    outils: "",
+    collegues: "",
+    diplomes: [],
+    permis: "",
+    periodeExercice: "",
+    accroches: ["", "", ""],
+    source: "Profil à compléter",
+    pointsForts: [],
+    pointsAConsolider: [],
   },
   {
     nom: "SELHAOUI",
@@ -530,18 +533,45 @@ const P: GotrmCvProfile[] = [
       "En gestion de parc, j'ai suivi les coûts d'entretien, la disponibilité des véhicules et les échéances réglementaires.",
     ],
     source: "CV transmis",
+    adresse: "93000 Bobigny",
+    pointsForts: [
+      "Gestion de parc et des moyens matériels",
+      "Transport sous contrainte (pharmaceutique, alimentaire)",
+      "Optimisation des tournées de livraison",
+      "Tenue des feuilles de route et preuves de livraison",
+    ],
+    pointsAConsolider: [
+      "Conception d'une prestation de transport",
+      "Recours à la sous-traitance",
+      "Tarification et calcul du prix de vente",
+    ],
   },
 ];
 
 const BY_NOM = new Map(P.map((p) => [p.nom.toUpperCase(), p]));
 
-/** Profil de secours pour un candidat non répertorié (aucun champ vide) */
+/**
+ * Profil de secours : aucun contenu inventé. Un candidat non répertorié
+ * ressort explicitement « à compléter » et son livret reste vide.
+ */
 export function fallbackGotrmProfile(nom: string, prenom: string): GotrmCvProfile {
-  const idx = Math.abs(
-    [...`${nom}${prenom}`].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7),
-  ) % P.length;
-  const base = P[idx];
-  return { ...base, nom: nom.toUpperCase(), prenom, source: "Profil reconstitué" };
+  return {
+    nom: (nom || "").toUpperCase(),
+    prenom: prenom || "",
+    entreprise: { nom: "", service: "", ville: "" },
+    posteOccupe: "",
+    profil: "",
+    experiences: [],
+    outils: "",
+    collegues: "",
+    diplomes: [],
+    permis: "",
+    periodeExercice: "",
+    accroches: ["", "", ""],
+    source: "Profil à compléter",
+    pointsForts: [],
+    pointsAConsolider: [],
+  };
 }
 
 /** Recherche stricte : retourne `undefined` si aucun profil n'a été transmis. */
