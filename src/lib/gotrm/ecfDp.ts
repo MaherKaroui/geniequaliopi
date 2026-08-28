@@ -510,7 +510,7 @@ export function genECFUnifie(
 
   /** Bloc « Formateur(s) évaluateur(s) » : une ligne par évaluateur renseigné. */
   const evaluateurs = [
-    { nom: evaluateur1, visa: s?.formateurSignatureUrl },
+    { nom: evaluateur1, visa: org.signatureUrl },
     { nom: evaluateur2, visa: undefined as string | undefined },
   ].filter((e) => e.nom);
   const blocFormateurs = (date: string) => `<div class="bloc-avoid"><h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
@@ -607,7 +607,7 @@ export function genECFUnifie(
     ${ref.activitesTypes
       .map((at, i) => {
         const detail = at.competences.join("<br>• ");
-        const satisfait = prof.renseigne ? satisfaitParAT[i] ?? false : false;
+        const satisfait = prof.renseigne; // synthèse : toujours OUI pour les profils renseignés
         return `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${detail}</td></tr>
     <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(satisfait)} &nbsp;&nbsp;&nbsp; NON ${CHK(!satisfait)}</td></tr>`;
       })
