@@ -347,9 +347,17 @@ export function genECFUnifie(
   const lieu = f.lieu || [org.adresse, `${org.codePostal || ""} ${org.ville || ""}`.trim()].filter(Boolean).join(", ");
   const statuts = statutsCompetences(seed, ref);
 
+  // Date de mise à jour du livret : jamais antérieure à la fin de formation
+  // (sinon le pied affiche une année incohérente avec la session, ex. 2025 pour
+  // une formation se terminant le 03/09/2026).
+  const finDoc = fin || f.dateFin || "";
+  const majDoc =
+    org.dateMaj && finDoc && new Date(org.dateMaj) >= new Date(finDoc)
+      ? org.dateMaj
+      : finDoc || org.dateMaj || "";
   const pied = (p: number, total: number) => `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px">
     <tr><th>SIGLE</th><th>Type de document</th>${ref.codeTitre ? "<th>Code titre</th>" : ""}${ref.millesime ? "<th>Millésime</th>" : ""}${ref.dateJo ? "<th>Date JO</th>" : ""}<th>Date de mise à jour</th><th>Page</th></tr>
-    <tr><td>${ref.sigle || ECF_SIGLE}</td><td>${ECF_TYPE_DOC}</td>${ref.codeTitre ? `<td>${ref.codeTitre}</td>` : ""}${ref.millesime ? `<td>${ref.millesime}</td>` : ""}${ref.dateJo ? `<td>${ref.dateJo}</td>` : ""}<td>${formatDate(org.dateMaj || "")}</td><td>${p}/${total}</td></tr>
+    <tr><td>${ref.sigle || ECF_SIGLE}</td><td>${ECF_TYPE_DOC}</td>${ref.codeTitre ? `<td>${ref.codeTitre}</td>` : ""}${ref.millesime ? `<td>${ref.millesime}</td>` : ""}${ref.dateJo ? `<td>${ref.dateJo}</td>` : ""}<td>${formatDate(majDoc)}</td><td>${p}/${total}</td></tr>
   </table>`;
 
   const pages: string[] = [];
@@ -390,7 +398,12 @@ export function genECFUnifie(
     const rows = comps.slice(0, 4).map((c, ei) => {
       const modalite = ECF_MODALITES[(ci + ei) % ECF_MODALITES.length](c.libelle, at.titre);
       const jour = addWorkDays(debut, ci * 3 + ei + 1);
-      const compsCells = comps.map((_, n) => `${n + 1} ${CHK(n === ei)}`).join(" &nbsp;&nbsp; ");
+      // Cases cochées variables par stagiaire et par évaluation (1 à 2 cases)
+      const nb = comps.length;
+      const first = (seed + ci * 5 + ei * 2) % nb;
+      const double = nb > 2 && (seed + ci + ei) % 3 === 0;
+      const second = (first + 1 + ((seed + ei * 3) % (nb - 1))) % nb;
+      const compsCells = comps.map((_, n) => `${n + 1} ${CHK(n === first || (double && n === second))}`).join(" &nbsp;&nbsp; ");
       return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${compsCells}</td></tr>`;
     });
 
