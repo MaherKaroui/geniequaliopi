@@ -565,6 +565,22 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "certification",
   },
   {
+    code: "45D",
+    label: "Grilles d'évaluation de l'épreuve (GJ1) – Dossier technique d'évaluation",
+    description: "Grille 1 jury du DTE : guides d'observation de la mise en situation professionnelle, guide de lecture de la production et grilles d'évaluation des activités-types (1 par stagiaire)",
+    autoTemplates: ["gj1_grilles_jury"],
+    perStagiaire: true,
+    category: "certification",
+  },
+  {
+    code: "45E",
+    label: "Grille d'évaluation de l'entretien final (GJ2) – Dossier technique d'évaluation",
+    description: "Grille 2 jury du DTE : guide de l'entretien final et grille d'évaluation des champs d'observation (1 par stagiaire)",
+    autoTemplates: ["gj2_entretien_final"],
+    perStagiaire: true,
+    category: "certification",
+  },
+  {
     code: "45C",
     label: "Procès-verbal global de session – Officiel Ministère du Travail",
     description: "PV global de session d'examen Titre Professionnel : récapitulatif des candidats, des CCP obtenus et de la décision du jury (1 document pour la session)",
