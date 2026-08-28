@@ -474,26 +474,57 @@ export function genECFUnifie(
   <p>Le <strong><em>Guide de mise en œuvre</em></strong> des évaluations passées en cours de formation est à télécharger sur le site du ministère chargé de l'emploi. Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>`);
 
   /**
-   * Grille officielle des compétences évaluées : cases numérotées 1 à 9,
-   * disposées en 3 colonnes × 3 lignes. On coche les compétences couvertes.
+   * Grille officielle des compétences évaluées : cases numérotées de 1 au
+   * nombre réel de compétences de l'activité-type, disposées en 3 colonnes.
+   * Aucun numéro inexistant n'est affiché ni coché.
    */
   const grilleComp = (cochees: Set<number>, actives: number): string => {
-    const cell = (n: number) =>
-      n <= actives ? `<td>${n} ${CHK(cochees.has(n - 1))}</td>` : `<td>&nbsp;</td>`;
-    return `<table class="grille-comp"><tr>${cell(1)}${cell(2)}${cell(3)}</tr><tr>${cell(4)}${cell(5)}${cell(6)}</tr><tr>${cell(7)}${cell(8)}${cell(9)}</tr></table>`;
+    const cells: string[] = [];
+    for (let n = 1; n <= 9; n++) {
+      cells.push(n <= actives ? `<td>${n} ${CHK(cochees.has(n - 1))}</td>` : `<td>&nbsp;</td>`);
+    }
+    const lignes = [0, 3, 6]
+      .filter((o) => o < Math.max(3, Math.ceil(actives / 3) * 3))
+      .map((o) => `<tr>${cells.slice(o, o + 3).join("")}</tr>`)
+      .join("");
+    return `<table class="grille-comp">${lignes}</table>`;
+  };
+
+  /**
+   * Sélection des compétences cochées pour une évaluation donnée.
+   * Règle : 3 à 4 cases lorsque l'activité-type compte au moins 4 compétences,
+   * sinon la totalité des compétences disponibles. Jamais de numéro hors AT.
+   */
+  const cochesEvaluation = (nbComp: number, indexEval: number, salt: number): Set<number> => {
+    const set = new Set<number>();
+    if (nbComp <= 0) return set;
+    const cible = nbComp >= 4 ? ((indexEval + salt) % 2 === 0 ? 3 : 4) : nbComp;
+    const depart = (indexEval * 2 + salt) % nbComp;
+    for (let k = 0; k < Math.min(cible, nbComp); k++) set.add((depart + k) % nbComp);
+    return set;
   };
 
   /** Bloc « Observations » de la trame : tiret magenta, filet, zone encadrée. */
-  const blocObservations = (texte: string) => `<h3 style="border-bottom:2px solid ${MAGENTA};padding-bottom:4px;margin-top:16px">Observations</h3>
-  <div class="cadre-reponse">${texte || "&nbsp;"}</div>`;
+  const blocObservations = (texte: string) => `<div class="bloc-avoid"><h3 style="border-bottom:2px solid ${MAGENTA};padding-bottom:4px;margin-top:16px">Observations</h3>
+  <div class="cadre-reponse">${texte || "&nbsp;"}</div></div>`;
 
-  /** Bloc « Formateur(s) évaluateur(s) » : Nom | Date | Visa, deux lignes. */
-  const blocFormateurs = (date: string) => `<h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
+  /** Bloc « Formateur(s) évaluateur(s) » : une ligne par évaluateur renseigné. */
+  const evaluateurs = [
+    { nom: evaluateur1, visa: s?.formateurSignatureUrl },
+    { nom: evaluateur2, visa: undefined as string | undefined },
+  ].filter((e) => e.nom);
+  const blocFormateurs = (date: string) => `<div class="bloc-avoid"><h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
-    <tr><td>${evaluateur1 || ""}</td><td>${evaluateur1 ? date : ""}</td><td>${evaluateur1 ? visaCell(evaluateur1, date, s?.formateurSignatureUrl) : "&nbsp;"}</td></tr>
-    <tr><td>${evaluateur2 || ""}</td><td>${evaluateur2 ? date : ""}</td><td>${evaluateur2 ? visaCell(evaluateur2, date) : "&nbsp;"}</td></tr>
-  </table>`;
+    ${evaluateurs.length
+      ? evaluateurs.map((e) => `<tr><td>${e.nom}</td><td>${date}</td><td>${visaCell(e.nom, date, e.visa)}</td></tr>`).join("")
+      : `<tr><td>&nbsp;</td><td>&nbsp;</td><td>${visaCell("", date)}</td></tr>`}
+  </table></div>`;
+
+  /** Bloc verdict : cases dessinées, l'une des deux options toujours marquée. */
+  const blocVerdict = (satisfait: boolean, intro: string) => `<div class="bloc-avoid"><p class="verdict">${intro}<br>
+    ${CHK(satisfait)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ${CHK(!satisfait)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p></div>`;
 
   // Verdict final par activité-type : utilisé dans la synthèse globale.
   const satisfaitParAT: boolean[] = [];
