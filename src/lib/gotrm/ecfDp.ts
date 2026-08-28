@@ -335,7 +335,7 @@ export function buildDpDossier(
    */
   const phrase = (fente: DpFente, usage: number): string => {
     const fr = banque.fentes[fente];
-    const k = stagiaireIdx + usage;
+    const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage;
     return `${fr.ouvertures[k % fr.ouvertures.length]} ${fr.suites[k % fr.suites.length]}`;
   };
 
