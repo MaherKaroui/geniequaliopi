@@ -842,7 +842,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     codeRNCP: "RNCP40990",
   },
   {
-    intitule: "TP GOTRM – Session d'examen SEPTEMBRE (10 candidats)",
+    intitule: "Gestionnaire des opérations de transport routier de marchandises (TP-01329 – RNCP40990)",
     objectifs: "Préparer et présenter la session d'examen du Titre professionnel TP-01329 « Gestionnaire des opérations de transport routier de marchandises » (RNCP40990, millésime 03, niveau 5, arrêté du 03/06/2025 publié au JO du 14/06/2025, date d'effet 24/08/2025). La session se déroule du 01 au 03 septembre pour 10 candidats et comprend : la mise en situation professionnelle (10h00 en 2 parties de 5h00 sur 2 jours distincts), l'entretien technique (1h00 dont 20 min de préparation), le questionnement à partir de production(s) (30 min) et l'entretien final (30 min). Chaque candidat dispose d'un livret d'évaluations passées en cours de formation (ECF) et d'un dossier professionnel (DP).",
     prerequis: "Dossier d'inscription complet (pièce d'identité, CV, attestations d'expérience), dossier professionnel (DP) renseigné et signé, livret ECF complété par l'organisme de formation, maîtrise des outils bureautiques Word® et Excel®.",
     duree: "12h00 d'épreuves par candidat – session collective sur 3 jours",

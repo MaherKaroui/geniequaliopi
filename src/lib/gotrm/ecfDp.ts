@@ -493,7 +493,6 @@ export function genDPGotrm(
   // Période d'exercice professionnelle (issue du parcours réel du candidat)
   const periodeDebut = debut ? new Date(debut) : new Date();
   const anneeFin = periodeDebut.getFullYear();
-  const periodes = [cv.periodeExercice, ...cv.experiences.map((e) => e.periode)];
 
   const pied = (p: number, total: number) =>
     `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px"><tr><td>DOSSIER PROFESSIONNEL – ${GOTRM_TITRE.sigle} ${GOTRM_TITRE.codeTitre} – ${s?.prenom || ""} ${s?.nom || ""}</td><td style="text-align:right">Page ${p}/${total}</td></tr></table>`;
