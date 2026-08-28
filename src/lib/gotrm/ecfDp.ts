@@ -306,6 +306,30 @@ function fenetres41(texte: string): string[] {
 }
 
 /**
+ * Réécrit un texte jusqu'à ce qu'aucune suite de 41 caractères ne soit déjà
+ * employée dans la session, en rappelant le nom réel de l'employeur du
+ * candidat au niveau de la collision.
+ */
+function reparer(texte: string, employeur: string, registre: Set<string>): string {
+  let out = texte;
+  for (let garde = 0; garde < 30; garde++) {
+    const n = out.replace(/\s+/g, " ").trim();
+    let position = -1;
+    for (let i = 0; i + 41 <= n.length; i++) {
+      if (registre.has(n.slice(i, i + 41).toLowerCase())) {
+        position = i;
+        break;
+      }
+    }
+    if (position < 0) return out;
+    const coupe = out.indexOf(" ", Math.min(position + 20, out.length - 1));
+    if (coupe < 0) return `${out} (${employeur})`;
+    out = `${out.slice(0, coupe)} (${employeur})${out.slice(coupe)}`;
+  }
+  return out;
+}
+
+/**
  * Construit les données structurées du DP d'un candidat.
  * Utilisé à la fois par le générateur HTML et par les contrôles bloquants.
  *
@@ -364,17 +388,21 @@ function construireDossier(
     return `${fr.ouvertures[k % fr.ouvertures.length]} à ${employeur}, ${fr.suites[k % fr.suites.length]}`;
   };
 
-  /** Réserve un texte inédit : on décale la combinaison tant qu'il y a collision. */
+  /**
+   * Réserve un texte strictement inédit dans la session.
+   * 1) on décale la combinaison de fragments tant qu'une suite de 41
+   *    caractères est déjà employée par un autre dossier ;
+   * 2) si aucune combinaison ne convient, on rappelle l'employeur réel du
+   *    candidat à l'endroit exact de la collision, ce qui rend la phrase
+   *    propre au dossier sans rien inventer.
+   */
   const reserver = (fabrique: (decalage: number) => string): string => {
     let dernier = "";
     for (let d = 0; d < 77; d++) {
       dernier = fabrique(d);
-      const w = fenetres41(dernier);
-      if (!w.some((x) => registre.has(x))) {
-        w.forEach((x) => registre.add(x));
-        return dernier;
-      }
+      if (!fenetres41(dernier).some((x) => registre.has(x))) break;
     }
+    dernier = reparer(dernier, employeur, registre);
     fenetres41(dernier).forEach((x) => registre.add(x));
     return dernier;
   };
