@@ -111,9 +111,10 @@ export function resolveReferentiel(f: FormationInfo): DpReferentiel {
       codeTitre: GOTRM_TITRE.codeTitre,
       millesime: GOTRM_TITRE.millesime,
       rncp: GOTRM_TITRE.rncp,
-      // Date d'arrêté non confirmée par le référentiel millésime 03 : ligne laissée vide.
-      dateArrete: undefined,
+      // Dates officielles du titre (référentiel millésime 03).
+      dateArrete: "03/06/2025",
       dateJo: "14/06/2025",
+      dateEffet: "24/08/2025",
       dateMaj: "16/06/2025",
       niveau: GOTRM_TITRE.niveau,
       sigle: GOTRM_TITRE.sigle,
