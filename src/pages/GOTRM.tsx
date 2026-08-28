@@ -46,6 +46,7 @@ import {
   type GotrmSession,
 } from "@/lib/gotrm/gotrmTypes";
 import { genECFGotrm, genDPGotrm } from "@/lib/gotrm/ecfDp";
+import { genGJ1Gotrm, genGJ2Gotrm } from "@/lib/gotrm/grillesJury";
 import { DPControleCoherence } from "@/components/DPControleCoherence";
 import { buildGenericFileName } from "@/lib/fileNaming";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
@@ -272,6 +273,8 @@ const GOTRMPage = () => {
             await htmlToPdfBlob(buildGrilleEvaluation(snapshot, c)),
           );
           step(`Grille jury — ${c.nom}`);
+          folder.file(fileName(`GJ1 Grilles evaluation epreuve ${c.nom}`), await htmlToPdfBlob(genGJ1Gotrm(snapshot, c)));
+          folder.file(fileName(`GJ2 Entretien final ${c.nom}`), await htmlToPdfBlob(genGJ2Gotrm(snapshot, c)));
           folder.file(fileName(`ECF ${c.nom}`), await htmlToPdfBlob(buildEcf(c)));
           folder.file(fileName(`Dossier professionnel ${c.nom}`), await htmlToPdfBlob(buildDp(c)));
           if (c.parcours === "Capitalisation de CCP") {
@@ -301,6 +304,8 @@ const GOTRMPage = () => {
     { label: "Convocation", build: (c) => buildConvocation(session, c) },
     { label: "Grille jury", build: (c) => buildGrilleEvaluation(session, c) },
     { label: "Livret de certification", build: (c) => buildLivretCertification(session, c) },
+    { label: "GJ1 — Grilles épreuve", build: (c) => genGJ1Gotrm(session, c) },
+    { label: "GJ2 — Entretien final", build: (c) => genGJ2Gotrm(session, c) },
     { label: "ECF", build: (c) => buildEcf(c) },
     { label: "DP", build: (c) => buildDp(c) },
   ];
