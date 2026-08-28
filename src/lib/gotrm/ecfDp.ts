@@ -647,8 +647,14 @@ export function genDPUnifie(
   const seed = seedOf(s);
   const d = buildDpDossier(org, f, stagiaires, stagiaireIdx);
   const { ref, cv, entreprise: ent } = d;
-  const debut = getStagiaireDateDebut(s, f);
-  const fin = getStagiaireDateFin(s, f);
+  let debut = getStagiaireDateDebut(s, f);
+  let fin = getStagiaireDateFin(s, f);
+  // Garde-fou GOTRM : l'ancienne saisie historique 2025 est remplacée par la
+  // session officielle 2026, qu'elle provienne de la formation ou du stagiaire.
+  if (isDossierForceComplet(f)) {
+    if (debut?.startsWith("2025-09-01")) debut = "2026-09-01";
+    if (fin?.startsWith("2025-09-03")) fin = "2026-09-03";
+  }
   const dateDeclaration = debut ? formatDate(subtractBusinessDays(debut, 3)) : formatDate(f.dateDebut || "");
   const villeDecl = s?.commune?.trim() || "";
   const periode = d.periodeConnue ? d.periodeExercice : A_RENSEIGNER;
