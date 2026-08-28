@@ -189,9 +189,10 @@ export function controlerDuplicationSession(dossiers: DpDossierData[]): DpAnomal
 export function controlerEcfSession(f: FormationInfo, stagiaires: StagiaireInfo[]): DpAnomalie[] {
   const out: DpAnomalie[] = [];
   const ref = resolveReferentiel(f);
+  const prises = new Set<string>();
   const livrets = stagiaires.map((s) => {
     const cv = findGotrmProfile(s?.nom, s?.prenom);
-    return { nom: nomCandidat(s), cv, prof: buildEcfProfilage(ref, cv) };
+    return { nom: nomCandidat(s), cv, prof: buildEcfProfilage(ref, cv, prises) };
   });
 
   for (const l of livrets) {

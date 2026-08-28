@@ -718,7 +718,11 @@ export function genECFUnifie(
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const ref = resolveReferentiel(f);
   const cv = profilCandidat(s);
-  const prof = buildEcfProfilage(ref, cv);
+  // Répartitions déjà attribuées aux candidats précédents : deux livrets d'une
+  // même session ne peuvent pas être superposables.
+  const prises = new Set<string>();
+  for (let i = 0; i < stagiaireIdx; i++) buildEcfProfilage(ref, profilCandidat(stagiaires[i]), prises);
+  const prof = buildEcfProfilage(ref, cv, prises);
   // Le 45B reprend la période du formulaire Formation, jamais une ancienne
   // période individuelle mémorisée sur la fiche stagiaire. Corrige aussi la
   // saisie historique erronée de cette session GOTRM (01–03/09/2025).

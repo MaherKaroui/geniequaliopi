@@ -92,7 +92,27 @@ function ancrage(cv: GotrmCvProfile, i: number): string {
  * Construit la répartition des niveaux et les appréciations à partir du profil.
  * Aucun tirage aléatoire : tout découle des points forts / à consolider.
  */
-export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfProfilage {
+/**
+ * @param signaturesPrises répartitions déjà attribuées dans la session : si la
+ * répartition issue du profil est strictement identique à celle d'un autre
+ * candidat, la sélection est décalée jusqu'à obtenir un livret non superposable.
+ */
+export function buildEcfProfilage(
+  ref: DpReferentiel,
+  cv?: GotrmCvProfile,
+  signaturesPrises?: Set<string>,
+): EcfProfilage {
+  for (let decalage = 0; decalage < 12; decalage++) {
+    const p = profilage(ref, cv, decalage);
+    if (!p.renseigne || !signaturesPrises || !signaturesPrises.has(p.signature)) {
+      if (p.renseigne) signaturesPrises?.add(p.signature);
+      return p;
+    }
+  }
+  return profilage(ref, cv, 0);
+}
+
+function profilage(ref: DpReferentiel, cv?: GotrmCvProfile, decalage = 0): EcfProfilage {
   const vide: EcfProfilage = {
     renseigne: false,
     parAT: ref.activitesTypes.map(() => []),
@@ -147,10 +167,10 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
   // profil : deux candidats faibles sur le même champ ne retiennent pas
   // exactement les mêmes compétences, et les livrets cessent d'être superposables.
   const vivier = ordre.slice(0, Math.min(ordre.length, k + 3));
-  const stride = vivier.length > 1 ? 1 + (empreinte % (vivier.length - 1)) : 1;
+  const stride = vivier.length > 1 ? 1 + ((empreinte + decalage) % (vivier.length - 1)) : 1;
   const nonAcquis = new Set<string>();
   for (let n = 0; nonAcquis.size < k && n < vivier.length * 3; n++) {
-    const l = vivier[(empreinte + n * stride) % vivier.length];
+    const l = vivier[(empreinte + decalage * 3 + n * stride) % vivier.length];
     nonAcquis.add(`${l.ci}-${l.i}`);
   }
 
