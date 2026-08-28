@@ -73,6 +73,29 @@ function addWorkDays(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Charte officielle « Ministère du Travail » historique des pièces 45A/45B :
+ * titres de section magenta, titre principal bleu République, tableaux à
+ * en-têtes bleu clair et pied de page tabulé.
+ */
+const STYLE_MINISTERE = `<style>
+  .doc-officiel{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
+  .doc-officiel h1{text-align:center;font-size:18pt;font-weight:bold;margin:26px 0 18px;letter-spacing:1px;color:#0055A4}
+  .doc-officiel h2{font-size:13pt;font-weight:bold;margin:22px 0 12px;color:#fff;background:#C2185B;padding:8px 14px}
+  .doc-officiel h3{font-size:11pt;font-weight:bold;margin:16px 0 8px;color:#0055A4}
+  .doc-officiel .activite-type{background:#C2185B;color:#fff;padding:8px 14px;font-weight:bold;font-size:11pt;margin:18px 0 10px;border-radius:2px}
+  .doc-officiel .exemple-titre{font-weight:bold;font-style:italic;margin:10px 0;color:#333}
+  .doc-officiel p{margin:8px 0;text-align:justify;line-height:1.5}
+  .doc-officiel ol,.doc-officiel ul{margin:8px 0 8px 22px}
+  .doc-officiel li{margin:3px 0}
+  .doc-officiel table{width:100%;border-collapse:collapse;margin:12px 0}
+  .doc-officiel table th,.doc-officiel table td{border:1px solid #000;padding:6px 8px;vertical-align:top;text-align:left}
+  .doc-officiel table th{background:#E8EEF7;font-weight:bold;font-size:9pt}
+  .doc-officiel .resultat-final{padding:12px;border:2px solid #0055A4;background:#E8EEF7;text-align:center;font-weight:bold;margin:14px 0}
+  .doc-officiel table.pied-officiel th,.doc-officiel table.pied-officiel td{border:1px solid #999;padding:3px 5px;text-align:center;background:#F0F0F0;font-size:8pt}
+  .doc-officiel .page-break{page-break-after:always;break-after:page}
+</style>`;
+
 const CHK = (on: boolean) => (on ? "☒" : "☐");
 
 /** Cellule de visa : image si fournie, sinon mention manuscrite attendue. */
@@ -455,7 +478,7 @@ export function genECFUnifie(
 
   const total = pages.length;
   const body = pages.map((p, i) => `${p}${pied(i + 1, total)}`).join(`<div class="page-break"></div>`);
-  return htmlWrap(body);
+  return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>`);
 }
 
 // ───────────────────────────────────────────── DP
@@ -662,7 +685,7 @@ export function genDPUnifie(
 
   const total = pages.length;
   const body = pages.map((p, i) => `${p}${pied(i + 1, total)}`).join(`<div class="page-break"></div>`);
-  return htmlWrap(body);
+  return htmlWrap(`${STYLE_MINISTERE}<div class="doc-officiel">${body}</div>`);
 }
 
 // ───────────────────────────────────────────── alias historiques
