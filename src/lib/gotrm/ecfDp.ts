@@ -601,7 +601,9 @@ export function genDPGotrm(
       const tache = pick(ex.taches, seed + ci * 7 + ej * 3);
       const moyen = pick(ex.moyens, seed + ci * 5 + ej);
       const compl = pick(ex.complement, seed + ci * 11 + ej);
-      const periode = pick(periodes, seed + ci * 2 + ej);
+      // Période d'exercice : période réelle d'emploi dans l'entreprise de référence
+      // (jamais les dates de la session d'examen)
+      const periode = cv.periodeExercice;
       const accroche = cv.accroches[ci] || cv.accroches[0] || "";
       pages.push(`<h2>Activité-type n° ${ci + 1} – ${ccp.libelle}</h2>
       <p><strong><em>Exemple n° ${ej + 1}</em></strong> ▶ ${ex.titre}</p>
@@ -610,7 +612,7 @@ export function genDPGotrm(
       <p><strong>2. Précisez les moyens utilisés :</strong></p>
       <p>${moyen} J'utilisais également ${outils}.</p>
       <p><strong>3. Avec qui avez-vous travaillé ?</strong></p>
-      <p>J'ai travaillé ${collegues}.</p>
+      <p>${ex.avecQui || `J'ai travaillé ${collegues}.`}</p>
       <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:10px">
         <tr><th colspan="2" style="text-align:left">4. Contexte</th></tr>
         <tr><th style="width:38%">Nom de l'entreprise, organisme ou association ▶</th><td>${ent.nom}${ent.ville ? ` – ${ent.ville}` : ""}</td></tr>
@@ -623,7 +625,19 @@ export function genDPGotrm(
   });
 
   // ── Titres, diplômes, CQP
-  const listeDip = cv.diplomes;
+  const listeDip: [string, string, string][] = [
+    ...cv.diplomes,
+    [
+      `Attestation de fin de formation – Parcours préparatoire au TP ${GOTRM_TITRE.sigle} (${GOTRM_TITRE.codeTitre})`,
+      org.nom,
+      formatDate(fin || debut),
+    ],
+    [
+      "Attestation d'évaluations passées en cours de formation (livret ECF)",
+      org.nom,
+      formatDate(fin || debut),
+    ],
+  ];
 
   pages.push(`<h2>Titres, diplômes, CQP, attestations de formation</h2>
   <p><em>(facultatif)</em></p>
@@ -631,6 +645,7 @@ export function genDPGotrm(
     <tr><th><strong>Intitulé</strong></th><th><strong>Autorité ou organisme</strong></th><th><strong>Date</strong></th></tr>
     ${listeDip.map(d => `<tr><td>${d[0]}</td><td>${d[1]}</td><td>${d[2]}</td></tr>`).join("")}
   </table>`);
+
 
   // ── Déclaration sur l'honneur (trame officielle)
   pages.push(`<h2>Déclaration sur l'honneur</h2>
