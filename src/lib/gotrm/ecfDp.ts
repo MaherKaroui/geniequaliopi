@@ -495,27 +495,9 @@ export function genDPGotrm(
   const pages: string[] = [];
 
   // ── Page 1 : page de garde officielle du DP (trame Ministère)
-  pages.push(`<table style="width:100%;border-collapse:collapse;margin-bottom:18px">
-    <tr style="vertical-align:top">
-      <td style="width:34%;border:1px solid #ccc;padding:12px;text-align:center">
-        <div style="width:56px;height:36px;margin:0 auto 8px;border:1px solid #999">
-          <table style="width:100%;height:100%;border-collapse:collapse"><tr>
-            <td style="width:33.33%;background:#002395"></td>
-            <td style="width:33.33%;background:#fff"></td>
-            <td style="width:33.33%;background:#ed2939"></td>
-          </tr></table>
-        </div>
-        <p style="font-size:8pt;font-style:italic;margin:4px 0">Liberté • Égalité • Fraternité</p>
-        <hr style="border:none;border-top:1px solid #999;margin:8px 0">
-        <p style="font-size:9pt;letter-spacing:0.5px;margin:4px 0"><strong>RÉPUBLIQUE FRANÇAISE</strong></p>
-        <p style="font-size:8pt;letter-spacing:0.3px;margin:4px 0">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
-      </td>
-      <td style="width:4%"></td>
-      <td style="width:62%;background:#f2f2f2;border-bottom:3px solid #e2007a;padding:28px 16px;text-align:center;vertical-align:middle">
-        <p style="font-size:16pt;margin:0;color:#333"><span style="font-size:12pt">DOSSIER</span> <strong>PROFESSIONNEL</strong> <span style="font-size:12pt">(DP)</span></p>
-      </td>
-    </tr>
-  </table>
+  pages.push(`<div style="text-align:center;margin-bottom:18px">
+    <img src="/__l5e/assets-v1/e274f437-8af3-4410-b05a-376db7494215/dp-header.png" alt="République Française – Dossier Professionnel (DP) – Ministère chargé de l'Emploi" style="width:100%;max-width:640px;height:auto;border:1px solid #ccc" />
+  </div>
   <table style="width:86%;margin:22px auto;border-collapse:collapse">
     <tr><th style="width:34%"><em>Nom de naissance</em></th><td>${s?.nom || ""}</td></tr>
     <tr><th><em>Nom d'usage</em></th><td>${s?.nom || ""}</td></tr>
