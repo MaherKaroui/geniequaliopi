@@ -217,8 +217,11 @@ export function buildDpDossier(
       const r1 = [accroche, next("contexte"), next("contrainte"), next("methode"), next("alea")].filter(Boolean).join(" ");
       // Les outils du profil ne sont cités que sur le premier exemple du dossier
       const outilsProfil = cv?.outils && exemples.length === 0 ? ` J'utilisais également ${cv.outils}.` : "";
-      const r2 = `Pour cette opération, j'ai utilisé ${next("outils")}.${outilsProfil}`;
-      const r3 = `J'ai travaillé ${next("interlocuteurs")}.`;
+      // L'ancrage sur l'entreprise et le service réels du candidat garantit que
+      // deux dossiers d'une même session ne peuvent pas produire la même rubrique.
+      const ancrage = [entreprise.service, entreprise.nom].filter(Boolean).join(" – ");
+      const r2 = `Pour cette opération, j'ai utilisé ${next("outils")}.${outilsProfil}${ancrage ? ` Les documents produits ont été classés dans le dossier d'exploitation de ${ancrage}.` : ""}`;
+      const r3 = `J'ai travaillé ${next("interlocuteurs")}${ancrage ? `, au sein de ${ancrage}` : ""}.`;
       const r5 = `${next("cloture")} ${next("retour")}`;
 
       exemples.push({ atIndex: ci + 1, atTitre: at.titre, numero: ej + 1, intitule, r1, r2, r3, r5 });
