@@ -132,7 +132,11 @@ export function buildEcfProfilage(ref: DpReferentiel, cv?: GotrmCvProfile): EcfP
 
   // 2. Les compétences les plus éloignées du profil deviennent non acquises.
   //    Cible réaliste : 2 à 4 par candidat, majorité d'acquis.
-  const rang = (l: Ligne) => l.net * 100 + l.prio * 10 + l.exp;
+  // Départage final entre compétences strictement équivalentes : empreinte du
+  // CONTENU du profil (postes, missions, diplômes) — jamais du nom du candidat.
+  let empreinte = 7;
+  for (const ch of `${texteVecu}${forts.join("")}${faibles.join("")}`) empreinte = (empreinte * 31 + ch.charCodeAt(0)) % 9973;
+  const rang = (l: Ligne) => l.net * 1000 + l.prio * 100 + l.exp * 10 + ((empreinte + l.ci * 7 + l.i * 13) % 7);
   const ordre = [...lignes].sort((a, b) => rang(a) - rang(b) || a.ci - b.ci || a.i - b.i);
   const negatives = ordre.filter((l) => l.net < 0 || (l.net === 0 && l.exp === 0)).length;
   const k = Math.min(4, Math.max(2, negatives));
