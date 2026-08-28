@@ -46,6 +46,7 @@ import {
   type GotrmSession,
 } from "@/lib/gotrm/gotrmTypes";
 import { genECFGotrm, genDPGotrm } from "@/lib/gotrm/ecfDp";
+import { DPControleCoherence } from "@/components/DPControleCoherence";
 import { buildGenericFileName } from "@/lib/fileNaming";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
@@ -321,9 +322,14 @@ const GOTRMPage = () => {
               </p>
             </div>
           </div>
-          <Button onClick={exportPack} className="gap-2">
-            <Download className="w-4 h-4" /> Générer le pack complet
-          </Button>
+          <DPControleCoherence
+            organisme={organisme}
+            formation={formation}
+            stagiaires={candidats.map(toStagiaire)}
+            onExport={exportPack}
+            triggerLabel="Générer le pack complet"
+            triggerClassName="gap-2"
+          />
         </div>
       </header>
 
