@@ -165,17 +165,24 @@ function grilleActivite(ccpIndex: number, c: GotrmCandidat): string {
 
 function blocSignaturesJury(s: GotrmSession): string {
   const membres = s.jury.filter((j) => j.nom.trim());
-  const cols = (membres.length ? membres : [{ nom: "", qualite: "Membre du jury" }, { nom: "", qualite: "Membre du jury" }])
+  const base = membres.length ? membres : [{ nom: "", qualite: "Membre du jury" }, { nom: "", qualite: "Membre du jury" }];
+  const signatures = [sigJury1.url, sigJury2.url];
+  const cols = base
     .map(
-      (j) => `<td style="width:${Math.floor(100 / Math.max(2, membres.length || 2))}%">
+      (j, i) => `<td style="width:${Math.floor(100 / Math.max(2, base.length))}%">
         <div><strong>${esc(j.nom)}</strong></div>
         <div style="font-size:9.5pt;color:#555">${esc(j.qualite)}</div>
-        <div style="height:58px"></div></td>`,
+        <div style="height:58px;display:flex;align-items:center;justify-content:center">${
+          i < signatures.length
+            ? `<img src="${signatures[i]}" alt="Signature du membre du jury" style="max-height:56px;max-width:150px;object-fit:contain" />`
+            : ""
+        }</div></td>`,
     )
     .join("");
   return `<p style="margin-top:14px"><strong>Signature des membres du jury :</strong></p>
   <table class="bloc-avoid"><tr>${cols}</tr></table>`;
 }
+
 
 /** GJ1 — Grilles d'évaluation de l'épreuve (guides d'observation + grilles). */
 export function genGJ1Gotrm(s: GotrmSession, c: GotrmCandidat): string {
