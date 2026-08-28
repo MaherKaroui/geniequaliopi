@@ -356,9 +356,7 @@ export function genECFUnifie(
 
   // ── Page de garde officielle
   pages.push(`<div style="text-align:center">
-    <p style="font-size:11pt;letter-spacing:1px;margin-bottom:2px">MINISTÈRE DU TRAVAIL, DE L'EMPLOI ET DE L'INSERTION</p>
-    <p style="font-size:9pt;font-style:italic;margin-top:0">Liberté • Égalité • Fraternité</p>
-    <h1 style="margin:18px 0 12px">LIVRET D'ÉVALUATIONS PASSÉES EN COURS DE FORMATION</h1>
+    <img src="/__l5e/assets-v1/4d848a41-d76e-4a70-90b8-4cc8a50a0e77/ecf-header-officiel.png" alt="Ministère du Travail – Livret d'évaluations passées en cours de formation" style="width:100%;max-width:640px;height:auto" />
     <h2 style="margin-bottom:2px">Titre professionnel</h2>
     <h2 style="margin-top:0">${ref.titreOfficiel}${ref.niveau ? ` – ${ref.niveau}` : ""}</h2>
   </div>
