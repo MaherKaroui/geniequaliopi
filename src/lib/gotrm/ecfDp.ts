@@ -28,7 +28,7 @@ import {
   resolveReferentiel,
   nettoyerIntitule,
   DP_TRAME_VERSION,
-  ECF_SIGLE,
+  
   ECF_TYPE_DOC,
   type DpReferentiel,
 } from "@/lib/dp/referentielTitres";
@@ -80,35 +80,52 @@ function addWorkDays(iso: string, days: number): string {
 }
 
 /**
- * Charte officielle « Ministère du Travail » historique des pièces 45A/45B :
- * titres de section magenta, titre principal bleu République, tableaux à
- * en-têtes bleu clair et pied de page tabulé.
+ * Charte des trames officielles 45A (Dossier professionnel) et 45B (Livret
+ * d'évaluations passées en cours de formation) : magenta soutenu #E5007D,
+ * bandes grises, tirets verticaux magenta, cadres de réponse gris clair.
+ * Aucun bleu : ce n'est pas la couleur des trames.
  */
+const MAGENTA = "#E5007D";
 const STYLE_MINISTERE = `<style>
-  .doc-officiel{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
-  .doc-officiel h1{text-align:center;font-size:18pt;font-weight:bold;margin:26px 0 18px;letter-spacing:1px;color:#0055A4}
-  .doc-officiel h2{font-size:13pt;font-weight:bold;margin:22px 0 12px;color:#fff;background:#C2185B;padding:8px 14px}
-  .doc-officiel h3{font-size:11pt;font-weight:bold;margin:16px 0 8px;color:#0055A4}
-  .doc-officiel .activite-type{background:#C2185B;color:#fff;padding:8px 14px;font-weight:bold;font-size:11pt;margin:18px 0 10px;border-radius:2px}
-  .doc-officiel .exemple-titre{font-weight:bold;font-style:italic;margin:10px 0;color:#333}
+  .doc-officiel{font-family:'Calibri','Arial',sans-serif;color:#1a1a1a;font-size:11pt;line-height:1.4}
+  .doc-officiel h1{text-align:center;font-size:17pt;font-weight:bold;margin:24px 0 16px;letter-spacing:1.5px;color:#333;text-transform:uppercase}
+  .doc-officiel h2{font-size:12pt;font-weight:bold;margin:20px 0 10px;color:#222;padding:0 0 5px 12px;border-left:5px solid ${MAGENTA};border-bottom:2px solid ${MAGENTA}}
+  .doc-officiel h3{font-size:11pt;font-weight:bold;margin:14px 0 6px;color:#222;padding-left:10px;border-left:4px solid ${MAGENTA}}
+  .doc-officiel .bande-titre{background:#F2F2F2;padding:9px 14px;font-variant:small-caps;letter-spacing:2px;color:#444;font-weight:bold;font-size:12pt;position:relative;border-bottom:4px solid ${MAGENTA}}
+  .doc-officiel .bandeau-magenta{background:${MAGENTA};color:#fff;font-weight:bold;text-align:center;padding:8px 12px;letter-spacing:.5px}
+  .doc-officiel .double-filet{border-top:3px solid ${MAGENTA};border-bottom:1px solid ${MAGENTA};height:4px;margin:0 0 14px}
+  .doc-officiel .bloc-identite{border-left:5px solid ${MAGENTA};padding:6px 0 6px 14px;margin:18px 0}
+  .doc-officiel .bloc-identite .lib{font-style:italic;color:${MAGENTA};font-size:10.5pt}
+  .doc-officiel .bloc-identite .val{font-weight:bold;color:#111}
+  .doc-officiel .cadre-reponse{border:1px solid #CFCFCF;padding:10px 12px;margin:6px 0 14px;min-height:52px;background:#fff}
+  .doc-officiel .cadre-fin{border:1px solid #BBB;padding:8px 12px;margin:10px 0;font-variant:small-caps;letter-spacing:1px}
+  .doc-officiel .entete-courant{text-align:center;font-variant:small-caps;letter-spacing:2px;color:#555;font-size:9.5pt;border-top:1px solid #CCC;border-bottom:1px solid #CCC;padding:3px 0;margin-bottom:0}
   .doc-officiel p{margin:8px 0;text-align:justify;line-height:1.5}
   .doc-officiel ol,.doc-officiel ul{margin:8px 0 8px 22px}
   .doc-officiel li{margin:3px 0}
   .doc-officiel table{width:100%;border-collapse:collapse;margin:12px 0}
-  .doc-officiel table th,.doc-officiel table td{border:1px solid #000;padding:6px 8px;vertical-align:top;text-align:left}
-  .doc-officiel table th{background:#E8EEF7;font-weight:bold;font-size:9pt}
-  .doc-officiel .resultat-final{padding:12px;border:2px solid #0055A4;background:#E8EEF7;text-align:center;font-weight:bold;margin:14px 0}
-  .doc-officiel table.pied-officiel th,.doc-officiel table.pied-officiel td{border:1px solid #999;padding:3px 5px;text-align:center;background:#F0F0F0;font-size:8pt}
-  .doc-officiel .pied-dp{margin-top:26px;padding-top:5px;border-top:2px solid #C2185B;display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:7.5pt;color:#555;letter-spacing:.2px}
-  .doc-officiel .pied-dp .pied-dp-t{flex:1 1 auto;text-align:left;font-variant:small-caps;letter-spacing:.5px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .doc-officiel .pied-dp .pied-dp-v{flex:0 0 auto;text-align:center;font-style:italic;white-space:nowrap}
-  .doc-officiel .pied-dp .pied-dp-p{flex:0 0 auto;text-align:right;white-space:nowrap;color:#C2185B;font-weight:bold}
+  .doc-officiel table th,.doc-officiel table td{border:1px solid #9A9A9A;padding:6px 8px;vertical-align:top;text-align:left;color:#1a1a1a}
+  .doc-officiel table th{background:#EFEFEF;font-weight:bold;font-size:9.5pt;color:#222}
+  .doc-officiel table.contexte th{background:#EFEFEF;color:#222;font-weight:bold}
+  .doc-officiel table.contexte caption{caption-side:top;text-align:left;font-weight:bold;background:#E4E4E4;color:#222;padding:6px 8px;border:1px solid #9A9A9A;border-bottom:0}
+  .doc-officiel .grille-comp{display:inline-block}
+  .doc-officiel table.grille-comp td{border:0;padding:1px 8px 1px 0;font-size:9pt;white-space:nowrap}
+  .doc-officiel .verdict{margin:10px 0;padding:8px 0;line-height:1.7}
   .doc-officiel .page-break{page-break-after:always;break-after:page}
+  /* Pied ancré (rendu hors flux par le moteur d'export, une fois par page physique) */
+  .footer.pied-dp{padding:6px 26px 0;border-top:2px solid ${MAGENTA};display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:8pt;line-height:1.6;color:#555;min-height:26px}
+  .footer.pied-dp .pied-dp-t{flex:1 1 auto;text-align:left;font-variant:small-caps;letter-spacing:.5px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .footer.pied-dp .pied-dp-v{flex:0 0 auto;text-align:center;font-style:italic;white-space:nowrap}
+  .footer.pied-dp .pied-dp-p{flex:0 0 auto;text-align:right;white-space:nowrap;color:${MAGENTA};font-weight:bold}
+  .footer.pied-ecf{padding:0 18px}
+  .footer.pied-ecf table{width:100%;border-collapse:collapse;font-size:7.5pt}
+  .footer.pied-ecf th,.footer.pied-ecf td{border:1px solid #9A9A9A;padding:3px 4px;text-align:center;line-height:1.5;color:#222}
+  .footer.pied-ecf th{background:#EFEFEF;font-weight:bold}
 </style>`;
 
 const STYLE_ECF = `<style>
   .doc-officiel .marqueur-attente{border:1.5px dashed #b00020;color:#b00020;font-weight:600;padding:8px 12px;margin:12px 0}
-  .doc-officiel .mention-prerenseigne{margin-top:18px;padding:8px 12px;border-left:4px solid #C2185B;background:#FDF2F6;font-size:9.5pt;font-style:italic;color:#333}
+  .doc-officiel .mention-prerenseigne{margin-top:18px;padding:8px 12px;border-left:4px solid ${MAGENTA};background:#FDF2F6;font-size:9.5pt;font-style:italic;color:#333}
 </style>`;
 
 const CHK = (on: boolean) => (on ? "☒" : "☐");
@@ -377,40 +394,73 @@ export function genECFUnifie(
     org.dateMaj && finDoc && new Date(org.dateMaj) >= new Date(finDoc)
       ? org.dateMaj
       : finDoc || org.dateMaj || "";
-  const pied = (p: number, total: number) => `<table class="pied-officiel" style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:16px">
-    <tr><th>SIGLE</th><th>Type de document</th>${ref.codeTitre ? "<th>Code titre</th>" : ""}${ref.millesime ? "<th>Millésime</th>" : ""}${ref.dateJo ? "<th>Date JO</th>" : ""}<th>Date de mise à jour</th><th>Page</th></tr>
-    <tr><td>${ref.sigle || ECF_SIGLE}</td><td>${ECF_TYPE_DOC}</td>${ref.codeTitre ? `<td>${ref.codeTitre}</td>` : ""}${ref.millesime ? `<td>${ref.millesime}</td>` : ""}${ref.dateJo ? `<td>${ref.dateJo}</td>` : ""}<td>${formatDate(majDoc)}</td><td>${p}/${total}</td></tr>
-  </table>`;
+  // Date de mise à jour du référentiel (trame officielle) sinon date de fin de session
+  const majPied = ref.dateMaj || formatDate(majDoc);
+
+  /**
+   * Pied de page officiel ECF : tableau à sept colonnes, ancré en bas de CHAQUE
+   * page physique par le moteur d'export (jetons {{PAGE}} / {{PAGES}}).
+   */
+  const piedEcf = `<div class="footer pied-ecf"><table>
+    <tr><th style="width:9%">SIGLE</th><th style="width:34%">Type de document</th><th style="width:11%">Code titre</th><th style="width:9%">Millésime</th><th style="width:12%">Date JO</th><th style="width:15%">Date de mise à jour</th><th style="width:10%">Page</th></tr>
+    <tr><td>${ref.sigle || ""}</td><td>${ECF_TYPE_DOC}</td><td>${ref.codeTitre || ""}</td><td>${ref.millesime || ""}</td><td>${ref.dateJo || ""}</td><td>${majPied}</td><td>{{PAGE}}/{{PAGES}}</td></tr>
+  </table></div>`;
 
   const pages: string[] = [];
 
-  // ── Page de garde officielle
+  // ── Page de garde officielle (trame « Livret d'évaluations »)
   pages.push(`<div style="text-align:center">
-    <img src="/__l5e/assets-v1/4d848a41-d76e-4a70-90b8-4cc8a50a0e77/ecf-header-officiel.png" alt="Ministère du Travail – Livret d'évaluations passées en cours de formation" style="width:100%;max-width:640px;height:auto" />
-    <h2 style="margin-bottom:2px">Titre professionnel</h2>
-    <h2 style="margin-top:0">${ref.titreOfficiel}${ref.niveau ? ` – ${ref.niveau}` : ""}</h2>
+    <img src="/__l5e/assets-v1/4d848a41-d76e-4a70-90b8-4cc8a50a0e77/ecf-header-officiel.png" alt="Ministère du Travail – Livret d'évaluations passées en cours de formation" style="width:100%;max-width:660px;height:auto" />
   </div>
-  <table style="width:62%;margin:14px auto;border-collapse:collapse;font-size:10pt">
-    ${ref.dateArrete ? `<tr><th style="width:50%">Arrêté du :</th><td>${ref.dateArrete}</td></tr>` : ""}
-    ${ref.dateJo ? `<tr><th style="width:50%">J.O. du :</th><td>${ref.dateJo}</td></tr>` : ""}
-    ${ref.codeTitre ? `<tr><th>Code titre :</th><td>${ref.codeTitre}</td></tr>` : ""}
-    ${ref.rncp ? `<tr><th>Fiche RNCP :</th><td>${ref.rncp}</td></tr>` : ""}
+  <div class="bandeau-magenta" style="margin-top:22px">Titre professionnel</div>
+  <div class="double-filet"></div>
+  <p style="text-align:center;font-size:13pt;font-weight:bold;margin:6px 0">${ref.titreOfficiel}</p>
+  ${ref.niveau ? `<p style="text-align:center;margin:0 0 14px">${ref.niveau}</p>` : ""}
+  <table style="width:72%;margin:10px 0 10px auto;border-collapse:collapse;font-size:10.5pt">
+    <tr><th style="width:48%">Arrêté du :</th><td>${ref.dateArrete || ""}</td></tr>
+    <tr><th>J.O. du :</th><td>${ref.dateJo || ""}</td></tr>
+    <tr><th>Date d'effet au :</th><td>${ref.dateJo || ""}</td></tr>
   </table>
-  <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:22px">
+  <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-top:18px">
     <tr><th style="width:32%">Organisme de formation</th><td>${org.nom}</td></tr>
     ${rowIf("Lieu de formation", lieu)}
-    <tr><th>Candidat(e)</th><td>Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</td></tr>
-    <tr><th>Nom</th><td><strong>${s?.nom || ""}</strong></td></tr>
-    <tr><th>Prénom</th><td><strong>${s?.prenom || ""}</strong></td></tr>
-    ${rowIf("Date de naissance", s?.dateNaissance ? formatDate(s.dateNaissance) : "")}
-    <tr><th>Période de formation</th><td>Du ${formatDate(debut)} au ${formatDate(fin)}</td></tr>
   </table>
+  <div class="bloc-identite" style="margin-top:20px">
+    <div class="lib" style="font-weight:bold;font-size:12pt">Candidat(e) :</div>
+    <div style="margin-top:6px">Mme ${CHK(s?.civilite === "Mme")} &nbsp;&nbsp;&nbsp; M. ${CHK(s?.civilite !== "Mme")}</div>
+    <div style="margin-top:6px"><span class="lib">Nom :</span> <span class="val">${s?.nom || ""}</span></div>
+    <div><span class="lib">Prénom :</span> <span class="val">${s?.prenom || ""}</span></div>
+    ${s?.dateNaissance ? `<div><span class="lib">Date de naissance :</span> <span class="val">${formatDate(s.dateNaissance)}</span></div>` : ""}
+    <div><span class="lib">Période de formation :</span> <span class="val">Du ${formatDate(debut)} au ${formatDate(fin)}</span></div>
+  </div>
   ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}`);
 
   // ── Présentation du dossier
   pages.push(`<h2>Présentation du dossier</h2>
   <p>Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
   <p>Le <strong><em>Guide de mise en œuvre</em></strong> des évaluations passées en cours de formation est à télécharger sur le site du ministère chargé de l'emploi. Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>`);
+
+  /**
+   * Grille officielle des compétences évaluées : cases numérotées 1 à 9,
+   * disposées en 3 colonnes × 3 lignes. On coche les compétences couvertes.
+   */
+  const grilleComp = (cochees: Set<number>, actives: number): string => {
+    const cell = (n: number) =>
+      n <= actives ? `<td>${n} ${CHK(cochees.has(n - 1))}</td>` : `<td>&nbsp;</td>`;
+    return `<table class="grille-comp"><tr>${cell(1)}${cell(2)}${cell(3)}</tr><tr>${cell(4)}${cell(5)}${cell(6)}</tr><tr>${cell(7)}${cell(8)}${cell(9)}</tr></table>`;
+  };
+
+  /** Bloc « Observations » de la trame : tiret magenta, filet, zone encadrée. */
+  const blocObservations = (texte: string) => `<h3 style="border-bottom:2px solid ${MAGENTA};padding-bottom:4px;margin-top:16px">Observations</h3>
+  <div class="cadre-reponse">${texte || "&nbsp;"}</div>`;
+
+  /** Bloc « Formateur(s) évaluateur(s) » : Nom | Date | Visa, deux lignes. */
+  const blocFormateurs = (date: string) => `<h3 style="margin-top:14px">Formateur(s) évaluateur(s)</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
+    <tr><td>${evaluateur1 || ""}</td><td>${evaluateur1 ? date : ""}</td><td>${evaluateur1 ? visaCell(evaluateur1, date, s?.formateurSignatureUrl) : "&nbsp;"}</td></tr>
+    <tr><td>${evaluateur2 || ""}</td><td>${evaluateur2 ? date : ""}</td><td>${evaluateur2 ? visaCell(evaluateur2, date) : "&nbsp;"}</td></tr>
+  </table>`;
 
   ref.activitesTypes.forEach((at, ci) => {
     const numAT = ci + 1;
@@ -419,87 +469,64 @@ export function genECFUnifie(
     const libelles = at.competences;
     const mods = modalitesAT(ci);
 
-    // Fiche de résultats : une ligne par compétence évaluée (max 4)
-    const rows = (prof.renseigne ? comps : libelles.map((l) => ({ libelle: l, niveau: "ACQUIS" as const, motif: "" })))
-      .slice(0, 4)
-      .map((c, ei) => {
-        const modalite = mods[ei % mods.length](c.libelle, at.titre);
-        const jour = prof.renseigne
-          ? dateEvaluation(debut, fin, offsetAT[ci] + ei, totalEval)
-          : "";
-        // Les cases cochées suivent la compétence réellement évaluée sur la ligne :
-        // une évaluation transversale coche en plus la compétence connexe non acquise.
-        const cochees = new Set<number>();
-        if (prof.renseigne) {
-          cochees.add(ei % comps.length);
-          const connexe = comps.findIndex((x, n) => n !== ei % comps.length && x.niveau !== "ACQUIS");
-          if (connexe >= 0 && ei % 2 === 1) cochees.add(connexe);
-        }
-        const compsCells = libelles
-          .map((_, n) => `${n + 1} ${CHK(cochees.has(n))}`)
-          .join(" &nbsp;&nbsp; ");
-        return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${compsCells}</td></tr>`;
-      });
+    // Quatre lignes d'évaluation numérotées 1 à 4 ; seules les évaluations
+    // réellement mises en œuvre sont décrites, les autres restent vierges.
+    const nbEval = prof.renseigne ? Math.min(4, Math.max(2, libelles.length)) : 0;
+    const rows = [0, 1, 2, 3].map((ei) => {
+      if (ei >= nbEval) {
+        return `<tr><td><strong>${ei + 1}</strong>&nbsp;</td><td>&nbsp;</td><td>${grilleComp(new Set(), libelles.length)}</td></tr>`;
+      }
+      const compEval = comps[ei % Math.max(1, comps.length)];
+      const modalite = mods[ei % mods.length](compEval?.libelle || libelles[ei % libelles.length], at.titre);
+      const jour = dateEvaluation(debut, fin, offsetAT[ci] + ei, totalEval);
+      // Cases cochées : la compétence travaillée sur la ligne, plus la compétence
+      // connexe non acquise lorsque l'évaluation est transversale.
+      const cochees = new Set<number>();
+      cochees.add(ei % Math.max(1, comps.length));
+      const connexe = comps.findIndex((x, n) => n !== ei % Math.max(1, comps.length) && x.niveau !== "ACQUIS");
+      if (connexe >= 0 && ei % 2 === 1) cochees.add(connexe);
+      return `<tr><td><strong>${ei + 1}</strong> ${modalite}</td><td>${jour ? formatDate(jour) : ""}</td><td>${grilleComp(cochees, libelles.length)}</td></tr>`;
+    });
 
-    pages.push(`<h2>Fiche de résultats des évaluations</h2>
-    <p><strong>Activité-type ${numAT}</strong> ${at.titre}</p>
-    <p><strong>Compétences :</strong></p>
+    const satisfait = prof.renseigne && aConsolider.length === 0;
+
+    pages.push(`<h2>Activité-type ${numAT} – ${at.titre}</h2>
+    <p><strong>Compétences professionnelles évaluées :</strong></p>
     <ol>${libelles.map((c) => `<li>${c}</li>`).join("")}</ol>
+    <h3>Évaluations complémentaires <em>(si nécessaire)</em></h3>
     <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
-      <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
+      <tr><th style="width:56%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
       ${rows.join("")}
     </table>
     ${prof.renseigne
-      ? `<table style="width:100%;border-collapse:collapse;font-size:9.5pt">
-      <tr><th style="width:55%">Compétence</th><th style="width:18%">Niveau atteint</th><th>Réévaluation</th></tr>
-      ${comps
-        .map(
-          (c) => `<tr><td>${c.libelle}</td><td>${LIBELLE_NIVEAU[c.niveau]}</td><td>${c.niveau === "ACQUIS" ? "Non" : "Oui"}</td></tr>`,
-        )
-        .join("")}
-    </table>
-    <p style="margin-top:12px">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
-    <p>${CHK(aConsolider.length === 0)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
-    ${CHK(aConsolider.length > 0)} Ne pas avoir satisfait à l'ensemble des critères issus des référentiels du titre professionnel.</p>`
-      : `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>`}`);
+      ? `<p class="verdict">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :<br>
+    ${CHK(satisfait)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+    ${CHK(!satisfait)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>`
+      : `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>`}
+    ${blocObservations(prof.renseigne ? prof.appreciations[ci] || "" : "")}
+    ${blocFormateurs(prof.renseigne ? dateVisa : "")}`);
 
-    // Appréciation + visas
-    pages.push(`<p>Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-    <p><strong>Compétences à réévaluer :</strong> ${prof.renseigne ? (aConsolider.length ? aConsolider.map((c) => c.libelle).join(" ; ") : "Néant pour cette activité-type.") : ""}</p>
-    <p><strong>Appréciation du formateur évaluateur :</strong> ${prof.renseigne ? prof.appreciations[ci] : ""}</p>
-    ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}
-    <p>${!prof.renseigne
-      ? ""
-      : aConsolider.length
-        ? `Une évaluation de consolidation est programmée sur ${aConsolider.length === 1 ? "la compétence" : "les compétences"} ci-dessus avant la fin du parcours.`
-        : `L'ensemble des critères de performance de l'activité-type ${numAT} est satisfait.`}</p>
-    <p style="margin-top:14px"><strong>Formateur(s) évaluateur(s) – Visa</strong></p>
-    <table style="width:100%;border-collapse:collapse;font-size:10pt">
-      ${evaluateur1 ? `<tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateVisa, s?.formateurSignatureUrl)}</td></tr>` : ""}
-      ${evaluateur2 ? `<tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>` : ""}
-    </table>`);
-
-    // Évaluations complémentaires — uniquement si consolidation nécessaire
+    // Réévaluation : uniquement si des compétences restent à travailler
     if (prof.renseigne && aConsolider.length) {
       const consolidation = ECF_CONSOLIDATION_PAR_AT[ci] || ECF_CONSOLIDATION_PAR_AT[0];
       const dateCons = dateEvaluation(debut, fin, totalEval - 1, totalEval);
-      const ligneComp = libelles
-        .map((l, n) => `${n + 1} ${CHK(aConsolider.some((c) => c.libelle === l))}`)
-        .join(" &nbsp;&nbsp; ");
-      pages.push(`<h2>Évaluations complémentaires</h2>
-      <p><em>Activité-type ${numAT} – ${at.titre}</em></p>
+      const dateConsFr = dateCons ? formatDate(dateCons) : dateVisa;
+      const cochees = new Set<number>();
+      libelles.forEach((l, n) => {
+        if (aConsolider.some((c) => c.libelle === l)) cochees.add(n);
+      });
+      pages.push(`<h2>Activité-type ${numAT} – Réévaluation</h2>
+      <h3>Évaluations complémentaires <em>(si nécessaire)</em></h3>
       <table style="width:100%;border-collapse:collapse;font-size:9.5pt">
-        <tr><th style="width:58%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences réévaluées <em>(cochez)</em></th></tr>
-        <tr><td><strong>1</strong> ${consolidation}</td><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${ligneComp}</td></tr>
+        <tr><th style="width:56%">Description des évaluations mises en œuvre</th><th style="width:14%">Dates</th><th>Compétences évaluées <em>(cochez)</em></th></tr>
+        <tr><td><strong>1</strong> ${consolidation}</td><td>${dateConsFr}</td><td>${grilleComp(cochees, libelles.length)}</td></tr>
+        ${[2, 3, 4].map((n) => `<tr><td><strong>${n}</strong>&nbsp;</td><td>&nbsp;</td><td>${grilleComp(new Set(), libelles.length)}</td></tr>`).join("")}
       </table>
-      <p style="margin-top:12px">À l'issue de la réévaluation, ${g(s, "le candidat est considéré", "la candidate est considérée")} :</p>
-      <p>${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
-      <p><strong>Observations</strong></p>
-      <p>La réévaluation portait sur ${aConsolider.map((c) => `${c.libelle} — ${c.motif}`).join(" ; ")}. Les productions remises lors de cette évaluation de consolidation sont conformes aux attendus : ${aConsolider.length === 1 ? "la compétence concernée est désormais acquise" : "les compétences concernées sont désormais acquises"}.</p>
-      <table style="width:100%;border-collapse:collapse;font-size:10pt">
-        ${evaluateur1 ? `<tr><th style="width:12%">Nom</th><td style="width:33%">${evaluateur1}</td><th style="width:12%">Date</th><td style="width:18%">${dateCons ? formatDate(dateCons) : dateVisa}</td><td style="width:25%">${visaCell(evaluateur1, dateCons ? formatDate(dateCons) : dateVisa, s?.formateurSignatureUrl)}</td></tr>` : ""}
-        ${evaluateur2 ? `<tr><th>Nom</th><td>${evaluateur2}</td><th>Date</th><td>${dateCons ? formatDate(dateCons) : dateVisa}</td><td>${visaCell(evaluateur2, dateCons ? formatDate(dateCons) : dateVisa)}</td></tr>` : ""}
-      </table>`);
+      <p class="verdict">À l'issue de la réévaluation, ${g(s, "le/la candidat(e) est considéré", "le/la candidat(e) est considérée")} :<br>
+      ${CHK(true)} Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.<br>
+      ${CHK(false)} Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+      ${blocObservations(`La réévaluation portait sur ${aConsolider.map((c) => `${c.libelle} — ${c.motif}`).join(" ; ")}. Les productions remises lors de cette évaluation de consolidation sont conformes aux attendus : ${aConsolider.length === 1 ? "la compétence concernée est désormais maîtrisée" : "les compétences concernées sont désormais maîtrisées"}.`)}
+      ${blocFormateurs(dateConsFr)}`);
     }
   });
 
@@ -509,12 +536,7 @@ export function genECFUnifie(
     <tr><th style="width:45%">Intitulé de l'activité-type</th><th>Compétences professionnelles</th></tr>
     ${ref.activitesTypes
       .map((at, i) => {
-        const comps = prof.parAT[i] || [];
-        const detail = prof.renseigne
-          ? comps
-              .map((c) => `${c.libelle} — <em>${LIBELLE_NIVEAU[c.niveau]}${c.niveau !== "ACQUIS" ? ", acquise après consolidation" : ""}</em>`)
-              .join("<br>• ")
-          : at.competences.join("<br>• ");
+        const detail = at.competences.join("<br>• ");
         return `<tr><td><strong>Activité-type ${i + 1}</strong> – ${at.titre}</td><td>• ${detail}</td></tr>
     <tr><td><strong>L'activité ${i + 1} est maîtrisée :</strong></td><td>OUI ${CHK(prof.renseigne)} &nbsp;&nbsp;&nbsp; NON ${CHK(false)}</td></tr>`;
       })
@@ -523,18 +545,13 @@ export function genECFUnifie(
 
   // ── Observations et visas finaux
   pages.push(`<h2>Observations</h2>
-  <p>${prof.renseigne ? prof.observation : ""}</p>
+  <div class="cadre-reponse">${prof.renseigne ? prof.observation : "&nbsp;"}</div>
   ${!prof.renseigne ? `<p class="marqueur-attente">${MARQUEUR_SANS_PROFIL}</p>` : ""}
-  <p style="margin-top:14px"><strong>Formateur(s) / Évaluateur(s)</strong></p>
-  <table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
-    ${evaluateur1 ? `<tr><td>${evaluateur1}</td><td>${dateVisa}</td><td>${visaCell(evaluateur1, dateVisa, s?.formateurSignatureUrl)}</td></tr>` : ""}
-    ${evaluateur2 ? `<tr><td>${evaluateur2}</td><td>${dateVisa}</td><td>${visaCell(evaluateur2, dateVisa)}</td></tr>` : ""}
-  </table>
+  ${blocFormateurs(prof.renseigne ? dateVisa : "")}
   ${org.dirigeant
-      ? `<p style="margin-top:14px"><strong>Représentant de l'organisme de formation</strong></p>
+      ? `<h3 style="margin-top:14px">Représentant de l'organisme de formation</h3>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><th style="width:40%">Nom</th><th style="width:25%">Date</th><th>Visa</th></tr>
+    <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
     <tr><td>${org.dirigeant}</td><td>${dateVisa}</td><td>${visaCell(org.dirigeant, dateVisa, org.tamponUrl)}</td></tr>
   </table>`
       : ""}
@@ -542,9 +559,9 @@ export function genECFUnifie(
   <table style="width:100%;border-collapse:collapse;font-size:10pt"><tr><th style="width:50%">Signature ${g(s, "du candidat", "de la candidate")} pour information</th><td>${cadreSignature(s?.signatureUrl)}</td></tr></table>
   <p class="mention-prerenseigne">${MENTION_PRE_RENSEIGNE}</p>`);
 
-  const total = pages.length;
-  const body = pages.map((p, i) => `${p}${pied(i + 1, total)}`).join(`<div class="page-break"></div>`);
-  return htmlWrap(`${STYLE_MINISTERE}${STYLE_ECF}<div class="doc-officiel">${body}</div>`);
+  // Le pied est ancré par le moteur d'export en bas de chaque page physique.
+  const body = pages.join(`<div class="page-break"></div>`);
+  return htmlWrap(`${STYLE_MINISTERE}${STYLE_ECF}<div class="doc-officiel">${body}</div>${piedEcf}`);
 }
 
 // ───────────────────────────────────────────── DP

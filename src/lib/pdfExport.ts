@@ -158,7 +158,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
 
   if (footerHeightPx > 0 && footerHtml) {
     const footer = document.createElement("div");
-    footer.className = "";
+    footer.className = "pdf-page-footer";
     footer.style.cssText = [
       "position:absolute",
       "left:0",
@@ -535,6 +535,20 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     if (renderPages.length === 0) {
       renderPages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
+
+    // Pagination réelle : le pied de page peut porter les jetons {{PAGE}} / {{PAGES}}
+    if (footerHtml && /\{\{PAGES?\}\}/.test(footerHtml)) {
+      renderPages.forEach((page, i) => {
+        const footer = page.querySelector(".pdf-page-footer");
+        if (footer) {
+          footer.innerHTML = footerHtml
+            .replace(/\{\{PAGES\}\}/g, String(renderPages.length))
+            .replace(/\{\{PAGE\}\}/g, String(i + 1));
+        }
+      });
+    }
+
+
 
     const orientation = PAGE_W_MM > PAGE_H_MM ? "landscape" : "portrait";
     const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation });

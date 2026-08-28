@@ -47,7 +47,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "ATASOY",
     prenom: "Dilovan",
-    entreprise: { nom: "O'MALO RESTAURATION & TRANSPORTS", service: "Gérance et logistique d'approvisionnement", ville: "Romilly-sur-Seine (10)" },
+    entreprise: { nom: "O'malo", service: "Gérance et logistique d'approvisionnement", ville: "Romilly-sur-Seine (10)" },
     posteOccupe: "Gérant d'établissement – gestion des approvisionnements et des livraisons",
     profil:
       "Ancien surveillant de travaux caténaires à la SNCF, puis créateur et gérant d'un restaurant employant dix personnes, j'ai l'habitude d'organiser des flux, de piloter une équipe et de tenir un budget.",
@@ -115,7 +115,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "BOUZZAOUI",
     prenom: "Yassine",
-    entreprise: { nom: "DELTA TRANSPORTS", service: "Exploitation bennes et matériel de chantier (Ampliroll / grue plateau)", ville: "Le Blanc-Mesnil (93)" },
+    entreprise: { nom: "Delta", service: "Exploitation bennes et matériel de chantier (Ampliroll / grue plateau)", ville: "Le Blanc-Mesnil (93)" },
     posteOccupe: "Conducteur poids lourd Ampliroll puis référent d'exploitation",
     profil:
       "Chauffeur poids lourd expérimenté, spécialisé dans la conduite de véhicules Ampliroll et de camions équipés de grue plateau, rigoureux sur les règles de sécurité et les opérations de chargement et de déchargement.",
@@ -174,7 +174,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "DAHOUM",
     prenom: "Anis",
-    entreprise: { nom: "AVITAIR / GROUPE 3S – PLATE-FORME AÉROPORTUAIRE", service: "Exploitation citerne et logistique aéroportuaire", ville: "Le Bourget / Roissy CDG (93-95)" },
+    entreprise: { nom: "Avitair", service: "Exploitation citerne et logistique aéroportuaire", ville: "Le Bourget / Roissy CDG (93-95)" },
     posteOccupe: "Conducteur SPL citerne – avitaillement et coordination de piste",
     profil:
       "Conducteur SPL titulaire des permis C et CE, formé aux matières dangereuses (ADR initial et citerne, DGR8), habitué aux environnements réglementés et aux procédures de piste.",
@@ -256,7 +256,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "HACHMI",
     prenom: "Lina",
-    entreprise: { nom: "FRED LOGISTIQUE", service: "Administration des transports – accueil, dossiers clients et facturation", ville: "Sevran (93)" },
+    entreprise: { nom: "Fred Logistique", service: "Administration des transports – accueil, dossiers clients et facturation", ville: "Sevran (93)" },
     posteOccupe: "Assistante secrétaire d'exploitation logistique",
     profil:
       "Titulaire d'un baccalauréat professionnel Gestion-Administration et d'un BTS Support à l'action managériale, j'ai exercé en logistique et en transport sur la gestion des appels, des dossiers clients et de la facturation.",
@@ -320,7 +320,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "HOUARI",
     prenom: "Hicham",
-    entreprise: { nom: "CLASS'PARK / ECTOR – ROISSY CDG", service: "Exploitation transport national – frigo, plateau et porteur", ville: "Louvres (95)" },
+    entreprise: { nom: "Class'Park / ECTOR", service: "Exploitation transport national – frigo, plateau et porteur", ville: "Louvres (95)" },
     posteOccupe: "Conducteur routier SPL (permis CE) – transport national",
     profil:
       "Conducteur routier sérieux, rigoureux et polyvalent, titulaire du permis CE, de la FIMO et de l'ADR, expérimenté en environnement exigeant (Roissy CDG) et maîtrisant les véhicules frigorifiques, plateaux et porteurs.",
@@ -483,7 +483,7 @@ const P: GotrmCvProfile[] = [
   {
     nom: "SELHAOUI",
     prenom: "Ilyes",
-    entreprise: { nom: "MOMSERVICE / TRANSLS", service: "Gestion de parc et exploitation des tournées de livraison", ville: "Bobigny (93)" },
+    entreprise: { nom: "Momservice", service: "Gestion de parc et exploitation des tournées de livraison", ville: "Bobigny (93)" },
     posteOccupe: "Gestionnaire de parc et chauffeur-livreur (transport sensible)",
     profil:
       "Chauffeur livreur expérimenté et polyvalent, ayant exercé dans la livraison pharmaceutique sous contraintes strictes ainsi que dans l'alimentaire, avec une expérience récente en gestion de parc automobile.",
