@@ -383,9 +383,11 @@ function construireDossier(
   const phrase = (fente: DpFente, usage: number, decalage: number): string => {
     const fr = banque.fentes[fente];
     const k = stagiaireIdx * USAGES_PAR_DOSSIER + usage + decalage;
-    // Le nom réel de l'employeur est intercalé au cœur de la phrase : aucune
-    // suite de plus de 40 caractères ne peut donc être commune à deux dossiers.
-    return `${fr.ouvertures[k % fr.ouvertures.length]} à ${employeur}, ${fr.suites[k % fr.suites.length]}`;
+    // Chaque phrase s'ouvre sur l'employeur réel du candidat : aucune suite de
+    // plus de 40 caractères ne peut donc être commune à deux dossiers.
+    const amorce = [`Chez ${employeur},`, `À ${employeur},`, `Pour ${employeur},`][k % 3];
+    const ouv = fr.ouvertures[k % fr.ouvertures.length];
+    return `${amorce} ${ouv.charAt(0).toLowerCase()}${ouv.slice(1)} ${fr.suites[k % fr.suites.length]}`;
   };
 
   /**
