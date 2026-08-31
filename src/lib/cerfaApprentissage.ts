@@ -10,6 +10,36 @@
  */
 import { PDFDocument, PDFTextField, PDFCheckBox, PDFImage } from "pdf-lib";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { getSmicMontant } from "@/lib/cerfaSettings";
+
+/** Âge en années révolues à une date ISO */
+function ageAt(naissanceIso: string | undefined, atIso: string): number | null {
+  if (!naissanceIso) return null;
+  const n = new Date(naissanceIso);
+  const d = new Date(atIso);
+  if (isNaN(n.getTime()) || isNaN(d.getTime())) return null;
+  let age = d.getUTCFullYear() - n.getUTCFullYear();
+  const m = d.getUTCMonth() - n.getUTCMonth();
+  if (m < 0 || (m === 0 && d.getUTCDate() < n.getUTCDate())) age--;
+  return age;
+}
+
+/** Ajoute des mois à une date ISO, retourne ISO */
+function addMonths(iso: string, months: number): string {
+  const d = new Date(iso);
+  d.setUTCMonth(d.getUTCMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Taux légal apprenti (% du SMIC) selon âge et année du contrat (1..4) */
+function tauxApprenti(age: number | null, annee: number): number | null {
+  if (age === null) return null;
+  const t = annee <= 1 ? 0 : annee === 2 ? 1 : 2; // index tranche année
+  if (age < 18) return [27, 39, 55][t];
+  if (age < 21) return [43, 51, 67][t];
+  if (age < 26) return [53, 61, 78][t];
+  return 100;
+}
 
 /** Embed une image (data URL ou URL) dans le PDF, retourne null si échec */
 async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PDFImage | null> {
@@ -322,25 +352,60 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_90", clean(o.ville));
 
   // ---------- RÉMUNÉRATION ----------
-  // Laissé entièrement vide : montant, périodes, taux et base sont à renseigner manuellement.
-  setText(form, "Zone de texte 8_72", "");
-  setText(form, "Zone de texte 21_73", "");
+  // Remplie automatiquement : SMIC depuis les réglages admin (défaut 1 823,03 €),
+  // taux légal selon âge de l'apprenti, périodes en années de 12 mois glissants.
+  const smic = getSmicMontant();
+  const fmtMontant = (n: number) => n.toFixed(2).replace(".", ",") + " €";
 
-  const REMUNERATION_FIELDS = [
-    // Ligne 1
-    "21_81", "21_82", "21_83", "21_84", "21_85", "21_86", "8_95", "8_96",
-    "21_87", "21_88", "21_89", "21_90", "21_91", "21_92", "8_97", "8_98",
-    // Ligne 2
-    "21_31", "21_32", "21_33", "21_34", "21_35", "21_36", "8_83", "8_84",
-    "21_37", "21_38", "21_39", "21_40", "21_41", "21_42", "8_85", "8_86",
-    // Ligne 3
-    "21_43", "21_44", "21_45", "21_46", "21_47", "21_48", "8_87", "8_88",
-    "21_49", "21_50", "21_51", "21_52", "21_53", "21_54", "8_89", "8_101",
-    // Ligne 4
-    "21_55", "21_56", "21_57", "21_58", "21_59", "21_60", "8_103", "8_104",
-    "21_61", "21_62", "21_63", "21_64", "21_65", "21_66", "8_105", "8_106",
+  // Montant mensuel brut + base (1ère période)
+  const ageDebut = ageAt(s.dateNaissance, dateDebut);
+  const taux1 = tauxApprenti(ageDebut, 1);
+  if (smic && taux1 !== null) {
+    setText(form, "Zone de texte 8_72", fmtMontant((smic * taux1) / 100)); // montant
+    setText(form, "Zone de texte 21_73", "SMIC"); // base
+  }
+
+  // Tableau : périodes de 12 mois (max 4 lignes), recalcul du taux à chaque année
+  const LIGNES = [
+    { d: ["21_81", "21_82", "21_83", "21_84", "21_85", "21_86"], taux: "8_95", brut: "8_96" },
+    { d: ["21_31", "21_32", "21_33", "21_34", "21_35", "21_36"], taux: "8_83", brut: "8_84" },
+    { d: ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48"], taux: "8_87", brut: "8_88" },
+    { d: ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60"], taux: "8_103", brut: "8_104" },
   ];
-  REMUNERATION_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
+  // On vide tout d'abord, puis on remplit les périodes calculées
+  const REMUNERATION_ALL_FIELDS = LIGNES.flatMap(l => [...l.d, l.taux, l.brut]);
+  REMUNERATION_ALL_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
+
+  if (smic && dateDebut && dateFin) {
+    let debutPeriode = dateDebut;
+    for (let annee = 1; annee <= 4; annee++) {
+      if (debutPeriode >= dateFin) break;
+      const finTheorique = addMonths(debutPeriode, 12);
+      // Fin de période = +12 mois - 1 jour, bornée à la fin du contrat
+      const finCalc = new Date(finTheorique);
+      finCalc.setUTCDate(finCalc.getUTCDate() - 1);
+      const finPeriode = (finCalc.toISOString().slice(0, 10) < dateFin)
+        ? finCalc.toISOString().slice(0, 10)
+        : dateFin;
+
+      const ageP = ageAt(s.dateNaissance, debutPeriode);
+      const taux = tauxApprenti(ageP, annee);
+      const l = LIGNES[annee - 1];
+      const [p1J, p1M, p1A] = splitDate(debutPeriode);
+      const [p2J, p2M, p2A] = splitDate(finPeriode);
+      setText(form, `Zone de texte ${l.d[0]}`, p1J);
+      setText(form, `Zone de texte ${l.d[1]}`, p1M);
+      setText(form, `Zone de texte ${l.d[2]}`, p1A);
+      setText(form, `Zone de texte ${l.d[3]}`, p2J);
+      setText(form, `Zone de texte ${l.d[4]}`, p2M);
+      setText(form, `Zone de texte ${l.d[5]}`, p2A);
+      if (taux !== null) {
+        setText(form, `Zone de texte ${l.taux}`, `${taux} %`);
+        setText(form, `Zone de texte ${l.brut}`, fmtMontant((smic * taux) / 100));
+      }
+      debutPeriode = addMonths(debutPeriode, 12);
+    }
+  }
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
   // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide (dates comprises).
