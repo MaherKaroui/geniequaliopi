@@ -89,6 +89,8 @@ export interface StagiaireInfo {
   formateurSignatureUrl?: string;
   adresseEntreprise?: string;
   siretEntreprise?: string;
+  dateNaissanceResponsable?: string;
+  emailResponsable?: string;
   numeroAction?: string;
 }
 

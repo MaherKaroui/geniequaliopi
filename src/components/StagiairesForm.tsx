@@ -38,7 +38,7 @@ interface StagiairesFormProps {
 
 const emptyStagiaire: StagiaireInfo = {
   civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
-  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "",
+  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "", dateNaissanceResponsable: "", emailResponsable: "",
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -389,6 +389,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <div>
               <Label>Responsable entreprise</Label>
               <Input value={stagiaire.responsableEntreprise || ""} onChange={e => updateStagiaire(index, 'responsableEntreprise', e.target.value)} placeholder="Nom du responsable" />
+            </div>
+            <div>
+              <Label>Date de naissance responsable</Label>
+              <Input type="date" value={stagiaire.dateNaissanceResponsable || ""} onChange={e => updateStagiaire(index, 'dateNaissanceResponsable', e.target.value)} />
+            </div>
+            <div>
+              <Label>Email responsable</Label>
+              <Input type="email" value={stagiaire.emailResponsable || ""} onChange={e => updateStagiaire(index, 'emailResponsable', e.target.value)} placeholder="Email du responsable" />
             </div>
             <div>
               <Label>Poste</Label>
