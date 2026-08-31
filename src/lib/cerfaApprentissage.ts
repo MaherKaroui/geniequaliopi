@@ -153,8 +153,8 @@ export async function genCerfaApprentissagePdf(
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
-  const telEnt = clean(s.telephone); // fallback
-  const courrielEnt = clean(s.email); // fallback
+  const telEnt = clean(o.telephone); // téléphone organisme
+  const courrielEnt = clean(o.email); // courriel employeur = mail du formulaire organisme
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
@@ -233,10 +233,11 @@ export async function genCerfaApprentissagePdf(
 
   setText(form, "Zone de texte 8_42", respNom); // Nom maître 1
   setText(form, "Zone de texte 8_43", respPrenom); // Prénom maître 1
-  setText(form, "Zone de texte 21_4", ""); // Date naissance maître 1 J
-  setText(form, "Zone de texte 21_5", "");
-  setText(form, "Zone de texte 21_6", "");
-  setText(form, "Zone de texte 8_44", ""); // Courriel maître 1
+  const [mnJ, mnM, mnA] = splitDate(s.dateNaissanceResponsable);
+  setText(form, "Zone de texte 21_4", mnJ); // Date naissance maître 1 J
+  setText(form, "Zone de texte 21_5", mnM);
+  setText(form, "Zone de texte 21_6", mnA);
+  setText(form, "Zone de texte 8_44", clean(s.emailResponsable)); // Courriel maître 1
   setText(form, "Zone de texte 8_45", clean(s.poste) || "Tuteur"); // Emploi occupé maître 1
 
   // Maître n°2 — vide
@@ -375,11 +376,10 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_98", "");
   // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
 
-  // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
-  // 8_93 (N° de dépôt) et 8_94 (Numéro d'avenant) restent vides → remplis par l'organisme dépositaire.
-  setText(form, "Zone de texte 8_91", clean(o.nom));
-  setText(form, "Zone de texte 8_92", clean(o.siret));
+  // ---------- CADRE RÉSERVÉ ORGANISME EN CHARGE DU DÉPÔT (bas page 2) ----------
+  // Toujours laissé VIDE : rempli par l'organisme dépositaire (OPCO).
+  setText(form, "Zone de texte 8_91", "");
+  setText(form, "Zone de texte 8_92", "");
   setText(form, "Zone de texte 8_93", "");
   setText(form, "Zone de texte 8_94", "");
 
