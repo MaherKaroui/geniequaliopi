@@ -377,10 +377,9 @@ export async function genCerfaApprentissagePdf(
   // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
-  // 8_93 (N° de dépôt) et 8_94 (Numéro d'avenant) restent vides → remplis par l'organisme dépositaire.
-  setText(form, "Zone de texte 8_91", clean(o.nom));
-  setText(form, "Zone de texte 8_92", clean(o.siret));
+  // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide.
+  setText(form, "Zone de texte 8_91", "");
+  setText(form, "Zone de texte 8_92", "");
   setText(form, "Zone de texte 8_93", "");
   setText(form, "Zone de texte 8_94", "");
 
