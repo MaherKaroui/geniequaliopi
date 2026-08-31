@@ -63,25 +63,10 @@ function drawFitted(
   page.drawImage(img, { x, y: yBottom, width: w, height: h });
 }
 
-/** Calcule l'âge à une date donnée (string YYYY-MM-DD) */
-function ageAt(birthIso: string | undefined, refIso: string | undefined): number | null {
-  if (!birthIso || !refIso) return null;
-  const b = new Date(birthIso);
-  const r = new Date(refIso);
-  if (isNaN(b.getTime()) || isNaN(r.getTime())) return null;
-  let age = r.getFullYear() - b.getFullYear();
-  const m = r.getMonth() - b.getMonth();
-  if (m < 0 || (m === 0 && r.getDate() < b.getDate())) age--;
-  return age;
-}
+// L'âge et les taux de rémunération sont calculés par `src/lib/cerfa/remuneration.ts`
+// à partir des tables éditables `smic_references` et `baremes_apprentissage`.
 
-/** Tarif (% du SMIC) selon l'âge de l'apprenti — barème légal 2024 */
-function tarifApprenti(age: number): { y1: number; y2: number } {
-  if (age < 18) return { y1: 27, y2: 39 };
-  if (age < 21) return { y1: 43, y2: 51 };
-  if (age < 26) return { y1: 53, y2: 61 };
-  return { y1: 100, y2: 100 }; // 26+ : 100% SMIC
-}
+
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
 
