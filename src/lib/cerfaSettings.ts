@@ -11,14 +11,19 @@ export interface SmicSetting {
 
 const KEY = "cerfa.smic";
 
+/** SMIC brut mensuel par défaut (au 1er janvier 2026) — utilisé si aucun réglage admin */
+const SMIC_DEFAUT: SmicSetting = { montant: "1823.03", dateEffet: "2026-01-01" };
+
 export function getSmicSetting(): SmicSetting {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return { montant: "", dateEffet: "" };
+    if (!raw) return SMIC_DEFAUT;
     const p = JSON.parse(raw);
-    return { montant: String(p.montant ?? ""), dateEffet: String(p.dateEffet ?? "") };
+    const montant = String(p.montant ?? "");
+    if (!montant) return SMIC_DEFAUT;
+    return { montant, dateEffet: String(p.dateEffet ?? "") };
   } catch {
-    return { montant: "", dateEffet: "" };
+    return SMIC_DEFAUT;
   }
 }
 
