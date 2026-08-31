@@ -153,8 +153,8 @@ export async function genCerfaApprentissagePdf(
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
-  const telEnt = clean(s.telephone); // fallback
-  const courrielEnt = clean(s.email); // fallback
+  const telEnt = clean(o.telephone); // téléphone organisme
+  const courrielEnt = clean(o.email); // courriel employeur = email du formulaire organisme
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
@@ -233,10 +233,11 @@ export async function genCerfaApprentissagePdf(
 
   setText(form, "Zone de texte 8_42", respNom); // Nom maître 1
   setText(form, "Zone de texte 8_43", respPrenom); // Prénom maître 1
-  setText(form, "Zone de texte 21_4", ""); // Date naissance maître 1 J
-  setText(form, "Zone de texte 21_5", "");
-  setText(form, "Zone de texte 21_6", "");
-  setText(form, "Zone de texte 8_44", ""); // Courriel maître 1
+  const [mnJ, mnM, mnA] = splitDate(s.dateNaissanceResponsableEntreprise);
+  setText(form, "Zone de texte 21_4", mnJ); // Date naissance maître 1 J
+  setText(form, "Zone de texte 21_5", mnM);
+  setText(form, "Zone de texte 21_6", mnA);
+  setText(form, "Zone de texte 8_44", clean(s.emailResponsableEntreprise)); // Courriel maître 1
   setText(form, "Zone de texte 8_45", clean(s.poste) || "Tuteur"); // Emploi occupé maître 1
 
   // Maître n°2 — vide
