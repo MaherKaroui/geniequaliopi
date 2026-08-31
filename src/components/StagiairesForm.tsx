@@ -62,7 +62,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     toast.success(`${n} stagiaire(s) fictif(s) généré(s) – ${regionLabel}`);
   };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
-  const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
+  const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string | boolean) => {
     const updated = [...data];
     updated[index] = { ...updated[index], [field]: value };
     onChange(updated);
