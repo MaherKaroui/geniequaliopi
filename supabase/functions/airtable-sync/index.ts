@@ -26,12 +26,12 @@ async function __requireAuth(req: Request): Promise<Response | null> {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders }
+    return new Response('ok', { headers: corsHeaders });
+  }
 
   const __authErr = await __requireAuth(req);
   if (__authErr) return __authErr;
-);
-  }
+
 
   const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY')?.trim();
   const baseId = Deno.env.get('AIRTABLE_BASE_ID')?.trim();

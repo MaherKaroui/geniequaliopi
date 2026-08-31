@@ -10,6 +10,9 @@
  */
 import { PDFDocument, PDFTextField, PDFCheckBox, PDFImage } from "pdf-lib";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { loadCerfaReferentiels } from "./cerfa/referentiels";
+import { controleCerfa, dateConclusionParDefaut, type CerfaRapport } from "./cerfa/validation";
+
 
 /** Embed une image (data URL ou URL) dans le PDF, retourne null si échec */
 async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PDFImage | null> {
@@ -137,6 +140,18 @@ export async function genCerfaApprentissagePdf(
   f: FormationInfo,
   s: StagiaireInfo,
 ): Promise<Blob> {
+  // ---------- CONTRÔLE BLOQUANT AVANT GÉNÉRATION ----------
+  const refs = await loadCerfaReferentiels();
+  const rapport = controleCerfa(o, f, s, refs);
+  if (!rapport.ok) {
+    const err = new Error(
+      `CERFA non déposable — ${rapport.bloquants.length} point(s) bloquant(s) :\n` +
+        rapport.bloquants.map((b) => `• [${b.rubrique}] ${b.champ} : ${b.observe} → ${b.attendu}`).join("\n"),
+    );
+    (err as Error & { rapport?: CerfaRapport }).rapport = rapport;
+    throw err;
+  }
+
   const res = await fetch(TEMPLATE_URL);
   if (!res.ok) throw new Error(`Template CERFA introuvable (${res.status})`);
   const bytes = await res.arrayBuffer();
@@ -153,23 +168,23 @@ export async function genCerfaApprentissagePdf(
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
-  const telEnt = clean(s.telephone); // fallback
-  const courrielEnt = clean(s.email); // fallback
+  const telEnt = clean(s.telephoneEntreprise); // champ propre à l'employeur — jamais celui de l'apprenti
+  const courrielEnt = clean(s.emailEntreprise);
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
-  setText(form, "Zone de texte 8_3", "SARL/Entreprise privée"); // Type employeur
+  setText(form, "Zone de texte 8_3", clean(s.typeEmployeur)); // Type employeur
   setText(form, "Zone de texte 8_14", adrEnt.numero); // N° adresse
   setText(form, "Zone de texte 8_13", adrEnt.voie); // Voie
   setText(form, "Zone de texte 8_4", ""); // Employeur spécifique
   setText(form, "Zone de texte 8_8", ""); // Complément
-  setText(form, "Zone de texte 8_7", ""); // Code APE
+  setText(form, "Zone de texte 8_7", clean(s.apeEntreprise)); // Code APE
   setText(form, "Zone de texte 8_9", cpvEnt.cp); // Code postal entreprise
   setText(form, "Zone de texte 8_10", cpvEnt.ville); // Commune entreprise
-  setText(form, "Zone de texte 8_5", ""); // Effectif total
-  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise (fallback)
-  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise (fallback)
-  setText(form, "Zone de texte 8_6", ""); // Code IDCC
+  setText(form, "Zone de texte 8_5", clean(s.effectifEntreprise)); // Effectif total
+  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise
+  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise
+  setText(form, "Zone de texte 8_6", s.aucuneConventionCollective ? "9999" : clean(s.idccEntreprise)); // Code IDCC
 
   // ---------- PAGE 1 — APPRENTI ----------
   setText(form, "Zone de texte 8_15", clean(s.nom)); // Nom de naissance
@@ -197,17 +212,19 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_27", clean(s.communeNaissance)); // Commune de naissance
   setText(form, "Zone de texte 8_21", ""); // Complément adresse apprenti
   setText(form, "Zone de texte 8_33", clean(s.nationalite)); // Nationalité
-  setText(form, "Zone de texte 8_34", ""); // Régime social
+  setText(form, "Zone de texte 8_34", clean(s.regimeSocial)); // Régime social
   setText(form, "Zone de texte 8_22", clean(s.codePostal)); // Code postal apprenti
   setText(form, "Zone de texte 8_23", clean(s.commune)); // Commune apprenti
   setText(form, "Zone de texte 8_24", clean(s.telephone)); // Téléphone apprenti
   setText(form, "Zone de texte 8_25", clean(s.email)); // Courriel apprenti
 
-  // Sportif haut niveau / RQTH = Non par défaut
-  setCheck(form, "Case #C3#A0 cocher 5_3", false); // sportif Oui
-  setCheck(form, "Case #C3#A0 cocher 5_4", true); // sportif Non
-  setCheck(form, "Case #C3#A0 cocher 5_5", false); // RQTH Oui
-  setCheck(form, "Case #C3#A0 cocher 5_6", true); // RQTH Non
+  // Sportif de haut niveau (saisi) / RQTH
+  const sportif = s.sportifHautNiveau === "oui";
+  setCheck(form, "Case #C3#A0 cocher 5_3", sportif); // sportif Oui
+  setCheck(form, "Case #C3#A0 cocher 5_4", !sportif); // sportif Non
+  setCheck(form, "Case #C3#A0 cocher 5_5", s.rqth === "oui"); // RQTH Oui
+  setCheck(form, "Case #C3#A0 cocher 5_6", s.rqth !== "oui"); // RQTH Non
+
 
   // Représentant légal (vide si majeur)
   setText(form, "Zone de texte 8_35", ""); // Nom prénom rep légal
@@ -218,26 +235,29 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_40", ""); // Commune rep
   setText(form, "Zone de texte 8_41", ""); // Courriel rep
 
-  // Diplôme dernier préparé / obtenu
-  setText(form, "Zone de texte 8_28", ""); // Situation avant
-  setText(form, "Zone de texte 8_29", ""); // Dernier diplôme préparé
-  setText(form, "Zone de texte 8_30", ""); // Dernière classe
-  setText(form, "Zone de texte 8_31", clean(s.diplome)); // Intitulé précis dernier diplôme
-  setText(form, "Zone de texte 8_32", ""); // Diplôme le plus élevé obtenu
+  // Parcours de l'apprenti
+  setText(form, "Zone de texte 8_28", clean(s.situationAvantContrat)); // Situation avant
+  setText(form, "Zone de texte 8_29", clean(s.dernierDiplomePrepare)); // Dernier diplôme préparé
+  setText(form, "Zone de texte 8_30", clean(s.derniereClasse)); // Dernière classe
+  setText(form, "Zone de texte 8_31", clean(s.intituleDernierDiplome)); // Intitulé précis dernier diplôme
+  setText(form, "Zone de texte 8_32", clean(s.diplome)); // Diplôme le plus élevé obtenu
+  // Projet de création / reprise d'entreprise
+  setCheck(form, "Case #C3#A0 cocher 5_7", s.projetCreationEntreprise === "oui");
+  setCheck(form, "Case #C3#A0 cocher 5_8", s.projetCreationEntreprise === "non");
+
 
   // ---------- PAGE 1 — MAÎTRE D'APPRENTISSAGE ----------
-  // Maître n°1 = responsable de l'entreprise du stagiaire
-  const respParts = clean(s.responsableEntreprise).split(/\s+/);
-  const respNom = respParts.length > 1 ? respParts.slice(1).join(" ") : clean(s.responsableEntreprise);
-  const respPrenom = respParts.length > 1 ? respParts[0] : "";
-
-  setText(form, "Zone de texte 8_42", respNom); // Nom maître 1
-  setText(form, "Zone de texte 8_43", respPrenom); // Prénom maître 1
-  setText(form, "Zone de texte 21_4", ""); // Date naissance maître 1 J
-  setText(form, "Zone de texte 21_5", "");
-  setText(form, "Zone de texte 21_6", "");
-  setText(form, "Zone de texte 8_44", ""); // Courriel maître 1
-  setText(form, "Zone de texte 8_45", clean(s.poste) || "Tuteur"); // Emploi occupé maître 1
+  // Champs saisis explicitement (jamais déduits du nom du responsable)
+  const [mnJ, mnM, mnA] = splitDate(s.maitreDateNaissance);
+  setText(form, "Zone de texte 8_42", clean(s.maitreNom)); // Nom maître 1
+  setText(form, "Zone de texte 8_43", clean(s.maitrePrenom)); // Prénom maître 1
+  setText(form, "Zone de texte 21_4", mnJ); // Date naissance maître 1
+  setText(form, "Zone de texte 21_5", mnM);
+  setText(form, "Zone de texte 21_6", mnA);
+  setText(form, "Zone de texte 8_44", clean(s.maitreEmail)); // Courriel maître 1
+  setText(form, "Zone de texte 8_45", clean(s.maitreEmploi)); // Emploi occupé maître 1
+  setText(form, "Zone de texte 8_50", clean(s.maitreDiplome)); // Diplôme le plus élevé
+  setText(form, "Zone de texte 8_52", clean(s.maitreNiveauDiplome)); // Niveau de diplôme
 
   // Maître n°2 — vide
   setText(form, "Zone de texte 8_46", "");
@@ -245,21 +265,19 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_48", "");
   setText(form, "Zone de texte 8_49", "");
 
-  // Attestation maître apprentissage
-  setCheck(form, "Case #C3#A0 cocher 6", true);
+  // Attestation d'éligibilité du maître d'apprentissage
+  setCheck(form, "Case #C3#A0 cocher 6", s.attestationEligibiliteMaitre !== false);
+
 
   // ---------- PAGE 2 — CONTRAT ----------
   // Type de contrat (11 = contrat d'apprentissage initial par défaut)
   setText(form, "Zone de texte 8_71", "11");
 
-  // Date de conclusion = 1 jour avant date début formation
-  const dateDebut = f.dateDebut;
-  const dateFin = f.dateFin;
-  const dateConclusion = dateDebut ? (() => {
-    const d = new Date(dateDebut);
-    d.setDate(d.getDate() - 7);
-    return d.toISOString().slice(0, 10);
-  })() : "";
+  // Dates du contrat (saisie contrat prioritaire sur les dates de formation)
+  const dateDebut = s.dateDebutContrat || f.dateDebut;
+  const dateFin = s.dateFinContrat || f.dateFin;
+  const dateConclusion = s.dateConclusionContrat || dateConclusionParDefaut(dateDebut);
+
 
   const [ccJ, ccM, ccA] = splitDate(dateConclusion);
   setText(form, "Zone de texte 21_16", ccJ);
@@ -290,15 +308,17 @@ export async function genCerfaApprentissagePdf(
   setCheck(form, "Case #C3#A0 cocher 5_14", true); // Non
 
   // ---------- PAGE 2 — FORMATION ----------
-  setCheck(form, "Case #C3#A0 cocher 5_11", false); // CFA entreprise Oui
-  setCheck(form, "Case #C3#A0 cocher 5_12", true); // CFA entreprise Non
+  // CFA d'entreprise : déduit de l'égalité des SIRET employeur / CFA
+  setCheck(form, "Case #C3#A0 cocher 5_11", rapport.cfaEntreprise); // Oui
+  setCheck(form, "Case #C3#A0 cocher 5_12", !rapport.cfaEntreprise); // Non
 
-  // Diplôme/titre visé
-  setText(form, "Zone de texte 8_77", clean(f.codeRNCP || ""));
+  // Diplôme/titre visé — code TYPE de diplôme (nomenclature notice), distinct du code RNCP
+  setText(form, "Zone de texte 8_77", clean(f.typeDiplome));
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
-  setText(form, "Zone de texte 8_73", ""); // N° UAI
-  setText(form, "Zone de texte 8_75", ""); // Code diplôme
+  setText(form, "Zone de texte 8_73", clean(f.uaiCfa)); // N° UAI
+  setText(form, "Zone de texte 8_75", clean(f.codeDiplome)); // Code diplôme
+
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
@@ -315,23 +335,23 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_26", ddM);
   setText(form, "Zone de texte 21_27", ddA);
 
-  // Date fin épreuves = date fin formation
-  setText(form, "Zone de texte 21_28", dfJ);
-  setText(form, "Zone de texte 21_29", dfM);
-  setText(form, "Zone de texte 21_30", dfA);
+  // Date prévue de fin des épreuves
+  const [feJ, feM, feA] = splitDate(s.dateFinEpreuves || dateFin);
+  setText(form, "Zone de texte 21_28", feJ);
+  setText(form, "Zone de texte 21_29", feM);
+  setText(form, "Zone de texte 21_30", feA);
 
   // CFA = lieu de formation principal
   setCheck(form, "Case #C3#A0 cocher 7", true);
 
-  // Durée formation
-  const dureeMatch = (f.duree || "").match(/(\d+)/);
+  // Durée de formation en CFA
+  const dureeMatch = (f.dureeFormationCfa || f.duree || "").match(/(\d+)/);
   const dureeHeures = dureeMatch ? dureeMatch[1] : "";
   setText(form, "Zone de texte 21_80", dureeHeures);
   // dont heures de formation à distance : total si distanciel, 0 si présentiel
   const modalites = (f.modalites || "").toLowerCase();
   const estDistanciel = /distanc|e-?learning|foad|en ligne|visio/.test(modalites);
   setText(form, "Zone de texte 8_102", estDistanciel ? dureeHeures || "0" : "0");
-
 
   // Attestation pièces justificatives
   setCheck(form, "Case #C3#A0 cocher 8", true);
@@ -341,47 +361,43 @@ export async function genCerfaApprentissagePdf(
   // Fait à (champ correct = 8_90)
   setText(form, "Zone de texte 8_90", clean(o.ville));
 
-  // ---------- RÉMUNÉRATION (1ère année — ligne du HAUT y=669) ----------
-  // Barème selon âge apprenti à la date de début du contrat.
-  // Le tableau CERFA compte 4 lignes (1ère→4ème année, de haut en bas : y=669, 655, 641, 627).
-  // On remplit la 1ère année (côté gauche : période unique du début→fin contrat).
-  const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
-  const tarif = tarifApprenti(age);
-  const SMIC_BRUT_MENSUEL = 1801.80;
-  const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
-  const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
-  // Salaire brut mensuel à l'embauche (euros , centimes)
-  setText(form, "Zone de texte 8_72", montantEuros);
-  setText(form, "Zone de texte 21_73", montantCents);
+  // ---------- RÉMUNÉRATION ----------
+  // Une ligne par période : années de contrat de 12 mois glissants, re-découpées
+  // à chaque changement de tranche d'âge. Pourcentages issus de `baremes_apprentissage`,
+  // montant issu de `smic_references` (aucune valeur codée en dur).
+  if (rapport.salaireMensuel !== null) {
+    const [montantEuros, montantCents] = rapport.salaireMensuel.toFixed(2).split(".");
+    setText(form, "Zone de texte 8_72", montantEuros);
+    setText(form, "Zone de texte 21_73", montantCents);
+  }
+  // Caisse de retraite complémentaire
+  setText(form, "Zone de texte 21_74", clean(s.caisseRetraiteComplementaire));
 
-  // 1ère année — case de gauche (du/au + % + SMIC/SMC)
-  setText(form, "Zone de texte 21_81", ddJ);
-  setText(form, "Zone de texte 21_82", ddM);
-  setText(form, "Zone de texte 21_83", ddA);
-  setText(form, "Zone de texte 21_84", dfJ);
-  setText(form, "Zone de texte 21_85", dfM);
-  setText(form, "Zone de texte 21_86", dfA);
-  setText(form, "Zone de texte 8_95", String(tarif.y1));
-  setText(form, "Zone de texte 8_96", "SMIC");
+  // Emplacements du tableau (4 lignes × 2 cases)
+  const SLOTS: { dates: string[]; pct: string; base: string }[] = [
+    { dates: ["21_81", "21_82", "21_83", "21_84", "21_85", "21_86"], pct: "8_95", base: "8_96" },
+    { dates: ["21_87", "21_88", "21_89", "21_90", "21_91", "21_92"], pct: "8_97", base: "8_98" },
+    { dates: ["21_37", "21_38", "21_39", "21_40", "21_41", "21_42"], pct: "8_56", base: "8_57" },
+    { dates: ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48"], pct: "8_58", base: "8_59" },
+    { dates: ["21_49", "21_50", "21_51", "21_52", "21_53", "21_54"], pct: "8_60", base: "8_61" },
+    { dates: ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60"], pct: "8_62", base: "8_63" },
+    { dates: ["21_61", "21_62", "21_63", "21_64", "21_65", "21_66"], pct: "8_64", base: "8_65" },
+    { dates: ["21_67", "21_68", "21_69", "21_70", "21_71", "21_72"], pct: "8_66", base: "8_67" },
+  ];
+  SLOTS.forEach((slot, i) => {
+    const p = rapport.periodes[i];
+    const [aJ, aM, aA] = splitDate(p?.debut);
+    const [bJ, bM, bA] = splitDate(p?.fin);
+    const vals = [aJ, aM, aA, bJ, bM, bA];
+    slot.dates.forEach((n, k) => setText(form, `Zone de texte ${n}`, p ? vals[k] : ""));
+    setText(form, `Zone de texte ${slot.pct}`, p && p.pourcentage !== null ? String(p.pourcentage) : "");
+    setText(form, `Zone de texte ${slot.base}`, p ? (p.base === "SMIC" ? "SMIC" : "SMIC/SMC") : "");
+  });
 
-  // Case de droite (2e période 1ère année) — laissée vide
-  setText(form, "Zone de texte 21_87", "");
-  setText(form, "Zone de texte 21_88", "");
-  setText(form, "Zone de texte 21_89", "");
-  setText(form, "Zone de texte 21_90", "");
-  setText(form, "Zone de texte 21_91", "");
-  setText(form, "Zone de texte 21_92", "");
-  setText(form, "Zone de texte 8_97", "");
-  setText(form, "Zone de texte 8_98", "");
-  // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
+  // ---------- CADRE RÉSERVÉ À L'ORGANISME EN CHARGE DU DÉPÔT ----------
+  // Réservé à l'OPCO : jamais rempli par le générateur (nom, SIRET, dates de
+  // réception et de décision, n° de dépôt, numéro d'avenant).
 
-  // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
-  // 8_93 (N° de dépôt) et 8_94 (Numéro d'avenant) restent vides → remplis par l'organisme dépositaire.
-  setText(form, "Zone de texte 8_91", clean(o.nom));
-  setText(form, "Zone de texte 8_92", clean(o.siret));
-  setText(form, "Zone de texte 8_93", "");
-  setText(form, "Zone de texte 8_94", "");
 
   pdf.getForm().updateFieldAppearances();
 
