@@ -68,6 +68,8 @@ export interface StagiaireInfo {
   telephone: string;
   entreprise: string;
   responsableEntreprise?: string;
+  dateNaissanceResponsableEntreprise?: string;
+  emailResponsableEntreprise?: string;
   signatureResponsableUrl?: string;
   poste: string;
   dateNaissance: string;
