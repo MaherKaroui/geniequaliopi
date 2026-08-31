@@ -62,60 +62,6 @@ export type Database = {
         }
         Relationships: []
       }
-      baremes_apprentissage: {
-        Row: {
-          annee_contrat: number
-          created_at: string
-          id: string
-          pourcentage: number
-          tranche_age: string
-          updated_at: string
-        }
-        Insert: {
-          annee_contrat: number
-          created_at?: string
-          id?: string
-          pourcentage: number
-          tranche_age: string
-          updated_at?: string
-        }
-        Update: {
-          annee_contrat?: number
-          created_at?: string
-          id?: string
-          pourcentage?: number
-          tranche_age?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      modeles_formation: {
-        Row: {
-          created_at: string
-          donnees: Json
-          id: string
-          nom: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          donnees?: Json
-          id?: string
-          nom?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          donnees?: Json
-          id?: string
-          nom?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -137,33 +83,6 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
-        }
-        Relationships: []
-      }
-      profils_employeurs: {
-        Row: {
-          created_at: string
-          donnees: Json
-          id: string
-          nom: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          donnees?: Json
-          id?: string
-          nom?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          donnees?: Json
-          id?: string
-          nom?: string
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -383,33 +302,6 @@ export type Database = {
           session?: Json
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      smic_references: {
-        Row: {
-          created_at: string
-          date_effet: string
-          id: string
-          montant_mensuel_35h: number
-          source: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          date_effet: string
-          id?: string
-          montant_mensuel_35h: number
-          source?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          date_effet?: string
-          id?: string
-          montant_mensuel_35h?: number
-          source?: string
-          updated_at?: string
         }
         Relationships: []
       }

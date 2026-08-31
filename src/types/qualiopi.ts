@@ -68,13 +68,6 @@ export interface StagiaireInfo {
   telephone: string;
   entreprise: string;
   responsableEntreprise?: string;
-  maitreNom?: string;
-  maitrePrenom?: string;
-  maitreDiplome?: string;
-  maitreNiveauDiplome?: string;
-  dateConclusionContrat?: string;
-  dateNaissanceResponsableEntreprise?: string;
-  emailResponsableEntreprise?: string;
   signatureResponsableUrl?: string;
   poste: string;
   dateNaissance: string;
@@ -117,8 +110,6 @@ export interface FormationInfo {
   nombreParticipants: string;
   formateur: string;
   codeRNCP?: string;
-  /** Code "type de diplôme" de la nomenclature (CERFA champ 8_77) — distinct du n° RNCP */
-  codeTypeDiplome?: string;
   rythmeAlternance?: string;
   formateurSignatureUrl?: string;
 }

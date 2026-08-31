@@ -39,7 +39,6 @@ interface StagiairesFormProps {
 const emptyStagiaire: StagiaireInfo = {
   civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
   adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "",
-  maitreNom: "", maitrePrenom: "", maitreDiplome: "", maitreNiveauDiplome: "", dateConclusionContrat: new Date().toISOString().slice(0, 10),
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -390,38 +389,6 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <div>
               <Label>Responsable entreprise</Label>
               <Input value={stagiaire.responsableEntreprise || ""} onChange={e => updateStagiaire(index, 'responsableEntreprise', e.target.value)} placeholder="Nom du responsable" />
-            </div>
-            <div>
-              <Label>Maître d'apprentissage — Nom</Label>
-              <Input value={stagiaire.maitreNom || ""} onChange={e => updateStagiaire(index, 'maitreNom', e.target.value)} placeholder="Nom du maître d'apprentissage" />
-            </div>
-            <div>
-              <Label>Maître d'apprentissage — Prénom</Label>
-              <Input value={stagiaire.maitrePrenom || ""} onChange={e => updateStagiaire(index, 'maitrePrenom', e.target.value)} placeholder="Prénom du maître d'apprentissage" />
-            </div>
-            <div>
-              <Label>Maître d'apprentissage — Diplôme</Label>
-              <Input value={stagiaire.maitreDiplome || ""} onChange={e => updateStagiaire(index, 'maitreDiplome', e.target.value)} placeholder="Intitulé du diplôme" />
-            </div>
-            <div>
-              <Label>Maître d'apprentissage — Niveau de diplôme</Label>
-              <Input value={stagiaire.maitreNiveauDiplome || ""} onChange={e => updateStagiaire(index, 'maitreNiveauDiplome', e.target.value)} placeholder="Ex : Niveau 5" />
-            </div>
-            <div>
-              <Label>Date de conclusion du contrat</Label>
-              <Input
-                type="date"
-                value={stagiaire.dateConclusionContrat || new Date().toISOString().slice(0, 10)}
-                onChange={e => updateStagiaire(index, 'dateConclusionContrat', e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Date de naissance responsable</Label>
-              <Input type="date" value={stagiaire.dateNaissanceResponsableEntreprise || ""} onChange={e => updateStagiaire(index, 'dateNaissanceResponsableEntreprise', e.target.value)} />
-            </div>
-            <div>
-              <Label>Email responsable entreprise</Label>
-              <Input type="email" value={stagiaire.emailResponsableEntreprise || ""} onChange={e => updateStagiaire(index, 'emailResponsableEntreprise', e.target.value)} placeholder="Email du responsable" />
             </div>
             <div>
               <Label>Poste</Label>

@@ -10,36 +10,6 @@
  */
 import { PDFDocument, PDFTextField, PDFCheckBox, PDFImage } from "pdf-lib";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { getSmicMontant } from "@/lib/cerfaSettings";
-
-/** Âge en années révolues à une date ISO */
-function ageAt(naissanceIso: string | undefined, atIso: string): number | null {
-  if (!naissanceIso) return null;
-  const n = new Date(naissanceIso);
-  const d = new Date(atIso);
-  if (isNaN(n.getTime()) || isNaN(d.getTime())) return null;
-  let age = d.getUTCFullYear() - n.getUTCFullYear();
-  const m = d.getUTCMonth() - n.getUTCMonth();
-  if (m < 0 || (m === 0 && d.getUTCDate() < n.getUTCDate())) age--;
-  return age;
-}
-
-/** Ajoute des mois à une date ISO, retourne ISO */
-function addMonths(iso: string, months: number): string {
-  const d = new Date(iso);
-  d.setUTCMonth(d.getUTCMonth() + months);
-  return d.toISOString().slice(0, 10);
-}
-
-/** Taux légal apprenti (% du SMIC) selon âge et année du contrat (1..4) */
-function tauxApprenti(age: number | null, annee: number): number | null {
-  if (age === null) return null;
-  const t = annee <= 1 ? 0 : annee === 2 ? 1 : 2; // index tranche année
-  if (age < 18) return [27, 39, 55][t];
-  if (age < 21) return [43, 51, 67][t];
-  if (age < 26) return [53, 61, 78][t];
-  return 100;
-}
 
 /** Embed une image (data URL ou URL) dans le PDF, retourne null si échec */
 async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PDFImage | null> {
@@ -88,6 +58,26 @@ function drawFitted(
   }
   // Coords JSON et pdf-lib utilisent le même système bottom-up
   page.drawImage(img, { x, y: yBottom, width: w, height: h });
+}
+
+/** Calcule l'âge à une date donnée (string YYYY-MM-DD) */
+function ageAt(birthIso: string | undefined, refIso: string | undefined): number | null {
+  if (!birthIso || !refIso) return null;
+  const b = new Date(birthIso);
+  const r = new Date(refIso);
+  if (isNaN(b.getTime()) || isNaN(r.getTime())) return null;
+  let age = r.getFullYear() - b.getFullYear();
+  const m = r.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && r.getDate() < b.getDate())) age--;
+  return age;
+}
+
+/** Tarif (% du SMIC) selon l'âge de l'apprenti — barème légal 2024 */
+function tarifApprenti(age: number): { y1: number; y2: number } {
+  if (age < 18) return { y1: 27, y2: 39 };
+  if (age < 21) return { y1: 43, y2: 51 };
+  if (age < 26) return { y1: 53, y2: 61 };
+  return { y1: 100, y2: 100 }; // 26+ : 100% SMIC
 }
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
@@ -163,8 +153,8 @@ export async function genCerfaApprentissagePdf(
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
-  const telEnt = clean(o.telephone); // téléphone organisme
-  const courrielEnt = clean(o.email); // courriel employeur = email du formulaire organisme
+  const telEnt = clean(s.telephone); // fallback
+  const courrielEnt = clean(s.email); // fallback
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
@@ -237,16 +227,16 @@ export async function genCerfaApprentissagePdf(
 
   // ---------- PAGE 1 — MAÎTRE D'APPRENTISSAGE ----------
   // Maître n°1 = responsable de l'entreprise du stagiaire
-  const respNom = clean(s.maitreNom);
-  const respPrenom = clean(s.maitrePrenom);
+  const respParts = clean(s.responsableEntreprise).split(/\s+/);
+  const respNom = respParts.length > 1 ? respParts.slice(1).join(" ") : clean(s.responsableEntreprise);
+  const respPrenom = respParts.length > 1 ? respParts[0] : "";
 
   setText(form, "Zone de texte 8_42", respNom); // Nom maître 1
   setText(form, "Zone de texte 8_43", respPrenom); // Prénom maître 1
-  const [mnJ, mnM, mnA] = splitDate(s.dateNaissanceResponsableEntreprise);
-  setText(form, "Zone de texte 21_4", mnJ); // Date naissance maître 1 J
-  setText(form, "Zone de texte 21_5", mnM);
-  setText(form, "Zone de texte 21_6", mnA);
-  setText(form, "Zone de texte 8_44", clean(s.emailResponsableEntreprise)); // Courriel maître 1
+  setText(form, "Zone de texte 21_4", ""); // Date naissance maître 1 J
+  setText(form, "Zone de texte 21_5", "");
+  setText(form, "Zone de texte 21_6", "");
+  setText(form, "Zone de texte 8_44", ""); // Courriel maître 1
   setText(form, "Zone de texte 8_45", clean(s.poste) || "Tuteur"); // Emploi occupé maître 1
 
   // Maître n°2 — vide
@@ -255,18 +245,21 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_48", "");
   setText(form, "Zone de texte 8_49", "");
 
-  // Attestation d'éligibilité du maître d'apprentissage : cochée seulement si diplôme + niveau saisis
-  const maitreEligible = !!(clean(s.maitreDiplome) && clean(s.maitreNiveauDiplome));
-  setCheck(form, "Case #C3#A0 cocher 6", maitreEligible);
+  // Attestation maître apprentissage
+  setCheck(form, "Case #C3#A0 cocher 6", true);
 
   // ---------- PAGE 2 — CONTRAT ----------
   // Type de contrat (11 = contrat d'apprentissage initial par défaut)
   setText(form, "Zone de texte 8_71", "11");
 
-  // Date de conclusion : saisie dans le formulaire stagiaire (pré-remplie à la date du jour)
+  // Date de conclusion = 1 jour avant date début formation
   const dateDebut = f.dateDebut;
   const dateFin = f.dateFin;
-  const dateConclusion = s.dateConclusionContrat || new Date().toISOString().slice(0, 10);
+  const dateConclusion = dateDebut ? (() => {
+    const d = new Date(dateDebut);
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().slice(0, 10);
+  })() : "";
 
   const [ccJ, ccM, ccA] = splitDate(dateConclusion);
   setText(form, "Zone de texte 21_16", ccJ);
@@ -297,19 +290,16 @@ export async function genCerfaApprentissagePdf(
   setCheck(form, "Case #C3#A0 cocher 5_14", true); // Non
 
   // ---------- PAGE 2 — FORMATION ----------
-  const normSiret = (v?: string) => (v || "").replace(/\D/g, "");
-  const cfaEntreprise = !!normSiret(o.siret) && normSiret(o.siret) === normSiret(s.siretEntreprise);
-  setCheck(form, "Case #C3#A0 cocher 5_11", cfaEntreprise); // CFA entreprise Oui
-  setCheck(form, "Case #C3#A0 cocher 5_12", !cfaEntreprise); // CFA entreprise Non
+  setCheck(form, "Case #C3#A0 cocher 5_11", false); // CFA entreprise Oui
+  setCheck(form, "Case #C3#A0 cocher 5_12", true); // CFA entreprise Non
 
   // Diplôme/titre visé
-  // Type de diplôme visé (nomenclature) — vide tant que le code n'est pas saisi
-  setText(form, "Zone de texte 8_77", clean(f.codeTypeDiplome || ""));
+  setText(form, "Zone de texte 8_77", clean(f.codeRNCP || ""));
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
-  setText(form, "Zone de texte 8_73", ""); // N° UAI — laissé vide
+  setText(form, "Zone de texte 8_73", ""); // N° UAI
   setText(form, "Zone de texte 8_75", ""); // Code diplôme
-  setText(form, "Zone de texte 8_74", ""); // N° SIRET CFA — laissé vide
+  setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
   // Adresse CFA
@@ -351,71 +341,47 @@ export async function genCerfaApprentissagePdf(
   // Fait à (champ correct = 8_90)
   setText(form, "Zone de texte 8_90", clean(o.ville));
 
-  // ---------- RÉMUNÉRATION ----------
-  // Remplie automatiquement : SMIC depuis les réglages admin (défaut 1 823,03 €),
-  // taux légal selon âge de l'apprenti, périodes en années de 12 mois glissants.
-  const smic = getSmicMontant();
-  const fmtMontant = (n: number) => n.toFixed(2).replace(".", ",") + " €";
+  // ---------- RÉMUNÉRATION (1ère année — ligne du HAUT y=669) ----------
+  // Barème selon âge apprenti à la date de début du contrat.
+  // Le tableau CERFA compte 4 lignes (1ère→4ème année, de haut en bas : y=669, 655, 641, 627).
+  // On remplit la 1ère année (côté gauche : période unique du début→fin contrat).
+  const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
+  const tarif = tarifApprenti(age);
+  const SMIC_BRUT_MENSUEL = 1801.80;
+  const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
+  const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
+  // Salaire brut mensuel à l'embauche (euros , centimes)
+  setText(form, "Zone de texte 8_72", montantEuros);
+  setText(form, "Zone de texte 21_73", montantCents);
 
-  // Montant mensuel brut + base (1ère période)
-  const ageDebut = ageAt(s.dateNaissance, dateDebut);
-  const taux1 = tauxApprenti(ageDebut, 1);
-  if (smic && taux1 !== null) {
-    setText(form, "Zone de texte 8_72", fmtMontant((smic * taux1) / 100)); // montant
-    setText(form, "Zone de texte 21_73", "SMIC"); // base
-  }
+  // 1ère année — case de gauche (du/au + % + SMIC/SMC)
+  setText(form, "Zone de texte 21_81", ddJ);
+  setText(form, "Zone de texte 21_82", ddM);
+  setText(form, "Zone de texte 21_83", ddA);
+  setText(form, "Zone de texte 21_84", dfJ);
+  setText(form, "Zone de texte 21_85", dfM);
+  setText(form, "Zone de texte 21_86", dfA);
+  setText(form, "Zone de texte 8_95", String(tarif.y1));
+  setText(form, "Zone de texte 8_96", "SMIC");
 
-  // Tableau : périodes de 12 mois (max 4 lignes), recalcul du taux à chaque année
-  const LIGNES = [
-    { d: ["21_81", "21_82", "21_83", "21_84", "21_85", "21_86"], taux: "8_95", brut: "8_96" },
-    { d: ["21_31", "21_32", "21_33", "21_34", "21_35", "21_36"], taux: "8_83", brut: "8_84" },
-    { d: ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48"], taux: "8_87", brut: "8_88" },
-    { d: ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60"], taux: "8_103", brut: "8_104" },
-  ];
-  // On vide tout d'abord, puis on remplit les périodes calculées
-  const REMUNERATION_ALL_FIELDS = LIGNES.flatMap(l => [...l.d, l.taux, l.brut]);
-  REMUNERATION_ALL_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
-
-  if (smic && dateDebut && dateFin) {
-    let debutPeriode = dateDebut;
-    for (let annee = 1; annee <= 4; annee++) {
-      if (debutPeriode >= dateFin) break;
-      const finTheorique = addMonths(debutPeriode, 12);
-      // Fin de période = +12 mois - 1 jour, bornée à la fin du contrat
-      const finCalc = new Date(finTheorique);
-      finCalc.setUTCDate(finCalc.getUTCDate() - 1);
-      const finPeriode = (finCalc.toISOString().slice(0, 10) < dateFin)
-        ? finCalc.toISOString().slice(0, 10)
-        : dateFin;
-
-      const ageP = ageAt(s.dateNaissance, debutPeriode);
-      const taux = tauxApprenti(ageP, annee);
-      const l = LIGNES[annee - 1];
-      const [p1J, p1M, p1A] = splitDate(debutPeriode);
-      const [p2J, p2M, p2A] = splitDate(finPeriode);
-      setText(form, `Zone de texte ${l.d[0]}`, p1J);
-      setText(form, `Zone de texte ${l.d[1]}`, p1M);
-      setText(form, `Zone de texte ${l.d[2]}`, p1A);
-      setText(form, `Zone de texte ${l.d[3]}`, p2J);
-      setText(form, `Zone de texte ${l.d[4]}`, p2M);
-      setText(form, `Zone de texte ${l.d[5]}`, p2A);
-      if (taux !== null) {
-        setText(form, `Zone de texte ${l.taux}`, `${taux} %`);
-        setText(form, `Zone de texte ${l.brut}`, fmtMontant((smic * taux) / 100));
-      }
-      debutPeriode = addMonths(debutPeriode, 12);
-    }
-  }
+  // Case de droite (2e période 1ère année) — laissée vide
+  setText(form, "Zone de texte 21_87", "");
+  setText(form, "Zone de texte 21_88", "");
+  setText(form, "Zone de texte 21_89", "");
+  setText(form, "Zone de texte 21_90", "");
+  setText(form, "Zone de texte 21_91", "");
+  setText(form, "Zone de texte 21_92", "");
+  setText(form, "Zone de texte 8_97", "");
+  setText(form, "Zone de texte 8_98", "");
+  // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide (dates comprises).
-  const CADRE_ORGANISME_FIELDS = [
-    "8_64", "8_65",
-    "21_67", "21_68", "21_69", "21_70", "21_71", "21_72",
-    "8_66", "8_67",
-    "8_91", "8_92", "8_93", "8_94",
-  ];
-  CADRE_ORGANISME_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
+  // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
+  // 8_93 (N° de dépôt) et 8_94 (Numéro d'avenant) restent vides → remplis par l'organisme dépositaire.
+  setText(form, "Zone de texte 8_91", clean(o.nom));
+  setText(form, "Zone de texte 8_92", clean(o.siret));
+  setText(form, "Zone de texte 8_93", "");
+  setText(form, "Zone de texte 8_94", "");
 
   pdf.getForm().updateFieldAppearances();
 
