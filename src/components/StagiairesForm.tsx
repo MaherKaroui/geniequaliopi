@@ -391,6 +391,30 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Input value={stagiaire.responsableEntreprise || ""} onChange={e => updateStagiaire(index, 'responsableEntreprise', e.target.value)} placeholder="Nom du responsable" />
             </div>
             <div>
+              <Label>Maître d'apprentissage — Nom</Label>
+              <Input value={stagiaire.maitreNom || ""} onChange={e => updateStagiaire(index, 'maitreNom', e.target.value)} placeholder="Nom du maître d'apprentissage" />
+            </div>
+            <div>
+              <Label>Maître d'apprentissage — Prénom</Label>
+              <Input value={stagiaire.maitrePrenom || ""} onChange={e => updateStagiaire(index, 'maitrePrenom', e.target.value)} placeholder="Prénom du maître d'apprentissage" />
+            </div>
+            <div>
+              <Label>Maître d'apprentissage — Diplôme</Label>
+              <Input value={stagiaire.maitreDiplome || ""} onChange={e => updateStagiaire(index, 'maitreDiplome', e.target.value)} placeholder="Intitulé du diplôme" />
+            </div>
+            <div>
+              <Label>Maître d'apprentissage — Niveau de diplôme</Label>
+              <Input value={stagiaire.maitreNiveauDiplome || ""} onChange={e => updateStagiaire(index, 'maitreNiveauDiplome', e.target.value)} placeholder="Ex : Niveau 5" />
+            </div>
+            <div>
+              <Label>Date de conclusion du contrat</Label>
+              <Input
+                type="date"
+                value={stagiaire.dateConclusionContrat || new Date().toISOString().slice(0, 10)}
+                onChange={e => updateStagiaire(index, 'dateConclusionContrat', e.target.value)}
+              />
+            </div>
+            <div>
               <Label>Date de naissance responsable</Label>
               <Input type="date" value={stagiaire.dateNaissanceResponsableEntreprise || ""} onChange={e => updateStagiaire(index, 'dateNaissanceResponsableEntreprise', e.target.value)} />
             </div>
