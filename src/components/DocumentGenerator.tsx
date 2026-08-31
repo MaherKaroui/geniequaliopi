@@ -148,6 +148,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [cerfaRapport, setCerfaRapport] = useState<{ rapport: CerfaRapport; titre: string } | null>(null);
+
   const [previewError, setPreviewError] = useState<string | null>(null);
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [generating, setGenerating] = useState(false);
