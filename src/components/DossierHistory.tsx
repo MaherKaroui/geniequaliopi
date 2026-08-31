@@ -143,7 +143,22 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
 
-  const visible = dossiers.filter((d) => (showArchived ? d.archived : !d.archived));
+  const q = search.trim().toLowerCase();
+  const visible = dossiers
+    .filter((d) => (showArchived ? d.archived : !d.archived))
+    .filter((d) => {
+      if (!q) return true;
+      const stagNames = (d.stagiaires || [])
+        .map((s: any) => `${s?.prenom || ""} ${s?.nom || ""}`)
+        .join(" ")
+        .toLowerCase();
+      return (
+        d.name.toLowerCase().includes(q) ||
+        (d.organisme?.nom || "").toLowerCase().includes(q) ||
+        (d.formation?.intitule || "").toLowerCase().includes(q) ||
+        stagNames.includes(q)
+      );
+    });
   const archivedCount = dossiers.filter((d) => d.archived).length;
   const activeCount = dossiers.length - archivedCount;
 
