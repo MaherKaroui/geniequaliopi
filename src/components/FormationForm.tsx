@@ -658,6 +658,41 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         )}
       </div>
 
+      {/* Champs CERFA 10103*14 — formation */}
+      <div className="p-4 border rounded-xl bg-card">
+        <Label className="font-semibold">CERFA 10103*14 — La formation</Label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Champs obligatoires au dépôt du contrat d'apprentissage. Le type de diplôme est un code de la nomenclature de la notice : il ne peut pas commencer par « RNCP ».
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <Label>N° UAI du CFA</Label>
+            <Input value={data.uaiCfa || ""} onChange={e => update("uaiCfa", e.target.value)} placeholder="Ex : 0931234X" />
+          </div>
+          <div>
+            <Label>Code du diplôme</Label>
+            <Input value={data.codeDiplome || ""} onChange={e => update("codeDiplome", e.target.value)} />
+          </div>
+          <div>
+            <Label>Type de diplôme visé</Label>
+            <Input
+              value={data.typeDiplome || ""}
+              onChange={e => update("typeDiplome", e.target.value)}
+              placeholder="Code type (notice)"
+            />
+            {/^rncp/i.test((data.typeDiplome || "").trim()) && (
+              <p className="text-xs text-destructive mt-1">Le n° RNCP se saisit dans le champ « Code RNCP ».</p>
+            )}
+          </div>
+          <div>
+            <Label>Durée de formation en CFA (h)</Label>
+            <Input value={data.dureeFormationCfa || ""} onChange={e => update("dureeFormationCfa", e.target.value)} placeholder="Ex : 800" />
+          </div>
+        </div>
+      </div>
+
+
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
           <Label htmlFor="intitule">Intitulé de la formation *</Label>
