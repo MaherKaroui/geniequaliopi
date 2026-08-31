@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CerfaReferencesAdmin from "@/components/admin/CerfaReferencesAdmin";
+
 import {
   Table,
   TableBody,
@@ -132,6 +134,7 @@ export default function Admin() {
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="logs">Journal d'activité</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="cerfa">Références CERFA</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -143,6 +146,10 @@ export default function Admin() {
           <TabsContent value="users" className="mt-6">
             <UsersTab currentUserId={user!.id} />
           </TabsContent>
+          <TabsContent value="cerfa" className="mt-6">
+            <CerfaReferencesAdmin />
+          </TabsContent>
+
         </Tabs>
       </div>
     </div>

@@ -62,7 +62,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     toast.success(`${n} stagiaire(s) fictif(s) généré(s) – ${regionLabel}`);
   };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
-  const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
+  const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string | boolean) => {
     const updated = [...data];
     updated[index] = { ...updated[index], [field]: value };
     onChange(updated);
@@ -413,6 +413,155 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               />
             </div>
           </div>
+
+          {/* ---- CERFA 10103*14 (contrat d'apprentissage) ---- */}
+          <details className="mt-2 pt-2 border-t border-border/50">
+            <summary className="text-xs font-semibold cursor-pointer text-primary">
+              CERFA 10103*14 — champs obligatoires au dépôt
+            </summary>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+              <div className="md:col-span-4 text-[11px] font-semibold uppercase text-muted-foreground">L'employeur</div>
+              <div>
+                <Label>Téléphone employeur</Label>
+                <Input value={stagiaire.telephoneEntreprise || ""} onChange={e => updateStagiaire(index, 'telephoneEntreprise', e.target.value)} placeholder="Distinct de l'apprenti" />
+              </div>
+              <div>
+                <Label>Courriel employeur</Label>
+                <Input value={stagiaire.emailEntreprise || ""} onChange={e => updateStagiaire(index, 'emailEntreprise', e.target.value)} placeholder="Distinct de l'apprenti" />
+              </div>
+              <div>
+                <Label>Type d'employeur</Label>
+                <Input value={stagiaire.typeEmployeur || ""} onChange={e => updateStagiaire(index, 'typeEmployeur', e.target.value)} placeholder="Code notice" />
+              </div>
+              <div>
+                <Label>Code APE</Label>
+                <Input value={stagiaire.apeEntreprise || ""} onChange={e => updateStagiaire(index, 'apeEntreprise', e.target.value)} placeholder="4941A" />
+              </div>
+              <div>
+                <Label>Effectif total salariés</Label>
+                <Input value={stagiaire.effectifEntreprise || ""} onChange={e => updateStagiaire(index, 'effectifEntreprise', e.target.value)} placeholder="Ex : 12" />
+              </div>
+              <div>
+                <Label>Code IDCC</Label>
+                <Input value={stagiaire.aucuneConventionCollective ? "9999" : (stagiaire.idccEntreprise || "")} disabled={!!stagiaire.aucuneConventionCollective} onChange={e => updateStagiaire(index, 'idccEntreprise', e.target.value)} placeholder="4 chiffres" />
+              </div>
+              <div className="flex items-end gap-2">
+                <input
+                  id={`sanscc-${index}`}
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={!!stagiaire.aucuneConventionCollective}
+                  onChange={e => updateStagiaire(index, 'aucuneConventionCollective', e.target.checked)}
+                />
+                <Label htmlFor={`sanscc-${index}`} className="text-xs">Aucune convention collective (9999)</Label>
+              </div>
+              <div>
+                <Label>Caisse de retraite complémentaire</Label>
+                <Input value={stagiaire.caisseRetraiteComplementaire || ""} onChange={e => updateStagiaire(index, 'caisseRetraiteComplementaire', e.target.value)} />
+              </div>
+
+              <div className="md:col-span-4 text-[11px] font-semibold uppercase text-muted-foreground">L'apprenti</div>
+              <div>
+                <Label>Régime social</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={stagiaire.regimeSocial || ""} onChange={e => updateStagiaire(index, 'regimeSocial', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="MSA">MSA</option>
+                  <option value="URSSAF">URSSAF</option>
+                </select>
+              </div>
+              <div>
+                <Label>Sportif de haut niveau</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={stagiaire.sportifHautNiveau || ""} onChange={e => updateStagiaire(index, 'sportifHautNiveau', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="oui">Oui</option>
+                  <option value="non">Non</option>
+                </select>
+              </div>
+              <div>
+                <Label>Situation avant ce contrat</Label>
+                <Input value={stagiaire.situationAvantContrat || ""} onChange={e => updateStagiaire(index, 'situationAvantContrat', e.target.value)} placeholder="Code notice" />
+              </div>
+              <div>
+                <Label>Dernier diplôme/titre préparé</Label>
+                <Input value={stagiaire.dernierDiplomePrepare || ""} onChange={e => updateStagiaire(index, 'dernierDiplomePrepare', e.target.value)} />
+              </div>
+              <div>
+                <Label>Dernière classe / année suivie</Label>
+                <Input value={stagiaire.derniereClasse || ""} onChange={e => updateStagiaire(index, 'derniereClasse', e.target.value)} />
+              </div>
+              <div>
+                <Label>Intitulé précis du dernier diplôme préparé</Label>
+                <Input value={stagiaire.intituleDernierDiplome || ""} onChange={e => updateStagiaire(index, 'intituleDernierDiplome', e.target.value)} />
+              </div>
+              <div>
+                <Label>Projet de création/reprise d'entreprise</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={stagiaire.projetCreationEntreprise || ""} onChange={e => updateStagiaire(index, 'projetCreationEntreprise', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="oui">Oui</option>
+                  <option value="non">Non</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-4 text-[11px] font-semibold uppercase text-muted-foreground">Le maître d'apprentissage</div>
+              <div>
+                <Label>Nom</Label>
+                <Input value={stagiaire.maitreNom || ""} onChange={e => updateStagiaire(index, 'maitreNom', e.target.value)} />
+              </div>
+              <div>
+                <Label>Prénom</Label>
+                <Input value={stagiaire.maitrePrenom || ""} onChange={e => updateStagiaire(index, 'maitrePrenom', e.target.value)} />
+              </div>
+              <div>
+                <Label>Date de naissance</Label>
+                <Input type="date" value={stagiaire.maitreDateNaissance || ""} onChange={e => updateStagiaire(index, 'maitreDateNaissance', e.target.value)} />
+              </div>
+              <div>
+                <Label>Courriel</Label>
+                <Input value={stagiaire.maitreEmail || ""} onChange={e => updateStagiaire(index, 'maitreEmail', e.target.value)} />
+              </div>
+              <div>
+                <Label>Emploi occupé</Label>
+                <Input value={stagiaire.maitreEmploi || ""} onChange={e => updateStagiaire(index, 'maitreEmploi', e.target.value)} />
+              </div>
+              <div>
+                <Label>Diplôme le plus élevé obtenu</Label>
+                <Input value={stagiaire.maitreDiplome || ""} onChange={e => updateStagiaire(index, 'maitreDiplome', e.target.value)} />
+              </div>
+              <div>
+                <Label>Niveau de diplôme</Label>
+                <Input value={stagiaire.maitreNiveauDiplome || ""} onChange={e => updateStagiaire(index, 'maitreNiveauDiplome', e.target.value)} placeholder="Ex : Niveau 4" />
+              </div>
+              <div className="flex items-end gap-2">
+                <input
+                  id={`elig-${index}`}
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={stagiaire.attestationEligibiliteMaitre !== false}
+                  onChange={e => updateStagiaire(index, 'attestationEligibiliteMaitre', e.target.checked)}
+                />
+                <Label htmlFor={`elig-${index}`} className="text-xs">Attestation d'éligibilité du maître</Label>
+              </div>
+
+              <div className="md:col-span-4 text-[11px] font-semibold uppercase text-muted-foreground">Le contrat</div>
+              <div>
+                <Label>Date de conclusion</Label>
+                <Input type="date" value={stagiaire.dateConclusionContrat || ""} onChange={e => updateStagiaire(index, 'dateConclusionContrat', e.target.value)} />
+              </div>
+              <div>
+                <Label>Début d'exécution</Label>
+                <Input type="date" value={stagiaire.dateDebutContrat || ""} onChange={e => updateStagiaire(index, 'dateDebutContrat', e.target.value)} />
+              </div>
+              <div>
+                <Label>Fin de contrat</Label>
+                <Input type="date" value={stagiaire.dateFinContrat || ""} onChange={e => updateStagiaire(index, 'dateFinContrat', e.target.value)} />
+              </div>
+              <div>
+                <Label>Fin prévue des épreuves</Label>
+                <Input type="date" value={stagiaire.dateFinEpreuves || ""} onChange={e => updateStagiaire(index, 'dateFinEpreuves', e.target.value)} />
+              </div>
+            </div>
+          </details>
+
           {/* Signature stagiaire */}
           <div className="space-y-2 mt-2 pt-2 border-t border-border/50">
             <div className="flex items-center gap-3">

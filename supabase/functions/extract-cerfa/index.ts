@@ -65,11 +65,10 @@ async function __requireAuth(req: Request): Promise<Response | null> {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const __authErr = await __requireAuth(req);
   if (__authErr) return __authErr;
-);
 
   try {
     const { fileDataUrl } = await req.json();

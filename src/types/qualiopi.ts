@@ -90,6 +90,38 @@ export interface StagiaireInfo {
   adresseEntreprise?: string;
   siretEntreprise?: string;
   numeroAction?: string;
+  // --- CERFA 10103*14 : employeur (coordonnées distinctes de l'apprenti) ---
+  telephoneEntreprise?: string;
+  emailEntreprise?: string;
+  apeEntreprise?: string;
+  effectifEntreprise?: string;
+  idccEntreprise?: string;
+  aucuneConventionCollective?: boolean;
+  typeEmployeur?: string;
+  // --- CERFA : parcours de l'apprenti ---
+  regimeSocial?: "MSA" | "URSSAF" | "";
+  sportifHautNiveau?: "oui" | "non" | "";
+  situationAvantContrat?: string;
+  dernierDiplomePrepare?: string;
+  derniereClasse?: string;
+  intituleDernierDiplome?: string;
+  projetCreationEntreprise?: "oui" | "non" | "";
+  // --- CERFA : maître d'apprentissage ---
+  maitreNom?: string;
+  maitrePrenom?: string;
+  maitreDateNaissance?: string;
+  maitreEmail?: string;
+  maitreEmploi?: string;
+  maitreDiplome?: string;
+  maitreNiveauDiplome?: string;
+  attestationEligibiliteMaitre?: boolean;
+  // --- CERFA : contrat ---
+  dateConclusionContrat?: string;
+  dateDebutContrat?: string;
+  dateFinContrat?: string;
+  dateFinEpreuves?: string;
+  caisseRetraiteComplementaire?: string;
+  cfaEntreprise?: "oui" | "non" | "";
 }
 
 export interface FormationInfo {
@@ -112,7 +144,13 @@ export interface FormationInfo {
   codeRNCP?: string;
   rythmeAlternance?: string;
   formateurSignatureUrl?: string;
+  // --- CERFA 10103*14 : formation ---
+  uaiCfa?: string;
+  codeDiplome?: string;
+  typeDiplome?: string;
+  dureeFormationCfa?: string;
 }
+
 
 export interface IndicateurData {
   numero: number;
