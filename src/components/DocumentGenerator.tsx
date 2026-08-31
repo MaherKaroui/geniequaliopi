@@ -445,11 +445,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
       const s = allStagiaires[doc.params.stagiaireIdx];
       if (s) {
+        const rapport = await controlerCerfa(s);
+        if (!rapport.ok) {
+          setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
+          toast.error("CERFA non déposable : corrigez les points bloquants");
+          return;
+        }
         const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
         saveAs(blob, buildCatalogFileName(doc, s, ".pdf"));
       }
       return;
     }
+
 
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       const resp = await fetch(getStaticFileUrl(doc)!);
