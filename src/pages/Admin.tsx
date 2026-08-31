@@ -42,6 +42,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArrowLeft, Download, Loader2, ShieldCheck } from "lucide-react";
+import { getSmicSetting, setSmicSetting } from "@/lib/cerfaSettings";
 import { toast } from "sonner";
 
 type ActivityLog = {
@@ -132,6 +133,7 @@ export default function Admin() {
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="logs">Journal d'activité</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="reglages">Réglages</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -142,6 +144,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="users" className="mt-6">
             <UsersTab currentUserId={user!.id} />
+          </TabsContent>
+          <TabsContent value="reglages" className="mt-6">
+            <ReglagesTab />
           </TabsContent>
         </Tabs>
       </div>
@@ -758,5 +763,73 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
         </SheetContent>
       </Sheet>
     </>
+  );
+}
+
+
+function ReglagesTab() {
+  const [montant, setMontant] = useState("");
+  const [dateEffet, setDateEffet] = useState("");
+
+  useEffect(() => {
+    const s = getSmicSetting();
+    setMontant(s.montant);
+    setDateEffet(s.dateEffet);
+  }, []);
+
+  return (
+    <Card className="max-w-xl">
+      <CardHeader>
+        <CardTitle>SMIC brut mensuel (CERFA apprentissage)</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Aucune valeur n'est codée en dur. Si ce réglage est vide, les cases « montant » du
+          CERFA restent vides (les taux en % restent calculés).
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="smic-montant">Montant brut mensuel (€)</Label>
+            <Input
+              id="smic-montant"
+              inputMode="decimal"
+              placeholder="Ex : 1801.80"
+              value={montant}
+              onChange={e => setMontant(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="smic-date">Date d'effet</Label>
+            <Input
+              id="smic-date"
+              type="date"
+              value={dateEffet}
+              onChange={e => setDateEffet(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => {
+              setSmicSetting({ montant: montant.trim(), dateEffet });
+              toast.success("Réglage enregistré");
+            }}
+          >
+            Enregistrer
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSmicSetting({ montant: "", dateEffet: "" });
+              setMontant("");
+              setDateEffet("");
+              toast.success("Réglage effacé");
+            }}
+          >
+            Effacer
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
