@@ -39,6 +39,7 @@ interface StagiairesFormProps {
 const emptyStagiaire: StagiaireInfo = {
   civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
   adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "",
+  maitreNom: "", maitrePrenom: "", maitreDiplome: "", maitreNiveauDiplome: "", dateConclusionContrat: new Date().toISOString().slice(0, 10),
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
