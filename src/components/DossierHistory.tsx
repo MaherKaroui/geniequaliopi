@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw, Archive, ArchiveRestore } from "lucide-react";
+import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw, Archive, ArchiveRestore, Search } from "lucide-react";
 
 interface DossierHistoryProps {
   userId: string;
