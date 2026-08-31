@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import CerfaImportExpress from "@/components/cerfa/CerfaImportExpress";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
@@ -20,9 +21,11 @@ interface FormationFormProps {
   onChange: (data: FormationInfo) => void;
   onImportStagiaires?: (stagiaires: StagiaireInfo[]) => void;
   onApplyOrganisme?: (organisme: OrganismeInfo) => void;
+  /** SIRET du CFA, utilisé par la barre de remplissage automatique pour retrouver le n° UAI. */
+  siretOrganisme?: string;
 }
 
-const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }: FormationFormProps) => {
+const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, siretOrganisme }: FormationFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);
@@ -657,6 +660,12 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
           </p>
         )}
       </div>
+
+      <CerfaImportExpress
+        siretCfa={siretOrganisme}
+        formation={data}
+        onPatchFormation={(patch) => onChange({ ...data, ...patch })}
+      />
 
       {/* Champs CERFA 10103*14 — formation */}
       <div className="p-4 border rounded-xl bg-card">

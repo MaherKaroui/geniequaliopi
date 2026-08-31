@@ -351,10 +351,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       if (s) {
         try {
           const rapport = await controlerCerfa(s);
-          if (!rapport.ok) {
-            setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
-            return;
-          }
+          setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
           const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
           const url = URL.createObjectURL(blob);
           setPreviewContent(null);
@@ -464,13 +461,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const s = allStagiaires[doc.params.stagiaireIdx];
       if (s) {
         const rapport = await controlerCerfa(s);
-        if (!rapport.ok) {
-          setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
-          toast.error("CERFA non déposable : corrigez les points bloquants");
-          return;
-        }
+        setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
         const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
-        saveAs(blob, buildCatalogFileName(doc, s, ".pdf"));
+        const nomFichier = buildCatalogFileName(doc, s, ".pdf");
+        saveAs(blob, rapport.complet ? nomFichier : nomFichier.replace(/\.pdf$/i, "_INCOMPLET.pdf"));
+        if (!rapport.complet) {
+          toast.warning(`CERFA téléchargé — ${rapport.champsVides.length} champ(s) à compléter à la main`);
+        }
       }
       return;
     }

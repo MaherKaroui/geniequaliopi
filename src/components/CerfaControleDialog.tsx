@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, PenLine } from "lucide-react";
 import { RUBRIQUES, type CerfaRapport } from "@/lib/cerfa/validation";
 
 interface Props {
@@ -13,7 +13,10 @@ interface Props {
 
 const fmtDate = (iso: string) => iso.split("-").reverse().join("/");
 
-/** Écran récapitulatif de contrôle avant génération du CERFA 10103*14. */
+/**
+ * Récapitulatif de contrôle du CERFA 10103*14.
+ * Purement informatif : aucun point ne bloque la génération du PDF.
+ */
 const CerfaControleDialog = ({ open, onOpenChange, titre, rapport, onGenerer }: Props) => {
   if (!rapport) return null;
   return (
@@ -21,18 +24,32 @@ const CerfaControleDialog = ({ open, onOpenChange, titre, rapport, onGenerer }: 
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {rapport.ok ? (
+            {rapport.complet ? (
               <CheckCircle2 className="w-5 h-5 text-primary" />
             ) : (
-              <XCircle className="w-5 h-5 text-destructive" />
+              <PenLine className="w-5 h-5 text-amber-500" />
             )}
-            Contrôle CERFA 10103*14 — {titre}
+            CERFA 10103*14 — {titre}
           </DialogTitle>
           <DialogDescription>
-            {rapport.bloquants.length} point(s) bloquant(s), {rapport.avertissements.length} avertissement(s).
-            Aucune valeur n'est inventée : les données manquantes doivent être saisies.
+            {rapport.complet
+              ? "Tous les champs contrôlés sont renseignés."
+              : `${rapport.manquants.length} champ(s) à compléter à la main, ${rapport.avertissements.length} avertissement(s). Le PDF reste téléchargeable : les champs vides sortent vides.`}
           </DialogDescription>
         </DialogHeader>
+
+        {!rapport.complet && (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+            <div className="text-sm font-semibold flex items-center gap-2 mb-2">
+              <PenLine className="w-4 h-4 text-amber-500" /> À compléter à la main
+            </div>
+            <ul className="text-xs grid md:grid-cols-2 gap-x-4 gap-y-1 list-disc pl-4">
+              {rapport.champsVides.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="space-y-4">
           {RUBRIQUES.map((rub) => {
@@ -46,7 +63,7 @@ const CerfaControleDialog = ({ open, onOpenChange, titre, rapport, onGenerer }: 
                     <tr>
                       <th className="text-left p-2 w-1/4">Champ</th>
                       <th className="text-left p-2 w-1/4">Valeur observée</th>
-                      <th className="text-left p-2">Correction attendue</th>
+                      <th className="text-left p-2">À compléter</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -54,8 +71,8 @@ const CerfaControleDialog = ({ open, onOpenChange, titre, rapport, onGenerer }: 
                       <tr key={i} className="border-t align-top">
                         <td className="p-2 font-medium">
                           <span className="inline-flex items-center gap-1">
-                            {it.niveau === "bloquant" ? (
-                              <XCircle className="w-3 h-3 text-destructive shrink-0" />
+                            {it.niveau === "manquant" ? (
+                              <PenLine className="w-3 h-3 text-amber-500 shrink-0" />
                             ) : (
                               <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0" />
                             )}
@@ -114,11 +131,7 @@ const CerfaControleDialog = ({ open, onOpenChange, titre, rapport, onGenerer }: 
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fermer
           </Button>
-          {onGenerer && (
-            <Button disabled={!rapport.ok} onClick={onGenerer}>
-              Générer le CERFA
-            </Button>
-          )}
+          {onGenerer && <Button onClick={onGenerer}>Générer le CERFA</Button>}
         </div>
       </DialogContent>
     </Dialog>

@@ -125,17 +125,18 @@ export async function genCerfaApprentissagePdf(
   f: FormationInfo,
   s: StagiaireInfo,
 ): Promise<Blob> {
-  // ---------- CONTRÔLE BLOQUANT AVANT GÉNÉRATION ----------
+  // ---------- CONTRÔLE NON BLOQUANT ----------
+  // Le PDF est TOUJOURS généré : les champs non renseignés sortent vides et
+  // sont listés dans le panneau « À compléter à la main ».
   const refs = await loadCerfaReferentiels();
   const rapport = controleCerfa(o, f, s, refs);
-  if (!rapport.ok) {
-    const err = new Error(
-      `CERFA non déposable — ${rapport.bloquants.length} point(s) bloquant(s) :\n` +
-        rapport.bloquants.map((b) => `• [${b.rubrique}] ${b.champ} : ${b.observe} → ${b.attendu}`).join("\n"),
+  if (!rapport.complet) {
+    console.info(
+      `CERFA incomplet (${rapport.champsVides.length} champ(s) vide(s)) — génération quand même :`,
+      rapport.champsVides,
     );
-    (err as Error & { rapport?: CerfaRapport }).rapport = rapport;
-    throw err;
   }
+
 
   const res = await fetch(TEMPLATE_URL);
   if (!res.ok) throw new Error(`Template CERFA introuvable (${res.status})`);

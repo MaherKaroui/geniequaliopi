@@ -1,6 +1,8 @@
 /**
- * Contrôles de conformité du CERFA 10103*14 avant génération du PDF.
- * Règle générale : on n'invente jamais une valeur manquante — on la signale et on bloque.
+ * Contrôles de conformité du CERFA 10103*14.
+ * Règle générale : on n'invente jamais une valeur manquante — on la signale.
+ * AUCUN contrôle n'est bloquant : le PDF est toujours téléchargeable, les champs
+ * non renseignés sortent vides et sont listés dans « À compléter à la main ».
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { CerfaReferentiels, SmicReference } from "./referentiels";
@@ -21,14 +23,19 @@ export interface CerfaFinding {
   champ: string;
   observe: string;
   attendu: string;
-  niveau: "bloquant" | "avertissement";
+  niveau: "manquant" | "avertissement";
 }
 
 export interface CerfaRapport {
   findings: CerfaFinding[];
-  bloquants: CerfaFinding[];
+  /** Champs obligatoires laissés vides — à compléter à la main sur le PDF. */
+  manquants: CerfaFinding[];
+  /** Incohérences détectées — simples avertissements. */
   avertissements: CerfaFinding[];
-  ok: boolean;
+  /** Libellés courts des champs vides (affichés sous le bouton de téléchargement). */
+  champsVides: string[];
+  /** Vrai si aucun champ obligatoire n'est vide (sinon le fichier est suffixé _INCOMPLET). */
+  complet: boolean;
   periodes: PeriodeRemuneration[];
   smicRef: SmicReference | null;
   salaireMensuel: number | null;
@@ -100,11 +107,11 @@ export function controleCerfa(
     champ: string,
     observe: string,
     attendu: string,
-    niveau: CerfaFinding["niveau"] = "bloquant",
+    niveau: CerfaFinding["niveau"] = "avertissement",
   ) => findings.push({ rubrique, champ, observe, attendu, niveau });
 
   const manquant = (rubrique: Rubrique, champ: string, valeur: string | undefined, attendu: string) => {
-    if (!(valeur || "").trim()) add(rubrique, champ, "vide", attendu);
+    if (!(valeur || "").trim()) add(rubrique, champ, "vide", attendu, "manquant");
   };
 
   const dateDebut = s.dateDebutContrat || f.dateDebut;
@@ -114,13 +121,13 @@ export function controleCerfa(
   // ---------- L'EMPLOYEUR ----------
   manquant("L'employeur", "Dénomination", s.entreprise, "Raison sociale de l'employeur");
   if (!luhnValide(s.siretEntreprise)) {
-    add("L'employeur", "SIRET", s.siretEntreprise || "vide", "SIRET à 14 chiffres, clé de Luhn valide");
+    add("L'employeur", "SIRET", s.siretEntreprise || "vide", "SIRET à 14 chiffres, clé de Luhn valide", s.siretEntreprise ? "avertissement" : "manquant");
   }
   manquant("L'employeur", "Code APE", s.apeEntreprise, "Code APE/NAF de l'établissement (ex. 4941A)");
   manquant("L'employeur", "Effectif total salariés", s.effectifEntreprise, "Effectif total de l'entreprise au 31/12");
   if (!s.aucuneConventionCollective) {
     if (!/^\d{4}$/.test(digits(s.idccEntreprise))) {
-      add("L'employeur", "Code IDCC", s.idccEntreprise || "vide", "Code IDCC à 4 chiffres, ou cocher « aucune convention collective » (9999)");
+      add("L'employeur", "Code IDCC", s.idccEntreprise || "vide", "Code IDCC à 4 chiffres, ou cocher « aucune convention collective » (9999)", s.idccEntreprise ? "avertissement" : "manquant");
     }
   } else if (digits(s.idccEntreprise) !== "9999") {
     add("L'employeur", "Code IDCC", s.idccEntreprise || "vide", "9999 lorsqu'aucune convention collective ne s'applique");
@@ -144,13 +151,13 @@ export function controleCerfa(
   manquant("L'apprenti", "Prénom", s.prenom, "Premier prénom");
   manquant("L'apprenti", "Date de naissance", s.dateNaissance, "Date de naissance de l'apprenti");
   if (!nirValide(s.nir)) {
-    add("L'apprenti", "NIR", s.nir || "vide", "NIR à 15 caractères avec clé de contrôle valide");
+    add("L'apprenti", "NIR", s.nir || "vide", "NIR à 15 caractères avec clé de contrôle valide", s.nir ? "avertissement" : "manquant");
   }
   manquant("L'apprenti", "Département de naissance", s.departementNaissance, "Code département de naissance");
   manquant("L'apprenti", "Commune de naissance", s.communeNaissance, "Commune de naissance");
   manquant("L'apprenti", "Régime social", s.regimeSocial, "MSA ou URSSAF");
   if (!s.sportifHautNiveau) {
-    add("L'apprenti", "Sportif de haut niveau", "aucune case cochée", "Oui ou Non explicitement renseigné");
+    add("L'apprenti", "Sportif de haut niveau", "aucune case cochée", "Oui ou Non explicitement renseigné", "manquant");
   }
   manquant("L'apprenti", "Situation avant ce contrat", s.situationAvantContrat, "Code situation avant contrat (notice)");
   manquant("L'apprenti", "Dernier diplôme ou titre préparé", s.dernierDiplomePrepare, "Diplôme/titre préparé avant ce contrat");
@@ -158,7 +165,7 @@ export function controleCerfa(
   manquant("L'apprenti", "Intitulé précis du dernier diplôme préparé", s.intituleDernierDiplome, "Intitulé exact");
   manquant("L'apprenti", "Diplôme le plus élevé obtenu", s.diplome, "Diplôme le plus élevé obtenu");
   if (!s.projetCreationEntreprise) {
-    add("L'apprenti", "Projet de création/reprise d'entreprise", "vide", "Oui ou Non explicitement renseigné");
+    add("L'apprenti", "Projet de création/reprise d'entreprise", "vide", "Oui ou Non explicitement renseigné", "manquant");
   }
 
   // ---------- LE MAÎTRE D'APPRENTISSAGE ----------
@@ -173,8 +180,8 @@ export function controleCerfa(
   }
 
   // ---------- LE CONTRAT ----------
-  if (!dateDebut) add("Le contrat", "Date de début d'exécution", "vide", "Date de début du contrat");
-  if (!dateFin) add("Le contrat", "Date de fin de contrat", "vide", "Date de fin du contrat");
+  if (!dateDebut) add("Le contrat", "Date de début d'exécution", "vide", "Date de début du contrat", "manquant");
+  if (!dateFin) add("Le contrat", "Date de fin de contrat", "vide", "Date de fin du contrat", "manquant");
   if (dateConclusion && dateDebut && dateConclusion > dateDebut) {
     add("Le contrat", "Date de conclusion", dateConclusion, "Antérieure ou égale à la date de début d'exécution");
   }
@@ -190,12 +197,12 @@ export function controleCerfa(
   manquant("La formation", "Code du diplôme", f.codeDiplome, "Code diplôme de la nomenclature (distinct du code RNCP)");
   manquant("La formation", "Code RNCP", f.codeRNCP, "Code RNCP du titre visé");
   if (!(f.typeDiplome || "").trim()) {
-    add("La formation", "Type de diplôme visé", "vide", "Code type de diplôme de la nomenclature de la notice");
+    add("La formation", "Type de diplôme visé", "vide", "Code type de diplôme de la nomenclature de la notice", "manquant");
   } else if (/^rncp/i.test(f.typeDiplome!.trim())) {
     add("La formation", "Type de diplôme visé", f.typeDiplome!, "Code type de diplôme de la notice — le n° RNCP va dans le champ « Code RNCP »");
   }
   if (!luhnValide(o.siret)) {
-    add("La formation", "SIRET du CFA", o.siret || "vide", "SIRET à 14 chiffres, clé de Luhn valide");
+    add("La formation", "SIRET du CFA", o.siret || "vide", "SIRET à 14 chiffres, clé de Luhn valide", o.siret ? "avertissement" : "manquant");
   }
 
   // CFA d'entreprise : déduit de l'égalité des SIRET
@@ -220,7 +227,7 @@ export function controleCerfa(
   // Durée de formation en CFA
   const heuresCfa = heuresDepuis(f.dureeFormationCfa || f.duree);
   if (heuresCfa === null) {
-    add("La formation", "Durée de formation en CFA", "vide", "Nombre d'heures de formation en CFA");
+    add("La formation", "Durée de formation en CFA", "vide", "Nombre d'heures de formation en CFA", "manquant");
   } else if (dateDebut && dateFin) {
     const mois = Math.max(moisEntre(dateDebut, dateFin), 0);
     const annees = Math.max(mois / 12, 0.01);
@@ -279,12 +286,13 @@ export function controleCerfa(
   const salaireMensuel =
     smicRef && pct1 !== null ? Math.round(((smicRef.montant_mensuel_35h * pct1) / 100) * 100) / 100 : null;
 
-  const bloquants = findings.filter((x) => x.niveau === "bloquant");
+  const manquants = findings.filter((x) => x.niveau === "manquant");
   return {
     findings,
-    bloquants,
+    manquants,
     avertissements: findings.filter((x) => x.niveau === "avertissement"),
-    ok: bloquants.length === 0,
+    champsVides: manquants.map((x) => `${x.rubrique} — ${x.champ}`),
+    complet: manquants.length === 0,
     periodes,
     smicRef,
     salaireMensuel,
