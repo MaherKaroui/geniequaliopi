@@ -2106,7 +2106,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           </div>
         </div>
       )}
+
+      <CerfaControleDialog
+        open={!!cerfaRapport}
+        onOpenChange={(v) => !v && setCerfaRapport(null)}
+        titre={cerfaRapport?.titre || ""}
+        rapport={cerfaRapport?.rapport || null}
+      />
     </div>
+
   );
 };
 
