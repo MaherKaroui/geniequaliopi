@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { X, PenTool, Sparkles, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
+import CerfaImportExpress from "@/components/cerfa/CerfaImportExpress";
 import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
@@ -419,6 +420,12 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <summary className="text-xs font-semibold cursor-pointer text-primary">
               CERFA 10103*14 — champs obligatoires au dépôt
             </summary>
+            <div className="mt-3">
+              <CerfaImportExpress
+                stagiaire={stagiaire}
+                onPatchStagiaire={(patch) => onChange(data.map((st, i) => (i === index ? { ...st, ...patch } : st)))}
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
               <div className="md:col-span-4 text-[11px] font-semibold uppercase text-muted-foreground">L'employeur</div>
               <div>

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import CerfaImportExpress from "@/components/cerfa/CerfaImportExpress";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
@@ -657,6 +658,11 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
           </p>
         )}
       </div>
+
+      <CerfaImportExpress
+        formation={data}
+        onPatchFormation={(patch) => onChange({ ...data, ...patch })}
+      />
 
       {/* Champs CERFA 10103*14 — formation */}
       <div className="p-4 border rounded-xl bg-card">
