@@ -32,6 +32,7 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
   const [saveName, setSaveName] = useState("");
   const [currentDossierId, setCurrentDossierId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [search, setSearch] = useState("");
   const { toast } = useToast();
 
   const fetchDossiers = async () => {
