@@ -648,6 +648,19 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
             onChange={e => update("codeRNCP", e.target.value.toUpperCase())}
           />
         </div>
+        <div className="mt-3">
+          <Label htmlFor="codeTypeDiplome">Code type de diplôme (nomenclature — CERFA)</Label>
+          <Input
+            id="codeTypeDiplome"
+            className="w-40 bg-card"
+            placeholder="Ex : 45"
+            value={data.codeTypeDiplome || ""}
+            onChange={e => update("codeTypeDiplome", e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Distinct du n° RNCP. Laissé vide sur le CERFA tant qu'il n'est pas saisi.
+          </p>
+        </div>
         {data.codeRNCP && (
           <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
             Code sélectionné : <strong>{data.codeRNCP}</strong>
