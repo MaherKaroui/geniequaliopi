@@ -331,6 +331,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
   };
 
+  /** Contrôle CERFA (SMIC/barèmes en base + règles de conformité) avant toute génération. */
+  const controlerCerfa = async (s: StagiaireInfo) => {
+    const refs = await loadCerfaReferentiels();
+    return controleCerfa(mergedOrganisme, selectedFormation, s, refs);
+  };
+
   const handlePreviewInner = async (doc: DocEntry) => {
 
     // CERFA Apprentissage rempli → PDF dans iframe
@@ -338,6 +344,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const s = allStagiaires[doc.params.stagiaireIdx];
       if (s) {
         try {
+          const rapport = await controlerCerfa(s);
+          if (!rapport.ok) {
+            setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
+            return;
+          }
           const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
           const url = URL.createObjectURL(blob);
           setPreviewContent(null);
@@ -353,6 +364,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       }
       return;
     }
+
 
     // Static PDF → embed in iframe
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
