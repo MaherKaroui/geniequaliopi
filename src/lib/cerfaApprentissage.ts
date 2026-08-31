@@ -10,6 +10,36 @@
  */
 import { PDFDocument, PDFTextField, PDFCheckBox, PDFImage } from "pdf-lib";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { getSmicMontant } from "@/lib/cerfaSettings";
+
+/** Âge en années révolues à une date ISO */
+function ageAt(naissanceIso: string | undefined, atIso: string): number | null {
+  if (!naissanceIso) return null;
+  const n = new Date(naissanceIso);
+  const d = new Date(atIso);
+  if (isNaN(n.getTime()) || isNaN(d.getTime())) return null;
+  let age = d.getUTCFullYear() - n.getUTCFullYear();
+  const m = d.getUTCMonth() - n.getUTCMonth();
+  if (m < 0 || (m === 0 && d.getUTCDate() < n.getUTCDate())) age--;
+  return age;
+}
+
+/** Ajoute des mois à une date ISO, retourne ISO */
+function addMonths(iso: string, months: number): string {
+  const d = new Date(iso);
+  d.setUTCMonth(d.getUTCMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Taux légal apprenti (% du SMIC) selon âge et année du contrat (1..4) */
+function tauxApprenti(age: number | null, annee: number): number | null {
+  if (age === null) return null;
+  const t = annee <= 1 ? 0 : annee === 2 ? 1 : 2; // index tranche année
+  if (age < 18) return [27, 39, 55][t];
+  if (age < 21) return [43, 51, 67][t];
+  if (age < 26) return [53, 61, 78][t];
+  return 100;
+}
 
 /** Embed une image (data URL ou URL) dans le PDF, retourne null si échec */
 async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PDFImage | null> {
@@ -322,11 +352,27 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_90", clean(o.ville));
 
   // ---------- RÉMUNÉRATION ----------
-  // Laissé entièrement vide : montant, périodes, taux et base sont à renseigner manuellement.
-  setText(form, "Zone de texte 8_72", "");
-  setText(form, "Zone de texte 21_73", "");
+  // Remplie automatiquement : SMIC depuis les réglages admin (défaut 1 823,03 €),
+  // taux légal selon âge de l'apprenti, périodes en années de 12 mois glissants.
+  const smic = getSmicMontant();
+  const fmtMontant = (n: number) => n.toFixed(2).replace(".", ",") + " €";
 
-  const REMUNERATION_FIELDS = [
+  // Montant mensuel brut + base (1ère période)
+  const ageDebut = ageAt(s.dateNaissance, dateDebut);
+  const taux1 = tauxApprenti(ageDebut, 1);
+  if (smic && taux1 !== null) {
+    setText(form, "Zone de texte 8_72", fmtMontant((smic * taux1) / 100)); // montant
+    setText(form, "Zone de texte 21_73", "SMIC"); // base
+  }
+
+  // Tableau : périodes de 12 mois (max 4 lignes), recalcul du taux à chaque année
+  const LIGNES = [
+    { d: ["21_81", "21_82", "21_83", "21_84", "21_85", "21_86"], taux: "8_95", brut: "8_96" },
+    { d: ["21_31", "21_32", "21_33", "21_34", "21_35", "21_36"], taux: "8_83", brut: "8_84" },
+    { d: ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48"], taux: "8_87", brut: "8_88" },
+    { d: ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60"], taux: "8_103", brut: "8_104" },
+  ];
+  const REMUNERATION_FIELDS_UNUSED = [
     // Ligne 1
     "21_81", "21_82", "21_83", "21_84", "21_85", "21_86", "8_95", "8_96",
     "21_87", "21_88", "21_89", "21_90", "21_91", "21_92", "8_97", "8_98",
