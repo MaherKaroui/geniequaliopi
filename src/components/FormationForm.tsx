@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import CerfaImportExpress from "@/components/cerfa/CerfaImportExpress";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
@@ -21,11 +20,9 @@ interface FormationFormProps {
   onChange: (data: FormationInfo) => void;
   onImportStagiaires?: (stagiaires: StagiaireInfo[]) => void;
   onApplyOrganisme?: (organisme: OrganismeInfo) => void;
-  /** SIRET du CFA, utilisé par la barre de remplissage automatique pour retrouver le n° UAI. */
-  siretOrganisme?: string;
 }
 
-const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, siretOrganisme }: FormationFormProps) => {
+const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }: FormationFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);
@@ -660,47 +657,6 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, s
           </p>
         )}
       </div>
-
-      <CerfaImportExpress
-        siretCfa={siretOrganisme}
-        formation={data}
-        onPatchFormation={(patch) => onChange({ ...data, ...patch })}
-      />
-
-      {/* Champs CERFA 10103*14 — formation */}
-      <div className="p-4 border rounded-xl bg-card">
-        <Label className="font-semibold">CERFA 10103*14 — La formation</Label>
-        <p className="text-xs text-muted-foreground mb-2">
-          Champs obligatoires au dépôt du contrat d'apprentissage. Le type de diplôme est un code de la nomenclature de la notice : il ne peut pas commencer par « RNCP ».
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <div>
-            <Label>N° UAI du CFA</Label>
-            <Input value={data.uaiCfa || ""} onChange={e => update("uaiCfa", e.target.value)} placeholder="Ex : 0931234X" />
-          </div>
-          <div>
-            <Label>Code du diplôme</Label>
-            <Input value={data.codeDiplome || ""} onChange={e => update("codeDiplome", e.target.value)} />
-          </div>
-          <div>
-            <Label>Type de diplôme visé</Label>
-            <Input
-              value={data.typeDiplome || ""}
-              onChange={e => update("typeDiplome", e.target.value)}
-              placeholder="Code type (notice)"
-            />
-            {/^rncp/i.test((data.typeDiplome || "").trim()) && (
-              <p className="text-xs text-destructive mt-1">Le n° RNCP se saisit dans le champ « Code RNCP ».</p>
-            )}
-          </div>
-          <div>
-            <Label>Durée de formation en CFA (h)</Label>
-            <Input value={data.dureeFormationCfa || ""} onChange={e => update("dureeFormationCfa", e.target.value)} placeholder="Ex : 800" />
-          </div>
-        </div>
-      </div>
-
-
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">

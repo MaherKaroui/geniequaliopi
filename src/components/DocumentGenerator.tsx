@@ -51,10 +51,6 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
-import { loadCerfaReferentiels } from "@/lib/cerfa/referentiels";
-import { controleCerfa, type CerfaRapport } from "@/lib/cerfa/validation";
-import CerfaControleDialog from "@/components/CerfaControleDialog";
-
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
@@ -148,8 +144,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [cerfaRapport, setCerfaRapport] = useState<{ rapport: CerfaRapport; titre: string } | null>(null);
-
   const [previewError, setPreviewError] = useState<string | null>(null);
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -337,12 +331,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
   };
 
-  /** Contrôle CERFA (SMIC/barèmes en base + règles de conformité) avant toute génération. */
-  const controlerCerfa = async (s: StagiaireInfo) => {
-    const refs = await loadCerfaReferentiels();
-    return controleCerfa(mergedOrganisme, selectedFormation, s, refs);
-  };
-
   const handlePreviewInner = async (doc: DocEntry) => {
 
     // CERFA Apprentissage rempli → PDF dans iframe
@@ -350,8 +338,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const s = allStagiaires[doc.params.stagiaireIdx];
       if (s) {
         try {
-          const rapport = await controlerCerfa(s);
-          setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
           const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
           const url = URL.createObjectURL(blob);
           setPreviewContent(null);
@@ -367,7 +353,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       }
       return;
     }
-
 
     // Static PDF → embed in iframe
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
@@ -460,18 +445,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
       const s = allStagiaires[doc.params.stagiaireIdx];
       if (s) {
-        const rapport = await controlerCerfa(s);
-        setCerfaRapport({ rapport, titre: `${s.prenom} ${s.nom}` });
         const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
-        const nomFichier = buildCatalogFileName(doc, s, ".pdf");
-        saveAs(blob, rapport.complet ? nomFichier : nomFichier.replace(/\.pdf$/i, "_INCOMPLET.pdf"));
-        if (!rapport.complet) {
-          toast.warning(`CERFA téléchargé — ${rapport.champsVides.length} champ(s) à compléter à la main`);
-        }
+        saveAs(blob, buildCatalogFileName(doc, s, ".pdf"));
       }
       return;
     }
-
 
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       const resp = await fetch(getStaticFileUrl(doc)!);
@@ -2103,15 +2081,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           </div>
         </div>
       )}
-
-      <CerfaControleDialog
-        open={!!cerfaRapport}
-        onOpenChange={(v) => !v && setCerfaRapport(null)}
-        titre={cerfaRapport?.titre || ""}
-        rapport={cerfaRapport?.rapport || null}
-      />
     </div>
-
   );
 };
 
