@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw, Archive, ArchiveRestore } from "lucide-react";
+import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw, Archive, ArchiveRestore, Search } from "lucide-react";
 
 interface DossierHistoryProps {
   userId: string;
@@ -32,6 +32,7 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
   const [saveName, setSaveName] = useState("");
   const [currentDossierId, setCurrentDossierId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [search, setSearch] = useState("");
   const { toast } = useToast();
 
   const fetchDossiers = async () => {
@@ -142,7 +143,22 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
 
-  const visible = dossiers.filter((d) => (showArchived ? d.archived : !d.archived));
+  const q = search.trim().toLowerCase();
+  const visible = dossiers
+    .filter((d) => (showArchived ? d.archived : !d.archived))
+    .filter((d) => {
+      if (!q) return true;
+      const stagNames = (d.stagiaires || [])
+        .map((s: any) => `${s?.prenom || ""} ${s?.nom || ""}`)
+        .join(" ")
+        .toLowerCase();
+      return (
+        d.name.toLowerCase().includes(q) ||
+        (d.organisme?.nom || "").toLowerCase().includes(q) ||
+        (d.formation?.intitule || "").toLowerCase().includes(q) ||
+        stagNames.includes(q)
+      );
+    });
   const archivedCount = dossiers.filter((d) => d.archived).length;
   const activeCount = dossiers.length - archivedCount;
 
@@ -196,6 +212,17 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
           <p className="text-xs text-muted-foreground">
             Astuce : chargez un dossier, changez uniquement la formation, puis cliquez sur <strong>Enregistrer comme nouveau</strong> pour créer une variante en gardant l'organisme et les stagiaires.
           </p>
+
+          {/* Recherche */}
+          <div className="relative border-t pt-3">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 mt-1.5 text-muted-foreground" />
+            <input
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg bg-background"
+              placeholder="Rechercher un dossier, organisme, formation ou stagiaire..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
           {/* Toggle actifs / archivés */}
           <div className="flex items-center justify-between border-t pt-3">
