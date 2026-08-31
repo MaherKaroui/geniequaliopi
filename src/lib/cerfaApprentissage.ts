@@ -340,9 +340,9 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_77", clean(f.codeTypeDiplome || ""));
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
-  setText(form, "Zone de texte 8_73", ""); // N° UAI
+  setText(form, "Zone de texte 8_73", ""); // N° UAI — laissé vide
   setText(form, "Zone de texte 8_75", ""); // Code diplôme
-  setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
+  setText(form, "Zone de texte 8_74", ""); // N° SIRET CFA — laissé vide
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
   // Adresse CFA
