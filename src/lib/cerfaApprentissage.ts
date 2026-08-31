@@ -372,21 +372,40 @@ export async function genCerfaApprentissagePdf(
     { d: ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48"], taux: "8_87", brut: "8_88" },
     { d: ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60"], taux: "8_103", brut: "8_104" },
   ];
-  const REMUNERATION_FIELDS_UNUSED = [
-    // Ligne 1
-    "21_81", "21_82", "21_83", "21_84", "21_85", "21_86", "8_95", "8_96",
-    "21_87", "21_88", "21_89", "21_90", "21_91", "21_92", "8_97", "8_98",
-    // Ligne 2
-    "21_31", "21_32", "21_33", "21_34", "21_35", "21_36", "8_83", "8_84",
-    "21_37", "21_38", "21_39", "21_40", "21_41", "21_42", "8_85", "8_86",
-    // Ligne 3
-    "21_43", "21_44", "21_45", "21_46", "21_47", "21_48", "8_87", "8_88",
-    "21_49", "21_50", "21_51", "21_52", "21_53", "21_54", "8_89", "8_101",
-    // Ligne 4
-    "21_55", "21_56", "21_57", "21_58", "21_59", "21_60", "8_103", "8_104",
-    "21_61", "21_62", "21_63", "21_64", "21_65", "21_66", "8_105", "8_106",
-  ];
-  REMUNERATION_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
+  // On vide tout d'abord, puis on remplit les périodes calculées
+  const REMUNERATION_ALL_FIELDS = LIGNES.flatMap(l => [...l.d, l.taux, l.brut]);
+  REMUNERATION_ALL_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
+
+  if (smic && dateDebut && dateFin) {
+    let debutPeriode = dateDebut;
+    for (let annee = 1; annee <= 4; annee++) {
+      if (debutPeriode >= dateFin) break;
+      const finTheorique = addMonths(debutPeriode, 12);
+      // Fin de période = +12 mois - 1 jour, bornée à la fin du contrat
+      const finCalc = new Date(finTheorique);
+      finCalc.setUTCDate(finCalc.getUTCDate() - 1);
+      const finPeriode = (finCalc.toISOString().slice(0, 10) < dateFin)
+        ? finCalc.toISOString().slice(0, 10)
+        : dateFin;
+
+      const ageP = ageAt(s.dateNaissance, debutPeriode);
+      const taux = tauxApprenti(ageP, annee);
+      const l = LIGNES[annee - 1];
+      const [p1J, p1M, p1A] = splitDate(debutPeriode);
+      const [p2J, p2M, p2A] = splitDate(finPeriode);
+      setText(form, `Zone de texte ${l.d[0]}`, p1J);
+      setText(form, `Zone de texte ${l.d[1]}`, p1M);
+      setText(form, `Zone de texte ${l.d[2]}`, p1A);
+      setText(form, `Zone de texte ${l.d[3]}`, p2J);
+      setText(form, `Zone de texte ${l.d[4]}`, p2M);
+      setText(form, `Zone de texte ${l.d[5]}`, p2A);
+      if (taux !== null) {
+        setText(form, `Zone de texte ${l.taux}`, `${taux} %`);
+        setText(form, `Zone de texte ${l.brut}`, fmtMontant((smic * taux) / 100));
+      }
+      debutPeriode = addMonths(debutPeriode, 12);
+    }
+  }
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
   // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide (dates comprises).
