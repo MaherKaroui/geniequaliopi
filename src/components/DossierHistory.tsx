@@ -213,6 +213,17 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
             Astuce : chargez un dossier, changez uniquement la formation, puis cliquez sur <strong>Enregistrer comme nouveau</strong> pour créer une variante en gardant l'organisme et les stagiaires.
           </p>
 
+          {/* Recherche */}
+          <div className="relative border-t pt-3">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 mt-1.5 text-muted-foreground" />
+            <input
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg bg-background"
+              placeholder="Rechercher un dossier, organisme, formation ou stagiaire..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
           {/* Toggle actifs / archivés */}
           <div className="flex items-center justify-between border-t pt-3">
             <p className="text-xs font-medium text-muted-foreground">
