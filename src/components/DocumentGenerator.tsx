@@ -51,6 +51,10 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
+import { loadCerfaReferentiels } from "@/lib/cerfa/referentiels";
+import { controleCerfa, type CerfaRapport } from "@/lib/cerfa/validation";
+import CerfaControleDialog from "@/components/CerfaControleDialog";
+
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
