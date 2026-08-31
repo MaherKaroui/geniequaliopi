@@ -132,6 +132,7 @@ export default function Admin() {
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="logs">Journal d'activité</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="cerfa">Références CERFA</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -143,6 +144,10 @@ export default function Admin() {
           <TabsContent value="users" className="mt-6">
             <UsersTab currentUserId={user!.id} />
           </TabsContent>
+          <TabsContent value="cerfa" className="mt-6">
+            <CerfaReferencesAdmin />
+          </TabsContent>
+
         </Tabs>
       </div>
     </div>
