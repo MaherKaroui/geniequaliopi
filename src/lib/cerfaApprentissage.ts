@@ -343,11 +343,14 @@ export async function genCerfaApprentissagePdf(
   REMUNERATION_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide.
-  setText(form, "Zone de texte 8_91", "");
-  setText(form, "Zone de texte 8_92", "");
-  setText(form, "Zone de texte 8_93", "");
-  setText(form, "Zone de texte 8_94", "");
+  // Cadre entièrement réservé à l'organisme de dépôt → toujours laissé vide (dates comprises).
+  const CADRE_ORGANISME_FIELDS = [
+    "8_64", "8_65",
+    "21_67", "21_68", "21_69", "21_70", "21_71", "21_72",
+    "8_66", "8_67",
+    "8_91", "8_92", "8_93", "8_94",
+  ];
+  CADRE_ORGANISME_FIELDS.forEach(name => setText(form, `Zone de texte ${name}`, ""));
 
   pdf.getForm().updateFieldAppearances();
 
