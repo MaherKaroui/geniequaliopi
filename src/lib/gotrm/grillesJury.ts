@@ -410,6 +410,17 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
     ).join("")}
   </table>`);
 
+  // Un ou deux « non » par grille selon le candidat (≈ 80–90 % de oui) :
+  // indices des items non satisfaits, déterministes et distincts par candidat.
+  const totalItems = GJ2_ITEMS.reduce((n, b) => n + b.items.length, 0);
+  const nonOui = new Set<number>();
+  const premier = (sd % totalItems) + 1;
+  nonOui.add(premier);
+  if (sd % 3 !== 0) {
+    const second = (premier + 3 + (sd % (totalItems - 3))) % totalItems + 1;
+    nonOui.add(second === premier ? (second % totalItems) + 1 : second);
+  }
+
   let idx = 0;
   pages.push(`${bandeau}<h2>Grille d'évaluation de l'entretien final</h2>
   <p>À partir de l'échange avec le candidat, considérez-vous que les champs d'observation ci-dessous sont satisfaisants ?</p>
@@ -419,15 +430,17 @@ export function genGJ2Gotrm(s: GotrmSession, c: GotrmCandidat): string {
       b.items
         .map((it, k) => {
           idx += 1;
-          const obs =
-            k === 0 && forts.length
+          const oui = !nonOui.has(idx);
+          const obs = !oui
+            ? pick(OBS_LIGNE_RESERVE, sd + idx * 3)
+            : k === 0 && forts.length
               ? `Appui constaté : ${forts[(sd + idx) % forts.length]}.`
               : k === b.items.length - 1 && consolider.length
                 ? `Réponse consolidée pendant l'échange sur : ${consolider[(sd + idx) % consolider.length]}.`
                 : pick(OBS_LIGNE, sd + idx * 2);
           return `<tr class="bloc-avoid">${k === 0 ? `<td rowspan="${b.items.length}"><strong>${esc(b.champ)}</strong></td>` : ""}
             <td>${esc(it)}</td>
-            <td style="text-align:center">${ON(true)}</td>
+            <td style="text-align:center">${ON(oui)}</td>
             <td style="font-size:9.5pt">${esc(obs)}</td></tr>`;
         })
         .join(""),
