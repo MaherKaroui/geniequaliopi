@@ -2352,7 +2352,7 @@ export function generateStagiaireOpenAnswers(
   stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
 ): StagiaireOpenAnswer[] {
   // Réponses écrites à la main (CQP Opérateur vitrage) : une copie différente par stagiaire.
-  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut);
+  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut, stagiaireInfo?.prenom);
   if (manualVitrage) {
     return questions.map((_q, qi) => {
       const reponse = manualVitrage.reponses[qi] ?? manualVitrage.reponses[qi % manualVitrage.reponses.length];
