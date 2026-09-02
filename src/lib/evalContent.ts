@@ -2297,6 +2297,20 @@ export function generateStagiaireOpenAnswers(
   isDebut: boolean,
   stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
 ): StagiaireOpenAnswer[] {
+  // Réponses écrites à la main (CQP Opérateur vitrage) : une copie différente par stagiaire.
+  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut);
+  if (manualVitrage) {
+    return questions.map((_q, qi) => {
+      const reponse = manualVitrage.reponses[qi] ?? manualVitrage.reponses[qi % manualVitrage.reponses.length];
+      const score = manualVitrage.scores[qi] ?? manualVitrage.scores[qi % manualVitrage.scores.length];
+      return {
+        reponse,
+        score,
+        feedback: score >= 1 ? "Bonne réponse" : score >= 0.5 ? "Réponse partielle" : "Réponse incomplète",
+      };
+    });
+  }
+
   const profile = getStagiaireTestProfile(stagiaireIndex);
   
   // First pass: generate raw answers
