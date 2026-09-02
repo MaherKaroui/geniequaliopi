@@ -24,6 +24,7 @@ function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIR
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
+import { getCachedPack } from "./aiEvalPack";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 
 // ========== HELPERS ==========
@@ -737,7 +738,12 @@ export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
 
 export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, exerciceIdx?: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const termine = isFormationTerminee(f);
+  // IA générative (RS6776) : QCM complets générés même si la formation n'est pas terminée,
+  // à partir du pack d'évaluation en cache (seedé par le preset).
+  const _tIA = (f.intitule || "").toLowerCase();
+  const _isIAGen = _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
+  const evalPackIA = _isIAGen ? getCachedPack(f) : null;
+  const termine = isFormationTerminee(f) || !!evalPackIA;
   if (!termine) {
     return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX – FORMATION ${f.intitule.toUpperCase()}`, subtitle: `${s.prenom} ${s.nom}`,
       extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
@@ -852,6 +858,31 @@ C) Drop the passenger on the side of the road.
 D) Drive faster to finish the ride.`,
       reponseAttendue: `Réponses correctes : 1-C, 2-B, 3-B, 4-C, 5-B. Le candidat doit maîtriser en anglais les notions clés de réglementation VTC (durée carte pro 5 ans, TVA 10 %, devis obligatoire au-delà de 100 €), les obligations en cas d'objet trouvé et la conduite à tenir en cas d'urgence à bord (PSC1, appel 15/112), conformément au référentiel RS5637.`,
     });
+  }
+
+  // ====== IA GÉNÉRATIVE (RS6776) : remplacer par de vrais QCM (10 questions avec réponses) ======
+  if (evalPackIA) {
+    const pool = [...(evalPackIA.qcmFin || []), ...(evalPackIA.qcmDebut || [])]
+      .filter(qq => qq && qq.question && Array.isArray(qq.options) && qq.options.length >= 2);
+    if (pool.length >= 3) {
+      const lettersQ = ["A", "B", "C", "D"];
+      const themes = (evalData.exercices || []).map(e => (e.titre || "")
+        .replace(/^C\d+\s*[–\-]\s*/i, "")
+        .replace(/^Exercice\s*:\s*/i, "")
+        .trim());
+      const nQ = Math.min(10, pool.length);
+      const built = Array.from({ length: totalExNeeded }, (_, i) => {
+        const qs = Array.from({ length: nQ }, (_, k) => pool[(i * 3 + k) % pool.length]);
+        const consigne = qs
+          .map((qq, qi) => `${qi + 1}) ${qq.question}\n${qq.options.map((op, oi) => `${lettersQ[oi]}) ${op}`).join("   ")}`)
+          .join("\n\n");
+        const corr = qs.map((qq, qi) => `${qi + 1}-${lettersQ[Math.max(0, Math.min(3, qq.correctIndex ?? 0))]}`).join(", ");
+        const theme = themes[i % Math.max(1, themes.length)] || "Notions clés de la formation";
+        return { titre: `QCM ${i + 1} : ${theme}`, consigne, reponseAttendue: `Réponses correctes : ${corr}.` };
+      });
+      exercices.length = 0;
+      exercices.push(...built);
+    }
   }
 
   // Fill the remaining slots — 1 per day, alternating QCM / case study
