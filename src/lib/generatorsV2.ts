@@ -24,6 +24,7 @@ function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIR
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
+import { getCachedPack } from "./aiEvalPack";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 
 // ========== HELPERS ==========
@@ -737,7 +738,12 @@ export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
 
 export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, exerciceIdx?: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const termine = isFormationTerminee(f);
+  // IA générative (RS6776) : QCM complets générés même si la formation n'est pas terminée,
+  // à partir du pack d'évaluation en cache (seedé par le preset).
+  const _tIA = (f.intitule || "").toLowerCase();
+  const _isIAGen = _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
+  const evalPackIA = _isIAGen ? getCachedPack(f) : null;
+  const termine = isFormationTerminee(f) || !!evalPackIA;
   if (!termine) {
     return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX – FORMATION ${f.intitule.toUpperCase()}`, subtitle: `${s.prenom} ${s.nom}`,
       extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
