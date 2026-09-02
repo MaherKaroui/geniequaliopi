@@ -1447,6 +1447,32 @@ EVAL_CONTENT["GOTRM"] = {
   ],
 };
 
+// CQP Opérateur vitrage (RNCP36223) — contenu d'évaluation intégralement statique
+EVAL_CONTENT["Vitrage"] = {
+  ...DEFAULT_CONTENT,
+  qcmPositionnement: VITRAGE_EVAL_PACK.qcmDebut.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  qcmFinal: VITRAGE_EVAL_PACK.qcmFin.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  exercices: (VITRAGE_EVAL_PACK.evaluationFinale?.exercices || []).map(e => ({
+    titre: e.titre,
+    consigne: e.consigne,
+    reponseAttendue: e.reponseAttendue,
+  })),
+  competences: [
+    "Identifier un vitrage et sa référence à partir du VIN et du marquage d'homologation",
+    "Déposer et reposer un vitrage inamovible collé selon la procédure constructeur et fabricant",
+    "Préparer la baie : ravoir à 1-2 mm, contrôle et traitement de la corrosion",
+    "Encoller et poser un vitrage : cordon triangulaire continu, cales, contrôle des jeux et de l'étanchéité",
+    "Appliquer et expliquer le temps de sécurité au décollage (SDAT)",
+    "Déposer et reposer un vitrage amovible et remettre en service un lève-vitre",
+    "Repérer les équipements ADAS et déclencher la procédure de calibrage adaptée",
+    "Diagnostiquer la réparabilité d'un impact selon les critères cumulatifs",
+    "Réaliser une réparation d'impact à la résine et en contrôler la qualité",
+    "Accueillir le client, annoncer un diagnostic et traiter le dossier assurance (franchise, cession de créance)",
+    "Proposer une prestation additionnelle à partir d'un constat réel, sans forcer la vente",
+    "Appliquer les règles HSE du poste vitrage et la filière déchets du verre feuilleté",
+  ],
+};
+
 
 export function getEvalContent(formationIntitule: string): FormationEvalContent {
   const key = getContentKey(formationIntitule);
