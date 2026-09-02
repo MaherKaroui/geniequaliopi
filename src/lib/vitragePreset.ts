@@ -688,14 +688,32 @@ export const VITRAGE_REPONSES_OUVERTES: VitrageReponsesOuvertes = {
   },
 };
 
+const VITRAGE_IDENTITES: Record<string, string> = {
+  FERREIRA: "ANTONIO",
+  "TRAORÉ": "MOUSSA",
+  TRAORE: "MOUSSA",
+  CHAUVIN: "SANDRINE",
+  NGUYEN: "KEVIN",
+  BOUZID: "SOFIANE",
+  LEMAIRE: "JULIE",
+};
+
+const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+
 /** Retourne les réponses écrites à la main pour un stagiaire vitrage, ou null. */
-export function getVitrageManualAnswers(nom: string | undefined, isDebut: boolean): { reponses: string[]; scores: number[] } | null {
-  if (!nom) return null;
-  const key = nom.trim().toUpperCase();
+export function getVitrageManualAnswers(
+  nom: string | undefined,
+  isDebut: boolean,
+  prenom?: string,
+): { reponses: string[]; scores: number[] } | null {
+  if (!nom || !prenom) return null;
+  const cleNom = norm(nom);
+  const attendu = VITRAGE_IDENTITES[cleNom] || VITRAGE_IDENTITES[norm(nom)];
+  if (!attendu || norm(prenom) !== norm(attendu)) return null; // nom homonyme d'une autre formation : on sort
   const bank = isDebut ? VITRAGE_REPONSES_OUVERTES.debut : VITRAGE_REPONSES_OUVERTES.fin;
   const scores = isDebut ? VITRAGE_REPONSES_OUVERTES.scoresDebut : VITRAGE_REPONSES_OUVERTES.scoresFin;
-  const reponses = bank[key] || bank[key.replace(/É/g, "E")] || (key === "TRAORE" ? bank["TRAORÉ"] : undefined);
-  const sc = scores[key] || scores[key.replace(/É/g, "E")] || (key === "TRAORE" ? scores["TRAORÉ"] : undefined);
+  const reponses = bank[cleNom] || bank[nom.trim().toUpperCase()];
+  const sc = scores[cleNom] || scores[nom.trim().toUpperCase()];
   if (!reponses || !sc) return null;
   return { reponses, scores: sc };
 }
