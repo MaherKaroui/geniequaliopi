@@ -860,6 +860,31 @@ D) Drive faster to finish the ride.`,
     });
   }
 
+  // ====== IA GÉNÉRATIVE (RS6776) : remplacer par de vrais QCM (10 questions avec réponses) ======
+  if (evalPackIA) {
+    const pool = [...(evalPackIA.qcmFin || []), ...(evalPackIA.qcmDebut || [])]
+      .filter(qq => qq && qq.question && Array.isArray(qq.options) && qq.options.length >= 2);
+    if (pool.length >= 3) {
+      const lettersQ = ["A", "B", "C", "D"];
+      const themes = (evalData.exercices || []).map(e => (e.titre || "")
+        .replace(/^C\d+\s*[–\-]\s*/i, "")
+        .replace(/^Exercice\s*:\s*/i, "")
+        .trim());
+      const nQ = Math.min(10, pool.length);
+      const built = Array.from({ length: totalExNeeded }, (_, i) => {
+        const qs = Array.from({ length: nQ }, (_, k) => pool[(i * 3 + k) % pool.length]);
+        const consigne = qs
+          .map((qq, qi) => `${qi + 1}) ${qq.question}\n${qq.options.map((op, oi) => `${lettersQ[oi]}) ${op}`).join("   ")}`)
+          .join("\n\n");
+        const corr = qs.map((qq, qi) => `${qi + 1}-${lettersQ[Math.max(0, Math.min(3, qq.correctIndex ?? 0))]}`).join(", ");
+        const theme = themes[i % Math.max(1, themes.length)] || "Notions clés de la formation";
+        return { titre: `QCM ${i + 1} : ${theme}`, consigne, reponseAttendue: `Réponses correctes : ${corr}.` };
+      });
+      exercices.length = 0;
+      exercices.push(...built);
+    }
+  }
+
   // Fill the remaining slots — 1 per day, alternating QCM / case study
   for (let i = exercices.length; i < totalExNeeded; i++) {
     const blockIdx = i;
