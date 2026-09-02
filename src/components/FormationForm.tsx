@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -281,6 +281,22 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         seedSecretariatAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires Secrétariat + contenus IA pré-remplis`);
+      } else if (
+        intituleLower.includes("création de contenus") ||
+        intituleLower.includes("creation de contenus") ||
+        intituleLower.includes("contenus rédactionnels") ||
+        intituleLower.includes("intelligence artificielle générative") ||
+        intituleLower.includes("ia générative")
+      ) {
+        // Auto-import IA générative RS6776
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...IA_GENERATIVE_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_IA_GENERATIVE]);
+        }
+        seedIAGenerativeAICaches();
+        toast.success(`Organisme IZIBUSINESS + 6 stagiaires IA générative + contenus IA pré-remplis (RS6776)`);
       }
     }
   };
