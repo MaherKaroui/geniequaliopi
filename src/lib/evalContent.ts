@@ -1,6 +1,7 @@
 // Formation-specific QCM questions, exercises, and evaluation content
 import { getCachedContentPack } from "./aiContentPack";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
+import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
 
 
 
