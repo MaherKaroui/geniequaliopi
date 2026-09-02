@@ -246,6 +246,19 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
       }
+      // Auto-import organisme + 6 stagiaires + contenus IA pour CQP Opérateur vitrage (RNCP36223)
+      const lowerVitrage = selected.intitule.toLowerCase();
+      if (lowerVitrage.includes("vitrage") || lowerVitrage.includes("rncp36223") || lowerVitrage.includes("pare-brise")) {
+        onChange({ ...selected, codeRNCP: "RNCP36223" });
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...VITRAGE_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_VITRAGE]);
+        }
+        seedVitrageAICaches();
+        toast.success(`Organisme IZIBUSINESS + 6 stagiaires CQP Opérateur vitrage + contenus pré-remplis (besoins, QCM, exercices, veilles, support de cours)`);
+      }
       // Auto-import organisme + 6 stagiaires + contenus IA pour Assistant ressources humaines (RNCP35030)
       if (selected.intitule.toLowerCase().includes("ressources humaines") || selected.intitule.toLowerCase().includes("rncp35030") || selected.intitule.toLowerCase().includes("(arh)")) {
         onChange({ ...selected, codeRNCP: "RNCP35030" });
