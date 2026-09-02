@@ -1336,6 +1336,8 @@ EVAL_CONTENT["Restauration"] = {
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
+  // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
+  if (lower.includes("vitrage") || lower.includes("rncp36223") || lower.includes("pare-brise") || lower.includes("pare brise")) return "Vitrage";
   if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
