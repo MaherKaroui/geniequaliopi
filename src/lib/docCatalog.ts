@@ -210,6 +210,7 @@ export function buildFullCatalog(
           "Accueil, téléphone et anglais pro",
           "Organisation, archivage et employabilité",
         ];
+        const isIAForm = tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative");
         const moduleTitles = isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
         let nbQcm: number;
@@ -231,9 +232,9 @@ export function buildFullCatalog(
             continue;
           }
           const exTitle = evalData?.exercices?.[exIdx % Math.max(1, nbExContent)]?.titre;
-          const isQcm = exTitle ? /^QCM\b/i.test(exTitle) : (exIdx % 2 === 0);
+          const isQcm = exTitle ? (/^QCM\b/i.test(exTitle) || isIAForm) : (exIdx % 2 === 0);
           const labelBase = exTitle
-            ? exTitle.replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").replace(/^Exercice\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
+            ? exTitle.replace(/^C\d+\s*[–\-]\s*Exercice\s*:\s*/i, "").replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").replace(/^Exercice\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
             : (hasBlocs && rncp!.blocsCompetences[exIdx]?.titre)
               ? rncp!.blocsCompetences[exIdx].titre.substring(0, 50)
               : `Jour ${exIdx + 1}`;
