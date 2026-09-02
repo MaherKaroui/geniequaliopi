@@ -277,6 +277,20 @@ const YOUTUBE_PAIE: CourseData['youtubeVideos'] = [
 ];
 
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
+const YOUTUBE_VITRAGE: CourseData['youtubeVideos'] = [
+  { title: "Remplacement d'un pare-brise : démontage et pose", url: "https://www.youtube.com/watch?v=aBJSWh6WRBQ", description: "Enchaînement complet dépose puis pose. Support des jours 4 et 5." },
+  { title: "VBSA — Processus de collage pare-brise", url: "https://www.youtube.com/watch?v=6xHrxiYqzRg", description: "Préparation, primaire, encollage, pose. Support du jour 5." },
+  { title: "Tutoriel : comment démonter un pare-brise collé", url: "https://www.youtube.com/watch?v=QO7zJS3xOKg", description: "Technique de dépose d'un vitrage collé. Support du jour 4." },
+  { title: "Tutoriel SmartCut — changer un pare-brise", url: "https://www.youtube.com/watch?v=B7DqlKWVtH4", description: "Mallette d'outillage complète pour une dépose rapide. Support du jour 3." },
+  { title: "Dépose et pose de pare-brise par un seul opérateur (Fixoglass VL)", url: "https://www.youtube.com/watch?v=x7stHvdAJkg", description: "Intervention en autonomie, utile pour l'intervention mobile." },
+  { title: "Comment démonter un pare-brise collé", url: "https://www.youtube.com/watch?v=D7-ZfpVmtCk", description: "Variante de méthode de découpe. Support du jour 4." },
+  { title: "Remplacement du pare-brise : la technique en 20 minutes", url: "https://www.youtube.com/watch?v=LyT-Oo2RAMs", description: "Dépose à l'aide d'un câble. Support du jour 4." },
+  { title: "Réparer un impact sur pare-brise avec de la résine", url: "https://www.youtube.com/watch?v=pTRSC_uEwhc", description: "Cycle complet de réparation. Support du jour 10." },
+  { title: "Comment réparer un impact de pare-brise", url: "https://www.youtube.com/watch?v=jDfO95N2QyM", description: "Deuxième démonstration du cycle vide / injection / UV. Support du jour 10." },
+  { title: "Kit de réparation pare-brise : mise en œuvre", url: "https://www.youtube.com/watch?v=nTF7AClpPAk", description: "Comparaison kit grand public / matériel professionnel. Support du jour 10." },
+  { title: "Playlist — Vidéos techniques pose et dépose de pare-brise", url: "https://www.youtube.com/playlist?list=PLGUfGqEvX3U6FHIQpe_YVCmKXxN4sk2UI", description: "Collection mise à disposition des stagiaires pour révision." },
+];
+
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
   // Nettoie : retire codes RNCP/RS, parenthèses
@@ -297,6 +311,8 @@ function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtube
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
+  // CQP Opérateur vitrage (RNCP36223)
+  if (t.includes('vitrage') || t.includes('rncp36223') || t.includes('pare-brise') || t.includes('pare brise')) return YOUTUBE_VITRAGE;
   // Massages spécifiques (avant générique)
   if (t.includes('postpartum') || t.includes('post-partum') || t.includes('post partum') || t.includes('postnatal') || t.includes('post-natal') || t.includes('post natal')) return YOUTUBE_MASSAGE_POSTPARTUM;
   if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
@@ -463,6 +479,7 @@ import { getMaquillageChapters } from "./courseContentMaquillage";
 import { getPaieChapters } from "./courseContentPaie";
 import { getSecretariatChapters } from "./courseContentSecretariat";
 import { getGOTRMChapters } from "./courseContentGOTRM";
+import { getVitrageChapters } from "./courseContentVitrage";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -494,6 +511,8 @@ function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
 }
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
+  const t0 = formationIntitule.toLowerCase();
+  if (t0.includes('vitrage') || t0.includes('rncp36223') || t0.includes('pare-brise') || t0.includes('pare brise')) return getVitrageChapters();
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
