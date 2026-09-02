@@ -54,6 +54,7 @@ import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
 import { pickCreaComment, isCreationEntrepriseFormation, CREA_BESOINS } from "./creationEntreprisePreset";
+import { pickIAComment, isIAGenerativeFormation } from "./iaGenerativePreset";
 import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 
@@ -16721,6 +16722,10 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const creaSeed = isCrea
     ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 7 : 17))
     : 0;
+  const isIA = isIAGenerativeFormation(f.intitule || "");
+  const iaSeed = isIA
+    ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 9 : 19))
+    : 0;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
@@ -16742,7 +16747,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
         ? pickWordComment(mode as "debut" | "fin", qi, wordSeed)
         : isCrea
           ? pickCreaComment(mode as "debut" | "fin", qi, creaSeed)
-          : "";
+          : isIA
+            ? pickIAComment(mode as "debut" | "fin", qi, iaSeed)
+            : "";
     const humanNote = humanCommentText
       ? `<br><em style="color:#475569;font-size:0.92em">« ${humanCommentText} »</em>`
       : "";
