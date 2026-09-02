@@ -200,12 +200,12 @@ async function __requireAuth(req: Request): Promise<Response | null> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders }
+    return new Response(null, { headers: corsHeaders });
+  }
 
   const __authErr = await __requireAuth(req);
   if (__authErr) return __authErr;
-);
-  }
+
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
