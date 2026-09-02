@@ -139,7 +139,7 @@ const IA_GENERATIVE_CONTENT_PACK: AIContentPack = {
 // ---------------------------------------------------------------------------
 const q = (question: string, options: string[], correctIndex: number) => ({ question, options, correctIndex });
 
-const IA_GENERATIVE_EVAL_PACK: AIEvalPack = {
+export const IA_GENERATIVE_EVAL_PACK: AIEvalPack = {
   qcmDebut: [
     q("L'IA générative est principalement capable de :", ["Analyser uniquement des tableaux Excel", "Créer du contenu nouveau à partir d'instructions", "Réparer du matériel informatique", "Gérer des bases de données SQL"], 1),
     q("Parmi ces outils, lequel est spécialisé dans la génération d'images ?", ["ChatGPT", "Microsoft Copilot", "Midjourney", "Claude"], 2),
