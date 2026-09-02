@@ -182,8 +182,11 @@ import { FORMATION_ARH } from "./arhPreset";
 export { ARH_ORG, STAGIAIRES_ARH, FORMATION_ARH, seedARHAICaches } from "./arhPreset";
 import { FORMATION_IA_GENERATIVE } from "./iaGenerativePreset";
 export { IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, FORMATION_IA_GENERATIVE, seedIAGenerativeAICaches } from "./iaGenerativePreset";
+import { FORMATION_VITRAGE } from "./vitragePreset";
+export { VITRAGE_ORG, STAGIAIRES_VITRAGE, FORMATION_VITRAGE, seedVitrageAICaches } from "./vitragePreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
+  FORMATION_VITRAGE,
   FORMATION_PAIE,
   FORMATION_SECRETARIAT,
   FORMATION_SAMA,
