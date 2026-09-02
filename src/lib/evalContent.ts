@@ -1,6 +1,7 @@
 // Formation-specific QCM questions, exercises, and evaluation content
 import { getCachedContentPack } from "./aiContentPack";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
+import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
 
 
 
@@ -1336,6 +1337,8 @@ EVAL_CONTENT["Restauration"] = {
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
+  // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
+  if (lower.includes("vitrage") || lower.includes("rncp36223") || lower.includes("pare-brise") || lower.includes("pare brise")) return "Vitrage";
   if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
@@ -1441,6 +1444,32 @@ EVAL_CONTENT["GOTRM"] = {
     "Manager une équipe de conducteurs (éco-conduite, entretien annuel, plan de formation)",
     "Appliquer l'éthique métier et refuser toute pratique non conforme (RSE, travail dissimulé)",
     "Préparer et soutenir la MSP TP-01329 (10 h sur 2 jours) devant le jury",
+  ],
+};
+
+// CQP Opérateur vitrage (RNCP36223) — contenu d'évaluation intégralement statique
+EVAL_CONTENT["Vitrage"] = {
+  ...DEFAULT_CONTENT,
+  qcmPositionnement: VITRAGE_EVAL_PACK.qcmDebut.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  qcmFinal: VITRAGE_EVAL_PACK.qcmFin.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  exercices: (VITRAGE_EVAL_PACK.evaluationFinale?.exercices || []).map(e => ({
+    titre: e.titre,
+    consigne: e.consigne,
+    reponseAttendue: e.reponseAttendue,
+  })),
+  competences: [
+    "Identifier un vitrage et sa référence à partir du VIN et du marquage d'homologation",
+    "Déposer et reposer un vitrage inamovible collé selon la procédure constructeur et fabricant",
+    "Préparer la baie : ravoir à 1-2 mm, contrôle et traitement de la corrosion",
+    "Encoller et poser un vitrage : cordon triangulaire continu, cales, contrôle des jeux et de l'étanchéité",
+    "Appliquer et expliquer le temps de sécurité au décollage (SDAT)",
+    "Déposer et reposer un vitrage amovible et remettre en service un lève-vitre",
+    "Repérer les équipements ADAS et déclencher la procédure de calibrage adaptée",
+    "Diagnostiquer la réparabilité d'un impact selon les critères cumulatifs",
+    "Réaliser une réparation d'impact à la résine et en contrôler la qualité",
+    "Accueillir le client, annoncer un diagnostic et traiter le dossier assurance (franchise, cession de créance)",
+    "Proposer une prestation additionnelle à partir d'un constat réel, sans forcer la vente",
+    "Appliquer les règles HSE du poste vitrage et la filière déchets du verre feuilleté",
   ],
 };
 
@@ -2107,6 +2136,34 @@ QUESTIONS_OUVERTES["Paie"] = {
   ],
 };
 
+// CQP Opérateur vitrage (RNCP36223) — 10 questions ouvertes début / 10 fin
+QUESTIONS_OUVERTES["Vitrage"] = {
+  debut: [
+    { question: "Décrivez, dans l'ordre, les étapes de la dépose et de la repose d'un pare-brise collé.", reponseAttendue: "Protection du véhicule, identification du vitrage par le VIN, dépose des périphériques et débranchement des capteurs, découpe du cordon, extraction à deux à la ventouse, ravoir à 1-2 mm, préparation du vitrage neuf (nettoyant, activateur, primaire, flash-off), encollage en cordon triangulaire continu, pose sur cales avec pression uniforme, remontage, calibrage ADAS, essai d'étanchéité, traçabilité sur l'OR et consignes au client." },
+    { question: "Qu'est-ce que le temps de sécurité au décollage (SDAT) et qui le fixe ?", reponseAttendue: "Délai minimal avant remise en circulation, fixé par le fabricant de la colle. Il dépend du produit, de la température et de l'hygrométrie. Avant ce délai, le collage n'a pas atteint sa résistance : le pare-brise participe à la rigidité de la caisse et sert d'appui à l'airbag passager." },
+    { question: "Qu'appelle-t-on le ravoir et quelle épaisseur de cordon conserve-t-on ?", reponseAttendue: "Raser l'ancien cordon en laissant 1 à 2 mm réguliers, car la colle neuve adhère mieux sur elle-même que sur la peinture. On ne recherche jamais la mise à nu ; en cas de mise à nu : dégraissage, primaire anticorrosion, respect du temps de séchage." },
+    { question: "Quels critères permettent de décider si un impact est réparable ?", reponseAttendue: "Critères cumulatifs : taille dans les limites, hors champ de vision du conducteur, distance suffisante au bord, absence de fissure ramifiée, hors zone caméra ADAS, film PVB intact, impact propre, sec et non déjà réparé. Un seul critère d'exclusion impose le remplacement ; dans le doute, on remplace." },
+    { question: "Décrivez le cycle de réparation d'un impact à la résine.", reponseAttendue: "Vitrage sec et à température, nettoyage et ouverture du point d'impact, injecteur centré sur son support à ventouses, cycles alternés vide/pression jusqu'à disparition de l'effet miroir dans toutes les branches, polymérisation UV, résine de finition sous film, nouveau passage UV, arasage à la lame à plat, polissage, contrôle des deux faces et photos avant/après." },
+    { question: "Que faut-il faire après le remplacement d'un pare-brise sur un véhicule équipé d'une caméra ADAS ?", reponseAttendue: "Réaliser un calibrage selon la procédure constructeur, statique (mires, aire plane, outil de diagnostic) et/ou dynamique (route, vitesse imposée). Sans calibrage : systèmes inopérants ou intempestifs, responsabilité de l'atelier engagée. Un procès-verbal de calibrage est remis au client et archivé." },
+    { question: "Comment remet-on en service un lève-vitre après remplacement d'une glace latérale ?", reponseAttendue: "Aspiration complète des débris dans le caisson et les coulisses, mise en place de la glace dans les pinces et serrage au couple, réglage du parallélisme, de l'affleurement et des butées, réinitialisation de l'anti-pincement selon la procédure constructeur, repose du pare-vapeur avec son mastic butyle, repose de la garniture et essais." },
+    { question: "Comment annoncez-vous à un client que son impact n'est pas réparable ?", reponseAttendue: "Montrer physiquement le dommage, nommer le critère bloquant en langage simple, expliquer la conséquence concrète, proposer immédiatement le remplacement avec délai, immobilisation, SDAT et prix, puis vérifier la garantie bris de glace, annoncer la franchise et proposer la cession de créance. Jamais de refus sans explication." },
+    { question: "Comment proposez-vous une prestation additionnelle sans forcer la vente ?", reponseAttendue: "Partir d'un constat réel fait sur le véhicule, le montrer au client, expliquer le bénéfice pour lui, annoncer clairement le prix et l'impact sur l'immobilisation, laisser choisir et accepter le refus sans insister. Interdits : proposer sans constat, présenter une option comme obligatoire, insister après un refus." },
+    { question: "Quelles règles d'hygiène, de sécurité et de gestion des déchets s'appliquent au poste vitrage ?", reponseAttendue: "EPI : gants anti-coupure, gants nitriles pour les produits, lunettes, chaussures de sécurité. Risque chimique lié aux isocyanates des colles polyuréthane : ventilation, lecture des FDS, jamais d'espace confiné. Manutention à deux ou à la ventouse double. Déchets : pare-brise feuilleté en filière spécifique (séparation verre/PVB), cartouches et chiffons souillés en déchets dangereux avec bordereau de suivi." },
+  ],
+  fin: [
+    { question: "À l'issue de la formation, décrivez la gamme complète de dépose et repose d'un pare-brise collé et justifiez chaque point de contrôle.", reponseAttendue: "Protection, identification par le VIN, dépose des périphériques et débranchement des capteurs, découpe adaptée, extraction à deux, ravoir à 1-2 mm, traitement anticorrosion si mise à nu, préparation du vitrage neuf avec respect du flash-off, cordon triangulaire continu, pose sur cales avec pression uniforme, contrôle des jeux, remontage, calibrage ADAS, essai d'étanchéité, traçabilité (référence, lot de colle, SDAT) et consignes de restitution." },
+    { question: "Expliquez le temps de sécurité au décollage et la manière de l'annoncer au client.", reponseAttendue: "Délai fixé par le fabricant de la colle, variable selon le produit, la température et l'hygrométrie, inscrit sur l'OR avec l'heure de fin de pose. Annonce dès le devis : heure précise de disponibilité, justification par la sécurité (rigidité de la caisse, appui de l'airbag passager). Aucune dérogation possible." },
+    { question: "Expliquez le ravoir et le traitement d'une mise à nu de la tôle.", reponseAttendue: "Cordon résiduel de 1 à 2 mm réguliers comme support d'accroche. Jamais de mise à nu volontaire ; changer de lame plutôt que forcer. En cas de mise à nu : dépoussiérage, dégraissage, primaire anticorrosion sur la zone concernée, respect intégral du temps de séchage. Toute corrosion existante est traitée avant pose." },
+    { question: "Énoncez les critères de réparabilité d'un impact et la règle du doute.", reponseAttendue: "Sept critères cumulatifs : taille, localisation hors champ de vision, distance au bord, absence de fissure ramifiée, hors zone caméra, PVB intact, impact propre et non déjà réparé. Un seul critère d'exclusion impose le remplacement. Méthode : nettoyer, mesurer au gabarit, observer les deux faces en lumière rasante, photographier, tracer la décision sur l'OR. Dans le doute, on ne répare pas." },
+    { question: "Décrivez le cycle complet de réparation à la résine et son critère d'arrêt.", reponseAttendue: "Conditions (vitrage sec, à température, hors soleil), nettoyage et ouverture du point d'impact, injecteur centré, cycles vide/pression poursuivis jusqu'à disparition complète de l'effet miroir dans toutes les branches, polymérisation UV, résine de finition sous film, UV, arasage à plat, polissage, contrôle des deux faces, photos avant/après, information du client sur la trace résiduelle." },
+    { question: "Expliquez les conséquences d'un remplacement de pare-brise sur les ADAS et le contenu du PV de calibrage.", reponseAttendue: "La position et l'angle de la caméra changent : calibrage obligatoire, statique et/ou dynamique selon le constructeur. Sans calibrage : freinage d'urgence et maintien dans la voie inopérants ou intempestifs, responsabilité de l'atelier, litige assurance. PV : VIN, immatriculation, km, date/heure, référence du vitrage, type de calibrage, outil et version logicielle, résultat validé, nom et visa du technicien." },
+    { question: "Détaillez la remise en service d'un lève-vitre et les contrôles finaux.", reponseAttendue: "Aspiration complète des débris, glace dans les pinces et serrage au couple, réglages parallélisme/affleurement/butées, réinitialisation de l'anti-pincement selon la procédure constructeur, repose du pare-vapeur avec mastic butyle (étanchéité de la porte), repose de la garniture, essais montée/descente et impulsion, contrôle de l'absence de bruit d'air, nettoyage." },
+    { question: "Conduisez l'annonce d'un diagnostic négatif à un client mécontent.", reponseAttendue: "Accueil et écoute, reformulation, examen contradictoire devant le client, dommage montré, critère bloquant nommé simplement, conséquence expliquée, solution de remplacement proposée avec délai, SDAT et prix, vérification de la garantie bris de glace, annonce de la franchise, proposition de cession de créance, créneau proposé et confirmation écrite. Ni agressivité ni promesse intenable." },
+    { question: "Construisez une proposition de prestation additionnelle à partir d'un constat réel.", reponseAttendue: "Constat réel montré au client (balais fendus, optiques opacifiées, lave-glace vide), bénéfice expliqué de son point de vue, prix annoncé clairement, absence d'immobilisation supplémentaire précisée, choix laissé, refus accepté et noté pour le passage suivant. Aucune proposition sans constat, aucun lien avec la prise en charge assurance." },
+    { question: "Présentez l'organisation HSE de votre poste : EPI, risque chimique, manutention, filière déchets.", reponseAttendue: "EPI : gants anti-coupure et nitriles, lunettes, chaussures de sécurité, vêtement couvrant. Risque chimique : isocyanates des colles polyuréthane, sensibilisants respiratoires et cutanés, ventilation, lecture des FDS, jamais en espace confiné. Manutention à deux ou ventouse double, dos droit, chevalet préparé. Poste 5S. Déchets : feuilleté en filière spécifique, verre trempé en filière verre technique, cartouches, primaires et chiffons souillés en déchets dangereux avec bordereau de suivi ; en mobile, bac embarqué et retour à l'atelier." },
+  ],
+};
+
 
 
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
@@ -2294,6 +2351,20 @@ export function generateStagiaireOpenAnswers(
   isDebut: boolean,
   stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
 ): StagiaireOpenAnswer[] {
+  // Réponses écrites à la main (CQP Opérateur vitrage) : une copie différente par stagiaire.
+  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut);
+  if (manualVitrage) {
+    return questions.map((_q, qi) => {
+      const reponse = manualVitrage.reponses[qi] ?? manualVitrage.reponses[qi % manualVitrage.reponses.length];
+      const score = manualVitrage.scores[qi] ?? manualVitrage.scores[qi % manualVitrage.scores.length];
+      return {
+        reponse,
+        score,
+        feedback: score >= 1 ? "Bonne réponse" : score >= 0.5 ? "Réponse partielle" : "Réponse incomplète",
+      };
+    });
+  }
+
   const profile = getStagiaireTestProfile(stagiaireIndex);
   
   // First pass: generate raw answers

@@ -19,6 +19,85 @@ export interface RNCPFiche {
 
 export const RNCP_FICHES: RNCPFiche[] = [
   {
+    code: "RNCP36223",
+    intitule: "CQP Opérateur vitrage",
+    niveau: "Niveau 3 (CAP/BEP)",
+    certificateur: "ANFA — Branche des services de l'automobile (CPNE)",
+    dateEnregistrement: "25/02/2022",
+    dateEcheance: "25/02/2027",
+    codeNSF: "252r – Réparation - maintenance de véhicules à moteur",
+    formacodes: "23631 – Carrosserie / 23632 – Vitrage automobile",
+    resume: "Le titulaire du CQP Opérateur vitrage réalise le remplacement des vitrages d'un véhicule automobile (pare-brise et lunette collés, glaces latérales et custodes) ainsi que la réparation des impacts sur vitrage feuilleté. Il repère les équipements d'aide à la conduite associés au pare-brise et déclenche la procédure de calibrage. Il assure l'accueil de la clientèle, le recueil du besoin, la restitution du véhicule et le traitement du dossier de prise en charge par l'assureur. Fiche accessible sur France Compétences : https://www.francecompetences.fr/recherche/rncp/36223/",
+    activitesVisees: "Préparation du poste et du véhicule, identification du vitrage à partir du VIN et du marquage d'homologation, dépose et repose des vitrages inamovibles collés, préparation de la baie (ravoir, traitement anticorrosion), encollage et pose selon les préconisations du fabricant de colle et du constructeur, dépose et repose des vitrages amovibles et remise en service des mécanismes de lève-vitre, diagnostic de réparabilité d'un impact et réparation à la résine, repérage des systèmes d'aide à la conduite et déclenchement du calibrage, accueil et conseil de la clientèle, traitement du dossier assurance, application des règles d'hygiène, de sécurité et d'environnement propres au vitrage automobile.",
+    blocsCompetences: [
+      {
+        titre: "BC01 — Remplacement des vitrages",
+        competences: [
+          "Préparer le poste de travail et le véhicule dans le respect des règles d'hygiène et de sécurité",
+          "Identifier le vitrage et sa référence à partir du VIN, des options et du marquage d'homologation",
+          "Déposer un vitrage inamovible collé et préparer la baie (ravoir, traitement anticorrosion)",
+          "Encoller et poser un vitrage inamovible selon les préconisations fabricant et constructeur",
+          "Déposer et reposer un vitrage amovible et remettre en service un mécanisme de lève-vitre",
+          "Repérer les équipements d'aide à la conduite et déclencher la procédure de calibrage",
+          "Contrôler la conformité de l'intervention et renseigner la traçabilité",
+        ],
+        matieres: [
+          { competence: "Hygiène, sécurité, environnement et organisation du poste", contenu: "EPI, risque chimique (isocyanates), manutention et prévention des TMS, méthode 5S, filière déchets du vitrage feuilleté", volume: "7h" },
+          { competence: "Technologie du vitrage automobile", contenu: "Verre feuilleté et film PVB, verre trempé, vitrages athermique, acoustique, chauffant, zones capteurs, marquage et homologation ONU R43, identification par le VIN", volume: "7h" },
+          { competence: "Outillage et systèmes de collage", contenu: "Systèmes à fil, lames oscillantes, ventouses, pistolets ; nettoyant, activateur, primaire, colle polyuréthane, temps de flash-off et temps de sécurité au décollage", volume: "7h" },
+          { competence: "Dépose et repose d'un vitrage collé", contenu: "Protection du véhicule, dépose des périphériques, découpe, extraction, ravoir, anticorrosion, encollage, pose, contrôles et essai d'étanchéité", volume: "21h" },
+          { competence: "Vitrages amovibles et lève-vitres", contenu: "Garniture de porte, pare-vapeur, aspiration des débris, pose et serrage au couple, réglages, réinitialisation de l'anti-pincement, lunette chauffante", volume: "7h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle sur véhicule (2h30) : dépose et repose d'un pare-brise collé avec déclenchement de la procédure de calibrage. Mise en situation professionnelle (1h15) : remplacement d'un vitrage amovible et remise en service du lève-vitre. Évaluation par un jury paritaire de branche.",
+      },
+      {
+        titre: "BC02 — Réparation d'un impact",
+        competences: [
+          "Réaliser le diagnostic de réparabilité d'un impact selon les critères cumulatifs",
+          "Argumenter et tracer la décision de réparation ou de remplacement",
+          "Réaliser la réparation d'un impact à la résine et en contrôler la qualité",
+        ],
+        matieres: [
+          { competence: "Systèmes d'aide à la conduite (ADAS)", contenu: "Repérage des équipements, calibrage statique et dynamique, procès-verbal de calibrage, responsabilités", volume: "7h" },
+          { competence: "Diagnostic de réparabilité", contenu: "Typologie des dommages, critères cumulatifs, règle du doute, mesure au gabarit, traçabilité photographique", volume: "7h" },
+          { competence: "Réparation à la résine", contenu: "Ouverture du point d'impact, cycles vide/pression, disparition de l'effet miroir, polymérisation UV, finition, arasage, polissage, contrôle qualité", volume: "7h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (15 min) : diagnostic de réparabilité et décision argumentée sur trois vitrages endommagés. Mise en situation professionnelle (1h15) : réparation complète d'un impact à la résine avec contrôle qualité et traçabilité.",
+      },
+      {
+        titre: "BC03 — Accueil de la clientèle et relation de service",
+        competences: [
+          "Accueillir le client, recueillir son besoin et réaliser l'examen contradictoire du véhicule",
+          "Annoncer un diagnostic, y compris un refus de réparation, en langage clair et argumenté",
+          "Traiter le dossier de prise en charge par l'assureur (garantie bris de glace, franchise, cession de créance)",
+          "Proposer une prestation additionnelle à partir d'un constat réel et traiter une réclamation",
+        ],
+        matieres: [
+          { competence: "Accueil et recueil du besoin", contenu: "Trame d'accueil, écoute et reformulation, examen contradictoire, photographies datées", volume: "7h" },
+          { competence: "Assurance et relation de service", contenu: "Garantie bris de glace, franchise, cession de créance, pièces du dossier, prestation additionnelle, traitement d'une réclamation", volume: "7h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (15 min) : jeu de rôle d'accueil client, annonce d'un diagnostic négatif et traitement du dossier assurance, suivi d'un entretien technique avec le jury.",
+      },
+    ],
+    secteursActivite: "Centres et réseaux spécialisés dans le vitrage automobile, carrosseries, concessions et agents de marque, ateliers d'entretien rapide, entreprises d'intervention mobile à domicile, services après-vente de loueurs et de gestionnaires de flottes.",
+    typesEmplois: [
+      "Opérateur vitrage",
+      "Monteur en vitrage automobile",
+      "Poseur de pare-brise",
+      "Technicien vitrage mobile",
+      "Opérateur pose et réparation de vitrage",
+    ],
+    codesROME: ["I1606 – Réparation de carrosserie", "I1604 – Mécanique automobile et entretien de véhicules"],
+    voiesAcces: [
+      "Formation initiale",
+      "Formation continue",
+      "Contrat de professionnalisation",
+      "Apprentissage",
+      "VAE",
+    ],
+    dureeIndicative: "90 heures en formation continue (13 jours ouvrés), dont 60 % de plateau technique",
+  },
+  {
     code: "RNCP39063",
     intitule: "TP - Négociateur technico-commercial",
     niveau: "Niveau 5 (Bac+2)",
