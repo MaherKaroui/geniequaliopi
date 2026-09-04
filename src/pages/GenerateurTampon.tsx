@@ -113,11 +113,8 @@ const GenerateurTampon = () => {
 
   const admPadding = Math.round(admBodySize * 0.8);
   const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
-  const rawSignatureWidth = (size * signatureSize) / 100;
-  const rawSignatureHeight = rawSignatureWidth * (signatureAspectRatio ?? 0.28);
-  const admSignatureBand = isAdmin && signatureUrl ? Math.ceil(rawSignatureHeight + admBodySize * 0.5) : 0;
-  const admTextStartY = admPadding + admSignatureBand;
-  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2 + admSignatureBand)) : size;
+  const admTextStartY = admPadding;
+  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
 
   const getImageAspectRatio = (src: string): Promise<number> =>
     new Promise((resolve) => {
@@ -127,19 +124,14 @@ const GenerateurTampon = () => {
       image.src = src;
     });
 
-  const getAdminSignatureDefaultY = (aspectRatio = 0.28, signatureScale = 35) => {
-    const signatureHeight = ((size * signatureScale) / 100) * aspectRatio;
-    const band = signatureHeight + admBodySize * 0.5;
-    const totalHeight = admContentHeight + admPadding * 2 + band;
-    return totalHeight > 0 ? clamp((band / 2 / totalHeight) * 100, 0, 100) : 50;
-  };
-
-  const applySignatureDefaults = (aspectRatio = 0.28) => {
+  const applySignatureDefaults = () => {
     setSignatureX(50);
     if (isAdmin) {
-      setSignatureSize(35);
-      setSignatureY(getAdminSignatureDefaultY(aspectRatio, 35));
+      // Signature posée au centre du bloc, à l'intérieur du tampon
+      setSignatureSize(45);
+      setSignatureY(50);
     } else {
+      setSignatureSize(40);
       setSignatureY(70);
     }
   };
