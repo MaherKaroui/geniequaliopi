@@ -120,8 +120,8 @@ const GenerateurTampon = () => {
 
     const sigW = (size * signatureSize) / 100;
     const sigH = sigW * (signatureAspectRatio ?? 0.28);
-    const centerX = clamp((size * signatureX) / 100, sigW / 2, size - sigW / 2);
-    const centerY = clamp((size * signatureY) / 100, sigH / 2, size - sigH / 2);
+    const centerX = clamp((size * signatureX) / 100, sigW / 2, Math.max(sigW / 2, size - sigW / 2));
+    const centerY = clamp((canvasHeight * signatureY) / 100, sigH / 2, Math.max(sigH / 2, canvasHeight - sigH / 2));
 
     return {
       width: sigW,
