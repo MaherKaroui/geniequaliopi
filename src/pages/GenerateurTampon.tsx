@@ -199,30 +199,46 @@ const GenerateurTampon = () => {
     if (!ctx) return;
 
     canvas.width = size * HIGH_RES_SCALE;
-    canvas.height = size * HIGH_RES_SCALE;
+    canvas.height = canvasHeight * HIGH_RES_SCALE;
     canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
+    canvas.style.height = `${canvasHeight}px`;
 
     ctx.setTransform(HIGH_RES_SCALE, 0, 0, HIGH_RES_SCALE, 0, 0);
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, size, canvasHeight);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
 
     ctx.save();
     ctx.globalAlpha = opacity / 100;
-    ctx.translate(size / 2, size / 2);
+    ctx.translate(size / 2, canvasHeight / 2);
     ctx.rotate((rotation * Math.PI) / 180);
-    ctx.translate(-size / 2, -size / 2);
+    ctx.translate(-size / 2, -canvasHeight / 2);
 
     const cx = size / 2;
-    const cy = size / 2;
+    const cy = canvasHeight / 2;
     const padding = 20;
 
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = borderWidth;
 
-    if (shape === "round") {
+    if (isAdmin) {
+      const inset = Math.max(borderWidth, 1) / 2 + 1;
+      if (borderWidth > 0) {
+        ctx.strokeRect(inset, inset, size - inset * 2, canvasHeight - inset * 2);
+      }
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      let y = admPadding;
+      admLines.forEach((line) => {
+        const lh = line.fontSize * 1.15;
+        ctx.font = `${line.bold ? "bold " : ""}${line.fontSize}px ${font}`;
+        ctx.fillText(line.text, cx, y + lh / 2);
+        y += lh;
+      });
+    } else if (shape === "round") {
+
       const r = (size - padding * 2) / 2;
       if (borderWidth > 0) {
         ctx.beginPath();
