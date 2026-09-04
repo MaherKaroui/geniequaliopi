@@ -408,7 +408,7 @@ const GenerateurTampon = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `tampon_${centerText.replace(/\s+/g, "_") || "organisme"}.png`;
+      a.download = `tampon_${((isAdmin ? admRaisonSociale : centerText) || "organisme").replace(/\s+/g, "_")}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
