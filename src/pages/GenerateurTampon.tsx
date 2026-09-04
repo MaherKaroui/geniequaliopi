@@ -78,7 +78,7 @@ const GenerateurTampon = () => {
 
   const [shape, setShape] = useState<StampShape>("administratif");
   const [color, setColor] = useState("#000000");
-  const [borderWidth, setBorderWidth] = useState(1);
+  const [borderWidth, setBorderWidth] = useState(0);
   const [size, setSize] = useState(500);
   const [font, setFont] = useState<FontFamily>("Arial");
   const [rotation, setRotation] = useState(0);
@@ -97,21 +97,22 @@ const GenerateurTampon = () => {
 
   const admSirenValue = (admSiren.trim() || admSiret.replace(/\D/g, "").slice(0, 9)).trim();
 
+  const admTitleSize = Math.floor(size / 16);
+  const admBodySize = Math.floor(size / 20);
+
   const admLines = (() => {
-    const titleSize = Math.floor(size / 13);
-    const bodySize = Math.floor(size / 18);
     const lines: { text: string; bold: boolean; fontSize: number }[] = [];
-    if (admRaisonSociale.trim()) lines.push({ text: admRaisonSociale.trim().toUpperCase(), bold: true, fontSize: titleSize });
-    if (admAdresse.trim()) lines.push({ text: admAdresse.trim().toUpperCase(), bold: false, fontSize: bodySize });
-    if (admCpVille.trim()) lines.push({ text: admCpVille.trim().toUpperCase(), bold: false, fontSize: bodySize });
-    if (admSiret.trim()) lines.push({ text: `Siret : ${admSiret.trim()}`, bold: false, fontSize: bodySize });
-    if (admSirenValue) lines.push({ text: `Siren : ${admSirenValue}`, bold: false, fontSize: bodySize });
-    if (admNda.trim()) lines.push({ text: `NDA : ${admNda.trim()}`, bold: false, fontSize: bodySize });
+    if (admRaisonSociale.trim()) lines.push({ text: admRaisonSociale.trim().toUpperCase(), bold: true, fontSize: admTitleSize });
+    if (admAdresse.trim()) lines.push({ text: admAdresse.trim().toUpperCase(), bold: false, fontSize: admBodySize });
+    if (admCpVille.trim()) lines.push({ text: admCpVille.trim().toUpperCase(), bold: false, fontSize: admBodySize });
+    if (admSiret.trim()) lines.push({ text: `Siret : ${admSiret.trim()}`, bold: false, fontSize: admBodySize });
+    if (admSirenValue) lines.push({ text: `Siren : ${admSirenValue}`, bold: false, fontSize: admBodySize });
+    if (admNda.trim()) lines.push({ text: `NDA : ${admNda.trim()}`, bold: false, fontSize: admBodySize });
     return lines;
   })();
 
-  const admPadding = Math.round(size / 28);
-  const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
+  const admPadding = Math.round(admBodySize * 0.8);
+  const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.05, 0);
   const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
 
 
@@ -232,7 +233,7 @@ const GenerateurTampon = () => {
       ctx.textBaseline = "middle";
       let y = admPadding;
       admLines.forEach((line) => {
-        const lh = line.fontSize * 1.15;
+        const lh = line.fontSize * 1.05;
         ctx.font = `${line.bold ? "bold " : ""}${line.fontSize}px ${font}`;
         ctx.fillText(line.text, cx, y + lh / 2);
         y += lh;
@@ -632,7 +633,7 @@ const GenerateurTampon = () => {
                       setShape(next);
                       if (next === "administratif") {
                         setColor("#000000");
-                        setBorderWidth(1);
+                        setBorderWidth(0);
                         setInnerBorder(false);
                         setStars(false);
                         setWorn(false);
