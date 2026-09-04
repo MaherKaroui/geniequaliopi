@@ -12,7 +12,7 @@ import { ChevronLeft, Download, Stamp, Upload, Pen, Trash2, Check } from "lucide
 import { toast } from "sonner";
 import SignaturePad from "@/components/SignaturePad";
 
-type StampShape = "round" | "oval" | "rectangle";
+type StampShape = "administratif" | "round" | "oval" | "rectangle";
 type FontFamily = "Arial" | "Georgia" | "Times New Roman" | "Courier New" | "Verdana" | "Impact";
 
 type CanvasPointerEvent = React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>;
@@ -45,6 +45,11 @@ const GenerateurTampon = () => {
         bottom: o.siret ? `SIRET ${o.siret}` : "SIRET 123 456 789 00012",
         center: (ville || o.ville || "VILLIERS-LE-BEL").toUpperCase(),
         sub: o.nda ? `NDA ${o.nda}` : "NDA 11 95 12345 95",
+        raisonSociale: (o.nom || "").toUpperCase(),
+        adresse: (o.adresse || "").toUpperCase(),
+        cpVille: ville.toUpperCase(),
+        siret: (o.siret || "").toString(),
+        nda: (o.nda || "").toString(),
       };
     } catch { return null; }
   })();
@@ -55,6 +60,14 @@ const GenerateurTampon = () => {
   const [centerText, setCenterText] = useState(prefill?.center ?? "VILLIERS-LE-BEL");
   const [subCenterText, setSubCenterText] = useState(prefill?.sub ?? "NDA 11 95 12345 95");
 
+  // Champs du bloc administratif
+  const [admRaisonSociale, setAdmRaisonSociale] = useState(prefill?.raisonSociale || "CEOS ACADEMY");
+  const [admAdresse, setAdmAdresse] = useState(prefill?.adresse || "35 AVENUE LEFEVRE,");
+  const [admCpVille, setAdmCpVille] = useState(prefill?.cpVille || "69120 VAULX-EN-VELIN");
+  const [admSiret, setAdmSiret] = useState(prefill?.siret || "91009758300017");
+  const [admSiren, setAdmSiren] = useState("");
+  const [admNda, setAdmNda] = useState(prefill?.nda || "84691948269");
+
   useEffect(() => {
     if (prefill) {
       localStorage.removeItem("tampon_prefill_organisme");
@@ -63,15 +76,15 @@ const GenerateurTampon = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [shape, setShape] = useState<StampShape>("round");
-  const [color, setColor] = useState("#1e40af");
-  const [borderWidth, setBorderWidth] = useState(6);
+  const [shape, setShape] = useState<StampShape>("administratif");
+  const [color, setColor] = useState("#000000");
+  const [borderWidth, setBorderWidth] = useState(1);
   const [size, setSize] = useState(500);
   const [font, setFont] = useState<FontFamily>("Arial");
   const [rotation, setRotation] = useState(0);
   const [opacity, setOpacity] = useState(100);
-  const [innerBorder, setInnerBorder] = useState(true);
-  const [stars, setStars] = useState(true);
+  const [innerBorder, setInnerBorder] = useState(false);
+  const [stars, setStars] = useState(false);
   const [worn, setWorn] = useState(false);
 
   const [signatureUrl, setSignatureUrl] = useState("");
@@ -80,13 +93,35 @@ const GenerateurTampon = () => {
   const [signatureX, setSignatureX] = useState(50);
   const [signatureY, setSignatureY] = useState(70);
 
+  const isAdmin = shape === "administratif";
+
+  const admSirenValue = (admSiren.trim() || admSiret.replace(/\D/g, "").slice(0, 9)).trim();
+
+  const admLines = (() => {
+    const titleSize = Math.floor(size / 13);
+    const bodySize = Math.floor(size / 18);
+    const lines: { text: string; bold: boolean; fontSize: number }[] = [];
+    if (admRaisonSociale.trim()) lines.push({ text: admRaisonSociale.trim().toUpperCase(), bold: true, fontSize: titleSize });
+    if (admAdresse.trim()) lines.push({ text: admAdresse.trim().toUpperCase(), bold: false, fontSize: bodySize });
+    if (admCpVille.trim()) lines.push({ text: admCpVille.trim().toUpperCase(), bold: false, fontSize: bodySize });
+    if (admSiret.trim()) lines.push({ text: `Siret : ${admSiret.trim()}`, bold: false, fontSize: bodySize });
+    if (admSirenValue) lines.push({ text: `Siren : ${admSirenValue}`, bold: false, fontSize: bodySize });
+    if (admNda.trim()) lines.push({ text: `NDA : ${admNda.trim()}`, bold: false, fontSize: bodySize });
+    return lines;
+  })();
+
+  const admPadding = Math.round(size / 28);
+  const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
+  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
+
+
   const getSignatureMetrics = () => {
     if (!signatureUrl) return null;
 
     const sigW = (size * signatureSize) / 100;
     const sigH = sigW * (signatureAspectRatio ?? 0.28);
-    const centerX = clamp((size * signatureX) / 100, sigW / 2, size - sigW / 2);
-    const centerY = clamp((size * signatureY) / 100, sigH / 2, size - sigH / 2);
+    const centerX = clamp((size * signatureX) / 100, sigW / 2, Math.max(sigW / 2, size - sigW / 2));
+    const centerY = clamp((canvasHeight * signatureY) / 100, sigH / 2, Math.max(sigH / 2, canvasHeight - sigH / 2));
 
     return {
       width: sigW,
@@ -164,30 +199,46 @@ const GenerateurTampon = () => {
     if (!ctx) return;
 
     canvas.width = size * HIGH_RES_SCALE;
-    canvas.height = size * HIGH_RES_SCALE;
+    canvas.height = canvasHeight * HIGH_RES_SCALE;
     canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
+    canvas.style.height = `${canvasHeight}px`;
 
     ctx.setTransform(HIGH_RES_SCALE, 0, 0, HIGH_RES_SCALE, 0, 0);
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, size, canvasHeight);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
 
     ctx.save();
     ctx.globalAlpha = opacity / 100;
-    ctx.translate(size / 2, size / 2);
+    ctx.translate(size / 2, canvasHeight / 2);
     ctx.rotate((rotation * Math.PI) / 180);
-    ctx.translate(-size / 2, -size / 2);
+    ctx.translate(-size / 2, -canvasHeight / 2);
 
     const cx = size / 2;
-    const cy = size / 2;
+    const cy = canvasHeight / 2;
     const padding = 20;
 
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = borderWidth;
 
-    if (shape === "round") {
+    if (isAdmin) {
+      const inset = Math.max(borderWidth, 1) / 2 + 1;
+      if (borderWidth > 0) {
+        ctx.strokeRect(inset, inset, size - inset * 2, canvasHeight - inset * 2);
+      }
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      let y = admPadding;
+      admLines.forEach((line) => {
+        const lh = line.fontSize * 1.15;
+        ctx.font = `${line.bold ? "bold " : ""}${line.fontSize}px ${font}`;
+        ctx.fillText(line.text, cx, y + lh / 2);
+        y += lh;
+      });
+    } else if (shape === "round") {
+
       const r = (size - padding * 2) / 2;
       if (borderWidth > 0) {
         ctx.beginPath();
@@ -339,6 +390,13 @@ const GenerateurTampon = () => {
     signatureSize,
     signatureX,
     signatureY,
+    admRaisonSociale,
+    admAdresse,
+    admCpVille,
+    admSiret,
+    admSiren,
+    admNda,
+    canvasHeight,
   ]);
 
   const handleDownload = () => {
@@ -350,7 +408,7 @@ const GenerateurTampon = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `tampon_${centerText.replace(/\s+/g, "_") || "organisme"}.png`;
+      a.download = `tampon_${((isAdmin ? admRaisonSociale : centerText) || "organisme").replace(/\s+/g, "_")}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -434,7 +492,7 @@ const GenerateurTampon = () => {
 
     return {
       x: ((clientX - rect.left) / rect.width) * size,
-      y: ((clientY - rect.top) / rect.height) * size,
+      y: ((clientY - rect.top) / rect.height) * canvasHeight,
     };
   };
 
@@ -470,10 +528,14 @@ const GenerateurTampon = () => {
     event.preventDefault();
 
     const nextCenterX = clamp(point.x - dragOffsetRef.current.x + metrics.width / 2, metrics.width / 2, size - metrics.width / 2);
-    const nextCenterY = clamp(point.y - dragOffsetRef.current.y + metrics.height / 2, metrics.height / 2, size - metrics.height / 2);
+    const nextCenterY = clamp(
+      point.y - dragOffsetRef.current.y + metrics.height / 2,
+      metrics.height / 2,
+      Math.max(metrics.height / 2, canvasHeight - metrics.height / 2),
+    );
 
     setSignatureX((nextCenterX / size) * 100);
-    setSignatureY((nextCenterY / size) * 100);
+    setSignatureY((nextCenterY / canvasHeight) * 100);
   };
 
   const stopDraggingSignature = () => {
@@ -505,35 +567,82 @@ const GenerateurTampon = () => {
             </TabsList>
 
             <TabsContent value="text" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>Texte du haut (courbé)</Label>
-                <Input value={topText} onChange={(e) => setTopText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Sous-titre</Label>
-                <Input value={middleText} onChange={(e) => setMiddleText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte central principal</Label>
-                <Input value={centerText} onChange={(e) => setCenterText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte central secondaire</Label>
-                <Input value={subCenterText} onChange={(e) => setSubCenterText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte du bas (courbé)</Label>
-                <Input value={bottomText} onChange={(e) => setBottomText(e.target.value)} />
-              </div>
+              {isAdmin ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>Raison sociale</Label>
+                    <Input value={admRaisonSociale} onChange={(e) => setAdmRaisonSociale(e.target.value)} placeholder="CEOS ACADEMY" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Adresse</Label>
+                    <Input value={admAdresse} onChange={(e) => setAdmAdresse(e.target.value)} placeholder="35 AVENUE LEFEVRE," />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Code postal + Ville</Label>
+                    <Input value={admCpVille} onChange={(e) => setAdmCpVille(e.target.value)} placeholder="69120 VAULX-EN-VELIN" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SIRET</Label>
+                    <Input value={admSiret} onChange={(e) => setAdmSiret(e.target.value)} placeholder="91009758300017" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SIREN (déduit du SIRET si vide)</Label>
+                    <Input value={admSiren} onChange={(e) => setAdmSiren(e.target.value)} placeholder={admSirenValue || "910097583"} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>NDA</Label>
+                    <Input value={admNda} onChange={(e) => setAdmNda(e.target.value)} placeholder="84691948269" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label>Texte du haut (courbé)</Label>
+                    <Input value={topText} onChange={(e) => setTopText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Sous-titre</Label>
+                    <Input value={middleText} onChange={(e) => setMiddleText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte central principal</Label>
+                    <Input value={centerText} onChange={(e) => setCenterText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte central secondaire</Label>
+                    <Input value={subCenterText} onChange={(e) => setSubCenterText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte du bas (courbé)</Label>
+                    <Input value={bottomText} onChange={(e) => setBottomText(e.target.value)} />
+                  </div>
+                </>
+              )}
             </TabsContent>
+
 
             <TabsContent value="style" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Forme</Label>
-                  <Select value={shape} onValueChange={(v) => setShape(v as StampShape)}>
+                  <Select
+                    value={shape}
+                    onValueChange={(v) => {
+                      const next = v as StampShape;
+                      setShape(next);
+                      if (next === "administratif") {
+                        setColor("#000000");
+                        setBorderWidth(1);
+                        setInnerBorder(false);
+                        setStars(false);
+                        setWorn(false);
+                        setRotation(0);
+                      }
+                    }}
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="administratif">Bloc administratif (recommandé)</SelectItem>
                       <SelectItem value="round">Rond</SelectItem>
                       <SelectItem value="oval">Ovale</SelectItem>
                       <SelectItem value="rectangle">Rectangulaire</SelectItem>
@@ -562,7 +671,7 @@ const GenerateurTampon = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Bord ({borderWidth}px)</Label>
-                  <Slider value={[borderWidth]} onValueChange={(values) => setBorderWidth(values[0])} min={2} max={14} step={1} />
+                  <Slider value={[borderWidth]} onValueChange={(values) => setBorderWidth(values[0])} min={0} max={14} step={1} />
                 </div>
               </div>
 
@@ -583,16 +692,20 @@ const GenerateurTampon = () => {
 
               <div className="flex items-center justify-between">
                 <Label>Bordure extérieure</Label>
-                <Switch checked={borderWidth > 0} onCheckedChange={(v) => setBorderWidth(v ? 6 : 0)} />
+                <Switch checked={borderWidth > 0} onCheckedChange={(v) => setBorderWidth(v ? (isAdmin ? 1 : 6) : 0)} />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Bordure intérieure</Label>
-                <Switch checked={innerBorder} onCheckedChange={setInnerBorder} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Étoiles décoratives (rond)</Label>
-                <Switch checked={stars} onCheckedChange={setStars} />
-              </div>
+              {!isAdmin && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label>Bordure intérieure</Label>
+                    <Switch checked={innerBorder} onCheckedChange={setInnerBorder} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label>Étoiles décoratives (rond)</Label>
+                    <Switch checked={stars} onCheckedChange={setStars} />
+                  </div>
+                </>
+              )}
               <div className="flex items-center justify-between">
                 <Label>Effet usé / vieilli</Label>
                 <Switch checked={worn} onCheckedChange={setWorn} />
