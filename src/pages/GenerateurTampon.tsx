@@ -567,27 +567,59 @@ const GenerateurTampon = () => {
             </TabsList>
 
             <TabsContent value="text" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>Texte du haut (courbé)</Label>
-                <Input value={topText} onChange={(e) => setTopText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Sous-titre</Label>
-                <Input value={middleText} onChange={(e) => setMiddleText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte central principal</Label>
-                <Input value={centerText} onChange={(e) => setCenterText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte central secondaire</Label>
-                <Input value={subCenterText} onChange={(e) => setSubCenterText(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Texte du bas (courbé)</Label>
-                <Input value={bottomText} onChange={(e) => setBottomText(e.target.value)} />
-              </div>
+              {isAdmin ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>Raison sociale</Label>
+                    <Input value={admRaisonSociale} onChange={(e) => setAdmRaisonSociale(e.target.value)} placeholder="CEOS ACADEMY" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Adresse</Label>
+                    <Input value={admAdresse} onChange={(e) => setAdmAdresse(e.target.value)} placeholder="35 AVENUE LEFEVRE," />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Code postal + Ville</Label>
+                    <Input value={admCpVille} onChange={(e) => setAdmCpVille(e.target.value)} placeholder="69120 VAULX-EN-VELIN" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SIRET</Label>
+                    <Input value={admSiret} onChange={(e) => setAdmSiret(e.target.value)} placeholder="91009758300017" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SIREN (déduit du SIRET si vide)</Label>
+                    <Input value={admSiren} onChange={(e) => setAdmSiren(e.target.value)} placeholder={admSirenValue || "910097583"} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>NDA</Label>
+                    <Input value={admNda} onChange={(e) => setAdmNda(e.target.value)} placeholder="84691948269" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label>Texte du haut (courbé)</Label>
+                    <Input value={topText} onChange={(e) => setTopText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Sous-titre</Label>
+                    <Input value={middleText} onChange={(e) => setMiddleText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte central principal</Label>
+                    <Input value={centerText} onChange={(e) => setCenterText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte central secondaire</Label>
+                    <Input value={subCenterText} onChange={(e) => setSubCenterText(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Texte du bas (courbé)</Label>
+                    <Input value={bottomText} onChange={(e) => setBottomText(e.target.value)} />
+                  </div>
+                </>
+              )}
             </TabsContent>
+
 
             <TabsContent value="style" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-3">
