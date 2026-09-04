@@ -692,16 +692,20 @@ const GenerateurTampon = () => {
 
               <div className="flex items-center justify-between">
                 <Label>Bordure extérieure</Label>
-                <Switch checked={borderWidth > 0} onCheckedChange={(v) => setBorderWidth(v ? 6 : 0)} />
+                <Switch checked={borderWidth > 0} onCheckedChange={(v) => setBorderWidth(v ? (isAdmin ? 1 : 6) : 0)} />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Bordure intérieure</Label>
-                <Switch checked={innerBorder} onCheckedChange={setInnerBorder} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Étoiles décoratives (rond)</Label>
-                <Switch checked={stars} onCheckedChange={setStars} />
-              </div>
+              {!isAdmin && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label>Bordure intérieure</Label>
+                    <Switch checked={innerBorder} onCheckedChange={setInnerBorder} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label>Étoiles décoratives (rond)</Label>
+                    <Switch checked={stars} onCheckedChange={setStars} />
+                  </div>
+                </>
+              )}
               <div className="flex items-center justify-between">
                 <Label>Effet usé / vieilli</Label>
                 <Switch checked={worn} onCheckedChange={setWorn} />
