@@ -625,9 +625,24 @@ const GenerateurTampon = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Forme</Label>
-                  <Select value={shape} onValueChange={(v) => setShape(v as StampShape)}>
+                  <Select
+                    value={shape}
+                    onValueChange={(v) => {
+                      const next = v as StampShape;
+                      setShape(next);
+                      if (next === "administratif") {
+                        setColor("#000000");
+                        setBorderWidth(1);
+                        setInnerBorder(false);
+                        setStars(false);
+                        setWorn(false);
+                        setRotation(0);
+                      }
+                    }}
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="administratif">Bloc administratif (recommandé)</SelectItem>
                       <SelectItem value="round">Rond</SelectItem>
                       <SelectItem value="oval">Ovale</SelectItem>
                       <SelectItem value="rectangle">Rectangulaire</SelectItem>
