@@ -45,6 +45,11 @@ const GenerateurTampon = () => {
         bottom: o.siret ? `SIRET ${o.siret}` : "SIRET 123 456 789 00012",
         center: (ville || o.ville || "VILLIERS-LE-BEL").toUpperCase(),
         sub: o.nda ? `NDA ${o.nda}` : "NDA 11 95 12345 95",
+        raisonSociale: (o.nom || "").toUpperCase(),
+        adresse: (o.adresse || "").toUpperCase(),
+        cpVille: ville.toUpperCase(),
+        siret: (o.siret || "").toString(),
+        nda: (o.nda || "").toString(),
       };
     } catch { return null; }
   })();
@@ -55,6 +60,14 @@ const GenerateurTampon = () => {
   const [centerText, setCenterText] = useState(prefill?.center ?? "VILLIERS-LE-BEL");
   const [subCenterText, setSubCenterText] = useState(prefill?.sub ?? "NDA 11 95 12345 95");
 
+  // Champs du bloc administratif
+  const [admRaisonSociale, setAdmRaisonSociale] = useState(prefill?.raisonSociale || "CEOS ACADEMY");
+  const [admAdresse, setAdmAdresse] = useState(prefill?.adresse || "35 AVENUE LEFEVRE,");
+  const [admCpVille, setAdmCpVille] = useState(prefill?.cpVille || "69120 VAULX-EN-VELIN");
+  const [admSiret, setAdmSiret] = useState(prefill?.siret || "91009758300017");
+  const [admSiren, setAdmSiren] = useState("");
+  const [admNda, setAdmNda] = useState(prefill?.nda || "84691948269");
+
   useEffect(() => {
     if (prefill) {
       localStorage.removeItem("tampon_prefill_organisme");
@@ -63,15 +76,15 @@ const GenerateurTampon = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [shape, setShape] = useState<StampShape>("round");
-  const [color, setColor] = useState("#1e40af");
-  const [borderWidth, setBorderWidth] = useState(6);
+  const [shape, setShape] = useState<StampShape>("administratif");
+  const [color, setColor] = useState("#000000");
+  const [borderWidth, setBorderWidth] = useState(1);
   const [size, setSize] = useState(500);
   const [font, setFont] = useState<FontFamily>("Arial");
   const [rotation, setRotation] = useState(0);
   const [opacity, setOpacity] = useState(100);
-  const [innerBorder, setInnerBorder] = useState(true);
-  const [stars, setStars] = useState(true);
+  const [innerBorder, setInnerBorder] = useState(false);
+  const [stars, setStars] = useState(false);
   const [worn, setWorn] = useState(false);
 
   const [signatureUrl, setSignatureUrl] = useState("");
@@ -79,6 +92,28 @@ const GenerateurTampon = () => {
   const [signatureSize, setSignatureSize] = useState(40);
   const [signatureX, setSignatureX] = useState(50);
   const [signatureY, setSignatureY] = useState(70);
+
+  const isAdmin = shape === "administratif";
+
+  const admSirenValue = (admSiren.trim() || admSiret.replace(/\D/g, "").slice(0, 9)).trim();
+
+  const admLines = (() => {
+    const titleSize = Math.floor(size / 13);
+    const bodySize = Math.floor(size / 18);
+    const lines: { text: string; bold: boolean; fontSize: number }[] = [];
+    if (admRaisonSociale.trim()) lines.push({ text: admRaisonSociale.trim().toUpperCase(), bold: true, fontSize: titleSize });
+    if (admAdresse.trim()) lines.push({ text: admAdresse.trim().toUpperCase(), bold: false, fontSize: bodySize });
+    if (admCpVille.trim()) lines.push({ text: admCpVille.trim().toUpperCase(), bold: false, fontSize: bodySize });
+    if (admSiret.trim()) lines.push({ text: `Siret : ${admSiret.trim()}`, bold: false, fontSize: bodySize });
+    if (admSirenValue) lines.push({ text: `Siren : ${admSirenValue}`, bold: false, fontSize: bodySize });
+    if (admNda.trim()) lines.push({ text: `NDA : ${admNda.trim()}`, bold: false, fontSize: bodySize });
+    return lines;
+  })();
+
+  const admPadding = Math.round(size / 28);
+  const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
+  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
+
 
   const getSignatureMetrics = () => {
     if (!signatureUrl) return null;
