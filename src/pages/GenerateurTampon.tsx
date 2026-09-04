@@ -500,9 +500,8 @@ const GenerateurTampon = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       const cleaned = await removeWhiteBackgroundFromDataUrl(reader.result as string);
-      const aspectRatio = await getImageAspectRatio(cleaned);
       setSignatureUrl(cleaned);
-      applySignatureDefaults(aspectRatio);
+      applySignatureDefaults();
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -835,9 +834,8 @@ const GenerateurTampon = () => {
         <SignaturePad
           onSave={async (url) => {
             const cleaned = await removeWhiteBackgroundFromDataUrl(url);
-            const aspectRatio = await getImageAspectRatio(cleaned);
             setSignatureUrl(cleaned);
-            applySignatureDefaults(aspectRatio);
+            applySignatureDefaults();
             setShowSignaturePad(false);
           }}
           onCancel={() => setShowSignaturePad(false)}
