@@ -116,14 +116,6 @@ const GenerateurTampon = () => {
   const admTextStartY = admPadding;
   const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
 
-  const getImageAspectRatio = (src: string): Promise<number> =>
-    new Promise((resolve) => {
-      const image = new Image();
-      image.onload = () => resolve(image.height / image.width || 0.28);
-      image.onerror = () => resolve(0.28);
-      image.src = src;
-    });
-
   const applySignatureDefaults = () => {
     setSignatureX(50);
     if (isAdmin) {
