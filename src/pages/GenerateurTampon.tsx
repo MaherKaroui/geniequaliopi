@@ -521,10 +521,14 @@ const GenerateurTampon = () => {
     event.preventDefault();
 
     const nextCenterX = clamp(point.x - dragOffsetRef.current.x + metrics.width / 2, metrics.width / 2, size - metrics.width / 2);
-    const nextCenterY = clamp(point.y - dragOffsetRef.current.y + metrics.height / 2, metrics.height / 2, size - metrics.height / 2);
+    const nextCenterY = clamp(
+      point.y - dragOffsetRef.current.y + metrics.height / 2,
+      metrics.height / 2,
+      Math.max(metrics.height / 2, canvasHeight - metrics.height / 2),
+    );
 
     setSignatureX((nextCenterX / size) * 100);
-    setSignatureY((nextCenterY / size) * 100);
+    setSignatureY((nextCenterY / canvasHeight) * 100);
   };
 
   const stopDraggingSignature = () => {
