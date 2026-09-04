@@ -485,7 +485,7 @@ const GenerateurTampon = () => {
 
     return {
       x: ((clientX - rect.left) / rect.width) * size,
-      y: ((clientY - rect.top) / rect.height) * size,
+      y: ((clientY - rect.top) / rect.height) * canvasHeight,
     };
   };
 
