@@ -390,6 +390,13 @@ const GenerateurTampon = () => {
     signatureSize,
     signatureX,
     signatureY,
+    admRaisonSociale,
+    admAdresse,
+    admCpVille,
+    admSiret,
+    admSiren,
+    admNda,
+    canvasHeight,
   ]);
 
   const handleDownload = () => {
