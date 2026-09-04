@@ -113,33 +113,17 @@ const GenerateurTampon = () => {
 
   const admPadding = Math.round(admBodySize * 0.8);
   const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
-  const rawSignatureWidth = (size * signatureSize) / 100;
-  const rawSignatureHeight = rawSignatureWidth * (signatureAspectRatio ?? 0.28);
-  const admSignatureBand = isAdmin && signatureUrl ? Math.ceil(rawSignatureHeight + admBodySize * 0.5) : 0;
-  const admTextStartY = admPadding + admSignatureBand;
-  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2 + admSignatureBand)) : size;
+  const admTextStartY = admPadding;
+  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
 
-  const getImageAspectRatio = (src: string): Promise<number> =>
-    new Promise((resolve) => {
-      const image = new Image();
-      image.onload = () => resolve(image.height / image.width || 0.28);
-      image.onerror = () => resolve(0.28);
-      image.src = src;
-    });
-
-  const getAdminSignatureDefaultY = (aspectRatio = 0.28, signatureScale = 35) => {
-    const signatureHeight = ((size * signatureScale) / 100) * aspectRatio;
-    const band = signatureHeight + admBodySize * 0.5;
-    const totalHeight = admContentHeight + admPadding * 2 + band;
-    return totalHeight > 0 ? clamp((band / 2 / totalHeight) * 100, 0, 100) : 50;
-  };
-
-  const applySignatureDefaults = (aspectRatio = 0.28) => {
+  const applySignatureDefaults = () => {
     setSignatureX(50);
     if (isAdmin) {
-      setSignatureSize(35);
-      setSignatureY(getAdminSignatureDefaultY(aspectRatio, 35));
+      // Signature posée au centre du bloc, à l'intérieur du tampon
+      setSignatureSize(45);
+      setSignatureY(50);
     } else {
+      setSignatureSize(40);
       setSignatureY(70);
     }
   };
@@ -508,9 +492,8 @@ const GenerateurTampon = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       const cleaned = await removeWhiteBackgroundFromDataUrl(reader.result as string);
-      const aspectRatio = await getImageAspectRatio(cleaned);
       setSignatureUrl(cleaned);
-      applySignatureDefaults(aspectRatio);
+      applySignatureDefaults();
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -843,9 +826,8 @@ const GenerateurTampon = () => {
         <SignaturePad
           onSave={async (url) => {
             const cleaned = await removeWhiteBackgroundFromDataUrl(url);
-            const aspectRatio = await getImageAspectRatio(cleaned);
             setSignatureUrl(cleaned);
-            applySignatureDefaults(aspectRatio);
+            applySignatureDefaults();
             setShowSignaturePad(false);
           }}
           onCancel={() => setShowSignaturePad(false)}

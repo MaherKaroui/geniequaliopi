@@ -156,10 +156,10 @@ export default function SignaturePad({ onSave, onCancel, label = "Signez ci-dess
       >
         <canvas
           ref={canvasRef}
-          width={1000}
-          height={360}
+          width={1200}
+          height={500}
           className="w-full cursor-crosshair rounded touch-none"
-          style={{ maxHeight: "180px" }}
+          style={{ maxHeight: "320px" }}
           onMouseDown={startDraw}
           onMouseMove={draw}
           onMouseUp={endDraw}
