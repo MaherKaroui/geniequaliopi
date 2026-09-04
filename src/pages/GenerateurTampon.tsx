@@ -12,7 +12,7 @@ import { ChevronLeft, Download, Stamp, Upload, Pen, Trash2, Check } from "lucide
 import { toast } from "sonner";
 import SignaturePad from "@/components/SignaturePad";
 
-type StampShape = "round" | "oval" | "rectangle";
+type StampShape = "administratif" | "round" | "oval" | "rectangle";
 type FontFamily = "Arial" | "Georgia" | "Times New Roman" | "Courier New" | "Verdana" | "Impact";
 
 type CanvasPointerEvent = React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>;
