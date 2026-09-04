@@ -113,14 +113,47 @@ const GenerateurTampon = () => {
 
   const admPadding = Math.round(admBodySize * 0.8);
   const admContentHeight = admLines.reduce((acc, l) => acc + l.fontSize * 1.15, 0);
-  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2)) : size;
+  const rawSignatureWidth = (size * signatureSize) / 100;
+  const rawSignatureHeight = rawSignatureWidth * (signatureAspectRatio ?? 0.28);
+  const admSignatureBand = isAdmin && signatureUrl ? Math.ceil(rawSignatureHeight + admBodySize * 0.5) : 0;
+  const admTextStartY = admPadding + admSignatureBand;
+  const canvasHeight = isAdmin ? Math.max(60, Math.round(admContentHeight + admPadding * 2 + admSignatureBand)) : size;
 
+  const getImageAspectRatio = (src: string): Promise<number> =>
+    new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image.height / image.width || 0.28);
+      image.onerror = () => resolve(0.28);
+      image.src = src;
+    });
+
+  const getAdminSignatureDefaultY = (aspectRatio = 0.28, signatureScale = 35) => {
+    const signatureHeight = ((size * signatureScale) / 100) * aspectRatio;
+    const band = signatureHeight + admBodySize * 0.5;
+    const totalHeight = admContentHeight + admPadding * 2 + band;
+    return totalHeight > 0 ? clamp((band / 2 / totalHeight) * 100, 0, 100) : 50;
+  };
+
+  const applySignatureDefaults = (aspectRatio = 0.28) => {
+    setSignatureX(50);
+    if (isAdmin) {
+      setSignatureSize(35);
+      setSignatureY(getAdminSignatureDefaultY(aspectRatio, 35));
+    } else {
+      setSignatureY(70);
+    }
+  };
 
   const getSignatureMetrics = () => {
     if (!signatureUrl) return null;
 
-    const sigW = (size * signatureSize) / 100;
-    const sigH = sigW * (signatureAspectRatio ?? 0.28);
+    let sigW = (size * signatureSize) / 100;
+    let sigH = sigW * (signatureAspectRatio ?? 0.28);
+    if (isAdmin && sigH > canvasHeight * 0.6) {
+      const scale = (canvasHeight * 0.6) / sigH;
+      sigH = canvasHeight * 0.6;
+      sigW *= scale;
+    }
     const centerX = clamp((size * signatureX) / 100, sigW / 2, Math.max(sigW / 2, size - sigW / 2));
     const centerY = clamp((canvasHeight * signatureY) / 100, sigH / 2, Math.max(sigH / 2, canvasHeight - sigH / 2));
 
@@ -231,7 +264,7 @@ const GenerateurTampon = () => {
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      let y = admPadding;
+      let y = admTextStartY;
       admLines.forEach((line) => {
         const lh = line.fontSize * 1.15;
         ctx.font = `${line.bold ? "bold " : ""}${line.fontSize}px ${font}`;
@@ -475,9 +508,9 @@ const GenerateurTampon = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       const cleaned = await removeWhiteBackgroundFromDataUrl(reader.result as string);
+      const aspectRatio = await getImageAspectRatio(cleaned);
       setSignatureUrl(cleaned);
-      setSignatureX(50);
-      setSignatureY(70);
+      applySignatureDefaults(aspectRatio);
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -528,7 +561,11 @@ const GenerateurTampon = () => {
 
     event.preventDefault();
 
-    const nextCenterX = clamp(point.x - dragOffsetRef.current.x + metrics.width / 2, metrics.width / 2, size - metrics.width / 2);
+    const nextCenterX = clamp(
+      point.x - dragOffsetRef.current.x + metrics.width / 2,
+      metrics.width / 2,
+      Math.max(metrics.width / 2, size - metrics.width / 2),
+    );
     const nextCenterY = clamp(
       point.y - dragOffsetRef.current.y + metrics.height / 2,
       metrics.height / 2,
@@ -746,7 +783,7 @@ const GenerateurTampon = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>Position verticale ({Math.round(signatureY)}%)</Label>
-                    <Slider value={[signatureY]} onValueChange={(values) => setSignatureY(values[0])} min={10} max={90} step={1} />
+                    <Slider value={[signatureY]} onValueChange={(values) => setSignatureY(values[0])} min={0} max={100} step={1} />
                   </div>
                 </div>
               ) : (
@@ -806,9 +843,9 @@ const GenerateurTampon = () => {
         <SignaturePad
           onSave={async (url) => {
             const cleaned = await removeWhiteBackgroundFromDataUrl(url);
+            const aspectRatio = await getImageAspectRatio(cleaned);
             setSignatureUrl(cleaned);
-            setSignatureX(50);
-            setSignatureY(70);
+            applySignatureDefaults(aspectRatio);
             setShowSignaturePad(false);
           }}
           onCancel={() => setShowSignaturePad(false)}
