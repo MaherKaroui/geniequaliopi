@@ -10,9 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2, Palette, GraduationCap } from "lucide-react";
-import BahoModal from "@/components/BahoModal";
-import ViModal from "@/components/ViModal";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -50,8 +48,6 @@ const Index = () => {
   const { isSuperAdmin } = useUserRole();
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
-  const [bahoOpen, setBahoOpen] = useState(false);
-  const [viOpen, setViOpen] = useState(false);
   const [brandingOpen, setBrandingOpen] = useState(false);
   const [myCertifOpen, setMyCertifOpen] = useState(false);
 
@@ -204,20 +200,12 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/gotrm")}>
-              <Truck className="w-5 h-5" /> GOTRM
-            </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
               <GraduationCap className="w-5 h-5" /> Génération VAE
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => setBahoOpen(true)}>
-              <Building2 className="w-5 h-5" /> BAHO
             </Button>
 
           </div>
         </div>
-        <BahoModal open={bahoOpen} onOpenChange={setBahoOpen} />
-        <ViModal open={viOpen} onOpenChange={setViOpen} />
       </div>
     );
   }
