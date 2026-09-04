@@ -204,10 +204,10 @@ const Index = () => {
               <GraduationCap className="w-5 h-5" /> Génération VAE
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://outlook-modifiable.netlify.app/", "_blank")}>
-              <Mail className="w-5 h-5" /> Outlook modifiable
+              <Mail className="w-5 h-5" /> Outlook 
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://gmail-modifiable.netlify.app/", "_blank")}>
-              <Globe className="w-5 h-5" /> Gmail modifiable
+              <Globe className="w-5 h-5" /> Gmail 
             </Button>
 
           </div>
