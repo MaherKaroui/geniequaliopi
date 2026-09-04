@@ -671,7 +671,7 @@ const GenerateurTampon = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Bord ({borderWidth}px)</Label>
-                  <Slider value={[borderWidth]} onValueChange={(values) => setBorderWidth(values[0])} min={2} max={14} step={1} />
+                  <Slider value={[borderWidth]} onValueChange={(values) => setBorderWidth(values[0])} min={0} max={14} step={1} />
                 </div>
               </div>
 
