@@ -61,12 +61,12 @@ const GenerateurTampon = () => {
   const [subCenterText, setSubCenterText] = useState(prefill?.sub ?? "NDA 11 95 12345 95");
 
   // Champs du bloc administratif
-  const [admRaisonSociale, setAdmRaisonSociale] = useState(prefill?.raisonSociale || "");
-  const [admAdresse, setAdmAdresse] = useState(prefill?.adresse || "");
-  const [admCpVille, setAdmCpVille] = useState(prefill?.cpVille || "");
-  const [admSiret, setAdmSiret] = useState(prefill?.siret || "");
+  const [admRaisonSociale, setAdmRaisonSociale] = useState(prefill?.raisonSociale || "NOM DE L'ORGANISME");
+  const [admAdresse, setAdmAdresse] = useState(prefill?.adresse || "ADRESSE");
+  const [admCpVille, setAdmCpVille] = useState(prefill?.cpVille || "CODE POSTAL VILLE");
+  const [admSiret, setAdmSiret] = useState(prefill?.siret || "000 000 000 00000");
   const [admSiren, setAdmSiren] = useState("");
-  const [admNda, setAdmNda] = useState(prefill?.nda || "");
+  const [admNda, setAdmNda] = useState(prefill?.nda || "NDA");
 
   useEffect(() => {
     if (prefill) {
