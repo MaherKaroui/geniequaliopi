@@ -1485,8 +1485,9 @@ export function buildFullCatalog(
       stagiaires.forEach((s, si) => {
         add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 Convocation jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
         add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 Procès-verbal de jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
-      add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 Notification de décision VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
-    });
+        add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 Notification de décision VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
+      });
+    }
 
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
     add("vae_c4i17_moyens_dedies", "CT4 - IND 17 Moyens dédiés à l'accompagnement VAE", 4, 17, "vae_moyens_dedies");
