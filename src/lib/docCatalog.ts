@@ -87,7 +87,7 @@ export function buildFullCatalog(
 
     // IND 7 — Adéquation contenus / exigences certification (RS/RNCP uniquement)
     formations.forEach((f, fi) => {
-      if (f.codeRNCP && f.codeRNCP.trim()) {
+      if (isCodeRsrncp(f.codeRNCP)) {
         add(`af_c2i7_fiche_certification_${fi}`, `CT2 - IND 7 FICHE CERTIFICATION RS/RNCP`, 2, 7, "fiche_certification_rs", { fi });
         add(`af_c2i7_tableau_croise_${fi}`, `CT2 - IND 7 TABLEAU CROISÉ COMPÉTENCES / MODULES`, 2, 7, "tableau_croise_cfa", { fi });
       }
