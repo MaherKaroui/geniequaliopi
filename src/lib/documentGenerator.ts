@@ -130,6 +130,11 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   const selectedFormation = userFormation.intitule
     ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
     : SAMPLE_FORMATIONS[0];
+  // Le code certification ne doit jamais hériter de l'exemple par défaut :
+  // un code vide signifie formation non RS/RNCP (IND 7 et 16 masqués).
+  if (userFormation.intitule) {
+    selectedFormation.codeRNCP = (userFormation.codeRNCP || "").trim();
+  }
   return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant);
 }
 
