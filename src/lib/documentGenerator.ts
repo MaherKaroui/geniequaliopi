@@ -11481,9 +11481,14 @@ function genDerouleWord(o: OrganismeInfo, f: FormationInfo) {
 
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
+  const t = (f.intitule || "").toLowerCase();
+
+  // PRIORITÉ : le déroulé est construit à partir du programme de la formation choisie
+  // (blocs "Jour N – ..." avec lignes horaires saisis dans le formulaire formation).
+  const derouleFromProgramme = genDerouleDepuisProgramme(o, f);
+  if (derouleFromProgramme) return derouleFromProgramme;
 
   // Word / Initiation Word: dedicated déroulé with real day structure
-  const t = (f.intitule || "").toLowerCase();
   const isWord = t.includes("word") || t.includes("initiation word") || (t.includes("bureautique") && !t.includes("excel") && !t.includes("powerpoint"));
   if (isWord) {
     return genDerouleWord(o, f);
