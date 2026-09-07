@@ -1478,11 +1478,13 @@ export function buildFullCatalog(
     });
 
     // IND 16 — Présentation à la certification
-    add("vae_c3i16_procedure_jury", "CT3 - IND 16 Procédure de passage devant le jury VAE", 3, 16, "vae_procedure_jury");
-    add("vae_c3i16_mail_conditions_certification", "CT3 - IND 16 Mail conditions de présentation aux certifications", 3, 16, "vae_mail_conditions_certification");
-    stagiaires.forEach((s, si) => {
-      add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 Convocation jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
-      add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 Procès-verbal de jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
+    const hasRsrncpVAE = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpVAE) {
+      add("vae_c3i16_procedure_jury", "CT3 - IND 16 Procédure de passage devant le jury VAE", 3, 16, "vae_procedure_jury");
+      add("vae_c3i16_mail_conditions_certification", "CT3 - IND 16 Mail conditions de présentation aux certifications", 3, 16, "vae_mail_conditions_certification");
+      stagiaires.forEach((s, si) => {
+        add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 Convocation jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
+        add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 Procès-verbal de jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
       add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 Notification de décision VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
     });
 
