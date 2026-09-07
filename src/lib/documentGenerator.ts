@@ -11434,6 +11434,149 @@ function extractFormationTopics(f: FormationInfo): string[] {
   return cleaned;
 }
 
+// Construit le déroulé pédagogique détaillé directement à partir du programme
+// saisi dans le formulaire formation (blocs "Jour N – ..." avec lignes horaires).
+// Retourne null si le programme n'a pas de structure jour par jour exploitable.
+function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string | null {
+  const programmeLines = (f.programme || "").split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  if (programmeLines.length === 0) return null;
+
+  const dayBlocks: { title: string; rows: { horaire: string; contenu: string }[] }[] = [];
+  let currentDay: { title: string; rows: { horaire: string; contenu: string }[] } | null = null;
+
+  for (const line of programmeLines) {
+    const dayMatch = line.match(/^(Jour(?:née)?|Séance|Module)\s*\d+/i);
+    if (dayMatch) {
+      currentDay = { title: line.replace(/\s*:\s*$/, "").trim(), rows: [] };
+      dayBlocks.push(currentDay);
+      continue;
+    }
+    if (!currentDay) continue;
+    const timeMatch = line.match(/^(\d{1,2}[hH:]\d{2}\s*[–\-—]\s*\d{1,2}[hH:]\d{2})\s*[:\s]\s*(.+)$/);
+    if (timeMatch) {
+      currentDay.rows.push({ horaire: timeMatch[1].replace(/[H]/g, "h").trim(), contenu: timeMatch[2].trim() });
+    } else {
+      currentDay.rows.push({ horaire: "", contenu: line.replace(/^[-•*]\s*/, "").trim() });
+    }
+  }
+
+  // Il faut au moins un bloc jour avec du contenu pour piloter le déroulé
+  const usable = dayBlocks.filter(d => d.rows.length > 0);
+  if (usable.length === 0) return null;
+
+  const heuresMatch = (f.duree || "").match(/(\d+)\s*h/i);
+  const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : usable.length * 7;
+
+  const methodesPool = [
+    "Démonstration + exercices pratiques",
+    "Exercices guidés",
+    "Mise en situation pratique",
+    "Apports théoriques + cas pratiques",
+    "Travail autonome accompagné",
+    "Démonstration + mise en pratique",
+  ];
+  const evalPool = [
+    "Exercice pratique",
+    "Exercice corrigé",
+    "Observation en situation",
+    "QCM intermédiaire",
+    "Vérification du document produit",
+    "Questions-réponses",
+  ];
+  const adaptPool = [
+    "Adaptation du rythme",
+    "Aide individualisée",
+    "Soutien individualisé",
+    "Aide ciblée",
+    "Accompagnement renforcé",
+    "Temps supplémentaire",
+  ];
+  const modalite = (f.modalites || "présentiel").toLowerCase();
+  const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
+  const outilsBase = isDistanciel ? "PC, visioconférence, support numérique" : "PC, vidéoprojecteur, support de formation";
+
+  const estPause = (c: string) => /^(pause|déjeuner|pause déjeuner)/i.test(c);
+  const estAccueil = (c: string) => /accueil|présentation de la formation|tour de table/i.test(c);
+  const estPositionnement = (c: string) => /positionnement/i.test(c);
+  const estEvalFinale = (c: string) => /évaluation finale|bilan de formation|grille d'acquisition|remise des attestations/i.test(c);
+
+  const dureeDepuisHoraire = (horaire: string): string => {
+    const m = horaire.match(/(\d{1,2})[hH:](\d{2})\s*[–\-—]\s*(\d{1,2})[hH:](\d{2})/);
+    if (!m) return "";
+    let mins = (parseInt(m[3]) * 60 + parseInt(m[4])) - (parseInt(m[1]) * 60 + parseInt(m[2]));
+    if (mins <= 0) mins += 24 * 60;
+    const h = Math.floor(mins / 60);
+    const reste = mins % 60;
+    return reste === 0 ? `${h}h00` : h === 0 ? `${reste}min` : `${h}h${String(reste).padStart(2, "0")}`;
+  };
+
+  const objectifPour = (contenu: string): string => {
+    if (estAccueil(contenu)) return "Comprendre les objectifs et le cadre de la formation";
+    if (estPositionnement(contenu)) return "Évaluer le niveau initial du stagiaire";
+    if (estEvalFinale(contenu)) return "Vérifier l'acquisition des compétences visées";
+    const clean = contenu.replace(/\s*[-–—]\s*.*$/, "").trim();
+    return `Maîtriser : ${clean.charAt(0).toLowerCase()}${clean.slice(1)}`;
+  };
+
+  const evaluationPour = (contenu: string, idx: number): string => {
+    if (estPositionnement(contenu)) return "Test de positionnement initial";
+    if (estEvalFinale(contenu)) return "Évaluation finale et grille d'acquisition";
+    if (estAccueil(contenu)) return "Questions-réponses";
+    return evalPool[idx % evalPool.length];
+  };
+
+  let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Durée :</strong> ${totalHeures} heures — ${usable.length} jour${usable.length > 1 ? "s" : ""}<br>
+    <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
+
+  usable.forEach((day, di) => {
+    extraHtml += `<h3 style="margin-top:${di > 0 ? "25" : "10"}px;color:#1e3a7b;font-size:13pt">${day.title}</h3>`;
+    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9pt;margin-bottom:10px">`;
+    extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
+      <td style="width:15%">Séquence</td>
+      <td style="width:8%">Durée</td>
+      <td style="width:16%">Objectif pédagogique</td>
+      <td style="width:18%">Contenus abordés</td>
+      <td style="width:13%">Méthodes & activités</td>
+      <td style="width:11%">Outils / supports</td>
+      <td style="width:11%">Évaluation</td>
+      <td style="width:8%">Adaptations</td>
+    </tr>`;
+
+    let seqIdx = 0;
+    day.rows.forEach((row, ri) => {
+      const contenu = row.contenu;
+      const pause = estPause(contenu);
+      const titreSeq = pause ? contenu : (contenu.split(/\s*[-–—:]\s*/)[0] || contenu).trim();
+      const duree = dureeDepuisHoraire(row.horaire) || "";
+      const sequenceCell = row.horaire ? `${row.horaire}<br>${titreSeq}` : titreSeq;
+      const bgColor = pause ? "#f0f0f0" : (ri % 2 === 0 ? "#ffffff" : "#f2f6fc");
+      const rowStyle = pause ? ' style="background:#f0f0f0;font-style:italic;color:#888"' : ` style="background:${bgColor}"`;
+      if (pause) {
+        extraHtml += `<tr${rowStyle}>
+          <td>${sequenceCell}</td><td>${duree}</td><td colspan="6">${contenu}</td>
+        </tr>`;
+        return;
+      }
+      extraHtml += `<tr${rowStyle}>
+        <td>${sequenceCell}</td>
+        <td>${duree}</td>
+        <td>${objectifPour(contenu)}</td>
+        <td>${contenu}</td>
+        <td>${estAccueil(contenu) ? "Échanges oraux, présentation du formateur" : methodesPool[seqIdx % methodesPool.length]}</td>
+        <td>${estAccueil(contenu) ? "Support de présentation" : outilsBase}</td>
+        <td>${evaluationPour(contenu, seqIdx)}</td>
+        <td>${adaptPool[seqIdx % adaptPool.length]}</td>
+      </tr>`;
+      seqIdx++;
+    });
+
+    extraHtml += `</table>`;
+  });
+
+  return buildDocument({ org: o, title: "Déroulé pédagogique détaillé de la formation", subtitle: f.intitule, extraHtml });
+}
+
 function genDerouleWord(o: OrganismeInfo, f: FormationInfo) {
   const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
 
@@ -11481,9 +11624,14 @@ function genDerouleWord(o: OrganismeInfo, f: FormationInfo) {
 
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
+  const t = (f.intitule || "").toLowerCase();
+
+  // PRIORITÉ : le déroulé est construit à partir du programme de la formation choisie
+  // (blocs "Jour N – ..." avec lignes horaires saisis dans le formulaire formation).
+  const derouleFromProgramme = genDerouleDepuisProgramme(o, f);
+  if (derouleFromProgramme) return derouleFromProgramme;
 
   // Word / Initiation Word: dedicated déroulé with real day structure
-  const t = (f.intitule || "").toLowerCase();
   const isWord = t.includes("word") || t.includes("initiation word") || (t.includes("bureautique") && !t.includes("excel") && !t.includes("powerpoint"));
   if (isWord) {
     return genDerouleWord(o, f);
