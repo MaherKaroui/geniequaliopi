@@ -537,17 +537,20 @@ export function buildFullCatalog(
     add("cfa_c2i6_decoupage_formation", "CT2 - IND 6 DÉCOUPAGE DE FORMATION CFA (Excel)", 2, 6, "decoupage_formation_cfa_excel");
 
     // IND 7 — Adéquation contenus / exigences certification (CFA)
-    add("cfa_c2i7_fiche_certification", "CT2 - IND 7 FICHE CERTIFICATION RS/RNCP", 2, 7, "fiche_certification_rs");
-    add("cfa_c2i7_tableau_croise", "CT2 - IND 7 TABLEAU CROISÉ", 2, 7, "tableau_croise_cfa");
-    add("cfa_c2i7_matrice_competences", "CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)", 2, 7, "matrice_competences_excel");
-    add("cfa_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
+    const hasRsrncpCFA = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpCFA) {
+      add("cfa_c2i7_fiche_certification", "CT2 - IND 7 FICHE CERTIFICATION RS/RNCP", 2, 7, "fiche_certification_rs");
+      add("cfa_c2i7_tableau_croise", "CT2 - IND 7 TABLEAU CROISÉ", 2, 7, "tableau_croise_cfa");
+      add("cfa_c2i7_matrice_competences", "CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)", 2, 7, "matrice_competences_excel");
+      add("cfa_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
+    }
 
     // (IND 13/14/15 moved to after IND 12 block below)
 
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        if (f.codeRNCP) {
+        if (isCodeRsrncp(f.codeRNCP)) {
           add(`cfa_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
         }
       });
