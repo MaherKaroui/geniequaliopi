@@ -14,6 +14,12 @@ import { dateMailDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
+function isCodeRsrncp(code?: string): boolean {
+  if (!code) return false;
+  const c = code.trim().toUpperCase();
+  return c.startsWith("RS") || c.startsWith("RNCP");
+}
+
 export function buildFullCatalog(
   formations: FormationInfo[],
   stagiaires: StagiaireInfo[],
