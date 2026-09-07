@@ -283,7 +283,7 @@ export function buildFullCatalog(
 
     // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
     formations.forEach((f, fi) => {
-      if (f.codeRNCP) {
+      if (isCodeRsrncp(f.codeRNCP)) {
         add(`af_c3i16_procedure_certification_${fi}`, `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
         stagiaires.forEach((s, si) => {
           add(`af_c3i16_convocation_certification_${fi}_${si}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
