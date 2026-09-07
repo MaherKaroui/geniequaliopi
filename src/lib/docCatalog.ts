@@ -14,6 +14,12 @@ import { dateMailDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
+function isCodeRsrncp(code?: string): boolean {
+  if (!code) return false;
+  const c = code.trim().toUpperCase();
+  return c.startsWith("RS") || c.startsWith("RNCP");
+}
+
 export function buildFullCatalog(
   formations: FormationInfo[],
   stagiaires: StagiaireInfo[],
@@ -81,7 +87,7 @@ export function buildFullCatalog(
 
     // IND 7 — Adéquation contenus / exigences certification (RS/RNCP uniquement)
     formations.forEach((f, fi) => {
-      if (f.codeRNCP && f.codeRNCP.trim()) {
+      if (isCodeRsrncp(f.codeRNCP)) {
         add(`af_c2i7_fiche_certification_${fi}`, `CT2 - IND 7 FICHE CERTIFICATION RS/RNCP`, 2, 7, "fiche_certification_rs", { fi });
         add(`af_c2i7_tableau_croise_${fi}`, `CT2 - IND 7 TABLEAU CROISÉ COMPÉTENCES / MODULES`, 2, 7, "tableau_croise_cfa", { fi });
       }
@@ -277,7 +283,7 @@ export function buildFullCatalog(
 
     // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
     formations.forEach((f, fi) => {
-      if (f.codeRNCP) {
+      if (isCodeRsrncp(f.codeRNCP)) {
         add(`af_c3i16_procedure_certification_${fi}`, `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
         stagiaires.forEach((s, si) => {
           add(`af_c3i16_convocation_certification_${fi}_${si}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
@@ -531,17 +537,20 @@ export function buildFullCatalog(
     add("cfa_c2i6_decoupage_formation", "CT2 - IND 6 DÉCOUPAGE DE FORMATION CFA (Excel)", 2, 6, "decoupage_formation_cfa_excel");
 
     // IND 7 — Adéquation contenus / exigences certification (CFA)
-    add("cfa_c2i7_fiche_certification", "CT2 - IND 7 FICHE CERTIFICATION RS/RNCP", 2, 7, "fiche_certification_rs");
-    add("cfa_c2i7_tableau_croise", "CT2 - IND 7 TABLEAU CROISÉ", 2, 7, "tableau_croise_cfa");
-    add("cfa_c2i7_matrice_competences", "CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)", 2, 7, "matrice_competences_excel");
-    add("cfa_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
+    const hasRsrncpCFA = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpCFA) {
+      add("cfa_c2i7_fiche_certification", "CT2 - IND 7 FICHE CERTIFICATION RS/RNCP", 2, 7, "fiche_certification_rs");
+      add("cfa_c2i7_tableau_croise", "CT2 - IND 7 TABLEAU CROISÉ", 2, 7, "tableau_croise_cfa");
+      add("cfa_c2i7_matrice_competences", "CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)", 2, 7, "matrice_competences_excel");
+      add("cfa_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
+    }
 
     // (IND 13/14/15 moved to after IND 12 block below)
 
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        if (f.codeRNCP) {
+        if (isCodeRsrncp(f.codeRNCP)) {
           add(`cfa_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
         }
       });
@@ -1229,12 +1238,15 @@ export function buildFullCatalog(
     // ===========================================================
     // IND 13 — Grille de compétences alternance nominative (retirée)
     // IND 16 — Procédure de respect des exigences du certificateur
-    add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
-    // IND 16 — DP & ECF officiels par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i16_dp_officiel_${si}`, `CT3 - IND 16 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 16, "dp_officiel", { stagiaireIdx: si });
-      add(`cfa_c3i16_ecf_officiel_${si}`, `CT3 - IND 16 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 16, "ecf_officiel", { stagiaireIdx: si });
-    });
+    const hasRsrncpCFAGap = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpCFAGap) {
+      add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
+      // IND 16 — DP & ECF officiels par stagiaire
+      stagiaires.forEach((s, si) => {
+        add(`cfa_c3i16_dp_officiel_${si}`, `CT3 - IND 16 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 16, "dp_officiel", { stagiaireIdx: si });
+        add(`cfa_c3i16_ecf_officiel_${si}`, `CT3 - IND 16 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 16, "ecf_officiel", { stagiaireIdx: si });
+      });
+    }
     // IND 17 — Inventaire des moyens
     
     // IND 18 — Fiches de poste + CR réunion
@@ -1469,13 +1481,16 @@ export function buildFullCatalog(
     });
 
     // IND 16 — Présentation à la certification
-    add("vae_c3i16_procedure_jury", "CT3 - IND 16 Procédure de passage devant le jury VAE", 3, 16, "vae_procedure_jury");
-    add("vae_c3i16_mail_conditions_certification", "CT3 - IND 16 Mail conditions de présentation aux certifications", 3, 16, "vae_mail_conditions_certification");
-    stagiaires.forEach((s, si) => {
-      add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 Convocation jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
-      add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 Procès-verbal de jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
-      add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 Notification de décision VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
-    });
+    const hasRsrncpVAE = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpVAE) {
+      add("vae_c3i16_procedure_jury", "CT3 - IND 16 Procédure de passage devant le jury VAE", 3, 16, "vae_procedure_jury");
+      add("vae_c3i16_mail_conditions_certification", "CT3 - IND 16 Mail conditions de présentation aux certifications", 3, 16, "vae_mail_conditions_certification");
+      stagiaires.forEach((s, si) => {
+        add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 Convocation jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
+        add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 Procès-verbal de jury VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
+        add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 Notification de décision VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
+      });
+    }
 
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
     add("vae_c4i17_moyens_dedies", "CT4 - IND 17 Moyens dédiés à l'accompagnement VAE", 4, 17, "vae_moyens_dedies");

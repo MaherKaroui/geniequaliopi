@@ -11434,11 +11434,62 @@ function extractFormationTopics(f: FormationInfo): string[] {
   return cleaned;
 }
 
+function genDerouleWord(o: OrganismeInfo, f: FormationInfo) {
+  const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
+
+  const jour1: string[][] = [
+    ["Accueil & présentation", "30min", "Comprendre les objectifs et le cadre de la formation", "Présentation du programme, des objectifs, des modalités d'évaluation", "Échanges oraux, présentation du formateur", "Support de présentation", "Questions-réponses", "Adaptation du rythme"],
+    ["Découverte de l'interface Word", "1h00", "Identifier les éléments de l'interface et personnaliser l'espace de travail", "Ruban, onglets, barre d'accès rapide, volet de navigation, modes d'affichage", "Démonstration + manipulation guidée", "PC, vidéoprojecteur, fiche interface", "Exercice d'identification", "Aide individualisée"],
+    ["Créer, ouvrir, enregistrer un document", "1h00", "Maîtriser la gestion des fichiers Word", "Nouveau document, modèles, enregistrement .docx / .pdf, ouverture, propriétés du document", "Démonstration + exercices pratiques", "PC, fiche pas-à-pas", "Document créé et enregistré", "Soutien individualisé"],
+    ["Saisie et modification de texte", "1h30", "Saisir et modifier du texte efficacement", "Saisie, sélection (Ctrl+A), copier/coller, annuler/rétablir, recherche/remplacement", "Exercices guidés", "PC, fiche raccourcis", "Exercice corrigé", "Adaptation du rythme"],
+    ["Mise en forme du texte", "1h30", "Mettre en forme un document professionnel", "Police, taille, couleur, gras, italique, soulignement, surlignage, mise en forme rapide", "Démonstration + mise en pratique", "PC, fiche mise en forme", "Vérification du document", "Aide ciblée"],
+    ["Gestion des paragraphes et interlignes", "30min", "Structurer un texte lisible", "Alignements, retraits, espacement avant/après, interligne simple / 1,5 / double", "Travail autonome accompagné", "PC, fiche paragraphes", "Document réalisé", "Accompagnement renforcé"],
+    ["Exercices pratiques guidés", "1h00", "Mobiliser les acquis du jour", "Mise en page d'une note de service simple avec titres, listes et mise en forme", "Travail autonome accompagné", "PC, fiche exercice", "Évaluation formative", "Accompagnement renforcé"],
+  ];
+
+  const jour2: string[][] = [
+    ["Insertion d'images, tableaux et formes", "2h00", "Enrichir un document avec des objets visuels", "Insertion d'image, redimensionnement, légende, tableau simple, bordures, formes", "Démonstration + exercices pratiques", "PC, fiche objets", "Exercice pratique", "Soutien individualisé"],
+    ["Listes à puces et numérotées", "1h00", "Structurer une information hiérarchisée", "Puces, numérotation, listes multiniveaux, retrait personnalisé", "Exercices guidés", "PC, fiche listes", "Document réalisé", "Aide ciblée"],
+    ["Mise en page complète", "1h30", "Préparer un document pour une diffusion professionnelle", "Marges, orientation, taille de page, en-têtes, pieds de page, numérotation", "Démonstration + mise en pratique", "PC, fiche mise en page", "Vérification du document", "Adaptation du rythme"],
+    ["Préparation à l'impression", "1h00", "Contrôler l'aspect final avant impression", "Aperçu avant impression, paramètres d'impression, export PDF", "Travail autonome accompagné", "PC, fiche impression", "Document PDF généré", "Accompagnement renforcé"],
+    ["Évaluation finale", "1h00", "Vérifier l'acquisition des compétences", "Cas pratique complet : rédaction et mise en page d'un courrier professionnel", "Travail autonome", "PC, grille d'évaluation", "Évaluation finale", "Accompagnement renforcé"],
+    ["Bilan & grille d'acquisition", "30min", "Consolider les acquis et identifier les suites", "Retour sur les points clés, remise des grilles d'acquisition, questions", "Échanges oraux", "Support de synthèse", "Questions-réponses", "Adaptation du rythme"],
+  ];
+
+  const buildTable = (rows: string[][]) => {
+    let html = `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+    for (const row of rows) {
+      html += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+    }
+    html += `</tbody></table>`;
+    return html;
+  };
+
+  const content = `<p><strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Durée :</strong> 14 heures — 2 jours (7h/jour)<br>
+    <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>
+    <h3>Jour 1 – Découverte et bases de Word</h3>
+    ${buildTable(jour1)}
+    <div class="page-break"></div>
+    <h3>Jour 2 – Mise en forme et documents professionnels</h3>
+    ${buildTable(jour2)}`;
+
+  return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+    { heading: "", content },
+  ] });
+}
+
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
 
-  // Massage prénatal: use dedicated déroulé with real day structure (9h + 4h)
+  // Word / Initiation Word: dedicated déroulé with real day structure
   const t = (f.intitule || "").toLowerCase();
+  const isWord = t.includes("word") || t.includes("initiation word") || (t.includes("bureautique") && !t.includes("excel") && !t.includes("powerpoint"));
+  if (isWord) {
+    return genDerouleWord(o, f);
+  }
+
+  // Massage prénatal: use dedicated déroulé with real day structure (9h + 4h)
   const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
   if (isMassage) {
     return genDeroulePedagogique(o, f);
