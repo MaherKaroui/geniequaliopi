@@ -1238,12 +1238,15 @@ export function buildFullCatalog(
     // ===========================================================
     // IND 13 — Grille de compétences alternance nominative (retirée)
     // IND 16 — Procédure de respect des exigences du certificateur
-    add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
-    // IND 16 — DP & ECF officiels par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i16_dp_officiel_${si}`, `CT3 - IND 16 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 16, "dp_officiel", { stagiaireIdx: si });
-      add(`cfa_c3i16_ecf_officiel_${si}`, `CT3 - IND 16 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 16, "ecf_officiel", { stagiaireIdx: si });
-    });
+    const hasRsrncpCFAGap = formations.some(f => isCodeRsrncp(f.codeRNCP));
+    if (hasRsrncpCFAGap) {
+      add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
+      // IND 16 — DP & ECF officiels par stagiaire
+      stagiaires.forEach((s, si) => {
+        add(`cfa_c3i16_dp_officiel_${si}`, `CT3 - IND 16 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 16, "dp_officiel", { stagiaireIdx: si });
+        add(`cfa_c3i16_ecf_officiel_${si}`, `CT3 - IND 16 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 16, "ecf_officiel", { stagiaireIdx: si });
+      });
+    }
     // IND 17 — Inventaire des moyens
     
     // IND 18 — Fiches de poste + CR réunion
