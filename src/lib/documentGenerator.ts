@@ -11437,8 +11437,14 @@ function extractFormationTopics(f: FormationInfo): string[] {
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
 
-  // Massage prénatal: use dedicated déroulé with real day structure (9h + 4h)
+  // Word / Initiation Word: dedicated déroulé with real day structure
   const t = (f.intitule || "").toLowerCase();
+  const isWord = t.includes("word") || t.includes("initiation word") || (t.includes("bureautique") && !t.includes("excel") && !t.includes("powerpoint"));
+  if (isWord) {
+    return genDerouleWord(o, f);
+  }
+
+  // Massage prénatal: use dedicated déroulé with real day structure (9h + 4h)
   const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
   if (isMassage) {
     return genDeroulePedagogique(o, f);
