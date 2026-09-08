@@ -1189,8 +1189,7 @@ export function getFormationDays(f: FormationInfo): string[] {
   const current = new Date(start);
   const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    const dow = current.getDay();
-    if (dow !== 0 && (includeSat || dow !== 6)) {
+    if (estJourFormation(current, start, end, { includeSat })) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);
