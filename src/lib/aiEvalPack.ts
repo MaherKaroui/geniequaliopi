@@ -6,7 +6,6 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import type { CorrigeFormateurData } from "./corrigeFormateur";
 
 export interface AIQCMQuestion {
   question: string;
@@ -26,7 +25,7 @@ export interface AIExerciceIntermediaire {
   questions: AIOpenQuestion[]; // 4
 }
 
-export interface AIExercicePratique extends CorrigeFormateurData {
+export interface AIExercicePratique {
   titre: string;
   consigne: string;
   reponseAttendue: string;
@@ -39,8 +38,6 @@ export interface AIEvaluationFinale {
 }
 
 export interface AIEvalPack {
-  /** Guide de passation formateur (une fois par formation) */
-  guidePassation?: string;
   qcmDebut: AIQCMQuestion[];      // 10
   qcmFin: AIQCMQuestion[];        // 10
   exerciceIntermediaire: AIExerciceIntermediaire;

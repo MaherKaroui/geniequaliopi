@@ -4,7 +4,6 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { FormationInfo } from "@/types/qualiopi";
-import type { CorrigeFormateurData } from "./corrigeFormateur";
 
 export interface AIContentBesoins {
   besoinsList: string[];
@@ -24,7 +23,7 @@ export interface AIContentChapter {
   sections: AIContentSection[];
 }
 
-export interface AIContentExercise extends CorrigeFormateurData {
+export interface AIContentExercise {
   titre: string;
   consigne: string;
   reponseAttendue: string;
@@ -45,8 +44,6 @@ export interface AIContentRessources {
 }
 
 export interface AIContentPack {
-  /** Guide de passation formateur (une fois par formation) */
-  guidePassation?: string;
   besoins: AIContentBesoins;
   chapters: AIContentChapter[];
   exercises: AIContentExercise[];
