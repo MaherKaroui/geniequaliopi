@@ -2,6 +2,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
+import { getUnitesExercices } from "./parcoursStagiaire";
 
 function getHoraireFin(_f: FormationInfo): string {
   // Conservé pour compatibilité — horaires journée standard
@@ -764,15 +765,13 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let nbBlocks: number;
   let EXERCICES_PER_BLOCK = 1;
   let blocLabels: string[] = [];
-  const _days = getFormationDays(f);
-  const _nbJours = _days.length;
-
+  // Unités d'évaluation propres au stagiaire : 1 par jour (parcours ≤ 12 jours)
+  // ou 1 par semaine calendaire (parcours long).
+  const _unites = getUnitesExercices(s, f);
+  const _nbJours = _unites.length;
+  nbBlocks = Math.max(1, _nbJours);
   if (hasBlocs) {
-    nbBlocks = rncp!.blocsCompetences.length;
     blocLabels = rncp!.blocsCompetences.map(b => b.titre);
-  } else {
-    // Strict : 1 exercice par jour de formation
-    nbBlocks = Math.max(1, _nbJours);
   }
 
   // VTC : on ajoutera 2 QCM anglais supplémentaires (épreuve langue étrangère RS5637)
@@ -888,53 +887,56 @@ D) Drive faster to finish the ride.`,
     }
   }
 
-  // Fill the remaining slots — 1 per day, alternating QCM / case study
+  // Fill the remaining slots — on réutilise EN ROTATION les contenus du pack
+  // pédagogique (IA / preset) plutôt que de produire des documents vides.
+  const _baseLen = exercices.length;
   for (let i = exercices.length; i < totalExNeeded; i++) {
-    const blockIdx = i;
+    const unite = _unites[i];
+    const suffixe = unite ? unite.label : `Jour ${i + 1}`;
+    if (_baseLen > 0) {
+      const src = exercices[i % _baseLen];
+      exercices.push({
+        titre: `${src.titre} — ${suffixe}`,
+        consigne: src.consigne,
+        reponseAttendue: src.reponseAttendue,
+      });
+      continue;
+    }
     if (hasBlocs) {
-      const blocTitre = blocLabels[blockIdx] || `Bloc ${blockIdx + 1}`;
+      const blocTitre = blocLabels[i % Math.max(1, blocLabels.length)] || `Bloc ${i + 1}`;
       exercices.push({
         titre: `Exercice ${i + 1} : Cas pratique – ${blocTitre}`,
         consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises dans le bloc « ${blocTitre} » de la formation « ${f.intitule} » pour produire le livrable demandé.`,
         reponseAttendue: `Application des acquis du bloc ${blocTitre} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
       });
     } else {
-      const jour = i + 1;
       exercices.push({
-        titre: `Exercice ${i + 1} : Cas pratique – Jour ${jour}`,
-        consigne: `À partir du contenu vu lors du jour ${jour} de la formation « ${f.intitule} », réalisez le livrable demandé : analyse de la situation, proposition argumentée, mise en œuvre opérationnelle.`,
-        reponseAttendue: `Application des acquis du jour ${jour} : démarche structurée, outils et méthodes vus en formation correctement mobilisés, résultat conforme aux attentes professionnelles.`,
+        titre: `Exercice ${i + 1} : Cas pratique – ${suffixe}`,
+        consigne: `À partir du contenu vu lors de « ${suffixe} » de la formation « ${f.intitule} », réalisez le livrable demandé : analyse de la situation, proposition argumentée, mise en œuvre opérationnelle.`,
+        reponseAttendue: `Application des acquis (${suffixe}) : démarche structurée, outils et méthodes vus en formation correctement mobilisés, résultat conforme aux attentes professionnelles.`,
       });
     }
   }
 
-
-
-
-  const blockStart = exerciceIdx !== undefined ? exerciceIdx * EXERCICES_PER_BLOCK : 0;
+  const blockStart = exerciceIdx !== undefined ? (exerciceIdx % Math.max(1, nbBlocks)) * EXERCICES_PER_BLOCK : 0;
   const blockEnd = exerciceIdx !== undefined ? blockStart + EXERCICES_PER_BLOCK : totalExNeeded;
   const selectedExercices = exercices.slice(blockStart, Math.min(blockEnd, exercices.length));
 
   let jourLabel: string;
-  if (hasBlocs && exerciceIdx !== undefined) {
-    const blocTitre = blocLabels[exerciceIdx] || `Bloc ${exerciceIdx + 1}`;
-    jourLabel = ` – ${blocTitre}`;
-  } else if (!hasBlocs && exerciceIdx !== undefined && nbBlocks > 1) {
-    jourLabel = ` – Jour ${exerciceIdx + 1}`;
-
+  if (exerciceIdx !== undefined && _unites[exerciceIdx]) {
+    jourLabel = ` – ${_unites[exerciceIdx].label}`;
+  } else if (hasBlocs && exerciceIdx !== undefined) {
+    jourLabel = ` – ${blocLabels[exerciceIdx] || `Bloc ${exerciceIdx + 1}`}`;
   } else {
     jourLabel = '';
   }
 
-  // Date du QCM : 1 QCM par jour de formation (jour 1, 2, 3, … N).
-  // Garantie : la date du QCM ne dépasse JAMAIS la date de fin de formation.
+  // Date du document : jour réel du stagiaire (parcours court) ou lundi de la
+  // semaine concernée (parcours long). Jamais au-delà de la fin de formation.
   let exerciseDate: string;
-  if (exerciceIdx !== undefined) {
-    const days = getFormationDays(f);
-    const nbJours = days.length;
-    // 1 QCM par jour ; si plus de QCM que de jours, on plafonne au dernier jour (= date de fin)
-    const jourCible = nbJours > 0 ? Math.min(exerciceIdx + 1, nbJours) : 0;
-    exerciseDate = nbJours > 0 && jourCible > 0 ? days[jourCible - 1] : formatDate(getStagiaireDateFin(s, f));
+  const _uniteSel = exerciceIdx !== undefined ? _unites[Math.min(exerciceIdx, _unites.length - 1)] : undefined;
+  if (_uniteSel?.date) {
+    exerciseDate = _uniteSel.date.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   } else {
     exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
