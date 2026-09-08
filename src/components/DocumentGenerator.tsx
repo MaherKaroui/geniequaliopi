@@ -993,7 +993,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = basePath;
+          const mailFolder = s ? `${basePath}/${buildStagiaireFolderName(s)}` : basePath;
           await safeRun(`${doc.nom} (mail)`, async () => {
             if (s) {
               const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
@@ -1204,7 +1204,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = basePath;
+          const mailFolder = s ? `${basePath}/${buildStagiaireFolderName(s)}` : basePath;
           if (s) {
             const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
             zip.file(`${mailFolder}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
@@ -1345,7 +1345,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = basePath;
+          const mailFolder = s ? `${basePath}/${buildStagiaireFolderName(s)}` : basePath;
           if (s) {
             const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
             zip.file(`${mailFolder}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
