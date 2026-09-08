@@ -3,6 +3,7 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { estJourFormation } from "./joursFeries";
+import { getUnitesExercices } from "./parcoursStagiaire";
 
 /** Nombre de jours de formation réels d'un stagiaire (fériés exclus, samedi de bord inclus). */
 function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
@@ -249,15 +250,10 @@ export function buildFullCatalog(
         const isIAForm = tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative");
         const moduleTitles = isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
-        let nbQcm: number;
-        if (moduleTitles) {
-          nbQcm = moduleTitles.length;
-        } else if (hasBlocs) {
-          nbQcm = rncp!.blocsCompetences.length;
-        } else {
-          const nbJoursStagiaire = nbJoursStagiaireCatalog(s, f) || nbJoursFormation;
-          nbQcm = Math.min(30, Math.max(1, nbJoursStagiaire));
-        }
+        // Nombre d'exercices / QCM dérivé du parcours RÉEL du stagiaire :
+        // ≤ 12 jours de formation → 1 par jour ; au-delà → 1 par semaine calendaire.
+        const unites = getUnitesExercices(s, f);
+        const nbQcm = moduleTitles ? moduleTitles.length : unites.length;
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
           if (moduleTitles) {
             add(
@@ -268,17 +264,12 @@ export function buildFullCatalog(
             );
             continue;
           }
-          const exTitle = evalData?.exercices?.[exIdx % Math.max(1, nbExContent)]?.titre;
+          const exTitle = nbExContent ? evalData?.exercices?.[exIdx % nbExContent]?.titre : undefined;
           const isQcm = exTitle ? (/^QCM\b/i.test(exTitle) || isIAForm) : (exIdx % 2 === 0);
-          const labelBase = exTitle
-            ? exTitle.replace(/^C\d+\s*[–\-]\s*Exercice\s*:\s*/i, "").replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").replace(/^Exercice\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
-            : (hasBlocs && rncp!.blocsCompetences[exIdx]?.titre)
-              ? rncp!.blocsCompetences[exIdx].titre.substring(0, 50)
-              : `Jour ${exIdx + 1}`;
           const prefix = isQcm ? `QCM ${exIdx + 1}` : `EXERCICE ${exIdx + 1}`;
           add(
             `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
-            `CT3 - IND 11 ${prefix} - Jour ${exIdx + 1} : ${labelBase} – ${s.prenom} ${s.nom}`,
+            `CT3 - IND 11 ${prefix} - ${unites[exIdx]?.label || `Jour ${exIdx + 1}`} – ${s.prenom} ${s.nom}`,
             3,
             11,
             "exercices_stagiaire",
