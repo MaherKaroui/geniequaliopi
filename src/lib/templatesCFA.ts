@@ -243,7 +243,7 @@ export function genAttestationPresenceCFA(o: OrganismeInfo, f: FormationInfo, st
   const allDays = getFormationDays(f);
   const passedDays = getPassedFormationDays(f);
   const today = new Date().toLocaleDateString('fr-FR');
-  let extra = stagiaires.slice(0, 10).map((s, i) => {
+  let extra = stagiaires.map((s, i) => {
     const taux = termine ? `${95 + (i % 5)}%` : (progress > 0 ? `${Math.round((passedDays.length / Math.max(1, allDays.length)) * (95 + (i % 5)))}% (provisoire – ${passedDays.length}/${allDays.length} jours)` : "___");
     return `
     <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur du CFA ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong>, apprenti(e) dans l'entreprise <strong>${s.entreprise}</strong>, a été présent(e) aux cours du CFA pour la période du ${formatDate(f.dateDebut)} au ${termine ? formatDate(f.dateFin) : today}.</p>
@@ -259,7 +259,7 @@ export function genAttestationFinParcours(o: OrganismeInfo, f: FormationInfo, st
     return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE PARCOURS", subtitle: f.intitule,
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les attestations de fin de parcours seront délivrées à l'issue de la formation.</em></p></div>` });
   }
-  let extra = stagiaires.slice(0, 10).map((s, i) => {
+  let extra = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return `<div class="section" style="text-align:center;padding:25px"><h2>ATTESTATION DE FIN DE PARCOURS</h2><p style="font-size:15px;margin:15px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a achevé avec succès le parcours d'apprentissage</p><p style="font-size:14px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note moyenne : <strong>${avg}/10</strong><br>Certification : ${avg >= 7 ? "✅ Obtenue" : "⚠️ En cours de validation"}</p><p style="margin-top:15px">Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p></div><div class="page-break"></div>`;
@@ -271,7 +271,7 @@ export function genAttestationFinParcours(o: OrganismeInfo, f: FormationInfo, st
 
 export function genPositionnementInitialApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return [s.prenom + " " + s.nom, s.entreprise, `${avg}/10`, avg >= 8 ? "Avancé" : avg >= 6 ? "Intermédiaire" : "Débutant", evalData.appreciations[i]?.split('.')[0] + '.' || ""];
@@ -363,7 +363,7 @@ export function genDeroulePedagogiqueCFA(o: OrganismeInfo, f: FormationInfo) {
 export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     if (!termine) {
       return [s.prenom + " " + s.nom, ...evalData.competences.map(() => "")];
     }
@@ -420,12 +420,12 @@ export function genBilanIntermediaireApprenti(o: OrganismeInfo, f: FormationInfo
   let extra = "";
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Les bilans intermédiaires seront complétés au fur et à mesure de l'avancement de la formation.</em></p></div>`;
-    stagiaires.slice(0, 10).forEach((s) => {
+    stagiaires.forEach((s) => {
       extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
         <p><strong>Note intermédiaire :</strong> ___/10<br><strong>Assiduité CFA :</strong> ___%<br><strong>Appréciation MA :</strong> ___<br><strong>Appréciation CFA :</strong> ___</p></div>`;
     });
   } else {
-    stagiaires.slice(0, 10).forEach((s, i) => {
+    stagiaires.forEach((s, i) => {
       const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
       const avg = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
       extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
@@ -443,7 +443,7 @@ export function genBilanFinalApprenti(o: OrganismeInfo, f: FormationInfo, stagia
       signatures: { type: "2", labels: ["Le Coordinateur CFA", "Le Directeur"], names: [o.responsablePedagogique, o.dirigeant] } });
   }
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     extra += `<div class="section"><h3>${s.prenom} ${s.nom}</h3>
@@ -457,14 +457,14 @@ export function genEvaluationAcquisCFA(o: OrganismeInfo, f: FormationInfo, stagi
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f);
   if (!termine) {
-    const rows = stagiaires.slice(0, 10).map((s) => {
+    const rows = stagiaires.map((s) => {
       return [s.prenom + " " + s.nom, ...evalData.competences.map(() => ""), "", ""];
     });
     return buildDocument({ org: o, title: "ÉVALUATION DES ACQUIS – CFA", subtitle: f.intitule, table: {
       headers: ["Apprenti(e)", ...evalData.competences.map((_, i) => `C${i+1}`), "Moyenne", "Validé"], rows
     } });
   }
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const finalSc = sc.map(v => Math.min(10, v + 2));
     const avg = Math.round(finalSc.reduce((a, b) => a + b, 0) / finalSc.length * 10) / 10;
@@ -479,7 +479,7 @@ export function genGrilleValidationCompetences(o: OrganismeInfo, f: FormationInf
   const evalData = getEvalContent(f.intitule);
   const competences = evalData.competences.length > 0 ? evalData.competences.slice(0, 5) : ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     if (!termine) {
       return [s.prenom + " " + s.nom, ...competences.map(() => "")];
     }
@@ -505,7 +505,7 @@ export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: Format
   const termine = isFormationTerminee(f);
   const progress = getFormationProgress(f);
   const enCours = !termine && progress > 0;
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     if (termine) {
       return [s.prenom + " " + s.nom, s.entreprise, i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun", `${2 + (i % 3)}h/mois`, i < 7 ? "✅ En place" : "📋 Planifié"];
     }
@@ -526,13 +526,13 @@ export function genSatisfactionApprenti(o: OrganismeInfo, f: FormationInfo, stag
   let extra = "";
   const criteres = ["Accueil au CFA", "Qualité des cours", "Lien CFA/Entreprise", "Accompagnement", "Supports", "Préparation examen"];
   if (!termine) {
-    stagiaires.slice(0, 8).forEach((s) => {
+    stagiaires.forEach((s) => {
       extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c) => [c, ""]));
     });
     return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION APPRENTI", subtitle: f.intitule, extraHtml: extra,
       sections: [{ heading: "Moyenne", content: "<p><em>Formation en cours – questionnaire à compléter à l'issue de la formation.</em></p>", variant: "green" }] });
   }
-  stagiaires.slice(0, 8).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const scores = criteres.map((_, ci) => 4 + ((si + ci) % 2));
     extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c, i) => [c, `${scores[i]}/5`]));
   });
@@ -591,7 +591,7 @@ export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, sta
   const termine = isFormationTerminee(f);
   const progress = getFormationProgress(f);
   const enCours = !termine && progress > 0;
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     if (termine) {
       return [s.prenom + " " + s.nom, s.entreprise, `${95 + (i % 5)}%`, `${i % 10 < 8 ? 0 : 1}`, `${i % 10 < 7 ? 0 : 1}`, i < 8 ? "✅ Bon" : "⚠️ À suivre"];
     }
@@ -610,7 +610,7 @@ export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo
   const termine = isFormationTerminee(f);
   const progress = getFormationProgress(f);
   const enCours = !termine && progress > 0;
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     if (termine) {
       return [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", `${1 + (i % 3)} visites`, i < 7 ? "✅" : "🔄", ""];
     }

@@ -129,7 +129,7 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros TTC.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} TTC par stagiaire</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} TTC par stagiaire</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
 
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
@@ -146,7 +146,7 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
   // Per-stagiaire signature pages
   let sigPages = '';
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
     const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
     sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
@@ -194,7 +194,7 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   // Per-stagiaire signature pages
   let sigPages = '';
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
     const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
     sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
@@ -210,7 +210,7 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
 export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = '';
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (i > 0) extra += '<div class="page-break"></div>';
     const civilite = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'Madame' : 'Monsieur';
     extra += `
@@ -249,7 +249,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
 
 export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = '';
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (i > 0) extra += '<div class="page-break"></div>';
     extra += `
       <h2>CONTRAT DE FORMATION PROFESSIONNELLE</h2>
@@ -287,6 +287,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       </div>
       <h3>Article 8 – Dispositions financières</h3>
        <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+      <p>TVA non applicable, article 261-4-4° du CGI.</p>
       <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
       <h3>Article 9 – Délai de rétractation</h3>
       <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
@@ -388,6 +389,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     </div>
     <h3>Article 8 – Dispositions financières</h3>
     <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+    <p>TVA non applicable, article 261-4-4° du CGI.</p>
     <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
     <h3>Article 9 – Délai de rétractation</h3>
     <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
@@ -522,7 +524,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
       extra += `<p style="margin-top:15px"><strong>Date : ${day}</strong></p>`;
       extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
       let tableRows = '';
-      stagiaires.slice(0, 10).forEach(s => {
+      stagiaires.forEach(s => {
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
         const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
         const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
@@ -552,7 +554,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
       if (m) dayDate = new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
       const isFuture = dayDate ? dayDate > today : false;
 
-      stagiaires.slice(0, 10).forEach((s, si) => {
+      stagiaires.forEach((s, si) => {
         if (isFuture) {
           rows.push([s.prenom + " " + s.nom, day, "—", "—", "—", "—", "⏳ À venir"]);
           return;
@@ -635,7 +637,7 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
     "QCM", "Test réussite", "Satisfaction"
   ];
 
-  const rows = stagiaires.slice(0, 10).map((s, si) => {
+  const rows = stagiaires.map((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     const civ = (s.civilite || '').toLowerCase().trim();
@@ -1456,7 +1458,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <div style="text-align:center;font-size:13px;color:#333;line-height:1.7;max-width:220mm;margin:0 auto">
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
         <p style="margin:8px 0;font-size:17px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
-        ${f.duree ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
+        ${getStagiaireDuree(s, f) ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>` : ""}
       </div>
 
       <!-- Mention légale -->
@@ -1516,7 +1518,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     extra += `<div class="section"><p><strong>Consigne :</strong> ${ex.consigne}</p></div>`;
     extra += `<div class="section section-green"><p><strong>Réponse attendue / Corrigé :</strong> ${ex.reponseAttendue}</p></div>`;
     extra += `<h4>Résultats par stagiaire</h4>`;
-    const rows = stagiaires.slice(0, 10).map((s, si) => {
+    const rows = stagiaires.map((s, si) => {
       const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
       const noteFinale = variations[(si + ei) % variations.length];
       const seed = (si * 7 + ei * 3) % 4;
@@ -1535,7 +1537,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
   // Jeu 1 : Quiz Rapidité
   extra += `<h3>Jeu 1 : Quiz Rapidité – Questions Flash</h3>`;
   extra += `<div class="section"><p><strong>Règle du jeu :</strong> Le formateur pose 10 questions rapides sur les notions clés de la formation. Chaque stagiaire dispose de 15 secondes pour répondre. 1 point par bonne réponse. Bonus de 2 points pour la réponse la plus rapide.</p></div>`;
-  const quizRows = stagiaires.slice(0, 10).map((s, si) => {
+  const quizRows = stagiaires.map((s, si) => {
     const score = 7 + ((si * 3 + 5) % 4); // 7 à 10
     const bonus = si % 3 === 0 ? 2 : 0;
     const total = Math.min(12, score + bonus);
@@ -1551,7 +1553,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     ? `Le stagiaire doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la pertinence des réponses, la créativité des solutions proposées et la qualité de l'argumentation.`
     : `Les stagiaires sont répartis en binômes. Chaque binôme doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la collaboration, la pertinence des réponses et la créativité des solutions proposées.`
   }</p></div>`;
-  const roleRows = stagiaires.slice(0, 10).map((s, si) => {
+  const roleRows = stagiaires.map((s, si) => {
     const collab = 3 + ((si * 2 + 1) % 3);
     const pertin = 3 + ((si * 3 + 2) % 3);
     const creat = 3 + ((si + 4) % 3);
@@ -1579,7 +1581,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
   // --- BILAN GLOBAL ---
   extra += `<div class="page-break"></div>`;
   extra += `<h2>BILAN GLOBAL DE L'ÉVALUATION FINALE</h2>`;
-  const bilanRows = stagiaires.slice(0, 10).map((s, si) => {
+  const bilanRows = stagiaires.map((s, si) => {
     const exNote = 8 + ((si * 2 + 3) % 3); // 8-10
     const quizNote = 7 + ((si * 3 + 5) % 4);
     const roleNote = (3 + ((si * 2 + 1) % 3)) + (3 + ((si * 3 + 2) % 3)) + (3 + ((si + 4) % 3));
@@ -1620,7 +1622,7 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   // Results per stagiaire
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const answers = generateStagiaireAnswers(questions, si + 100);
     const result = computeQCMScore(questions, answers);
     const qcmScore = Math.max(8, Math.min(10, result.score + (si % 3))); // minimum 8/10
@@ -1644,7 +1646,7 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f);
   let extra = '';
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     extra += `<h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>`;
@@ -1670,7 +1672,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les attestations de réussite seront délivrées à l'issue de la formation.</em></p></div>` });
   }
   let extra = '';
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
     const stagDuree = getStagiaireDuree(s, f);
     const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
@@ -1705,7 +1707,7 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros TTC.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${(s?.tarifFormation?.trim() || f.tarif) ? `<p>Tarif de la formation « ${f.intitule} » : ${s?.tarifFormation?.trim() || f.tarif} TTC par stagiaire</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${getStagiaireTarif(s, f)} par stagiaire — TVA non applicable, article 261-4-4° du CGI.</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
     { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation tardive ou d'abandon injustifié, ${o.nom} se réserve le droit de facturer tout ou partie de la formation engagée.</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },

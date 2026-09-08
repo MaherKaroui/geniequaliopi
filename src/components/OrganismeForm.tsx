@@ -194,6 +194,22 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Input id="certifications" value={data.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Ex: Qualiopi (valide jusqu'au...)" />
         </div>
         )}
+        <div>
+          <Label htmlFor="numeroCertificatQualiopi">N° certificat Qualiopi</Label>
+          <Input id="numeroCertificatQualiopi" value={data.numeroCertificatQualiopi || ''} onChange={e => update('numeroCertificatQualiopi' as any, e.target.value)} placeholder="Ex: 2024/98765.1" />
+        </div>
+        <div>
+          <Label htmlFor="organismeCertificateur">Organisme certificateur</Label>
+          <Input id="organismeCertificateur" value={data.organismeCertificateur || ''} onChange={e => update('organismeCertificateur' as any, e.target.value)} placeholder="Ex: AFNOR Certification" />
+        </div>
+        <div>
+          <Label htmlFor="dateObtentionQualiopi">Date d'obtention Qualiopi</Label>
+          <Input id="dateObtentionQualiopi" type="date" value={data.dateObtentionQualiopi || ''} onChange={e => update('dateObtentionQualiopi' as any, e.target.value)} />
+        </div>
+        <div>
+          <Label htmlFor="dateFinValiditeQualiopi">Date de fin de validité Qualiopi</Label>
+          <Input id="dateFinValiditeQualiopi" type="date" value={data.dateFinValiditeQualiopi || ''} onChange={e => update('dateFinValiditeQualiopi' as any, e.target.value)} />
+        </div>
         {!hidden('outilsUtilises') && (
         <div className="md:col-span-2">
           <Label htmlFor="outilsUtilises">Outils utilisés</Label>

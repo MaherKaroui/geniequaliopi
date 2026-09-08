@@ -2,6 +2,28 @@ import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
+import { estJourFormation } from "./joursFeries";
+
+/** Nombre de jours de formation réels d'un stagiaire (fériés exclus, samedi de bord inclus). */
+function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
+  const deb = (s.dateDebutFormation || f.dateDebut || "").trim();
+  const fin = (s.dateFinFormation || f.dateFin || "").trim();
+  if (!deb || !fin) return 0;
+  const parse = (v: string): Date | null => {
+    const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const start = parse(deb), end = parse(fin);
+  if (!start || !end || end < start) return 0;
+  let n = 0;
+  const cur = new Date(start);
+  while (cur <= end) {
+    if (estJourFormation(cur, start, end)) n++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return n;
+}
 import { getEvalContent } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdc/bdcTemplatesBC";
@@ -62,6 +84,13 @@ export function buildFullCatalog(
     add("af_c1i2_lien_site_internet", "CT1 - IND 2 LIEN DU SITE INTERNET", 1, 2, "lien_site_internet");
     add("af_c1i2_procedure_indicateurs_perf", "CT1 - IND 2 PROCÉDURE DE SUIVI DES INDICATEURS DE PERFORMANCE", 1, 2, "procedure_indicateurs_performance");
     add("af_c1i2_tableau_bord_perf", "CT1 - IND 2 TABLEAU DE BORD INDICATEURS DE PERFORMANCE", 1, 2, "indicateurs_performance");
+
+    // IND 3 — Taux d'obtention des certifications (uniquement si code RNCP renseigné)
+    formations.forEach((f, fi) => {
+      if (f.codeRNCP && f.codeRNCP.trim()) {
+        add(`af_c1i3_taux_obtention_${fi}`, `CT1 - IND 3 TAUX D'OBTENTION DE LA CERTIFICATION`, 1, 3, "taux_obtention_certification", { fi });
+      }
+    });
 
 
     // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION =====
@@ -137,6 +166,7 @@ export function buildFullCatalog(
       add(`af_c3i9_convocation_${si}`, `CT3 - IND 9 CONVOCATION – ${s.prenom} ${s.nom}`, 3, 9, "convocation_stagiaire", { stagiaireIdx: si });
     });
     add("af_c3i9_procedure_accueil", "CT3 - IND 9 PROCÉDURE D'ACCUEIL DES STAGIAIRES", 3, 9, "procedure_accueil_stagiaires");
+    add("af_c3i9_livret_accueil", "CT3 - IND 9 LIVRET D'ACCUEIL DU STAGIAIRE", 3, 9, "livret_accueil");
     // Règlement intérieur — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
       add(`af_c3i9_reglement_interieur_${si}`, `CT3 - IND 9 RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, 3, 9, "reglement_interieur_stagiaire", { stagiaireIdx: si });
@@ -186,7 +216,7 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
       const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
-      const nbJours = getFormationDays(f).length;
+      const nbJoursFormation = getFormationDays(f).length;
 
       stagiaires.forEach((s, si) => {
         add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
@@ -225,7 +255,8 @@ export function buildFullCatalog(
         } else if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
-          nbQcm = Math.max(1, nbJours);
+          const nbJoursStagiaire = nbJoursStagiaireCatalog(s, f) || nbJoursFormation;
+          nbQcm = Math.min(30, Math.max(1, nbJoursStagiaire));
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
           if (moduleTitles) {
@@ -272,6 +303,7 @@ export function buildFullCatalog(
 
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_certificat_realisation_${fi}_${si}`, `CT3 - IND 11 CERTIFICAT DE RÉALISATION – ${s.prenom} ${s.nom}`, 3, 11, "certificat_realisation_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 

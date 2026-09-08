@@ -925,6 +925,19 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
   const fin = s.dateFinFormation || f.dateFin || "";
   const titre = f.intitule || "Formation";
   const termine = isBilanFroidDisponibleStagiaire(s, f);
+  const estCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim());
+  const labelBenef = estCFA ? "L'apprenti(e) :" : "Le/La stagiaire :";
+  const parseFin = (v: string): Date | null => {
+    if (!v) return null;
+    const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const finDate = parseFin(fin);
+  const formationFinie = !!finDate && finDate.getTime() < Date.now();
+  const statutTxt = formationFinie
+    ? `Formation terminée le ${fin ? fmtDate(fin) : "—"} — bilan à froid à administrer 3 à 6 mois après la fin`
+    : `Formation en cours — bilan à froid à administrer 3 à 6 mois après la fin (${fin ? fmtDate(fin) : "—"})`;
 
   const questions = [
     "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans votre travail ?",
@@ -946,8 +959,8 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
         <table style="width:100%;border-collapse:collapse;">
           <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
           <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
-          <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
-          <tr><td ${tdb} style="background:#fff8e1;">Statut</td><td ${td} style="background:#fff8e1;color:#92400e;font-weight:600;">⏳ Formation en cours — bilan à froid à administrer 3 à 6 mois après la fin (${fin ? fmtDate(fin) : "—"})</td></tr>
+          <tr><td ${tdb}>${labelBenef}</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
+          <tr><td ${tdb} style="background:#fff8e1;">Statut</td><td ${td} style="background:#fff8e1;color:#92400e;font-weight:600;">⏳ ${statutTxt}</td></tr>
         </table>` },
       { heading: "Évaluation", content: `<p style="color:#666;font-style:italic;">À compléter par le bénéficiaire entre 3 et 6 mois après la fin de la formation.</p>
         <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
@@ -991,7 +1004,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
       <table style="width:100%;border-collapse:collapse;">
         <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
         <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
-        <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
+        <tr><td ${tdb}>${labelBenef}</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
         <tr><td ${tdb}>Période d'administration</td><td ${td}>${mentionDelai}</td></tr>
       </table>` },
     { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>

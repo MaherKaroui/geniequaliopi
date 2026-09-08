@@ -52,7 +52,7 @@ function tableRow(cells: string[], isHeader = false): string {
 
 export function generateExcelSuiviStagiaires(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   let html = tableRow(["N°", "Nom", "Prénom", "Email", "Téléphone", "Entreprise", "Poste", "Date naissance", "Statut"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     html += tableRow([`${i + 1}`, s.nom, s.prenom, s.email, s.telephone, s.entreprise, s.poste, formatDate(s.dateNaissance), "✅ Inscrit"]);
   });
   return excelWrap(`Suivi stagiaires – ${f.intitule}`, [{ name: "Stagiaires", html }]);
@@ -61,7 +61,7 @@ export function generateExcelSuiviStagiaires(o: OrganismeInfo, f: FormationInfo,
 export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const jours = ["Jour 1", "Jour 2", "Jour 3", "Jour 4", "Jour 5"];
   let html = tableRow(["Stagiaire", ...jours, "Total heures", "Taux présence"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     // Synchronized: 100% attendance for all (matches émargement)
     const presences = jours.map(() => "P");
     const total = jours.length * 7;
@@ -74,7 +74,7 @@ export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, sta
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["Stagiaire", "Positionnement", "Intermédiaire", "Finale", "Moyenne", "Progression", "Résultat"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (termine) {
       const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
       const pos = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
@@ -93,7 +93,7 @@ export function generateExcelSatisfaction(o: OrganismeInfo, f: FormationInfo, st
   const termine = isFormationTerminee(f, stagiaires);
   const criteres = ["Accueil", "Objectifs", "Contenu", "Pédagogie", "Formateur", "Supports", "Durée", "Recommandation"];
   let html = tableRow(["Stagiaire", ...criteres, "Moyenne"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (termine) {
       const scores = criteres.map((_, ci) => 4 + ((i + ci) % 2));
       const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
@@ -103,7 +103,7 @@ export function generateExcelSatisfaction(o: OrganismeInfo, f: FormationInfo, st
     }
   });
   if (termine) {
-    html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.slice(0,10).map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
+    html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
   }
   return excelWrap(`Satisfaction – ${f.intitule}`, [{ name: "Satisfaction", html }]);
 }
@@ -140,7 +140,7 @@ export function generateExcelSuiviCompetences(o: OrganismeInfo, f: FormationInfo
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["Stagiaire", ...evalData.competences, "Moyenne", "Statut"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     if (termine) {
       const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
       const scores = evalData.competences.map((_, ci) => Math.min(10, sc[ci % sc.length] + 2));
@@ -186,7 +186,7 @@ export function generateExcelPlanActions(o: OrganismeInfo): string {
 export function generateExcelSuiviApprentis(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["N°", "Apprenti", "Entreprise", "MA", "Assiduité CFA", "Assiduité Ent.", "Note CFA", "Éval MA", "Visite 1", "Visite 2", "Statut"], true);
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     const avgMA = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
@@ -196,7 +196,7 @@ export function generateExcelSuiviApprentis(o: OrganismeInfo, f: FormationInfo, 
 }
 
 export function generateExcelSuiviEntreprises(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const entreprises = [...new Set(stagiaires.slice(0, 10).map(s => s.entreprise).filter(Boolean))];
+  const entreprises = [...new Set(stagiaires.map(s => s.entreprise).filter(Boolean))];
   let html = tableRow(["Entreprise", "Nb apprentis", "Satisfaction", "Visites réalisées", "Convention signée", "Renouvellement"], true);
   entreprises.forEach((ent, i) => {
     html += tableRow([ent, `${1 + (i % 3)}`, `${4 + (i % 2)}/5`, `${2 + (i % 2)}`, "✅ Oui", "✅ Oui"]);
@@ -353,7 +353,7 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
   html += `<th>QCM</th><th>Test réussite</th><th>Satisfaction</th>`;
   html += `</tr>`;
 
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     // Sexe basé sur la civilité (et non sur la terminaison du prénom)
