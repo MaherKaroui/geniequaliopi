@@ -63,6 +63,13 @@ export function buildFullCatalog(
     add("af_c1i2_procedure_indicateurs_perf", "CT1 - IND 2 PROCÉDURE DE SUIVI DES INDICATEURS DE PERFORMANCE", 1, 2, "procedure_indicateurs_performance");
     add("af_c1i2_tableau_bord_perf", "CT1 - IND 2 TABLEAU DE BORD INDICATEURS DE PERFORMANCE", 1, 2, "indicateurs_performance");
 
+    // IND 3 — Taux d'obtention des certifications (uniquement si code RNCP renseigné)
+    formations.forEach((f, fi) => {
+      if (f.codeRNCP && f.codeRNCP.trim()) {
+        add(`af_c1i3_taux_obtention_${fi}`, `CT1 - IND 3 TAUX D'OBTENTION DE LA CERTIFICATION`, 1, 3, "taux_obtention_certification", { fi });
+      }
+    });
+
 
     // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION =====
 
@@ -137,6 +144,7 @@ export function buildFullCatalog(
       add(`af_c3i9_convocation_${si}`, `CT3 - IND 9 CONVOCATION – ${s.prenom} ${s.nom}`, 3, 9, "convocation_stagiaire", { stagiaireIdx: si });
     });
     add("af_c3i9_procedure_accueil", "CT3 - IND 9 PROCÉDURE D'ACCUEIL DES STAGIAIRES", 3, 9, "procedure_accueil_stagiaires");
+    add("af_c3i9_livret_accueil", "CT3 - IND 9 LIVRET D'ACCUEIL DU STAGIAIRE", 3, 9, "livret_accueil");
     // Règlement intérieur — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
       add(`af_c3i9_reglement_interieur_${si}`, `CT3 - IND 9 RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, 3, 9, "reglement_interieur_stagiaire", { stagiaireIdx: si });
@@ -186,7 +194,7 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
       const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
-      const nbJours = getFormationDays(f).length;
+      const nbJoursFormation = getFormationDays(f).length;
 
       stagiaires.forEach((s, si) => {
         add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
@@ -225,7 +233,8 @@ export function buildFullCatalog(
         } else if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
-          nbQcm = Math.max(1, nbJours);
+          const nbJoursStagiaire = getStagiaireDays(s, f).length || nbJoursFormation;
+          nbQcm = Math.min(30, Math.max(1, nbJoursStagiaire));
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
           if (moduleTitles) {
@@ -272,6 +281,7 @@ export function buildFullCatalog(
 
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_certificat_realisation_${fi}_${si}`, `CT3 - IND 11 CERTIFICAT DE RÉALISATION – ${s.prenom} ${s.nom}`, 3, 11, "certificat_realisation_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 
