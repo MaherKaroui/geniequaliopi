@@ -3,6 +3,7 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 import { getUnitesExercices } from "./parcoursStagiaire";
+import { renderCorrigeFormateurHTML, renderGuidePassationHTML, renderTrameExerciceHTML, type ExerciceEnrichi } from "./corrigeFormateur";
 
 function getHoraireFin(_f: FormationInfo): string {
   // Conservé pour compatibilité — horaires journée standard
@@ -726,16 +727,15 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
 export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
   const evalData = getEvalContent(f.intitule);
   const exercices = evalData.exercices;
+  const aiPackTrame = getCachedContentPack(f);
+  const exSource: ExerciceEnrichi[] = (aiPackTrame?.exercises?.length ? aiPackTrame.exercises : exercices) as ExerciceEnrichi[];
   let extra = '';
-  exercices.forEach((ex, ei) => {
-    extra += `<h3>${ex.titre}</h3>`;
-    extra += `<p><strong>Consigne :</strong></p><p>${ex.consigne}</p>`;
-    extra += `<p><strong>Travail réalisé :</strong></p>`;
-    extra += `<p>.................................................................................................</p>`;
-    extra += `<p>.................................................................................................</p>`;
-    extra += `<p>.................................................................................................</p>`;
-    if (ei < exercices.length - 1) extra += '<br/>';
+  exSource.forEach((ex, ei) => {
+    if (ei > 0) extra += `<div class="page-break"></div>`;
+    extra += renderTrameExerciceHTML(ex, f, ei);
   });
+  extra += `<div class="page-break"></div>`;
+  extra += renderGuidePassationHTML(f, aiPackTrame?.guidePassation);
   return buildDocument({ org: o, title: "EXERCICES PRATIQUES – FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
   // NO signatures
 }
@@ -755,7 +755,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const evalData = getEvalContent(f.intitule);
   // Override AI : si un AIContentPack est en cache, on utilise ses exercices riches en priorité
   const aiPack = getCachedContentPack(f);
-  const allExercices = (aiPack?.exercises?.length ? aiPack.exercises.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })) : evalData.exercices);
+  const allExercices = (aiPack?.exercises?.length ? aiPack.exercises.map(e => ({ ...e, titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })) : evalData.exercices);
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
 
   // Check if formation has competency blocs
@@ -1507,7 +1507,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
   const evalData = getEvalContent(f.intitule);
   const aiPackEP = getCachedContentPack(f);
   const exercices = aiPackEP?.exercises?.length
-    ? aiPackEP.exercises.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue }))
+    ? aiPackEP.exercises.map(e => ({ ...e, titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue }))
     : evalData.exercices;
   let extra = `<h2>ÉVALUATION FINALE – EXERCICES & JEUX</h2>`;
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre d'épreuves :</strong> ${exercices.length + 2} (${exercices.length} exercices + 2 jeux pédagogiques)</p>`;
@@ -1517,8 +1517,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
   exercices.forEach((ex, ei) => {
     extra += `<div class="page-break"></div>`;
     extra += `<h3>Exercice ${ei + 1} : ${ex.titre}</h3>`;
-    extra += `<div class="section"><p><strong>Consigne :</strong> ${ex.consigne}</p></div>`;
-    extra += `<div class="section section-green"><p><strong>Réponse attendue / Corrigé :</strong> ${ex.reponseAttendue}</p></div>`;
+    extra += renderCorrigeFormateurHTML(ex as ExerciceEnrichi, f, ei);
     extra += `<h4>Résultats par stagiaire</h4>`;
     const rows = stagiaires.map((s, si) => {
       const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
