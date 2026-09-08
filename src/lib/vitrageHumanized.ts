@@ -364,11 +364,22 @@ export function pickVitrageExerciceAnswer(
   exerciceIdx: number,
   stagiaireIdx: number,
   s: { nom?: string; prenom?: string; civilite?: string },
+  contexte?: string,
 ): string | null {
   if (!isVitrageFormation(intitule, code)) return null;
   const seed = vitrageSeed(s.nom, s.prenom);
   const fem = isFeminin(s.civilite, s.prenom);
-  const pool = EXERCICES_PRODUCTIONS[exerciceIdx % EXERCICES_PRODUCTIONS.length];
+
+  // Choix du bloc de production selon le thème réel de l'exercice
+  const t = (contexte || "").toLowerCase();
+  let bloc: number;
+  if (/impact|réparabilité|reparabilite|diagnostic|résine|resine|injection/.test(t)) bloc = 0;
+  else if (/dépose|depose|découpe|decoupe|extraction|ravoir|préparation|preparation/.test(t)) bloc = 1;
+  else if (/pose|collage|encoll|cordon|calibrage|adas/.test(t)) bloc = 2;
+  else if (/client|accueil|devis|sécurité|securite|déchet|dechet|epi|risque/.test(t)) bloc = 3;
+  else bloc = exerciceIdx % EXERCICES_PRODUCTIONS.length;
+
+  const pool = EXERCICES_PRODUCTIONS[bloc];
   const idx = (seed + exerciceIdx * 5 + stagiaireIdx) % pool.length;
   return accorder(pool[idx], fem);
 }

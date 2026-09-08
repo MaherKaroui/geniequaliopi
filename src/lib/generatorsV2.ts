@@ -1135,7 +1135,7 @@ D) Drive faster to finish the ride.`,
       .replace(/\[.*?\]/g, '');
 
     // Output the student response as a single flowing block — no extra filler paragraphs
-    const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s)
+    const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     extra += `<p>${creaRep || repClean}</p>`;
 
