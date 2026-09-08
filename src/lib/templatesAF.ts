@@ -4,6 +4,7 @@ import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
+import { getTauxObtention, getCommentaireIndicateurs } from "./indicateursResultats";
 
 // ========== DOCUMENTS ADMINISTRATIFS AF ==========
 
