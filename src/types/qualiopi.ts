@@ -118,6 +118,15 @@ export interface FormationInfo {
   codeRNCP?: string;
   rythmeAlternance?: string;
   formateurSignatureUrl?: string;
+  // ===== Indicateurs de résultats (critère 1) — saisis, jamais fabriqués =====
+  anneeIndicateurs?: string;
+  tauxSatisfaction?: string;
+  nombreAvisSatisfaction?: string;
+  tauxAssiduite?: string;
+  nombreStagiairesFormes?: string;
+  nbPresentesCertification?: string;
+  nbAdmisCertification?: string;
+  commentaireIndicateurs?: string;
 }
 
 export interface IndicateurData {

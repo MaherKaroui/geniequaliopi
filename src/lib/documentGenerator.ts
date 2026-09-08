@@ -59,6 +59,7 @@ import { pickCreaComment, isCreationEntrepriseFormation, CREA_BESOINS } from "./
 import { pickIAComment, isIAGenerativeFormation } from "./iaGenerativePreset";
 import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
+import { getSatisfactionLabel, getAssiduiteLabel, getNombreStagiairesFormes, getTauxObtention, getCommentaireIndicateurs, getRepartitionParAnnee, NON_COLLECTE } from "./indicateursResultats";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
@@ -2785,11 +2786,25 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       ${(() => {
         if (!isCFA) {
+          const sat = getSatisfactionLabel(f);
+          const ass = getAssiduiteLabel(f);
+          const nbF = getNombreStagiairesFormes(f);
+          const obt = getTauxObtention(f);
+          const com = getCommentaireIndicateurs(f);
+          if (!sat && !ass && !nbF && !obt) {
+            return `<p>Indicateurs en cours de collecte pour la première année d'activité sur cette action.</p>`;
+          }
+          const rows = [
+            nbF ? ["Nombre de stagiaires formés", nbF] : null,
+            sat ? ["Taux de satisfaction globale", sat] : null,
+            ass ? ["Taux d'assiduité", ass] : null,
+            obt ? ["Taux d'obtention de la certification", `${obt.taux} % (${obt.admis}/${obt.presentes})`] : null,
+          ].filter(Boolean) as string[][];
           return `<table>
             <tr><th style="width:60%">Indicateur</th><th>Résultat</th></tr>
-            <tr><td>Nombre de stagiaires formés</td><td>${nbStagiaires}</td></tr>
-            <tr><td>Taux de satisfaction globale</td><td>90%</td></tr>
+            ${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}
           </table>
+          ${com ? `<p style="margin-top:8px">${com}</p>` : ""}
           <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>`;
         }
         const termineProg = isFormationTerminee(f, stagiaires.filter(s => s.nom && s.nom.trim()));
@@ -4623,45 +4638,56 @@ function genAuditInterne(o: OrganismeInfo, semestre: string) {
 function genIndicateursPerformance(o: OrganismeInfo, formations: FormationInfo[], stagiaires: StagiaireInfo[]) {
   const f = formations[0];
   const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
-  const nbStagiaires = stagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
+  const valides = stagiaires.filter(s => s.nom && s.nom.trim());
 
-  // Determine year from individual dates or formation
-  const firstDate = stagiaires.find(s => s.dateDebutFormation)?.dateDebutFormation || f?.dateDebut || f?.dateFin || "";
-  const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
-  const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+  // Répartition réelle par année et par mois (dates individuelles prioritaires)
+  const repartition = getRepartitionParAnnee(f, valides);
+  const anneeTitre = (f?.anneeIndicateurs || "").trim()
+    || (repartition.length ? repartition.map(r => r.annee).join(" / ") : String(new Date().getFullYear()));
 
-  // Count stagiaires per month based on individual dates
-  const countPerMonth = new Array(12).fill(0);
-  const hasIndividualDates = stagiaires.some(s => s.dateDebutFormation);
+  const satisfaction = getSatisfactionLabel(f);
+  const assiduite = getAssiduiteLabel(f);
+  const obtention = getTauxObtention(f);
+  const commentaire = getCommentaireIndicateurs(f);
+  const nbFormes = getNombreStagiairesFormes(f);
 
-  if (hasIndividualDates) {
-    stagiaires.filter(s => s.nom && s.nom.trim()).forEach(s => {
-      const d = s.dateDebutFormation || f?.dateDebut || "";
-      if (d) {
-        const pd = new Date(d + "T00:00:00");
-        if (!isNaN(pd.getTime())) countPerMonth[pd.getMonth()]++;
-      }
-    });
-  } else {
-    const fallbackDate = f?.dateDebut || f?.dateFin || "";
-    const pd = fallbackDate ? new Date(fallbackDate + "T00:00:00") : null;
-    const moisF = pd && !isNaN(pd.getTime()) ? pd.getMonth() : -1;
-    if (moisF >= 0) countPerMonth[moisF] = nbStagiaires;
+  let tableHtml = "";
+
+  repartition.forEach(r => {
+    tableHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:10px;margin-bottom:14px">
+      <tr style="background:#1e3a7b;color:#fff"><th>Action de formation</th><th>Indicateur</th>`;
+    mois.forEach(m => { tableHtml += `<th>${m}-${String(r.annee).slice(2)}</th>`; });
+    tableHtml += `<th>Commentaires / analyse</th></tr>`;
+    tableHtml += `<tr><td rowspan="2">${f?.intitule || o.nom}</td><td>Nombre de stagiaires</td>`;
+    r.parMois.forEach(n => { tableHtml += `<td>${n > 0 ? n : ""}</td>`; });
+    tableHtml += `<td style="font-size:9px">${r.total} stagiaire${r.total > 1 ? "s" : ""} sur l'année ${r.annee}.</td></tr>`;
+    tableHtml += `<tr><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
+    mois.forEach(() => { tableHtml += `<td></td>`; });
+    tableHtml += `<td style="font-size:9px">${satisfaction || NON_COLLECTE}</td></tr>`;
+    tableHtml += `</table>`;
+  });
+
+  if (!repartition.length) {
+    tableHtml += `<p>Aucune date de session renseignée : la répartition mensuelle ne peut pas être établie.</p>`;
   }
 
-  let tableHtml = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:10px">
-    <tr style="background:#1e3a7b;color:#fff"><th>Action de formation</th><th>Indicateur</th>`;
-  mois.forEach(m => { tableHtml += `<th>${m}-${String(annee).slice(2)}</th>`; });
-  tableHtml += `<th>Commentaires / analyse</th></tr>`;
-  tableHtml += `<tr><td rowspan="2">${f?.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
-  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? "90%" : ""}</td>`; });
-  tableHtml += `<td style="font-size:9px">${f?.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 9/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30.</td></tr>`;
-  tableHtml += `<tr><td>Nombre de stagiaires</td>`;
-  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
-  tableHtml += `<td></td></tr></table>`;
+  const synthese: string[][] = [
+    ["Taux de satisfaction", satisfaction || NON_COLLECTE],
+    ["Taux d'assiduité", assiduite || NON_COLLECTE],
+    ["Nombre de stagiaires formés", nbFormes || (repartition.length ? String(repartition.reduce((a, r) => a + r.total, 0)) : NON_COLLECTE)],
+    ["Taux d'obtention de la certification", obtention ? `${obtention.taux} % (${obtention.admis}/${obtention.presentes})` : "Non disponible"],
+  ];
+  tableHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:11px;margin-top:8px">
+    <tr style="background:#1e3a7b;color:#fff"><th style="width:60%">Indicateur${(f?.anneeIndicateurs || "").trim() ? ` – ${f!.anneeIndicateurs}` : ""}</th><th>Résultat</th></tr>
+    ${synthese.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}
+  </table>`;
+
+  if (commentaire) {
+    tableHtml += `<p style="margin-top:12px">${commentaire}</p>`;
+  }
   tableHtml += `<p style="margin-top:12px;font-style:italic;color:#666">⚠️ Ce document est généré au format Excel (.xls) dans le dossier ZIP exporté.</p>`;
 
-  return buildDocument({ org: o, title: `TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, extraHtml: tableHtml });
+  return buildDocument({ org: o, title: `TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${anneeTitre}`, extraHtml: tableHtml });
 }
 
 function genRapportAmelioration(o: OrganismeInfo) {

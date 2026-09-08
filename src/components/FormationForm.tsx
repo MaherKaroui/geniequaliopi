@@ -787,6 +787,51 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
             <input ref={formateurSigRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFormateurSigFile(e.target.files[0]); }} />
           </div>
         </div>
+
+        <div className="md:col-span-2 mt-2 p-4 border rounded-lg bg-muted/30">
+          <Label className="font-semibold text-primary text-base">Indicateurs de résultats (critère 1)</Label>
+          <div className="grid md:grid-cols-2 gap-4 mt-3">
+            <div>
+              <Label htmlFor="anneeIndicateurs">Année des indicateurs</Label>
+              <Input id="anneeIndicateurs" value={data.anneeIndicateurs || ''} onChange={e => update('anneeIndicateurs', e.target.value)} placeholder="Ex: 2025" />
+            </div>
+            <div>
+              <Label htmlFor="nombreStagiairesFormes">Nombre de stagiaires formés</Label>
+              <Input id="nombreStagiairesFormes" value={data.nombreStagiairesFormes || ''} onChange={e => update('nombreStagiairesFormes', e.target.value)} placeholder="Ex: 53" />
+            </div>
+            <div>
+              <Label htmlFor="tauxSatisfaction">Taux de satisfaction (%)</Label>
+              <Input id="tauxSatisfaction" value={data.tauxSatisfaction || ''} onChange={e => update('tauxSatisfaction', e.target.value)} placeholder="Ex: 95" />
+            </div>
+            <div>
+              <Label htmlFor="nombreAvisSatisfaction">Nombre d'avis recueillis</Label>
+              <Input id="nombreAvisSatisfaction" value={data.nombreAvisSatisfaction || ''} onChange={e => update('nombreAvisSatisfaction', e.target.value)} placeholder="Ex: 15" />
+            </div>
+            <div>
+              <Label htmlFor="tauxAssiduite">Taux d'assiduité (%)</Label>
+              <Input id="tauxAssiduite" value={data.tauxAssiduite || ''} onChange={e => update('tauxAssiduite', e.target.value)} placeholder="Ex: 100" />
+            </div>
+            <div />
+            <div>
+              <Label htmlFor="nbPresentesCertification">Candidats présentés à la certification</Label>
+              <Input id="nbPresentesCertification" value={data.nbPresentesCertification || ''} onChange={e => update('nbPresentesCertification', e.target.value)} placeholder="Ex: 12" />
+            </div>
+            <div>
+              <Label htmlFor="nbAdmisCertification">Candidats admis</Label>
+              <Input id="nbAdmisCertification" value={data.nbAdmisCertification || ''} onChange={e => update('nbAdmisCertification', e.target.value)} placeholder="Ex: 11" />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="commentaireIndicateurs">Commentaire / analyse</Label>
+              <Textarea id="commentaireIndicateurs" value={data.commentaireIndicateurs || ''} onChange={e => update('commentaireIndicateurs', e.target.value)} rows={3} placeholder="Analyse des résultats, contexte, plan d'action…" />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Le taux d'obtention de la certification n'est pas saisi : il est calculé à partir des candidats présentés et admis.
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Ces valeurs doivent provenir de vos questionnaires de satisfaction et des procès-verbaux de jury du certificateur. Laissez vide ce que vous n'avez pas encore : un indicateur absent se justifie, un indicateur inventé ne se justifie pas.
+          </p>
+        </div>
       </div>
     </div>
   );
