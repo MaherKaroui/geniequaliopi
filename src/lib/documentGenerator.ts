@@ -867,7 +867,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "taux_obtention_certification": return genTauxObtentionCertification(o, f, stagiaires);
     case "certificat_realisation_stagiaire": return genCertificatRealisationStagiaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "suivi_absences": return genSuiviAbsences(o, f, stagiaires);
-    case "fiche_poste_formateur": return genFichePosteRole(o, params?.role ?? "formateur", params?.formateurNom);
+    case "fiche_poste_formateur": return genFichePosteRole(o, params?.role ?? "formateur", params?.formateurNom, f);
     case "contrat_sous_traitance_v2": {
       // If a specific formateur name is passed, override the formation formateur
       const fForST = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
