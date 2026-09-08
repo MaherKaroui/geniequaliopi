@@ -13773,7 +13773,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
   const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
-  const openAnswers = rempli ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
+  const openAnswers = rempli ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP }) : [];
 
   extra += `<h3>Partie 2 — Questions ouvertes</h3>`;
   openQs.forEach((q, qi) => {
