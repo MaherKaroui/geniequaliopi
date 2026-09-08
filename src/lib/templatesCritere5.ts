@@ -5,15 +5,26 @@ import { FormateurInfo } from "./sampleData";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
-export function genFichePosteRole(o: OrganismeInfo, role: string, formateurNom?: string) {
+export function genFichePosteRole(o: OrganismeInfo, role: string, formateurNom?: string, f?: FormationInfo) {
   switch (role) {
-    case "referent_handicap": return genFichePosteRefHandicap(o);
-    case "referent_administratif": return genFichePosteRefAdmin(o);
+    case "referent_handicap": return genFichePosteRefHandicap(o, f);
+    case "referent_administratif": return genFichePosteRefAdmin(o, f);
     case "referent_qualite_externe": return genFichePosteRefQualiteExterne(o);
-    case "formateur": return genFichePosteFormateurNom(o, formateurNom);
-    case "dirigeant": return genFichePosteResponsablePedagogique(o);
-    default: return genFichePosteFormateurNom(o, formateurNom);
+    case "formateur": return genFichePosteFormateurNom(o, formateurNom, f);
+    case "dirigeant": return genFichePosteResponsablePedagogique(o, f);
+    default: return genFichePosteFormateurNom(o, formateurNom, f);
   }
+}
+
+/** Domaine de la formation, utilisé pour contextualiser les fiches de poste. */
+function domaineFormation(f?: FormationInfo): string {
+  const t = (f?.intitule || "").trim();
+  return t || "la formation dispensée par l'organisme";
+}
+
+/** Ligne « Profil requis » d'expérience, contextualisée à la formation. */
+function ligneExperience(f?: FormationInfo): string {
+  return `<li>Expérience minimum de 2 ans dans le domaine « ${domaineFormation(f)} » ou en formation d'adultes sur ce domaine</li>`;
 }
 
 function genFichePosteRefQualiteExterne(o: OrganismeInfo) {
