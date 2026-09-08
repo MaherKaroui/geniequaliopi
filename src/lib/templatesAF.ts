@@ -171,7 +171,7 @@ export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInf
 }
 
 export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map(s => `
+  let extra = stagiaires.map(s => `
     <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur de ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi avec assiduité la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}, soit ${f.duree}.</p>
     <p><strong>Taux de présence :</strong> 100%<br><strong>Absences :</strong> Aucune absence constatée</p>
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
@@ -181,7 +181,7 @@ export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map(s => `
+  let extra = stagiaires.map(s => `
     <div class="section" style="padding:25px"><p style="text-align:center;font-size:16px;margin-bottom:15px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
     <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong>${o.nda ? ` (NDA : ${o.nda})` : ""},</p>
     <p>atteste que <strong>${s.prenom} ${s.nom}</strong></p>
@@ -199,7 +199,7 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
 
 export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     const niveau = avg >= 8 ? "Avancé" : avg >= 6 ? "Intermédiaire" : "Débutant";
@@ -686,7 +686,7 @@ export function genFicheSequence(o: OrganismeInfo, f: FormationInfo) {
 
 export function genGrilleEvaluationFormative(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     return [s.prenom + " " + s.nom, ...evalData.competences.slice(0, 4).map((_, ci) => {
       const score = sc[ci % sc.length];
@@ -702,7 +702,7 @@ export function genGrilleEvaluationFormative(o: OrganismeInfo, f: FormationInfo,
 
 export function genGrilleEvaluationSommative(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const finalSc = sc.map(v => Math.min(10, v + 2));
     const avg = Math.round(finalSc.reduce((a, b) => a + b, 0) / finalSc.length * 10) / 10;
@@ -731,7 +731,7 @@ export function genTestFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   });
   
   extra += `<div class="page-break"></div><h2>Résultats</h2>`;
-  const summaryRows = stagiaires.slice(0, 10).map((s, i) => {
+  const summaryRows = stagiaires.map((s, i) => {
     const answers = generateStagiaireAnswers(questions, i + 200);
     const result = computeQCMScore(questions, answers);
     const boosted = Math.min(result.total, result.score + 1);
@@ -748,7 +748,7 @@ export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationIn
   const evalData = getEvalContent(f.intitule);
   const termine = isFormationTerminee(f);
   let extra = `<h2>Grille d'acquisition des compétences – Suivi individuel</h2>`;
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
     const rows = evalData.competences.map((comp) => {
@@ -769,7 +769,7 @@ export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo
   let extra = "";
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Les bilans pédagogiques individuels seront complétés à l'issue de la formation.</em></p></div>`;
-    stagiaires.slice(0, 10).forEach((s) => {
+    stagiaires.forEach((s) => {
       extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
       extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ___/10<br><strong>Résultat :</strong> ___</p></div>`;
       extra += `<p><strong>Appréciation du formateur :</strong> ___</p>`;
@@ -778,7 +778,7 @@ export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo
       extra += `<p><strong>Recommandations :</strong> ___</p>`;
     });
   } else {
-    stagiaires.slice(0, 10).forEach((s, i) => {
+    stagiaires.forEach((s, i) => {
       const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
       const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
       extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
@@ -819,7 +819,7 @@ export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiai
   }
   const questions = ["Utilisation des acquis au quotidien", "Impact sur la performance", "Compétences encore utiles", "Besoins complémentaires identifiés", "Recommanderiez-vous cette formation"];
   let extra = `<p><em>Enquête réalisée 3 mois après la formation – Taux de réponse : ${Math.min(stagiaires.length, 10) > 5 ? "85" : "90"}%</em></p>`;
-  stagiaires.slice(0, 8).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const profiles = [
       [5, 5, 5, 4, 5], [4, 4, 4, 3, 4], [5, 4, 5, 5, 5], [4, 5, 4, 4, 5],
       [3, 4, 4, 4, 4], [5, 5, 5, 3, 5], [4, 4, 5, 4, 4], [5, 4, 4, 5, 5]
@@ -840,7 +840,7 @@ export function genSatisfactionEntreprise(o: OrganismeInfo, f: FormationInfo, st
     return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction entreprise sera réalisée à l'issue de la formation.</em></p></div>` });
   }
-  const entreprises = [...new Set(stagiaires.slice(0, 10).map(s => s.entreprise).filter(Boolean))];
+  const entreprises = [...new Set(stagiaires.map(s => s.entreprise).filter(Boolean))];
   let extra = "";
   entreprises.forEach((ent, i) => {
     const scores = [4 + (i % 2), 4, 5 - (i % 2), 4 + (i % 2), 5, 4];

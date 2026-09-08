@@ -1418,7 +1418,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
 
   // Summary table
-  const summaryRows = stagiaires.slice(0, 10).map((s, i) => {
+  const summaryRows = stagiaires.map((s, i) => {
     const answers = generateStagiaireAnswers(questions, i);
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
@@ -1903,7 +1903,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   let tableStag = "";
   if (stagiaires.length > 0) {
     const financements = ["OPCO", "Pôle Emploi", "Financement personnel"];
-    const rows = stagiaires.slice(0, 10).map((s, i) => {
+    const rows = stagiaires.map((s, i) => {
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
       const financement = financements[i % financements.length];
@@ -2999,7 +2999,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   extra += `<p>Ce test permet d'évaluer le niveau initial de chaque stagiaire avant le début de la formation.</p>`;
 
   // Summary
-  const summaryRows = stagiaires.slice(0, 10).map((s, i) => {
+  const summaryRows = stagiaires.map((s, i) => {
     const answers = generateStagiaireAnswers(questions, i);
     const result = computeQCMScore(questions, answers);
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
@@ -3026,7 +3026,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 function genGrilleEvaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   const competences = evalData.competences;
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const cols = competences.map((_, ci) => {
       const score = sc[ci % sc.length];
@@ -3128,7 +3128,7 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   // Horaires journée standard : matin + après-midi (7 h/jour)
   const blocs = [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h00' }];
   const sigHeaders = blocs.map(b => `Signature ${b.label} (${b.horaire})`);
-  const rows = stagiaires.slice(0, 10).map(s => {
+  const rows = stagiaires.map(s => {
     const sig = `Signé ${s.prenom[0]}.${s.nom}`;
     return [s.nom, s.prenom, s.entreprise, ...blocs.map(() => sig)];
   });
@@ -3245,7 +3245,7 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   const mixte = isMixte(f);
   let extra = '';
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours en distanciel sont reportés ci-dessous.</em></p>`;
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const days = getStagiaireDays(s, f);
     if (si > 0) extra += '<div class="page-break"></div>';
     extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
@@ -3272,7 +3272,7 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s) => {
+  const rows = stagiaires.map((s) => {
     const stagDuree = getStagiaireDuree(s, f);
     const totalH = parseInt(stagDuree) || (getStagiaireDays(s, f).length * 7);
     const dateDebut = formatDate(getStagiaireDateDebut(s, f));
@@ -3371,7 +3371,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   const targetList = typeof stagiaireIdx === 'number' && stagiaires[stagiaireIdx]
     ? [stagiaires[stagiaireIdx]]
-    : stagiaires.slice(0, 10);
+    : stagiaires;
   targetList.forEach((s, si) => {
     const days = getStagiaireDays(s, f);
     if (si > 0) extra += '<div class="page-break"></div>';
@@ -3434,7 +3434,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
 function genTableauPresence(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f).slice(0, 5);
-  const rows = stagiaires.slice(0, 10).map(s => [s.prenom + " " + s.nom, ...days.map(() => "✅")]);
+  const rows = stagiaires.map(s => [s.prenom + " " + s.nom, ...days.map(() => "✅")]);
   return buildDocument({ org: o, title: "TABLEAU DE PRÉSENCE", subtitle: f.intitule, table: { headers: ["Stagiaire", ...days.map((_, i) => `Jour ${i + 1}`)], rows } });
 }
 
@@ -3442,7 +3442,7 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const evalData = getEvalContent(f.intitule);
   const competences = evalData.competences;
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} – ${s.entreprise} (${s.poste})</h3>`;
     extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
@@ -3467,7 +3467,7 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   let extra = `<h2>Évaluation intermédiaire – à mi-parcours de la formation</h2>`;
   extra += `<p>Cette évaluation mesure la progression des stagiaires à mi-parcours de la formation « ${f.intitule} ».</p>`;
 
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const interScores = sc.map(s => Math.min(10, s + 1));
     const avg = Math.round(interScores.reduce((a, b) => a + b, 0) / interScores.length * 10) / 10;
@@ -3499,7 +3499,7 @@ function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   let totalReussis = 0;
   let totalNote = 0;
 
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const finalScores = sc.map(s => Math.min(10, s + 2));
     const avg = Math.round(finalScores.reduce((a, b) => a + b, 0) / finalScores.length * 10) / 10;
@@ -3893,7 +3893,7 @@ function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stag
   // Assign stagiaires to groups based on their profile
   if (stagiaires.length > 0) {
     extra += `<h3>Répartition des stagiaires – ${f.intitule}</h3>`;
-    const rows = stagiaires.slice(0, 10).map((s, i) => {
+    const rows = stagiaires.map((s, i) => {
       const profiles = ['bon', 'excellent', 'moyen', 'bon', 'debutant', 'excellent', 'bon', 'moyen', 'bon', 'moyen'];
       const level = profiles[i % profiles.length];
       const groupe = level === 'excellent' ? 'Groupe 3' : level === 'bon' ? 'Groupe 2' : level === 'moyen' ? 'Groupe 2' : 'Groupe 1';
@@ -3929,7 +3929,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 
   // Individual results
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     const answers = generateStagiaireAnswers(questions, si);
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
@@ -3963,7 +3963,7 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
     // Results per stagiaire
     extra += `<h3>Résultats par stagiaire</h3>`;
-    const rows = stagiaires.slice(0, 10).map((s, si) => {
+    const rows = stagiaires.map((s, si) => {
       const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
       const noteFinale = variations[(si + ei) % variations.length];
       const appreciation = noteFinale >= 9 ? "Excellent travail, exercice parfaitement réalisé"
@@ -3975,7 +3975,7 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   // Global summary
   extra += `<div class="page-break"></div><h2>Synthèse des exercices pratiques</h2>`;
-  const globalRows = stagiaires.slice(0, 10).map((s, si) => {
+  const globalRows = stagiaires.map((s, si) => {
     const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
     const notes = exercices.map((_, ei) => variations[(si + ei) % variations.length]);
     const avg = Math.round(notes.reduce((a, b) => a + b, 0) / notes.length * 10) / 10;
@@ -4011,7 +4011,7 @@ function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireIn
   // Individual detailed results
   let totalReussis = 0;
   extra += `<div class="page-break"></div><h2>Résultats individuels détaillés</h2>`;
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  stagiaires.forEach((s, si) => {
     // Final QCM: slightly better answers (end of formation)
     const answers = generateStagiaireAnswers(questions, si + 100);
     const result = computeQCMScore(questions, answers);
@@ -4044,7 +4044,7 @@ function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireIn
 }
 
 function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map(s => `
+  let extra = stagiaires.map(s => `
     <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))} (${getStagiaireDuree(s, f)}).</p>
     <p><strong>Objectifs atteints :</strong> ${f.objectifs}</p>
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
@@ -4055,7 +4055,7 @@ function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
 }
 
 function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map((s, i) => {
+  let extra = stagiaires.map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const note = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
@@ -5279,7 +5279,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
     let sheetSuivi = tr(["Apprenti", ...allCompCodes, "% Global", "Observations"], true);
 
     // Pre-fill with stagiaire data using EVAL_SCORES
-    stagiaires.slice(0, 10).forEach((s, si) => {
+    stagiaires.forEach((s, si) => {
       const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
       const levels = allCompCodes.map((_, ci) => {
         if (!termine && !blocStatus[Math.floor(ci / Math.max(1, rncp.blocsCompetences[0]?.competences.length || 1))]?.done) return "";
@@ -5377,7 +5377,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
 
   // Notes synchronized with EVAL_SCORES (used in exercises, grilles, QCM, etc.)
   const globalAvgNote = stagiaires.length > 0
-    ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+    ? Math.round(stagiaires.reduce((sum, _, si) => {
         const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
         return sum + sc.reduce((a, b) => a + b, 0) / sc.length;
       }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10 // *2 to convert /10 → /20
@@ -5412,7 +5412,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   if (rncp) {
     if (termine) {
       // Synchronized: count students with avg >= 7/10 as certified
-      const nbReussis = stagiaires.slice(0, 10).filter((_, si) => {
+      const nbReussis = stagiaires.filter((_, si) => {
         const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
         return sc.reduce((a, b) => a + b, 0) / sc.length >= 7;
       }).length;
@@ -5502,7 +5502,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const nbEvalRealisees = blocDone ? bloc.matieres.length : blocPartial ? Math.ceil(bloc.matieres.length * blocRealisees / blocVol) : 0;
       // Synchronized with EVAL_SCORES: use bloc-index-mapped scores
       const blocScoreAvg = stagiaires.length > 0
-        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+        ? Math.round(stagiaires.reduce((sum, _, si) => {
             const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
             return sum + Math.min(10, sc[bi % sc.length] + 1);
           }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
@@ -5521,7 +5521,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
         const matTaux = vol > 0 ? Math.round(matReal / vol * 100) : 0;
         // Synchronized note per matière with EVAL_SCORES
         const matScoreAvg = stagiaires.length > 0
-          ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+          ? Math.round(stagiaires.reduce((sum, _, si) => {
               const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
               return sum + Math.min(10, sc[(bi + matCumul) % sc.length] + 1);
             }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
@@ -5550,7 +5550,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const modTaux = perBloc > 0 ? Math.round(modReal / perBloc * 100) : 0;
       // Synchronized note with EVAL_SCORES
       const modScoreAvg = stagiaires.length > 0
-        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+        ? Math.round(stagiaires.reduce((sum, _, si) => {
             const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
             return sum + Math.min(10, sc[ci % sc.length] + 1);
           }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
@@ -9518,7 +9518,7 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
 
       let tableRows = '';
-      stagiaires.slice(0, 10).forEach(s => {
+      stagiaires.forEach(s => {
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
         const stagSigHtml = s.signatureUrl
           ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
@@ -12192,7 +12192,7 @@ function genProcedureAccueilStagiaires(o: OrganismeInfo) {
 }
 
 function genGroupesNiveaux(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const niveau = i % 3 === 0 ? "Débutant" : i % 3 === 1 ? "Intermédiaire" : "Avancé";
     const groupe = i % 3 === 0 ? "Groupe A" : i % 3 === 1 ? "Groupe B" : "Groupe C";
     return [s.prenom + " " + s.nom, s.entreprise, niveau, groupe];
@@ -12215,7 +12215,7 @@ function genProcedureEvalDebutFormation(o: OrganismeInfo) {
 function genGrilleAcquisitionCompetencesSF(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
     const rows = evalData.competences.map((comp) => {
@@ -12923,7 +12923,7 @@ function genProcedureAdaptation(o: OrganismeInfo) {
 }
 
 function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
+  const rows = stagiaires.map((s, i) => {
     const niveau = i % 3 === 0 ? "Débutant" : i % 3 === 1 ? "Intermédiaire" : "Avancé";
     return [s.prenom + " " + s.nom, s.entreprise, niveau, i % 3 === 0 ? "Exercices simplifiés" : "Parcours standard", "Aucune", "En cours"];
   });
@@ -13239,7 +13239,7 @@ function genProcedureAmeliorationContinue(o: OrganismeInfo) {
 function genAppreciationsBeneficiaires(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
   let extra = `<p><em>Fréquence : fin de formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone (relance maximum un mois).</em></p>`;
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const dateFinStag = getStagiaireDateFin(s, f);
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Intitulé de la formation :</strong></td><td>${f.intitule}</td></tr><tr><td><strong>Date :</strong></td><td>${formatDate(dateFinStag)}</td></tr><tr><td><strong>Nom/prénom des intervenants :</strong></td><td>${f.formateur}</td></tr><tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr></table>`;
@@ -13422,7 +13422,7 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
   }
-  stagiaires.slice(0, 8).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const criteres = [
       "Utilisez-vous encore les outils depuis la formation ?",
@@ -13479,7 +13479,7 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
   }
-  stagiaires.slice(0, 10).forEach((s, i) => {
+  stagiaires.forEach((s, i) => {
     const dateFin = getStagiaireDateFin(s, f);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
