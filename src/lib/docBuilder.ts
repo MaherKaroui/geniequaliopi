@@ -858,14 +858,16 @@ export function hasIndividualDates(stagiaires: StagiaireInfo[]): boolean {
   return firsts.size > 1 || lasts.size > 1;
 }
 
-/** Get display durée — shows "À définir selon le groupe" if individual dates differ */
+/** Get display durée — priorité à la durée saisie ; libellé d'attente seulement si vide */
 export function getDisplayDuree(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
+  if (f.duree && f.duree.trim()) return f.duree;
   if (stagiaires && hasIndividualDates(stagiaires)) return "À définir selon le groupe";
   return f.duree;
 }
 
-/** Get display tarif — shows "Tarif sur demande" if individual dates differ */
+/** Get display tarif — priorité au tarif saisi ; libellé d'attente seulement si vide */
 export function getDisplayTarif(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
+  if (f.tarif && f.tarif.trim()) return f.tarif;
   if (stagiaires && hasIndividualDates(stagiaires)) return "Tarif sur demande";
   return f.tarif;
 }
@@ -1063,11 +1065,20 @@ export function footer(org: OrganismeInfo): string {
   const dateMaj = (org as any).dateMaj
     ? new Date((org as any).dateMaj).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })
     : new Date().toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' });
+  const numQ = (org.numeroCertificatQualiopi || "").trim();
+  const certif = (org.organismeCertificateur || "").trim();
+  const finVal = (org.dateFinValiditeQualiopi || "").trim();
+  let qualiopiLine = "";
+  if (numQ) {
+    const finTxt = finVal ? new Date(finVal).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' }) : "";
+    qualiopiLine = `<p style="margin:0 0 8px">Certifié Qualiopi n° ${numQ}${certif ? ` délivré par ${certif}` : ""} au titre des actions de formation${finTxt ? ` — valable jusqu'au ${finTxt}` : ""}</p>`;
+  }
   return `<div class="footer">
     <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>
     <p style="margin:0 0 8px">Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
     <p style="margin:0 0 8px">Siret: ${org.siret}</p>
     ${org.nda ? `<p style="margin:0 0 8px">Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>` : ""}
+    ${qualiopiLine}
     <p style="margin:4px 0 0">V${version} ${dateMaj}</p>
   </div>`;
 }
