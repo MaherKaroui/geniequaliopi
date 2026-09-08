@@ -23,7 +23,7 @@ export interface AIContentChapter {
   sections: AIContentSection[];
 }
 
-export interface AIContentExercise {
+export interface AIContentExercise extends CorrigeFormateurData {
   titre: string;
   consigne: string;
   reponseAttendue: string;
