@@ -16,7 +16,7 @@ describe("dossier ceos", () => {
     
     for (const si of [0,1]) {
       for (const id of ["test_positionnement_debut_stagiaire","test_positionnement_fin_stagiaire","exercices_stagiaire","analyse_besoins"]) {
-        try { console.log("###", si, id, txt(generateDocumentById(id, "", { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(0,60)+" | len="+txt(generateDocumentById(id,"",{stagiaireIdx:si,exerciceIdx:0},o,f,st)).length+" | "+(txt(generateDocumentById(id,"",{stagiaireIdx:si,exerciceIdx:0},o,f,st)).match(/Réponse du stagiaire[^|]{0,160}|Je [^.]{20,160}\./g)||[]).slice(0,2).join(" ~~ ")); }
+        try { console.log("###", si, id, txt(generateDocumentById("x", id, { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(0,60)+" | len="+txt(generateDocumentById("x",id,{stagiaireIdx:si,exerciceIdx:0},o,f,st)).length+" | "+(txt(generateDocumentById("x",id,{stagiaireIdx:si,exerciceIdx:0},o,f,st)).match(/Réponse du stagiaire[^|]{0,160}|Je [^.]{20,160}\./g)||[]).slice(0,2).join(" ~~ ")); }
         catch (e: any) { console.log("###", si, id, "ERR", e.message); }
       }
     }
