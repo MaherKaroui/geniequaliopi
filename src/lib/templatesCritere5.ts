@@ -5,15 +5,26 @@ import { FormateurInfo } from "./sampleData";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
-export function genFichePosteRole(o: OrganismeInfo, role: string, formateurNom?: string) {
+export function genFichePosteRole(o: OrganismeInfo, role: string, formateurNom?: string, f?: FormationInfo) {
   switch (role) {
-    case "referent_handicap": return genFichePosteRefHandicap(o);
-    case "referent_administratif": return genFichePosteRefAdmin(o);
+    case "referent_handicap": return genFichePosteRefHandicap(o, f);
+    case "referent_administratif": return genFichePosteRefAdmin(o, f);
     case "referent_qualite_externe": return genFichePosteRefQualiteExterne(o);
-    case "formateur": return genFichePosteFormateurNom(o, formateurNom);
-    case "dirigeant": return genFichePosteResponsablePedagogique(o);
-    default: return genFichePosteFormateurNom(o, formateurNom);
+    case "formateur": return genFichePosteFormateurNom(o, formateurNom, f);
+    case "dirigeant": return genFichePosteResponsablePedagogique(o, f);
+    default: return genFichePosteFormateurNom(o, formateurNom, f);
   }
+}
+
+/** Domaine de la formation, utilisé pour contextualiser les fiches de poste. */
+function domaineFormation(f?: FormationInfo): string {
+  const t = (f?.intitule || "").trim();
+  return t || "la formation dispensée par l'organisme";
+}
+
+/** Ligne « Profil requis » d'expérience, contextualisée à la formation. */
+function ligneExperience(f?: FormationInfo): string {
+  return `<li>Expérience minimum de 2 ans dans le domaine « ${domaineFormation(f)} » ou en formation d'adultes sur ce domaine</li>`;
 }
 
 function genFichePosteRefQualiteExterne(o: OrganismeInfo) {
@@ -33,7 +44,7 @@ function genFichePosteRefQualiteExterne(o: OrganismeInfo) {
   ] });
 }
 
-function genFichePosteRefHandicap(o: OrganismeInfo) {
+function genFichePosteRefHandicap(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Référent Handicap", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
     { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges à distance peuvent être organisés avec les partenaires institutionnels ou les bénéficiaires lorsque la situation le nécessite.</p>` },
@@ -42,14 +53,14 @@ function genFichePosteRefHandicap(o: OrganismeInfo) {
     { heading: "Missions principales", content: `<ul><li>Informer et orienter les personnes en situation de handicap</li><li>Analyser les besoins spécifiques des bénéficiaires en amont de la formation</li><li>Proposer et coordonner les aménagements pédagogiques, matériels et organisationnels</li><li>Assurer le suivi individualisé des stagiaires en situation de handicap</li><li>Sensibiliser les équipes pédagogiques et administratives à l'accueil des publics PSH</li><li>Mobiliser et coordonner les partenaires spécialisés (Agefiph, Cap Emploi, MDPH, etc.)</li><li>Veiller à l'accessibilité des locaux, outils et supports de formation</li><li>Mettre à jour les informations relatives à l'accessibilité sur les supports de communication</li><li>Assurer la traçabilité des actions mises en place</li><li>Participer aux audits et contrôles Qualiopi</li><li>Contribuer à l'amélioration continue de la politique handicap de l'organisme</li></ul>` },
     { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Connaître le cadre légal du handicap et de l'accessibilité</li><li>Analyser les besoins spécifiques des personnes en situation de handicap</li><li>Mettre en place des aménagements adaptés aux contraintes de formation</li><li>Mobiliser les dispositifs et acteurs du champ du handicap</li><li>Conseiller les équipes pédagogiques sur l'adaptation des parcours</li><li>Assurer la traçabilité et la confidentialité des informations</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Écoute active et bienveillance</li><li>Sens de la confidentialité et du respect de la personne</li><li>Empathie et capacité d'adaptation</li><li>Rigueur et sens de l'organisation</li><li>Capacité à travailler en réseau</li><li>Communication claire et rassurante</li><li>Réactivité face aux situations particulières</li><li>Esprit d'analyse et de solution</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Sensibilité ou expérience dans l'accompagnement des personnes en situation de handicap</li><li>Connaissance du secteur de la formation professionnelle appréciée</li><li>Une formation ou une expérience en lien avec le handicap est un plus</li><li>Capacité à travailler en lien avec des partenaires institutionnels</li><li>Expérience minimum de 2 ans en tant que formateur / management en pack office word</li></ul>` },
+    { heading: "Profil requis", content: `<ul><li>Sensibilité ou expérience dans l'accompagnement des personnes en situation de handicap</li><li>Connaissance du secteur de la formation professionnelle appréciée</li><li>Une formation ou une expérience en lien avec le handicap est un plus</li><li>Capacité à travailler en lien avec des partenaires institutionnels</li>${ligneExperience(f)}</ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux procédures internes liées à l'accessibilité</li><li>Outils de suivi et de traçabilité</li><li>Répertoire des partenaires handicap</li><li>Supports d'information et de sensibilisation</li><li>Appui de la direction et de l'équipe pédagogique</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Nombre de bénéficiaires PSH accompagnés</li><li>Taux de satisfaction des bénéficiaires PSH</li><li>Pertinence des aménagements mis en place</li><li>Traçabilité des actions d'accompagnement</li><li>Résultats des audits Qualiopi</li></ul>` },
     { heading: "Positionnement hiérarchique", content: `<p>Le/La Référent(e) Handicap intervient sous l'autorité de la direction de l'organisme et travaille en collaboration étroite avec le référent pédagogique, le référent administratif et les formateurs.</p>` },
   ] });
 }
 
-function genFichePosteRefAdmin(o: OrganismeInfo) {
+function genFichePosteRefAdmin(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Référent Administratif", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
     { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent être réalisées sur des sites partenaires pour des besoins administratifs liés aux actions de formation.</p>` },
@@ -58,30 +69,51 @@ function genFichePosteRefAdmin(o: OrganismeInfo) {
     { heading: "Missions principales", content: `<ul><li>Gérer les inscriptions et le suivi administratif des stagiaires</li><li>Constituer, vérifier et archiver les dossiers administratifs de formation</li><li>Établir et suivre les documents réglementaires : contrats ou conventions de formation, convocations, règlement intérieur, conditions générales de vente</li><li>Assurer le suivi des feuilles d'émargement et des attestations de fin de formation</li><li>Gérer les délais d'accès à la formation</li><li>Assurer la relation administrative avec les stagiaires, formateurs et partenaires</li><li>Préparer et suivre les dossiers de financement (CPF, OPCO, autofinancement)</li><li>Veiller au respect des obligations réglementaires (DA, BPF, EDOF, Qualiopi)</li><li>Mettre à jour les bases de données administratives</li><li>Participer aux audits et contrôles (Qualiopi, financeurs, DREETS)</li><li>Contribuer à l'amélioration continue des processus administratifs</li></ul>` },
     { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Maîtriser les procédures administratives de la formation professionnelle</li><li>Constituer et contrôler des dossiers administratifs conformes</li><li>Utiliser les outils bureautiques (Word, Excel, messagerie)</li><li>Utiliser des outils de gestion de formation et plateformes dématérialisées</li><li>Suivre des échéanciers et respecter les délais réglementaires</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li><li>Assurer la traçabilité et l'archivage documentaire</li><li>Rédiger des courriers et documents administratifs professionnels</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Rigueur et sens de l'organisation</li><li>Fiabilité et discrétion professionnelle</li><li>Autonomie dans la gestion des dossiers</li><li>Sens des priorités</li><li>Esprit d'analyse et de contrôle</li><li>Qualités relationnelles et communication professionnelle</li><li>Capacité à travailler en équipe</li><li>Réactivité face aux demandes administratives</li><li>Respect des procédures et des délais</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Formation ou expérience en gestion administrative</li><li>Expérience souhaitée dans un organisme de formation</li><li>Connaissance du cadre réglementaire de la formation professionnelle appréciée</li><li>Maîtrise des outils bureautiques</li><li>Expérience minimum de 2 ans en tant que formateur / management en pack office word</li></ul>` },
+    { heading: "Profil requis", content: `<ul><li>Formation ou expérience en gestion administrative</li><li>Expérience souhaitée dans un organisme de formation</li><li>Connaissance du cadre réglementaire de la formation professionnelle appréciée</li><li>Maîtrise des outils bureautiques</li>${ligneExperience(f)}</ul>` },
     { heading: "Moyens et outils mis à disposition", content: `<ul><li>Poste informatique équipé</li><li>Logiciels bureautiques et outils de gestion administrative</li><li>Accès aux plateformes réglementaires (EDOF, OPCO, etc.)</li><li>Procédures internes et référentiels qualité</li><li>Accompagnement par l'équipe pédagogique et qualité</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Taux de conformité des dossiers administratifs</li><li>Respect des délais réglementaires</li><li>Qualité des documents produits</li><li>Satisfaction des stagiaires et formateurs (partie administrative)</li><li>Résultats des audits et contrôles</li></ul>` },
     { heading: "Positionnement hiérarchique", content: `<p>Le/La Référent(e) Administratif(ve) exerce ses missions sous l'autorité de la direction de l'organisme et travaille en lien étroit avec le référent pédagogique et les formateurs.</p>` },
   ] });
 }
 
-function genFichePosteFormateurNom(o: OrganismeInfo, formateurNom?: string) {
-  const subtitleName = formateurNom ? `Formateur / Formatrice – ${formateurNom}` : "Formateur / Formatrice Bureautique – Microsoft Word";
+function genFichePosteFormateurNom(o: OrganismeInfo, formateurNom?: string, f?: FormationInfo) {
+  const dom = domaineFormation(f);
+  const subtitleName = formateurNom
+    ? `Formateur / Formatrice – ${formateurNom}${f?.intitule ? ` – ${f.intitule}` : ""}`
+    : `Formateur / Formatrice – ${dom}`;
+  // Compétences techniques : issues des objectifs saisis de la formation, sinon formulation générique
+  const objectifsList = (f?.objectifs || "")
+    .split(/\r?\n|;/)
+    .map(l => l.replace(/^[-•\s]+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  const savoirFaireMetier = objectifsList.length
+    ? objectifsList.map(l => `<li>Maîtriser et transmettre : ${l}</li>`).join("")
+    : `<li>Maîtriser les savoirs, gestes et techniques professionnels du domaine « ${dom} »</li>`;
+  const moyens = (f?.moyensPedagogiques || "")
+    .split(/\r?\n|;/)
+    .map(l => l.replace(/^[-•\s]+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  const moyensList = moyens.length
+    ? moyens.map(l => `<li>${l}</li>`).join("")
+    : `<li>Salle et/ou plateau technique équipé pour le domaine « ${dom} »</li><li>Matériels, équipements et consommables nécessaires aux mises en situation</li>`;
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: subtitleName, sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent également être organisées sur des sites partenaires, dans le cadre d'actions de formation planifiées par l'organisme.</p>` },
+    { heading: "Formation concernée", content: `<p><strong>${dom}</strong>${f?.codeRNCP ? ` — ${f.codeRNCP}` : ""}${f?.duree ? `<br/>Durée : ${f.duree}` : ""}${f?.modalites ? `<br/>Modalités : ${f.modalites}` : ""}</p>` },
+    { heading: "Lieu d'intervention", content: `<p>La mission est réalisée${f?.lieu ? ` au sein du lieu de formation : ${f.lieu}` : " au sein des locaux de l'organisme de formation situés au :"}</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent également être organisées sur des sites partenaires, dans le cadre d'actions de formation planifiées par l'organisme.</p>` },
     { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants, en fonction des besoins pédagogiques :</p><ul><li>Vacataire de la formation professionnelle, avec rémunération à l'heure ou à la journée d'intervention,</li><li>Formateur indépendant, dans le cadre d'un contrat de prestation de services,</li><li>Salarié en contrat à durée déterminée ou indéterminée, selon le volume d'activité.</li></ul><p>L'ensemble des modalités contractuelles est établi dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
-    { heading: "Finalité du poste", content: `<p>Le/La formateur(trice) bureautique Microsoft Word a pour mission de concevoir, animer et évaluer des actions de formation permettant aux apprenants d'acquérir les compétences de base nécessaires à l'utilisation du logiciel Word, dans un contexte professionnel ou personnel.</p><p>Il/Elle contribue activement à la qualité des parcours de formation, à la satisfaction des stagiaires et à l'amélioration continue des pratiques pédagogiques de l'organisme.</p>` },
-    { heading: "Missions principales", content: `<ul><li>Animer des sessions de formation Microsoft Word – niveau initiation, en présentiel</li><li>Présenter clairement les objectifs de formation et le déroulé pédagogique</li><li>Adapter les contenus et le rythme aux profils et niveaux des apprenants</li><li>Mettre en œuvre une pédagogie active favorisant la pratique et l'autonomie</li><li>Accompagner individuellement les stagiaires tout au long de la formation</li><li>Concevoir et utiliser des supports pédagogiques adaptés</li><li>Évaluer les acquis des stagiaires (tests, exercices, évaluations finales)</li><li>Renseigner les documents de suivi pédagogique et administratif</li><li>Réaliser les bilans à chaud et à froid</li><li>Appliquer et respecter les procédures internes et le cadre Qualiopi</li><li>Contribuer aux actions d'amélioration continue de l'organisme</li></ul>` },
-    { heading: "Savoir-faire (compétences techniques et pédagogiques)", content: `<ul><li>Maîtriser les fonctionnalités essentielles de Microsoft Word, notamment : création, ouverture, enregistrement et modification de documents ; mise en forme du texte et des paragraphes ; insertion d'images, tableaux, listes et objets simples ; mise en page et préparation à l'impression</li><li>Concevoir des supports pédagogiques clairs et accessibles</li><li>Animer une formation en alternant apports théoriques et exercices pratiques</li><li>Adapter sa pédagogie à un public débutant ou peu à l'aise avec l'outil informatique</li><li>Évaluer les compétences acquises à l'aide de grilles et d'outils adaptés</li><li>Assurer un suivi pédagogique structuré</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li></ul>` },
+    { heading: "Finalité du poste", content: `<p>Le/La formateur(trice) a pour mission de concevoir, animer et évaluer les actions de formation « ${dom} », afin de permettre aux bénéficiaires d'acquérir les compétences visées par le programme et de les mettre en œuvre en situation professionnelle.</p><p>Il/Elle contribue activement à la qualité des parcours de formation, à la satisfaction des stagiaires et à l'amélioration continue des pratiques pédagogiques de l'organisme.</p>` },
+    { heading: "Missions principales", content: `<ul><li>Animer les sessions de la formation « ${dom} »${f?.modalites ? ` (${f.modalites})` : ""}</li><li>Présenter clairement les objectifs de formation et le déroulé pédagogique</li><li>Adapter les contenus et le rythme aux profils et niveaux des apprenants</li><li>Mettre en œuvre une pédagogie active favorisant la pratique et l'autonomie</li><li>Accompagner individuellement les stagiaires tout au long de la formation</li><li>Concevoir et utiliser des supports pédagogiques adaptés au domaine</li><li>Évaluer les acquis des stagiaires (positionnement, exercices, évaluations finales)</li><li>Renseigner les documents de suivi pédagogique et administratif</li><li>Réaliser les bilans à chaud et à froid</li><li>Appliquer et respecter les procédures internes et le cadre Qualiopi</li><li>Contribuer aux actions d'amélioration continue de l'organisme</li></ul>` },
+    { heading: "Savoir-faire (compétences techniques et pédagogiques)", content: `<ul>${savoirFaireMetier}<li>Concevoir des supports pédagogiques clairs et accessibles</li><li>Animer une formation en alternant apports théoriques et mises en pratique</li><li>Adapter sa pédagogie aux publics accueillis${f?.publicVise ? ` : ${f.publicVise}` : ""}</li><li>Évaluer les compétences acquises à l'aide de grilles et d'outils adaptés</li><li>Assurer un suivi pédagogique structuré</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Sens de la pédagogie et de la transmission des savoirs</li><li>Patience, écoute active et bienveillance</li><li>Capacité à rassurer et accompagner des publics débutants</li><li>Adaptabilité face à des profils variés</li><li>Clarté et rigueur dans les explications</li><li>Posture professionnelle et respect du cadre de formation</li><li>Sens de l'organisation et ponctualité</li><li>Esprit d'amélioration continue</li><li>Capacité à travailler en collaboration avec l'équipe pédagogique</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Bonne maîtrise du logiciel Microsoft Word</li><li>Expérience professionnelle ou pédagogique en bureautique</li><li>Une expérience en formation pour adultes est appréciée</li><li>Connaissance du cadre de la formation professionnelle continue est un plus</li><li>Expérience minimum de 2 ans en tant que formateur / management en pack office word</li></ul>` },
-    { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Salle de formation équipée</li><li>Ordinateur et matériel pédagogique</li><li>Logiciel Microsoft Word (version récente)</li><li>Supports pédagogiques fournis par l'organisme</li><li>Assistance pédagogique et administrative</li></ul>`, variant: "green" },
+    { heading: "Profil requis", content: `<ul><li>Maîtrise professionnelle confirmée du domaine « ${dom} »</li><li>Expérience professionnelle et/ou pédagogique dans ce domaine</li><li>Une expérience en formation pour adultes est appréciée</li><li>Connaissance du cadre de la formation professionnelle continue est un plus</li>${ligneExperience(f)}</ul>` },
+    { heading: "Moyens et ressources mis à disposition", content: `<ul>${moyensList}<li>Supports pédagogiques fournis par l'organisme</li><li>Assistance pédagogique et administrative</li></ul>`, variant: "green" },
     { heading: "Positionnement dans l'organisation", content: `<p>Le/La formateur(trice) intervient sous la responsabilité du référent pédagogique et s'inscrit dans la démarche qualité et d'amélioration continue de ${o.nom}.</p>` },
   ] });
 }
 
-function genFichePosteResponsablePedagogique(o: OrganismeInfo) {
+function genFichePosteResponsablePedagogique(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Responsable Pédagogique", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
     { heading: "Lieu d'intervention", content: `<p>La fonction est exercée principalement en présentiel, au sein des locaux de l'organisme situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges ponctuels à distance peuvent avoir lieu avec les formateurs, partenaires ou bénéficiaires, selon les besoins pédagogiques et organisationnels.</p>` },
@@ -93,7 +125,7 @@ function genFichePosteResponsablePedagogique(o: OrganismeInfo) {
     { heading: "Missions principales – Suivi des bénéficiaires", content: `<ul><li>Veiller à la qualité de l'accueil, de l'accompagnement et du suivi des stagiaires</li><li>S'assurer de la prise en compte des besoins spécifiques, notamment PSH</li><li>Garantir l'objectivité et la traçabilité des évaluations</li></ul>` },
     { heading: "Savoir-faire (compétences techniques et pédagogiques)", content: `<ul><li>Concevoir et structurer des dispositifs de formation</li><li>Définir des objectifs pédagogiques mesurables</li><li>Mettre en œuvre des méthodes pédagogiques adaptées aux adultes</li><li>Piloter des évaluations des acquis et de la satisfaction</li><li>Analyser des données pédagogiques et qualité</li><li>Appliquer le Référentiel National Qualité (Qualiopi)</li><li>Encadrer et accompagner des équipes de formateurs</li><li>Utiliser les outils bureautiques et plateformes de formation</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Leadership pédagogique</li><li>Sens de l'organisation et de la planification</li><li>Rigueur et sens des responsabilités</li><li>Capacité d'analyse et de prise de décision</li><li>Qualités relationnelles et communication professionnelle</li><li>Esprit d'écoute et de coopération</li><li>Adaptabilité et réactivité</li><li>Engagement dans une démarche d'amélioration continue</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Formation ou expérience significative en ingénierie pédagogique</li><li>Expérience dans la formation professionnelle pour adultes</li><li>Connaissance approfondie du cadre réglementaire de la formation</li><li>Expérience en management ou coordination d'équipe appréciée</li><li>Expérience minimum de 2 ans en tant que formateur / management en pack office word</li></ul>` },
+    { heading: "Profil requis", content: `<ul><li>Formation ou expérience significative en ingénierie pédagogique</li><li>Expérience dans la formation professionnelle pour adultes</li><li>Connaissance approfondie du cadre réglementaire de la formation</li><li>Expérience en management ou coordination d'équipe appréciée</li>${ligneExperience(f)}</ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux outils pédagogiques et qualité</li><li>Plateformes de gestion de formation et supports numériques</li><li>Procédures internes et référentiels qualité</li><li>Appui de la direction et des équipes administratives</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Atteinte des objectifs pédagogiques</li><li>Taux de satisfaction des bénéficiaires</li><li>Qualité des programmes et des évaluations</li><li>Résultats des audits Qualiopi</li><li>Engagement et performance des formateurs</li></ul>` },
     { heading: "Positionnement hiérarchique", content: `<p>Le/La Responsable Pédagogique est placé(e) sous l'autorité de la direction de l'organisme et travaille en lien étroit avec le référent administratif, le référent handicap et les formateurs.</p>` },
