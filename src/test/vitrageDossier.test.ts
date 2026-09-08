@@ -14,11 +14,9 @@ describe("dossier ceos", () => {
       { civilite: "Mme", nom: "MARTIN", prenom: "Sophie", entreprise: "", poste: "Reconversion" },
     ];
     
-    for (const si of [0,1]) {
-      for (const id of ["test_positionnement_debut_stagiaire","test_positionnement_fin_stagiaire","exercices_stagiaire","analyse_besoins"]) {
-        try { console.log("###", si, id, txt(generateDocumentById("x", id, { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(0,60)+" | len="+txt(generateDocumentById("x",id,{stagiaireIdx:si,exerciceIdx:0},o,f,st)).length+" | "+(txt(generateDocumentById("x",id,{stagiaireIdx:si,exerciceIdx:0},o,f,st)).match(/Réponse du stagiaire[^|]{0,160}|Je [^.]{20,160}\./g)||[]).slice(0,2).join(" ~~ ")); }
-        catch (e: any) { console.log("###", si, id, "ERR", e.message); }
-      }
+    for (const si of [0]) {
+      const h = txt(generateDocumentById("x","exercices_stagiaire",{stagiaireIdx:si,exerciceIdx:0},o,f,st));
+      console.log("EX>>>", h.slice(0,2200));
     }
   });
 });
