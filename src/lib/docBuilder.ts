@@ -1,5 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
+import { estJourFormation } from "./joursFeries";
 
 /** Return telephone string only if non-empty, otherwise "" */
 export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
@@ -871,15 +872,15 @@ export function getDisplayTarif(f: FormationInfo, stagiaires?: StagiaireInfo[]):
 
 /** Calculate individual stagiaire duration based on their dates (business days × hours/day) */
 export function getStagiaireDuree(s: StagiaireInfo, f: FormationInfo): string {
-  const dateDebut = s.dateDebutFormation || "";
-  const dateFin = s.dateFinFormation || "";
+  const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+  const dateFin = s.dateFinFormation || f.dateFin || "";
   if (dateDebut && dateFin) {
     const start = new Date(dateDebut + "T00:00:00");
     const end = new Date(dateFin + "T00:00:00");
     let businessDays = 0;
     const current = new Date(start);
     while (current <= end) {
-      if (current.getDay() !== 0 && current.getDay() !== 6) businessDays++;
+      if (estJourFormation(current, start, end)) businessDays++;
       current.setDate(current.getDate() + 1);
     }
     if (businessDays > 0) {
@@ -888,7 +889,7 @@ export function getStagiaireDuree(s: StagiaireInfo, f: FormationInfo): string {
       return `${totalHours} heures (${businessDays} jours)`;
     }
   }
-  return "À définir selon le groupe";
+  return f.duree || "À définir selon le groupe";
 }
 
 /** Format a formation info block for a specific stagiaire (uses their individual dates/tarif if available) */
