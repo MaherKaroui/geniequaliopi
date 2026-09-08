@@ -59,6 +59,7 @@ import { pickCreaComment, isCreationEntrepriseFormation, CREA_BESOINS } from "./
 import { pickIAComment, isIAGenerativeFormation } from "./iaGenerativePreset";
 import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
+import { getSatisfactionLabel, getAssiduiteLabel, getNombreStagiairesFormes, getTauxObtention, getCommentaireIndicateurs, getRepartitionParAnnee, NON_COLLECTE } from "./indicateursResultats";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
