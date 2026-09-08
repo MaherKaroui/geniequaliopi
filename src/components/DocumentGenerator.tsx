@@ -189,6 +189,23 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const allStagiaires = useMemo(() => mergeStagiaires(stagiaires), [stagiaires]);
   const catalog = useMemo(() => getFullCatalog(organisme, formation, stagiaires), [organisme, formation, stagiaires]);
   const progress = catalog.length ? Math.round((generated.size / catalog.length) * 100) : 0;
+  // Index critère → indicateur → documents (évite de re-filtrer le catalogue à chaque rendu)
+  const docsIndex = useMemo(() => {
+    const byCritere = new Map<number, DocEntry[]>();
+    const byInd = new Map<string, DocEntry[]>();
+    catalog.forEach(doc => {
+      if (doc.id.startsWith("cfa_siteweb_")) return;
+      if (!byCritere.has(doc.critere)) byCritere.set(doc.critere, []);
+      byCritere.get(doc.critere)!.push(doc);
+      const k = `${doc.critere}-${doc.indicateur}`;
+      if (!byInd.has(k)) byInd.set(k, []);
+      byInd.get(k)!.push(doc);
+    });
+    return { byCritere, byInd };
+  }, [catalog]);
+  // Rendu paresseux : on n'affiche qu'un lot de documents par indicateur déplié
+  const PAGE_DOCS = 100;
+  const [visibleDocs, setVisibleDocs] = useState<Record<string, number>>({});
   const importIssues = useMemo(
     () => importAudit?.matches.filter((match) => match.status === "missing" || match.status === "near") ?? [],
     [importAudit],
