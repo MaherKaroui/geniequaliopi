@@ -10,6 +10,7 @@ import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS,
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
+import { isVitrageFormation, getVitrageBesoin } from "./vitrageHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
