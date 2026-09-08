@@ -7,6 +7,7 @@ import { EVAL_SCORES, getFormationDays, parseDuree } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance } from "./documentGenerator";
 import { getRNCPByCode } from "./rncpData";
+import { getSatisfactionLabel, getAssiduiteLabel, getNombreStagiairesFormes, getTauxObtention, getCommentaireIndicateurs, getRepartitionParAnnee, NON_COLLECTE } from "./indicateursResultats";
 
 function excelWrap(title: string, sheets: { name: string; html: string }[]): string {
   // Multi-sheet Excel HTML workbook
@@ -290,6 +291,36 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
       cfaHtml += `<tr><td>${ind}</td><td>${res}</td><td>${com}</td></tr>`;
     });
     return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE CFA – ${annee}`, [{ name: "Indicateurs CFA", html: cfaHtml }]);
+  }
+
+  // ═══ Variante Action de formation — valeurs saisies uniquement ═══
+  if (!isVAE && !isCFA) {
+    const repartition = getRepartitionParAnnee(f, stagiaires.filter(s => s.nom && s.nom.trim()));
+    const sat = getSatisfactionLabel(f);
+    const ass = getAssiduiteLabel(f);
+    const obt = getTauxObtention(f);
+    const com = getCommentaireIndicateurs(f);
+    const nbF = getNombreStagiairesFormes(f);
+    const anneeTitre = (f.anneeIndicateurs || "").trim() || (repartition.length ? repartition.map(r => r.annee).join(" / ") : String(annee));
+
+    let afHtml = "";
+    repartition.forEach(r => {
+      afHtml += tableRow([`${labelAction} – ${r.annee}`, "Indicateur", ...mois.map(m => `${m}-${String(r.annee).slice(2)}`), "Commentaires / analyse"], true);
+      afHtml += tableRow([f.intitule || o.nom, `Nombre de ${labelBeneficiaires}`, ...r.parMois.map(n => n > 0 ? String(n) : ""), `${r.total} ${r.total > 1 ? labelBeneficiaires : labelBeneficiaire} sur l'année ${r.annee}.`]);
+      afHtml += tableRow(["", "Taux de satisfaction appréciation des bénéficiaires", ...mois.map(() => ""), sat || NON_COLLECTE]);
+      afHtml += tableRow([...Array(15).fill("")]);
+    });
+    if (!repartition.length) {
+      afHtml += tableRow(["Aucune date de session renseignée : répartition mensuelle non établie."]);
+    }
+    afHtml += tableRow(["Synthèse", "Indicateur", "Résultat"], true);
+    afHtml += tableRow(["", "Taux de satisfaction", sat || NON_COLLECTE]);
+    afHtml += tableRow(["", "Taux d'assiduité", ass || NON_COLLECTE]);
+    afHtml += tableRow(["", `Nombre de ${labelBeneficiaires} formés`, nbF || (repartition.length ? String(repartition.reduce((a, r) => a + r.total, 0)) : NON_COLLECTE)]);
+    afHtml += tableRow(["", "Taux d'obtention de la certification", obt ? `${obt.taux}% (${obt.admis}/${obt.presentes})` : "Non disponible"]);
+    if (com) afHtml += tableRow(["", "Commentaire", com]);
+
+    return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${anneeTitre}`, [{ name: "Tableau de bord", html: afHtml }]);
   }
 
   // Header row with Année n-1 column
