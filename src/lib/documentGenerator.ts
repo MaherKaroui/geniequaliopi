@@ -9930,7 +9930,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(f.dateDebut))}</p>
@@ -9989,7 +9989,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
@@ -10115,7 +10115,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:16px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>`;
 
@@ -10288,7 +10288,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
 
   // === Early return : CQP Opérateur vitrage automobile ===
   if (isVitrageFormation(f.intitule, f.codeRNCP)) {
-    return getVitrageEvalBesoins(s, hasEntreprise);
+    return getVitrageEvalBesoins(s, hasEntreprise, idx);
   }
 
   // === Early return : Création d'entreprise (porteurs de projet) ===

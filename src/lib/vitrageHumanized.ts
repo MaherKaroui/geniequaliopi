@@ -702,10 +702,14 @@ const BESOINS_CONTRIBUTION_ENT = [
 export function getVitrageEvalBesoins(
   s: { nom?: string; prenom?: string; civilite?: string; entreprise?: string },
   hasEntreprise: boolean,
+  idx?: number,
 ) {
   const seed = vitrageSeed(s.nom, s.prenom);
   const fem = isFeminin(s.civilite, s.prenom);
-  const pick = (arr: string[], off: number) => accorder(arr[(seed + off * 7) % arr.length], fem);
+  // Si l'index du stagiaire est connu, on l'utilise : chacun des 53 stagiaires
+  // reçoit alors une réponse différente (pas de doublon dans le groupe).
+  const base = typeof idx === "number" && idx >= 0 ? idx : seed;
+  const pick = (arr: string[], off: number) => accorder(arr[(base + off) % arr.length], fem);
   const ent = (txt: string) =>
     accorder(
       txt.replace(/\{un\}/g, fem ? "une" : "un").replace(/\{collab\}/g, fem ? "collaboratrice" : "collaborateur"),
@@ -715,16 +719,16 @@ export function getVitrageEvalBesoins(
   return {
     civilite,
     raisonSociale: hasEntreprise ? (s.entreprise as string) : "/",
-    attentes: ent(BESOINS_ATTENTES_ENT[(seed + 3) % BESOINS_ATTENTES_ENT.length]),
-    missions: ent(BESOINS_MISSIONS_ENT[(seed + 5) % BESOINS_MISSIONS_ENT.length]),
-    contribution: ent(BESOINS_CONTRIBUTION_ENT[(seed + 11) % BESOINS_CONTRIBUTION_ENT.length]),
-    diplome: pick(BESOINS_DIPLOMES, 1),
-    objectif: pick(BESOINS_OBJECTIFS, 2),
+    attentes: ent(BESOINS_ATTENTES_ENT[(base + 3) % BESOINS_ATTENTES_ENT.length]),
+    missions: ent(BESOINS_MISSIONS_ENT[(base + 5) % BESOINS_MISSIONS_ENT.length]),
+    contribution: ent(BESOINS_CONTRIBUTION_ENT[(base + 11) % BESOINS_CONTRIBUTION_ENT.length]),
+    diplome: pick(BESOINS_DIPLOMES, 0),
+    objectif: pick(BESOINS_OBJECTIFS, 7),
     budget: hasEntreprise
       ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
-      : BESOINS_BUDGET_PERSO[(seed + 4) % BESOINS_BUDGET_PERSO.length],
-    projetPro: pick(BESOINS_PROJET, 6),
-    handicap: pick(BESOINS_HANDICAP, 8),
-    disponibilites: pick(BESOINS_DISPO, 9),
+      : BESOINS_BUDGET_PERSO[(base + 1) % BESOINS_BUDGET_PERSO.length],
+    projetPro: pick(BESOINS_PROJET, 19),
+    handicap: pick(BESOINS_HANDICAP, 31),
+    disponibilites: pick(BESOINS_DISPO, 43),
   };
 }
