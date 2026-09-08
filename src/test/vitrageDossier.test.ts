@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 import { generateDocumentById } from "@/lib/documentGenerator";
-const txt = (h: string) => String(h).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+const txt = (h: string) => String(h).split("</style>").pop()!.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 describe("dossier ceos", () => {
   it("rend", () => {
     const o: any = { nom: "CEOS ACADEMY", siret: "123", nda: "11", adresse: "Paris", email: "a@b.c" };
@@ -16,7 +16,7 @@ describe("dossier ceos", () => {
     
     for (const si of [0,1]) {
       for (const id of ["test_positionnement_debut_stagiaire","test_positionnement_fin_stagiaire","exercices_stagiaire","analyse_besoins"]) {
-        try { console.log("###", si, id, txt(generateDocumentById(id, "", { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(0, 700)); }
+        try { console.log("###", si, id, txt(generateDocumentById(id, "", { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(300, 1400)); }
         catch (e: any) { console.log("###", si, id, "ERR", e.message); }
       }
     }
