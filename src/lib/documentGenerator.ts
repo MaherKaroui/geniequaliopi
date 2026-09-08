@@ -1903,7 +1903,10 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
       const financement = financements[i % financements.length];
-      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, domain.besoins[i % domain.besoins.length]];
+      const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
+        ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
+        : domain.besoins[i % domain.besoins.length];
+      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
     tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Prise en charge", "Besoin principal identifié"], rows);
   }
