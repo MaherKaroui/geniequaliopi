@@ -383,3 +383,130 @@ export function pickVitrageExerciceAnswer(
   const idx = (seed + exerciceIdx * 5 + stagiaireIdx) % pool.length;
   return accorder(pool[idx], fem);
 }
+
+// ============================================================
+// ÉVALUATION DES BESOINS — réponses humanisées, une par stagiaire
+// ============================================================
+
+const BESOINS_DIPLOMES = [
+  "CAP Maintenance des véhicules automobiles (option voitures particulières), obtenu en 2016",
+  "Baccalauréat professionnel Maintenance des véhicules – option A voitures particulières",
+  "CAP Peinture en carrosserie, puis 4 ans en atelier de carrosserie",
+  "Baccalauréat général, suivi de 3 ans d'expérience en centre auto (montage pneus, révisions)",
+  "CAP Réparation des carrosseries obtenu en apprentissage",
+  "Brevet des collèges, puis parcours entièrement en apprentissage sur le terrain",
+  "Bac Pro Maintenance des matériels, reconversion vers le vitrage automobile",
+  "CAP Carrossier-réparateur + habilitation électrique B0L",
+  "Titre professionnel Mécanicien automobile, obtenu à l'AFPA en 2019",
+  "Baccalauréat technologique STI2D, première expérience en centre de réparation rapide",
+  "CAP Vente, reconversion après 5 ans en grande distribution",
+  "Aucun diplôme du secteur : expérience acquise sur le tas dans l'atelier familial",
+];
+
+const BESOINS_OBJECTIFS = [
+  "Devenir totalement autonome sur le remplacement d'un pare-brise collé, calibrage ADAS compris, pour ne plus dépendre d'un collègue sur les véhicules récents.",
+  "Passer du montage de vitres latérales au pare-brise collé, qui est la prestation la plus demandée dans notre secteur.",
+  "Obtenir le CQP pour candidater dans un centre spécialisé vitrage et sortir de l'intérim.",
+  "Réduire mon temps d'intervention : je sais faire, mais je mets encore près du double du temps barème.",
+  "Maîtriser le calibrage des caméras et radars, parce que sans ça je refuse aujourd'hui la moitié des véhicules qui entrent.",
+  "Ouvrir à terme mon activité de réparation d'impact en intervention mobile, avec une vraie certification derrière moi.",
+  "Sécuriser mon poste actuel : mon employeur veut un opérateur vitrage certifié pour conserver l'agrément assureur.",
+  "Apprendre la réparation par injection de résine, que je ne pratique pas du tout aujourd'hui.",
+  "Me reconvertir proprement dans un métier manuel qui recrute, après des années dans un secteur qui ne me convenait plus.",
+  "Savoir décider seul entre réparation et remplacement, et pouvoir le justifier face au client et à l'assureur.",
+  "Être capable de travailler seul en atelier le samedi, sans avoir besoin qu'un chef d'atelier valide chaque étape.",
+  "Monter en compétence sur les colles et les temps de séchage, parce que c'est là que je me sens le moins sûr.",
+];
+
+const BESOINS_PROJET = [
+  "Cette formation me donne la partie technique qui me manque. J'ai la main, la rigueur, mais pas la méthode ni les règles de sécurité liées au collage structurel.",
+  "Le vitrage automobile recrute en permanence dans ma région : une certification reconnue me met en position de choisir mon employeur plutôt que l'inverse.",
+  "Sans maîtrise du calibrage ADAS, je serais hors marché d'ici deux ans : tous les véhicules qui entrent à l'atelier en sont équipés.",
+  "Elle me permettra de facturer des prestations à plus forte valeur ajoutée et de ne plus me limiter aux petites interventions.",
+  "À l'issue du parcours je pourrai prendre en charge un véhicule de bout en bout : diagnostic, décision, intervention, restitution client.",
+  "C'est l'étape indispensable avant de me mettre à mon compte en intervention mobile ; sans certificat, aucun assureur ne référence.",
+  "Je veux arrêter d'être cantonné aux tâches annexes de l'atelier et devenir la personne référente sur le vitrage.",
+  "Elle sécurise mon parcours : un métier manuel, en tension, difficilement délocalisable, avec des perspectives d'évolution vers chef d'atelier.",
+  "Mon employeur conditionne mon passage en CDI à l'obtention de cette qualification.",
+  "Elle me permettra de reprendre confiance après une longue période sans emploi et de repartir sur des bases solides.",
+];
+
+const BESOINS_HANDICAP = [
+  "Non, je ne suis pas en situation de handicap. Aucun aménagement n'est nécessaire.",
+  "Non. Je porte simplement des lunettes de correction, ce qui n'a aucune incidence sur le suivi de la formation.",
+  "Non, aucune situation de handicap déclarée. Je suis apte au port de charges et au travail en atelier.",
+  "Non. Je signale toutefois une gêne au genou droit après une ancienne blessure : je préfère éviter les postures à genoux prolongées, sans que cela nécessite d'aménagement formel.",
+  "Non, pas de handicap. Je précise être daltonien léger, ce qui ne pose pas de difficulté pour les travaux réalisés.",
+  "Non. Aucun aménagement pédagogique, technique ou matériel n'est sollicité.",
+  "Non. J'ai néanmoins informé le référent handicap d'un traitement médical sans incidence sur la pratique en atelier.",
+];
+
+const BESOINS_DISPO = [
+  "Je suis disponible en journée du lundi au vendredi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Aucune contrainte particulière à signaler.",
+  "Disponible en journée du lundi au vendredi (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>). Je dépose mon enfant à l'école le matin : merci de me prévenir en cas de démarrage avancé.",
+  "Je peux suivre la formation en journée, du lundi au vendredi, de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>. Je viens en transports, un départ à 17h00 me convient parfaitement.",
+  "Disponibilité totale en journée du lundi au vendredi sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, y compris pour rester un peu plus tard sur les travaux pratiques si nécessaire.",
+  "Je suis disponible en journée (<strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>) du lundi au vendredi. Je n'ai pas de demande d'aménagement horaire.",
+  "Journée complète du lundi au vendredi, <strong>09h00 – 12h30</strong> puis <strong>13h30 – 17h00</strong>. Je signale un rendez-vous médical déjà pris que je décalerai si besoin.",
+  "Disponible en journée, du lundi au vendredi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Je fais 40 minutes de route matin et soir mais cela reste compatible.",
+];
+
+const BESOINS_BUDGET_PERSO = [
+  "Financement personnel",
+  "Financement personnel, complété par mes droits CPF",
+  "Financement personnel (paiement échelonné en trois fois convenu avec l'organisme)",
+  "Financement personnel, sans dispositif complémentaire mobilisé à ce jour",
+];
+
+const BESOINS_ATTENTES_ENT = [
+  "Nous attendons {un} {collab} capable de traiter seul{e} un remplacement de pare-brise collé, calibrage compris, sans supervision du chef d'atelier.",
+  "Notre attente est que notre {collab} maîtrise la décision réparation/remplacement et la justifie auprès de l'assureur, afin de réduire nos litiges de prise en charge.",
+  "Nous souhaitons fiabiliser la qualité de nos poses : moins de reprises pour infiltration ou bruit d'air, et un respect strict des temps de séchage.",
+  "L'objectif est d'avoir en interne {un} opérateur{e} certifié{e} pour conserver notre référencement auprès des compagnies d'assurance.",
+  "Nous attendons une réduction du temps d'immobilisation des véhicules, aujourd'hui pénalisant pour notre planning atelier.",
+];
+
+const BESOINS_MISSIONS_ENT = [
+  "Réception du véhicule, diagnostic de réparabilité, remplacement des vitrages collés et non collés, calibrage des systèmes d'aide à la conduite et restitution au client.",
+  "Aujourd'hui limité aux vitres latérales et à la pose d'accessoires ; à l'issue de la formation, prise en charge complète des pare-brise collés sur véhicules ADAS.",
+  "Interventions en atelier et en mobile chez le client : réparation d'impacts par injection de résine, remplacement de pare-brise, gestion des consommables et des déchets.",
+  "Accueil client, établissement du devis, déclaration auprès de l'assureur, intervention technique puis contrôle qualité avant restitution.",
+];
+
+const BESOINS_CONTRIBUTION_ENT = [
+  "Disposer d'un second opérateur qualifié nous permet d'absorber les pics d'activité sans sous-traiter et de tenir nos délais de restitution.",
+  "La certification est exigée par nos partenaires assureurs : elle conditionne directement le maintien de notre volume d'affaires.",
+  "Réduire les reprises après pose représente une économie directe et préserve notre réputation locale, qui repose sur le bouche-à-oreille.",
+  "Le calibrage ADAS réalisé en interne évite la sous-traitance chez le concessionnaire, coûteuse et génératrice de délais.",
+];
+
+/** Réponses d'évaluation des besoins propres au CQP vitrage, différentes pour chaque stagiaire. */
+export function getVitrageEvalBesoins(
+  s: { nom?: string; prenom?: string; civilite?: string; entreprise?: string },
+  hasEntreprise: boolean,
+) {
+  const seed = vitrageSeed(s.nom, s.prenom);
+  const fem = isFeminin(s.civilite, s.prenom);
+  const pick = (arr: string[], off: number) => accorder(arr[(seed + off * 7) % arr.length], fem);
+  const ent = (txt: string) =>
+    accorder(
+      txt.replace(/\{un\}/g, fem ? "une" : "un").replace(/\{collab\}/g, fem ? "collaboratrice" : "collaborateur"),
+      fem,
+    );
+  const civilite = s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : (s.civilite || "Monsieur");
+  return {
+    civilite,
+    raisonSociale: hasEntreprise ? (s.entreprise as string) : "/",
+    attentes: ent(BESOINS_ATTENTES_ENT[(seed + 3) % BESOINS_ATTENTES_ENT.length]),
+    missions: ent(BESOINS_MISSIONS_ENT[(seed + 5) % BESOINS_MISSIONS_ENT.length]),
+    contribution: ent(BESOINS_CONTRIBUTION_ENT[(seed + 11) % BESOINS_CONTRIBUTION_ENT.length]),
+    diplome: pick(BESOINS_DIPLOMES, 1),
+    objectif: pick(BESOINS_OBJECTIFS, 2),
+    budget: hasEntreprise
+      ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
+      : BESOINS_BUDGET_PERSO[(seed + 4) % BESOINS_BUDGET_PERSO.length],
+    projetPro: pick(BESOINS_PROJET, 6),
+    handicap: pick(BESOINS_HANDICAP, 8),
+    disponibilites: pick(BESOINS_DISPO, 9),
+  };
+}
