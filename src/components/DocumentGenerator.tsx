@@ -859,12 +859,43 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     });
   };
 
+  /** Pré-contrôle bloquant AF : stagiaire sans nom, prénom, dates, ou dates incohérentes. */
+  const controlerStagiairesAF = (): string[] => {
+    const erreurs: string[] = [];
+    const parse = (v?: string): Date | null => {
+      if (!v || !v.trim()) return null;
+      const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    };
+    (allStagiaires || []).forEach((s, i) => {
+      const label = `${s.prenom || ""} ${s.nom || ""}`.trim() || `Stagiaire ${i + 1}`;
+      if (!s.nom || !s.nom.trim()) erreurs.push(`${label} : nom manquant`);
+      if (!s.prenom || !s.prenom.trim()) erreurs.push(`${label} : prénom manquant`);
+      const deb = parse(s.dateDebutFormation || selectedFormation?.dateDebut);
+      const fin = parse(s.dateFinFormation || selectedFormation?.dateFin);
+      if (!deb || !fin) erreurs.push(`${label} : dates de formation manquantes`);
+      else if (fin < deb) erreurs.push(`${label} : date de fin antérieure à la date de début`);
+    });
+    return erreurs;
+  };
+
   const handleDownloadAll = () => {
     // BDC : contrôle de cohérence obligatoire avant tout export (BLOC 2)
     if (isBDCOrg) {
       setBdcControleOpen(true);
       return;
     }
+
+    const erreurs = controlerStagiairesAF();
+    if (erreurs.length > 0) {
+      toast.error(
+        `Génération bloquée — ${erreurs.length} anomalie(s) à corriger dans la fiche stagiaire : ${erreurs.slice(0, 5).join(" · ")}${erreurs.length > 5 ? " …" : ""}`,
+        { duration: 12000 }
+      );
+      return;
+    }
+
 
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
