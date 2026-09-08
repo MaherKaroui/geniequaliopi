@@ -138,7 +138,6 @@ const TOOL_SCHEMA = {
           },
           required: ["titre", "exercices"],
         },
-      },
         guidePassation: {
           type: "string",
           description: "Guide de passation formateur : introduction de l'exercice, aides autorisées et interdites, traçage de l'observation, restitution au stagiaire (10-15 lignes, spécifique au métier).",
