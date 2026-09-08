@@ -10,7 +10,7 @@ import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS,
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
-import { isVitrageFormation, getVitrageBesoin } from "./vitrageHumanized";
+import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./vitrageHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
@@ -9930,7 +9930,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(f.dateDebut))}</p>
@@ -9989,7 +9989,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
@@ -10115,7 +10115,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 
 <p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s, f)}</td></tr></table>
 
 <p style="margin-top:16px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>`;
 
@@ -10182,7 +10182,10 @@ function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
 }
 
 /** Réponse "disponibilités / aménagement horaire" : journée standard 09h-17h. */
-function getDisponibilitesAnswer(s: StagiaireInfo): string {
+function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
+  if (f && isVitrageFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getVitrageEvalBesoins(s, false).disponibilites;
+  }
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
@@ -10234,6 +10237,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
     result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
   }
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  // CQP vitrage : réponses humanisées propres à chaque stagiaire (pas d'écrasement global)
+  if (isVitrageFormation(f.intitule, f.codeRNCP)) return result;
   // Override global : diplôme = Baccalauréat, financement adapté au contexte
   result.diplome = "Baccalauréat";
   if (isCFAAlternance) {
@@ -10280,6 +10285,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
   const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
+
+  // === Early return : CQP Opérateur vitrage automobile ===
+  if (isVitrageFormation(f.intitule, f.codeRNCP)) {
+    return getVitrageEvalBesoins(s, hasEntreprise);
+  }
 
   // === Early return : Création d'entreprise (porteurs de projet) ===
   if (isCreationEntrepriseFormation(formation)) {
