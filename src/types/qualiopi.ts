@@ -58,6 +58,10 @@ export interface OrganismeInfo {
   logoUrl?: string;
   signatureUrl?: string;
   tamponUrl?: string;
+  numeroCertificatQualiopi?: string;
+  organismeCertificateur?: string;
+  dateObtentionQualiopi?: string;
+  dateFinValiditeQualiopi?: string;
 }
 
 export interface StagiaireInfo {
