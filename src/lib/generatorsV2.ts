@@ -26,6 +26,7 @@ import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
 import { IA_GENERATIVE_EVAL_PACK } from "./iaGenerativePreset";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
+import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 
 // ========== HELPERS ==========
 
@@ -1134,7 +1135,8 @@ D) Drive faster to finish the ride.`,
       .replace(/\[.*?\]/g, '');
 
     // Output the student response as a single flowing block — no extra filler paragraphs
-    const creaRep = pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
+    const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s)
+      || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     extra += `<p>${creaRep || repClean}</p>`;
 
     // Formateur correction

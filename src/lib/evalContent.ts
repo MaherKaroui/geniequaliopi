@@ -2,6 +2,7 @@
 import { getCachedContentPack } from "./aiContentPack";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
 import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
+import { isVitrageFormation, getVitrageAutoAnswers } from "./vitrageHumanized";
 
 
 
@@ -2349,20 +2350,35 @@ export function generateStagiaireOpenAnswers(
   questions: QuestionOuverte[],
   stagiaireIndex: number,
   isDebut: boolean,
-  stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
+  stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string; civilite?: string },
+  formationInfo?: { intitule?: string; codeRNCP?: string }
 ): StagiaireOpenAnswer[] {
-  // Réponses écrites à la main (CQP Opérateur vitrage) : une copie différente par stagiaire.
-  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut, stagiaireInfo?.prenom);
-  if (manualVitrage) {
-    return questions.map((_q, qi) => {
-      const reponse = manualVitrage.reponses[qi] ?? manualVitrage.reponses[qi % manualVitrage.reponses.length];
-      const score = manualVitrage.scores[qi] ?? manualVitrage.scores[qi % manualVitrage.scores.length];
+  const toAnswers = (reponses: string[], scores: number[]) =>
+    questions.map((_q, qi) => {
+      const reponse = reponses[qi] ?? reponses[qi % reponses.length];
+      const score = scores[qi] ?? scores[qi % scores.length];
       return {
         reponse,
         score,
         feedback: score >= 1 ? "Bonne réponse" : score >= 0.5 ? "Réponse partielle" : "Réponse incomplète",
       };
     });
+
+  // Réponses écrites à la main (CQP Opérateur vitrage) : une copie différente par stagiaire.
+  const manualVitrage = getVitrageManualAnswers(stagiaireInfo?.nom, isDebut, stagiaireInfo?.prenom);
+  if (manualVitrage) return toAnswers(manualVitrage.reponses, manualVitrage.scores);
+
+  // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
+  // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  if (isVitrageFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const auto = getVitrageAutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(auto.reponses, auto.scores);
   }
 
   const profile = getStagiaireTestProfile(stagiaireIndex);

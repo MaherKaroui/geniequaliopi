@@ -10,6 +10,7 @@ import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS,
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
+import { isVitrageFormation, getVitrageBesoin } from "./vitrageHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
@@ -1903,7 +1904,10 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
       const financement = financements[i % financements.length];
-      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, domain.besoins[i % domain.besoins.length]];
+      const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
+        ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
+        : domain.besoins[i % domain.besoins.length];
+      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
     tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Prise en charge", "Besoin principal identifié"], rows);
   }
@@ -3570,7 +3574,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     return buildDocument({ org: o, title: `TEST DE POSITIONNEMENT ${labelCap.toUpperCase()} DE FORMATION`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, extraHtml: extra });
   }
 
-  const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
+  const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
   const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
@@ -13773,7 +13777,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
   const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
-  const openAnswers = rempli ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
+  const openAnswers = rempli ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP }) : [];
 
   extra += `<h3>Partie 2 — Questions ouvertes</h3>`;
   openQs.forEach((q, qi) => {
