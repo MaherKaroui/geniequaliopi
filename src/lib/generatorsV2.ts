@@ -26,6 +26,7 @@ import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
 import { IA_GENERATIVE_EVAL_PACK } from "./iaGenerativePreset";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
+import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 
 // ========== HELPERS ==========
 
