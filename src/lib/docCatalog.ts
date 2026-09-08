@@ -2,6 +2,28 @@ import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
+import { estJourFormation } from "./joursFeries";
+
+/** Nombre de jours de formation réels d'un stagiaire (fériés exclus, samedi de bord inclus). */
+function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
+  const deb = (s.dateDebutFormation || f.dateDebut || "").trim();
+  const fin = (s.dateFinFormation || f.dateFin || "").trim();
+  if (!deb || !fin) return 0;
+  const parse = (v: string): Date | null => {
+    const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const start = parse(deb), end = parse(fin);
+  if (!start || !end || end < start) return 0;
+  let n = 0;
+  const cur = new Date(start);
+  while (cur <= end) {
+    if (estJourFormation(cur, start, end)) n++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return n;
+}
 import { getEvalContent } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdc/bdcTemplatesBC";
@@ -233,7 +255,7 @@ export function buildFullCatalog(
         } else if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
-          const nbJoursStagiaire = getStagiaireDays(s, f).length || nbJoursFormation;
+          const nbJoursStagiaire = nbJoursStagiaireCatalog(s, f) || nbJoursFormation;
           nbQcm = Math.min(30, Math.max(1, nbJoursStagiaire));
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
