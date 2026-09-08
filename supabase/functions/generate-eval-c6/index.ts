@@ -15,6 +15,13 @@ RÈGLES STRICTES :
 - Pour exerciceIntermediaire et evaluationFinale : questions ouvertes avec correction détaillée (3-6 lignes).
 - Réponse en FRANÇAIS uniquement.
 - Niveau adapté : positionnement début = bases, positionnement fin = avancé/synthèse.
+- Pour chaque exercice de evaluationFinale, produis un corrigé formateur COMPLET en 4 parties :
+  1) consigneDetaillee : situation professionnelle, matériel/documents fournis, livrable attendu, durée allouée, conditions (individuel/binôme, documents autorisés, poste)
+  2) reponseDeveloppee : déroulé complet étape par étape dans l'ordre opératoire, avec valeurs, seuils, références et gestes techniques précis du métier (plusieurs paragraphes)
+  3) criteresEvaluation : 5 à 7 critères OBSERVABLES avec indicateur de réussite et points, total EXACTEMENT 20, + seuilValidation et criteresEliminatoires (sécurité)
+  4) erreursFrequentes : 3 à 5 erreurs réelles, lacune révélée, remédiation proposée
+- Ajoute un guidePassation formateur pour l'ensemble de la formation.
+- Jamais de formulation générique : cite le matériel, les normes, les valeurs et les gestes du métier concerné.
 - Réponds UNIQUEMENT via l'appel d'outil, jamais en texte libre.`;
 
 const TOOL_SCHEMA = {
@@ -90,15 +97,53 @@ const TOOL_SCHEMA = {
                   consigne: { type: "string", description: "Consigne pratique détaillée (4-8 lignes)" },
                   reponseAttendue: { type: "string", description: "Corrigé/critères de réussite (4-8 lignes)" },
                   points: { type: "integer", minimum: 2, maximum: 10 },
+                  consigneDetaillee: { type: "string", description: "Situation professionnelle complète : contexte, matériel/documents mis à disposition, livrable attendu, conditions (individuel/binôme, documents autorisés, poste de travail). 6-10 lignes, spécifique au métier." },
+                  dureeAllouee: { type: "string", description: "Durée allouée, ex. « 1 h 30 »" },
+                  conditionsRealisation: { type: "string" },
+                  materielFourni: { type: "string" },
+                  livrableAttendu: { type: "string" },
+                  reponseDeveloppee: { type: "string", description: "Déroulé complet, étape par étape, dans l'ordre opératoire, avec valeurs, seuils, références normatives et gestes techniques précis du métier. Plusieurs paragraphes (15-25 lignes), jamais générique." },
+                  criteresEvaluation: {
+                    type: "array",
+                    description: "5 à 7 critères OBSERVABLES ; le total des points fait exactement 20",
+                    items: {
+                      type: "object",
+                      properties: {
+                        critere: { type: "string" },
+                        indicateur: { type: "string", description: "Indicateur de réussite observable par le formateur" },
+                        points: { type: "number" },
+                      },
+                      required: ["critere", "indicateur", "points"],
+                    },
+                  },
+                  seuilValidation: { type: "string", description: "Ex. « 12/20 »" },
+                  criteresEliminatoires: { type: "array", items: { type: "string" }, description: "Typiquement sécurité / EPI / respect d'un temps de sécurité" },
+                  erreursFrequentes: {
+                    type: "array",
+                    description: "3 à 5 erreurs réellement observées sur ce type d'exercice",
+                    items: {
+                      type: "object",
+                      properties: {
+                        erreur: { type: "string" },
+                        lacune: { type: "string" },
+                        remediation: { type: "string" },
+                      },
+                      required: ["erreur", "lacune", "remediation"],
+                    },
+                  },
                 },
-                required: ["titre", "consigne", "reponseAttendue", "points"],
+                required: ["titre", "consigne", "reponseAttendue", "points", "consigneDetaillee", "reponseDeveloppee", "criteresEvaluation", "seuilValidation", "erreursFrequentes"],
               },
             },
           },
           required: ["titre", "exercices"],
         },
+        guidePassation: {
+          type: "string",
+          description: "Guide de passation formateur : introduction de l'exercice, aides autorisées et interdites, traçage de l'observation, restitution au stagiaire (10-15 lignes, spécifique au métier).",
+        },
       },
-      required: ["qcmDebut", "qcmFin", "exerciceIntermediaire", "evaluationFinale"],
+      required: ["qcmDebut", "qcmFin", "exerciceIntermediaire", "evaluationFinale", "guidePassation"],
       additionalProperties: false,
     },
   },

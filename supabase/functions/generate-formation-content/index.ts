@@ -100,9 +100,47 @@ const CONTENT_TOOL = {
               consigne: { type: "string" },
               reponseAttendue: { type: "string" },
               points: { type: "number" },
+              consigneDetaillee: { type: "string", description: "Situation professionnelle complète : contexte, matériel/documents mis à disposition, livrable attendu, conditions (individuel/binôme, documents autorisés, poste de travail). 6-10 lignes, spécifique au métier." },
+              dureeAllouee: { type: "string", description: "Durée allouée, ex. « 1 h 30 »" },
+              conditionsRealisation: { type: "string" },
+              materielFourni: { type: "string" },
+              livrableAttendu: { type: "string" },
+              reponseDeveloppee: { type: "string", description: "Déroulé complet, étape par étape, dans l'ordre opératoire, avec valeurs, seuils, références normatives et gestes techniques précis du métier. Plusieurs paragraphes (15-25 lignes), jamais générique." },
+              criteresEvaluation: {
+                type: "array",
+                description: "5 à 7 critères OBSERVABLES ; le total des points fait exactement 20",
+                items: {
+                  type: "object",
+                  properties: {
+                    critere: { type: "string" },
+                    indicateur: { type: "string", description: "Indicateur de réussite observable par le formateur" },
+                    points: { type: "number" },
+                  },
+                  required: ["critere", "indicateur", "points"],
+                },
+              },
+              seuilValidation: { type: "string", description: "Ex. « 12/20 »" },
+              criteresEliminatoires: { type: "array", items: { type: "string" }, description: "Typiquement sécurité / EPI / respect d'un temps de sécurité" },
+              erreursFrequentes: {
+                type: "array",
+                description: "3 à 5 erreurs réellement observées sur ce type d'exercice",
+                items: {
+                  type: "object",
+                  properties: {
+                    erreur: { type: "string" },
+                    lacune: { type: "string" },
+                    remediation: { type: "string" },
+                  },
+                  required: ["erreur", "lacune", "remediation"],
+                },
+              },
             },
-            required: ["titre", "consigne", "reponseAttendue", "points"],
+            required: ["titre", "consigne", "reponseAttendue", "points", "consigneDetaillee", "reponseDeveloppee", "criteresEvaluation", "seuilValidation", "erreursFrequentes"],
           },
+        },
+        guidePassation: {
+          type: "string",
+          description: "Guide de passation à l'usage du formateur : comment introduire l'exercice, ce qu'il peut ou ne peut pas aider, comment tracer l'observation, comment restituer au stagiaire. 10-15 lignes, spécifique au métier.",
         },
         ressources: {
           type: "object",
@@ -127,7 +165,7 @@ const CONTENT_TOOL = {
           required: ["supportsHtml", "outilsHtml", "ressourcesComplHtml", "videos"],
         },
       },
-      required: ["besoins", "chapters", "exercises", "ressources"],
+      required: ["besoins", "chapters", "exercises", "ressources", "guidePassation"],
     },
   },
 };
@@ -185,7 +223,12 @@ NOMBRE DE STAGIAIRES : ${nbStagiaires}
 Tu dois OBLIGATOIREMENT produire :
 1. besoins (10 besoins individuels + synthèse + adaptations)
 2. chapters : **5 chapitres**, **3 sections par chapitre**, **200-300 mots de HTML par section**
-3. exercises : **6 exercices** progressifs avec **corrigés détaillés**
+3. exercises : **6 exercices** progressifs. Pour CHAQUE exercice, un corrigé formateur en 4 parties :
+   a) consigneDetaillee : situation professionnelle, matériel/documents fournis, livrable, durée, conditions de réalisation
+   b) reponseDeveloppee : déroulé complet étape par étape dans l'ordre opératoire, avec valeurs, seuils, références et gestes techniques PRÉCIS du métier (plusieurs paragraphes)
+   c) criteresEvaluation : 5 à 7 critères observables + indicateur de réussite + points, TOTAL EXACTEMENT 20, avec seuilValidation et criteresEliminatoires (sécurité)
+   d) erreursFrequentes : 3 à 5 erreurs réelles, la lacune qu'elles révèlent, la remédiation du formateur
+5. guidePassation : guide formateur pour la passation des exercices
 4. ressources : supports, outils, 5 vidéos YouTube (URLs de recherche), sites/livres réels du domaine
 
 Tout doit être 100% cohérent avec le métier "${intitule}".${humanizeInstruction}`;
