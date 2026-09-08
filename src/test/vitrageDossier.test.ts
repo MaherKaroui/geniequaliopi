@@ -13,10 +13,12 @@ describe("dossier ceos", () => {
       { civilite: "M.", nom: "DUPONT", prenom: "Marc", entreprise: "X", poste: "Poseur" },
       { civilite: "Mme", nom: "MARTIN", prenom: "Sophie", entreprise: "", poste: "Reconversion" },
     ];
-    const ctx: any = { organisme: o, formation: f, stagiaires: st };
-    for (const id of ["test_positionnement_debut_stagiaire", "test_positionnement_fin_stagiaire"]) {
-      try { console.log("###", id, txt(generateDocumentById(id, "", { ...ctx, stagiaireIdx: 0 }) as any).slice(0, 600)); }
-      catch (e: any) { console.log("###", id, "ERR", e.message); }
+    
+    for (const si of [0,1]) {
+      for (const id of ["test_positionnement_debut_stagiaire","test_positionnement_fin_stagiaire","exercices_stagiaire","analyse_besoins"]) {
+        try { console.log("###", si, id, txt(generateDocumentById(id, "", { stagiaireIdx: si, exerciceIdx: 0 }, o, f, st)).slice(0, 700)); }
+        catch (e: any) { console.log("###", si, id, "ERR", e.message); }
+      }
     }
   });
 });
