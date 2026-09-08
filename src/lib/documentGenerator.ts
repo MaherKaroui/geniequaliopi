@@ -3570,7 +3570,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     return buildDocument({ org: o, title: `TEST DE POSITIONNEMENT ${labelCap.toUpperCase()} DE FORMATION`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, extraHtml: extra });
   }
 
-  const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
+  const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
   const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
