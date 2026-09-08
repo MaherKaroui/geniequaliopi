@@ -20,7 +20,7 @@ import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne, genChecklistFormateur } from "./templatesCritere6";
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
-import { genDeroulePedagogique, genFactureOPCO } from "./templatesAF";
+import { genDeroulePedagogique, genFactureOPCO, genTauxObtentionCertification, genCertificatRealisationStagiaire } from "./templatesAF";
 import { genECFGotrm, genDPGotrm } from "./gotrm/ecfDp";
 
 import { getRNCPByCode } from "./rncpData";
@@ -863,6 +863,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "suivi_inscriptions": return genSuiviInscriptions(o, f, stagiaires);
     case "attestation_assiduite": return genAttestationAssiduite(o, f, stagiaires);
     case "certificat_realisation": return genCertificatRealisation(o, f, stagiaires);
+    case "taux_obtention_certification": return genTauxObtentionCertification(o, f, stagiaires);
+    case "certificat_realisation_stagiaire": return genCertificatRealisationStagiaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "suivi_absences": return genSuiviAbsences(o, f, stagiaires);
     case "fiche_poste_formateur": return genFichePosteRole(o, params?.role ?? "formateur", params?.formateurNom);
     case "contrat_sous_traitance_v2": {
