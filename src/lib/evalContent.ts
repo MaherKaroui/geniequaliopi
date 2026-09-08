@@ -2,6 +2,7 @@
 import { getCachedContentPack } from "./aiContentPack";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
 import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
+import { isVitrageFormation, getVitrageAutoAnswers } from "./vitrageHumanized";
 
 
 
