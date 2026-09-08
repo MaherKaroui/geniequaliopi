@@ -2130,7 +2130,26 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
   let sessionsHtml = "";
   if (hasIndiv) {
-    sessionsHtml = `<p><strong>Sessions en ${anneeFormation}</strong></p>`;
+    // Sessions réelles : regroupement sur le couple (dateDebutFormation, dateFinFormation)
+    const seen = new Set<string>();
+    const sessions: { debut: string; fin: string; nb: number }[] = [];
+    stagiaires.forEach(s => {
+      const d = (s.dateDebutFormation || f.dateDebut || "").trim();
+      const fn = (s.dateFinFormation || f.dateFin || "").trim();
+      if (!d && !fn) return;
+      const key = `${d}|${fn}`;
+      if (seen.has(key)) {
+        const found = sessions.find(x => `${x.debut}|${x.fin}` === key);
+        if (found) found.nb++;
+        return;
+      }
+      seen.add(key);
+      sessions.push({ debut: d, fin: fn, nb: 1 });
+    });
+    sessions.sort((a, b) => a.debut.localeCompare(b.debut));
+    sessionsHtml = sessions.length
+      ? `<p><strong>Sessions programmées :</strong></p><ul style="margin:4px 0 8px 18px">${sessions.map(x => `<li>Du ${formatDate(x.debut)} au ${formatDate(x.fin)}</li>`).join("")}</ul>`
+      : `<p><strong>Sessions en ${anneeFormation}</strong></p>`;
   }
 
   // Detect FLE / certification by competence blocks
@@ -2452,7 +2471,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
-      <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
+      <p><strong>Nombre de participants :</strong> ${f.nombreParticipants || nbStagiaires}</p>
     </div>
 
     ${(() => {
