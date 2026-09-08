@@ -1176,6 +1176,9 @@ D) Drive faster to finish the ride.`,
     }
     extra += `<p><strong>Note attribuée : ${noteRound} / ${noteMax}</strong></p>`;
 
+    // Corrigé formateur enrichi (référence d'évaluation – indicateur 11)
+    extra += renderCorrigeFormateurHTML(ex as ExerciceEnrichi, f, ei);
+
   });
 
   // --- SCORE & APPRÉCIATION FORMATEUR (1 QCM par fichier) ---
