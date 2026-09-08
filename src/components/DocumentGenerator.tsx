@@ -1796,7 +1796,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         <div className="space-y-2">
           {CRITERES_INFO.map((critere) => {
             const isExpanded = expandedCriteres.has(critere.numero);
-            const critereDocs = catalog.filter((doc) => doc.critere === critere.numero && !doc.id.startsWith("cfa_siteweb_"));
+            const critereDocs = docsIndex.byCritere.get(critere.numero) || [];
             if (critereDocs.length === 0) return null;
             const critereGenerated = critereDocs.filter((doc) => generated.has(doc.id)).length;
 
@@ -1828,7 +1828,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   <div className="border-t px-3 pb-3 space-y-1">
                     {critere.indicateurs.map((indicateur) => {
                       const isIndExpanded = expandedIndicateurs.has(indicateur.numero);
-                      const indDocs = catalog.filter((doc) => doc.critere === critere.numero && doc.indicateur === indicateur.numero && !doc.id.startsWith("cfa_siteweb_"));
+                      const indDocs = docsIndex.byInd.get(`${critere.numero}-${indicateur.numero}`) || [];
                       if (indDocs.length === 0) return null;
                       const indGenerated = indDocs.filter((doc) => generated.has(doc.id)).length;
 
@@ -1856,9 +1856,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                             )}
                           </button>
 
-                          {isIndExpanded && (
+                          {isIndExpanded && (() => {
+                            const key = `${critere.numero}-${indicateur.numero}`;
+                            const limit = visibleDocs[key] ?? PAGE_DOCS;
+                            const shown = indDocs.slice(0, limit);
+                            return (
                             <div className="ml-8 space-y-0.5 mt-1">
-                              {indDocs.map((doc) => {
+                              {shown.map((doc) => {
                                 const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
                                 return (
                                   <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
@@ -1876,8 +1880,17 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                                   </div>
                                 );
                               })}
+                              {indDocs.length > shown.length && (
+                                <button
+                                  className="text-xs text-primary underline p-1.5"
+                                  onClick={() => setVisibleDocs(v => ({ ...v, [key]: limit + PAGE_DOCS }))}
+                                >
+                                  Afficher {Math.min(PAGE_DOCS, indDocs.length - shown.length)} documents de plus ({shown.length} / {indDocs.length})
+                                </button>
+                              )}
                             </div>
-                          )}
+                            );
+                          })()}
                         </div>
                       );
                     })}
