@@ -1,4 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { estJourFormation } from "./joursFeries";
 
 export const SAMPLE_ORGANISME: OrganismeInfo = {
   nom: "FormaPro Excellence",

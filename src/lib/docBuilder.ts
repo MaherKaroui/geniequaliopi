@@ -1,5 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
+import { estJourFormation } from "./joursFeries";
 
 /** Return telephone string only if non-empty, otherwise "" */
 export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
