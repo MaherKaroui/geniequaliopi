@@ -129,7 +129,7 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros TTC.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} TTC par stagiaire</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} TTC par stagiaire</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
 
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
@@ -287,6 +287,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       </div>
       <h3>Article 8 – Dispositions financières</h3>
        <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+      <p>TVA non applicable, article 261-4-4° du CGI.</p>
       <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
       <h3>Article 9 – Délai de rétractation</h3>
       <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
@@ -388,6 +389,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     </div>
     <h3>Article 8 – Dispositions financières</h3>
     <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+    <p>TVA non applicable, article 261-4-4° du CGI.</p>
     <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
     <h3>Article 9 – Délai de rétractation</h3>
     <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
@@ -1456,7 +1458,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <div style="text-align:center;font-size:13px;color:#333;line-height:1.7;max-width:220mm;margin:0 auto">
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
         <p style="margin:8px 0;font-size:17px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
-        ${f.duree ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
+        ${getStagiaireDuree(s, f) ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>` : ""}
       </div>
 
       <!-- Mention légale -->
@@ -1705,7 +1707,7 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros TTC.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${(s?.tarifFormation?.trim() || f.tarif) ? `<p>Tarif de la formation « ${f.intitule} » : ${s?.tarifFormation?.trim() || f.tarif} TTC par stagiaire</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${getStagiaireTarif(s, f)} par stagiaire — TVA non applicable, article 261-4-4° du CGI.</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
     { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation tardive ou d'abandon injustifié, ${o.nom} se réserve le droit de facturer tout ou partie de la formation engagée.</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
