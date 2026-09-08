@@ -764,15 +764,13 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let nbBlocks: number;
   let EXERCICES_PER_BLOCK = 1;
   let blocLabels: string[] = [];
-  const _days = getFormationDays(f);
-  const _nbJours = _days.length;
-
+  // Unités d'évaluation propres au stagiaire : 1 par jour (parcours ≤ 12 jours)
+  // ou 1 par semaine calendaire (parcours long).
+  const _unites = getUnitesExercices(s, f);
+  const _nbJours = _unites.length;
+  nbBlocks = Math.max(1, _nbJours);
   if (hasBlocs) {
-    nbBlocks = rncp!.blocsCompetences.length;
     blocLabels = rncp!.blocsCompetences.map(b => b.titre);
-  } else {
-    // Strict : 1 exercice par jour de formation
-    nbBlocks = Math.max(1, _nbJours);
   }
 
   // VTC : on ajoutera 2 QCM anglais supplémentaires (épreuve langue étrangère RS5637)
