@@ -480,6 +480,7 @@ import { getPaieChapters } from "./courseContentPaie";
 import { getSecretariatChapters } from "./courseContentSecretariat";
 import { getGOTRMChapters } from "./courseContentGOTRM";
 import { getVitrageChapters } from "./courseContentVitrage";
+import { getOngulaireChapters } from "./courseContentOngulaire";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -512,6 +513,7 @@ function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t0 = formationIntitule.toLowerCase();
+  if (t0.includes('ongulaire') || t0.includes('rs7302')) return getOngulaireChapters();
   if (t0.includes('vitrage') || t0.includes('rncp36223') || t0.includes('pare-brise') || t0.includes('pare brise')) return getVitrageChapters();
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;

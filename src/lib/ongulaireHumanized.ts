@@ -528,7 +528,7 @@ export function getOngulaireEvalBesoins(
           ],
           2,
         ),
-    projet: pick(BESOINS_PROJETS, 13),
+    projetPro: pick(BESOINS_PROJETS, 13),
     handicap: pick(BESOINS_HANDICAP, 4),
     disponibilites: pick(BESOINS_DISPOS, 9),
   };

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -245,6 +245,13 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
+      }
+      // Techniques de prothésie ongulaire (RS7302) : contenus 100 % pré-remplis, AUCUN stagiaire importé
+      const lowerOngulaire = selected.intitule.toLowerCase();
+      if (lowerOngulaire.includes("ongulaire") || lowerOngulaire.includes("rs7302")) {
+        onChange({ ...selected, codeRNCP: "RS7302" });
+        seedOngulaireAICaches();
+        toast.success("Prothésie ongulaire RS7302 : contenu, exercices, tests de positionnement, veilles, support de cours et ressources déjà générés");
       }
       // Auto-import organisme + 6 stagiaires + contenus IA pour CQP Opérateur vitrage (RNCP36223)
       const lowerVitrage = selected.intitule.toLowerCase();
