@@ -185,8 +185,11 @@ import { FORMATION_IA_GENERATIVE } from "./iaGenerativePreset";
 export { IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, FORMATION_IA_GENERATIVE, seedIAGenerativeAICaches } from "./iaGenerativePreset";
 import { FORMATION_VITRAGE } from "./vitragePreset";
 export { VITRAGE_ORG, STAGIAIRES_VITRAGE, FORMATION_VITRAGE, seedVitrageAICaches } from "./vitragePreset";
+import { FORMATION_ONGULAIRE } from "./ongulairePreset";
+export { FORMATION_ONGULAIRE, seedOngulaireAICaches } from "./ongulairePreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
+  FORMATION_ONGULAIRE,
   FORMATION_VITRAGE,
   FORMATION_PAIE,
   FORMATION_SECRETARIAT,

@@ -3,6 +3,8 @@ import { getCachedContentPack } from "./aiContentPack";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
 import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
 import { isVitrageFormation, getVitrageAutoAnswers } from "./vitrageHumanized";
+import { ONGULAIRE_EVAL_PACK } from "./ongulairePreset";
+import { isOngulaireFormation, getOngulaireAutoAnswers } from "./ongulaireHumanized";
 
 
 
@@ -1339,6 +1341,7 @@ EVAL_CONTENT["Restauration"] = {
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
+  if (lower.includes("ongulaire") || lower.includes("rs7302")) return "Ongulaire";
   if (lower.includes("vitrage") || lower.includes("rncp36223") || lower.includes("pare-brise") || lower.includes("pare brise")) return "Vitrage";
   if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
@@ -1445,6 +1448,38 @@ EVAL_CONTENT["GOTRM"] = {
     "Manager une équipe de conducteurs (éco-conduite, entretien annuel, plan de formation)",
     "Appliquer l'éthique métier et refuser toute pratique non conforme (RSE, travail dissimulé)",
     "Préparer et soutenir la MSP TP-01329 (10 h sur 2 jours) devant le jury",
+  ],
+};
+
+// Techniques de prothésie ongulaire (RS7302) — contenu d'évaluation intégralement statique
+EVAL_CONTENT["Ongulaire"] = {
+  ...DEFAULT_CONTENT,
+  qcmPositionnement: ONGULAIRE_EVAL_PACK.qcmDebut.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  qcmFinal: ONGULAIRE_EVAL_PACK.qcmFin.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  exercices: (ONGULAIRE_EVAL_PACK.evaluationFinale?.exercices || []).map(e => ({
+    titre: e.titre,
+    consigne: e.consigne,
+    reponseAttendue: e.reponseAttendue,
+  })),
+  competences: [
+    "Accueillir la cliente, recueillir ses attentes et valider la faisabilité de la prestation (C1)",
+    "Préparer et agencer l'espace de travail en choisissant les produits adaptés (C2)",
+    "Respecter le protocole d'hygiène et de sécurité du poste de travail (C3)",
+    "Préparer l'ongle naturel : cuticules, bord libre, matification, dépoussiérage (C4)",
+    "Réaliser une extension par capsule ou par chablon (C5)",
+    "Construire la prothésie ongulaire et réussir l'apex (C6)",
+    "Réaliser une décoration : semi-permanent, French, Babyboomer, effets, 3D (C7)",
+    "Maîtriser le cycle complet de remplissage (C8)",
+    "Finaliser le soin : huile à cuticules et modelage hydratant (C9)",
+    "Conseiller et informer sur les soins post-prestation (C10)",
+  ],
+  appreciations: [
+    "Protocole d'hygiène parfaitement appliqué. Préparation de l'ongle rigoureuse. Apex régulier.",
+    "Bonne progression sur la construction. Le fondu du raccord de capsule est à travailler.",
+    "Accueil structuré et fiche diagnostique complète. Gestes de limage à sécuriser.",
+    "Très bonne maîtrise du semi-permanent. Symétrie des sourires de French à consolider.",
+    "Stagiaire assidu(e) et appliqué(e). Remplissage réalisé dans l'ordre imposé, sans oubli.",
+    "Diagnostic des contre-indications acquis. Discours client clair et rassurant.",
   ],
 };
 
@@ -2137,6 +2172,34 @@ QUESTIONS_OUVERTES["Paie"] = {
   ],
 };
 
+// Techniques de prothésie ongulaire (RS7302) — 10 questions ouvertes début / 10 fin
+QUESTIONS_OUVERTES["Ongulaire"] = {
+  debut: [
+    { question: "Décrivez l'anatomie de l'ongle : quelles parties connaissez-vous et à quoi servent-elles ?", reponseAttendue: "Matrice (zone de fabrication, sous le repli sus-unguéal, toute agression y est irréversible), lunule (partie visible de la matrice), lit de l'ongle (tissu vascularisé), tablette, bord libre, replis latéraux et cuticules (barrière naturelle contre les infections)." },
+    { question: "À quelle vitesse pousse un ongle et quelle conséquence cela a-t-il sur l'entretien ?", reponseAttendue: "Environ 3 mm par mois à la main, deux fois moins au pied. C'est ce qui impose un remplissage toutes les 3 à 4 semaines : au-delà, l'apex se décale et l'ongle casse à la zone de stress." },
+    { question: "Quelles contre-indications interdisent une pose de prothésie ongulaire ?", reponseAttendue: "Onychomycose, onycholyse, périonyxis ou panaris, plaie ouverte du pourtour, allergie connue aux acrylates. À reporter ou avis médical : psoriasis unguéal, lichen, verrue péri-unguéale, ongle très fin ou traumatisé. La prothésiste ne diagnostique pas : elle refuse et oriente." },
+    { question: "Comment traite-t-on les cuticules lors de la préparation de l'ongle ?", reponseAttendue: "On les ramollit puis on les repousse au repousse-cuticules ou au bâtonnet de buis, sans jamais les couper (barrière contre les infections). On retire le ptérygion adhérent avec un embout adapté à vitesse maîtrisée, sans entamer la matrice." },
+    { question: "Pourquoi et comment matifie-t-on l'ongle naturel ?", reponseAttendue: "Pour garantir l'adhérence du produit. On matifie toute la surface au buffer 180/240 jusqu'à disparition complète de la brillance, y compris le long des replis et à la base, puis on dépoussière à la brosse et on déshydrate au cleaner. Toute zone restée brillante deviendra un décollement." },
+    { question: "Quelle est la différence entre une capsule et un chablon, et comment choisit-on la taille d'une capsule ?", reponseAttendue: "La capsule est collée sur l'ongle, le chablon sert de support temporaire pour construire une longueur libre avec une base plus fine et sur mesure. La capsule doit couvrir la largeur d'un repli latéral à l'autre sans les chevaucher ; à défaut, prendre la taille au-dessus et limer les côtés." },
+    { question: "Qu'est-ce que l'apex et où doit-il se situer ?", reponseAttendue: "L'apex est le point le plus épais de la construction, situé à la zone de stress, centré dans l'axe. Vu de profil, la courbe est continue sans marche ni creux ; vu de dessus, la ligne centrale est droite et l'épaisseur symétrique. Un apex mal placé provoque la casse." },
+    { question: "Décrivez le protocole d'hygiène et de stérilisation avant et après une prestation.", reponseAttendue: "Avant : nettoyage puis désinfection du poste, de la lampe et de la ponceuse avec un produit bactéricide, fongicide et virucide aux normes NF ; lavage des mains 1 min au savon antiseptique puis 30 s de solution hydroalcoolique ; masque et gants ; mains de la cliente désinfectées. Après : consommables à usage unique jetés, outils métalliques stérilisés en autoclave ou bac à ultrasons, poste et périmètre nettoyés." },
+    { question: "Quels risques les produits de prothésie ongulaire font-ils courir à la professionnelle et comment s'en protéger ?", reponseAttendue: "Les (méth)acrylates sont des sensibilisants cutanés : une allergie acquise est définitive. Ne jamais mettre le produit en contact avec la peau ni toucher le gel non polymérisé, ventiler, aspirer les poussières de limage, respecter les temps de catalyse (un gel sous-catalysé reste allergène), porter masque et gants, lire les fiches de données de sécurité." },
+    { question: "Comment conduisez-vous l'accueil d'une cliente et que notez-vous sur la fiche diagnostique ?", reponseAttendue: "Posture accueillante, questionnement sur les habitudes, les attentes (forme, longueur, couleur, décoration), le mode de vie et les antécédents, prise en compte d'une éventuelle situation de handicap, examen des dix ongles, validation de la faisabilité, information exhaustive sur les étapes et le prix. Fiche : date, identité, état des ongles, contre-indications, technique, produits, forme, durée, prix, conseils, date de remplissage." },
+  ],
+  fin: [
+    { question: "À l'issue de la formation, décrivez l'anatomie de l'ongle et les conséquences pratiques pour votre travail.", reponseAttendue: "Matrice, lunule, lit, tablette, bord libre, replis et cuticules. Conséquences : ne jamais limer dans la zone matricielle, ne pas couper les cuticules mais les repousser, adapter la préparation à l'épaisseur réelle de la tablette." },
+    { question: "Expliquez le rythme de pousse et la manière de l'annoncer à la cliente.", reponseAttendue: "Environ 3 mm par mois à la main. Le remplissage se programme à 3 ou 4 semaines, dès la fin de la pose, et à 3 semaines pour un métier manuel ou un lavage fréquent des mains. C'est une nécessité technique, pas une vente forcée." },
+    { question: "Énoncez les contre-indications et la manière de formuler un refus argumenté.", reponseAttendue: "Interdictions : mycose, onycholyse, périonyxis, plaie, allergie aux acrylates. À reporter : psoriasis, lichen, verrue, ongle très fin ou traumatisé. Formulation : montrer, nommer ce que l'on observe sans poser de diagnostic, expliquer la conséquence concrète, proposer une suite et un rendez-vous. Décision tracée sur la fiche." },
+    { question: "Décrivez la préparation complète de l'ongle naturel et ses points de contrôle.", reponseAttendue: "Ramollir et repousser les cuticules, retirer le ptérygion à vitesse maîtrisée, raccourcir le bord libre à la lime 180-240 en un seul sens, matifier toute la surface, dépoussiérer, déshydrater au cleaner. Contrôles : aucune zone brillante, aucune douleur ni échauffement, tablette non amincie, contour propre et sec." },
+    { question: "Expliquez la pose d'une capsule et celle d'un chablon, avec leurs contrôles respectifs.", reponseAttendue: "Capsule : taille couvrant d'un repli à l'autre sans les chevaucher, colle en petite quantité, pose droite dans l'axe, bascule pour chasser les bulles, découpe à la longueur, fondu du raccord. Chablon : découpe ajustée à la courbure, glissé sous le bord libre sans espace, alignement contrôlé de dessus (axe) et de profil (prolongement du bord libre) avant toute construction." },
+    { question: "Décrivez la construction complète de la prothésie et le contrôle de l'apex.", reponseAttendue: "Primer ou nail prep en fine couche séché à l'air libre, gel de base fin sans toucher les cuticules catalysé 60 s, gel de construction en une ou deux gouttes travaillées à la spatule, apex à la zone de stress, limage de mise en forme, gel de finition en couche moyenne catalysé 2 × 60 s. Contrôle : courbe continue de profil, ligne centrale droite de dessus, aucun débordement latéral ni sur les cuticules." },
+    { question: "Expliquez les techniques de décoration vues en formation et leurs critères de réussite.", reponseAttendue: "Semi-permanent : couches fines, deux passages, capsulage du bord libre, absence de traces et de raclage. French : sourire net et symétrique sur les dix doigts, pointes alignées sur les replis. Babyboomer : dégradé harmonieux sans démarcation. Effets (sucré, marbre, chrome, sirène, aérographe) : couche uniforme sans paquet. 3D : relief visible, design harmonieux, colle maîtrisée." },
+    { question: "Énoncez le cycle complet de remplissage dans l'ordre et ses points techniques.", reponseAttendue: "Désinfecter, préparer, limer, poncer, déposer l'ancienne couleur, préparer et reconstruire, remplir, catalyser, modeler et limer, nettoyer, finir. Points techniques : grain de lime et embout adaptés, vitesse ajustée, mouvements restreints à la zone, fine couche de gel conservée, cuticules repoussées, nouvel apex reconstruit, temps de catalyse respectés. Un décollement se lime jusqu'au gel sain, jamais recouvert." },
+    { question: "Expliquez le protocole d'hygiène, la stérilisation et la prévention du risque allergique.", reponseAttendue: "Désinfection du poste, de la lampe et de la ponceuse aux normes NF avant et après ; lavage des mains 1 min + 30 s hydroalcoolique ; masque et gants ; limes carton et buffers à usage unique par cliente ; outils métalliques et embouts stérilisés (autoclave ou ultrasons) et stockés en pochette fermée. Risque allergique : aucun contact du gel non polymérisé avec la peau, ventilation, aspiration des poussières, temps de catalyse respectés, conformité cosmétique et FDS vérifiées." },
+    { question: "Décrivez la finalisation du soin, les conseils post-prestation et l'adaptation à une personne en situation de handicap.", reponseAttendue: "Finition : une goutte d'huile à cuticules par doigt sans débordement, massage circulaire, modelage hydratant homogène des mains, contrôle final devant la cliente. Conseils : gants pour le ménage, huile quotidienne, ne pas utiliser les ongles comme outil, ne jamais arracher ni limer un gel décollé, revenir en cas de douleur ou d'odeur, remplissage à 3-4 semaines, jamais de dépose maison. Handicap : adaptation décidée avec la personne (hauteur du poste, annonce des gestes, communication écrite ou visuelle, prestation fractionnée, ventilation renforcée)." },
+  ],
+};
+
 // CQP Opérateur vitrage (RNCP36223) — 10 questions ouvertes début / 10 fin
 QUESTIONS_OUVERTES["Vitrage"] = {
   debut: [
@@ -2370,6 +2433,17 @@ export function generateStagiaireOpenAnswers(
 
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  if (isOngulaireFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoOng = getOngulaireAutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoOng.reponses, autoOng.scores);
+  }
+
   if (isVitrageFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const auto = getVitrageAutoAnswers(
       stagiaireInfo?.nom,
