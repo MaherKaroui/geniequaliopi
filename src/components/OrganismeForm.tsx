@@ -61,9 +61,10 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
   };
 
   const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
-    const types = data.typesActions.includes(type)
-      ? data.typesActions.filter(t => t !== type)
-      : [...data.typesActions, type];
+    const current = data.typesActions || [];
+    const types = current.includes(type)
+      ? current.filter(t => t !== type)
+      : [...current, type];
     onChange({ ...data, typesActions: types });
   };
 
@@ -233,7 +234,7 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
             {typesOptions.map(option => (
               <label key={option.value} className="flex items-center gap-2 cursor-pointer">
                 <Checkbox
-                  checked={data.typesActions.includes(option.value)}
+                  checked={(data.typesActions || []).includes(option.value)}
                   onCheckedChange={() => toggleType(option.value)}
                 />
                 <span className="text-sm">{option.label}</span>
