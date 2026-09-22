@@ -61,9 +61,10 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
   };
 
   const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
-    const types = data.typesActions.includes(type)
-      ? data.typesActions.filter(t => t !== type)
-      : [...data.typesActions, type];
+    const current = data.typesActions || [];
+    const types = current.includes(type)
+      ? current.filter(t => t !== type)
+      : [...current, type];
     onChange({ ...data, typesActions: types });
   };
 
