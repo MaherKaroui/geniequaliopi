@@ -18,7 +18,6 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
-import BdcControleCoherence from "./BdcControleCoherence";
 
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
@@ -833,7 +832,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   // ============ Guide Prépa Qualiopi universel (AF / CFA / BDC / VAE) ============
   const [typeActionPrepa, setTypeActionPrepa] = useState<TypeActionAudit>(() => detectTypeAction(mergedOrganisme));
   const [loadingGuidePrepa, setLoadingGuidePrepa] = useState(false);
-  const [bdcControleOpen, setBdcControleOpen] = useState(false);
 
 
   const handlePreviewGuidePrepa = () => {
@@ -898,9 +896,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownloadAll = () => {
-    // BDC : contrôle de cohérence obligatoire avant tout export (BLOC 2)
+    // Un bilan de compétences peut être exporté pendant son déroulement.
     if (isBDCOrg) {
-      setBdcControleOpen(true);
+      runBdcExport();
       return;
     }
 
@@ -1542,16 +1540,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   return (
     <div className="space-y-4">
-      {isBDCOrg && (
-        <BdcControleCoherence
-          open={bdcControleOpen}
-          onOpenChange={setBdcControleOpen}
-          organisme={mergedOrganisme}
-          formation={selectedFormation}
-          beneficiaires={allStagiaires}
-          onConfirm={runBdcExport}
-        />
-      )}
       <div className="flex items-center justify-between mb-4">
 
         <div>
