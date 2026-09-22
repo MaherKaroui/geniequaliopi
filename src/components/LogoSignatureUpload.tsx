@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool, Stamp } from "lucide-react";
+import { X, PenTool, Stamp, Sparkles } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 
 interface LogoSignatureUploadProps {
@@ -25,6 +25,7 @@ const UploadCard = ({
   onDraw,
   onGenerate,
   generateLabel,
+  generateIcon,
 }: {
   label: string;
   imageUrl?: string;
@@ -35,6 +36,7 @@ const UploadCard = ({
   onDraw?: () => void;
   onGenerate?: () => void;
   generateLabel?: string;
+  generateIcon?: "stamp" | "sparkles";
 }) => (
   <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-background">
     <Label className="font-semibold text-sm text-foreground">{label}</Label>
@@ -68,7 +70,7 @@ const UploadCard = ({
       )}
       {onGenerate && (
         <Button variant="default" size="sm" className="flex-1 min-w-[80px] gap-1" onClick={onGenerate}>
-          <Stamp className="w-3 h-3" /> {generateLabel || "Générer"}
+          {generateIcon === "sparkles" ? <Sparkles className="w-3 h-3" /> : <Stamp className="w-3 h-3" />} {generateLabel || "Générer"}
         </Button>
       )}
     </div>
@@ -91,6 +93,13 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
       localStorage.removeItem("generated_tampon_url");
     }
   }, [onTamponChange]);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("generated_logo_url");
+    if (!stored) return;
+    onLogoChange(stored);
+    sessionStorage.removeItem("generated_logo_url");
+  }, [onLogoChange]);
 
   const handleFile = (file: File, callback: (url: string) => void) => {
     const reader = new FileReader();
@@ -123,6 +132,12 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
           altText="Logo"
           onClear={() => onLogoChange("")}
           onUpload={() => logoRef.current?.click()}
+          onGenerate={() => {
+            sessionStorage.setItem("logo_prefill_name", organismePrefill?.nom || "");
+            navigate("/generateur-logo");
+          }}
+          generateLabel="Créer"
+          generateIcon="sparkles"
         />
         <UploadCard
           label="Signature du dirigeant"
