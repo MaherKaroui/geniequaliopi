@@ -136,7 +136,7 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
             sessionStorage.setItem("logo_prefill_name", organismePrefill?.nom || "");
             navigate("/generateur-logo");
           }}
-          generateLabel="Créer"
+          generateLabel="Générer"
           generateIcon="sparkles"
         />
         <UploadCard
