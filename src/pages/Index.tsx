@@ -10,7 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -196,6 +196,9 @@ const Index = () => {
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-tampon")}>
               <Stamp className="w-5 h-5" /> Générateur Tampon
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-logo")}>
+              <Sparkles className="w-5 h-5" /> Créateur de logo
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités

@@ -9,6 +9,7 @@ import ControleEY from "./pages/ControleEY";
 import DemandeNDA from "./pages/DemandeNDA";
 import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
+import GenerateurLogo from "./pages/GenerateurLogo";
 import OPCOMobilites from "./pages/OPCOMobilites";
 import GOTRMPage from "./pages/GOTRM";
 import MuseeDossier from "./pages/MuseeDossier";
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/demande-nda" element={<DemandeNDA />} />
           <Route path="/generateur-cv" element={<GenerateurCV />} />
           <Route path="/generateur-tampon" element={<GenerateurTampon />} />
+          <Route path="/generateur-logo" element={<GenerateurLogo />} />
           <Route path="/opco-mobilites" element={<OPCOMobilites />} />
           <Route path="/gotrm" element={<GOTRMPage />} />
           <Route path="/musee" element={<MuseeDossier />} />
