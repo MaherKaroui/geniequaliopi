@@ -20,7 +20,7 @@ export async function streamImage(
       body = form;
       requestHeaders.delete("Content-Type");
     } else {
-      const payload = { ...input, stream };
+      const payload: Record<string, unknown> = { ...input, stream };
       if (!stream) delete payload.partial_images;
       body = JSON.stringify(payload);
       requestHeaders.set("Content-Type", "application/json");
