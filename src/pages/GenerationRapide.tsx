@@ -4,7 +4,7 @@ import JSZip from "jszip";
 import { toast } from "sonner";
 import {
   Zap, ChevronLeft, ChevronDown, ChevronRight, Plus, Trash2, Upload, Eye, Download,
-  Loader2, Sparkles, CheckCircle2, AlertTriangle, FileText, Building2, GraduationCap, Users,
+  Loader2, Sparkles, CheckCircle2, AlertTriangle, FileText, Building2, GraduationCap, Users, PenTool,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
