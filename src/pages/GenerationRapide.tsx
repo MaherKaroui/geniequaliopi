@@ -92,29 +92,39 @@ const fileToDataUrl = (file: File) =>
 /* Bloc repliable                                                      */
 /* ------------------------------------------------------------------ */
 
-const Section = ({ icon, title, subtitle, children, defaultOpen = true }: {
-  icon: React.ReactNode; title: string; subtitle?: string; children: React.ReactNode; defaultOpen?: boolean;
+const Section = ({ step, icon, title, subtitle, done, children, defaultOpen = true }: {
+  step?: string; icon: React.ReactNode; title: string; subtitle?: string; done?: boolean; children: React.ReactNode; defaultOpen?: boolean;
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-card rounded-2xl border shadow-card overflow-hidden">
+    <div className="bg-card rounded-2xl border shadow-card overflow-hidden ring-1 ring-transparent hover:ring-primary/20 transition-shadow">
       <button type="button" onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-muted/40 transition-colors">
+        {step && (
+          <span className="w-9 h-9 shrink-0 rounded-xl bg-gradient-hero text-primary-foreground flex items-center justify-center text-sm font-bold shadow-card">
+            {step}
+          </span>
+        )}
         <span className="text-primary">{icon}</span>
-        <span className="flex-1">
+        <span className="flex-1 min-w-0">
           <span className="block font-semibold">{title}</span>
           {subtitle && <span className="block text-xs text-muted-foreground">{subtitle}</span>}
         </span>
-        {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        {done && (
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full shrink-0">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Complet
+          </span>
+        )}
+        {open ? <ChevronDown className="w-4 h-4 shrink-0 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 shrink-0 text-muted-foreground" />}
       </button>
-      {open && <div className="px-5 pb-5 space-y-4">{children}</div>}
+      {open && <div className="px-5 pb-5 pt-1 space-y-4">{children}</div>}
     </div>
   );
 };
 
 const Field = ({ label, required, ...props }: { label: string; required?: boolean } & React.ComponentProps<typeof Input>) => (
   <div className="space-y-1">
-    <Label className="text-xs">{label}{required && <span className="text-destructive"> *</span>}</Label>
-    <Input {...props} />
+    <Label className="text-xs font-medium text-muted-foreground">{label}{required && <span className="text-destructive"> *</span>}</Label>
+    <Input {...props} className="bg-background" />
   </div>
 );
 
