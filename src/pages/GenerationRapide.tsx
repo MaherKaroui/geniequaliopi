@@ -366,10 +366,6 @@ const GenerationRapide = () => {
 
 
   /* ---------- Formation d'exemple ---------- */
-  // Mémorise les valeurs issues du dernier exemple chargé : elles sont remplacées
-  // si l'utilisateur choisit un autre exemple (mais jamais ses propres saisies).
-  const lastSampleRef = useRef<Record<string, string>>({});
-
   const loadSampleFormation = (idxStr: string) => {
     const sample = SAMPLE_FORMATIONS[Number(idxStr)];
     if (!sample) return;
@@ -380,36 +376,28 @@ const GenerationRapide = () => {
       if (v) return "Présentiel";
       return "";
     };
-    const prev = lastSampleRef.current;
-    const next: Record<string, string> = {};
-    // Vide, ou identique à l'exemple précédemment chargé → on remplace.
-    const take = (key: string, current: string, val: string) => {
-      const cur = (current || "").trim();
-      const use = !cur || cur === (prev[key] || "").trim() ? (val || "") : current;
-      next[key] = val || "";
-      return use;
-    };
+    // Changer d'exemple remplace tout le contenu de la formation (dates et lieu conservés).
     setFormation((f) => ({
       ...f,
-      intitule: take("intitule", f.intitule, sample.intitule || ""),
-      codeRNCP: take("codeRNCP", f.codeRNCP || "", sample.codeRNCP || ""),
-      duree: take("duree", f.duree, sample.duree || ""),
-      modalites: take("modalites", f.modalites, normModalite(sample.modalites)),
-      tarif: take("tarif", f.tarif, sample.tarif || ""),
-      formateur: take("formateur", f.formateur, sample.formateur || ""),
-      nombreParticipants: take("nombreParticipants", f.nombreParticipants, sample.nombreParticipants || ""),
-      objectifs: take("objectifs", f.objectifs, sample.objectifs || ""),
-      programme: take("programme", f.programme, sample.programme || ""),
-      prerequis: take("prerequis", f.prerequis, sample.prerequis || ""),
-      methodesEvaluation: take("methodesEvaluation", f.methodesEvaluation, sample.methodesEvaluation || ""),
-      moyensPedagogiques: take("moyensPedagogiques", f.moyensPedagogiques, sample.moyensPedagogiques || ""),
-      publicVise: take("publicVise", f.publicVise, sample.publicVise || ""),
-      delaiAcces: take("delaiAcces", f.delaiAcces, sample.delaiAcces || ""),
+      intitule: sample.intitule || "",
+      codeRNCP: sample.codeRNCP || "",
+      duree: sample.duree || "",
+      modalites: normModalite(sample.modalites),
+      tarif: sample.tarif || "",
+      formateur: sample.formateur || "",
+      nombreParticipants: sample.nombreParticipants || "",
+      objectifs: sample.objectifs || "",
+      programme: sample.programme || "",
+      prerequis: sample.prerequis || "",
+      methodesEvaluation: sample.methodesEvaluation || "",
+      moyensPedagogiques: sample.moyensPedagogiques || "",
+      publicVise: sample.publicVise || "",
+      delaiAcces: sample.delaiAcces || "",
     }));
-    lastSampleRef.current = next;
     setShowContenu(true);
     toast.success(`Formation d'exemple chargée : ${sample.intitule}. Vérifiez les dates, le lieu et le tarif.`);
   };
+
 
 
 
