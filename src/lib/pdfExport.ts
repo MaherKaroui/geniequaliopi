@@ -318,6 +318,12 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     pageYieldMs = 0,
   } = options;
 
+  // Caches valables uniquement pour cet appel (CSS spécifique au document).
+  footerHeightCache = new Map<string, number>();
+  probeFitCache = new WeakMap<Node, boolean>();
+  probeParts = null;
+
+
   // Detect custom page size from meta tag, fallback to A4
   const customSize = detectPageSizeMm(htmlContent);
   const PAGE_W_MM = customSize?.wMm ?? A4_WIDTH_MM;
