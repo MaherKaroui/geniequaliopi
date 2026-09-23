@@ -3,12 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { FolderOpen, Trash2, History, ChevronDown, ChevronUp, RefreshCw, Search } from "lucide-react";
+import { FolderOpen, Trash2, History, ChevronDown, ChevronUp, RefreshCw, Search, Save, SaveAll } from "lucide-react";
+
+interface RapideCurrentData {
+  organisme: OrganismeInfo;
+  formation: FormationInfo;
+  stagiaires: StagiaireInfo[];
+}
 
 interface RapideHistoryProps {
   userId: string;
   refreshKey: number;
   onLoad: (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => void;
+  /** Retourne l'état actuel du formulaire pour Enregistrer / Mettre à jour */
+  getCurrentData?: () => RapideCurrentData | null;
 }
 
 interface RapideGeneration {
@@ -22,9 +30,11 @@ interface RapideGeneration {
   updated_at: string;
 }
 
-const RapideHistory = ({ userId, refreshKey, onLoad }: RapideHistoryProps) => {
+const RapideHistory = ({ userId, refreshKey, onLoad, getCurrentData }: RapideHistoryProps) => {
   const [items, setItems] = useState<RapideGeneration[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
@@ -61,6 +71,58 @@ const RapideHistory = ({ userId, refreshKey, onLoad }: RapideHistoryProps) => {
   const handleLoad = (d: RapideGeneration) => {
     onLoad(d.organisme, d.formation, d.stagiaires || []);
     toast({ title: "Chargé", description: `Génération "${d.name}" restaurée.` });
+  };
+
+  const buildName = (data: RapideCurrentData) =>
+    `${data.organisme?.nom || "Sans organisme"} – ${data.formation?.intitule || "Sans formation"}`;
+
+  const handleSaveNew = async () => {
+    const data = getCurrentData?.();
+    if (!data) {
+      toast({ title: "Rien à enregistrer", description: "Remplissez le formulaire avant d'enregistrer.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("rapide_generations").insert({
+      user_id: userId,
+      name: buildName(data),
+      organisme: data.organisme as any,
+      formation: data.formation as any,
+      stagiaires: data.stagiaires as any,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Enregistré", description: "Le dossier actuel a été ajouté à l'historique." });
+      fetchItems();
+    }
+  };
+
+  const handleUpdate = async (d: RapideGeneration) => {
+    const data = getCurrentData?.();
+    if (!data) {
+      toast({ title: "Rien à enregistrer", description: "Remplissez le formulaire avant de mettre à jour.", variant: "destructive" });
+      return;
+    }
+    setUpdatingId(d.id);
+    const { error } = await supabase
+      .from("rapide_generations")
+      .update({
+        name: buildName(data),
+        organisme: data.organisme as any,
+        formation: data.formation as any,
+        stagiaires: data.stagiaires as any,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", d.id);
+    setUpdatingId(null);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Mis à jour", description: `"${d.name}" remplacé par le formulaire actuel.` });
+      fetchItems();
+    }
   };
 
   const q = search.trim().toLowerCase();
@@ -109,6 +171,11 @@ const RapideHistory = ({ userId, refreshKey, onLoad }: RapideHistoryProps) => {
             <Button size="sm" variant="outline" onClick={fetchItems} disabled={loading} className="gap-1 shrink-0">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Actualiser
             </Button>
+            {getCurrentData && (
+              <Button size="sm" onClick={handleSaveNew} disabled={saving} className="gap-1 shrink-0">
+                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Enregistrer
+              </Button>
+            )}
           </div>
 
           {loading ? (
@@ -130,6 +197,18 @@ const RapideHistory = ({ userId, refreshKey, onLoad }: RapideHistoryProps) => {
                     <Button size="sm" variant="ghost" onClick={() => handleLoad(d)} className="gap-1 text-xs">
                       <FolderOpen className="w-3.5 h-3.5" /> Charger
                     </Button>
+                    {getCurrentData && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleUpdate(d)}
+                        disabled={updatingId === d.id}
+                        className="gap-1 text-xs"
+                        title="Remplacer cette entrée par le formulaire actuel"
+                      >
+                        {updatingId === d.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <SaveAll className="w-3.5 h-3.5" />} Mettre à jour
+                      </Button>
+                    )}
                     <Button size="sm" variant="ghost" onClick={() => handleDelete(d.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
