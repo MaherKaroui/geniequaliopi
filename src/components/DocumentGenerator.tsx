@@ -63,11 +63,18 @@ import {
 } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
+// Un rAF coûte ~16 ms : on ne le paie qu'un document sur 5, le reste du temps
+// un simple setTimeout(0) suffit à garder l'onglet réactif.
+let yieldTick = 0;
 const yieldToBrowser = (delayMs = 0) =>
   new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      window.setTimeout(resolve, delayMs);
-    });
+    if (++yieldTick % 5 === 0) {
+      requestAnimationFrame(() => {
+        window.setTimeout(resolve, delayMs);
+      });
+    } else {
+      window.setTimeout(resolve, 0);
+    }
   });
 
 // Templates générant directement un Blob .xlsx via SheetJS (sans passer par du HTML)
