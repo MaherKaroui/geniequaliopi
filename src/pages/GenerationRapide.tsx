@@ -512,7 +512,7 @@ const GenerationRapide = () => {
     toast.success("Génération lancée — suivez la progression en bas à droite");
   };
 
-  const cerfaActif = selected.cerfaivr;
+  const cerfaActif = selected.cerfa;
   const orgComplet = (["nom", "siret", "nda", "adresse", "codePostal", "ville", "dirigeant"] as const)
     .every((k) => String(organisme[k] ?? "").trim().length > 0);
   const formComplet = erreurs.filter((e) => e.startsWith("Formation")).length === 0;
