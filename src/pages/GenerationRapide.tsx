@@ -680,15 +680,37 @@ const GenerationRapide = () => {
 
         {/* BLOC C — STAGIAIRES */}
         <Section step="3" icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation" done={stagComplet}>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input ref={docFileRef} type="file" accept=".pdf,.docx,.xlsx,.xls" multiple className="hidden" onChange={(e) => importDocument(e.target.files)} />
-            <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()} disabled={importing} className="gap-2">
-              {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />} Importer un document
-            </Button>
+            <button
+              type="button"
+              onClick={() => docFileRef.current?.click()}
+              disabled={importing}
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 transition-colors text-left disabled:opacity-60"
+            >
+              <span className="w-9 h-9 shrink-0 rounded-xl bg-gradient-hero text-primary-foreground flex items-center justify-center shadow-card">
+                {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold">Importer un document</span>
+                <span className="block text-xs text-muted-foreground">PDF, DOCX ou XLSX — plusieurs fichiers possibles</span>
+              </span>
+            </button>
             <input ref={edofFileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={(e) => importEdof(e.target.files)} />
-            <Button variant="outline" size="sm" onClick={() => edofFileRef.current?.click()} disabled={importing} className="gap-2">
-              <Upload className="w-4 h-4" /> Importer un export EDOF (.xlsx)
-            </Button>
+            <button
+              type="button"
+              onClick={() => edofFileRef.current?.click()}
+              disabled={importing}
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 transition-colors text-left disabled:opacity-60"
+            >
+              <span className="w-9 h-9 shrink-0 rounded-xl bg-muted text-muted-foreground flex items-center justify-center">
+                <Upload className="w-4 h-4" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold">Importer un export EDOF (.xlsx)</span>
+                <span className="block text-xs text-muted-foreground">Formation et stagiaires remplis automatiquement</span>
+              </span>
+            </button>
           </div>
 
           <div className="space-y-4">
