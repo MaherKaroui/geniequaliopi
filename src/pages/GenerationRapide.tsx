@@ -415,10 +415,6 @@ const GenerationRapide = () => {
   };
 
   /* ---------- Génération ---------- */
-  const buildFileName = (doc: PackDoc, stagiaire: StagiaireInfo | null, ext: string) => {
-    const entry: DocEntry = { id: doc.key, nom: doc.label, critere: 0, indicateur: 0, template: doc.template };
-    return buildDocumentFileName(entry, organisme.nom, organisme.version, organisme.dateMaj, ext, stagiaire);
-  };
 
   const handleGenerate = () => {
     if (erreurs.length > 0) {
