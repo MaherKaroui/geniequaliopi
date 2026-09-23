@@ -807,7 +807,7 @@ const GenerationRapide = () => {
       </main>
 
       {/* BARRE DE GÉNÉRATION */}
-      <div className="fixed bottom-0 inset-x-0 border-t bg-card/95 backdrop-blur-sm z-20">
+      <div className="fixed bottom-0 inset-x-0 border-t bg-card/95 backdrop-blur-sm z-20 shadow-card">
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Label className="text-xs">Format</Label>
