@@ -651,10 +651,20 @@ const GenerationRapide = () => {
             <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-600" />
             <span>Un champ pédagogique laissé vide serait remplacé par le contenu de la formation d'exemple : complétez-les tous avant de générer.</span>
           </p>
-          <Button variant="outline" onClick={runAI} disabled={aiLoading} className="gap-2">
-            {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            Compléter le contenu pédagogique avec l'IA
-          </Button>
+          <button
+            type="button"
+            onClick={runAI}
+            disabled={aiLoading}
+            className="flex items-center gap-3 p-3.5 rounded-xl border border-dashed border-primary/40 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent hover:from-primary/15 hover:via-primary/10 transition-colors text-left disabled:opacity-60 w-full"
+          >
+            <span className="w-9 h-9 shrink-0 rounded-xl bg-gradient-hero text-primary-foreground flex items-center justify-center shadow-card">
+              {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold">Compléter le contenu pédagogique avec l'IA</span>
+              <span className="block text-xs text-muted-foreground">Rédige objectifs, programme, prérequis et méthodes d'évaluation (10–30 s)</span>
+            </span>
+          </button>
 
           <Section icon={<FileText className="w-4 h-4" />} title="Contenu pédagogique (relecture)" open={showContenu} onOpenChange={setShowContenu}>
             <div className="grid grid-cols-1 gap-3">
@@ -791,9 +801,13 @@ const GenerationRapide = () => {
             ))}
           </div>
 
-          <Button variant="outline" size="sm" onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])} className="gap-2">
+          <button
+            type="button"
+            onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
+            className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
+          >
             <Plus className="w-4 h-4" /> Ajouter un stagiaire
-          </Button>
+          </button>
         </Section>
 
         {/* DOCUMENTS DU PACK */}
