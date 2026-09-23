@@ -198,8 +198,11 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
   return { page, content };
 }
 
-/** Mémoïsation (footerHtml + largeur) : la mesure force un reflow coûteux. */
-const footerHeightCache = new Map<string, number>();
+/**
+ * Mémoïsation (footerHtml + largeur) valable pour UN SEUL appel de
+ * `htmlToPdfBlob` : le CSS injecté diffère d'un document à l'autre.
+ */
+let footerHeightCache = new Map<string, number>();
 
 function measureFooterHeight(host: HTMLDivElement, footerHtml: string, pageWPx = A4_WIDTH_PX): number {
   if (!footerHtml) return 0;
