@@ -937,6 +937,27 @@ const GenerationRapide = () => {
                   <Field label="Responsable entreprise" value={s.responsableEntreprise || ""} onChange={(e) => setStag(i, { responsableEntreprise: e.target.value })} />
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/50">
+                  <SignatureField
+                    label="Signature stagiaire"
+                    value={s.signatureUrl || ""}
+                    padKey={`sig-${i}`}
+                    openPad={drawingPad}
+                    setOpenPad={setDrawingPad}
+                    onChange={(url) => setStag(i, { signatureUrl: url })}
+                  />
+                  <SignatureField
+                    label="Signature resp. entreprise"
+                    value={s.signatureResponsableUrl || ""}
+                    padKey={`resp-${i}`}
+                    openPad={drawingPad}
+                    setOpenPad={setDrawingPad}
+                    onChange={(url) => setStag(i, { signatureResponsableUrl: url })}
+                  />
+                </div>
+
+
+
                 {cerfaActif && (
                   <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
