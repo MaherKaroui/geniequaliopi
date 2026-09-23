@@ -789,17 +789,13 @@ const GenerationRapide = () => {
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-5 pb-32">
         {userId && (
-          <DossierHistory
-            key={historyKey}
+          <RapideHistory
+            refreshKey={historyKey}
             userId={userId}
-            organisme={organisme}
-            formation={formation}
-            stagiaires={stagiaires}
             onLoad={(org, form, stag) => {
               setOrganisme(org);
               setFormation(form);
               setStagiaires(stag.length > 0 ? stag : [{ ...emptyStagiaire }]);
-              toast.success("Dossier chargé");
             }}
           />
         )}
