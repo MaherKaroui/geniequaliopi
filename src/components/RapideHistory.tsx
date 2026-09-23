@@ -171,6 +171,11 @@ const RapideHistory = ({ userId, refreshKey, onLoad, getCurrentData }: RapideHis
             <Button size="sm" variant="outline" onClick={fetchItems} disabled={loading} className="gap-1 shrink-0">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Actualiser
             </Button>
+            {getCurrentData && (
+              <Button size="sm" onClick={handleSaveNew} disabled={saving} className="gap-1 shrink-0">
+                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Enregistrer
+              </Button>
+            )}
           </div>
 
           {loading ? (
