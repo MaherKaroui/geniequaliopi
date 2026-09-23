@@ -92,29 +92,39 @@ const fileToDataUrl = (file: File) =>
 /* Bloc repliable                                                      */
 /* ------------------------------------------------------------------ */
 
-const Section = ({ icon, title, subtitle, children, defaultOpen = true }: {
-  icon: React.ReactNode; title: string; subtitle?: string; children: React.ReactNode; defaultOpen?: boolean;
+const Section = ({ step, icon, title, subtitle, done, children, defaultOpen = true }: {
+  step?: string; icon: React.ReactNode; title: string; subtitle?: string; done?: boolean; children: React.ReactNode; defaultOpen?: boolean;
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-card rounded-2xl border shadow-card overflow-hidden">
+    <div className="bg-card rounded-2xl border shadow-card overflow-hidden ring-1 ring-transparent hover:ring-primary/20 transition-shadow">
       <button type="button" onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-muted/40 transition-colors">
+        {step && (
+          <span className="w-9 h-9 shrink-0 rounded-xl bg-gradient-hero text-primary-foreground flex items-center justify-center text-sm font-bold shadow-card">
+            {step}
+          </span>
+        )}
         <span className="text-primary">{icon}</span>
-        <span className="flex-1">
+        <span className="flex-1 min-w-0">
           <span className="block font-semibold">{title}</span>
           {subtitle && <span className="block text-xs text-muted-foreground">{subtitle}</span>}
         </span>
-        {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        {done && (
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full shrink-0">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Complet
+          </span>
+        )}
+        {open ? <ChevronDown className="w-4 h-4 shrink-0 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 shrink-0 text-muted-foreground" />}
       </button>
-      {open && <div className="px-5 pb-5 space-y-4">{children}</div>}
+      {open && <div className="px-5 pb-5 pt-1 space-y-4">{children}</div>}
     </div>
   );
 };
 
 const Field = ({ label, required, ...props }: { label: string; required?: boolean } & React.ComponentProps<typeof Input>) => (
   <div className="space-y-1">
-    <Label className="text-xs">{label}{required && <span className="text-destructive"> *</span>}</Label>
-    <Input {...props} />
+    <Label className="text-xs font-medium text-muted-foreground">{label}{required && <span className="text-destructive"> *</span>}</Label>
+    <Input {...props} className="bg-background" />
   </div>
 );
 
@@ -131,11 +141,19 @@ const GenerationRapide = () => {
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
 
-  const [selected, setSelected] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"])),
+  const [selected, setSelected] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = sessionStorage.getItem("qualiopi_rapide_docs");
+      if (raw) return { ...Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"])), ...JSON.parse(raw) };
+    } catch { /* ignore */ }
+    return Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"]));
+  });
+  const [exportFormat, setExportFormat] = useState<"pdf" | "doc">(
+    () => (sessionStorage.getItem("qualiopi_rapide_fmt") as "pdf" | "doc") || "pdf",
   );
-  const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
-  const [zipMode, setZipMode] = useState<"zip" | "files">("zip");
+  const [zipMode, setZipMode] = useState<"zip" | "files">(
+    () => (sessionStorage.getItem("qualiopi_rapide_zip") as "zip" | "files") || "zip",
+  );
 
   const [aiLoading, setAiLoading] = useState(false);
   const aiTriggered = useRef(false);
@@ -175,6 +193,9 @@ const GenerationRapide = () => {
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_org", JSON.stringify(organisme)); }, [organisme, loaded]);
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_form", JSON.stringify(formation)); }, [formation, loaded]);
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_stag", JSON.stringify(stagiaires)); }, [stagiaires, loaded]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_docs", JSON.stringify(selected)); }, [selected]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_fmt", exportFormat); }, [exportFormat]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_zip", zipMode); }, [zipMode]);
 
   /* ---------- Modalité → pré-cochage émargement / connexion ---------- */
   useEffect(() => {
@@ -492,26 +513,42 @@ const GenerationRapide = () => {
   };
 
   const cerfaActif = selected.cerfa;
+  const orgComplet = (["nom", "siret", "nda", "adresse", "codePostal", "ville", "dirigeant"] as const)
+    .every((k) => String(organisme[k] ?? "").trim().length > 0);
+  const formComplet = erreurs.filter((e) => e.startsWith("Formation")).length === 0;
+  const stagComplet = stagiairesValides.length > 0;
 
   /* ------------------------------------------------------------------ */
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            <span className="font-semibold">Génération rapide</span>
-            <span className="text-xs text-muted-foreground hidden sm:inline">— pack de documents essentiels en moins de 2 minutes</span>
+      <header className="sticky top-0 z-10 border-b bg-gradient-hero text-primary-foreground shadow-card">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-10 h-10 shrink-0 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
+              <Zap className="w-5 h-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-bold text-lg leading-tight">Génération rapide</span>
+              <span className="block text-xs text-primary-foreground/80 truncate">Pack de documents essentiels en moins de 2 minutes</span>
+            </span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1">
-            <ChevronLeft className="w-4 h-4" /> Accueil
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium bg-white/15 rounded-full px-3 py-1.5">
+              <FileText className="w-3.5 h-3.5" /> {planned.length} document(s)
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium bg-white/15 rounded-full px-3 py-1.5">
+              ≈ {estimationSec < 60 ? `${estimationSec} s` : `${Math.round(estimationSec / 60)} min`}
+            </span>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+              <ChevronLeft className="w-4 h-4" /> Accueil
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-5 pb-32">
         {/* BLOC A — ORGANISME */}
-        <Section icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires">
+        <Section step="1" icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires" done={orgComplet}>
           <div className="flex flex-col sm:flex-row gap-2">
             <Input placeholder="Lien Pappers de l'organisme (optionnel)" value={pappersUrl} onChange={(e) => setPappersUrl(e.target.value)} />
             <Button variant="outline" onClick={importPappers} disabled={pappersLoading} className="gap-2 shrink-0">
@@ -551,7 +588,7 @@ const GenerationRapide = () => {
         </Section>
 
         {/* BLOC B — FORMATION */}
-        <Section icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement">
+        <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-2">
               <Field label="Intitulé" required value={formation.intitule} onChange={(e) => setForm({ intitule: e.target.value })} onBlur={onIntituleBlur} />
@@ -605,7 +642,7 @@ const GenerationRapide = () => {
         </Section>
 
         {/* BLOC C — STAGIAIRES */}
-        <Section icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation">
+        <Section step="3" icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation" done={stagComplet}>
           <div className="flex flex-wrap gap-2">
             <input ref={docFileRef} type="file" accept=".pdf,.docx,.xlsx,.xls" multiple className="hidden" onChange={(e) => importDocument(e.target.files)} />
             <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()} disabled={importing} className="gap-2">
@@ -619,9 +656,14 @@ const GenerationRapide = () => {
 
           <div className="space-y-4">
             {stagiaires.map((s, i) => (
-              <div key={i} className="rounded-xl border p-3 space-y-3 bg-muted/20">
+              <div key={i} className="rounded-xl border p-3 space-y-3 bg-muted/20 shadow-card">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-muted-foreground">Stagiaire {i + 1}</span>
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <span className="w-6 h-6 rounded-full bg-gradient-hero text-primary-foreground flex items-center justify-center text-[11px] font-bold">
+                      {(s.prenom?.trim()?.[0] || (i + 1).toString()).toUpperCase()}
+                    </span>
+                    Stagiaire {i + 1}{s.prenom?.trim() && s.nom?.trim() ? ` — ${s.prenom} ${s.nom}` : ""}
+                  </span>
                   <Button variant="ghost" size="sm" onClick={() => setStagiaires((l) => l.filter((_, j) => j !== i))} disabled={stagiaires.length === 1}>
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
@@ -696,28 +738,42 @@ const GenerationRapide = () => {
         </Section>
 
         {/* DOCUMENTS DU PACK */}
-        <Section icon={<FileText className="w-5 h-5" />} title="Documents du pack" subtitle={`${planned.length} document(s) · estimation ≈ ${estimationSec} s`}>
-          <div className="space-y-2">
-            {PACK_DOCS.map((doc) => {
+        <Section step="4" icon={<FileText className="w-5 h-5" />} title="Documents du pack" subtitle={`${planned.length} document(s) · estimation ≈ ${estimationSec < 60 ? `${estimationSec} s` : `${Math.round(estimationSec / 60)} min`}`} done={erreurs.length === 0}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {PACK_DOCS.map((doc, docIdx) => {
               const conventionGrisee = doc.key === "convention" && stagiairesValides.length > 0 && stagiairesValides.every((s) => !conventionPossible(s));
               const count = planned.filter((p) => p.doc.key === doc.key).length;
               const firstIdx = planned.find((p) => p.doc.key === doc.key)?.stagiaireIdx ?? null;
+              const actif = !!selected[doc.key] && !conventionGrisee;
               return (
-                <div key={doc.key} className={`flex items-center gap-3 p-3 rounded-lg border ${conventionGrisee ? "opacity-60" : ""}`}>
+                <div
+                  key={doc.key}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                    conventionGrisee ? "opacity-60" : actif ? "border-primary/40 bg-primary/5" : "hover:bg-muted/30"
+                  }`}
+                >
+                  <span
+                    className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-[11px] font-bold ${
+                      actif ? "bg-gradient-hero text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {docIdx + 1}
+                  </span>
                   <Checkbox
                     checked={!!selected[doc.key]}
                     disabled={conventionGrisee}
                     onCheckedChange={(v) => setSelected((p) => ({ ...p, [doc.key]: v === true }))}
+                    className="shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{doc.label}</p>
                     <p className="text-xs text-muted-foreground">
                       {conventionGrisee
                         ? "Sans entreprise, il s'agit d'un contrat bilatéral et non d'une convention."
-                        : doc.perStagiaire ? `1 par stagiaire${selected[doc.key] ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
+                        : doc.perStagiaire ? `1 par stagiaire${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => openPreview(doc, doc.perStagiaire ? firstIdx ?? 0 : null)} title="Aperçu">
+                  <Button variant="ghost" size="sm" onClick={() => openPreview(doc, doc.perStagiaire ? firstIdx ?? 0 : null)} title="Aperçu" aria-label={`Aperçu : ${doc.label}`}>
                     <Eye className="w-4 h-4" />
                   </Button>
                 </div>
@@ -751,7 +807,7 @@ const GenerationRapide = () => {
       </main>
 
       {/* BARRE DE GÉNÉRATION */}
-      <div className="fixed bottom-0 inset-x-0 border-t bg-card/95 backdrop-blur-sm z-20">
+      <div className="fixed bottom-0 inset-x-0 border-t bg-card/95 backdrop-blur-sm z-20 shadow-card">
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Label className="text-xs">Format</Label>
