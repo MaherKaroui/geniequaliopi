@@ -27,7 +27,7 @@ import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import DossierHistory from "@/components/DossierHistory";
-import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -249,6 +249,38 @@ const GenerationRapide = () => {
   const setForm = (patch: Partial<FormationInfo>) => setFormation((f) => ({ ...f, ...patch }));
   const setStag = (idx: number, patch: Partial<StagiaireInfo>) =>
     setStagiaires((list) => list.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
+
+  /* ---------- Stagiaire fictif ---------- */
+  const genererStagiaireFictif = () => {
+    setStagiaires((list) => {
+      const noms = new Set(
+        list.filter((s) => s.prenom?.trim() && s.nom?.trim()).map((s) => `${s.prenom} ${s.nom}`.toLowerCase())
+      );
+      const dispo = SAMPLE_STAGIAIRES.filter((s) => !noms.has(`${s.prenom} ${s.nom}`.toLowerCase()));
+      const pool = dispo.length > 0 ? dispo : SAMPLE_STAGIAIRES;
+      const base = pool[list.length % pool.length];
+      const fictif: StagiaireInfo = {
+        ...emptyStagiaire,
+        civilite: base.civilite,
+        nom: base.nom,
+        prenom: base.prenom,
+        email: base.email,
+        telephone: base.telephone,
+        entreprise: base.entreprise,
+        poste: base.poste,
+        dateNaissance: base.dateNaissance,
+        financeur: base.entreprise ? "Entreprise" : "Personnel",
+      };
+      const last = list[list.length - 1];
+      if (last && !last.prenom?.trim() && !last.nom?.trim() && !last.email?.trim()) {
+        return [...list.slice(0, -1), fictif];
+      }
+      return [...list, fictif];
+    });
+    toast.success("Stagiaire fictif généré — les dates et le tarif individuels restent vides : ils héritent de ceux de la formation.");
+
+  };
+
 
   /* ---------- Formation d'exemple ---------- */
   const loadSampleFormation = (idxStr: string) => {
@@ -939,13 +971,23 @@ const GenerationRapide = () => {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
-            className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Ajouter un stagiaire
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Ajouter un stagiaire
+            </button>
+            <button
+              type="button"
+              onClick={genererStagiaireFictif}
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-primary/40 text-sm font-medium text-primary/80 hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" /> Générer un stagiaire fictif
+            </button>
+          </div>
+
         </Section>
 
         {/* DOCUMENTS DU PACK */}
