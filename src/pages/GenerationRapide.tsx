@@ -907,38 +907,6 @@ const GenerationRapide = () => {
           </Section>
         </Section>
 
-        {/* DESIGN DU DOSSIER */}
-        <Section step="5" icon={<Palette className="w-5 h-5" />} title="Design du dossier" subtitle={`${effectiveDesignName} · ${effectiveDocStyle.theme}`} defaultOpen={false}>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border bg-muted/20 p-4">
-            <div className="flex items-center gap-3 flex-1">
-              <Switch checked={automaticStyle} onCheckedChange={setAutomaticStyle} id="automatic-design" />
-              <div>
-                <Label htmlFor="automatic-design" className="font-semibold">Automatique — un design unique par organisme</Label>
-                <p className="text-xs text-muted-foreground mt-0.5">Le même organisme retrouve toujours la même charte.</p>
-              </div>
-            </div>
-            {automaticStyle && (
-              <Button type="button" variant="outline" size="sm" onClick={() => setDesignOffset((value) => value + 1)} className="gap-2 shrink-0">
-                <RefreshCw className="w-4 h-4" /> Autre design
-              </Button>
-            )}
-          </div>
-
-          <div className="rounded-xl border bg-background p-4 flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex gap-2 shrink-0">
-              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.primaryColor }} aria-label="Couleur principale" />
-              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.secondaryColor }} aria-label="Couleur secondaire" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">{effectiveDesignName} <span className="font-normal text-muted-foreground">· thème {effectiveDocStyle.theme}</span></p>
-              <p className="text-sm mt-1" style={{ fontFamily: effectiveDocStyle.headingFont }}>Titres — {effectiveDocStyle.headingFont.split(",")[0].replaceAll("'", "")}</p>
-              <p className="text-xs text-muted-foreground" style={{ fontFamily: effectiveDocStyle.fontFamily }}>Corps du document — {effectiveDocStyle.fontFamily.split(",")[0].replaceAll("'", "")}, {effectiveDocStyle.fontSize}px</p>
-            </div>
-          </div>
-
-          {!automaticStyle && <DocStyleConfigPanel style={manualStyle} onChange={setManualStyle} />}
-        </Section>
-
         {/* BLOC B — FORMATION */}
         <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
           <div className="space-y-1">
@@ -1258,6 +1226,38 @@ const GenerationRapide = () => {
               <p>La génération dépassera 2 minutes. Passez en format Word ou réduisez le nombre de stagiaires pour aller plus vite.</p>
             </div>
           )}
+        </Section>
+
+        {/* DESIGN DU DOSSIER */}
+        <Section step="5" icon={<Palette className="w-5 h-5" />} title="Design du dossier" subtitle={`${effectiveDesignName} · ${effectiveDocStyle.theme}`} defaultOpen={false}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border bg-muted/20 p-4">
+            <div className="flex items-center gap-3 flex-1">
+              <Switch checked={automaticStyle} onCheckedChange={setAutomaticStyle} id="automatic-design" />
+              <div>
+                <Label htmlFor="automatic-design" className="font-semibold">Automatique — un design unique par organisme</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">Le même organisme retrouve toujours la même charte.</p>
+              </div>
+            </div>
+            {automaticStyle && (
+              <Button type="button" variant="outline" size="sm" onClick={() => setDesignOffset((value) => value + 1)} className="gap-2 shrink-0">
+                <RefreshCw className="w-4 h-4" /> Autre design
+              </Button>
+            )}
+          </div>
+
+          <div className="rounded-xl border bg-background p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex gap-2 shrink-0">
+              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.primaryColor }} aria-label="Couleur principale" />
+              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.secondaryColor }} aria-label="Couleur secondaire" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{effectiveDesignName} <span className="font-normal text-muted-foreground">· thème {effectiveDocStyle.theme}</span></p>
+              <p className="text-sm mt-1" style={{ fontFamily: effectiveDocStyle.headingFont }}>Titres — {effectiveDocStyle.headingFont.split(",")[0].replace(/'/g, "")}</p>
+              <p className="text-xs text-muted-foreground" style={{ fontFamily: effectiveDocStyle.fontFamily }}>Corps du document — {effectiveDocStyle.fontFamily.split(",")[0].replace(/'/g, "")}, {effectiveDocStyle.fontSize}px</p>
+            </div>
+          </div>
+
+          {!automaticStyle && <DocStyleConfigPanel style={manualStyle} onChange={setManualStyle} />}
         </Section>
 
         {/* CONFORMITÉ / ERREURS */}
