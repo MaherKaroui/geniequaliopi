@@ -30,9 +30,11 @@ interface RapideGeneration {
   updated_at: string;
 }
 
-const RapideHistory = ({ userId, refreshKey, onLoad }: RapideHistoryProps) => {
+const RapideHistory = ({ userId, refreshKey, onLoad, getCurrentData }: RapideHistoryProps) => {
   const [items, setItems] = useState<RapideGeneration[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
