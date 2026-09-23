@@ -971,13 +971,23 @@ const GenerationRapide = () => {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
-            className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Ajouter un stagiaire
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Ajouter un stagiaire
+            </button>
+            <button
+              type="button"
+              onClick={genererStagiaireFictif}
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-primary/40 text-sm font-medium text-primary/80 hover:text-primary hover:bg-primary/5 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" /> Générer un stagiaire fictif
+            </button>
+          </div>
+
         </Section>
 
         {/* DOCUMENTS DU PACK */}
