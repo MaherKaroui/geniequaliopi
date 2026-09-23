@@ -567,7 +567,6 @@ const DemandeNDA = () => {
                 scope="nda"
                 manualStyle={docStyle}
                 onManualStyleChange={handleStyleChange}
-                onEffectiveStyleChange={(style) => { setDocStyleState(style); setDocStyle(style); }}
               />
 
               {/* CV Upload (optional) */}

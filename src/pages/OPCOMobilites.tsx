@@ -987,7 +987,6 @@ export default function OPCOMobilites() {
               scope="opco"
               manualStyle={docStyle}
               onManualStyleChange={handleStyleChange}
-              onEffectiveStyleChange={(style) => { setDocStyleState(style); applyDocStyle(style); }}
             />
           </Card>
 

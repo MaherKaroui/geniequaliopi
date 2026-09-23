@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Palette, RefreshCw } from "lucide-react";
 import type { DocStyleConfig, OrganismeInfo } from "@/types/qualiopi";
 import { DEFAULT_DOC_STYLE } from "@/types/qualiopi";
@@ -37,6 +37,9 @@ export default function DossierOutputSettings({ organisme, scope, manualStyle: c
   const manual = controlledManual ?? localManual;
   const automaticDesign = useMemo(() => getAutomaticDossierDesign(organisme, offset), [organisme, offset]);
   const effective = automatic ? automaticDesign.style : manual;
+  const onEffectiveStyleChangeRef = useRef(onEffectiveStyleChange);
+
+  useEffect(() => { onEffectiveStyleChangeRef.current = onEffectiveStyleChange; }, [onEffectiveStyleChange]);
 
   useEffect(() => {
     sessionStorage.setItem(`${prefix}_quality`, quality);
@@ -46,8 +49,8 @@ export default function DossierOutputSettings({ organisme, scope, manualStyle: c
   useEffect(() => { sessionStorage.setItem(`${prefix}_offset`, String(offset)); }, [offset, prefix]);
   useEffect(() => {
     setDocStyle(effective);
-    onEffectiveStyleChange?.(effective);
-  }, [effective, onEffectiveStyleChange]);
+    onEffectiveStyleChangeRef.current?.(effective);
+  }, [effective]);
 
   const changeManual = (style: DocStyleConfig) => {
     setLocalManual(style);

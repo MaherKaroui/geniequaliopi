@@ -421,7 +421,6 @@ const ControleEY = () => {
                     scope="ey"
                     manualStyle={docStyle}
                     onManualStyleChange={handleStyleChange}
-                    onEffectiveStyleChange={setDocStyle}
                   />
                 )}
               </div>

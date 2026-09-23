@@ -47,7 +47,7 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "bdc_nt_stats_xlsx",
   "bdc_nt_cr6mois_stagiaire",
 ]);
-import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
+import { downloadAsPdf, getActivePdfOptions, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
@@ -932,7 +932,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
     }, 0);
 
-    const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+    const bulkPdfOptions = getActivePdfOptions();
     const zip = new JSZip();
 
     const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
@@ -1637,7 +1637,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         scope="qualiopi"
         manualStyle={docStyle}
         onManualStyleChange={handleStyleChange}
-        onEffectiveStyleChange={(style) => { setDocStyleState(style); setDocStyle(style); }}
       />
 
       {/* ========== PRÉPA QUALIOPI UNIVERSEL (AF / CFA / BDC / VAE) ========== */}
