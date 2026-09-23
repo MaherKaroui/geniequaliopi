@@ -548,7 +548,35 @@ const GenerationRapide = () => {
         return blob;
       },
     });
+    void saveHistorique(snapOrg, snapForm, snapStag);
     toast.success("Génération lancée — suivez la progression en bas à droite");
+  };
+
+  /* ---------- Enregistrement automatique dans l'historique ---------- */
+  const saveHistorique = async (o: OrganismeInfo, f: FormationInfo, st: StagiaireInfo[]) => {
+    if (!userId) return;
+    const name = `${o.nom} – ${f.intitule || "Sans formation"}`;
+    try {
+      const { data: existing } = await supabase
+        .from("saved_dossiers")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("name", name)
+        .limit(1);
+      const payload = { organisme: o as any, formation: f as any, stagiaires: st as any };
+      if (existing && existing.length > 0) {
+        await supabase
+          .from("saved_dossiers")
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq("id", (existing[0] as any).id);
+      } else {
+        await supabase.from("saved_dossiers").insert({ user_id: userId, name, ...payload });
+      }
+      setHistoryKey((k) => k + 1);
+      toast.success("Dossier enregistré dans l'historique");
+    } catch (e) {
+      console.error("[HISTORIQUE RAPIDE]", e);
+    }
   };
 
   const cerfaActif = selected.cerfa;
