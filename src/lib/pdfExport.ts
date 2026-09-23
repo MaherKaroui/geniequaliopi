@@ -263,6 +263,14 @@ function pageOnlyHasOrphanHeading(page: HTMLDivElement): boolean {
   return !!content && contentOnlyHasHeadings(content);
 }
 
+/**
+ * Page de test réutilisée pour tout un appel de `htmlToPdfBlob`, plus un cache
+ * par nœud : on évite de recréer/détruire une page (et donc un reflow complet)
+ * à chaque mesure, et de mesurer deux fois le même nœud.
+ */
+let probeParts: PageParts | null = null;
+let probeFitCache = new WeakMap<Node, boolean>();
+
 function nodeFitsOnFreshPage(
   host: HTMLDivElement,
   node: Node,
@@ -271,10 +279,16 @@ function nodeFitsOnFreshPage(
   pageWPx: number,
   pageHPx: number
 ): boolean {
-  const probe = createPage(host, footerHtml, footerHeightPx, pageWPx, pageHPx);
-  probe.content.appendChild(node.cloneNode(true));
-  const fits = probe.content.scrollHeight <= probe.content.clientHeight + 1;
-  host.removeChild(probe.page);
+  const cached = probeFitCache.get(node);
+  if (cached !== undefined) return cached;
+
+  if (!probeParts || probeParts.page.parentNode !== host) {
+    probeParts = createPage(host, footerHtml, footerHeightPx, pageWPx, pageHPx);
+  }
+  probeParts.content.replaceChildren(node.cloneNode(true));
+  const fits = probeParts.content.scrollHeight <= probeParts.content.clientHeight + 1;
+  probeParts.content.replaceChildren();
+  probeFitCache.set(node, fits);
   return fits;
 }
 
