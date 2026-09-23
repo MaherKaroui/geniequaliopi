@@ -548,7 +548,7 @@ const GenerationRapide = () => {
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-5 pb-32">
         {/* BLOC A — ORGANISME */}
-        <Section icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires">
+        <Section step="1" icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires" done={orgComplet}>
           <div className="flex flex-col sm:flex-row gap-2">
             <Input placeholder="Lien Pappers de l'organisme (optionnel)" value={pappersUrl} onChange={(e) => setPappersUrl(e.target.value)} />
             <Button variant="outline" onClick={importPappers} disabled={pappersLoading} className="gap-2 shrink-0">
@@ -588,7 +588,7 @@ const GenerationRapide = () => {
         </Section>
 
         {/* BLOC B — FORMATION */}
-        <Section icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement">
+        <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-2">
               <Field label="Intitulé" required value={formation.intitule} onChange={(e) => setForm({ intitule: e.target.value })} onBlur={onIntituleBlur} />
@@ -642,7 +642,7 @@ const GenerationRapide = () => {
         </Section>
 
         {/* BLOC C — STAGIAIRES */}
-        <Section icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation">
+        <Section step="3" icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation" done={stagComplet}>
           <div className="flex flex-wrap gap-2">
             <input ref={docFileRef} type="file" accept=".pdf,.docx,.xlsx,.xls" multiple className="hidden" onChange={(e) => importDocument(e.target.files)} />
             <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()} disabled={importing} className="gap-2">
