@@ -723,17 +723,26 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
         if (stripCanvas) {
           const sliceW = Math.round(PAGE_W_PX * scale);
-          const sliceH = Math.round(PAGE_H_PX * scale);
           try {
             for (let i = 0; i < batch.length; i++) {
+              // Bornes absolues (et non un pas arrondi multiplié) : l'erreur
+              // d'arrondi de PAGE_H_PX * scale (ex. 1684,5 px en Standard)
+              // ne s'accumule plus d'une page à l'autre.
+              const top = Math.round(i * PAGE_H_PX * scale);
+              const bottom = Math.round((i + 1) * PAGE_H_PX * scale);
+              let srcH = bottom - top;
+              // Garde : ne jamais demander une zone source hors du strip.
+              if (top + srcH > stripCanvas.height) {
+                srcH = Math.max(0, stripCanvas.height - top);
+              }
               const slice = document.createElement("canvas");
               slice.width = sliceW;
-              slice.height = sliceH;
+              slice.height = srcH;
               const sctx = slice.getContext("2d");
               if (!sctx) throw new Error("2d context indisponible");
               sctx.fillStyle = "#ffffff";
-              sctx.fillRect(0, 0, sliceW, sliceH);
-              sctx.drawImage(stripCanvas, 0, i * sliceH, sliceW, sliceH, 0, 0, sliceW, sliceH);
+              sctx.fillRect(0, 0, sliceW, srcH);
+              sctx.drawImage(stripCanvas, 0, top, sliceW, srcH, 0, 0, sliceW, srcH);
               await addPageFromCanvas(slice, batch[i]);
               disposeCanvas(slice);
               if ((i + 1) % 4 === 0) await new Promise<void>((r) => setTimeout(r, 0));
