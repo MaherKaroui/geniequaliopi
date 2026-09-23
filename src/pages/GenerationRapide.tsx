@@ -26,6 +26,7 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
+import DossierHistory from "@/components/DossierHistory";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -165,6 +166,11 @@ const GenerationRapide = () => {
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   const [selected, setSelected] = useState<Record<string, boolean>>(() => {
     try {
