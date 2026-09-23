@@ -27,6 +27,7 @@ import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import DossierHistory from "@/components/DossierHistory";
+import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -164,6 +165,7 @@ const GenerationRapide = () => {
 
   const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
+  const [sampleFormationKey, setSampleFormationKey] = useState("");
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -247,6 +249,40 @@ const GenerationRapide = () => {
   const setForm = (patch: Partial<FormationInfo>) => setFormation((f) => ({ ...f, ...patch }));
   const setStag = (idx: number, patch: Partial<StagiaireInfo>) =>
     setStagiaires((list) => list.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
+
+  /* ---------- Formation d'exemple ---------- */
+  const loadSampleFormation = (idxStr: string) => {
+    const sample = SAMPLE_FORMATIONS[Number(idxStr)];
+    if (!sample) return;
+    const normModalite = (m?: string) => {
+      const v = (m || "").toLowerCase();
+      if (v.includes("mixte")) return "Mixte (présentiel et distanciel)";
+      if (v.includes("distanciel") && !v.includes("présentiel")) return "Distanciel";
+      if (v) return "Présentiel";
+      return "";
+    };
+    // Tout ce que l'utilisateur a déjà saisi reste prioritaire : seuls les champs vides sont remplis.
+    setFormation((f) => ({
+      ...f,
+      intitule: f.intitule.trim() || sample.intitule || "",
+      codeRNCP: (f.codeRNCP || "").trim() || sample.codeRNCP || "",
+      duree: f.duree.trim() || sample.duree || "",
+      modalites: f.modalites.trim() || normModalite(sample.modalites),
+      tarif: f.tarif.trim() || sample.tarif || "",
+      formateur: f.formateur.trim() || sample.formateur || "",
+      nombreParticipants: f.nombreParticipants.trim() || sample.nombreParticipants || "",
+      objectifs: f.objectifs.trim() || sample.objectifs || "",
+      programme: f.programme.trim() || sample.programme || "",
+      prerequis: f.prerequis.trim() || sample.prerequis || "",
+      methodesEvaluation: f.methodesEvaluation.trim() || sample.methodesEvaluation || "",
+      moyensPedagogiques: f.moyensPedagogiques.trim() || sample.moyensPedagogiques || "",
+      publicVise: f.publicVise.trim() || sample.publicVise || "",
+      delaiAcces: f.delaiAcces.trim() || sample.delaiAcces || "",
+    }));
+    setShowContenu(true);
+    toast.success(`Formation d'exemple chargée : ${sample.intitule}. Vérifiez les dates, le lieu et le tarif.`);
+  };
+
 
   /* ---------- Pappers ---------- */
   const importPappers = async () => {
@@ -713,6 +749,17 @@ const GenerationRapide = () => {
 
         {/* BLOC B — FORMATION */}
         <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
+          <div className="space-y-1">
+            <Label className="text-xs">Charger une formation d'exemple (remplit uniquement les champs vides)</Label>
+            <Select value={sampleFormationKey} onValueChange={(v) => { setSampleFormationKey(v); loadSampleFormation(v); }}>
+              <SelectTrigger><SelectValue placeholder="Choisir une formation d'exemple…" /></SelectTrigger>
+              <SelectContent>
+                {SAMPLE_FORMATIONS.map((sf, i) => (
+                  <SelectItem key={i} value={String(i)}>{sf.intitule}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-2">
               <Field label="Intitulé" required value={formation.intitule} onChange={(e) => setForm({ intitule: e.target.value })} onBlur={onIntituleBlur} />
