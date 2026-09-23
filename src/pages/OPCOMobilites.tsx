@@ -19,7 +19,7 @@ import {
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
-import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
 import {
   OPCO_DOCUMENTS, OPCO_CATEGORIES, type OpcoCategory,
   type OpcoDocumentItem, type OpcoDocState, type OpcoDocStatus,
@@ -982,7 +982,13 @@ export default function OPCOMobilites() {
               Choisissez le thème visuel appliqué à l'ensemble des documents OPCO générés
               (polices, couleurs, en-têtes, styles de titres et de tableaux).
             </p>
-            <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+            <DossierOutputSettings
+              organisme={organisme}
+              scope="opco"
+              manualStyle={docStyle}
+              onManualStyleChange={handleStyleChange}
+              onEffectiveStyleChange={(style) => { setDocStyleState(style); applyDocStyle(style); }}
+            />
           </Card>
 
           <div className="flex justify-end gap-2">

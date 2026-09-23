@@ -17,7 +17,7 @@ import { saveToDrive } from "@/lib/googleDrive";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-import DocStyleConfigPanel from "./DocStyleConfigPanel";
+import DossierOutputSettings from "./DossierOutputSettings";
 
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
@@ -1632,7 +1632,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         </span>
       </div>
 
-      <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+      <DossierOutputSettings
+        organisme={mergedOrganisme}
+        scope="qualiopi"
+        manualStyle={docStyle}
+        onManualStyleChange={handleStyleChange}
+        onEffectiveStyleChange={(style) => { setDocStyleState(style); setDocStyle(style); }}
+      />
 
       {/* ========== PRÉPA QUALIOPI UNIVERSEL (AF / CFA / BDC / VAE) ========== */}
       <div className="relative overflow-hidden rounded-2xl border-2 border-blue-400/50 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100/60 shadow-md">

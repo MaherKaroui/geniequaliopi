@@ -22,7 +22,7 @@ import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
 import { DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
-import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -562,7 +562,13 @@ const DemandeNDA = () => {
           {currentStep === 4 && (
             <div className="space-y-8">
               {/* Style Panel */}
-              <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+              <DossierOutputSettings
+                organisme={organisme}
+                scope="nda"
+                manualStyle={docStyle}
+                onManualStyleChange={handleStyleChange}
+                onEffectiveStyleChange={(style) => { setDocStyleState(style); setDocStyle(style); }}
+              />
 
               {/* CV Upload (optional) */}
               <Card>

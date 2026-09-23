@@ -52,6 +52,7 @@ import { buildGenericFileName } from "@/lib/fileNaming";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -339,6 +340,7 @@ const GOTRMPage = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        <DossierOutputSettings organisme={organisme} scope="gotrm" compact />
         <section className="bg-card rounded-2xl border shadow-card p-6 space-y-4">
           <h2 className="font-semibold">Configuration de la session</h2>
           <div className="grid md:grid-cols-3 gap-4">

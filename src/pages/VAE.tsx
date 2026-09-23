@@ -14,6 +14,7 @@ import {
   DEFAULT_ORGANISME, EMPTY_CERTIFICATION, EMPTY_CANDIDAT, EMPTY_SESSION, EMPTY_CONTENTS,
   type VAEOrganisme, type VAECertification, type VAECandidat, type VAESession, type VAEContents, type VAEData,
 } from "@/lib/vae/vaeTypes";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
 
 const STEPS = [
   { id: 1, label: "Organisme" },
@@ -54,6 +55,11 @@ export default function VAEPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        <DossierOutputSettings
+          organisme={{ nom: organisme.nom, siret: organisme.siret, dateMaj: organisme.dateMaj }}
+          scope="vae"
+          compact
+        />
         {user && (
           <VAEDossierHistory
             userId={user.id}

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { toast } from "sonner";
 
 const emptyOrganisme: OrganismeInfo = {
@@ -414,7 +415,15 @@ const ControleEY = () => {
                     )}
                   </div>
                 )}
-                {key === "design" && <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />}
+                {key === "design" && (
+                  <DossierOutputSettings
+                    organisme={organisme}
+                    scope="ey"
+                    manualStyle={docStyle}
+                    onManualStyleChange={handleStyleChange}
+                    onEffectiveStyleChange={setDocStyle}
+                  />
+                )}
               </div>
             )}
           </div>
