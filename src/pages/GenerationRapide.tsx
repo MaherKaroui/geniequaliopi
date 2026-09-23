@@ -656,9 +656,14 @@ const GenerationRapide = () => {
 
           <div className="space-y-4">
             {stagiaires.map((s, i) => (
-              <div key={i} className="rounded-xl border p-3 space-y-3 bg-muted/20">
+              <div key={i} className="rounded-xl border p-3 space-y-3 bg-muted/20 shadow-card">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-muted-foreground">Stagiaire {i + 1}</span>
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <span className="w-6 h-6 rounded-full bg-gradient-hero text-primary-foreground flex items-center justify-center text-[11px] font-bold">
+                      {(s.prenom?.trim()?.[0] || (i + 1).toString()).toUpperCase()}
+                    </span>
+                    Stagiaire {i + 1}{s.prenom?.trim() && s.nom?.trim() ? ` — ${s.prenom} ${s.nom}` : ""}
+                  </span>
                   <Button variant="ghost" size="sm" onClick={() => setStagiaires((l) => l.filter((_, j) => j !== i))} disabled={stagiaires.length === 1}>
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
