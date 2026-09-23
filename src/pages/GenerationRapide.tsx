@@ -141,11 +141,19 @@ const GenerationRapide = () => {
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
 
-  const [selected, setSelected] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"])),
+  const [selected, setSelected] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = sessionStorage.getItem("qualiopi_rapide_docs");
+      if (raw) return { ...Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"])), ...JSON.parse(raw) };
+    } catch { /* ignore */ }
+    return Object.fromEntries(PACK_DOCS.map((d) => [d.key, d.key !== "cerfa"]));
+  });
+  const [exportFormat, setExportFormat] = useState<"pdf" | "doc">(
+    () => (sessionStorage.getItem("qualiopi_rapide_fmt") as "pdf" | "doc") || "pdf",
   );
-  const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
-  const [zipMode, setZipMode] = useState<"zip" | "files">("zip");
+  const [zipMode, setZipMode] = useState<"zip" | "files">(
+    () => (sessionStorage.getItem("qualiopi_rapide_zip") as "zip" | "files") || "zip",
+  );
 
   const [aiLoading, setAiLoading] = useState(false);
   const aiTriggered = useRef(false);
