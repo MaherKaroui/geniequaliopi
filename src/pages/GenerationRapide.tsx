@@ -845,6 +845,7 @@ const GenerationRapide = () => {
               setFormation(form);
               setStagiaires(stag.length > 0 ? stag : [{ ...emptyStagiaire }]);
             }}
+            getCurrentData={() => ({ organisme, formation, stagiaires })}
           />
         )}
 
