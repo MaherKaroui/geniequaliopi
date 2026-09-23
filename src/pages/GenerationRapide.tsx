@@ -959,6 +959,18 @@ const GenerationRapide = () => {
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
+                  <Button
+                    data-no-check
+                    variant="outline"
+                    size="sm"
+                    disabled={downloadingKey !== null || conventionGrisee}
+                    onClick={() => downloadDoc(doc)}
+                    title={`Télécharger ${doc.perStagiaire ? "(1 fichier par stagiaire)" : ""}`}
+                    aria-label={`Télécharger : ${doc.label}`}
+                    className="h-8 w-8 p-0 shrink-0 rounded-lg"
+                  >
+                    {downloadingKey === doc.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                  </Button>
                   <Checkbox
                     checked={!!selected[doc.key]}
                     disabled={conventionGrisee}
