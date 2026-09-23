@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 import { toast } from "sonner";
 import {
-  Zap, ChevronLeft, ChevronDown, ChevronRight, Plus, Trash2, Upload, Eye,
+  Zap, ChevronLeft, ChevronDown, ChevronRight, Plus, Trash2, Upload, Eye, Download,
   Loader2, Sparkles, CheckCircle2, AlertTriangle, FileText, Building2, GraduationCap, Users,
 } from "lucide-react";
 
@@ -168,6 +168,7 @@ const GenerationRapide = () => {
   const [loaded, setLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [historyKey, setHistoryKey] = useState(0);
+  const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -471,7 +472,46 @@ const GenerationRapide = () => {
     } finally { setPreviewLoading(false); }
   };
 
+  /* ---------- Téléchargement d'un document seul ---------- */
+  const downloadDoc = async (doc: PackDoc) => {
+    const items = planned.filter((p) => p.doc.key === doc.key);
+    const cible = items.length > 0
+      ? items
+      : doc.perStagiaire
+        ? stagiairesValides.map((s) => ({ doc, stagiaire: s, stagiaireIdx: stagiaires.indexOf(s) }))
+        : [{ doc, stagiaire: null as StagiaireInfo | null, stagiaireIdx: null as number | null }];
+    if (doc.perStagiaire && cible.length === 0) { toast.error("Ajoutez d'abord un stagiaire"); return; }
+
+    setDownloadingKey(doc.key);
+    const t = toast.loading(`Préparation : ${doc.label}…`);
+    try {
+      const { saveAs } = await import("file-saver");
+      const safeFormation = buildFormationSafe(formation, organisme, stagiairesValides);
+      for (const { stagiaire, stagiaireIdx } of cible) {
+        let blob: Blob;
+        let ext: string;
+        if (doc.key === "cerfa") {
+          blob = await genCerfaApprentissagePdf(organisme, safeFormation, stagiaire!);
+          ext = ".pdf";
+        } else {
+          const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
+          const content = generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires);
+          if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 }); ext = ".pdf"; }
+          else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
+        }
+        saveAs(blob, buildFileNameStatic(doc, stagiaire ?? null, ext, organisme));
+        await yieldToBrowser(16);
+      }
+      toast.success(`${cible.length} fichier(s) téléchargé(s)`, { id: t });
+    } catch (e: any) {
+      toast.error("Téléchargement impossible : " + (e?.message || "erreur inconnue"), { id: t });
+    } finally {
+      setDownloadingKey(null);
+    }
+  };
+
   /* ---------- Génération ---------- */
+
 
   const handleGenerate = () => {
     if (erreurs.length > 0) {
