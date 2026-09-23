@@ -27,7 +27,7 @@ import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import DossierHistory from "@/components/DossierHistory";
-import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -249,6 +249,40 @@ const GenerationRapide = () => {
   const setForm = (patch: Partial<FormationInfo>) => setFormation((f) => ({ ...f, ...patch }));
   const setStag = (idx: number, patch: Partial<StagiaireInfo>) =>
     setStagiaires((list) => list.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
+
+  /* ---------- Stagiaire fictif ---------- */
+  const genererStagiaireFictif = () => {
+    setStagiaires((list) => {
+      const noms = new Set(
+        list.filter((s) => s.prenom?.trim() && s.nom?.trim()).map((s) => `${s.prenom} ${s.nom}`.toLowerCase())
+      );
+      const dispo = SAMPLE_STAGIAIRES.filter((s) => !noms.has(`${s.prenom} ${s.nom}`.toLowerCase()));
+      const pool = dispo.length > 0 ? dispo : SAMPLE_STAGIAIRES;
+      const base = pool[list.length % pool.length];
+      const fictif: StagiaireInfo = {
+        ...emptyStagiaire,
+        civilite: base.civilite,
+        nom: base.nom,
+        prenom: base.prenom,
+        email: base.email,
+        telephone: base.telephone,
+        entreprise: base.entreprise,
+        poste: base.poste,
+        dateNaissance: base.dateNaissance,
+        financeur: base.entreprise ? "Entreprise" : "Personnel",
+      };
+      const last = list[list.length - 1];
+      if (last && !last.prenom?.trim() && !last.nom?.trim() && !last.email?.trim()) {
+        return [...list.slice(0, -1), fictif];
+      }
+      return [...list, fictif];
+    });
+    toast({
+      title: "Stagiaire fictif généré",
+      description: "Les dates et le tarif individuels restent vides : ils héritent de ceux de la formation.",
+    });
+  };
+
 
   /* ---------- Formation d'exemple ---------- */
   const loadSampleFormation = (idxStr: string) => {
