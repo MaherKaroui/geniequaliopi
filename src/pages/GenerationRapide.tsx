@@ -512,21 +512,37 @@ const GenerationRapide = () => {
     toast.success("Génération lancée — suivez la progression en bas à droite");
   };
 
-  const cerfaActif = selected.cerfa;
+  const cerfaActif = selected.cerfaivr;
+  const orgComplet = (["nom", "siret", "nda", "adresse", "codePostal", "ville", "dirigeant"] as const)
+    .every((k) => String(organisme[k] ?? "").trim().length > 0);
+  const formComplet = erreurs.filter((e) => e.startsWith("Formation")).length === 0;
+  const stagComplet = stagiairesValides.length > 0;
 
   /* ------------------------------------------------------------------ */
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            <span className="font-semibold">Génération rapide</span>
-            <span className="text-xs text-muted-foreground hidden sm:inline">— pack de documents essentiels en moins de 2 minutes</span>
+      <header className="sticky top-0 z-10 border-b bg-gradient-hero text-primary-foreground shadow-card">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-10 h-10 shrink-0 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
+              <Zap className="w-5 h-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-bold text-lg leading-tight">Génération rapide</span>
+              <span className="block text-xs text-primary-foreground/80 truncate">Pack de documents essentiels en moins de 2 minutes</span>
+            </span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1">
-            <ChevronLeft className="w-4 h-4" /> Accueil
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium bg-white/15 rounded-full px-3 py-1.5">
+              <FileText className="w-3.5 h-3.5" /> {planned.length} document(s)
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium bg-white/15 rounded-full px-3 py-1.5">
+              ≈ {estimationSec < 60 ? `${estimationSec} s` : `${Math.round(estimationSec / 60)} min`}
+            </span>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+              <ChevronLeft className="w-4 h-4" /> Accueil
+            </Button>
+          </div>
         </div>
       </header>
 
