@@ -687,9 +687,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
     // Un seul appel html2canvas par lot de pages : le coût fixe (clonage du
     // document + reparse CSS) n'est plus payé une fois par page.
-    const batchSize = (window as unknown as { __PDF_NO_BATCH?: boolean }).__PDF_NO_BATCH
-      ? 1
-      : Math.max(1, Math.floor(16000 / (PAGE_H_PX * scale)));
+    const batchSize = Math.max(1, Math.floor(16000 / (PAGE_H_PX * scale)));
 
     for (let start = 0; start < renderPages.length; start += batchSize) {
       const batch = renderPages.slice(start, start + batchSize);
