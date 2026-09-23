@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790158823744,
+      "tag": "0000_create_rapide_generations",
+      "breakpoints": true
+    }
+  ]
+}
