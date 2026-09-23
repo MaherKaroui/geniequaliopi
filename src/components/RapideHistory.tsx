@@ -73,6 +73,58 @@ const RapideHistory = ({ userId, refreshKey, onLoad, getCurrentData }: RapideHis
     toast({ title: "Chargé", description: `Génération "${d.name}" restaurée.` });
   };
 
+  const buildName = (data: RapideCurrentData) =>
+    `${data.organisme?.nom || "Sans organisme"} – ${data.formation?.intitule || "Sans formation"}`;
+
+  const handleSaveNew = async () => {
+    const data = getCurrentData?.();
+    if (!data) {
+      toast({ title: "Rien à enregistrer", description: "Remplissez le formulaire avant d'enregistrer.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("rapide_generations").insert({
+      user_id: userId,
+      name: buildName(data),
+      organisme: data.organisme as any,
+      formation: data.formation as any,
+      stagiaires: data.stagiaires as any,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Enregistré", description: "Le dossier actuel a été ajouté à l'historique." });
+      fetchItems();
+    }
+  };
+
+  const handleUpdate = async (d: RapideGeneration) => {
+    const data = getCurrentData?.();
+    if (!data) {
+      toast({ title: "Rien à enregistrer", description: "Remplissez le formulaire avant de mettre à jour.", variant: "destructive" });
+      return;
+    }
+    setUpdatingId(d.id);
+    const { error } = await supabase
+      .from("rapide_generations")
+      .update({
+        name: buildName(data),
+        organisme: data.organisme as any,
+        formation: data.formation as any,
+        stagiaires: data.stagiaires as any,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", d.id);
+    setUpdatingId(null);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Mis à jour", description: `"${d.name}" remplacé par le formulaire actuel.` });
+      fetchItems();
+    }
+  };
+
   const q = search.trim().toLowerCase();
   const visible = items.filter((d) => {
     if (!q) return true;
