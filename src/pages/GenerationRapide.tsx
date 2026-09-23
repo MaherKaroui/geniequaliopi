@@ -366,6 +366,10 @@ const GenerationRapide = () => {
 
 
   /* ---------- Formation d'exemple ---------- */
+  // Mémorise les valeurs issues du dernier exemple chargé : elles sont remplacées
+  // si l'utilisateur choisit un autre exemple (mais jamais ses propres saisies).
+  const lastSampleRef = useRef<Record<string, string>>({});
+
   const loadSampleFormation = (idxStr: string) => {
     const sample = SAMPLE_FORMATIONS[Number(idxStr)];
     if (!sample) return;
@@ -376,27 +380,37 @@ const GenerationRapide = () => {
       if (v) return "Présentiel";
       return "";
     };
-    // Tout ce que l'utilisateur a déjà saisi reste prioritaire : seuls les champs vides sont remplis.
+    const prev = lastSampleRef.current;
+    const next: Record<string, string> = {};
+    // Vide, ou identique à l'exemple précédemment chargé → on remplace.
+    const take = (key: string, current: string, val: string) => {
+      const cur = (current || "").trim();
+      const use = !cur || cur === (prev[key] || "").trim() ? (val || "") : current;
+      next[key] = val || "";
+      return use;
+    };
     setFormation((f) => ({
       ...f,
-      intitule: f.intitule.trim() || sample.intitule || "",
-      codeRNCP: (f.codeRNCP || "").trim() || sample.codeRNCP || "",
-      duree: f.duree.trim() || sample.duree || "",
-      modalites: f.modalites.trim() || normModalite(sample.modalites),
-      tarif: f.tarif.trim() || sample.tarif || "",
-      formateur: f.formateur.trim() || sample.formateur || "",
-      nombreParticipants: f.nombreParticipants.trim() || sample.nombreParticipants || "",
-      objectifs: f.objectifs.trim() || sample.objectifs || "",
-      programme: f.programme.trim() || sample.programme || "",
-      prerequis: f.prerequis.trim() || sample.prerequis || "",
-      methodesEvaluation: f.methodesEvaluation.trim() || sample.methodesEvaluation || "",
-      moyensPedagogiques: f.moyensPedagogiques.trim() || sample.moyensPedagogiques || "",
-      publicVise: f.publicVise.trim() || sample.publicVise || "",
-      delaiAcces: f.delaiAcces.trim() || sample.delaiAcces || "",
+      intitule: take("intitule", f.intitule, sample.intitule || ""),
+      codeRNCP: take("codeRNCP", f.codeRNCP || "", sample.codeRNCP || ""),
+      duree: take("duree", f.duree, sample.duree || ""),
+      modalites: take("modalites", f.modalites, normModalite(sample.modalites)),
+      tarif: take("tarif", f.tarif, sample.tarif || ""),
+      formateur: take("formateur", f.formateur, sample.formateur || ""),
+      nombreParticipants: take("nombreParticipants", f.nombreParticipants, sample.nombreParticipants || ""),
+      objectifs: take("objectifs", f.objectifs, sample.objectifs || ""),
+      programme: take("programme", f.programme, sample.programme || ""),
+      prerequis: take("prerequis", f.prerequis, sample.prerequis || ""),
+      methodesEvaluation: take("methodesEvaluation", f.methodesEvaluation, sample.methodesEvaluation || ""),
+      moyensPedagogiques: take("moyensPedagogiques", f.moyensPedagogiques, sample.moyensPedagogiques || ""),
+      publicVise: take("publicVise", f.publicVise, sample.publicVise || ""),
+      delaiAcces: take("delaiAcces", f.delaiAcces, sample.delaiAcces || ""),
     }));
+    lastSampleRef.current = next;
     setShowContenu(true);
     toast.success(`Formation d'exemple chargée : ${sample.intitule}. Vérifiez les dates, le lieu et le tarif.`);
   };
+
 
 
   /* ---------- Pappers ---------- */
