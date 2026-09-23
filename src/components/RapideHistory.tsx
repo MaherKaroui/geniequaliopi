@@ -197,6 +197,18 @@ const RapideHistory = ({ userId, refreshKey, onLoad, getCurrentData }: RapideHis
                     <Button size="sm" variant="ghost" onClick={() => handleLoad(d)} className="gap-1 text-xs">
                       <FolderOpen className="w-3.5 h-3.5" /> Charger
                     </Button>
+                    {getCurrentData && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleUpdate(d)}
+                        disabled={updatingId === d.id}
+                        className="gap-1 text-xs"
+                        title="Remplacer cette entrée par le formulaire actuel"
+                      >
+                        {updatingId === d.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <SaveAll className="w-3.5 h-3.5" />} Mettre à jour
+                      </Button>
+                    )}
                     <Button size="sm" variant="ghost" onClick={() => handleDelete(d.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
