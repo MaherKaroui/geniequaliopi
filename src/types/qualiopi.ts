@@ -96,6 +96,8 @@ export interface StagiaireInfo {
   dateNaissanceResponsable?: string;
   emailResponsable?: string;
   numeroAction?: string;
+  /** Financeur de la formation (CPF, OPCO, Entreprise, Personnel, France Travail, Région, Autre) */
+  financeur?: string;
 }
 
 export interface FormationInfo {

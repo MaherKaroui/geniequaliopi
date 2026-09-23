@@ -17,6 +17,7 @@ import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
+import { genChiffreAffairesSession } from "./templatesCA";
 import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne, genChecklistFormateur } from "./templatesCritere6";
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
@@ -325,6 +326,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
     case "organigramme": return genOrganigramme(o, selectedFormation);
+    // Génération rapide uniquement — volontairement hors buildFullCatalog (hors 32 indicateurs)
+    case "ca_session": return genChiffreAffairesSession(o, f, stagiaires);
     case "charte_qualite": return genCharteQualite(o);
     case "politique_qualite": return genPolitiqueQualite(o);
     case "cgv": return genCGV_V2(o, f, stagiaires);

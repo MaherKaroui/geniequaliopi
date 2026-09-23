@@ -10,7 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -182,7 +182,10 @@ const Index = () => {
             ))}
           </div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
-            <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
+            <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated gap-2" onClick={() => navigate("/rapide")}>
+              <Zap className="w-5 h-5" /> Génération rapide
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base" onClick={() => updateStarted(true)}>
               Commencer <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/controle-ey")}>
@@ -250,6 +253,9 @@ const Index = () => {
               {airtableLoading ? 'Envoi...' : 'Airtable'}
             </Button>
             {/* Archivé : MyCertif */}
+            <Button variant="outline" size="sm" onClick={() => navigate("/rapide")} className="gap-1">
+              <Zap className="w-4 h-4" /> Rapide
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/audit-live")} className="gap-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
               <ShieldCheck className="w-4 h-4" /> Audit live
             </Button>
