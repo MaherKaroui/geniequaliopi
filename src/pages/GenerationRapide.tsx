@@ -26,6 +26,7 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
+import DossierHistory from "@/components/DossierHistory";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -165,6 +166,12 @@ const GenerationRapide = () => {
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [historyKey, setHistoryKey] = useState(0);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   const [selected, setSelected] = useState<Record<string, boolean>>(() => {
     try {
@@ -542,7 +549,35 @@ const GenerationRapide = () => {
         return blob;
       },
     });
+    void saveHistorique(snapOrg, snapForm, snapStag);
     toast.success("Génération lancée — suivez la progression en bas à droite");
+  };
+
+  /* ---------- Enregistrement automatique dans l'historique ---------- */
+  const saveHistorique = async (o: OrganismeInfo, f: FormationInfo, st: StagiaireInfo[]) => {
+    if (!userId) return;
+    const name = `${o.nom} – ${f.intitule || "Sans formation"}`;
+    try {
+      const { data: existing } = await supabase
+        .from("saved_dossiers")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("name", name)
+        .limit(1);
+      const payload = { organisme: o as any, formation: f as any, stagiaires: st as any };
+      if (existing && existing.length > 0) {
+        await supabase
+          .from("saved_dossiers")
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq("id", (existing[0] as any).id);
+      } else {
+        await supabase.from("saved_dossiers").insert({ user_id: userId, name, ...payload });
+      }
+      setHistoryKey((k) => k + 1);
+      toast.success("Dossier enregistré dans l'historique");
+    } catch (e) {
+      console.error("[HISTORIQUE RAPIDE]", e);
+    }
   };
 
   const cerfaActif = selected.cerfa;
@@ -580,6 +615,22 @@ const GenerationRapide = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-5 pb-32">
+        {userId && (
+          <DossierHistory
+            key={historyKey}
+            userId={userId}
+            organisme={organisme}
+            formation={formation}
+            stagiaires={stagiaires}
+            onLoad={(org, form, stag) => {
+              setOrganisme(org);
+              setFormation(form);
+              setStagiaires(stag.length > 0 ? stag : [{ ...emptyStagiaire }]);
+              toast.success("Dossier chargé");
+            }}
+          />
+        )}
+
         {/* BLOC A — ORGANISME */}
         <Section step="1" icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires" done={orgComplet}>
           <div className="flex flex-col sm:flex-row gap-2">
