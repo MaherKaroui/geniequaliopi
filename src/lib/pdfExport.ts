@@ -28,11 +28,33 @@ type PageParts = {
   content: HTMLDivElement;
 };
 
-type PdfExportOptions = {
+export type PdfExportOptions = {
   scale?: number;
   imageQuality?: number;
   pageYieldMs?: number;
 };
+
+export type PdfQuality = "standard" | "high" | "maximum";
+
+export const PDF_QUALITY_PRESETS: Record<PdfQuality, {
+  label: string;
+  seconds: number;
+  options: Required<PdfExportOptions>;
+}> = {
+  standard: { label: "Standard — rapide", seconds: 5, options: { scale: 1.5, imageQuality: 0.9, pageYieldMs: 8 } },
+  high: { label: "Haute — recommandé", seconds: 9, options: { scale: 2, imageQuality: 0.95, pageYieldMs: 8 } },
+  maximum: { label: "Maximale — impression", seconds: 16, options: { scale: 3, imageQuality: 1, pageYieldMs: 12 } },
+};
+
+let activePdfQuality: PdfQuality = "high";
+
+export function setActivePdfQuality(quality: PdfQuality): void {
+  activePdfQuality = quality;
+}
+
+export function getActivePdfOptions(): Required<PdfExportOptions> {
+  return { ...PDF_QUALITY_PRESETS[activePdfQuality].options };
+}
 
 const loadedGoogleFontHrefs = new Set<string>();
 
@@ -262,7 +284,7 @@ function getTableBodyRows(table: HTMLElement): HTMLTableRowElement[] {
   ) as HTMLTableRowElement[];
 }
 
-export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
+export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = getActivePdfOptions()): Promise<Blob> {
   const {
     scale = 2,
     imageQuality = 0.95,

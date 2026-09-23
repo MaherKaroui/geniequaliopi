@@ -17,7 +17,7 @@ import { saveToDrive } from "@/lib/googleDrive";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-import DocStyleConfigPanel from "./DocStyleConfigPanel";
+import DossierOutputSettings from "./DossierOutputSettings";
 
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
@@ -47,7 +47,7 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "bdc_nt_stats_xlsx",
   "bdc_nt_cr6mois_stagiaire",
 ]);
-import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
+import { downloadAsPdf, getActivePdfOptions, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
@@ -932,7 +932,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
     }, 0);
 
-    const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+    const bulkPdfOptions = getActivePdfOptions();
     const zip = new JSZip();
 
     const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
@@ -1179,7 +1179,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return;
       }
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+      const bulkPdfOptions = getActivePdfOptions();
       const zip = new JSZip();
       let processedFiles = 0;
 
@@ -1320,7 +1320,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return;
       }
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+      const bulkPdfOptions = getActivePdfOptions();
       const zip = new JSZip();
       let processedFiles = 0;
 
@@ -1632,7 +1632,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         </span>
       </div>
 
-      <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+      <DossierOutputSettings
+        organisme={mergedOrganisme}
+        scope="qualiopi"
+        manualStyle={docStyle}
+        onManualStyleChange={handleStyleChange}
+      />
 
       {/* ========== PRÉPA QUALIOPI UNIVERSEL (AF / CFA / BDC / VAE) ========== */}
       <div className="relative overflow-hidden rounded-2xl border-2 border-blue-400/50 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100/60 shadow-md">

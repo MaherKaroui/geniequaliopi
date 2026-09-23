@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { VAEData, VAEContents } from "@/lib/vae/vaeTypes";
 import { buildVAEZip } from "@/lib/vae/vaeGenerator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Props { data: VAEData; onContentsChange: (c: VAEContents) => void; }
 
@@ -14,6 +15,7 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
   const [loadingAI, setLoadingAI] = useState(false);
   const [loadingZip, setLoadingZip] = useState(false);
   const [progress, setProgress] = useState("");
+  const [format, setFormat] = useState<"word" | "pdf">("pdf");
 
   const generateContents = async () => {
     if (!data.certification.rncp || !data.candidat.nom) { toast.error("Remplissez d'abord la certification et le candidat"); return; }
@@ -36,7 +38,7 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
   const generateZip = async () => {
     setLoadingZip(true);
     try {
-      const blob = await buildVAEZip(data, setProgress);
+      const blob = await buildVAEZip(data, setProgress, { format });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -66,9 +68,13 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
           {loadingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
           Générer les contenus IA
         </Button>
+        <Select value={format} onValueChange={(value) => setFormat(value as "word" | "pdf")}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="word">Word</SelectItem></SelectContent>
+        </Select>
         <Button onClick={generateZip} disabled={loadingZip} variant="default" className="gap-2 bg-gradient-hero border-0">
           {loadingZip ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          Générer le dossier (ZIP Word)
+          Générer le dossier (ZIP {format === "pdf" ? "PDF" : "Word"})
         </Button>
         {progress && <span className="text-sm text-muted-foreground self-center">{progress}</span>}
       </div>

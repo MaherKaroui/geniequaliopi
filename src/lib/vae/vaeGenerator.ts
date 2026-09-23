@@ -1,5 +1,7 @@
 import JSZip from "jszip";
 import { htmlToWordBlob } from "@/lib/wordExport";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { withActiveDossierStyle } from "@/lib/dossierDesign";
 import type { VAEData } from "./vaeTypes";
 import {
   getBesoinsHTML,
@@ -38,7 +40,7 @@ function certTag(intitule: string): string {
 export async function buildVAEZip(
   d: VAEData,
   onProgress?: (msg: string) => void,
-  options?: { includeCV?: boolean }
+  options?: { includeCV?: boolean; format?: "word" | "pdf" }
 ): Promise<Blob> {
   const zip = new JSZip();
   const NOM = safe(d.candidat.nom).toUpperCase();
@@ -71,9 +73,10 @@ export async function buildVAEZip(
   for (const [name, fn] of docs) {
     onProgress?.(name);
     try {
-      const blob = await htmlToWordBlob(fn());
+      const styledHtml = withActiveDossierStyle(fn());
+      const blob = options?.format === "pdf" ? await htmlToPdfBlob(styledHtml) : await htmlToWordBlob(styledHtml);
       const isDocx = blob.type.includes("officedocument");
-      const finalName = isDocx ? name : name.replace(/\.docx$/i, ".doc");
+      const finalName = options?.format === "pdf" ? name.replace(/\.docx$/i, ".pdf") : isDocx ? name : name.replace(/\.docx$/i, ".doc");
       zip.file(finalName, blob);
     } catch (e) {
       console.error("VAE gen error", name, e);

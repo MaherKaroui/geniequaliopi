@@ -1,5 +1,7 @@
 # Roadmap
 
-- [x] Ajouter un bouton « Générer » directement à côté du logo dans le formulaire organisme.
-- [x] Retirer le bloc « Contrôle de cohérence du dossier » du bilan de compétences pour autoriser les formations en cours.
-- [x] Vérifier les deux parcours et le contrôle du code.
+- [x] Centraliser les niveaux de qualité PDF et les chartes déterministes.
+- [x] Ajouter un contrôle partagé qualité/design aux générateurs.
+- [x] Appliquer le style et la qualité aux aperçus, téléchargements et ZIP.
+- [x] Vérifier les types et les écrans principaux.
+- [x] Vérifier le défaut Haute à 192 DPI et le déterminisme entre organismes.

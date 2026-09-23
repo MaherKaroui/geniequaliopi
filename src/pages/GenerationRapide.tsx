@@ -30,6 +30,8 @@ import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import SignaturePad from "@/components/SignaturePad";
 import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import { setDocStyle } from "@/lib/docBuilder";
+import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
+import { PDF_QUALITY_PRESETS, type PdfQuality } from "@/lib/pdfExport";
 
 import RapideHistory from "@/components/RapideHistory";
 import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
@@ -60,36 +62,7 @@ const emptyStagiaire: StagiaireInfo = {
 
 const FINANCEURS = ["CPF", "OPCO", "Entreprise", "Personnel", "France Travail", "Région", "Autre"];
 
-type PdfQuality = "standard" | "high" | "maximum";
-
-const PDF_QUALITIES: Record<PdfQuality, {
-  label: string;
-  seconds: number;
-  options: { scale: number; imageQuality: number; pageYieldMs: number };
-}> = {
-  standard: { label: "Standard — rapide", seconds: 5, options: { scale: 1.5, imageQuality: 0.9, pageYieldMs: 8 } },
-  high: { label: "Haute — recommandé", seconds: 9, options: { scale: 2, imageQuality: 0.95, pageYieldMs: 8 } },
-  maximum: { label: "Maximale — impression", seconds: 16, options: { scale: 3, imageQuality: 1, pageYieldMs: 12 } },
-};
-
-const AUTO_DESIGNS: Array<{ name: string; style: DocStyleConfig }> = [
-  { name: "Classique marine", style: { ...DEFAULT_DOC_STYLE, theme: "classique", primaryColor: "#17365d", secondaryColor: "#356859", fontFamily: "'Source Sans 3', sans-serif", headingFont: "'Libre Baskerville', serif", headerStyle: "classic", headingStyle: "line-bottom", logoPosition: "center" } },
-  { name: "Élégant bordeaux", style: { ...DEFAULT_DOC_STYLE, theme: "elegant", primaryColor: "#6b2737", secondaryColor: "#6b5d32", fontFamily: "'Lato', sans-serif", headingFont: "'Playfair Display', serif", headerStyle: "elegant", headingStyle: "underline-double", logoPosition: "center" } },
-  { name: "Minimal graphite", style: { ...DEFAULT_DOC_STYLE, theme: "minimaliste", primaryColor: "#202124", secondaryColor: "#4d5b66", fontFamily: "'Outfit', sans-serif", headingFont: "'Outfit', sans-serif", headerStyle: "compact", headingStyle: "plain", logoPosition: "left" } },
-  { name: "Académique forêt", style: { ...DEFAULT_DOC_STYLE, theme: "academique", primaryColor: "#244b3b", secondaryColor: "#705b36", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14, headerStyle: "boxed", headingStyle: "underline-double", logoPosition: "center" } },
-  { name: "Monochrome officiel", style: { ...DEFAULT_DOC_STYLE, theme: "monochrome", primaryColor: "#111111", secondaryColor: "#525252", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif", headerStyle: "split", headingStyle: "line-bottom", logoPosition: "left" } },
-  { name: "Papier premium", style: { ...DEFAULT_DOC_STYLE, theme: "simplepro", primaryColor: "#18324a", secondaryColor: "#806b3f", fontFamily: "'Inter', sans-serif", headingFont: "'Cormorant Garamond', serif", headerStyle: "elegant", headingStyle: "left-bar", logoPosition: "center" } },
-];
-
-const organismeSeed = (o: OrganismeInfo): number => {
-  const seedStr = `${o.nom || ""}|${o.siret || ""}|${o.dateMaj || ""}`;
-  let seed = 0;
-  for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
-  return seed;
-};
-
-const automaticDesign = (o: OrganismeInfo, offset: number) =>
-  AUTO_DESIGNS[(organismeSeed(o) + offset) % AUTO_DESIGNS.length];
+const PDF_QUALITIES = PDF_QUALITY_PRESETS;
 
 interface PackDoc {
   key: string;
@@ -589,7 +562,7 @@ const GenerationRapide = () => {
     [planned, exportFormat, pdfQuality],
   );
 
-  const autoDesign = useMemo(() => automaticDesign(organisme, designOffset), [organisme, designOffset]);
+  const autoDesign = useMemo(() => getAutomaticDossierDesign(organisme, designOffset), [organisme, designOffset]);
   const effectiveDocStyle = automaticStyle ? autoDesign.style : manualStyle;
   const effectiveDesignName = automaticStyle ? autoDesign.name : "Personnalisé";
 

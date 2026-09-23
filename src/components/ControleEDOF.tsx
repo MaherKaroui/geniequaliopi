@@ -6,7 +6,7 @@ import { generateDocumentById, getStagiaireDays } from "@/lib/documentGenerator"
 import { buildPerStagiairePdfFileName, buildDocFolderName, sanitizeFileSegment } from "@/lib/eyExport";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { setDocStyle } from "@/lib/docBuilder";
-import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { getActivePdfOptions, htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -21,12 +21,6 @@ import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEval
 const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(() => setTimeout(r, ms)));
 
 type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
-
-const MASS_EXPORT_PDF_OPTIONS = {
-  scale: 1.5,
-  imageQuality: 0.9,
-  pageYieldMs: 25,
-} satisfies PdfBlobOptions;
 
 const ZIP_EXPORT_OPTIONS = {
   type: "blob" as const,
@@ -356,7 +350,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         const zip = new JSZip();
         const isBacPro = eyDoc.category === "controle_bac_pro";
         await appendAutoDocToZip(zip, eyDoc, {
-          pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+          pdfOptions: getActivePdfOptions(),
           folderByDocument: isBacPro,
           onItemDone: (current, total) => {
             setProgress(Math.round((current / Math.max(total, 1)) * 100));
@@ -436,7 +430,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           } else if (eyDoc.autoTemplates.length > 0) {
             const isBacPro = eyDoc.category === "controle_bac_pro";
             await appendAutoDocToZip(zip, eyDoc, {
-              pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+              pdfOptions: getActivePdfOptions(),
               sourceStagiaires: stagSnap,
               folderByDocument: isBacPro,
               onItemDone: (current, total) => {
@@ -620,7 +614,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         } else if (state.status === "auto") {
           const isBacPro = eyDoc.category === "controle_bac_pro";
           await appendAutoDocToZip(zip, eyDoc, {
-            pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+            pdfOptions: getActivePdfOptions(),
             sourceStagiaires: exportStagiaires,
             folderByDocument: isBacPro,
             onItemDone: (current, total) => {
