@@ -3,12 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { FolderOpen, Trash2, History, ChevronDown, ChevronUp, RefreshCw, Search } from "lucide-react";
+import { FolderOpen, Trash2, History, ChevronDown, ChevronUp, RefreshCw, Search, Save, SaveAll } from "lucide-react";
+
+interface RapideCurrentData {
+  organisme: OrganismeInfo;
+  formation: FormationInfo;
+  stagiaires: StagiaireInfo[];
+}
 
 interface RapideHistoryProps {
   userId: string;
   refreshKey: number;
   onLoad: (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => void;
+  /** Retourne l'état actuel du formulaire pour Enregistrer / Mettre à jour */
+  getCurrentData?: () => RapideCurrentData | null;
 }
 
 interface RapideGeneration {
