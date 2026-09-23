@@ -27,6 +27,7 @@ import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import DossierHistory from "@/components/DossierHistory";
+import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
