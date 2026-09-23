@@ -167,6 +167,7 @@ const GenerationRapide = () => {
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [historyKey, setHistoryKey] = useState(0);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
