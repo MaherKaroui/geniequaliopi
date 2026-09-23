@@ -88,17 +88,42 @@ const fileToDataUrl = (file: File) =>
     r.readAsDataURL(file);
   });
 
+/**
+ * Neutralise l'héritage de la formation d'exemple (SAMPLE_FORMATIONS[0]) fait par
+ * _generateDocumentByIdInner : tout champ vide de la page rapide est remplacé par
+ * des faits réels (organisme, stagiaires saisis) et jamais par le contenu
+ * « prothésie ongulaire » de l'exemple.
+ */
+const buildFormationSafe = (
+  formation: FormationInfo,
+  organisme: OrganismeInfo,
+  stagiairesValides: StagiaireInfo[],
+): FormationInfo => ({
+  ...formation,
+  lieu: formation.lieu?.trim() || `${organisme.adresse}, ${organisme.codePostal} ${organisme.ville}`,
+  formateur: formation.formateur?.trim() || organisme.responsablePedagogique?.trim() || organisme.dirigeant?.trim() || "",
+  nombreParticipants: String(formation.nombreParticipants ?? "").trim() || String(stagiairesValides.length),
+  rythmeAlternance: String(formation.rythmeAlternance ?? "").trim() || " ",
+});
+
 /* ------------------------------------------------------------------ */
 /* Bloc repliable                                                      */
 /* ------------------------------------------------------------------ */
 
-const Section = ({ step, icon, title, subtitle, done, children, defaultOpen = true }: {
+const Section = ({ step, icon, title, subtitle, done, children, defaultOpen = true, open: openProp, onOpenChange }: {
   step?: string; icon: React.ReactNode; title: string; subtitle?: string; done?: boolean; children: React.ReactNode; defaultOpen?: boolean;
+  open?: boolean; onOpenChange?: (open: boolean) => void;
 }) => {
-  const [open, setOpen] = useState(defaultOpen);
+  const [openState, setOpenState] = useState(defaultOpen);
+  const open = openProp ?? openState;
+  const setOpen = (value: boolean | ((prev: boolean) => boolean)) => {
+    const next = typeof value === "function" ? value(open) : value;
+    if (onOpenChange) onOpenChange(next);
+    else setOpenState(next);
+  };
   return (
     <div className="bg-card rounded-2xl border shadow-card overflow-hidden ring-1 ring-transparent hover:ring-primary/20 transition-shadow">
-      <button type="button" onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-muted/40 transition-colors">
+      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-muted/40 transition-colors">
         {step && (
           <span className="w-9 h-9 shrink-0 rounded-xl bg-gradient-hero text-primary-foreground flex items-center justify-center text-sm font-bold shadow-card">
             {step}
@@ -392,6 +417,13 @@ const GenerationRapide = () => {
       ["tarif", "tarif"], ["modalites", "modalité"], ["objectifs", "objectifs"], ["programme", "programme"],
     ];
     for (const [k, label] of reqForm) if (!String(formation[k] ?? "").trim()) e.push(`Formation : ${label}`);
+    const reqPeda: [keyof FormationInfo, string][] = [
+      ["prerequis", "prérequis"], ["methodesEvaluation", "méthodes d'évaluation"],
+      ["moyensPedagogiques", "moyens pédagogiques"], ["publicVise", "public visé"], ["delaiAcces", "délai d'accès"],
+    ];
+    for (const [k, label] of reqPeda)
+      if (!String(formation[k] ?? "").trim())
+        e.push(`Formation : ${label} (cliquez sur « Compléter le contenu pédagogique avec l'IA »)`);
     if (formation.dateDebut && formation.dateFin && formation.dateDebut > formation.dateFin)
       e.push("Formation : la date de début doit précéder la date de fin");
 
@@ -417,13 +449,14 @@ const GenerationRapide = () => {
     setPreviewOpen(true);
     setPreviewLoading(true);
     try {
+      const safeFormation = buildFormationSafe(formation, organisme, stagiairesValides);
       if (doc.key === "cerfa") {
         const s = stagiaires[stagiaireIdx ?? 0];
-        const blob = await genCerfaApprentissagePdf(organisme, formation, s);
+        const blob = await genCerfaApprentissagePdf(organisme, safeFormation, s);
         setPreviewBlobUrl(URL.createObjectURL(blob));
       } else {
         const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-        setPreviewHtml(generateDocumentById(doc.key, doc.template, params, organisme, formation, stagiaires));
+        setPreviewHtml(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires));
       }
     } catch (e: any) {
       toast.error("Aperçu impossible : " + (e?.message || "erreur inconnue"));
@@ -444,8 +477,8 @@ const GenerationRapide = () => {
     if (planned.length === 0) { toast.error("Aucun document sélectionné"); return; }
 
     const snapOrg = { ...organisme };
-    const snapForm = { ...formation };
     const snapStag = stagiaires.map((s) => ({ ...s }));
+    const snapForm = buildFormationSafe(formation, snapOrg, snapStag.filter((s) => s.prenom?.trim() && s.nom?.trim()));
     const snapPlan = planned.map((p) => ({ ...p }));
     const snapFormat = exportFormat;
     const snapZip = zipMode === "zip";
@@ -477,7 +510,7 @@ const GenerationRapide = () => {
               const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
               const content = generateDocumentById(doc.key, doc.template, params, snapOrg, snapForm, snapStag);
               if (snapFormat === "pdf") { blob = await htmlToPdfBlob(content, pdfOptions); ext = ".pdf"; }
-              else { blob = await htmlToWordBlob(content); ext = ".doc"; }
+              else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
             }
             const fileName = buildFileNameStatic(doc, stagiaire, ext, snapOrg);
             const path = stagiaire
@@ -614,12 +647,16 @@ const GenerationRapide = () => {
             <Field label="Nombre de participants" value={formation.nombreParticipants} onChange={(e) => setForm({ nombreParticipants: e.target.value })} />
           </div>
 
+          <p className="text-xs text-muted-foreground flex items-start gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-600" />
+            <span>Un champ pédagogique laissé vide serait remplacé par le contenu de la formation d'exemple : complétez-les tous avant de générer.</span>
+          </p>
           <Button variant="outline" onClick={runAI} disabled={aiLoading} className="gap-2">
             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Compléter le contenu pédagogique avec l'IA
           </Button>
 
-          <Section icon={<FileText className="w-4 h-4" />} title="Contenu pédagogique (relecture)" defaultOpen={showContenu}>
+          <Section icon={<FileText className="w-4 h-4" />} title="Contenu pédagogique (relecture)" open={showContenu} onOpenChange={setShowContenu}>
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1">
                 <Label className="text-xs">Objectifs<span className="text-destructive"> *</span></Label>
