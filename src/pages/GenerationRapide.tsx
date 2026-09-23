@@ -165,6 +165,7 @@ const GenerationRapide = () => {
 
   const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
+  const [sampleFormationKey, setSampleFormationKey] = useState("");
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([{ ...emptyStagiaire }]);
   const [loaded, setLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
