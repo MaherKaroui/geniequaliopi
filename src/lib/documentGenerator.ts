@@ -1232,43 +1232,111 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
   const formateur = f?.formateur?.trim() || dir;
   const isCFA = Array.isArray(o.typesActions) && (o.typesActions.includes('apprentissage') || o.typesActions.includes('vae'));
 
-  const box = (titre: string, nom: string) => `
-    <td style="padding:10px;vertical-align:top">
-      <div style="background:#eef3fc;padding:16px 18px;border-radius:10px;text-align:center;border:1px solid #c7d7f5;min-height:70px">
-        <div style="color:#1e3a7b;font-weight:700;font-size:13px;margin-bottom:6px">${titre}</div>
-        <div style="font-size:13px;color:#1a1a1a">${nom}</div>
-      </div>
-    </td>`;
+  // --- Rôles (logique inchangée) -------------------------------------
+  const niveau2: Array<[string, string]> = [
+    ["Référent Pédagogique", refPeda],
+    ["Référent Administratif", refAdmin],
+    ["Référent Qualité", refQualite],
+  ];
+  const niveau3: Array<[string, string]> = [
+    ["Référent Handicap", refHandi],
+    ["Formateur", formateur],
+  ];
+  if (isCFA) niveau3.push(["Relation Entreprise", refPeda]);
+  const niveau4: Array<[string, string]> = isCFA
+    ? [["Référent Mobilité Nationale et Internationale", refPeda]]
+    : [];
 
-  return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
-    <div style="margin:30px 0;text-align:center">
-      <table style="margin:0 auto 28px auto;border-collapse:separate;border-spacing:0;width:360px">
-        <tr>
-          <td style="background:#eef3fc;border:1px solid #c7d7f5;border-radius:10px;padding:18px 22px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-            <div style="display:block;color:#111111 !important;font-weight:800;font-size:16px;line-height:1.25;margin:0 0 8px 0;text-transform:uppercase;font-family:Arial,sans-serif">DIRECTION GÉNÉRALE</div>
-            <div style="display:block;color:#111111 !important;font-weight:600;font-size:14px;line-height:1.25;margin:0;font-family:Arial,sans-serif">${dir}</div>
-          </td>
-        </tr>
-      </table>
-      <table style="margin:0 auto;border-collapse:separate;border-spacing:0">
-        <tr>
-          ${box("Référent Pédagogique", refPeda)}
-          ${box("Référent Administratif", refAdmin)}
-          ${box("Référent Qualité", refQualite)}
-        </tr>
-        <tr>
-          ${box("Référent Handicap", refHandi)}
-          ${box("Formateur", formateur)}
-          ${isCFA ? box("Relation Entreprise", refPeda) : `<td style="padding:10px"></td>`}
-        </tr>
-        ${isCFA ? `<tr>
-          <td style="padding:10px"></td>
-          ${box("Référent Mobilité Nationale et Internationale", refPeda)}
-          <td style="padding:10px"></td>
-        </tr>` : ``}
-      </table>
-    </div>` });
+  // --- Style : couleurs du dossier ------------------------------------
+  const st = getDocStyle();
+  const primary = st.primaryColor || "#1e3a7b";
+  const secondary = st.secondaryColor || primary;
+  const hexToRgb = (hex: string): [number, number, number] => {
+    const h = (hex || "").replace("#", "").trim();
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(full.slice(0, 6) || "1e3a7b", 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const rgba = (hex: string, a: number) => { const [r, g2, b] = hexToRgb(hex); return `rgba(${r},${g2},${b},${a})`; };
+  const EXACT = "-webkit-print-color-adjust:exact;print-color-adjust:exact";
+
+  // --- Variante déterministe (nom + siret + dateMaj) -------------------
+  const seedStr = `${o.nom || ""}|${o.siret || ""}|${o.dateMaj || ""}`;
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+  const variant = seed % 6;
+
+  const initials = (nom: string) =>
+    (nom || "")
+      .replace(/^(M\.|Mme|Mr|Monsieur|Madame)\s+/i, "")
+      .split(/[\s-]+/).filter(Boolean).slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() || "").join("") || "—";
+
+  const rowWrap = (inner: string, gap = "14px") =>
+    `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:${gap};margin:0 0 ${gap} 0;background:transparent">${inner}</div>`;
+
+  // --- Rendu d'une case selon la variante ------------------------------
+  const cell = (titre: string, nom: string, chef = false): string => {
+    const w = chef ? "min-width:300px" : "min-width:190px;max-width:230px";
+    switch (variant) {
+      case 0: // cartes arrondies pleines, teinte primaire
+        return `<div style="${w};flex:0 1 auto;background:${rgba(primary, chef ? 0.16 : 0.08)};border:1px solid ${rgba(primary, 0.35)};border-radius:12px;padding:${chef ? "16px 22px" : "13px 16px"};text-align:center;${EXACT}">
+          <div style="color:${primary};font-weight:700;font-size:${chef ? "15px" : "12.5px"};text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">${titre}</div>
+          <div style="color:#111;font-size:13px;font-weight:600">${nom}</div>
+        </div>`;
+      case 1: // cases blanches bordure fine (arborescence avec filets)
+        return `<div style="${w};flex:0 1 auto;background:#ffffff;border:1px solid ${rgba(primary, 0.5)};border-radius:4px;padding:${chef ? "15px 22px" : "12px 16px"};text-align:center;${EXACT}">
+          <div style="color:${primary};font-weight:700;font-size:${chef ? "14.5px" : "12.5px"};margin-bottom:4px">${titre}</div>
+          <div style="color:#111;font-size:13px">${nom}</div>
+        </div>`;
+      case 2: // barre d'accent à gauche
+        return `<div style="${w};flex:0 1 auto;background:#ffffff;border:1px solid #d8d8d8;border-left:5px solid ${chef ? primary : secondary};border-radius:3px;padding:${chef ? "14px 18px" : "11px 14px"};text-align:left;${EXACT}">
+          <div style="color:${primary};font-weight:700;font-size:${chef ? "14.5px" : "12.5px"};text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">${titre}</div>
+          <div style="color:#111;font-size:13px">${nom}</div>
+        </div>`;
+      case 3: // typographique minimaliste
+        return `<div style="${w};flex:0 1 auto;padding:10px 14px;text-align:center;border-bottom:1px solid ${rgba(primary, 0.35)};background:transparent">
+          <div style="color:${primary};font-weight:700;font-size:${chef ? "13px" : "11px"};text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">${titre}</div>
+          <div style="color:#111;font-size:${chef ? "15px" : "13px"};font-weight:600">${nom}</div>
+        </div>`;
+      case 4: // bandeaux pleine largeur
+        return `<div style="flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;background:${chef ? rgba(primary, 0.14) : "#ffffff"};border:1px solid ${rgba(primary, 0.3)};border-radius:3px;padding:11px 16px;${EXACT}">
+          <span style="color:${primary};font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px">${titre}</span>
+          <span style="color:#111;font-size:13px;font-weight:600">${nom}</span>
+        </div>`;
+      default: // 5 : pastille d'initiales
+        return `<div style="${w};flex:0 1 auto;display:flex;align-items:center;gap:10px;background:#ffffff;border:1px solid ${rgba(primary, 0.35)};border-radius:10px;padding:${chef ? "13px 16px" : "10px 13px"};${EXACT}">
+          <span style="flex:0 0 auto;width:${chef ? "40px" : "34px"};height:${chef ? "40px" : "34px"};border-radius:50%;background:${rgba(primary, 0.15)};border:1px solid ${rgba(primary, 0.4)};color:${primary};font-weight:800;font-size:${chef ? "14px" : "12px"};display:flex;align-items:center;justify-content:center;${EXACT}">${initials(nom)}</span>
+          <span style="text-align:left">
+            <span style="display:block;color:${primary};font-weight:700;font-size:12.5px">${titre}</span>
+            <span style="display:block;color:#111;font-size:13px">${nom}</span>
+          </span>
+        </div>`;
+    }
+  };
+
+  const connector = variant === 1
+    ? `<div style="width:1px;height:18px;background:${rgba(primary, 0.55)};margin:0 auto;${EXACT}"></div>`
+    : `<div style="height:6px"></div>`;
+
+  const bar = variant === 1
+    ? `<div style="height:1px;background:${rgba(primary, 0.35)};max-width:560px;margin:0 auto 14px auto;${EXACT}"></div>`
+    : "";
+
+  const level = (roles: Array<[string, string]>) =>
+    roles.length ? `${connector}${bar}${rowWrap(roles.map(([t, n]) => cell(t, n)).join(""))}` : "";
+
+  const body = `
+    <div style="margin:26px 0;page-break-inside:avoid;background:transparent">
+      ${rowWrap(cell("Direction générale", dir, true), "16px")}
+      ${level(niveau2)}
+      ${level(niveau3)}
+      ${level(niveau4)}
+    </div>`;
+
+  return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: body });
 }
+
 
 function genCharteQualite(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "CHARTE QUALITÉ", sections: [
