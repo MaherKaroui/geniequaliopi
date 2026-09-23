@@ -198,8 +198,15 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
   return { page, content };
 }
 
+/** Mémoïsation (footerHtml + largeur) : la mesure force un reflow coûteux. */
+const footerHeightCache = new Map<string, number>();
+
 function measureFooterHeight(host: HTMLDivElement, footerHtml: string, pageWPx = A4_WIDTH_PX): number {
   if (!footerHtml) return 0;
+
+  const cacheKey = `${pageWPx}|${footerHtml}`;
+  const cached = footerHeightCache.get(cacheKey);
+  if (cached !== undefined) return cached;
 
   const measure = document.createElement("div");
   measure.className = "pdf-root";
@@ -211,7 +218,10 @@ function measureFooterHeight(host: HTMLDivElement, footerHtml: string, pageWPx =
   host.removeChild(measure);
 
   // extra safety buffer to avoid clipping the final footer line in PDFs
-  return Math.max(96, Math.min(220, raw + FOOTER_BUFFER_PX));
+  const value = Math.max(96, Math.min(220, raw + FOOTER_BUFFER_PX));
+  if (footerHeightCache.size > 200) footerHeightCache.clear();
+  footerHeightCache.set(cacheKey, value);
+  return value;
 }
 
 function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
