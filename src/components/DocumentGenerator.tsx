@@ -1179,7 +1179,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return;
       }
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+      const bulkPdfOptions = getActivePdfOptions();
       const zip = new JSZip();
       let processedFiles = 0;
 
@@ -1320,7 +1320,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return;
       }
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+      const bulkPdfOptions = getActivePdfOptions();
       const zip = new JSZip();
       let processedFiles = 0;
 
