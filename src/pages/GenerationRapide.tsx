@@ -4,7 +4,7 @@ import JSZip from "jszip";
 import { toast } from "sonner";
 import {
   Zap, ChevronLeft, ChevronDown, ChevronRight, Plus, Trash2, Upload, Eye, Download,
-  Loader2, Sparkles, CheckCircle2, AlertTriangle, FileText, Building2, GraduationCap, Users, PenTool,
+  Loader2, Sparkles, CheckCircle2, AlertTriangle, FileText, Building2, GraduationCap, Users, PenTool, Palette, RefreshCw,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { supabase } from "@/integrations/supabase/client";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
@@ -27,6 +28,8 @@ import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import SignaturePad from "@/components/SignaturePad";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
+import { setDocStyle } from "@/lib/docBuilder";
 
 import RapideHistory from "@/components/RapideHistory";
 import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
@@ -56,6 +59,37 @@ const emptyStagiaire: StagiaireInfo = {
 };
 
 const FINANCEURS = ["CPF", "OPCO", "Entreprise", "Personnel", "France Travail", "Région", "Autre"];
+
+type PdfQuality = "standard" | "high" | "maximum";
+
+const PDF_QUALITIES: Record<PdfQuality, {
+  label: string;
+  seconds: number;
+  options: { scale: number; imageQuality: number; pageYieldMs: number };
+}> = {
+  standard: { label: "Standard — rapide", seconds: 5, options: { scale: 1.5, imageQuality: 0.9, pageYieldMs: 8 } },
+  high: { label: "Haute — recommandé", seconds: 9, options: { scale: 2, imageQuality: 0.95, pageYieldMs: 8 } },
+  maximum: { label: "Maximale — impression", seconds: 16, options: { scale: 3, imageQuality: 1, pageYieldMs: 12 } },
+};
+
+const AUTO_DESIGNS: Array<{ name: string; style: DocStyleConfig }> = [
+  { name: "Classique marine", style: { ...DEFAULT_DOC_STYLE, theme: "classique", primaryColor: "#17365d", secondaryColor: "#356859", fontFamily: "'Source Sans 3', sans-serif", headingFont: "'Libre Baskerville', serif", headerStyle: "classic", headingStyle: "line-bottom", logoPosition: "center" } },
+  { name: "Élégant bordeaux", style: { ...DEFAULT_DOC_STYLE, theme: "elegant", primaryColor: "#6b2737", secondaryColor: "#6b5d32", fontFamily: "'Lato', sans-serif", headingFont: "'Playfair Display', serif", headerStyle: "elegant", headingStyle: "underline-double", logoPosition: "center" } },
+  { name: "Minimal graphite", style: { ...DEFAULT_DOC_STYLE, theme: "minimaliste", primaryColor: "#202124", secondaryColor: "#4d5b66", fontFamily: "'Outfit', sans-serif", headingFont: "'Outfit', sans-serif", headerStyle: "compact", headingStyle: "plain", logoPosition: "left" } },
+  { name: "Académique forêt", style: { ...DEFAULT_DOC_STYLE, theme: "academique", primaryColor: "#244b3b", secondaryColor: "#705b36", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14, headerStyle: "boxed", headingStyle: "underline-double", logoPosition: "center" } },
+  { name: "Monochrome officiel", style: { ...DEFAULT_DOC_STYLE, theme: "monochrome", primaryColor: "#111111", secondaryColor: "#525252", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif", headerStyle: "split", headingStyle: "line-bottom", logoPosition: "left" } },
+  { name: "Papier premium", style: { ...DEFAULT_DOC_STYLE, theme: "simplepro", primaryColor: "#18324a", secondaryColor: "#806b3f", fontFamily: "'Inter', sans-serif", headingFont: "'Cormorant Garamond', serif", headerStyle: "elegant", headingStyle: "left-bar", logoPosition: "center" } },
+];
+
+const organismeSeed = (o: OrganismeInfo): number => {
+  const seedStr = `${o.nom || ""}|${o.siret || ""}|${o.dateMaj || ""}`;
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+  return seed;
+};
+
+const automaticDesign = (o: OrganismeInfo, offset: number) =>
+  AUTO_DESIGNS[(organismeSeed(o) + offset) % AUTO_DESIGNS.length];
 
 interface PackDoc {
   key: string;
@@ -249,6 +283,18 @@ const GenerationRapide = () => {
   const [zipMode, setZipMode] = useState<"zip" | "files">(
     () => (sessionStorage.getItem("qualiopi_rapide_zip") as "zip" | "files") || "zip",
   );
+  const [pdfQuality, setPdfQuality] = useState<PdfQuality>(() => {
+    const saved = sessionStorage.getItem("qualiopi_rapide_pdf_quality") as PdfQuality | null;
+    return saved && saved in PDF_QUALITIES ? saved : "high";
+  });
+  const [automaticStyle, setAutomaticStyle] = useState(() => sessionStorage.getItem("qualiopi_rapide_style_auto") !== "false");
+  const [designOffset, setDesignOffset] = useState(() => Number(sessionStorage.getItem("qualiopi_rapide_style_offset") || "0") || 0);
+  const [manualStyle, setManualStyle] = useState<DocStyleConfig>(() => {
+    try {
+      const saved = sessionStorage.getItem("qualiopi_rapide_style_manual");
+      return saved ? { ...DEFAULT_DOC_STYLE, ...JSON.parse(saved) } : { ...DEFAULT_DOC_STYLE };
+    } catch { return { ...DEFAULT_DOC_STYLE }; }
+  });
 
   const [aiLoading, setAiLoading] = useState(false);
   const aiTriggered = useRef(false);
@@ -291,6 +337,10 @@ const GenerationRapide = () => {
   useEffect(() => { sessionStorage.setItem("qualiopi_rapide_docs", JSON.stringify(selected)); }, [selected]);
   useEffect(() => { sessionStorage.setItem("qualiopi_rapide_fmt", exportFormat); }, [exportFormat]);
   useEffect(() => { sessionStorage.setItem("qualiopi_rapide_zip", zipMode); }, [zipMode]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_pdf_quality", pdfQuality); }, [pdfQuality]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_style_auto", String(automaticStyle)); }, [automaticStyle]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_style_offset", String(designOffset)); }, [designOffset]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_style_manual", JSON.stringify(manualStyle)); }, [manualStyle]);
 
   /* ---------- Modalité → pré-cochage émargement / connexion ---------- */
   useEffect(() => {
@@ -535,9 +585,13 @@ const GenerationRapide = () => {
   }, [selected, stagiaires]);
 
   const estimationSec = useMemo(
-    () => planned.reduce((sum, p) => sum + (p.doc.key === "cerfa" ? 3 : exportFormat === "pdf" ? 6 : 1), 0),
-    [planned, exportFormat],
+    () => planned.reduce((sum, p) => sum + (p.doc.key === "cerfa" ? 3 : exportFormat === "pdf" ? PDF_QUALITIES[pdfQuality].seconds : 1), 0),
+    [planned, exportFormat, pdfQuality],
   );
+
+  const autoDesign = useMemo(() => automaticDesign(organisme, designOffset), [organisme, designOffset]);
+  const effectiveDocStyle = automaticStyle ? autoDesign.style : manualStyle;
+  const effectiveDesignName = automaticStyle ? autoDesign.name : "Personnalisé";
 
   /* ---------- Contrôles bloquants ---------- */
   const erreurs = useMemo(() => {
@@ -585,6 +639,7 @@ const GenerationRapide = () => {
     setPreviewOpen(true);
     setPreviewLoading(true);
     try {
+      setDocStyle(effectiveDocStyle);
       const safeFormation = buildFormationSafe(formation, organisme, stagiairesValides);
       if (doc.key === "cerfa") {
         const s = stagiaires[stagiaireIdx ?? 0];
@@ -592,7 +647,13 @@ const GenerationRapide = () => {
         setPreviewBlobUrl(URL.createObjectURL(blob));
       } else {
         const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-        setPreviewHtml(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires));
+        const content = generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires);
+        if (exportFormat === "pdf") {
+          const blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options);
+          setPreviewBlobUrl(URL.createObjectURL(blob));
+        } else {
+          setPreviewHtml(content);
+        }
       }
     } catch (e: any) {
       toast.error("Aperçu impossible : " + (e?.message || "erreur inconnue"));
@@ -616,15 +677,17 @@ const GenerationRapide = () => {
       const { saveAs } = await import("file-saver");
       const safeFormation = buildFormationSafe(formation, organisme, stagiairesValides);
       for (const { stagiaire, stagiaireIdx } of cible) {
+        setDocStyle(effectiveDocStyle);
         let blob: Blob;
         let ext: string;
         if (doc.key === "cerfa") {
-          blob = await genCerfaApprentissagePdf(organisme, safeFormation, stagiaire!);
+          if (!stagiaire) throw new Error("Stagiaire manquant pour le CERFA");
+          blob = await genCerfaApprentissagePdf(organisme, safeFormation, stagiaire);
           ext = ".pdf";
         } else {
           const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
           const content = generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires);
-          if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 }); ext = ".pdf"; }
+          if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options); ext = ".pdf"; }
           else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
         }
         saveAs(blob, buildFileNameStatic(doc, stagiaire ?? null, ext, organisme));
@@ -657,6 +720,8 @@ const GenerationRapide = () => {
     const snapPlan = planned.map((p) => ({ ...p }));
     const snapFormat = exportFormat;
     const snapZip = zipMode === "zip";
+    const snapQuality = pdfQuality;
+    const snapStyle = { ...effectiveDocStyle };
     const zipName = buildGenericFileName("PACK_RAPIDE_QUALIOPI", snapOrg.nom, snapOrg.version, snapOrg.dateMaj, ".zip");
 
     runJob({
@@ -668,7 +733,7 @@ const GenerationRapide = () => {
         const zip = new JSZip();
         const rootFolder = `PACK_RAPIDE_${(snapOrg.nom || "ORGANISME").toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_|_$/g, "")}`;
         const failures: { name: string; reason: string }[] = [];
-        const pdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+        const pdfOptions = PDF_QUALITIES[snapQuality].options;
 
         for (let i = 0; i < snapPlan.length; i++) {
           const { doc, stagiaire, stagiaireIdx } = snapPlan[i];
@@ -676,10 +741,12 @@ const GenerationRapide = () => {
           reporter.setProgress(Math.round((i / snapPlan.length) * 92));
           reporter.setMessage(`${i + 1}/${snapPlan.length} — ${doc.label}`);
           try {
+            setDocStyle(snapStyle);
             let blob: Blob;
             let ext: string;
             if (doc.key === "cerfa") {
-              blob = await genCerfaApprentissagePdf(snapOrg, snapForm, stagiaire!);
+              if (!stagiaire) throw new Error("Stagiaire manquant pour le CERFA");
+              blob = await genCerfaApprentissagePdf(snapOrg, snapForm, stagiaire);
               ext = ".pdf";
             } else {
               const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
@@ -1161,6 +1228,38 @@ const GenerationRapide = () => {
           )}
         </Section>
 
+        {/* DESIGN DU DOSSIER */}
+        <Section step="5" icon={<Palette className="w-5 h-5" />} title="Design du dossier" subtitle={`${effectiveDesignName} · ${effectiveDocStyle.theme}`} defaultOpen={false}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border bg-muted/20 p-4">
+            <div className="flex items-center gap-3 flex-1">
+              <Switch checked={automaticStyle} onCheckedChange={setAutomaticStyle} id="automatic-design" />
+              <div>
+                <Label htmlFor="automatic-design" className="font-semibold">Automatique — un design unique par organisme</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">Le même organisme retrouve toujours la même charte.</p>
+              </div>
+            </div>
+            {automaticStyle && (
+              <Button type="button" variant="outline" size="sm" onClick={() => setDesignOffset((value) => value + 1)} className="gap-2 shrink-0">
+                <RefreshCw className="w-4 h-4" /> Autre design
+              </Button>
+            )}
+          </div>
+
+          <div className="rounded-xl border bg-background p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex gap-2 shrink-0">
+              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.primaryColor }} aria-label="Couleur principale" />
+              <span className="w-8 h-8 rounded-full border shadow-sm" style={{ backgroundColor: effectiveDocStyle.secondaryColor }} aria-label="Couleur secondaire" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{effectiveDesignName} <span className="font-normal text-muted-foreground">· thème {effectiveDocStyle.theme}</span></p>
+              <p className="text-sm mt-1" style={{ fontFamily: effectiveDocStyle.headingFont }}>Titres — {effectiveDocStyle.headingFont.split(",")[0].replace(/'/g, "")}</p>
+              <p className="text-xs text-muted-foreground" style={{ fontFamily: effectiveDocStyle.fontFamily }}>Corps du document — {effectiveDocStyle.fontFamily.split(",")[0].replace(/'/g, "")}, {effectiveDocStyle.fontSize}px</p>
+            </div>
+          </div>
+
+          {!automaticStyle && <DocStyleConfigPanel style={manualStyle} onChange={setManualStyle} />}
+        </Section>
+
         {/* CONFORMITÉ / ERREURS */}
         {erreurs.length > 0 ? (
           <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4">
@@ -1201,10 +1300,24 @@ const GenerationRapide = () => {
               </SelectContent>
             </Select>
           </div>
-          <span className="text-xs text-muted-foreground">{planned.length} document(s) · ≈ {estimationSec} s</span>
+          <div className="flex items-center gap-2">
+            <Label className="text-xs">Qualité</Label>
+            <Select value={pdfQuality} onValueChange={(v) => setPdfQuality(v as PdfQuality)} disabled={exportFormat !== "pdf"}>
+              <SelectTrigger className="w-[205px] h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(Object.keys(PDF_QUALITIES) as PdfQuality[]).map((quality) => (
+                  <SelectItem key={quality} value={quality}>{PDF_QUALITIES[quality].label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <span className="text-xs text-muted-foreground">{planned.length} document(s) · ≈ {estimationSec < 60 ? `${estimationSec} s` : `${Math.round(estimationSec / 60)} min`}</span>
           <Button onClick={handleGenerate} className="ml-auto gap-2 bg-gradient-hero border-0 text-primary-foreground">
             <Zap className="w-4 h-4" /> Générer le pack rapide
           </Button>
+          <p className="basis-full text-[11px] text-muted-foreground leading-snug">
+            L'export PDF est une image de la page : la qualité Haute suffit pour un audit, la Maximale pour une impression. Pour un texte sélectionnable et cherchable, choisissez le format Word.
+          </p>
         </div>
       </div>
 
