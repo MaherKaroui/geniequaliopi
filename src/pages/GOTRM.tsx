@@ -53,6 +53,7 @@ import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
+import { withActiveDossierStyle } from "@/lib/dossierDesign";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -227,7 +228,7 @@ const GOTRMPage = () => {
       fileName: fileName(label),
       run: async (r) => {
         r.report(30, "Génération du document…");
-        const blob = await htmlToPdfBlob(html);
+        const blob = await htmlToPdfBlob(withActiveDossierStyle(html));
         r.report(100, "Terminé");
         return blob;
       },
@@ -264,33 +265,33 @@ const GOTRMPage = () => {
           )!;
           folder.file(
             fileName(`Fiche candidat ${c.nom}`),
-            await htmlToPdfBlob(buildFicheCandidat(snapshot, c)),
+            await htmlToPdfBlob(withActiveDossierStyle(buildFicheCandidat(snapshot, c))),
           );
           step(`Fiche candidat — ${c.nom}`);
-          folder.file(fileName(`Convocation ${c.nom}`), await htmlToPdfBlob(buildConvocation(snapshot, c)));
+          folder.file(fileName(`Convocation ${c.nom}`), await htmlToPdfBlob(withActiveDossierStyle(buildConvocation(snapshot, c))));
           step(`Convocation — ${c.nom}`);
           folder.file(
             fileName(`Grille evaluation jury ${c.nom}`),
-            await htmlToPdfBlob(buildGrilleEvaluation(snapshot, c)),
+            await htmlToPdfBlob(withActiveDossierStyle(buildGrilleEvaluation(snapshot, c))),
           );
           step(`Grille jury — ${c.nom}`);
-          folder.file(fileName(`GJ1 Grilles evaluation epreuve ${c.nom}`), await htmlToPdfBlob(genGJ1Gotrm(snapshot, c)));
-          folder.file(fileName(`GJ2 Entretien final ${c.nom}`), await htmlToPdfBlob(genGJ2Gotrm(snapshot, c)));
-          folder.file(fileName(`ECF ${c.nom}`), await htmlToPdfBlob(buildEcf(c)));
-          folder.file(fileName(`Dossier professionnel ${c.nom}`), await htmlToPdfBlob(buildDp(c)));
+          folder.file(fileName(`GJ1 Grilles evaluation epreuve ${c.nom}`), await htmlToPdfBlob(withActiveDossierStyle(genGJ1Gotrm(snapshot, c))));
+          folder.file(fileName(`GJ2 Entretien final ${c.nom}`), await htmlToPdfBlob(withActiveDossierStyle(genGJ2Gotrm(snapshot, c))));
+          folder.file(fileName(`ECF ${c.nom}`), await htmlToPdfBlob(withActiveDossierStyle(buildEcf(c))));
+          folder.file(fileName(`Dossier professionnel ${c.nom}`), await htmlToPdfBlob(withActiveDossierStyle(buildDp(c))));
           if (c.parcours === "Capitalisation de CCP") {
             folder.file(
               fileName(`Livret de certification ${c.nom}`),
-              await htmlToPdfBlob(buildLivretCertification(snapshot, c)),
+              await htmlToPdfBlob(withActiveDossierStyle(buildLivretCertification(snapshot, c))),
             );
           }
         }
 
-        zip.file(fileName("Feuille emargement session"), await htmlToPdfBlob(buildEmargement(snapshot)));
+        zip.file(fileName("Feuille emargement session"), await htmlToPdfBlob(withActiveDossierStyle(buildEmargement(snapshot))));
         step("Émargement");
-        zip.file(fileName("Proces verbal de session"), await htmlToPdfBlob(buildProcesVerbal(snapshot)));
+        zip.file(fileName("Proces verbal de session"), await htmlToPdfBlob(withActiveDossierStyle(buildProcesVerbal(snapshot))));
         step("Procès-verbal");
-        zip.file(fileName("Synthese de session"), await htmlToPdfBlob(buildSyntheseSession(snapshot)));
+        zip.file(fileName("Synthese de session"), await htmlToPdfBlob(withActiveDossierStyle(buildSyntheseSession(snapshot))));
         step("Synthèse");
 
         const blob = await zip.generateAsync({ type: "blob" });

@@ -23,7 +23,7 @@ interface Props {
 export default function DossierOutputSettings({ organisme, scope, manualStyle: controlledManual, onManualStyleChange, onEffectiveStyleChange, compact = false }: Props) {
   const prefix = `dossier_output_${scope}`;
   const [quality, setQuality] = useState<PdfQuality>(() => {
-    const value = sessionStorage.getItem(`${prefix}_quality`) as PdfQuality | null;
+    const value = sessionStorage.getItem("dossier_output_pdf_quality") as PdfQuality | null;
     return value && value in PDF_QUALITY_PRESETS ? value : "high";
   });
   const [automatic, setAutomatic] = useState(() => sessionStorage.getItem(`${prefix}_automatic`) !== "false");
@@ -42,7 +42,7 @@ export default function DossierOutputSettings({ organisme, scope, manualStyle: c
   useEffect(() => { onEffectiveStyleChangeRef.current = onEffectiveStyleChange; }, [onEffectiveStyleChange]);
 
   useEffect(() => {
-    sessionStorage.setItem(`${prefix}_quality`, quality);
+    sessionStorage.setItem("dossier_output_pdf_quality", quality);
     setActivePdfQuality(quality);
   }, [prefix, quality]);
   useEffect(() => { sessionStorage.setItem(`${prefix}_automatic`, String(automatic)); }, [automatic, prefix]);

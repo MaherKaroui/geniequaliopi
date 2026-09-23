@@ -1,5 +1,6 @@
 import type { DocStyleConfig, OrganismeInfo } from "@/types/qualiopi";
 import { DEFAULT_DOC_STYLE } from "@/types/qualiopi";
+import { getDocStyle } from "@/lib/docBuilder";
 
 export const DOSSIER_AUTO_DESIGNS: Array<{ name: string; style: DocStyleConfig }> = [
   { name: "Classique marine", style: { ...DEFAULT_DOC_STYLE, theme: "classique", primaryColor: "#17365d", secondaryColor: "#356859", fontFamily: "'Source Sans 3', sans-serif", headingFont: "'Libre Baskerville', serif", headerStyle: "classic", headingStyle: "line-bottom", logoPosition: "center" } },
@@ -20,4 +21,19 @@ export function organismeDesignSeed(o: Pick<OrganismeInfo, "nom" | "siret" | "da
 export function getAutomaticDossierDesign(o: Pick<OrganismeInfo, "nom" | "siret" | "dateMaj">, offset = 0) {
   const index = ((organismeDesignSeed(o) + offset) % DOSSIER_AUTO_DESIGNS.length + DOSSIER_AUTO_DESIGNS.length) % DOSSIER_AUTO_DESIGNS.length;
   return DOSSIER_AUTO_DESIGNS[index];
+}
+
+/** Adds a final, print-safe style layer without changing a generator's content. */
+export function withActiveDossierStyle(html: string): string {
+  const style = getDocStyle();
+  const css = `<style data-dossier-style>
+    body{font-family:${style.fontFamily};font-size:${style.fontSize}px;color:#111;background:#fff}
+    h1,h2,h3,h4{font-family:${style.headingFont};color:${style.primaryColor}}
+    h2,h3{border-color:${style.secondaryColor}}
+    thead th,table th{border-color:${style.primaryColor}}
+    a{color:${style.primaryColor}}
+    .doc-header,.header{border-color:${style.primaryColor}}
+    .footer{border-color:${style.secondaryColor};color:#222;background:#fff}
+  </style>`;
+  return /<\/head>/i.test(html) ? html.replace(/<\/head>/i, `${css}</head>`) : `${css}${html}`;
 }
