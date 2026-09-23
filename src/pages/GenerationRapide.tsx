@@ -86,9 +86,15 @@ const PACK_DOCS: PackDoc[] = [
   { key: "cerfa", label: "CERFA 10103*14 — contrat d'apprentissage", folder: "10_CERFA", template: "cerfa_apprentissage", perStagiaire: true },
 ];
 
+// rAF coûteux (~16 ms) : une fois tous les 5 documents seulement.
+let yieldTick = 0;
 const yieldToBrowser = (delayMs = 0) =>
   new Promise<void>((resolve) => {
-    requestAnimationFrame(() => { window.setTimeout(resolve, delayMs); });
+    if (++yieldTick % 5 === 0) {
+      requestAnimationFrame(() => { window.setTimeout(resolve, delayMs); });
+    } else {
+      window.setTimeout(resolve, 0);
+    }
   });
 
 const fileToDataUrl = (file: File) =>
