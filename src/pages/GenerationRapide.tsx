@@ -885,7 +885,7 @@ const GenerationRapide = () => {
         {/* BLOC B — FORMATION */}
         <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
           <div className="space-y-1">
-            <Label className="text-xs">Charger une formation d'exemple (remplit uniquement les champs vides)</Label>
+            <Label className="text-xs">Charger une formation d'exemple (remplace le contenu de la formation)</Label>
             <Select value={sampleFormationKey} onValueChange={(v) => { setSampleFormationKey(v); loadSampleFormation(v); }}>
               <SelectTrigger><SelectValue placeholder="Choisir une formation d'exemple…" /></SelectTrigger>
               <SelectContent>
