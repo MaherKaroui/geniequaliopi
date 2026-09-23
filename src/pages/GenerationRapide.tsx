@@ -341,6 +341,7 @@ const GenerationRapide = () => {
     const out: PlannedDoc[] = [];
     for (const doc of PACK_DOCS) {
       if (!selected[doc.key]) continue;
+      if (doc.key === "convention" && !stagiaires.some((s) => s.prenom?.trim() && s.nom?.trim() && conventionPossible(s))) continue;
       if (!doc.perStagiaire) { out.push({ doc, stagiaire: null, stagiaireIdx: null }); continue; }
       stagiaires.forEach((s, i) => {
         if (!s.prenom?.trim() || !s.nom?.trim()) return;
@@ -375,11 +376,6 @@ const GenerationRapide = () => {
 
     if (stagiairesValides.length === 0) e.push("Au moins un stagiaire avec prénom et nom");
 
-    if (selected.convention) {
-      const sansEntreprise = stagiairesValides.filter((s) => !conventionPossible(s));
-      if (sansEntreprise.length === stagiairesValides.length && stagiairesValides.length > 0)
-        e.push("Convention cochée : aucun stagiaire n'a d'entreprise renseignée");
-    }
 
     if (selected.cerfa) {
       stagiairesValides.forEach((s) => {
