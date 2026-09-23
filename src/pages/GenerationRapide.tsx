@@ -615,6 +615,22 @@ const GenerationRapide = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-5 pb-32">
+        {userId && (
+          <DossierHistory
+            key={historyKey}
+            userId={userId}
+            organisme={organisme}
+            formation={formation}
+            stagiaires={stagiaires}
+            onLoad={(org, form, stag) => {
+              setOrganisme(org);
+              setFormation(form);
+              setStagiaires(stag.length > 0 ? stag : [{ ...emptyStagiaire }]);
+              toast.success("Dossier chargé");
+            }}
+          />
+        )}
+
         {/* BLOC A — ORGANISME */}
         <Section step="1" icon={<Building2 className="w-5 h-5" />} title="Organisme de formation" subtitle="Les champs marqués * sont obligatoires" done={orgComplet}>
           <div className="flex flex-col sm:flex-row gap-2">
