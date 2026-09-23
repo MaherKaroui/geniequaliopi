@@ -589,30 +589,28 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation });
     const pxToMm = PAGE_W_MM / PAGE_W_PX;
 
-    for (let i = 0; i < renderPages.length; i++) {
-      if (pageYieldMs > 0) {
-        await yieldToBrowser(pageYieldMs);
-      }
+    const disposeCanvas = (canvas: HTMLCanvasElement) => {
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.width = 1;
+      canvas.height = 1;
+      canvas.width = 0;
+      canvas.height = 0;
+    };
 
-      if (i > 0) pdf.addPage();
-
-      const canvas = await html2canvas(renderPages[i], {
-        scale,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        width: PAGE_W_PX,
-        height: PAGE_H_PX,
-        windowWidth: PAGE_W_PX,
-        windowHeight: PAGE_H_PX,
+    const canvasToJpegBytes = async (canvas: HTMLCanvasElement): Promise<Uint8Array | string> => {
+      const blob: Blob | null = await new Promise((resolve) => {
+        if (typeof canvas.toBlob !== "function") return resolve(null);
+        canvas.toBlob((b) => resolve(b), "image/jpeg", imageQuality);
       });
+      if (!blob) return canvas.toDataURL("image/jpeg", imageQuality);
+      return new Uint8Array(await blob.arrayBuffer());
+    };
 
-      const imgData = canvas.toDataURL("image/jpeg", imageQuality);
-      pdf.addImage(imgData, "JPEG", 0, 0, PAGE_W_MM, PAGE_H_MM);
-
-      // Add clickable link annotations over the rasterized image
-      const anchors = renderPages[i].querySelectorAll("a[href]");
-      const pageRect = renderPages[i].getBoundingClientRect();
+    const addLinksForPage = (page: HTMLDivElement) => {
+      const anchors = page.querySelectorAll("a[href]");
+      if (!anchors.length) return;
+      const pageRect = page.getBoundingClientRect();
       anchors.forEach((anchor) => {
         const href = anchor.getAttribute("href");
         if (!href || !href.startsWith("http")) return;
@@ -625,18 +623,100 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           pdf.link(x, y, w, h, { url: href });
         }
       });
+    };
 
-      // Aggressive canvas cleanup to free GPU/CPU memory
-      const ctx = canvas.getContext("2d");
-      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.width = 1;
-      canvas.height = 1;
-      canvas.width = 0;
-      canvas.height = 0;
+    let pageIndex = 0;
+    const addPageFromCanvas = async (canvas: HTMLCanvasElement, page: HTMLDivElement) => {
+      if (pageIndex > 0) pdf.addPage();
+      const data = await canvasToJpegBytes(canvas);
+      pdf.addImage(data as unknown as string, "JPEG", 0, 0, PAGE_W_MM, PAGE_H_MM);
+      addLinksForPage(page);
+      pageIndex++;
+    };
 
-      // Remove rendered page from DOM immediately to free memory
-      if (renderPages[i].parentNode) {
-        renderPages[i].parentNode.removeChild(renderPages[i]);
+    /** Rendu page par page (chemin de secours, comportement historique). */
+    const renderPageByPage = async (batch: HTMLDivElement[]) => {
+      for (const page of batch) {
+        const canvas = await html2canvas(page, {
+          scale,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+          width: PAGE_W_PX,
+          height: PAGE_H_PX,
+          windowWidth: PAGE_W_PX,
+          windowHeight: PAGE_H_PX,
+        });
+        await addPageFromCanvas(canvas, page);
+        disposeCanvas(canvas);
+      }
+    };
+
+    // Un seul appel html2canvas par lot de pages : le coût fixe (clonage du
+    // document + reparse CSS) n'est plus payé une fois par page.
+    const batchSize = Math.max(1, Math.floor(16000 / (PAGE_H_PX * scale)));
+
+    for (let start = 0; start < renderPages.length; start += batchSize) {
+      const batch = renderPages.slice(start, start + batchSize);
+
+      if (pageYieldMs > 0 && start > 0) {
+        await new Promise<void>((r) => setTimeout(r, 0));
+      }
+
+      if (batch.length === 1) {
+        await renderPageByPage(batch);
+      } else {
+        const strip = document.createElement("div");
+        strip.style.cssText = `position:relative;width:${PAGE_W_PX}px;height:${PAGE_H_PX * batch.length}px;background:#fff;`;
+        host.appendChild(strip);
+        for (const page of batch) strip.appendChild(page);
+
+        let stripCanvas: HTMLCanvasElement | null = null;
+        try {
+          stripCanvas = await html2canvas(strip, {
+            scale,
+            useCORS: true,
+            logging: false,
+            backgroundColor: "#ffffff",
+            width: PAGE_W_PX,
+            height: PAGE_H_PX * batch.length,
+            windowWidth: PAGE_W_PX,
+            windowHeight: PAGE_H_PX * batch.length,
+          });
+        } catch (err) {
+          console.warn("[pdfExport] rendu par lot impossible, repli page par page", err);
+          stripCanvas = null;
+        }
+
+        if (stripCanvas) {
+          const sliceW = Math.round(PAGE_W_PX * scale);
+          const sliceH = Math.round(PAGE_H_PX * scale);
+          try {
+            for (let i = 0; i < batch.length; i++) {
+              const slice = document.createElement("canvas");
+              slice.width = sliceW;
+              slice.height = sliceH;
+              const sctx = slice.getContext("2d");
+              if (!sctx) throw new Error("2d context indisponible");
+              sctx.fillStyle = "#ffffff";
+              sctx.fillRect(0, 0, sliceW, sliceH);
+              sctx.drawImage(stripCanvas, 0, i * sliceH, sliceW, sliceH, 0, 0, sliceW, sliceH);
+              await addPageFromCanvas(slice, batch[i]);
+              disposeCanvas(slice);
+              if ((i + 1) % 4 === 0) await new Promise<void>((r) => setTimeout(r, 0));
+            }
+          } finally {
+            disposeCanvas(stripCanvas);
+          }
+        } else {
+          await renderPageByPage(batch);
+        }
+
+        if (strip.parentNode) strip.parentNode.removeChild(strip);
+      }
+
+      for (const page of batch) {
+        if (page.parentNode) page.parentNode.removeChild(page);
       }
     }
 
