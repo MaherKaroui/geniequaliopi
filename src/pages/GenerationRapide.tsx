@@ -738,28 +738,42 @@ const GenerationRapide = () => {
         </Section>
 
         {/* DOCUMENTS DU PACK */}
-        <Section icon={<FileText className="w-5 h-5" />} title="Documents du pack" subtitle={`${planned.length} document(s) · estimation ≈ ${estimationSec} s`}>
-          <div className="space-y-2">
-            {PACK_DOCS.map((doc) => {
+        <Section step="4" icon={<FileText className="w-5 h-5" />} title="Documents du pack" subtitle={`${planned.length} document(s) · estimation ≈ ${estimationSec < 60 ? `${estimationSec} s` : `${Math.round(estimationSec / 60)} min`}`} done={erreurs.length === 0}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {PACK_DOCS.map((doc, docIdx) => {
               const conventionGrisee = doc.key === "convention" && stagiairesValides.length > 0 && stagiairesValides.every((s) => !conventionPossible(s));
               const count = planned.filter((p) => p.doc.key === doc.key).length;
               const firstIdx = planned.find((p) => p.doc.key === doc.key)?.stagiaireIdx ?? null;
+              const actif = !!selected[doc.key] && !conventionGrisee;
               return (
-                <div key={doc.key} className={`flex items-center gap-3 p-3 rounded-lg border ${conventionGrisee ? "opacity-60" : ""}`}>
+                <div
+                  key={doc.key}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                    conventionGrisee ? "opacity-60" : actif ? "border-primary/40 bg-primary/5" : "hover:bg-muted/30"
+                  }`}
+                >
+                  <span
+                    className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-[11px] font-bold ${
+                      actif ? "bg-gradient-hero text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {docIdx + 1}
+                  </span>
                   <Checkbox
                     checked={!!selected[doc.key]}
                     disabled={conventionGrisee}
                     onCheckedChange={(v) => setSelected((p) => ({ ...p, [doc.key]: v === true }))}
+                    className="shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{doc.label}</p>
                     <p className="text-xs text-muted-foreground">
                       {conventionGrisee
                         ? "Sans entreprise, il s'agit d'un contrat bilatéral et non d'une convention."
-                        : doc.perStagiaire ? `1 par stagiaire${selected[doc.key] ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
+                        : doc.perStagiaire ? `1 par stagiaire${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => openPreview(doc, doc.perStagiaire ? firstIdx ?? 0 : null)} title="Aperçu">
+                  <Button variant="ghost" size="sm" onClick={() => openPreview(doc, doc.perStagiaire ? firstIdx ?? 0 : null)} title="Aperçu" aria-label={`Aperçu : ${doc.label}`}>
                     <Eye className="w-4 h-4" />
                   </Button>
                 </div>
