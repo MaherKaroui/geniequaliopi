@@ -167,6 +167,42 @@ export type Database = {
         }
         Relationships: []
       }
+      rapide_generations: {
+        Row: {
+          created_at: string
+          formation: Json | null
+          id: string
+          name: string
+          nb_documents: number | null
+          organisme: Json | null
+          stagiaires: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          formation?: Json | null
+          id?: string
+          name: string
+          nb_documents?: number | null
+          organisme?: Json | null
+          stagiaires?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          formation?: Json | null
+          id?: string
+          name?: string
+          nb_documents?: number | null
+          organisme?: Json | null
+          stagiaires?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_dossiers: {
         Row: {
           archived: boolean
