@@ -28,7 +28,7 @@ import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import SignaturePad from "@/components/SignaturePad";
 
-import DossierHistory from "@/components/DossierHistory";
+import RapideHistory from "@/components/RapideHistory";
 import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
@@ -726,23 +726,28 @@ const GenerationRapide = () => {
     if (!userId) return;
     const name = `${o.nom} – ${f.intitule || "Sans formation"}`;
     try {
+      const payload = {
+        organisme: o as any,
+        formation: f as any,
+        stagiaires: st as any,
+        nb_documents: planned.length,
+      };
       const { data: existing } = await supabase
-        .from("saved_dossiers")
+        .from("rapide_generations")
         .select("id")
         .eq("user_id", userId)
         .eq("name", name)
         .limit(1);
-      const payload = { organisme: o as any, formation: f as any, stagiaires: st as any };
       if (existing && existing.length > 0) {
         await supabase
-          .from("saved_dossiers")
+          .from("rapide_generations")
           .update({ ...payload, updated_at: new Date().toISOString() })
           .eq("id", (existing[0] as any).id);
       } else {
-        await supabase.from("saved_dossiers").insert({ user_id: userId, name, ...payload });
+        await supabase.from("rapide_generations").insert({ user_id: userId, name, ...payload });
       }
       setHistoryKey((k) => k + 1);
-      toast.success("Dossier enregistré dans l'historique");
+      toast.success("Génération enregistrée dans l'historique rapide");
     } catch (e) {
       console.error("[HISTORIQUE RAPIDE]", e);
     }
