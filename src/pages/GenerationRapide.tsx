@@ -277,10 +277,8 @@ const GenerationRapide = () => {
       }
       return [...list, fictif];
     });
-    toast({
-      title: "Stagiaire fictif généré",
-      description: "Les dates et le tarif individuels restent vides : ils héritent de ceux de la formation.",
-    });
+    toast.success("Stagiaire fictif généré — les dates et le tarif individuels restent vides : ils héritent de ceux de la formation.");
+
   };
 
 
