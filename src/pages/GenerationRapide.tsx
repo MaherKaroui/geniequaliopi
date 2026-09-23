@@ -193,6 +193,9 @@ const GenerationRapide = () => {
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_org", JSON.stringify(organisme)); }, [organisme, loaded]);
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_form", JSON.stringify(formation)); }, [formation, loaded]);
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_stag", JSON.stringify(stagiaires)); }, [stagiaires, loaded]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_docs", JSON.stringify(selected)); }, [selected]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_fmt", exportFormat); }, [exportFormat]);
+  useEffect(() => { sessionStorage.setItem("qualiopi_rapide_zip", zipMode); }, [zipMode]);
 
   /* ---------- Modalité → pré-cochage émargement / connexion ---------- */
   useEffect(() => {
