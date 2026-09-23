@@ -155,6 +155,62 @@ const Field = ({ label, required, ...props }: { label: string; required?: boolea
   </div>
 );
 
+const SignatureField = ({
+  label, value, padKey, openPad, setOpenPad, onChange,
+}: {
+  label: string; value: string; padKey: string;
+  openPad: string | null; setOpenPad: (k: string | null) => void;
+  onChange: (url: string) => void;
+}) => {
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const handleFile = (f?: File) => {
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => onChange(reader.result as string);
+    reader.readAsDataURL(f);
+  };
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Label className="text-xs font-semibold">{label}</Label>
+        {value ? (
+          <div className="relative group">
+            <img src={value} alt={label} className="h-10 w-auto max-w-[120px] object-contain rounded border bg-background p-0.5" />
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Trash2 className="w-2.5 h-2.5" />
+            </button>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">Aucune</span>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+        <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => fileRef.current?.click()}>
+          {value ? "Changer" : "Charger"}
+        </Button>
+        <Button
+          type="button" variant="outline" size="sm" className="h-7 text-xs gap-1"
+          onClick={() => setOpenPad(openPad === padKey ? null : padKey)}
+        >
+          <PenTool className="w-3 h-3" /> Dessiner
+        </Button>
+      </div>
+      {openPad === padKey && (
+        <SignaturePad
+          label={`✍️ ${label}`}
+          onSave={(dataUrl) => { onChange(dataUrl); setOpenPad(null); }}
+          onCancel={() => setOpenPad(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+
+
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
