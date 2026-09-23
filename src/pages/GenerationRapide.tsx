@@ -24,7 +24,7 @@ import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { buildDocumentFileName, buildGenericFileName, buildStagiaireFolderName } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { parseEdofXlsx } from "@/lib/edofParser";
-import { extractMultipleStagiairesFromFile } from "@/lib/stagiaireFileExtractor";
+import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 
 /* ------------------------------------------------------------------ */
@@ -261,7 +261,7 @@ const GenerationRapide = () => {
       for (const file of Array.from(files)) {
         const { stagiaires: extraits, entreprise } = await extractMultipleStagiairesFromFile(file);
         for (const ex of extraits) {
-          ajouts.push({ ...emptyStagiaire, ...ex, entreprise: ex.entreprise || entreprise || "" } as StagiaireInfo);
+          ajouts.push(extractionToStagiaire(ex, { ...emptyStagiaire, entreprise: entreprise || "" }));
         }
       }
       if (ajouts.length === 0) { toast.error("Aucun stagiaire détecté dans ce document"); return; }
@@ -452,7 +452,8 @@ const GenerationRapide = () => {
         for (let i = 0; i < snapPlan.length; i++) {
           const { doc, stagiaire, stagiaireIdx } = snapPlan[i];
           const label = stagiaire ? `${doc.label} — ${stagiaire.prenom} ${stagiaire.nom}` : doc.label;
-          reporter.report(Math.round((i / snapPlan.length) * 92), `${i + 1}/${snapPlan.length} — ${doc.label}`);
+          reporter.setProgress(Math.round((i / snapPlan.length) * 92));
+          reporter.setMessage(`${i + 1}/${snapPlan.length} — ${doc.label}`);
           try {
             let blob: Blob;
             let ext: string;
@@ -489,7 +490,7 @@ const GenerationRapide = () => {
           toast.warning(`${failures.length} document(s) en échec.`);
         }
 
-        if (!snapZip) { reporter.report(100, "Terminé"); return; }
+        if (!snapZip) { reporter.setProgress(100); reporter.setMessage("Terminé"); return; }
         reporter.setMessage("Compression du ZIP…");
         const blob = await zip.generateAsync({ type: "blob" }, (meta) => reporter.setProgress(92 + meta.percent * 0.08));
         return blob;
