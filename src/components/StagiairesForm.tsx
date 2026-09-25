@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
-import { StagiaireInfo } from "@/types/qualiopi";
+import { StagiaireInfo, FormationInfo } from "@/types/qualiopi";
+import ReferentielGenerator from "@/components/ReferentielGenerator";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,8 @@ const FORMATEURS_PREDIFINIS = [
 interface StagiairesFormProps {
   data: StagiaireInfo[];
   onChange: (data: StagiaireInfo[]) => void;
+  formation?: FormationInfo;
+  onFormationChange?: (f: FormationInfo) => void;
 }
 
 const emptyStagiaire: StagiaireInfo = {
@@ -41,7 +45,7 @@ const emptyStagiaire: StagiaireInfo = {
   adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "", dateNaissanceResponsable: "", emailResponsable: "",
 };
 
-const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
+const StagiairesForm = ({ data, onChange, formation, onFormationChange }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -55,11 +59,16 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const [importingConvoc, setImportingConvoc] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const generateFakes = (replace: boolean) => {
-    const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
-    const fakes = generateFakeStagiairesIDF({ count: n, region: fakeRegion });
+    const n = Math.max(1, Math.min(300, Math.floor(fakeCount) || 1));
+    const fakes = generateFakeStagiairesIDF({ count: n, region: fakeRegion }).map(f => ({ ...f, fictif: true }));
     onChange(replace ? fakes : [...data, ...fakes]);
     const regionLabel = fakeRegion === "all" ? "France entière" : REGIONS[fakeRegion].label;
     toast.success(`${n} stagiaire(s) fictif(s) généré(s) – ${regionLabel}`);
+  };
+  const nbFictifs = data.filter(s => s.fictif).length;
+  const removeFictifs = () => {
+    onChange(data.filter(s => !s.fictif));
+    toast.success(`${nbFictifs} stagiaire(s) fictif(s) supprimé(s)`);
   };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
@@ -206,7 +215,12 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
         <div>
           <h2 className="text-xl font-bold">Stagiaires</h2>
-          <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
+          <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s) · {data.length - nbFictifs} réel(s) / {nbFictifs} fictif(s)</p>
+          {nbFictifs > 0 && (
+            <Button variant="ghost" size="sm" onClick={removeFictifs} className="h-7 px-2 text-xs text-destructive hover:text-destructive">
+              Supprimer tous les fictifs
+            </Button>
+          )}
         </div>
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col">
@@ -225,7 +239,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           <div className="flex flex-col">
             <Label className="text-xs">Nb fictifs</Label>
             <Input
-              type="number" min={1} max={100}
+              type="number" min={1} max={300}
               value={fakeCount}
               onChange={e => setFakeCount(parseInt(e.target.value) || 1)}
               className="h-9 w-20"
@@ -280,6 +294,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
         </div>
       </div>
 
+      <ReferentielGenerator
+        formation={formation}
+        onFormationChange={onFormationChange}
+        count={fakeCount}
+        region={fakeRegion}
+        onGenerate={(list, replace) => onChange(replace ? list : [...data, ...list])}
+      />
+
       {data.length === 0 && (
         <div className="text-center py-12 bg-secondary/50 rounded-xl border border-dashed border-border">
           <p className="text-muted-foreground">Aucun stagiaire ajouté</p>
@@ -292,7 +314,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
       {data.map((stagiaire, index) => (
         <div key={index} className="p-4 bg-card rounded-xl border shadow-card space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-primary">Stagiaire {index + 1}</span>
+            <span className="text-sm font-semibold text-primary flex items-center gap-2">Stagiaire {index + 1}{stagiaire.fictif && <Badge variant="secondary" className="text-[10px]">Fictif</Badge>}</span>
             <Button variant="ghost" size="sm" onClick={() => removeStagiaire(index)} className="text-destructive hover:text-destructive text-xs">
               Supprimer
             </Button>
