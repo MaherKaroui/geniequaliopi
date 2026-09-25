@@ -181,14 +181,18 @@ const GOTRMPage = () => {
   });
 
   const replaceFromGenerated = (generated: StagiaireInfo[]) => {
-    setCandidats(generated.map((s, index) => ({
-      ...newCandidat(index, dateDebut),
-      civilite: s.civilite || "M.",
-      nom: s.nom,
-      prenom: s.prenom,
-      dateNaissance: s.dateNaissance,
-      fictif: true,
-    })));
+    setCandidats((current) => generated.map((s, index) => {
+      const existing = current.find((candidate) => candidate.nom === s.nom && candidate.prenom === s.prenom && candidate.dateNaissance === s.dateNaissance);
+      if (existing) return { ...existing, ordrePassage: index + 1 };
+      return {
+        ...newCandidat(index, dateDebut),
+        civilite: s.civilite || "M.",
+        nom: s.nom,
+        prenom: s.prenom,
+        dateNaissance: s.dateNaissance,
+        fictif: true,
+      };
+    }));
   };
 
   const buildEcf = (c: GotrmCandidat) => genECFGotrm(organisme, formation, [toStagiaire(c)], 0);
@@ -381,13 +385,6 @@ const GOTRMPage = () => {
             </div>
           </div>
 
-          <FakeStagiairesToolbar
-            value={candidats.map(toStagiaire)}
-            onChange={replaceFromGenerated}
-            formation={formation}
-            compact
-          />
-
           <div className="grid md:grid-cols-2 gap-6 pt-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -453,6 +450,13 @@ const GOTRMPage = () => {
               </label>
             </div>
           </div>
+
+          <FakeStagiairesToolbar
+            value={candidats.map(toStagiaire)}
+            onChange={replaceFromGenerated}
+            formation={formation}
+            compact
+          />
 
           {conflits.length > 0 && (
             <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
