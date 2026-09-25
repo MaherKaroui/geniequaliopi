@@ -1,25 +1,20 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import mammoth from "mammoth";
-import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { FormationInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, BookOpen, FileUp, Link2, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { AlertTriangle, BookOpen, FileUp, Link2, Loader2, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { RegionKey } from "@/lib/fakeStagiaireRegions";
 import {
-  generateStagiairesFromReferentiel, isApprentissage, isReferentielInactif,
-  referentielFromFormation, type ReferentielAnalyse,
+  isReferentielInactif, type ReferentielAnalyse,
 } from "@/lib/fakeStagiaireReferentiel";
 
 interface Props {
-  formation?: FormationInfo;
-  onFormationChange?: (f: FormationInfo) => void;
-  count: number;
-  region: RegionKey | "all";
-  onGenerate: (stagiaires: StagiaireInfo[], replace: boolean) => void;
+  formation: FormationInfo;
+  onFormationChange: (f: FormationInfo) => void;
 }
 
 const readDataUrl = (file: File) => new Promise<string>((res, rej) => {
@@ -31,12 +26,17 @@ async function invokeErr(error: any): Promise<string> {
   return error?.message || "Erreur inconnue";
 }
 
-const ReferentielGenerator = ({ formation, onFormationChange, count, region, onGenerate }: Props) => {
+const ReferentielGenerator = ({ formation, onFormationChange }: Props) => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [ref, setRef] = useState<ReferentielAnalyse | null>(null);
-  const [source, setSource] = useState<string>("");
+  const [ref, setRef] = useState<ReferentielAnalyse | null>(formation.referentiel ?? null);
+  const [source, setSource] = useState<string>(formation.referentiel ? "Fiche enregistrée avec la formation" : "");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setRef(formation.referentiel ?? null);
+    if (formation.referentiel) setSource("Fiche enregistrée avec la formation");
+  }, [formation.referentiel]);
 
   const analyse = async (body: Record<string, unknown>, label: string) => {
     setLoading(true);
@@ -45,8 +45,10 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
       const { data, error } = await supabase.functions.invoke("analyse-referentiel", { body });
       if (error) throw new Error(await invokeErr(error));
       if (data?.error) throw new Error(data.error);
-      setRef(data as ReferentielAnalyse);
+      const analysed = data as ReferentielAnalyse;
+      setRef(analysed);
       setSource(label);
+      onFormationChange({ ...formation, referentiel: analysed });
       toast.success("Référentiel analysé", { id: t });
     } catch (e: any) {
       toast.error(e.message || "Analyse impossible", { id: t, duration: 8000 });
@@ -64,13 +66,8 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const useFormation = () => {
-    if (!formation?.intitule) { toast.error("Renseignez d'abord l'intitulé à l'étape Formation."); return; }
-    setRef(referentielFromFormation(formation)); setSource("Données de l'étape Formation");
-  };
-
   const applyToFormation = () => {
-    if (!ref || !formation || !onFormationChange) return;
+    if (!ref) return;
     const next = { ...formation };
     const filled: string[] = [];
     const set = (k: keyof FormationInfo, v: string, label: string) => {
@@ -81,17 +78,10 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
     set("publicVise", ref.publicVise, "public visé");
     set("methodesEvaluation", ref.modalitesEvaluation, "méthodes d'évaluation");
     set("codeRNCP", ref.code, "code RNCP/RS");
-    if (!filled.length) { toast.info("Aucun champ vide à compléter : vos saisies sont conservées."); return; }
+    next.referentiel = ref;
+    if (!filled.length) { onFormationChange(next); toast.info("Aucun champ vide à compléter : vos saisies sont conservées."); return; }
     onFormationChange(next);
     toast.success(`Formation complétée : ${filled.join(", ")}`);
-  };
-
-  const generate = (replace: boolean) => {
-    if (!ref) return;
-    const n = Math.max(1, Math.min(300, Math.floor(count) || 1));
-    const f = formation ?? ({} as FormationInfo);
-    onGenerate(generateStagiairesFromReferentiel({ count: n, region, referentiel: ref, formation: f }), replace);
-    toast.success(`${n} stagiaire(s) fictif(s) cohérent(s) avec le référentiel`);
   };
 
   const inactif = ref ? isReferentielInactif(ref) : false;
@@ -100,8 +90,7 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
     <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
       <div className="flex items-center gap-2">
         <BookOpen className="w-4 h-4 text-primary" />
-        <h3 className="font-semibold text-sm">Générer depuis le référentiel</h3>
-        {formation && isApprentissage(formation) && <Badge variant="secondary">Apprentissage (16-29 ans)</Badge>}
+        <h3 className="font-semibold text-sm">Référentiel France Compétences</h3>
       </div>
       <div className="flex flex-col md:flex-row gap-2">
         <div className="flex-1">
@@ -115,9 +104,6 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
           <input ref={fileRef} type="file" accept=".pdf,.docx,application/pdf" className="hidden" onChange={e => onFile(e.target.files?.[0])} />
           <Button size="sm" variant="outline" className="h-9 gap-1" disabled={loading} onClick={() => fileRef.current?.click()}>
             <FileUp className="w-4 h-4" /> PDF / DOCX
-          </Button>
-          <Button size="sm" variant="ghost" className="h-9 gap-1" disabled={loading} onClick={useFormation}>
-            Utiliser l'étape Formation
           </Button>
         </div>
       </div>
@@ -152,13 +138,9 @@ const ReferentielGenerator = ({ formation, onFormationChange, count, region, onG
           {ref.publicVise && <p className="text-xs"><strong>Public visé :</strong> {ref.publicVise}</p>}
           {ref.modalitesEvaluation && <p className="text-xs"><strong>Évaluation :</strong> {ref.modalitesEvaluation}</p>}
           <div className="flex flex-wrap gap-2 pt-1">
-            {onFormationChange && formation && (
-              <Button size="sm" variant="outline" className="gap-1" onClick={applyToFormation}>
-                <Wand2 className="w-4 h-4" /> Appliquer à la formation
-              </Button>
-            )}
-            <Button size="sm" className="gap-1" onClick={() => generate(false)}><Sparkles className="w-4 h-4" /> Générer {count} (ajouter)</Button>
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => generate(true)}><Sparkles className="w-4 h-4" /> Générer (remplacer)</Button>
+            <Button size="sm" variant="outline" className="gap-1" onClick={applyToFormation}>
+              <Wand2 className="w-4 h-4" /> Appliquer à la formation
+            </Button>
           </div>
         </div>
       )}

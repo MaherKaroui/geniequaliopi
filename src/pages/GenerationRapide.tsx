@@ -34,7 +34,9 @@ import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { PDF_QUALITY_PRESETS, type PdfQuality } from "@/lib/pdfExport";
 
 import RapideHistory from "@/components/RapideHistory";
-import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
+import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -338,38 +340,6 @@ const GenerationRapide = () => {
   const setForm = (patch: Partial<FormationInfo>) => setFormation((f) => ({ ...f, ...patch }));
   const setStag = (idx: number, patch: Partial<StagiaireInfo>) =>
     setStagiaires((list) => list.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
-
-  /* ---------- Stagiaire fictif ---------- */
-  const genererStagiaireFictif = () => {
-    setStagiaires((list) => {
-      const noms = new Set(
-        list.filter((s) => s.prenom?.trim() && s.nom?.trim()).map((s) => `${s.prenom} ${s.nom}`.toLowerCase())
-      );
-      const dispo = SAMPLE_STAGIAIRES.filter((s) => !noms.has(`${s.prenom} ${s.nom}`.toLowerCase()));
-      const pool = dispo.length > 0 ? dispo : SAMPLE_STAGIAIRES;
-      const base = pool[list.length % pool.length];
-      const fictif: StagiaireInfo = {
-        ...emptyStagiaire,
-        civilite: base.civilite,
-        nom: base.nom,
-        prenom: base.prenom,
-        email: base.email,
-        telephone: base.telephone,
-        entreprise: base.entreprise,
-        poste: base.poste,
-        dateNaissance: base.dateNaissance,
-        financeur: base.entreprise ? "Entreprise" : "Personnel",
-      };
-      const last = list[list.length - 1];
-      if (last && !last.prenom?.trim() && !last.nom?.trim() && !last.email?.trim()) {
-        return [...list.slice(0, -1), fictif];
-      }
-      return [...list, fictif];
-    });
-    toast.success("Stagiaire fictif généré — les dates et le tarif individuels restent vides : ils héritent de ceux de la formation.");
-
-  };
-
 
   /* ---------- Formation d'exemple ---------- */
   const loadSampleFormation = (idxStr: string) => {
@@ -970,6 +940,7 @@ const GenerationRapide = () => {
 
         {/* BLOC C — STAGIAIRES */}
         <Section step="3" icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation" done={stagComplet}>
+          <FakeStagiairesToolbar value={stagiaires} onChange={setStagiaires} formation={formation} compact />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input ref={docFileRef} type="file" accept=".pdf,.docx,.xlsx,.xls" multiple className="hidden" onChange={(e) => importDocument(e.target.files)} />
             <button
@@ -1012,6 +983,7 @@ const GenerationRapide = () => {
                       {(s.prenom?.trim()?.[0] || (i + 1).toString()).toUpperCase()}
                     </span>
                     Stagiaire {i + 1}{s.prenom?.trim() && s.nom?.trim() ? ` — ${s.prenom} ${s.nom}` : ""}
+                    {s.fictif && <Badge variant="secondary" className="text-[10px]">Fictif</Badge>}
                   </span>
                   <Button variant="ghost" size="sm" onClick={() => setStagiaires((l) => l.filter((_, j) => j !== i))} disabled={stagiaires.length === 1}>
                     <Trash2 className="w-4 h-4 text-destructive" />
@@ -1102,20 +1074,13 @@ const GenerationRapide = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
             <button
               type="button"
               onClick={() => setStagiaires((l) => [...l, { ...emptyStagiaire }])}
               className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-muted-foreground/30 text-sm font-medium text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-colors"
             >
               <Plus className="w-4 h-4" /> Ajouter un stagiaire
-            </button>
-            <button
-              type="button"
-              onClick={genererStagiaireFictif}
-              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border border-dashed border-primary/40 text-sm font-medium text-primary/80 hover:text-primary hover:bg-primary/5 transition-colors"
-            >
-              <Sparkles className="w-4 h-4" /> Générer un stagiaire fictif
             </button>
           </div>
 

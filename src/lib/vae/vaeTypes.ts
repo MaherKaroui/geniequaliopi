@@ -64,6 +64,7 @@ export interface VAECandidat {
   competences?: string[];
   signature?: string; // data URL
   tampon?: string;    // data URL
+  fictif?: boolean;
 }
 
 export interface VAESession {

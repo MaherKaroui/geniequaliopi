@@ -54,6 +54,8 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { withActiveDossierStyle } from "@/lib/dossierDesign";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -175,7 +177,23 @@ const GOTRMPage = () => {
     dateDebutFormation: c.msp1Date || dateDebut,
     dateFinFormation: c.msp2Date || dateFin,
     commune: organisme.ville,
+    fictif: c.fictif,
   });
+
+  const replaceFromGenerated = (generated: StagiaireInfo[]) => {
+    setCandidats((current) => generated.map((s, index) => {
+      const existing = current.find((candidate) => candidate.nom === s.nom && candidate.prenom === s.prenom && candidate.dateNaissance === s.dateNaissance);
+      if (existing) return { ...existing, ordrePassage: index + 1 };
+      return {
+        ...newCandidat(index, dateDebut),
+        civilite: s.civilite || "M.",
+        nom: s.nom,
+        prenom: s.prenom,
+        dateNaissance: s.dateNaissance,
+        fictif: true,
+      };
+    }));
+  };
 
   const buildEcf = (c: GotrmCandidat) => genECFGotrm(organisme, formation, [toStagiaire(c)], 0);
   const buildDp = (c: GotrmCandidat) => genDPGotrm(organisme, formation, [toStagiaire(c)], 0);
@@ -433,6 +451,13 @@ const GOTRMPage = () => {
             </div>
           </div>
 
+          <FakeStagiairesToolbar
+            value={candidats.map(toStagiaire)}
+            onChange={replaceFromGenerated}
+            formation={formation}
+            compact
+          />
+
           {conflits.length > 0 && (
             <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               Les deux parties de la MSP ne peuvent pas être planifiées le même jour :{" "}
@@ -450,6 +475,7 @@ const GOTRMPage = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
                     N° {c.ordrePassage} — {gotrmCandidatNomComplet(c) || "Nouveau candidat"} · {c.identifiant}
+                    {c.fictif && <Badge variant="secondary" className="ml-2 text-[10px]">Fictif</Badge>}
                   </span>
                   <Button variant="ghost" size="icon" onClick={() => setCandidats((p) => p.filter((x) => x.id !== c.id))}>
                     <Trash2 className="w-4 h-4" />

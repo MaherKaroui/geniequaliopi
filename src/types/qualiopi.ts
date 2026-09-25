@@ -102,6 +102,23 @@ export interface StagiaireInfo {
   fictif?: boolean;
 }
 
+export interface ReferentielAnalyse {
+  code: string;
+  type: "RNCP" | "RS" | "";
+  intitule: string;
+  niveau: number | null;
+  certificateur: string;
+  dateFinEnregistrement: string;
+  actif: boolean | null;
+  blocs: { code: string; intitule: string }[];
+  prerequis: string;
+  publicVise: string;
+  codesRome: string[];
+  metiers: string[];
+  secteurs: string[];
+  modalitesEvaluation: string;
+}
+
 export interface FormationInfo {
   intitule: string;
   objectifs: string;
@@ -131,6 +148,8 @@ export interface FormationInfo {
   nbPresentesCertification?: string;
   nbAdmisCertification?: string;
   commentaireIndicateurs?: string;
+  /** Fiche France Compétences analysée, conservée avec le dossier. */
+  referentiel?: ReferentielAnalyse;
 }
 
 export interface IndicateurData {

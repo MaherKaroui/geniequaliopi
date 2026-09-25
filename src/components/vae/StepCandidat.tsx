@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { VAECandidat, VAECertification } from "@/lib/vae/vaeTypes";
 import { downloadCVWord } from "@/lib/vae/vaeGenerator";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
+import type { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
 interface Props { data: VAECandidat; onChange: (v: VAECandidat) => void; certification: VAECertification; }
 
@@ -67,9 +70,42 @@ export default function StepCandidat({ data, onChange, certification }: Props) {
   const removeDip = (i: number) => onChange({ ...data, diplomes: data.diplomes.filter((_, k) => k !== i) });
   const updateDip = (i: number, key: string, v: string) => onChange({ ...data, diplomes: data.diplomes.map((e, k) => k === i ? { ...e, [key]: v } : e) });
 
+  const formationVae: FormationInfo = {
+    intitule: certification.intitule || "Certification visée par la VAE",
+    objectifs: certification.blocs.map((bloc) => bloc.intitule).join(" ; "),
+    prerequis: "Expérience professionnelle en rapport avec la certification visée",
+    duree: "", modalites: "VAE", tarif: "", programme: certification.blocs.map((bloc) => bloc.intitule).join("\n"),
+    methodesEvaluation: "Validation des acquis de l'expérience", moyensPedagogiques: "Accompagnement VAE",
+    publicVise: "Candidat disposant d'une expérience en rapport avec la certification", delaiAcces: "",
+    dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "1", formateur: "", codeRNCP: certification.rncp,
+  };
+  const candidatAsStagiaire: StagiaireInfo[] = data.prenom || data.nom ? [{
+    civilite: data.civilite, prenom: data.prenom, nom: data.nom, email: data.email, telephone: data.telephone,
+    entreprise: data.employeur, poste: data.emploiActuel, dateNaissance: data.dateNaissance,
+    adresse: data.adresse, codePostal: data.codePostal, commune: data.ville, fictif: data.fictif,
+  }] : [];
+  const applyFakeCandidate = (generated: StagiaireInfo[]) => {
+    const person = generated[0];
+    if (!person) { onChange({ ...data, fictif: false }); return; }
+    const job = person.poste || certification.intitule || "Professionnel du secteur";
+    onChange({
+      ...data,
+      civilite: person.civilite, prenom: person.prenom, nom: person.nom, dateNaissance: person.dateNaissance,
+      adresse: person.adresse || "", codePostal: person.codePostal || "", ville: person.commune || "",
+      telephone: person.telephone, email: person.email, emploiActuel: job, employeur: person.entreprise,
+      statut: person.entreprise ? "Salarié" : "Demandeur d'emploi", fictif: true,
+      experiences: [{
+        poste: job, entreprise: person.entreprise || "Entreprise du secteur", dateDebut: "2019", dateFin: "Aujourd'hui",
+        missions: certification.blocs.length ? certification.blocs.map((bloc) => bloc.intitule).join(" ; ") : `Activités professionnelles en lien avec ${certification.intitule || "la certification visée"}`,
+      }],
+    });
+  };
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Candidat et CV</h2>
+      <h2 className="text-xl font-semibold flex items-center gap-2">Candidat et CV {data.fictif && <Badge variant="secondary">Fictif</Badge>}</h2>
+
+      <FakeStagiairesToolbar value={candidatAsStagiaire} onChange={applyFakeCandidate} formation={formationVae} compact />
 
       <div className="flex flex-wrap gap-3 p-4 border rounded-lg bg-secondary/30">
         <label className="cursor-pointer">

@@ -23,6 +23,7 @@ export interface VSSApprenant {
   colDebut?: string;
   colFin?: string;
   source?: string; // feuille / section d'origine
+  fictif?: boolean;
 }
 
 

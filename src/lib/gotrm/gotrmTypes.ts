@@ -24,6 +24,7 @@ export interface GotrmCandidat {
   msp2Horaire: string;
   /** Historique de capitalisation : CCP déjà obtenus */
   ccpObtenus: { ccp: string; date: string; session: string }[];
+  fictif?: boolean;
 }
 
 export interface GotrmSession {

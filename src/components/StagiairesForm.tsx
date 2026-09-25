@@ -1,14 +1,12 @@
 import { useRef, useState } from "react";
 import { StagiaireInfo, FormationInfo } from "@/types/qualiopi";
-import ReferentielGenerator from "@/components/ReferentielGenerator";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool, Sparkles, FileUp, Loader2 } from "lucide-react";
+import { X, PenTool, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
-import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
-import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
@@ -37,7 +35,6 @@ interface StagiairesFormProps {
   data: StagiaireInfo[];
   onChange: (data: StagiaireInfo[]) => void;
   formation?: FormationInfo;
-  onFormationChange?: (f: FormationInfo) => void;
 }
 
 const emptyStagiaire: StagiaireInfo = {
@@ -45,7 +42,7 @@ const emptyStagiaire: StagiaireInfo = {
   adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "", dateNaissanceResponsable: "", emailResponsable: "",
 };
 
-const StagiairesForm = ({ data, onChange, formation, onFormationChange }: StagiairesFormProps) => {
+const StagiairesForm = ({ data, onChange, formation }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -53,23 +50,10 @@ const StagiairesForm = ({ data, onChange, formation, onFormationChange }: Stagia
   const convocInputRef = useRef<HTMLInputElement | null>(null);
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
-  const [fakeCount, setFakeCount] = useState<number>(5);
-  const [fakeRegion, setFakeRegion] = useState<RegionKey | "all">("ile-de-france");
   const [importingCerfa, setImportingCerfa] = useState(false);
   const [importingConvoc, setImportingConvoc] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
-  const generateFakes = (replace: boolean) => {
-    const n = Math.max(1, Math.min(300, Math.floor(fakeCount) || 1));
-    const fakes = generateFakeStagiairesIDF({ count: n, region: fakeRegion }).map(f => ({ ...f, fictif: true }));
-    onChange(replace ? fakes : [...data, ...fakes]);
-    const regionLabel = fakeRegion === "all" ? "France entière" : REGIONS[fakeRegion].label;
-    toast.success(`${n} stagiaire(s) fictif(s) généré(s) – ${regionLabel}`);
-  };
   const nbFictifs = data.filter(s => s.fictif).length;
-  const removeFictifs = () => {
-    onChange(data.filter(s => !s.fictif));
-    toast.success(`${nbFictifs} stagiaire(s) fictif(s) supprimé(s)`);
-  };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
     const updated = [...data];
@@ -216,41 +200,8 @@ const StagiairesForm = ({ data, onChange, formation, onFormationChange }: Stagia
         <div>
           <h2 className="text-xl font-bold">Stagiaires</h2>
           <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s) · {data.length - nbFictifs} réel(s) / {nbFictifs} fictif(s)</p>
-          {nbFictifs > 0 && (
-            <Button variant="ghost" size="sm" onClick={removeFictifs} className="h-7 px-2 text-xs text-destructive hover:text-destructive">
-              Supprimer tous les fictifs
-            </Button>
-          )}
         </div>
         <div className="flex flex-wrap items-end gap-2">
-          <div className="flex flex-col">
-            <Label className="text-xs">Région</Label>
-            <select
-              className="flex h-9 rounded-md border border-input bg-background px-2 text-sm"
-              value={fakeRegion}
-              onChange={e => setFakeRegion(e.target.value as RegionKey | "all")}
-            >
-              <option value="all">France entière</option>
-              {Object.entries(REGIONS).map(([key, r]) => (
-                <option key={key} value={key}>{r.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col">
-            <Label className="text-xs">Nb fictifs</Label>
-            <Input
-              type="number" min={1} max={300}
-              value={fakeCount}
-              onChange={e => setFakeCount(parseInt(e.target.value) || 1)}
-              className="h-9 w-20"
-            />
-          </div>
-          <Button onClick={() => generateFakes(false)} size="sm" variant="outline" className="gap-1 h-9">
-            <Sparkles className="w-4 h-4" /> Générer (ajouter)
-          </Button>
-          <Button onClick={() => generateFakes(true)} size="sm" variant="outline" className="gap-1 h-9">
-            <Sparkles className="w-4 h-4" /> Générer (remplacer)
-          </Button>
           <input
             ref={cerfaInputRef}
             type="file"
@@ -294,13 +245,7 @@ const StagiairesForm = ({ data, onChange, formation, onFormationChange }: Stagia
         </div>
       </div>
 
-      <ReferentielGenerator
-        formation={formation}
-        onFormationChange={onFormationChange}
-        count={fakeCount}
-        region={fakeRegion}
-        onGenerate={(list, replace) => onChange(replace ? list : [...data, ...list])}
-      />
+      <FakeStagiairesToolbar value={data} onChange={onChange} formation={formation} compact />
 
       {data.length === 0 && (
         <div className="text-center py-12 bg-secondary/50 rounded-xl border border-dashed border-border">

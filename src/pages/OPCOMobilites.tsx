@@ -970,7 +970,7 @@ export default function OPCOMobilites() {
             <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />
           </Card>
           <Card className="p-6">
-            <StagiairesForm data={stagiaires} onChange={setStagiaires} />
+            <StagiairesForm data={stagiaires} onChange={setStagiaires} formation={formation} />
           </Card>
 
           <Card className="p-6 space-y-4">
