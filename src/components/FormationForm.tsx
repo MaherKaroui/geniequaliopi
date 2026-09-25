@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { generateAIVeillePack, clearCachedVeillePack } from "@/lib/aiVeillePack";
 import { generateAIContentPack, clearCachedContentPack } from "@/lib/aiContentPack";
+import ReferentielGenerator from "@/components/ReferentielGenerator";
 
 interface FormationFormProps {
   data: FormationInfo;
@@ -367,6 +368,8 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         <h2 className="text-xl font-bold">Informations de la formation</h2>
         <p className="text-sm text-muted-foreground">Générez tout via IA, choisissez un exemple, importez EDOF, ou remplissez manuellement</p>
       </div>
+
+      <ReferentielGenerator formation={data} onFormationChange={onChange} />
 
       {/* AI Generator */}
       <div className="p-5 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-2 border-primary/30 rounded-xl space-y-3">

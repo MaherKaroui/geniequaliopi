@@ -1,23 +1,8 @@
-import type { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import type { FormationInfo, ReferentielAnalyse, StagiaireInfo } from "@/types/qualiopi";
 import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import type { RegionKey } from "@/lib/fakeStagiaireRegions";
 
-export interface ReferentielAnalyse {
-  code: string;
-  type: "RNCP" | "RS" | "";
-  intitule: string;
-  niveau: number | null;
-  certificateur: string;
-  dateFinEnregistrement: string;
-  actif: boolean | null;
-  blocs: { code: string; intitule: string }[];
-  prerequis: string;
-  publicVise: string;
-  codesRome: string[];
-  metiers: string[];
-  secteurs: string[];
-  modalitesEvaluation: string;
-}
+export type { ReferentielAnalyse } from "@/types/qualiopi";
 
 export function isReferentielInactif(r: ReferentielAnalyse): boolean {
   if (r.actif === false) return true;
