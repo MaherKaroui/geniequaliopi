@@ -10,7 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap, BarChart3 } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -181,6 +181,18 @@ const Index = () => {
               </div>
             ))}
           </div>
+          <div className="p-5 bg-card rounded-xl border shadow-card text-left flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <BarChart3 className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm">Analyse BPF — à faire avant de créer le dossier Qualiopi</h3>
+              <p className="text-xs text-muted-foreground mt-1">Importez votre Bilan Pédagogique et Financier : chiffres clés, contrôles de cohérence, types d'actions et pièces à préparer.</p>
+            </div>
+            <Button variant="outline" className="gap-2 shrink-0" onClick={() => navigate("/analyse-bpf")}>
+              <BarChart3 className="w-4 h-4" /> Analyser mon BPF
+            </Button>
+          </div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
             <Button size="lg" className="bg-gradient-accent border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated gap-2" onClick={() => navigate("/rapide")}>
               <Zap className="w-5 h-5" /> Génération rapide
@@ -205,6 +217,9 @@ const Index = () => {
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/analyse-bpf")}>
+              <BarChart3 className="w-5 h-5" /> Analyse BPF
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
               <GraduationCap className="w-5 h-5" /> Génération VAE
@@ -281,7 +296,7 @@ const Index = () => {
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {currentStep === 1 && <OrganismeForm data={organisme} onChange={updateOrganisme} />}
           {currentStep === 2 && <FormationForm data={formation} onChange={updateFormation} onImportStagiaires={updateStagiaires} />}
-          {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} />}
+          {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} formation={formation} onFormationChange={updateFormation} />}
           {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
           {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
         </div>
