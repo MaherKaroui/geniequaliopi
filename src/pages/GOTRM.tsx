@@ -54,6 +54,8 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { withActiveDossierStyle } from "@/lib/dossierDesign";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -175,7 +177,19 @@ const GOTRMPage = () => {
     dateDebutFormation: c.msp1Date || dateDebut,
     dateFinFormation: c.msp2Date || dateFin,
     commune: organisme.ville,
+    fictif: c.fictif,
   });
+
+  const replaceFromGenerated = (generated: StagiaireInfo[]) => {
+    setCandidats(generated.map((s, index) => ({
+      ...newCandidat(index, dateDebut),
+      civilite: s.civilite || "M.",
+      nom: s.nom,
+      prenom: s.prenom,
+      dateNaissance: s.dateNaissance,
+      fictif: true,
+    })));
+  };
 
   const buildEcf = (c: GotrmCandidat) => genECFGotrm(organisme, formation, [toStagiaire(c)], 0);
   const buildDp = (c: GotrmCandidat) => genDPGotrm(organisme, formation, [toStagiaire(c)], 0);
@@ -367,6 +381,13 @@ const GOTRMPage = () => {
             </div>
           </div>
 
+          <FakeStagiairesToolbar
+            value={candidats.map(toStagiaire)}
+            onChange={replaceFromGenerated}
+            formation={formation}
+            compact
+          />
+
           <div className="grid md:grid-cols-2 gap-6 pt-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -450,6 +471,7 @@ const GOTRMPage = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
                     N° {c.ordrePassage} — {gotrmCandidatNomComplet(c) || "Nouveau candidat"} · {c.identifiant}
+                    {c.fictif && <Badge variant="secondary" className="ml-2 text-[10px]">Fictif</Badge>}
                   </span>
                   <Button variant="ghost" size="icon" onClick={() => setCandidats((p) => p.filter((x) => x.id !== c.id))}>
                     <Trash2 className="w-4 h-4" />

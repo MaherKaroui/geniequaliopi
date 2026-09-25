@@ -34,6 +34,8 @@ import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { PDF_QUALITY_PRESETS, type PdfQuality } from "@/lib/pdfExport";
 
 import RapideHistory from "@/components/RapideHistory";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
 import { SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES } from "@/lib/sampleData";
 
 /* ------------------------------------------------------------------ */
@@ -970,6 +972,7 @@ const GenerationRapide = () => {
 
         {/* BLOC C — STAGIAIRES */}
         <Section step="3" icon={<Users className="w-5 h-5" />} title={`Stagiaires (${stagiairesValides.length})`} subtitle="Dates et tarif laissés vides = ceux de la formation" done={stagComplet}>
+          <FakeStagiairesToolbar value={stagiaires} onChange={setStagiaires} formation={formation} compact />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input ref={docFileRef} type="file" accept=".pdf,.docx,.xlsx,.xls" multiple className="hidden" onChange={(e) => importDocument(e.target.files)} />
             <button
@@ -1012,6 +1015,7 @@ const GenerationRapide = () => {
                       {(s.prenom?.trim()?.[0] || (i + 1).toString()).toUpperCase()}
                     </span>
                     Stagiaire {i + 1}{s.prenom?.trim() && s.nom?.trim() ? ` — ${s.prenom} ${s.nom}` : ""}
+                    {s.fictif && <Badge variant="secondary" className="text-[10px]">Fictif</Badge>}
                   </span>
                   <Button variant="ghost" size="sm" onClick={() => setStagiaires((l) => l.filter((_, j) => j !== i))} disabled={stagiaires.length === 1}>
                     <Trash2 className="w-4 h-4 text-destructive" />
