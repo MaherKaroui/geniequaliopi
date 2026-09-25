@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import mammoth from "mammoth";
 import { FormationInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,11 @@ const ReferentielGenerator = ({ formation, onFormationChange }: Props) => {
   const [ref, setRef] = useState<ReferentielAnalyse | null>(formation.referentiel ?? null);
   const [source, setSource] = useState<string>(formation.referentiel ? "Fiche enregistrée avec la formation" : "");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setRef(formation.referentiel ?? null);
+    if (formation.referentiel) setSource("Fiche enregistrée avec la formation");
+  }, [formation.referentiel]);
 
   const analyse = async (body: Record<string, unknown>, label: string) => {
     setLoading(true);
