@@ -13,6 +13,8 @@ import {
   Users, Plus, Trash2, Clock, Bug,
 } from "lucide-react";
 import { toast } from "sonner";
+import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   formation: FormationInfo;
@@ -65,6 +67,27 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
     if (!stagiaires.length) { toast.error("Aucun stagiaire dans le formulaire"); return; }
     setApprenants(stagiairesToVSS(stagiaires as any, formation.dateDebut, formation.dateFin, 0));
     toast.success(`${stagiaires.length} apprenant(s) chargé(s) — renseignez les heures VSS`);
+  };
+
+  const apprenantsAsStagiaires: StagiaireInfo[] = apprenants.map((apprenant) => {
+    const parts = apprenant.nom.trim().split(/\s+/);
+    return {
+      civilite: "", prenom: parts.shift() || "", nom: parts.join(" "), email: apprenant.email || "",
+      telephone: "", entreprise: apprenant.entreprise || "", poste: "", dateNaissance: "",
+      dateDebutFormation: apprenant.dateDebut, dateFinFormation: apprenant.dateFin, fictif: apprenant.fictif,
+    };
+  });
+  const applyGeneratedApprenants = (generated: StagiaireInfo[]) => {
+    setApprenants((current) => generated.map((personne, index) => {
+      const fullName = `${personne.prenom} ${personne.nom}`.trim();
+      const existing = current.find((item) => item.nom === fullName);
+      return existing ?? normaliserApprenantVSS({
+        id: `fictif-${Date.now()}-${index}`, nom: fullName, email: personne.email,
+        entreprise: personne.entreprise, formation: formation.intitule,
+        dateDebut: personne.dateDebutFormation || formation.dateDebut || "",
+        dateFin: personne.dateFinFormation || formation.dateFin || "", heuresVSS: 0, fictif: true,
+      });
+    }));
   };
 
   const download = (blob: Blob, name: string) => {
@@ -182,6 +205,8 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
             début et la date de fin, avec répartition exacte du volume d'heures VSS (capacité max {MAX_H_JOUR} h/jour).
           </p>
 
+          <FakeStagiairesToolbar value={apprenantsAsStagiaires} onChange={applyGeneratedApprenants} formation={formation} compact />
+
           <div className="flex flex-wrap gap-2">
             <input
               ref={fileRef}
@@ -244,7 +269,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                 <tbody>
                   {apprenants.map((a) => (
                     <tr key={a.id} className="border-t">
-                      <td className="p-2 font-medium">{a.nom}</td>
+                       <td className="p-2 font-medium">{a.nom}{a.fictif && <Badge variant="secondary" className="ml-2 text-[10px]">Fictif</Badge>}</td>
                       <td className="p-2 text-muted-foreground">{a.source || "—"}</td>
                       <td className="p-2 text-muted-foreground">{a.colDebut || "—"}</td>
                       <td className="p-2">{a.rawDebut || "—"}</td>
@@ -275,7 +300,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
                     <div>
                       <label className="text-[11px] text-muted-foreground">Apprenant</label>
-                      <Input value={a.nom} onChange={(e) => update(a.id, { nom: e.target.value })} className="h-8 text-sm" />
+                       <div className="flex items-center gap-1"><Input value={a.nom} onChange={(e) => update(a.id, { nom: e.target.value })} className="h-8 text-sm" />{a.fictif && <Badge variant="secondary" className="text-[10px]">Fictif</Badge>}</div>
                     </div>
                     <div>
                       <label className="text-[11px] text-muted-foreground">Date de début</label>
