@@ -367,7 +367,7 @@ const ControleEY = () => {
                     onApplyOrganisme={handleOrgChange}
                   />
                 )}
-                {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+                {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} formation={formation} />}
                 {key === "signature" && (
                   <div className="space-y-4">
                     {signature ? (
