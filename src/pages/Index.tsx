@@ -189,9 +189,6 @@ const Index = () => {
               <h3 className="font-semibold text-sm">Analyse BPF — à faire avant de créer le dossier Qualiopi</h3>
               <p className="text-xs text-muted-foreground mt-1">Importez votre Bilan Pédagogique et Financier : chiffres clés, contrôles de cohérence, types d'actions et pièces à préparer.</p>
             </div>
-            <Button variant="outline" className="gap-2 shrink-0" onClick={() => navigate("/analyse-bpf")}>
-              <BarChart3 className="w-4 h-4" /> Analyser mon BPF
-            </Button>
           </div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
             <Button size="lg" className="bg-gradient-accent border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated gap-2" onClick={() => navigate("/rapide")}>
