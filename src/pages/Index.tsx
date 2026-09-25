@@ -181,15 +181,6 @@ const Index = () => {
               </div>
             ))}
           </div>
-          <div className="p-5 bg-card rounded-xl border shadow-card text-left flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <BarChart3 className="w-6 h-6 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-sm">Analyse BPF — à faire avant de créer le dossier Qualiopi</h3>
-              <p className="text-xs text-muted-foreground mt-1">Importez votre Bilan Pédagogique et Financier : chiffres clés, contrôles de cohérence, types d'actions et pièces à préparer.</p>
-            </div>
-          </div>
           <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
             <Button size="lg" className="bg-gradient-accent border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated gap-2" onClick={() => navigate("/rapide")}>
               <Zap className="w-5 h-5" /> Génération rapide
