@@ -252,6 +252,7 @@ export function generateFakeStagiairesIDF(options: FakeStagiaireOptions): Stagia
       formateurSignatureUrl: "",
       adresseEntreprise: "",
       siretEntreprise: "",
+      fictif: true,
     });
   }
 

@@ -98,6 +98,8 @@ export interface StagiaireInfo {
   numeroAction?: string;
   /** Financeur de la formation (CPF, OPCO, Entreprise, Personnel, France Travail, Région, Autre) */
   financeur?: string;
+  /** true si le stagiaire a été produit par un générateur de données fictives */
+  fictif?: boolean;
 }
 
 export interface FormationInfo {
