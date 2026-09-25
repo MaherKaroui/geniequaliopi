@@ -12,6 +12,7 @@ import GenerateurTampon from "./pages/GenerateurTampon";
 import GenerateurLogo from "./pages/GenerateurLogo";
 import OPCOMobilites from "./pages/OPCOMobilites";
 import GenerationRapide from "./pages/GenerationRapide";
+import AnalyseBPF from "./pages/AnalyseBPF";
 import GOTRMPage from "./pages/GOTRM";
 import MuseeDossier from "./pages/MuseeDossier";
 import QualiopiCheck from "./pages/QualiopiCheck";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/audit-live" element={<QualiopiCheck />} />
           <Route path="/vae" element={<VAEPage />} />
           <Route path="/rapide" element={<GenerationRapide />} />
+          <Route path="/analyse-bpf" element={<AnalyseBPF />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
