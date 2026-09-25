@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      bpf_analyses: {
+        Row: {
+          created_at: string
+          donnees: Json
+          exercice: string
+          id: string
+          organisme: string
+          resultats: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          donnees?: Json
+          exercice?: string
+          id?: string
+          organisme?: string
+          resultats?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          donnees?: Json
+          exercice?: string
+          id?: string
+          organisme?: string
+          resultats?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       modeles_formation: {
         Row: {
           created_at: string
