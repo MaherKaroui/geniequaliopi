@@ -837,6 +837,8 @@ const GenerationRapide = () => {
             <Field label="Dirigeant" required value={organisme.dirigeant} onChange={(e) => setOrg({ dirigeant: e.target.value })} />
             <Field label="Email" type="email" value={organisme.email} onChange={(e) => setOrg({ email: e.target.value })} />
             <Field label="Téléphone" value={organisme.telephone} onChange={(e) => setOrg({ telephone: e.target.value })} />
+            <Field label="Version des documents" value={organisme.version} onChange={(e) => setOrg({ version: e.target.value })} />
+            <Field label="Date de mise à jour" type="date" value={organisme.dateMaj} onChange={(e) => setOrg({ dateMaj: e.target.value })} />
           </div>
 
           <Section icon={<FileText className="w-4 h-4" />} title="Champs optionnels" defaultOpen={false}>
