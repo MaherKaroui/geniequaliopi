@@ -186,14 +186,13 @@ function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, 
 // A. Documents personnalisés candidat
 // ------------------------------------------------------------------
 
-// 1) Évaluation des besoins
 /** Ville extraite de l'adresse de l'organisme (« … 69003 Lyon » → « Lyon »), pour « Fait à … ». */
 function villeDepuisAdresse(adresse?: string): string {
-  const m = (adresse || "").match(/\d{5}\s+([^,
-]+)\s*$/);
+  const m = (adresse || "").match(/\d{5}\s+([^,]+?)\s*$/);
   return m ? m[1].trim() : "……………………";
 }
 
+// 1) Évaluation des besoins
 export function getBesoinsHTML(d: VAEData): string {
   const { organisme: o, candidat: c, certification: cert, session: s, contents } = d;
   const b = contents.besoins;
