@@ -4,6 +4,8 @@ import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
+import { entreesNonApplicables, motifNonApplicable, genDeclarationNonApplicabilite } from "./nonApplicabilite";
+import { INDICATEURS_REFERENCE as REF_RNQ } from "./qualiopiReference";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
@@ -160,7 +162,10 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   }
   const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation"]);
   const base = mails.length ? catalogue.filter((d) => !REMPLACES.has(d.template)) : catalogue;
-  return [...base, ...fcEntrees, ...mails];
+  // Chaque indicateur 1 à 33 a une pièce : déclaration motivée s'il est sans objet.
+  const complet = [...base, ...fcEntrees];
+  const typeDossierNA = (types[0] || "actions-formation") as OrganismeInfo["typesActions"][number];
+  return [...complet, ...entreesNonApplicables(complet, typeDossierNA, selectedFormation), ...mails];
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
@@ -241,6 +246,19 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
         if (s) return genEvaluationBlocsStagiaire(o, fFC, s);
       }
     }
+  }
+  if (template === "indicateur_non_applicable") {
+    const ind = Number(params?.ind) || 0;
+    const fNA = resolveFormation(userFormation, org, userStagiaires);
+    const typeNA = ((org.typesActions || [])[0] || "actions-formation") as OrganismeInfo["typesActions"][number];
+    const motif = motifNonApplicable(ind, typeNA, fNA);
+    if (motif) return genDeclarationNonApplicabilite(o, fNA, ind, motif);
+    const ref = REF_RNQ.find((r) => r.numero === ind);
+    return buildDocument({ org: o, title: `INDICATEUR ${ind} — PIÈCES À PRODUIRE`, sections: [
+      { heading: "Libellé", content: `<p>${ref?.intitule || ""}</p>` },
+      { heading: "Niveau attendu", content: `<p>${ref?.niveauAttendu || ""}</p>` },
+      { heading: "Preuves attendues", content: `<ul>${(ref?.questionsPreuves || []).map((q) => `<li>${q}</li>`).join("")}</ul>` },
+    ] });
   }
   if (template === "mail_capture") {
     const s = mergeStagiaires(userStagiaires)[params?.stagiaireIdx ?? 0];
