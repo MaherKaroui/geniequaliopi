@@ -410,9 +410,9 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
 
 export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: FormationInfo): string {
   const annee = new Date().getFullYear();
-  let html = tableRow(["Indicateur", "Méthode de calcul", "Objectif 2026", "Périodicité de suivi", "Seuil d'alerte", "Action corrective prévue si objectif non atteint"], true);
+  let html = tableRow(["Indicateur", "Méthode de calcul", `Objectif ${annee}`, "Périodicité de suivi", "Seuil d'alerte", "Action corrective prévue si objectif non atteint"], true);
   const data: string[][] = [
-    ["Nombre de candidats accompagnés", "Comptage des conventions d'accompagnement signées", "≥ 5 candidats", "Trimestriel", "< 2 candidats / trimestre", "Renforcement de la communication (site, réseaux, partenaires CEP/Pôle emploi), participation à des salons professionnels esthétique"],
+    ["Nombre de candidats accompagnés", "Comptage des conventions d'accompagnement signées", "≥ 5 candidats", "Trimestriel", "< 2 candidats / trimestre", "Renforcement de la communication (site, réseaux, conseillers en évolution professionnelle, France Travail, plateforme vae.gouv.fr)"],
     ["Taux de satisfaction des candidats", "Questionnaires de satisfaction – notes ≥ 4/5 / total répondants × 100", "≥ 90%", "À chaque fin d'accompagnement", "< 80%", "Analyse des retours, entretien individuel avec les candidats insatisfaits, adaptation des méthodes d'accompagnement"],
     ["Taux de complétude des dossiers", "Dossiers complets au 1er dépôt / total dossiers déposés × 100", "≥ 85%", "À chaque dépôt de dossier", "< 70%", "Renforcement de l'accompagnement rédactionnel, checklist de contrôle, relecture systématique avant dépôt"],
     ["Taux de présentation au jury", "Candidats présentés au jury / candidats accompagnés × 100", "≥ 80%", "Annuel", "< 60%", "Suivi renforcé des candidats à risque, entretiens de remotivation, aménagement du planning"],
@@ -428,10 +428,10 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
   // Second sheet: planning de suivi trimestriel
   let html2 = tableRow(["Trimestre", "Actions de suivi prévues", "Indicateurs à mesurer", "Responsable", "Statut"], true);
   const planning: string[][] = [
-    ["T1 2026 (jan-mars)", "Lancement activité, premiers accompagnements, mise en place des outils de suivi", "Nb candidats, taux de satisfaction", o.responsablePedagogique || o.dirigeant, "À renseigner"],
-    ["T2 2026 (avr-juin)", "Suivi des premiers dossiers, ajustements méthodologiques", "Nb candidats, complétude dossiers, taux d'abandon", o.responsablePedagogique || o.dirigeant, "À renseigner"],
-    ["T3 2026 (juil-sept)", "Bilan semestriel, premières présentations jury", "Taux présentation jury, satisfaction, recommandation", o.responsablePedagogique || o.dirigeant, "À renseigner"],
-    ["T4 2026 (oct-déc)", "Bilan annuel, diffusion des résultats, plan d'amélioration", "Tous indicateurs – bilan complet", o.referentQualite || o.dirigeant, "À renseigner"],
+    [`T1 ${annee} (jan-mars)`, "Lancement activité, premiers accompagnements, mise en place des outils de suivi", "Nb candidats, taux de satisfaction", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    [`T2 ${annee} (avr-juin)`, "Suivi des premiers dossiers, ajustements méthodologiques", "Nb candidats, complétude dossiers, taux d'abandon", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    [`T3 ${annee} (juil-sept)`, "Bilan semestriel, premières présentations jury", "Taux présentation jury, satisfaction, recommandation", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    [`T4 ${annee} (oct-déc)`, "Bilan annuel, diffusion des résultats, plan d'amélioration", "Tous indicateurs – bilan complet", o.referentQualite || o.dirigeant, "À renseigner"],
   ];
   planning.forEach(r => html2 += tableRow(r));
 

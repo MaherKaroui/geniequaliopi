@@ -52,8 +52,8 @@ export async function buildVAEZip(
   const docs: Array<[string, () => string]> = [
     // A. Documents personnalisés candidat
     [`Evaluation_Besoins_${suffix}.docx`, () => getBesoinsHTML(d)],
-    [`Livret_1_Recevabilite_${suffix}.docx`, () => getLivret1HTML(d)],
-    [`Livret_2_${suffix}.docx`, () => getLivret2HTML(d)],
+    [`Dossier_Faisabilite_${suffix}.docx`, () => getLivret1HTML(d)],
+    [`Dossier_Validation_${suffix}.docx`, () => getLivret2HTML(d)],
     [`Convention_${suffix}.docx`, () => getConventionHTML(d)],
     [`Convocation_${suffix}.docx`, () => getConvocationHTML(d)],
     [`Autorisation_RGPD_${suffix}.docx`, () => getAutorisationRGPDHTML(d)],
