@@ -439,7 +439,7 @@ tr:nth-child(odd){background:#fff}
     simplepro: `
 body{background:#fff;color:#1a1a1a;padding:60px 70px;max-width:880px}
 .header{text-align:center;margin-bottom:48px;padding-bottom:28px;position:relative}
-.header::before{content:"Organisme de formation certifié Qualiopi";display:block;font-size:${s.fontSize - 3}px;color:${s.secondaryColor};letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.header::before{content:"Organisme de formation professionnelle";display:block;font-size:${s.fontSize - 3}px;color:${s.secondaryColor};letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
 .header::after{content:"";display:block;width:64px;height:1px;background:${s.secondaryColor};margin:22px auto 0}
 .header h1{border:none;background:none;padding:0;color:#111;font-family:${s.headingFont};font-weight:600;text-transform:uppercase;letter-spacing:6px;font-size:${s.fontSize + 18}px;line-height:1.15}
 .org-name{font-family:${s.headingFont};font-size:${s.fontSize + 18}px;font-weight:600;letter-spacing:6px;text-transform:uppercase;color:#111;line-height:1.15}

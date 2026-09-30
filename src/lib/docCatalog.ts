@@ -156,7 +156,12 @@ export function buildFullCatalog(
     });
     // Contrat ou Convention de formation — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
-      const hasEntreprise = !!(s.entreprise && s.entreprise.trim());
+      // Convention si l'entreprise (ou son OPCO, la Région) finance ; contrat de formation
+      // professionnelle (art. L.6353-3) quand la personne finance elle-même (ou via CPF / France Travail).
+      const fin = (s.financeur || "").toLowerCase();
+      const hasEntreprise = fin
+        ? /opco|entreprise|employeur|plan de d[ée]veloppement|r[ée]gion/.test(fin)
+        : !!(s.entreprise && s.entreprise.trim());
       if (hasEntreprise) {
         add(`af_c3i9_convention_formation_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION TRIPARTITE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_tripartite", { stagiaireIdx: si });
       } else {
@@ -404,7 +409,8 @@ export function buildFullCatalog(
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("af_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
     add("af_c6i26_formation_referent_handicap", "CT6 - IND 26 FORMATION DU RÉFÉRENT HANDICAP (à joindre)", 6, 26, "diplome_referent_handicap_docx");
-    add("af_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
+    // Fiche du réseau Ressources Handicap Formation d'Île-de-France : seulement pour un organisme francilien.
+    if (/^(75|77|78|91|92|93|94|95)/.test((orgCodePostal || "").replace(/\s/g, ""))) add("af_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("af_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
     add("af_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES (diaporama)", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
 

@@ -146,7 +146,7 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   // Mails automatiques : captures Gmail / Outlook datées (remplacent les 5 mails génériques .docx).
   const mails = entreesCatalogueMails(mergeOrganisme(org), selectedFormation, mergeStagiaires(userStagiaires));
   if (mails.length === 0) return catalogue;
-  const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation"]);
+  const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation", "mail_rdv_evaluation_besoins", "mail_envoi_contrat_convocation_ri"]);
   return [...catalogue.filter((d) => !REMPLACES.has(d.template)), ...mails];
 }
 
@@ -1145,11 +1145,18 @@ function genFicheIdentite(o: OrganismeInfo) {
 }
 
 function genPresentation(o: OrganismeInfo) {
+  // Uniquement des données saisies : aucune année, effectif ou statistique inventés.
+  const annee = /^\d{4}/.test(o.dateMaj || "") ? (o.dateMaj || "").slice(0, 4) : "";
+  const LIB: Record<string, string> = { "actions-formation": "actions de formation", "apprentissage": "formations par apprentissage", "vae": "accompagnements à la VAE", "bilans-competences": "bilans de compétences" };
+  const offres = (o.typesActions || []).map((t) => LIB[t]).filter(Boolean).join(", ");
+  const certif = (o.numeroCertificatQualiopi || "").trim()
+    ? `Notre organisme est certifié Qualiopi (certificat n° ${o.numeroCertificatQualiopi}${o.organismeCertificateur ? `, délivré par ${o.organismeCertificateur}` : ""}).`
+    : "Notre organisme met en œuvre le référentiel national qualité (décret n° 2026-728) dans le cadre de sa démarche de certification Qualiopi.";
   return buildDocument({ org: o, title: "PRÉSENTATION DE L'ORGANISME", sections: [
-    { heading: "Notre histoire", content: `<p>${o.nom} est un organisme de formation professionnelle créé en 2015, spécialisé dans les domaines suivants : ${o.domainesFormation}. Fort d'une équipe de formateurs experts et certifiés, nous accompagnons chaque année plus de 500 stagiaires dans le développement de leurs compétences professionnelles.</p>` },
-    { heading: "Notre mission", content: `<p>Proposer des formations de qualité, adaptées aux besoins des entreprises et des individus, dans le respect du Référentiel National Qualité (RNQ). Notre organisme est certifié Qualiopi pour les actions de formation et les bilans de compétences.</p>` },
-    { heading: "Nos valeurs", content: `<p>• <strong>Excellence pédagogique</strong> : des formateurs experts et des contenus actualisés<br>• <strong>Personnalisation</strong> : chaque parcours est adapté au profil du stagiaire<br>• <strong>Innovation</strong> : intégration des nouvelles technologies et méthodes pédagogiques<br>• <strong>Accessibilité</strong> : accueil de tous les publics, y compris en situation de handicap</p>` },
-    { heading: "Nos chiffres clés 2024", content: `<p>• 523 stagiaires formés<br>• 47 formations dispensées<br>• 97% de taux de satisfaction<br>• 89% de taux de réussite<br>• 82% d'insertion professionnelle à 6 mois</p>`, variant: "green" },
+    { heading: "Notre organisme", content: `<p>${o.nom} est un organisme de formation professionnelle${annee ? ` créé en ${annee}` : ""}${o.ville ? `, basé à ${o.ville}` : ""}${o.nda ? ` (déclaration d'activité n° ${o.nda})` : ""}.${o.domainesFormation ? ` Domaines : ${o.domainesFormation}.` : ""}${offres ? ` Prestations : ${offres}.` : ""}</p>` },
+    { heading: "Notre mission", content: `<p>Proposer des prestations adaptées aux besoins des personnes et des entreprises, dans le respect du référentiel national qualité. ${certif}</p>` },
+    { heading: "Nos engagements", content: `<p>• Analyse du besoin de chaque bénéficiaire avant l'entrée en formation<br>• Objectifs opérationnels et évaluables<br>• Accessibilité : référent handicap, ${o.referentHandicap || o.dirigeant}<br>• Recueil systématique des appréciations et traitement des réclamations</p>` },
+    { heading: "Contact", content: `<p>${o.dirigeant ? `${o.dirigeant}, dirigeant(e)<br>` : ""}${o.email || ""}${o.telephone ? ` – ${o.telephone}` : ""}${o.siteWeb ? `<br>${o.siteWeb}` : ""}</p>`, variant: "green" },
   ]});
 }
 
@@ -8244,7 +8251,7 @@ function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
   // Generate realistic auto-filled answers based on stagiaire profile and formation
   const answers = generateEvalBesoinsAnswers(s, f, o, stagiaires.indexOf(s));
-  const questionFinancement = hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD;
+  const questionFinancement = questionFinancementPour(s, f);
   
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -8302,6 +8309,18 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
 const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
+/** Formation non certifiante : pas d'éligibilité au CPF, la question ne le propose pas. */
+const QUESTION_FINANCEMENT_NON_CERTIFIANTE = "Quel budget avez-vous prévu pour cette formation et comment la financez-vous (financement personnel, employeur, France Travail) ?";
+/** La formation est-elle financée par l'entreprise (OPCO, plan, employeur) ? Décidé par le financeur saisi, l'entreprise seule ne suffit pas. */
+function financeParEntreprise(s: StagiaireInfo): boolean {
+  const fin = (s.financeur || "").toLowerCase();
+  if (fin) return /opco|entreprise|employeur|plan de d[ée]veloppement|r[ée]gion/.test(fin);
+  return !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+}
+function questionFinancementPour(s: StagiaireInfo, f: FormationInfo): string {
+  if (financeParEntreprise(s)) return QUESTION_FINANCEMENT_ENTREPRISE;
+  return /^(RS|RNCP)\d+$/i.test(String(f.codeRNCP || "").replace(/\s+/g, "")) ? QUESTION_FINANCEMENT_STANDARD : QUESTION_FINANCEMENT_NON_CERTIFIANTE;
+}
 const QUESTION_FINANCEMENT_ENTREPRISE = "Quel dispositif de financement est mobilisé par l'entreprise pour cette formation (OPCO / plan de développement des compétences) ?";
 const QUESTION_FINANCEMENT_ALTERNANCE = "Quel dispositif de financement est mobilisé pour cette formation en alternance (OPCO / contrat d'apprentissage) ?";
 
@@ -8314,7 +8333,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   }
   const questionFinancement = isAlternanceOPCO
     ? QUESTION_FINANCEMENT_ALTERNANCE
-    : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
+    : questionFinancementPour(s, f);
 
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -8323,7 +8342,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <strong>Prénom :</strong> ${s.prenom}<br>
 ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br>
 <strong>Mail :</strong> ${s.email || "___"}<br>
-<strong>Date :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+<strong>Période de formation :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Formation souhaitée :</strong> ${f.intitule}
 </td></tr></table>`;
 
@@ -8381,7 +8400,7 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 <strong>Formation :</strong> ${f.intitule}<br>
 <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Entreprise :</strong> ${hasEntreprise ? s.entreprise : "À compléter"}<br>
-<strong>Tuteur / Maître d'apprentissage :</strong> ${tuteurNom}
+<strong>Maître d'apprentissage / tuteur :</strong> ${tuteurNom}
 </td></tr></table>`;
 
   return buildDocument({ org: o, title: "Évaluation des besoins – Entreprise", extraHtml: headerBlock + `
@@ -8463,7 +8482,7 @@ function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiair
   }
   const questionFinancement = isAlternanceOPCO
     ? QUESTION_FINANCEMENT_ALTERNANCE
-    : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
+    : questionFinancementPour(s, f);
   const tuteurNom = (s as any).tuteur?.trim() || s.responsableEntreprise?.trim() || (s.entreprise?.trim() ? `Représentant(e) de ${s.entreprise.trim()}` : "Représentant(e) de l'entreprise");
   const dateAnalyse = formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)));
 
@@ -8474,7 +8493,7 @@ function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiair
 <strong>Prénom :</strong> ${s.prenom}<br>
 ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""}
 <strong>Mail :</strong> ${s.email || "___"}<br>
-<strong>Date :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+<strong>Période de formation :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Formation souhaitée :</strong> ${f.intitule}
 </td></tr></table>`;
 
@@ -8482,7 +8501,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <h2 style="margin-top:24px;color:#1e3a7b;border-bottom:2px solid #1e3a7b;padding-bottom:6px">PARTIE APPRENANT</h2>
 <p style="margin-top:8px;font-style:italic;color:#555">Trame d'évaluation des besoins – Partie Apprenant (parcours, expérience, projet, financement, accessibilité).</p>
 
-<h3 style="margin-top:16px;color:#1e3a7b">EXPÉRIENCE ET SCOLAIRE :</h3>
+<h3 style="margin-top:16px;color:#1e3a7b">PARCOURS ET PROJET :</h3>
 
 <p><strong>1. Quel est le dernier diplôme ou titre que vous avez obtenu ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.diplome}</td></tr></table>
@@ -8515,7 +8534,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <strong>Formation :</strong> ${f.intitule}<br>
 <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Entreprise :</strong> ${hasEntreprise ? s.entreprise : "À compléter"}<br>
-<strong>Tuteur / Maître d'apprentissage :</strong> ${tuteurNom}
+<strong>${isAlternanceOPCO ? "Maître d'apprentissage" : "Responsable en entreprise"} :</strong> ${tuteurNom}
 </td></tr></table>
 
 <p style="margin-top:14px;font-style:italic;color:#555">Trame d'évaluation des besoins – Partie Entreprise (à compléter par l'employeur ou le tuteur).</p>
@@ -8555,7 +8574,9 @@ ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;m
   return buildDocument({
     org: o,
     title: "Évaluation des besoins",
-    extraHtml: civiliteBlock + apprenantPart + (hasEntreprise ? entreprisePart : "") + footer,
+    // Partie entreprise seulement si l'entreprise est partie prenante (financement employeur/OPCO
+    // ou apprentissage) : une personne qui se finance elle-même n'engage pas son employeur.
+    extraHtml: civiliteBlock + apprenantPart + (hasEntreprise && (isAlternanceOPCO || financeParEntreprise(s)) ? entreprisePart : "") + footer,
   });
 
 }
@@ -8578,11 +8599,13 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
+    // Les horaires de session restent ceux du programme : l'aménagement porte sur le rythme,
+    // les pauses et les supports (jamais une « demande » de suivre les horaires normaux).
     const variantesPSH = [
-      `Compte tenu de ma situation de handicap (RQTH), je sollicite un aménagement horaire en journée. Je suis disponible du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, créneaux qui me permettent de suivre la formation dans des conditions adaptées à mon état de santé.`,
-      `Je sollicite un aménagement horaire spécifique au titre de ma RQTH : disponibilité en journée du lundi au vendredi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Cet aménagement est nécessaire pour préserver mon énergie et garantir une assimilation optimale des contenus pédagogiques.`,
-      `En raison de ma situation de handicap, je demande à suivre la formation en journée, du lundi au vendredi, de <strong>09h00 à 12h30</strong> puis de <strong>13h30 à 17h00</strong>. Ce rythme diurne est indispensable pour me permettre de concilier mes contraintes médicales avec un parcours de formation soutenu.`,
-      `Mon état de santé (RQTH) nécessite un aménagement horaire en journée. Je serai disponible du lundi au vendredi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, ce qui me permettra de bénéficier d'une concentration optimale et d'un suivi pédagogique adapté à mes besoins.`,
+      `Les horaires de la session (<strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>) me conviennent. Au titre de ma RQTH, je souhaite des pauses courtes plus fréquentes et des supports transmis à l'avance, à confirmer avec le référent handicap.`,
+      `Je suis disponible en journée du lundi au vendredi. Compte tenu de ma situation de handicap, j'aurais besoin de pouvoir me lever et faire une pause toutes les heures environ, et d'un poste adapté ; je préciserai ces besoins lors de l'entretien avec le référent handicap.`,
+      `Les créneaux proposés (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) sont compatibles avec mon emploi du temps. Je demande un aménagement du rythme : exercices réalisables en temps majoré et documents en police agrandie.`,
+      `Je peux suivre la formation en journée. En raison de ma RQTH, je souhaite que les séances les plus denses soient placées le matin et disposer d'un temps supplémentaire pour les évaluations, selon les modalités définies avec le référent handicap.`,
     ];
     return variantesPSH[baseHash % variantesPSH.length];
   }
@@ -8640,7 +8663,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   } else if (declare) {
     result.budget = declare;
   } else if (!isVitrageFormation(f.intitule, f.codeRNCP) && !isOngulaireFormation(f.intitule, f.codeRNCP)) {
-    result.budget = hasEntreprise
+    result.budget = financeParEntreprise(s)
       ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
       : "Financement personnel";
   }
