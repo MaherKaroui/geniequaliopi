@@ -1240,7 +1240,8 @@ D) Drive faster to finish the ride.`,
   const appIdx = avgPct >= 90 ? 0 : avgPct >= 60 ? 1 : 2;
   extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>__APPRECIATION_FINALE__</p>`;
-  extra += `<p><strong>Score final attribué : ${moyenneFinale}/10 — ${totalNote}/${totalMax} points</strong></p>`;
+  // Un seul barème affiché : les points obtenus sur les points possibles de l'exercice.
+  extra += `<p><strong>Score final attribué : ${totalNote}/${totalMax} points (soit ${moyenneFinale}/10)</strong></p>`;
 
   const appreciationFinale = appreciationsFR[appIdx][appSeed].replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`);
   extra = extra.replace("__APPRECIATION_FINALE__", appreciationFinale);
