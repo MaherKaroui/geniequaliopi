@@ -100,7 +100,7 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
 }
 
 // ============================================================================
-// MISSION 6 — Plan d'actions Mixité et Égalité Femmes/Hommes
+// MISSION 7 (L6231-2) — Plan d'actions Mixité et Égalité Femmes/Hommes
 // ============================================================================
 export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
@@ -179,7 +179,7 @@ export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, st
 }
 
 // ============================================================================
-// MISSION 8 — Suivi de l'insertion professionnelle à 6 mois
+// IND 29 / MISSION 13 (L6231-2) — Suivi de l'insertion professionnelle à 6 mois
 // ============================================================================
 export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const terminee = isFormationTerminee(f, stagiaires);
@@ -246,7 +246,7 @@ export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ============================================================================
-// MISSION 9 — Mobilité internationale Erasmus+
+// MISSION 10 (L6231-2) — Mobilité internationale Erasmus+
 // ============================================================================
 export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", civilite: "M." } as StagiaireInfo;
@@ -327,7 +327,7 @@ export function genProcedureMobiliteErasmusCFA(o: OrganismeInfo) {
 }
 
 // ============================================================================
-// MISSION 11 — Aide à la recherche d'employeur
+// MISSION 2 (L6231-2) — Aide à la recherche d'employeur
 // ============================================================================
 export function genProcedureAideRechercheEmployeurCFA(o: OrganismeInfo) {
   return buildDocument({
@@ -420,7 +420,7 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
 }
 
 // ============================================================================
-// MISSION 13 — Attestation de formation Maître d'Apprentissage
+// MISSION 12 (L6231-2) / IND 13 — Attestation de formation Maître d'Apprentissage
 // ============================================================================
 export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", entreprise: "Entreprise d'accueil" } as StagiaireInfo;
@@ -1059,7 +1059,7 @@ export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
 }
 
 // ============================================================================
-// MISSION 2 (L6231-2) — Encourager la mixité au sein des métiers
+// MISSION 8 (L6231-2) — Encourager la mixité au sein des métiers
 // ============================================================================
 export function genPlanMixiteMetiersCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
@@ -1136,7 +1136,7 @@ export function genPlanMixiteMetiersCFA(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ============================================================================
-// MISSION 7 (L6231-2) — Accompagnement éducatif, social et professionnel
+// MISSION 14 (L6231-2) — Accompagnement éducatif, social et accès aux aides
 // ============================================================================
 export function genProcedureAccompagnementEducatifSocialCFA(o: OrganismeInfo) {
   return buildDocument({
@@ -1180,7 +1180,7 @@ export function genProcedureAccompagnementEducatifSocialCFA(o: OrganismeInfo) {
 }
 
 // ============================================================================
-// MISSION 12 (L6231-2) — Accueil à tout moment de l'année
+// Accueil à tout moment de l'année (entrées permanentes) — hors numérotation des 14 missions
 // ============================================================================
 export function genProcedureAccueilToutMomentCFA(o: OrganismeInfo) {
   return buildDocument({
@@ -1224,7 +1224,7 @@ export function genProcedureAccueilToutMomentCFA(o: OrganismeInfo) {
 }
 
 // ============================================================================
-// MISSION 14 (L6231-3 / R6233-1) — Conseil de perfectionnement
+// IND 20 (L6231-3 / R6233-1) — Conseil de perfectionnement
 // ============================================================================
 export function genConseilPerfectionnementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
