@@ -1,4 +1,5 @@
 // Documents CFA — Couverture des 14 missions officielles (Art. L6231-2 du Code du Travail)
+import { dateQCMMission } from "./calendrierMissionsCFA";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, tableHTML, isFormationTerminee } from "./docBuilder";
 
@@ -1558,19 +1559,10 @@ export function genQCMMissionCFA(
     });
   }
 
-  // Date du QCM = vendredi de la semaine école N (rythme 1 sem école / 3 sem entreprise)
-  // Lundi semaine école N = lundi de dateDebut + (N-1)*28 jours ; QCM rendu vendredi (+4j)
-  function isoMondayOf(s: string): Date {
-    const d = new Date(s);
-    const day = (d.getDay() + 6) % 7;
-    d.setDate(d.getDate() - day);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
-  const startStr = f.dateDebut || new Date().toISOString().slice(0, 10);
-  const lundi = isoMondayOf(startStr);
-  lundi.setDate(lundi.getDate() + (missionNumero - 1) * 28 + 4); // vendredi semaine école N
-  const dateRef = lundi.toISOString().slice(0, 10);
+  // Date du QCM = dernier jour école de la semaine dédiée à la mission, dans le
+  // calendrier d'alternance réel de l'apprenti (source commune avec les mails).
+  const dq = dateQCMMission(f, missionNumero, stagiaire);
+  const dateRef = `${dq.getFullYear()}-${String(dq.getMonth() + 1).padStart(2, "0")}-${String(dq.getDate()).padStart(2, "0")}`;
 
   // Si la date du QCM n'est pas encore passée (formation pas encore arrivée à cette
   // semaine d'école), on laisse la copie vierge : pas de réponse cochée, pas de score,

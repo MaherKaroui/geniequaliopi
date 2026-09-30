@@ -32,6 +32,7 @@ import { BDC_TEMPLATES_MANQUANTS } from "./bdc/bdcTemplatesBC";
 import { BDC_NT_STATS_FILES } from "./bdc/bdcNTStatsXlsx";
 import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
 import { dateMailMission } from "./mailsMissionsCFA";
+import { MISSIONS_QCM } from "./templatesCFA14Missions";
 import { dateMailDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 
@@ -1581,22 +1582,11 @@ export function buildFullCatalog(
       );
     });
 
-    const MISSIONS_TITRES: { num: number; titre: string }[] = [
-      { num: 1, titre: "Handicap" },
-      { num: 2, titre: "Mixité des métiers" },
-      { num: 3, titre: "Coopération CFA/Entreprise" },
-      { num: 4, titre: "Activités citoyennes" },
-      { num: 5, titre: "Rupture de contrat" },
-      { num: 6, titre: "Mixité & Égalité F/H" },
-      { num: 7, titre: "Accompagnement éducatif & social" },
-      { num: 8, titre: "Insertion professionnelle" },
-      { num: 9, titre: "Mobilité Erasmus+" },
-      { num: 10, titre: "Mobilité nationale" },
-      { num: 11, titre: "Aide recherche employeur" },
-      { num: 12, titre: "Accueil à tout moment" },
-      { num: 13, titre: "Formation du Maître d'Apprentissage" },
-      { num: 14, titre: "Conseil de perfectionnement" },
-    ];
+    // Titres alignés sur la numérotation officielle (art. L.6231-2) de MISSIONS_QCM.
+    const MISSIONS_TITRES: { num: number; titre: string }[] = MISSIONS_QCM.map((m) => ({
+      num: m.numero,
+      titre: m.titre.replace(/^Mission \d+\s*—\s*/, "").split(/\s*\(/)[0],
+    }));
     // Ne conserver que les mails dont la date d'envoi est ≤ aujourd'hui
     // (les mails futurs — non encore envoyés — sont retirés du dossier).
     const now = new Date();
@@ -1605,7 +1595,7 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       MISSIONS_TITRES.forEach((m) => {
         if (!fRef) return;
-        const dEnvoi = dateMailMission(fRef, m.num);
+        const dEnvoi = dateMailMission(fRef, m.num, s);
         if (dEnvoi.getTime() > now.getTime()) return;
         add(
           `mail_mission${m.num}_${si}`,
@@ -1622,7 +1612,7 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       MISSIONS_TITRES.forEach((m) => {
         if (!fRef) return;
-        const dEnvoi = dateMailDiffusionMission(fRef, m.num);
+        const dEnvoi = dateMailDiffusionMission(fRef, m.num, s);
         if (dEnvoi.getTime() > now.getTime()) return;
         add(
           `mail_diffusion_mission${m.num}_${si}`,

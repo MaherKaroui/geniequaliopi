@@ -1,6 +1,7 @@
 // Mails d'envoi / d'annonce de DIFFUSION d'une mission CFA
 // Envoyé la veille (J-1) de la semaine école dédiée à la mission.
 // Style Gmail-like, cohérent avec mailsMissionsCFA.ts
+import { lundiMission } from "@/lib/calendrierMissionsCFA";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
 const MISSIONS_DIFFUSION: { num: number; titre: string; supports: string }[] = [
@@ -46,16 +47,14 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/** Lundi de la N-ième semaine école (rythme 1 sem école / 3 sem entreprise → +28j par mission). */
-export function dateDiffusionMission(f: FormationInfo, missionNumero: number): Date {
-  const start = parseDateSafe(f.dateDebut) || new Date();
-  const monday = startOfISOWeek(start);
-  return addDays(monday, (missionNumero - 1) * 28);
+/** Lundi de la semaine école où la mission est diffusée (rythme saisi, borné au contrat de l'apprenti). */
+export function dateDiffusionMission(f: FormationInfo, missionNumero: number, s?: StagiaireInfo): Date {
+  return lundiMission(f, missionNumero, s);
 }
 
 /** Date d'envoi du mail d'annonce = veille (J-1) de la diffusion. */
-export function dateMailDiffusionMission(f: FormationInfo, missionNumero: number): Date {
-  const diffusion = dateDiffusionMission(f, missionNumero);
+export function dateMailDiffusionMission(f: FormationInfo, missionNumero: number, s?: StagiaireInfo): Date {
+  const diffusion = dateDiffusionMission(f, missionNumero, s);
   const veille = addDays(diffusion, -1); // dimanche
   // Envoi déterministe en fin de journée (17h45 + offset)
   veille.setHours(17, 45 + (missionNumero % 10), 0, 0);
@@ -93,8 +92,8 @@ export function genMailDiffusionMissionCFA(
   const mission = MISSIONS_DIFFUSION.find((m) => m.num === missionNumero);
   if (!mission) return "<p>Mission introuvable.</p>";
 
-  const dEnvoi = dateMailDiffusionMission(f, missionNumero);
-  const dDiffusion = dateDiffusionMission(f, missionNumero);
+  const dEnvoi = dateMailDiffusionMission(f, missionNumero, s);
+  const dDiffusion = dateDiffusionMission(f, missionNumero, s);
   const finSemaine = addDays(dDiffusion, 4);
 
   const dateCourt = dEnvoi.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });

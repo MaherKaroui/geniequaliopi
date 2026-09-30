@@ -3,6 +3,7 @@
 // Style Gmail-like, identique aux autres mails du dossier (mail_pre_inscription, etc.).
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { MISSIONS_QCM } from "@/lib/templatesCFA14Missions";
+import { lundiMission, dateQCMMission } from "@/lib/calendrierMissionsCFA";
 
 /* ----- Date helpers (semaines école = 1 sem école / 3 sem entreprise par défaut) ----- */
 function parseDateSafe(s?: string): Date | null {
@@ -28,13 +29,9 @@ function fmtTime(d: Date): string {
   return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Calcule la date d'envoi du mail QCM mission N (lundi de la N-ième semaine école). */
-export function dateMailMission(f: FormationInfo, missionNumero: number): Date {
-  const start = parseDateSafe(f.dateDebut) || new Date();
-  const monday = startOfISOWeek(start);
-  // Rythme par défaut : 1 sem école / 3 sem entreprise → 1 cycle = 4 semaines
-  // Mission N envoyée la semaine école n°N (donc lundi + (N-1)*4 semaines)
-  const lundiSemaineEcole = addDays(monday, (missionNumero - 1) * 28);
+/** Date d'envoi du mail QCM mission N : lundi de la semaine école de l'apprenti (rythme saisi, bornée à son contrat). */
+export function dateMailMission(f: FormationInfo, missionNumero: number, s?: StagiaireInfo): Date {
+  const lundiSemaineEcole = lundiMission(f, missionNumero, s);
   // Heure d'envoi déterministe (8h05 + offset minutes selon mission)
   lundiSemaineEcole.setHours(8, 5 + (missionNumero % 7), 0, 0);
   return lundiSemaineEcole;
@@ -77,11 +74,11 @@ export function genMailMissionCFA(
   const mission = MISSIONS_QCM.find((m) => m.numero === missionNumero);
   if (!mission) return "<p>Mission introuvable.</p>";
 
-  const dEnvoi = dateMailMission(f, missionNumero);
+  const dEnvoi = dateMailMission(f, missionNumero, s);
   const dateLong = fmtLong(dEnvoi);
   const dateCourte = fmtShort(dEnvoi);
   const heure = fmtTime(dEnvoi);
-  const finSemaine = addDays(dEnvoi, 4); // vendredi de la même semaine
+  const finSemaine = dateQCMMission(f, missionNumero, s); // dernier jour école de la semaine
 
   const fromName = o.nom || "Centre de Formation";
   const fromEmail = o.email || `contact@${(o.nom || "cfa").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`;
