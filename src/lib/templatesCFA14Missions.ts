@@ -257,7 +257,7 @@ export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationIn
     sections: [
       {
         heading: "Préambule (Mission 9 — Art. L6231-2)",
-        content: `<p>Conformément à la 9ᵉ mission des CFA, <strong>${o.nom}</strong> encourage et organise la mobilité internationale de ses apprentis dans le cadre du programme Erasmus+. La présente convention formalise les conditions de la période de mobilité.</p>${terminee ? "" : `<p><em>Convention <strong>prévisionnelle</strong> — formation actuellement en cours, dates de mobilité à confirmer.</em></p>`}`,
+        content: `<p>Conformément à la 10ᵉ mission des CFA (art. L.6231-2, 10°), <strong>${o.nom}</strong> encourage et organise la mobilité internationale de ses apprentis dans le cadre du programme Erasmus+. La présente convention formalise les conditions de la période de mobilité.</p>${terminee ? "" : `<p><em>Convention <strong>prévisionnelle</strong> — formation actuellement en cours, dates de mobilité à confirmer.</em></p>`}`,
       },
       {
         heading: "Parties à la convention",
@@ -277,7 +277,7 @@ export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationIn
       },
       {
         heading: "Article 4 — Bourse et financement",
-        content: `<p>L'apprenti percevra une bourse Erasmus+ d'un montant indicatif de <strong>1 200 € pour 4 semaines</strong>, virée en deux fois (80 % avant le départ, 20 % au retour après remise du rapport).</p>`,
+        content: `<p>L'apprenti perçoit la bourse Erasmus+ selon le barème de l'Agence Erasmus+ France en vigueur à la date du départ (pays de destination et durée), versée selon l'échéancier prévu au contrat de mobilité.</p>`,
       },
       {
         heading: "Référent mobilité internationale",
@@ -728,18 +728,18 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
       },
       {
         heading: "Référent mobilité",
-        content: `<p>Conformément à la Mission 10, un personnel dédié est nommé :</p><p><strong>Référent mobilité :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Il mobilise les ressources locales (Région, Mission Locale, France Travail, opérateurs OPCO) pour faciliter la mobilité géographique des apprentis sur le territoire national.</p>`,
+        content: `<p>Conformément à la Mission 10, un personnel dédié est nommé :</p><p><strong>Référent mobilité :</strong> ${o.referentMobilite || o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Il mobilise les ressources locales (Région, Mission Locale, France Travail, opérateurs OPCO) pour faciliter la mobilité géographique des apprentis sur le territoire national.</p>`,
       },
       {
         heading: "Dispositifs de mobilité nationale activés",
         content: tableHTML(
           ["Dispositif", "Public", "Aide / Outil", "Partenaire"],
           [
-            ["Aide Mobili-Jeune (Action Logement)", "Apprentis < 30 ans", "Jusqu'à 100 €/mois pendant 1 an", "Action Logement"],
-            ["Carte Imagine R / Pass Navigo solidarité", "Apprentis Île-de-France", "Tarif réduit transports", "Île-de-France Mobilités"],
-            ["Aide régionale à la mobilité (ARA)", "Apprentis selon Région", "Variable (ex. 200–600 €)", "Conseils régionaux"],
-            ["Plateforme « 1jeune1solution » — Mobilité", "Tous apprentis", "Information + simulateur", "État"],
-            ["Réseau d'hébergement inter-CFA", "Apprentis en mobilité courte", "Mise en relation", "Réseau des CFA"],
+            ["Aide Mobili-Jeune (Action Logement)", "Alternants de moins de 30 ans", "Aide au paiement du loyer — montant et conditions sur actionlogement.fr", "Action Logement"],
+            ...(/^(75|77|78|91|92|93|94|95)/.test((o.codePostal || "").trim()) ? [["Forfait Imagine R", "Apprentis franciliens", "Tarif réduit transports", "Île-de-France Mobilités"]] : []),
+            ["Aides de la Région à la mobilité des apprentis", "Selon la Région du CFA", "Transport, hébergement, restauration — conditions de la Région", "Conseil régional"],
+            ["Plateforme « 1jeune1solution »", "Tous apprentis", "Information et simulateur d'aides", "État"],
+            ["Mobilité inter-CFA", "Apprentis en mobilité nationale", "Convention de mise à disposition", "CFA partenaires"],
           ]
         ),
       },
@@ -757,27 +757,25 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
       },
       {
         heading: "Suivi individuel des demandes de mobilité nationale",
-        content: stagiaires.length > 0
+        content: stagiaires.filter((x) => (x.nom || "").trim()).length > 0
           ? tableHTML(
-              ["Apprenti", "Type d'aide demandée", "Statut dossier", "Date suivi"],
-              stagiaires.slice(0, 5).map((s, i) => {
-                const aides = ["Aide Mobili-Jeune", "Carte Imagine R", "Aide régionale ARA", "Aide Mobili-Jeune", "Aide Mobili-Jeune"];
-                const statuts = terminee
-                  ? ["Accordée", "Accordée", "Accordée", "En instruction", "Accordée"]
-                  : ["En instruction", "Dossier déposé", "À déposer", "À déposer", "Accordée"];
-                const ratio = suiviRatios[i % suiviRatios.length];
-                const dSuivi = at(ratio);
-                const dateSuiviStr = dSuivi ? formatDate(dSuivi.toISOString().slice(0, 10)) : formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
-                return [`${s.prenom} ${s.nom}`, aides[i % aides.length], statuts[i % statuts.length], dateSuiviStr];
+              ["Apprenti", "Information mobilité délivrée", "Projet de mobilité", "Suite donnée"],
+              stagiaires.filter((x) => (x.nom || "").trim()).map((x) => {
+                const d = dateQCMMission(f, 10, x);
+                const passe = d.getTime() <= today.getTime();
+                const dfr = formatDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+                return [`${x.prenom} ${x.nom}`, passe ? `Oui — atelier Mission 10 du ${dfr}` : `Prévue le ${dfr}`, passe ? "Aucun projet exprimé à ce jour" : "—", passe ? "Information renouvelée à l'entretien de suivi" : "—"];
               })
             )
-          : `<p><em>Aucun apprenti renseigné — tableau à compléter au fil des demandes.</em></p>`,
+          : `<p><em>Aucun apprenti renseigné.</em></p>`,
       },
       {
         heading: "Bilan",
-        content: terminee
-          ? `<p><strong>Taux d'apprentis ayant bénéficié d'au moins une aide à la mobilité :</strong> 68 %<br><strong>Montant moyen mobilisé par apprenti :</strong> 720 €</p>`
-          : `<p><strong>Bilan à consolider</strong> en fin d'année — formation en cours.</p>`,
+        content: (() => {
+          const liste = stagiaires.filter((x) => (x.nom || "").trim());
+          const informes = liste.filter((x) => dateQCMMission(f, 10, x).getTime() <= today.getTime()).length;
+          return `<p><strong>Apprentis informés sur la mobilité :</strong> ${informes} / ${liste.length} (émargement de l'atelier Mission 10). Les projets de mobilité accompagnés et les aides obtenues sont consolidés dans le tableau de bord des 14 missions.</p>`;
+        })(),
         variant: "green",
       },
     ],
@@ -832,7 +830,7 @@ export function genConventionMobiliteInterCFA(o: OrganismeInfo, f: FormationInfo
       },
       {
         heading: "Article 6 — Modalités financières",
-        content: `<p>☐ Mise à disposition à <strong>titre gratuit</strong> (réciprocité entre CFA partenaires)<br>☐ Refacturation au CFA d'origine sur la base de [montant] € / heure stagiaire<br>☐ Prise en charge des frais de transport / hébergement par : ☐ Apprenti  ☐ Employeur  ☐ CFA d'origine  ☐ Aide régionale (Carte mobilité, ARA, etc.)</p>`,
+        content: `<p>☐ Mise à disposition à <strong>titre gratuit</strong> (réciprocité entre CFA partenaires)<br>☐ Refacturation au CFA d'origine sur la base de [montant] € / heure stagiaire<br>☐ Prise en charge des frais de transport / hébergement par : ☐ Apprenti  ☐ Employeur  ☐ CFA d'origine  ☐ Aide de la Région (selon la Région du CFA)</p>`,
       },
       {
         heading: "Article 7 — Engagements du CFA d'accueil",
@@ -894,7 +892,7 @@ export function genFicheDemandeMobiliteNationale(o: OrganismeInfo, f: FormationI
       },
       {
         heading: "Aides mobilisables (à cocher)",
-        content: `<p>☐ <strong>Aide mobilité Région</strong> (transport / hébergement) — formulaire région<br>☐ <strong>Carte de réduction transport</strong> (Imagine R, OùRA!, Pass Pays de la Loire…)<br>☐ <strong>Aide au logement temporaire</strong> (FJT, CROUS hors étudiant, Action Logement Mobili-Jeune)<br>☐ <strong>Aide exceptionnelle CFA</strong> (fonds social interne)<br>☐ <strong>Aide employeur</strong> (prise en charge transport/repas)</p>`,
+        content: `<p>☐ <strong>Aide mobilité Région</strong> (transport / hébergement) — formulaire région<br>☐ <strong>Carte de réduction transport</strong> (dispositif de la Région du CFA)<br>☐ <strong>Aide au logement temporaire</strong> (FJT, CROUS hors étudiant, Action Logement Mobili-Jeune)<br>☐ <strong>Aide exceptionnelle CFA</strong> (fonds social interne)<br>☐ <strong>Aide employeur</strong> (prise en charge transport/repas)</p>`,
       },
       {
         heading: "Décision finale",
@@ -962,7 +960,7 @@ export function genFichePosteReferentMobiliteNationale(o: OrganismeInfo, f: Form
       },
       {
         heading: "Missions principales",
-        content: `<p>Dans le cadre du projet d'établissement et de la certification Qualiopi de <strong>${o.nom}</strong>, le Référent Mobilité assure les missions suivantes :</p><p>• <strong>Accompagnement individuel</strong> des apprentis dans la définition et la mise en œuvre de leur projet de mobilité (nationale ou Erasmus+).<br>• <strong>Vérification</strong> des documents administratifs et contractuels liés aux bourses de mobilité (Erasmus+, aides régionales, ARA, Mobili-Jeune…).<br>• <strong>Saisie et suivi</strong> sur les bases de données institutionnelles (Mobility Tool+, Beneficiary Module, plateformes régionales).<br>• <strong>Relance, classement et archivage</strong> des dossiers de mobilité dans l'espace partagé du CFA.<br>• <strong>Organisation des réunions</strong> du réseau Référents Mobilité, suivi et comptes-rendus.<br>• <strong>Animation</strong> du réseau de CFA partenaires (France) et d'établissements d'accueil (Europe).<br>• <strong>Suivi des projets individuels</strong> de mobilité (préparation, départ, suivi à distance, retour, Europass Mobilité).<br>• <strong>Écoute et dialogue</strong> avec les apprenants pour préciser, mettre en œuvre et sécuriser leur projet de mobilité.<br>• <strong>Participation</strong> au groupe de travail interne qualité dans une démarche d'amélioration continue de la mobilité.<br>• <strong>Représentation</strong> de ${o.nom} lors d'événements liés à la mobilité européenne et nationale.</p>`,
+        content: `<p>Dans le cadre du projet d'établissement et de la certification Qualiopi de <strong>${o.nom}</strong>, le Référent Mobilité assure les missions suivantes :</p><p>• <strong>Accompagnement individuel</strong> des apprentis dans la définition et la mise en œuvre de leur projet de mobilité (nationale ou Erasmus+).<br>• <strong>Vérification</strong> des documents administratifs et contractuels liés aux bourses de mobilité (Erasmus+, aides de la Région, Mobili-Jeune…).<br>• <strong>Saisie et suivi</strong> sur les bases de données institutionnelles (Mobility Tool+, Beneficiary Module, plateformes régionales).<br>• <strong>Relance, classement et archivage</strong> des dossiers de mobilité dans l'espace partagé du CFA.<br>• <strong>Organisation des réunions</strong> du réseau Référents Mobilité, suivi et comptes-rendus.<br>• <strong>Animation</strong> du réseau de CFA partenaires (France) et d'établissements d'accueil (Europe).<br>• <strong>Suivi des projets individuels</strong> de mobilité (préparation, départ, suivi à distance, retour, Europass Mobilité).<br>• <strong>Écoute et dialogue</strong> avec les apprenants pour préciser, mettre en œuvre et sécuriser leur projet de mobilité.<br>• <strong>Participation</strong> au groupe de travail interne qualité dans une démarche d'amélioration continue de la mobilité.<br>• <strong>Représentation</strong> de ${o.nom} lors d'événements liés à la mobilité européenne et nationale.</p>`,
       },
       {
         heading: "Spécificités du poste / contraintes",
@@ -1311,8 +1309,8 @@ export const MISSIONS_QCM: MissionQCM[] = [
       { q: "La mission 1 du CFA (L.6231-2) consiste à :", options: ["Vendre des formations", "Accompagner les personnes souhaitant s'orienter ou se réorienter par la voie de l'apprentissage", "Recruter pour l'entreprise", "Délivrer des diplômes"], correctIndex: 1 },
       { q: "Pour les personnes en situation de handicap, le CFA doit désigner :", options: ["Un délégué syndical", "Un référent chargé de l'intégration des personnes en situation de handicap", "Un médecin du travail", "Un tuteur extérieur"], correctIndex: 1 },
       { q: "La RQTH est délivrée par :", options: ["Le médecin traitant", "La MDPH (CDAPH)", "Le CFA", "L'employeur"], correctIndex: 1 },
-      { q: "Quel organisme finance principalement les aménagements de poste ?", options: ["Pôle Emploi", "AGEFIPH / FIPHFP", "URSSAF", "DREETS"], correctIndex: 1 },
-      { q: "Le CFA appuie la recherche d'un employeur pour la PSH afin de :", options: ["Faciliter son intégration en entreprise et en CFA", "Réduire les coûts", "Sélectionner les meilleurs", "Remplacer Pôle Emploi"], correctIndex: 0 },
+      { q: "Quel organisme finance principalement les aménagements de poste ?", options: ["France Travail", "AGEFIPH / FIPHFP", "URSSAF", "DREETS"], correctIndex: 1 },
+      { q: "Le CFA appuie la recherche d'un employeur pour la PSH afin de :", options: ["Faciliter son intégration en entreprise et en CFA", "Réduire les coûts", "Sélectionner les meilleurs", "Remplacer France Travail"], correctIndex: 0 },
       { q: "Un aménagement de formation peut consister à :", options: ["Réduire les compétences exigées", "Adapter les supports et le rythme sans baisser le niveau", "Supprimer les évaluations", "Allonger automatiquement le contrat de 2 ans"], correctIndex: 1 },
       { q: "L'apprenti en situation de handicap bénéficie-t-il d'une prolongation possible du contrat ?", options: ["Non, jamais", "Oui, jusqu'à 1 an supplémentaire", "Oui, doublement automatique", "Oui, sans limite"], correctIndex: 1 },
       { q: "La confidentialité de la situation de handicap est :", options: ["Optionnelle", "Obligatoire (secret professionnel)", "Publique", "Réservée à l'employeur"], correctIndex: 1 },
@@ -1455,7 +1453,7 @@ export const MISSIONS_QCM: MissionQCM[] = [
       { q: "La mission 10 impose au CFA de :", options: ["Interdire la mobilité", "Encourager la mobilité nationale et internationale des apprentis", "Limiter à un seul stage", "Refuser Erasmus+"], correctIndex: 1 },
       { q: "Le CFA doit nommer :", options: ["Aucun référent", "Un personnel dédié, qui peut comprendre un référent mobilité", "Un avocat", "Un comptable"], correctIndex: 1 },
       { q: "Au niveau international, le CFA mobilise :", options: ["Aucun programme", "Les programmes de l'Union européenne (Erasmus+)", "Les visas touristiques", "Les billets perso"], correctIndex: 1 },
-      { q: "Durée minimale d'une mobilité courte Erasmus+ apprenti :", options: ["1 jour", "2 semaines", "6 mois", "1 an"], correctIndex: 1 },
+      { q: "Durée minimale d'une mobilité courte Erasmus+ d'un apprenti :", options: ["1 jour", "10 jours", "6 mois", "1 an"], correctIndex: 1 },
       { q: "Pendant la mobilité longue (>4 semaines), le contrat français est :", options: ["Rompu", "Mis en veille (statut spécifique mobilité)", "Remplacé par un CDD", "Inchangé totalement"], correctIndex: 1 },
       { q: "L'agence française Erasmus+ s'appelle :", options: ["France Travail", "Agence Erasmus+ France / Éducation Formation", "URSSAF", "DREETS"], correctIndex: 1 },
       { q: "L'Europass Mobilité atteste :", options: ["Du diplôme", "Des compétences acquises lors de la mobilité européenne", "De l'identité", "Du salaire"], correctIndex: 1 },
@@ -1528,17 +1526,32 @@ export const MISSIONS_QCM: MissionQCM[] = [
   },
 ];
 
-function pickStudentAnswers(stagiaire: StagiaireInfo, missionNumero: number, questions: { correctIndex: number; options: string[] }[]): number[] {
-  // Deterministic per stagiaire + mission. ~80% correct.
-  const base = `${stagiaire?.prenom || ""}${stagiaire?.nom || ""}M${missionNumero}`;
-  let h = 0;
-  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
+/**
+ * Réponses d'un apprenti au QCM d'une mission : déterministes par apprenti, différentes
+ * d'un apprenti à l'autre, et cohérentes avec son profil (un apprenti RQTH connaît mieux
+ * la mission 1 et les aides, un mineur a eu l'information renforcée santé-sécurité, un
+ * apprenti sans entreprise a suivi l'atelier de recherche d'employeur, etc.).
+ */
+export function pickStudentAnswers(stagiaire: StagiaireInfo, missionNumero: number, questions: { correctIndex: number; options: string[] }[]): number[] {
+  const base = `${stagiaire?.prenom || ""}|${stagiaire?.nom || ""}|${stagiaire?.dateNaissance || ""}`;
+  let h = 2166136261;
+  for (let i = 0; i < base.length; i++) { h ^= base.charCodeAt(i); h = Math.imul(h, 16777619); }
+  const niveau = 0.66 + (((h >>> 0) % 1000) / 1000) * 0.26; // de 66 % à 92 % selon l'apprenti
+  const naissance = new Date(stagiaire?.dateNaissance || "");
+  const age = isNaN(naissance.getTime()) ? 30 : (Date.now() - naissance.getTime()) / (365.25 * 86400000);
+  const bonus =
+    (stagiaire?.rqth === "oui" && (missionNumero === 1 || missionNumero === 14) ? 0.12 : 0) +
+    (age < 18 && missionNumero === 4 ? 0.1 : 0) +
+    (!(stagiaire?.entreprise || "").trim() && missionNumero === 2 ? 0.1 : 0) +
+    ((stagiaire?.entreprise || "").trim() && missionNumero === 3 ? 0.06 : 0);
+  const taux = Math.min(0.97, niveau + bonus);
   return questions.map((q, qi) => {
-    const seed = Math.abs(h + qi * 7);
-    const rand = ((seed * 9301 + 49297) % 233280) / 233280;
-    if (rand < 0.8) return q.correctIndex;
+    let x = (h ^ Math.imul(missionNumero * 97 + qi * 131, 2654435761)) >>> 0;
+    x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+    const rand = ((x >>> 0) % 10000) / 10000;
+    if (rand < taux) return q.correctIndex;
     const wrong = q.options.map((_, i) => i).filter((i) => i !== q.correctIndex);
-    return wrong[seed % wrong.length];
+    return wrong[(x >>> 0) % wrong.length];
   });
 }
 
@@ -1643,7 +1656,8 @@ export function genQCMMissionCFA(
 // CHAPEAU 14 MISSIONS — Procédure de communication & mise en œuvre
 // ============================================================================
 export function genProcedureCommunication14MissionsCFA(o: OrganismeInfo) {
-  const annee = new Date().getFullYear();
+  const dMaj = (o.dateMaj || new Date().toISOString()).slice(0, 10);
+  const annee = new Date(dMaj).getFullYear() || new Date().getFullYear();
   return buildDocument({
     org: o,
     title: "PROCÉDURE — COMMUNICATION ET MISE EN ŒUVRE DES 14 MISSIONS DU CFA",
@@ -1667,7 +1681,7 @@ export function genProcedureCommunication14MissionsCFA(o: OrganismeInfo) {
       },
       {
         heading: "5. Missions abordées (Art. L6231-2)",
-        content: `<ol><li>Orientation et insertion professionnelle</li><li>Recherche d'entreprise et appui au recrutement</li><li>Suivi pédagogique CFA / entreprise</li><li>Santé et sécurité au travail</li><li>Maintien en formation 6 mois (rupture de contrat)</li><li>Aides sociales et matérielles</li><li>Égalité femmes-hommes</li><li>Égalité des chances</li><li>Lutte contre les discriminations</li><li>Mobilité nationale et internationale</li><li>Formation à distance</li><li>Évaluation des compétences</li><li>Réorientation</li><li>Accès aux aides spécifiques (handicap, logement, transport)</li></ol>`,
+        content: `<ol>${MISSIONS_QCM.map((m) => `<li>${m.titre.replace(/^Mission \d+ — /, "")}</li>`).join("")}</ol><p>Numérotation identique à celle de l'article L.6231-2 (1° à 14°) ; chaque mission dispose d'une fiche mission, d'une newsletter, d'un visuel, d'un atelier émargé et d'un QCM individuel corrigé.</p>`,
       },
       {
         heading: "6. Webinaires",
@@ -1695,12 +1709,12 @@ export function genProcedureCommunication14MissionsCFA(o: OrganismeInfo) {
       },
       {
         heading: "12. Amélioration continue",
-        content: `<p>Les actions sont analysées chaque trimestre par le Conseil de perfectionnement afin d'améliorer le dispositif (contenu, fréquence, supports, accessibilité).</p>`,
+        content: `<p>Les résultats (tableau de bord des 14 missions) sont analysés chaque trimestre en réunion pédagogique et présentés au moins une fois par an au conseil de perfectionnement, afin d'améliorer le dispositif (contenu, fréquence, supports, accessibilité).</p>`,
         variant: "green",
       },
       {
         heading: "13. Validation",
-        content: `<p><strong>Responsable :</strong> ${o.dirigeant} — Direction<br><strong>Date :</strong> ${formatDate(new Date().toISOString().slice(0, 10))}<br><strong>Version :</strong> V1</p>`,
+        content: `<p><strong>Responsable :</strong> ${o.dirigeant} — Direction<br><strong>Date :</strong> ${formatDate(dMaj)}<br><strong>Version :</strong> V${o.version || "1"}</p>`,
       },
     ],
   });
@@ -1717,7 +1731,7 @@ const MISSIONS_PLANNING: { num: number; titre: string; thematique: string; suppo
   { num: 3,  titre: "Cohérence CFA / Entreprise",                           thematique: "Maître d'apprentissage, visites, livret",            supports: "Affiche A3 Mission 3 + Procédure coopération + QCM",                       canal: "Réunion MA + ENT + Mail apprenti" },
   { num: 4,  titre: "Droits, devoirs & Santé-Sécurité au travail",          thematique: "Code du travail, prévention, RPS",                   supports: "Affiche A3 Mission 4 + Note d'information SST + QCM",                      canal: "Affichage atelier + ENT + Mail apprenti" },
   { num: 5,  titre: "Rupture de contrat",                                   thematique: "Procédure de rupture, maintien 6 mois en formation", supports: "Affiche A3 Mission 5 + Procédure maintien 6 mois + QCM",                   canal: "Entretien individuel + ENT + Mail apprenti" },
-  { num: 6,  titre: "Accompagnement social & matériel",                     thematique: "Aides régionales, transport, santé psy, logement",   supports: "Affiche A3 Mission 6 + Cartes aides (ARA, Imagine R, Santé Psy) + QCM",    canal: "Référent social + ENT + Mail apprenti" },
+  { num: 6,  titre: "Accompagnement social & matériel",                     thematique: "Aides régionales, transport, santé psy, logement",   supports: "Affiche A3 Mission 6 + Procédure d'accompagnement social + liste des aides de la Région du CFA + QCM",    canal: "Référent social + ENT + Mail apprenti" },
   { num: 7,  titre: "Mixité Femmes – Hommes",                               thematique: "Plan mixité, lutte contre stéréotypes",              supports: "Affiche A3 Mission 7 + Plan d'actions mixité F/H + QCM",                  canal: "Salle commune + ENT + Mail apprenti" },
   { num: 8,  titre: "Égalité professionnelle & mixité des métiers",         thematique: "Mixité dans les métiers préparés, témoignages",      supports: "Affiche A3 Mission 8 + Plan mixité des métiers + QCM",                    canal: "Forum métiers + ENT + Mail apprenti" },
   { num: 9,  titre: "Diversité & lutte contre les discriminations",         thematique: "Charte diversité, cellule d'écoute",                 supports: "Affiche A3 Mission 9 + Plan diversité + QCM",                              canal: "Affichage + ENT + Mail apprenti" },
@@ -1725,7 +1739,7 @@ const MISSIONS_PLANNING: { num: number; titre: string; thematique: string; suppo
   { num: 11, titre: "Suivi de la formation à distance",                     thematique: "LMS, connexion, accompagnement pédagogique distant", supports: "Affiche A3 Mission 11 + Procédure suivi distance + QCM",                  canal: "Mail + LMS + ENT" },
   { num: 12, titre: "Évaluation des compétences acquises",                  thematique: "Modalités d'évaluation, livret, jurys",              supports: "Affiche A3 Mission 12 + Attestation formation MA + QCM",                  canal: "Réunion pédagogique + ENT + Mail apprenti" },
   { num: 13, titre: "Accompagnement post-formation",                        thematique: "Insertion, suivi à 6 mois, réseau alumni",           supports: "Affiche A3 Mission 13 + Procédure accompagnement post-formation + QCM",   canal: "Mail + ENT + Entretien individuel" },
-  { num: 14, titre: "Accès aux aides des apprentis",                        thematique: "Aide permis B, aide 1er équipement, mobili-jeunes", supports: "Affiche A3 Mission 14 + Procédure accès aux aides + QCM",                  canal: "Référent social + ENT + Mail apprenti" },
+  { num: 14, titre: "Accès aux aides des apprentis",                        thematique: "Logement (CAF, Action Logement), transport, 1er équipement, prime d'activité", supports: "Affiche A3 Mission 14 + Procédure accès aux aides + QCM",                  canal: "Référent social + ENT + Mail apprenti" },
 ];
 
 function fmtLongFRPlanning(d: Date): string {

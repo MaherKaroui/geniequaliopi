@@ -2,6 +2,8 @@ import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genC
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
+import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14MissionsCFA, genPlanAnnuel14MissionsCFA, genProcedureAccompagnementSocialCFA, genProcedureEvaluationCompetencesCFA } from "./missionsCFA2026";
+import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2026, genInformationDroitsDevoirsSST2026, genTableauCandidatsSansContrat2026 } from "./missionsCFA2026Plans";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
 import { entreesNonApplicables, motifNonApplicable, genDeclarationNonApplicabilite } from "./nonApplicabilite";
@@ -1031,8 +1033,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "livret_maitre_apprentissage_cfa": return genLivretMaitreApprentissageCFA(o);
     case "tableau_suivi_parcours_beneficiaires_cfa_excel": return generateExcelSuiviParcoursBeneficiairesCFA(o, f, stagiaires);
     // === 14 Missions CFA — Templates dédiés ===
-    case "plan_activites_citoyennes_cfa": return genPlanActivitesCitoyennesCFA(o, f, stagiaires);
-    case "plan_mixite_egalite_fh_cfa": return genPlanMixiteEgaliteFHCFA(o, f, stagiaires);
+    case "plan_activites_citoyennes_cfa": return genInformationDroitsDevoirsSST2026(o, f, stagiaires);
+    case "plan_mixite_egalite_fh_cfa": return genPlanMixiteEgaliteFH2026(o, f, stagiaires);
     case "suivi_insertion_pro_cfa": return genSuiviInsertionProCFA(o, f, stagiaires);
     case "convention_mobilite_erasmus_cfa": return genConventionMobiliteErasmusCFA(o, f, stagiaires);
     case "procedure_mobilite_erasmus_cfa": return genProcedureMobiliteErasmusCFA(o);
@@ -1042,16 +1044,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "site_web_atelier_cv_cfa": return genSiteWebAtelierCVCFA(o);
     case "site_web_atelier_entretien_cfa": return genSiteWebAtelierEntretienCFA(o);
     case "livret_referent_handicap_cfa": return genLivretReferentHandicapCFA(o);
-    case "tableau_suivi_candidats_sans_contrat_cfa": return genTableauSuiviCandidatsSansContratCFA(o, f, stagiaires);
+    case "tableau_suivi_candidats_sans_contrat_cfa": return genTableauCandidatsSansContrat2026(o, f, stagiaires);
     case "attestation_formation_maitre_apprentissage_cfa": return genAttestationFormationMaitreApprentissageCFA(o, f, stagiaires);
     case "cooperation_cfa_entreprise_cfa": return genCoperationCFAEntrepriseCFA(o, f, stagiaires);
-    case "plan_diversite_lutte_discriminations_cfa": return genPlanDiversiteLutteDiscriminationsCFA(o, f, stagiaires);
+    case "plan_diversite_lutte_discriminations_cfa": return genPlanDiversite2026(o, f, stagiaires);
     case "plan_mobilite_nationale_cfa": return genPlanMobiliteNationaleCFA(o, f, stagiaires);
     case "convention_mobilite_inter_cfa": return genConventionMobiliteInterCFA(o, f, stagiaires);
     case "fiche_demande_mobilite_nationale": return genFicheDemandeMobiliteNationale(o, f, stagiaires);
     case "fiche_poste_referent_mobilite_nationale": return genFichePosteReferentMobiliteNationale(o, f, stagiaires);
     case "procedure_accompagnement_post_formation_cfa": return genProcedureAccompagnementPostFormationCFA(o);
-    case "plan_mixite_metiers_cfa": return genPlanMixiteMetiersCFA(o, f, stagiaires);
+    case "plan_mixite_metiers_cfa": return genPlanMixiteMetiers2026(o, f, stagiaires);
     case "procedure_accompagnement_educatif_social_cfa": return genProcedureAccompagnementEducatifSocialCFA(o);
     case "procedure_accueil_tout_moment_cfa": return genProcedureAccueilToutMomentCFA(o);
     case "conseil_perfectionnement_cfa": return genConseilPerfectionnementCFA(o, f, stagiaires);
@@ -1089,6 +1091,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       if (reunion.getTime() > today.getTime()) reunion.setTime(today.getTime());
       return genSyntheseEvaluationEnseignements(o, f, finis, blocs[bi]?.titre || f.intitule, reunion.toLocaleDateString("fr-FR"), finis.length > 0);
     }
+    case "fiche_mission_cfa": return genFicheMissionCFA(o, f, stagiaires, typeof params?.missionNumero === "number" ? params.missionNumero : 1);
+    case "emargement_atelier_mission_cfa": return genEmargementAtelierMissionCFA(o, f, stagiaires, typeof params?.missionNumero === "number" ? params.missionNumero : 1);
+    case "tableau_bord_14_missions_cfa": return genTableauBord14MissionsCFA(o, f, stagiaires);
+    case "plan_annuel_14_missions_cfa": return genPlanAnnuel14MissionsCFA(o, f, stagiaires);
+    case "procedure_accompagnement_social_cfa": return genProcedureAccompagnementSocialCFA(o);
+    case "procedure_evaluation_competences_cfa": return genProcedureEvaluationCompetencesCFA(o, f);
     case "qcm_mission_cfa": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
