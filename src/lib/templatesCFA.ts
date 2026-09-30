@@ -8,14 +8,6 @@ const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
 
 // ========== A. DOCUMENTS ADMINISTRATIFS CFA ==========
 
-export function genPresentationCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PRÉSENTATION DE L'ORGANISME – CFA", sections: [
-    { heading: "Notre CFA", content: `<p>${o.nom} est un Centre de Formation d'Apprentis (CFA) spécialisé dans les domaines suivants : ${o.domainesFormation}. Notre mission est de former les apprentis aux métiers de demain en alternant périodes en entreprise et en centre de formation.</p>` },
-    { heading: "Notre approche", content: "<p>• Formation en alternance avec un accompagnement personnalisé<br>• Liens étroits avec les entreprises du territoire<br>• Suivi individualisé de chaque apprenti<br>• Préparation aux certifications professionnelles (RNCP)</p>" },
-    { heading: "Chiffres clés", content: "<p>• 250 apprentis formés en 2024<br>• 15 formations en alternance<br>• 120 entreprises partenaires<br>• 92% de taux de réussite aux examens<br>• 88% d'insertion professionnelle à 6 mois</p>", variant: "green" },
-  ] });
-}
-
 export function genOrganigrammeCFA(o: OrganismeInfo) {
   const ped = o.responsablePedagogique || o.dirigeant;
   const qual = o.referentQualite || o.dirigeant;
@@ -566,27 +558,6 @@ export function genSatisfactionFormateurCFA(o: OrganismeInfo, f: FormationInfo) 
   } });
 }
 
-export function genTableauSuiviRuptures(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DES RUPTURES – CFA", table: {
-    headers: ["N°", "Apprenti", "Entreprise", "Date rupture", "Motif", "Action", "Issue"],
-    rows: [
-      ["1", "Anonymisé A.", "Entreprise X", "15/11/2024", "Difficultés relationnelles", "Médiation + recherche nouvelle entreprise", "✅ Nouveau contrat signé"],
-      ["2", "Anonymisé B.", "Entreprise Y", "20/01/2025", "Réorientation", "Accompagnement projet professionnel", "✅ Réorientation vers formation adaptée"],
-    ]
-  }, sections: [{ heading: "Bilan", content: "<p>Taux de rupture : 3% (2 ruptures sur 65 contrats)<br>100% des apprentis ont été accompagnés suite à la rupture.</p>", variant: "green" }] });
-}
-
-export function genTableauSuiviInsertion(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'INSERTION PROFESSIONNELLE", table: {
-    headers: ["Promotion", "Nb diplômés", "Emploi 3 mois", "Emploi 6 mois", "Poursuite études", "Recherche"],
-    rows: [
-      ["2022", "58", "42 (72%)", "50 (86%)", "5 (9%)", "3 (5%)"],
-      ["2023", "62", "48 (77%)", "55 (89%)", "4 (6%)", "3 (5%)"],
-      ["2024", "65", "52 (80%)", "58 (89%)", "4 (6%)", "3 (5%)"],
-    ]
-  }, sections: [{ heading: "Synthèse", content: "<p><strong>Taux d'insertion à 6 mois : 89%</strong><br>En progression constante depuis 3 ans.</p>", variant: "green" }] });
-}
-
 export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
   const progress = getFormationProgress(f);
@@ -622,52 +593,6 @@ export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo
   });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ACCOMPAGNEMENT", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Niveau accompagnement", "Visites réalisées", "Objectif atteint", "Remarques"], rows
-  } });
-}
-
-export function genRegistreReclamationsCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "REGISTRE DES RÉCLAMATIONS – CFA", table: {
-    headers: ["N°", "Date", "Émetteur", "Type", "Objet", "Traitement", "Délai", "Statut"],
-    rows: [
-      ["1", "10/10/2024", "Apprenti", "Pédagogie", "Rythme trop rapide module 3", "Ajout séances de soutien", "72h", "✅"],
-      ["2", "15/11/2024", "Entreprise", "Organisation", "Planning alternance modifié tardivement", "Communication anticipée", "48h", "✅"],
-      ["3", "20/01/2025", "Parent", "Information", "Manque d'information sur les examens", "Envoi calendrier + réunion parents", "24h", "✅"],
-    ]
-  }, sections: [{ heading: "Bilan", content: "<p>3 réclamations – 100% traitées sous 72h.</p>", variant: "green" }] });
-}
-
-export function genPlanAmeliorationCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PLAN D'AMÉLIORATION CONTINUE – CFA", table: {
-    headers: ["N°", "Action", "Origine", "Responsable", "Échéance", "Statut"],
-    rows: [
-      ["1", "Renforcer la coordination CFA/entreprise", "Enquête entreprises", o.responsablePedagogique, "T2 2025", "🔄 En cours"],
-      ["2", "Créer un portail maître d'apprentissage", "Retours MA", "Service IT", "T3 2025", "📋 Planifié"],
-      ["3", "Développer le soutien scolaire", "Analyse résultats", o.responsablePedagogique, "T1 2025", "✅ Fait"],
-      ["4", "Améliorer le suivi des ruptures", "Analyse qualité", o.referentQualite, "T2 2025", "🔄 En cours"],
-    ]
-  } });
-}
-
-export function genSyntheseQualiteCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "SYNTHÈSE QUALITÉ – CFA 2024", sections: [
-    { heading: "Indicateurs clés", content: "<p>✅ Taux de réussite : 92% (objectif 85%)<br>✅ Satisfaction apprentis : 92% (objectif 85%)<br>✅ Satisfaction entreprises : 90% (objectif 85%)<br>✅ Taux d'insertion : 89% (objectif 80%)<br>✅ Taux de rupture : 3% (objectif ≤5%)</p>", variant: "green" },
-    { heading: "Points forts", content: "<p>• Qualité de l'accompagnement individualisé<br>• Relations solides avec les entreprises<br>• Taux de réussite en progression</p>" },
-    { heading: "Axes d'amélioration 2025", content: "<p>• Digitalisation du carnet de liaison<br>• Renforcement des visites en entreprise<br>• Développement des partenariats</p>" },
-  ] });
-}
-
-export function genTableauIndicateursCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "TABLEAU DES INDICATEURS – CFA", table: {
-    headers: ["Indicateur", "2022", "2023", "2024", "Objectif", "Tendance"],
-    rows: [
-      ["Taux de réussite", "88%", "90%", "92%", "≥ 85%", "↗ En hausse"],
-      ["Taux d'insertion (6 mois)", "86%", "88%", "89%", "≥ 80%", "↗ En hausse"],
-      ["Satisfaction apprentis", "88%", "90%", "92%", "≥ 85%", "↗ En hausse"],
-      ["Satisfaction entreprises", "85%", "88%", "90%", "≥ 85%", "↗ En hausse"],
-      ["Taux de rupture", "5%", "4%", "3%", "≤ 5%", "↘ En baisse"],
-      ["Nb apprentis", "180", "220", "250", "≥ 200", "↗ En hausse"],
-      ["Nb entreprises partenaires", "90", "105", "120", "≥ 100", "↗ En hausse"],
-    ]
   } });
 }
 
@@ -714,24 +639,9 @@ export function genPreuveGestionRuptures(o: OrganismeInfo) {
   ] });
 }
 
-export function genPreuveInsertionProfessionnelle(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PREUVE – INSERTION PROFESSIONNELLE", sections: [
-    { heading: "Enquête", content: "<p>Enquête réalisée à 3 mois et 6 mois après l'obtention de la certification.</p>" },
-    { heading: "Résultats 2024", content: "<p>• Taux d'insertion à 6 mois : 89%<br>• Dont CDI : 45%<br>• Dont CDD : 25%<br>• Poursuite d'études : 19%<br>• En recherche : 11%</p>", variant: "green" },
-    { heading: "Preuves", content: "<p>☑ Questionnaires d'insertion remplis<br>☑ Tableau de suivi de l'insertion<br>☑ Base de données des anciens apprentis</p>" },
-  ] });
-}
-
 export function genPreuveRelationEntreprise(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PREUVE – RELATION AVEC LES ENTREPRISES", sections: [
     { heading: "Preuves", content: "<p>☑ 120 conventions de partenariat actives<br>☑ Comptes-rendus de visite en entreprise<br>☑ Enquêtes de satisfaction entreprise (90%)<br>☑ Fiches de liaison CFA/entreprise<br>☑ CR réunion annuelle entreprises</p>", variant: "green" },
-  ] });
-}
-
-export function genPreuveAccessibiliteHandicapCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PREUVE – ACCESSIBILITÉ HANDICAP CFA", sections: [
-    { heading: "Référent", content: `<p>${o.referentHandicap} – ${o.email}</p>` },
-    { heading: "Preuves", content: "<p>☑ Charte handicap CFA signée<br>☑ 6 apprentis en situation de handicap accueillis en 2024<br>☑ Aménagements mis en place (1/3 temps, supports adaptés)<br>☑ Partenariats Agefiph, MDPH, Cap Emploi<br>☑ Formation du référent handicap à jour</p>", variant: "green" },
   ] });
 }
 
