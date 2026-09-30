@@ -54,17 +54,20 @@ export function genDeclarationNonApplicabilite(o: OrganismeInfo, f: FormationInf
   });
 }
 
-/** Entrées de catalogue pour les indicateurs 1 à 33 sans aucune pièce. */
+/** Entrées de catalogue pour les indicateurs 1 à 33 sans aucune pièce :
+ * uniquement les indicateurs réellement non applicables (motif motivé).
+ * Un indicateur applicable sans pièce généré est retiré du dossier. */
 export function entreesNonApplicables(catalogue: DocEntry[], type: Type, f: FormationInfo): DocEntry[] {
   const couverts = new Set(catalogue.map((d) => d.indicateur));
   const out: DocEntry[] = [];
   for (let ind = 1; ind <= 33; ind++) {
     if (couverts.has(ind)) continue;
     const motif = motifNonApplicable(ind, type, f);
+    if (!motif) continue;
     const c = critereDe(ind);
     out.push({
       id: `na_ind${ind}`,
-      nom: motif ? `CT${c} - IND ${ind} DÉCLARATION DE NON-APPLICABILITÉ` : `CT${c} - IND ${ind} PIÈCES À PRODUIRE`,
+      nom: `CT${c} - IND ${ind} DÉCLARATION DE NON-APPLICABILITÉ`,
       critere: c, indicateur: ind, template: "indicateur_non_applicable",
       params: { ind },
     });
