@@ -21,6 +21,7 @@ import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, type BdcContext, type Beneficiaire } from "./bdcModel";
 import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "@/lib/qualite2026";
+import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
@@ -2269,6 +2270,9 @@ export async function buildBDCNTConseilsZip(
       { ind: 27, nom: "Indicateur 27 - Registre de sous-traitance et de portage salarial", html: genRegistreSousTraitancePortage(org, "BC", formation, benList) },
       { ind: 27, nom: "Indicateur 27 - Annexe clauses qualité des contrats de sous-traitance", html: genClausesQualiteContrat(org, "BC") },
       { ind: 32, nom: "Indicateur 32 - Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
+
+      // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement)
+      ...entreesCatalogueTypeAudit(org).map((e) => ({ ind: e.indicateur, nom: `Indicateur ${e.indicateur} - ${e.nom.replace(/^CT\d+ - IND \d+ /, "")}`, html: renderTypeAuditTemplate(e.template, org, formation, benList) || "" })),
     ];
     for (const p of pieces2026) {
       advance(p.nom);

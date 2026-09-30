@@ -64,6 +64,8 @@ export interface OrganismeInfo {
   organismeCertificateur?: string;
   dateObtentionQualiopi?: string;
   dateFinValiditeQualiopi?: string;
+  /** Type d'audit préparé : « auto » (défaut) = déduit du certificat Qualiopi. */
+  typeAudit?: "auto" | "initial" | "surveillance" | "renouvellement";
 }
 
 export interface StagiaireInfo {

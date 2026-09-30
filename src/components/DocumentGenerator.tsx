@@ -11,6 +11,7 @@ import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type
 import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { resolveFormation, financeursEffectifs } from "@/lib/formationResolue";
+import { typeAuditEffectif, LIBELLES_AUDIT, type TypeAudit, type TypeAuditSaisi } from "@/lib/typeAudit";
 import { clientMailOrganisme, retrouverMail, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
 import { captureMail } from "@/lib/mails/captureMail";
 import { preloadFranceCompetences } from "@/lib/franceCompetences";
@@ -144,9 +145,11 @@ interface DocumentGeneratorProps {
   formation: FormationInfo;
   stagiaires: StagiaireInfo[];
   criteres: CritereData[];
+  /** Mise à jour de l'organisme (persistance du type d'audit choisi). */
+  onOrganismeChange?: (o: OrganismeInfo) => void;
 }
 
-const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGeneratorProps) => {
+const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange }: DocumentGeneratorProps) => {
   const { runJob, hasActive } = useBackgroundJobs();
   const [expandedCriteres, setExpandedCriteres] = useState<Set<number>>(new Set());
   
@@ -745,7 +748,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewBook = () => {
-    const content = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    const content = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
     setPreviewContent(content);
     setPreviewTitle("BOOK QUALIOPI – Dossier complet");
     setCurrentDocId("book_qualiopi");
@@ -753,7 +756,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownloadBook = async () => {
-    const content = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    const content = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
@@ -763,7 +766,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const { detectTypeAction } = await import("@/lib/guideAuditUniversal");
       const t = detectTypeAction(mergedOrganisme);
       const type = t === "CFA" ? "AF" : t;
-      const blob = generateFeuilleRouteQualiopiUniversal(mergedOrganisme, catalog, [selectedFormation], allStagiaires, type);
+      const blob = generateFeuilleRouteQualiopiUniversal(mergedOrganisme, catalog, [selectedFormation], allStagiaires, type, typeAuditCFA);
       saveAs(blob, buildGenericFileName(`FEUILLE_ROUTE_QUALIOPI_${type}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
       toast.success("Feuille de route Qualiopi téléchargée");
     } catch (e) {
@@ -777,7 +780,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [loadingBookCFA, setLoadingBookCFA] = useState(false);
   const [loadingFeuilleRouteCFA, setLoadingFeuilleRouteCFA] = useState(false);
   const [loadingGuideAuditCFA, setLoadingGuideAuditCFA] = useState(false);
-  const [typeAuditCFA, setTypeAuditCFA] = useState<'initial' | 'surveillance' | 'renouvellement'>('initial');
+  // Type d'audit (tous types d'action) : « auto » = déduit du certificat Qualiopi de l'organisme.
+  const [typeAuditChoix, setTypeAuditChoix] = useState<TypeAuditSaisi>(organisme.typeAudit || "auto");
+  const typeAuditCFA: TypeAudit = typeAuditEffectif({ ...mergedOrganisme, typeAudit: typeAuditChoix });
+  const setTypeAuditCFA = (v: TypeAuditSaisi) => {
+    setTypeAuditChoix(v);
+    onOrganismeChange?.({ ...organisme, typeAudit: v });
+  };
 
   const handleDownloadBookCFA = async () => {
     setLoadingBookCFA(true);
@@ -1017,7 +1026,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       };
 
       await safeRun("BOOK_QUALIOPI", async () => {
-        const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+        const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
         if (exportFormat === "pdf") {
           addFileToZip(
             `QUALIOPI/${buildGenericFileName("BOOK_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".pdf")}`,
@@ -1512,7 +1521,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return { blob, extension };
       };
 
-      const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+      const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
       if (exportFormat === "pdf") {
         zip.file(`BOOK_QUALIOPI.pdf`, await htmlToPdfBlob(bookContent));
       } else {
@@ -1721,6 +1730,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   <SelectItem value="VAE">Validation des Acquis (VAE)</SelectItem>
                 </SelectContent>
               </Select>
+              <label className="text-[11px] font-semibold text-blue-900 uppercase tracking-wide mt-2">Type d'audit</label>
+              <Select value={typeAuditChoix} onValueChange={(v) => setTypeAuditCFA(v as TypeAuditSaisi)}>
+                <SelectTrigger className="h-9 bg-white border-blue-300 text-blue-900 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">Automatique (d'après le certificat) — {LIBELLES_AUDIT[typeAuditEffectif({ ...mergedOrganisme, typeAudit: "auto" })]}</SelectItem>
+                  <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
+                  <SelectItem value="surveillance">Audit de surveillance</SelectItem>
+                  <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 p-3 flex gap-1.5 flex-wrap">
@@ -1756,11 +1777,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               </div>
               <div className="flex flex-col gap-1 min-w-[220px]">
                 <label className="text-[11px] font-semibold text-orange-900 uppercase tracking-wide">Type d'audit</label>
-                <Select value={typeAuditCFA} onValueChange={(v) => setTypeAuditCFA(v as any)}>
+                <Select value={typeAuditChoix} onValueChange={(v) => setTypeAuditCFA(v as TypeAuditSaisi)}>
                   <SelectTrigger className="h-9 bg-white border-orange-300 text-orange-900 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="auto">Automatique (d'après le certificat) — {LIBELLES_AUDIT[typeAuditEffectif({ ...mergedOrganisme, typeAudit: "auto" })]}</SelectItem>
                     <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
                     <SelectItem value="surveillance">Audit de surveillance</SelectItem>
                     <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>

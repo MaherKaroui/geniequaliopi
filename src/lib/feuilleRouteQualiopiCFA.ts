@@ -3,6 +3,8 @@
 // Documents à présenter · Vigilance. Les 8 indicateurs CFA spécifiques (13,14,15,16,20,27,28,32)
 // sont marqués en orange. Mention nouvel entrant / pondération incluse.
 
+import { isStagiaireFormationTerminee } from "./docBuilder";
+import { typeAuditEffectif } from "./typeAudit";
 import * as XLSX from "xlsx";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
@@ -19,7 +21,7 @@ export function generateFeuilleRouteQualiopiCFA(
   catalog: DocEntry[],
   formations: FormationInfo[] = [],
   stagiaires: StagiaireInfo[] = [],
-  typeAudit: TypeAuditCFA = 'initial'
+  typeAudit: TypeAuditCFA = typeAuditEffectif(org)
 ): Blob {
   const isNE = typeAudit === 'initial';
   const docsByInd = new Map<number, string[]>();
@@ -33,6 +35,9 @@ export function generateFeuilleRouteQualiopiCFA(
   rows.push([isNE
     ? `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. Nouvel entrant : indicateurs ${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")} — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
     : `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. ${getTypeAuditLabel(typeAudit)} : vérification de la MISE EN ŒUVRE effective sur tous les indicateurs.`]);
+  if (!isNE && !stagiaires.some((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo)))) {
+    rows.push([`⚠ ${getTypeAuditLabel(typeAudit)} : aucun apprenti du dossier n'a terminé son parcours — l'auditeur attend des preuves de mise en œuvre sur la période.`]);
+  }
   rows.push([]);
   const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Pondération"];
   rows.push(header);

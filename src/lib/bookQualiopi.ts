@@ -1,3 +1,4 @@
+import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry, CRITERES_INFO } from "@/types/qualiopi";
 import { baseStyle, formatDate, orgHeader, footer, isFacebookPage } from "./docBuilder";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
@@ -7,7 +8,8 @@ export function generateBookQualiopi(
   org: OrganismeInfo,
   formations: FormationInfo[],
   stagiaires: StagiaireInfo[],
-  catalog: DocEntry[]
+  catalog: DocEntry[],
+  typeAudit: TypeAudit = typeAuditEffectif(org)
 ): string {
   const bookStyle = `<style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -94,7 +96,8 @@ tr:nth-child(even){background:#f8f9fa}
       Organisme de formation – NDA : ${org.nda}
     </div>
     <div class="subtitle" style="margin-top:40px;opacity:0.7">SIRET : ${org.siret}</div>
-    <div class="year">2024</div>
+    <div class="org-badge">${LIBELLES_AUDIT[typeAudit]}</div>
+    <div class="year">${new Date().getFullYear()}</div>
   </div>`;
   html += `<div class="page-break"></div>`;
 
@@ -245,7 +248,7 @@ tr:nth-child(even){background:#f8f9fa}
           </div>
           <div class="indicateur-content">
             ${ref ? `<div class="indicateur-intitule">${ref.intitule}</div>` : `<div class="indicateur-intitule">${ind.titre}</div>`}
-            ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}</div>` : ""}
+            ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero)}</em></div>` : ""}
 
             <div class="preuves-list">
               <h4>📁 Preuves et documents (${indDocs.length})</h4>
