@@ -861,9 +861,9 @@ const tableauAmeliorationContinue: BdcDocDef = {
       `_Tableau ouvert le ${dateSysteme(ctx)} (V1), tenu à jour en continu. Effectif concerné : ${ctx.beneficiaires.length} bénéficiaire(s). L'analyse des risques qualité (IND 32, décret n° 2026-728) figure dans une pièce distincte._\n`,
       "| N° | Origine (réclamation, enquête, audit, veille) | Constat | Analyse de cause | Action corrective | Responsable | Échéance | Statut | Efficacité vérifiée |",
       "|---|---|---|---|---|---|---|---|---|",
-      "| 1 |  |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
-      "| 2 |  |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
-      "| 3 |  |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
+      ...entreesVeille(ctx).map((e) => `| ${e.ref} | Veille IND ${e.ind} — ${e.source} | ${e.resume} | Évolution externe | ${e.action} | ${e.pilote} | ${e.echeance} | ${e.statut} | ${e.statut === "Réalisé" ? "Pièces mises à jour présentes au dossier" : "À vérifier à échéance"} |`),
+      "| R1 | Réclamation / appréciation |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
+      "| R2 | Réclamation / appréciation |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
       "",
       "_Les constats sont issus des réclamations enregistrées, des questionnaires de satisfaction renseignés par les bénéficiaires, des retours des financeurs et de la veille. Aucune donnée n'est saisie à la place d'un tiers._",
       "",
@@ -1013,54 +1013,167 @@ const planDeveloppementConsultant: BdcDocDef = {
       `| Outils d'investigation (intérêts, personnalité) | Actualiser la maîtrise des outils utilisés | Formation courte | ${trim(6)} | Prévue | Attestation de formation |`,
       `| Analyse de pratiques / supervision | Prendre du recul sur les accompagnements | Supervision entre pairs, 2 séances/an | ${trim(9)} | Prévue | Compte rendu |`,
       `| Accueil des personnes en situation de handicap | Adapter l'accompagnement | Ressource Handicap Formation (Agefiph) | ${trim(12)} | Prévue | Attestation |`,
+      `| Maîtrise de l'IA générative (règlement (UE) 2024/1689, art. 4) | Encadrer l'usage de l'IA pour la recherche documentaire, sans donnée personnelle | Autoformation encadrée | ${trim(4)} | Prévue | Attestation / support |`,
       "",
       "Le statut de chaque action est mis à jour à sa réalisation (preuve jointe). Un entretien annuel fait le point sur les besoins de développement (pièce « Entretien annuel »).",
     ].join("\n");
   },
 };
 
-function veilleDef(ind: 23 | 24 | 25, nom: string, titre: string, lignes: (ctx: BdcContext) => Array<[string, string, string, string]>): BdcDocDef {
+/* --------------------------- Veilles (IND 23, 24, 25) --------------------------- */
+
+interface EntreeVeille {
+  ind: 23 | 24 | 25;
+  /** Date de parution de la source (ISO) — jamais future, jamais inventée. */
+  parution: string;
+  /** Précision affichée quand seule l'année ou le mois est certain. */
+  parutionLibelle?: string;
+  source: string;
+  lien: string;
+  resume: string;
+  impact: string;
+  action: string;
+  pilote: (ctx: BdcContext) => string;
+}
+
+const piloteQualite = (ctx: BdcContext) => ctx.organisme.representantLegal.nom || ctx.prestation.consultant.nom;
+const piloteConsultant = (ctx: BdcContext) => ctx.prestation.consultant.nom;
+
+const VEILLES_BC: EntreeVeille[] = [
+  // ---- IND 23 : légale et réglementaire ----
+  ...REFERENCES_REGLEMENTAIRES_2026.filter((r) => r.types.includes("BC")).map((r): EntreeVeille => ({
+    ind: 23, parution: r.date, source: r.texte, lien: r.source, resume: r.objet,
+    impact: r.date.startsWith("2026")
+      ? "Audit à compter du 1er novembre 2026 sur 33 indicateurs : sous-traitance et portage à tracer dans les contrats (IND 27), analyse des risques qualité à formaliser (IND 32) ; IND 33 non applicable au bilan."
+      : r.date.startsWith("2024") ? "Niveaux attendus et preuves à produire pour chaque indicateur applicable au bilan de compétences."
+      : r.date.startsWith("2019") ? "Certification qualité obligatoire pour réaliser des bilans financés par le CPF ou un OPCO."
+      : "Cadre du bilan de compétences (art. L6313-4) et de la certification qualité (art. L6316-1).",
+    action: r.date.startsWith("2026")
+      ? "Registre de sous-traitance et de portage, annexe « Clauses qualité » des contrats, analyse des risques qualité ajoutés au dossier ; process veilles et tableau d'amélioration mis à jour."
+      : r.date.startsWith("2024") ? "Revue de chaque pièce du dossier au regard du guide ; indicateurs non applicables au bilan identifiés (3, 7, 8, 13 à 16, 20, 28, 29, 33)."
+      : "Procédures, contrats et livret d'accueil alignés sur ces textes.",
+    pilote: piloteQualite,
+  })),
+  { ind: 23, parution: "2019-01-01", parutionLibelle: "01/01/2019 (version en vigueur)", source: "Code du travail, art. L6313-4 et R6313-4 à R6313-8", lien: "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000038014105/",
+    resume: "Consentement, trois phases (préliminaire, investigation, conclusion), 24 heures au plus, résultats et synthèse au seul bénéficiaire, organisation dédiée, destruction des documents, convention tripartite et délai de 10 jours.",
+    impact: "Contenu obligatoire du programme, du contrat ou de la convention, de la synthèse et des règles de conservation.",
+    action: "Programme des 3 phases, convention bipartite / tripartite, accord de conservation (3 ans au plus sur accord écrit, R6313-7) et attestation de remise de la synthèse rédigés en conséquence.",
+    pilote: piloteQualite },
+  // ---- IND 24 : emplois, métiers, compétences ----
+  { ind: 24, parution: "2022-03-01", parutionLibelle: "Mars 2022", source: "France Stratégie et Dares — « Les métiers en 2030 »", lien: "https://www.strategie.gouv.fr",
+    resume: "Projection des créations d'emplois et des besoins de recrutement par famille de métiers à l'horizon 2030.",
+    impact: "Permet de confronter les pistes des bénéficiaires aux métiers porteurs et aux métiers en déclin.",
+    action: "Rapport intégré au répertoire des sources de la phase d'investigation ; consulté pour chaque piste retenue.", pilote: piloteConsultant },
+  { ind: 24, parution: "2024-01-01", parutionLibelle: "2024", source: "France Travail — Répertoire opérationnel des métiers et des emplois (ROME 4.0)", lien: "https://www.francetravail.fr",
+    resume: "Refonte du ROME : fiches métiers décrites par compétences, savoirs et contextes de travail.",
+    impact: "Le portefeuille de compétences et les enquêtes métier s'appuient sur le vocabulaire des compétences du ROME 4.0.",
+    action: "Trame du portefeuille de compétences et guide d'enquête métier alignés sur les fiches ROME 4.0.", pilote: piloteConsultant },
+  { ind: 24, parution: "2025-04-01", parutionLibelle: "Avril 2025", source: "France Travail — enquête Besoins en main-d'œuvre (BMO) 2025", lien: "https://statistiques.francetravail.org/bmo",
+    resume: "Projets de recrutement et difficultés anticipées par métier et par bassin d'emploi.",
+    impact: "Vérification des débouchés locaux des pistes explorées par chaque bénéficiaire.",
+    action: "Consultation systématique de la BMO du bassin du bénéficiaire en phase d'investigation, mentionnée dans le plan d'action.", pilote: piloteConsultant },
+  // ---- IND 25 : innovations pédagogiques et technologiques ----
+  { ind: 25, parution: "2019-01-01", parutionLibelle: "01/01/2019", source: "Code du travail, art. D6313-3-1 (actions réalisées à distance)", lien: "https://www.legifrance.gouv.fr",
+    resume: "Conditions des prestations à distance : assistance technique et pédagogique, information du bénéficiaire, évaluations jalonnant le parcours.",
+    impact: "Encadre les entretiens en classe virtuelle et l'émargement à distance.",
+    action: "Pièce « Moyens, confidentialité et informations pratiques » (IND 17) : prérequis techniques, assistance, lien nominatif, émargement électronique horodaté.", pilote: piloteConsultant },
+  { ind: 25, parution: "2024-07-12", parutionLibelle: "12/07/2024 (JOUE)", source: "Règlement (UE) 2024/1689 sur l'intelligence artificielle", lien: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    resume: "Cadre européen de l'IA ; obligation de maîtrise de l'IA par les personnels qui l'utilisent, applicable depuis le 2 février 2025.",
+    impact: "Usage d'outils d'IA générative possible pour la recherche documentaire sur les métiers, jamais avec des données personnelles du bénéficiaire.",
+    action: "Règle d'usage encadré de l'IA générative ajoutée aux ressources du consultant ; formation à la maîtrise de l'IA inscrite au plan de développement des compétences (IND 22).", pilote: piloteQualite },
+  { ind: 25, parution: "2025-06-28", parutionLibelle: "28/06/2025 (entrée en application)", source: "Directive (UE) 2019/882 — exigences d'accessibilité des produits et services numériques", lien: "https://eur-lex.europa.eu/eli/dir/2019/882/oj",
+    resume: "Exigences d'accessibilité applicables aux services numériques, dans la continuité du RGAA.",
+    impact: "Les ressources numériques remises aux bénéficiaires doivent être lisibles, agrandissables et compatibles avec les aides techniques.",
+    action: "Ressources du bénéficiaire (IND 19) fournies en version numérique accessible ; adaptation étudiée avec le référent handicap (IND 26).", pilote: piloteQualite },
+];
+
+function isoDate(s: string): Date { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+
+/** Entrées d'une veille : parution passée uniquement ; échéance = parution + 1 mois (au plus tôt la date de MAJ). */
+function entreesVeille(ctx: BdcContext, ind?: 23 | 24 | 25) {
+  const maj = ctx.organisme.dateMaj || ctx.prestation.dateDebut;
+  const auj = Date.now();
+  return VEILLES_BC
+    .filter((e) => (!ind || e.ind === ind) && isoDate(e.parution).getTime() <= auj)
+    .sort((x, y) => x.parution.localeCompare(y.parution))
+    .map((e, i) => {
+      const p = isoDate(e.parution);
+      const ech = new Date(Math.max(p.getTime(), maj.getTime())); ech.setMonth(ech.getMonth() + 1);
+      const realise = ech.getTime() <= auj;
+      return { ...e, ref: `V${e.ind}-${String(i + 1).padStart(2, "0")}`, parutionAff: e.parutionLibelle || fmtDateFR(p), echeance: fmtDateFR(ech), statut: realise ? "Réalisé" : "En cours", pilote: e.pilote(ctx), anterieureMaj: p.getTime() <= maj.getTime() };
+    });
+}
+
+function veilleDef(ind: 23 | 24 | 25, nom: string, titre: string): BdcDocDef {
   return {
     nom, indicateur: ind, parBeneficiaire: false,
-    build: (ctx) => [
-      H(titre),
-      `_Registre ouvert le ${dateSysteme(ctx)} (V1), tenu à jour en continu. Chaque entrée est datée de la publication de sa source ; son exploitation est tracée dans la dernière colonne._\n`,
-      "| Date de la source | Source | Information | Exploitation dans la prestation |",
-      "|---|---|---|---|",
-      ...lignes(ctx).map(([d, s, i, e]) => `| ${d} | ${s} | ${i} | ${e} |`),
-    ].join("\n"),
+    build: (ctx) => {
+      const lignes = entreesVeille(ctx, ind);
+      return [
+        H(titre),
+        `_Registre ouvert le ${dateSysteme(ctx)} (V1), tenu à jour en continu selon le process veilles (sources, fréquence, exploitation). Chaque entrée porte la date de parution réelle de sa source ; son exploitation est suivie jusqu'à la preuve de diffusion._\n`,
+        "| Réf. | Parution | Source | Résumé | Impact sur le bilan de compétences | Décision / action | Pilote | Échéance | Statut | Diffusion interne |",
+        "|---|---|---|---|---|---|---|---|---|---|",
+        ...lignes.map((e) => `| ${e.ref} | ${e.parutionAff} | ${e.source} — ${e.lien} | ${e.resume} | ${e.impact} | ${e.action} | ${e.pilote} | ${e.echeance} | ${e.statut} | ${e.anterieureMaj ? `Compte rendu d'exploitation de la veille du ${dateSysteme(ctx)}` : "Prochain compte rendu d'exploitation (revue qualité)"} |`),
+        "",
+        `Chaque action est reportée au tableau d'amélioration continue (IND 32) sous la même référence.`,
+      ].join("\n");
+    },
   };
 }
 
-const veilleReglementaire = veilleDef(23, "Indicateur 23 - Registre de veille légale et réglementaire", "Veille légale et réglementaire", () =>
-  REFERENCES_REGLEMENTAIRES_2026
-    .filter((r) => r.types.includes("BC") && new Date(r.date).getTime() <= Date.now())
-    .map((r) => [fmtDateFR(new Date(r.date)), `${r.texte} — ${r.source}`, r.objet, r.date.startsWith("2026") ? "Mise à jour du système qualité : registre de sous-traitance (IND 27), analyse des risques (IND 32)." : "Intégré aux procédures et aux documents contractuels."] as [string, string, string, string])
-    .concat([["—", `Code du travail, ${ARTICLES_BC.definition}, ${ARTICLES_BC.phases} à ${ARTICLES_BC.convention.replace("art. ", "")}`, "Cadre du bilan : consentement, 3 phases, 24 h maximum, synthèse au seul bénéficiaire, destruction, convention tripartite", "Base des clauses contractuelles, du livret d'accueil et du cadre légal (IND 1)."]]));
+const veilleReglementaire = veilleDef(23, "Indicateur 23 - Registre de veille légale et réglementaire", "Veille légale et réglementaire");
+const veilleMetiers = veilleDef(24, "Indicateur 24 - Registre de veille emplois, métiers et compétences", "Veille sur les évolutions des compétences, des métiers et des emplois");
+const veillePedagogique = veilleDef(25, "Indicateur 25 - Registre de veille innovations pédagogiques et technologiques", "Veille sur les innovations pédagogiques et technologiques");
 
-const veilleMetiers = veilleDef(24, "Indicateur 24 - Registre de veille emplois, métiers et compétences", "Veille sur les évolutions des compétences, des métiers et des emplois", (ctx) => {
-  const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
-  const rows: Array<[string, string, string, string]> = [
-    ["Publication annuelle", "France Travail — enquête Besoins en main-d'œuvre (BMO), https://statistiques.francetravail.org/bmo", "Métiers en tension et projets de recrutement par bassin d'emploi", "Utilisée en phase d'investigation pour vérifier les débouchés des pistes explorées."],
-    ["Mise à jour continue", "France Travail — répertoire ROME 4.0", "Fiches métiers, compétences et passerelles", "Support des enquêtes métier et du portefeuille de compétences."],
-    ["Mise à jour continue", "France Compétences — répertoires RNCP et RS", "Certifications actives, blocs de compétences, voies d'accès", "Vérification des formations proposées dans les plans d'action."],
-  ];
-  if (prof && !prof.generique) rows.push([prof.veilleMetier.date, `${prof.veilleMetier.source} — ${prof.veilleMetier.lien}`, prof.veilleMetier.intitule, prof.veilleMetier.exploitation]);
-  return rows;
-});
-
-const veillePedagogique = veilleDef(25, "Indicateur 25 - Registre de veille innovations pédagogiques et technologiques", "Veille sur les innovations pédagogiques et technologiques", (ctx) => {
-  const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
-  const rows: Array<[string, string, string, string]> = [
-    ["Mise à jour continue", "Centre Inffo — actualités de l'orientation et de la formation, https://www.centre-inffo.fr", "Évolution des pratiques d'accompagnement et du conseil en évolution professionnelle", "Ajustement des outils d'investigation et du déroulé des séances."],
-    ["Mise à jour continue", "Outils d'entretien à distance et de signature électronique", "Visioconférence sécurisée, émargement électronique horodaté", "Déploiement du bilan en distanciel synchrone (IND 17)."],
-    ["Mise à jour continue", "Outils d'intelligence artificielle générative", "Aide à la recherche documentaire sur les métiers ; vigilance sur la confidentialité", "Usage limité à la recherche documentaire, sans donnée personnelle du bénéficiaire."],
-  ];
-  if (prof && !prof.generique) rows.push([prof.veilleTechnologique.date, `${prof.veilleTechnologique.source} — ${prof.veilleTechnologique.lien}`, prof.veilleTechnologique.intitule, prof.veilleTechnologique.exploitation]);
-  return rows;
-});
+/** Compte rendu d'exploitation des veilles, daté de la MAJ : seules les entrées parues avant cette date y figurent. */
+const compteRenduVeille: BdcDocDef = {
+  nom: "Indicateur 23 - Compte rendu d'exploitation des veilles",
+  indicateur: 23,
+  parBeneficiaire: false,
+  build: (ctx) => {
+    const lignes = entreesVeille(ctx).filter((e) => e.anterieureMaj);
+    return [
+      H("Compte rendu d'exploitation des veilles"),
+      `**Date** : ${dateSysteme(ctx)}  \n**Participants** : ${[ctx.organisme.representantLegal.nom, ctx.prestation.consultant.nom].filter((v, i, a) => v && a.indexOf(v) === i).join(", ")}  \n**Objet** : exploitation des veilles légale (IND 23), métiers (IND 24) et pédagogique / technologique (IND 25).\n`,
+      lignes.length ? "| Réf. | Veille | Information | Décision | Action du tableau d'amélioration |" : "_Aucune entrée parue avant cette date : les veilles seront exploitées lors de la prochaine revue qualité._",
+      lignes.length ? "|---|---|---|---|---|" : "",
+      ...lignes.map((e) => `| ${e.ref} | IND ${e.ind} | ${e.source} | ${e.action} | ${e.ref} — ${e.statut} (échéance ${e.echeance}) |`),
+      "",
+      "**Diffusion** : compte rendu transmis aux intervenants et classé avec les registres de veille.",
+    ].join("\n");
+  },
+};
 
 import { supportCoursPatisserie } from "./bdcSupportCoursPatisserie";
+
+const ressourcesBeneficiaire: BdcDocDef = {
+  nom: "Indicateur 19 - Ressources mises à disposition du bénéficiaire",
+  indicateur: 19,
+  parBeneficiaire: false,
+  build: (ctx) => {
+    const p = ctx.prestation;
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+    return [
+      H("Ressources mises à disposition du bénéficiaire"),
+      "_Ressources remises ou indiquées au bénéficiaire au fil des trois phases ; leur appropriation est vérifiée en séance._\n",
+      "| Ressource | Contenu | Phase | Modalité d'accès |",
+      "|---|---|---|---|",
+      "| Livret d'accueil du bénéficiaire | Déroulement, droits, confidentialité, contacts | Préliminaire | Remis à la contractualisation |",
+      "| Portefeuille de compétences | Trame d'analyse des expériences et des compétences | Investigation | Document numérique complété en séance |",
+      "| Questionnaire d'intérêts et test de personnalité | Outils d'investigation restitués par le consultant | Investigation | Passation en séance, restitution orale et écrite |",
+      "| Guide de l'enquête métier | Questions types, préparation et compte rendu d'enquête | Investigation | Remis avant les enquêtes |",
+      "| Répertoire des sources métiers | France Travail (fiches ROME, enquête BMO), France Compétences (RNCP / RS), Onisep, sites des branches | Investigation | Liens transmis par courriel |",
+      "| Trame de plan d'action | Étapes, échéances, ressources, financements | Conclusion | Complétée en séance, reprise dans la synthèse |",
+      prof && !prof.generique ? `| Ressources du secteur visé (${prof.label}) | ${prof.formations.slice(0, 2).join(" ; ")} | Investigation | Transmises selon le projet |` : "",
+      "",
+      H2("Appropriation"),
+      `Chaque ressource est présentée par ${p.consultant.nom} lors de sa remise ; le bénéficiaire peut revenir sur son usage à chaque séance. En distanciel, les ressources sont partagées à l'écran puis transmises par courriel (assistance : ${ctx.organisme.emailContact || "courriel de l'organisme"}).`,
+      H2("Accessibilité"),
+      `Les documents sont disponibles en version numérique agrandissable ; toute autre adaptation est étudiée avec le référent handicap (${ctx.organisme.referentHandicap.nom}).`,
+    ].join("\n");
+  },
+};
 
 /** Support de cours métier : uniquement pour le profil Pâtisserie & Cake Design (gabarit du client). */
 const supportCoursPatisserieConditionnel: BdcDocDef = {
@@ -1092,6 +1205,8 @@ export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   veilleReglementaire,
   veilleMetiers,
   veillePedagogique,
+  compteRenduVeille,
+  ressourcesBeneficiaire,
   supportCoursPatisserieConditionnel,
 ];
 

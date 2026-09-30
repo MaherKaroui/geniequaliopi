@@ -577,7 +577,7 @@ export const PIECES_ATTENDUES_BC: Record<number, string[]> = {
   19: ["Ressources mises à disposition"],
   21: ["Fiches de poste des fonctions exercées", "Process recrutement"],
   22: ["Entretien annuel", "Plan de développement des compétences"],
-  23: ["Registre de veille légale et réglementaire", "Process veilles"],
+  23: ["Registre de veille légale et réglementaire", "Process veilles", "Compte rendu d'exploitation des veilles"],
   24: ["Registre de veille emplois, métiers et compétences"],
   25: ["Registre de veille innovations pédagogiques et technologiques"],
   26: ["Process handicap", "Partenaires handicap"],

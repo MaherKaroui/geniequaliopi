@@ -1116,8 +1116,7 @@ Mail : {ORG_MAIL}
 
 Dans le cadre de nos actions, plusieurs indicateurs de résultats sont
 définis afin d'évaluer l'efficacité de notre accompagnement et de
-communiquer de manière transparente sur notre site internet
-(actuellement en cours de développement) ainsi que sur l'ensemble de nos
+communiquer de manière transparente sur notre site internet ainsi que sur l'ensemble de nos
 supports de communication, tels que la plaquette, le flyer et les
 réseaux sociaux.
 
@@ -1439,9 +1438,8 @@ donneur d'ordre »
 
 **Et**
 
-2 -- « Nom de l'organisme de formation sous-traitant », « adresse »
-SIRET XXX, organisme de formation enregistré sous le numéro XXX auprès
-du Préfet de la région XXX,
+2 -- Raison sociale du sous-traitant : ______________________, adresse : ______________________,
+SIRET ______________________, déclaration d'activité n° ______________________ (le cas échéant),
 
 ci-après « le sous-traitant »
 
