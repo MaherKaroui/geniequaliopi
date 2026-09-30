@@ -1,11 +1,16 @@
 // Documents CFA — Combler les écarts de preuves identifiés sur la matrice
-// "Prépa audit Qualiopi CFA" (Dreamers Team / V9 nouvel entrant).
+// « Prépa audit Qualiopi CFA » (guide de lecture V9, nouvel entrant).
 // 18 générateurs courts, datés, brandés.
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, isFormationTerminee } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, isFormationTerminee, getDocRefDate } from "./docBuilder";
 
-const todayLong = () => new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+// Documents de système qualité : datés de la date de MAJ du dossier (V1), à défaut du jour.
+const todayLong = () => {
+  const ref = getDocRefDate();
+  const d = ref ? new Date(ref + "T00:00:00") : new Date();
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+};
 
 // ============================================================================
 // IND 13 — Grille de compétences alternance (nominative)
@@ -365,23 +370,33 @@ export function genPVSessionGeneriqueCFA(o: OrganismeInfo, f: FormationInfo, sta
 // IND 17 — Inventaire daté des moyens
 // ============================================================================
 export function genInventaireMoyensCFA(o: OrganismeInfo, f: FormationInfo) {
+  // Inventaire construit à partir des données saisies (modalités, outils, adresse,
+  // intervenants) : aucun équipement ni marque inventés.
+  const moda = (f.modalites || "").toLowerCase();
+  const distanciel = /distanciel|foad|e-learning|mixte/.test(moda);
+  const presentiel = /pr[ée]sentiel|mixte/.test(moda) || !distanciel;
+  const outils = (o.outilsUtilises || "").split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+  const adresse = [o.adresse, [o.codePostal, o.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const rows: string[][] = [
-    ["Locaux", `${o.adresse || ""}, ${o.codePostal || ""} ${o.ville || ""}`, "Salles équipées", "Conformes ERP 5e cat.", todayLong()],
-    ["Vidéoprojecteurs", "x3 — Epson EB-W06", "Salles 1, 2, 3", "Opérationnels", todayLong()],
-    ["Postes informatiques", "x15 — Dell OptiPlex i5", "Salle informatique", "Sous garantie", todayLong()],
-    ["Licences logicielles", "Microsoft 365 E3 (x15) + Adobe Creative Cloud (x5)", "Active Directory", "Renouvelées annuellement", todayLong()],
-    ["LMS", `Moodle 4.x — Hébergement OVH`, "Web", "Sauvegardes quotidiennes", todayLong()],
-    ["Plateforme visio", "Zoom Education", "Web", "Compte payant", todayLong()],
-    ["Accessibilité PSH", "Rampe d'accès, sanitaires PMR, signalétique", "Locaux", "Conformes loi 2005", todayLong()],
-    ["Maintenance", "Contrat IT — prestataire externe", "Hebdomadaire", "Active", todayLong()],
+    ["Moyens humains", `Direction : ${o.dirigeant || "—"} ; responsable pédagogique : ${o.responsablePedagogique || o.dirigeant || "—"} ; formateur : ${f.formateur || o.responsablePedagogique || o.dirigeant || "—"}`, "CV et justificatifs au dossier des intervenants (IND 21)", todayLong()],
+    ["Référents", `Handicap : ${o.referentHandicap || o.dirigeant || "—"} ; mobilité : ${o.referentMobilite || o.dirigeant || "—"} ; qualité : ${o.referentQualite || o.dirigeant || "—"}`, "Lettres de mission (IND 20)", todayLong()],
   ];
+  if (presentiel) rows.push(["Locaux", adresse || "Adresse du CFA", "Accessibilité vérifiée ; aménagements possibles sur demande du référent handicap", todayLong()]);
+  if (distanciel) {
+    rows.push(["Classe virtuelle", outils.filter((x) => /meet|zoom|teams|visio/i.test(x)).join(", ") || (f.lieu || "Google Meet / Zoom"), "Lien individuel transmis avant chaque séance ; test de connexion au démarrage", todayLong()]);
+    rows.push(["Assistance technique et pédagogique", `${o.email || "Adresse électronique du CFA"}${o.telephone ? ` — ${o.telephone}` : ""}`, "Réponse sous 24 h ouvrées (art. D.6313-3-1 C. trav.)", todayLong()]);
+  }
+  const autres = outils.filter((x) => !/meet|zoom|teams|visio/i.test(x));
+  if (autres.length) rows.push(["Outils numériques", autres.join(", "), "Comptes actifs, accès donnés aux apprentis", todayLong()]);
+  rows.push(["Ressources pédagogiques", `Support de cours, découpage de formation, exercices corrigés et référentiel de la certification${f.codeRNCP ? ` (${f.codeRNCP})` : ""}`, "Mis à jour à chaque révision du programme (IND 19)", todayLong()]);
+  rows.push(["Équipement de l'apprenti", distanciel ? "Ordinateur avec webcam, micro et connexion internet (vérifiés lors de l'inscription)" : "Matériel fourni par le CFA pendant les séances", distanciel ? "Prêt ou orientation vers les aides au premier équipement si besoin" : "Contrôlé avant chaque session", todayLong()]);
   return buildDocument({
     org: o,
-    title: `INVENTAIRE DES MOYENS PÉDAGOGIQUES, TECHNIQUES ET D'ENCADREMENT`,
+    title: `INVENTAIRE DES MOYENS HUMAINS, TECHNIQUES ET PÉDAGOGIQUES`,
     sections: [
-      { heading: "Objet (Indicateur 17)", content: `<p>Inventaire daté des moyens mis en œuvre par le CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule || ""}</strong>. Mise à jour : ${todayLong()}.</p>` },
+      { heading: "Objet (Indicateur 17)", content: `<p>Inventaire des moyens mis en œuvre par le CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule || ""}</strong> (${f.modalites || "modalités définies au programme"}). Établi le ${todayLong()} ; mis à jour à chaque changement de moyens. Les justificatifs (bail, factures, licences) sont conservés par le CFA et présentés sur demande.</p>` },
     ],
-    table: { headers: ["Catégorie", "Description / Réf.", "Localisation", "État / Conformité", "Date contrôle"], rows },
+    table: { headers: ["Catégorie", "Description", "Modalités / conformité", "Date"], rows },
     signatures: { type: "2", labels: ["Responsable pédagogique", "Direction"], names: [o.responsablePedagogique, o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
