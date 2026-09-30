@@ -3,6 +3,8 @@ import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
+import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
+import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements } from "./qualite2026";
@@ -145,9 +147,12 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   const catalogue = buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.codePostal, org.referentQualite);
   // Mails automatiques : captures Gmail / Outlook datées (remplacent les 5 mails génériques .docx).
   const mails = entreesCatalogueMails(mergeOrganisme(org), selectedFormation, mergeStagiaires(userStagiaires));
-  if (mails.length === 0) return catalogue;
+  // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement).
+  const audit = entreesCatalogueTypeAudit(mergeOrganisme(org)) as DocEntry[];
+  const avecAudit = [...catalogue, ...audit];
+  if (mails.length === 0) return avecAudit;
   const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation"]);
-  return [...catalogue.filter((d) => !REMPLACES.has(d.template)), ...mails];
+  return [...avecAudit.filter((d) => !REMPLACES.has(d.template)), ...mails];
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
@@ -216,6 +221,10 @@ function stripEmojis(html: string): string {
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
+  if (template.startsWith("audit_")) {
+    const html = renderTypeAuditTemplate(template, o, resolveFormation(userFormation, org, userStagiaires), mergeStagiaires(userStagiaires));
+    if (html !== null) return html;
+  }
   if (template === "mail_capture") {
     const s = mergeStagiaires(userStagiaires)[params?.stagiaireIdx ?? 0];
     const r = s ? retrouverMail(o, resolveFormation(userFormation, org, userStagiaires), s, String(params?.mailKey || "")) : null;
@@ -4756,7 +4765,18 @@ function compositionConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, 
 }
 
 function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const { iso, tenu } = dateConseilPerfectionnement(f);
+  let { iso, tenu } = dateConseilPerfectionnement(f);
+  // Surveillance / renouvellement : un conseil de perfectionnement a nécessairement été tenu
+  // sur la période ; on présente le PV de la dernière séance, datée dans le passé.
+  if (!tenu && typeAuditEffectif(o) !== "initial") {
+    const d = dateRevueDirection(o);
+    d.setMonth(d.getMonth() - 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+    const majIso = (o.dateMaj || "").trim();
+    const cand = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    iso = majIso && cand < majIso ? majIso : cand;
+    tenu = true;
+  }
   const dateReunion = formatDate(iso);
   const today = new Date().toISOString().slice(0, 10);
   // Programmation signée un mois avant la réunion, jamais dans le futur.
@@ -11178,9 +11198,15 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
     lignes.push([`AC-V${String(i + 1).padStart(2, "0")}`, e.priseEnCompte, `Veille IND ${ind}`, `${e.titre} — ${e.impact}`, ind === 23 ? "Évolution réglementaire non prise en compte" : ind === 24 ? "Contenus décalés des besoins du métier" : "Méthodes et outils pédagogiques obsolètes", e.action, e.pilote, e.echeance, clos ? e.echeance : "", clos ? `Clôturé — ${e.diffusion}` : "En cours"]);
   });
   const dateRisques = formatDate((o.dateMaj || todayIso) <= todayIso ? (o.dateMaj || todayIso) : todayIso);
+  const typeAud = typeAuditEffectif(o);
+  const dateRD = formatDate((() => { const d = dateRevueDirection(o); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })());
   risquesAction.forEach(([risque, action, qui], i) => {
-    lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `Risque coté « élevé » dans la cartographie des risques de ${o.nom}`, risque, action, qui, "Permanent — revue annuelle", "", "Mesure de maîtrise en place ; efficacité revue à la revue qualité annuelle"]);
+    lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `Risque coté « élevé » dans la cartographie des risques de ${o.nom}`, risque, action, qui, "Permanent — revue annuelle", "",
+      typeAud === "initial" ? "Mesure de maîtrise en place ; efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`]);
   });
+  if (typeAud !== "initial") {
+    lignes.push(["AC-RD01", dateRD, `Revue de direction (${LIBELLES_AUDIT[typeAud]})`, "Revue annuelle des résultats, appréciations, réclamations, veille et risques", "Tous risques de la cartographie", typeAud === "renouvellement" ? "Bilan du cycle de certification et mise à jour de l'analyse des risques" : "Mise à jour des indicateurs publiés et de l'analyse des risques", o.dirigeant, dateRD, dateRD, "Clôturé — compte rendu de revue de direction (IND 32)"]);
+  }
   lignes.forEach((l) => {
     xlsHtml += `<tr>${l.map((c) => `<td>${c}</td>`).join("")}</tr>`;
   });

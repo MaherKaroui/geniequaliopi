@@ -2,6 +2,8 @@
 // 7 colonnes : Critère · N° · Indicateur · Niveau attendu V9 · Ce qu'il faut dire ·
 // Documents à présenter · Vigilance. Indicateurs spécifiques au type d'action marqués en orange.
 
+import { isStagiaireFormationTerminee } from "./docBuilder";
+import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import * as XLSX from "xlsx";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
@@ -33,7 +35,8 @@ export function generateFeuilleRouteQualiopiUniversal(
   catalog: DocEntry[],
   formations: FormationInfo[] = [],
   stagiaires: StagiaireInfo[] = [],
-  type: TypeActionAudit = "AF"
+  type: TypeActionAudit = "AF",
+  typeAudit: TypeAudit = typeAuditEffectif(org)
 ): Blob {
   const refCode = ACTION_TO_REF_CODE[type];
   const label = TYPE_ACTION_LABELS[type];
@@ -49,8 +52,11 @@ export function generateFeuilleRouteQualiopiUniversal(
   });
 
   const rows: (string | number)[][] = [];
-  rows.push([`PRÉPARATION AUDIT QUALIOPI — ${label} — ${org.nom} — ${frDate(new Date().toISOString())}`]);
+  rows.push([`PRÉPARATION AUDIT QUALIOPI — ${label} — ${org.nom} — ${LIBELLES_AUDIT[typeAudit]} — ${frDate(new Date().toISOString())}`]);
   rows.push([`Référentiel national qualité (décret n° 2026-728, guide de lecture V9) — 7 critères / ${indicateurs.length} indicateurs applicables au périmètre « ${label} ». Indicateurs spécifiques surlignés en orange.`]);
+  if (typeAudit !== "initial" && !stagiaires.some((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo)))) {
+    rows.push([`⚠ ${LIBELLES_AUDIT[typeAudit]} : aucun ${ben.toLowerCase()} du dossier n'a terminé son parcours — l'auditeur attend des preuves de mise en œuvre sur la période. Ajouter les sessions réalisées avant l'audit.`]);
+  }
   rows.push([]);
   const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Type"];
   rows.push(header);
@@ -80,7 +86,9 @@ export function generateFeuilleRouteQualiopiUniversal(
         `Critère ${cNum}`,
         ind.numero,
         ind.intitule,
-        ind.niveauAttendu,
+        `${ind.niveauAttendu}
+
+${attenduSelonAudit(typeAudit, ind.numero)}`,
         `« ${script} »`,
         allDocs,
         vigilance,

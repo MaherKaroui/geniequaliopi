@@ -3,6 +3,7 @@
 // avec pour chacun le niveau attendu V9, le script "ce qu'il faut dire", les preuves
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
+import { typeAuditEffectif } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
@@ -11,7 +12,7 @@ export function generateBookQualiopiCFA(
   formations: FormationInfo[],
   stagiaires: StagiaireInfo[],
   catalog: DocEntry[],
-  typeAudit: TypeAuditCFA = 'initial'
+  typeAudit: TypeAuditCFA = typeAuditEffectif(org)
 ): string {
   const isNE = typeAudit === 'initial';
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });

@@ -1,4 +1,5 @@
 // Critère 5 — IND 21 & IND 22 generators (based on real SELECT FORMATION documents)
+import { typeAuditEffectif } from "./typeAudit";
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate } from "./docBuilder";
@@ -437,6 +438,11 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const anneePlan = majIso ? Number(majIso.slice(0, 4)) : year;
   html = html.replace(`${prevYear} – ${year}`, `${anneePlan} – ${anneePlan + 1} (établi le ${dateEtab})`);
   html = html.replace("<th>Année</th>", "<th>Année</th><th>Statut</th>");
+  // Nouvel entrant : plan prévisionnel. Surveillance / renouvellement : les actions échues
+  // renvoient au bilan de réalisation (IND 22), qui les confirme par attestation ou les reporte.
+  const statutPlan = typeAuditEffectif(o) === "initial"
+    ? "Prévue — attestation à joindre après réalisation"
+    : "Voir bilan de réalisation du plan (IND 22) : réalisée avec attestation ou reportée avec motif";
   futureTrainings.forEach((t, i) => {
     const trimestre = ["T1", "T2", "T3", "T4"][i % 4];
     html += `<tr>
@@ -451,7 +457,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
       <td>${t.duree}</td>
       <td>${trimestre} ${anneePlan + (i >= 4 ? 1 : 0)}</td>
       <td>${anneePlan}</td>
-      <td>Prévue — attestation à joindre après réalisation</td>
+      <td>${statutPlan}</td>
     </tr>`;
   });
 

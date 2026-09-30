@@ -7,6 +7,8 @@
 // filtré par le périmètre applicable, avec un script « ce qu'il faut dire »
 // adapté à chaque type d'action.
 
+import { isStagiaireFormationTerminee } from "./docBuilder";
+import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
 import { generateGuideAuditCFA } from "./guideAuditCFA";
@@ -187,9 +189,14 @@ function generateGuideAutres(
   formations: FormationInfo[],
   catalog: DocEntry[],
   stagiaires: StagiaireInfo[],
-  type: TypeActionAudit
+  type: TypeActionAudit,
+  typeAudit: TypeAudit = typeAuditEffectif(org)
 ): string {
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+  const formationsTerminees = stagiaires.filter((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo))).length;
+  const alerteAudit = typeAudit !== "initial" && formationsTerminees === 0
+    ? `<div class="vigilance"><strong>⚠️ ${LIBELLES_AUDIT[typeAudit]} :</strong> aucun ${ACTION_BENEFICIAIRE[type].toLowerCase()} du dossier n'a terminé son parcours. L'auditeur attend des preuves de mise en œuvre sur la période (émargements, évaluations, satisfaction, résultats chiffrés) : ajoutez les sessions réalisées avant l'audit.</div>`
+    : "";
   const refCode = ACTION_TO_REF_CODE[type];
   const label = ACTION_LABELS[type];
   const ben = ACTION_BENEFICIAIRE[type];
@@ -204,7 +211,8 @@ function generateGuideAutres(
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${STYLES}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
-  <div class="sub">${label} — ${org.nom}<br>Référentiel national qualité (décret n° 2026-728, guide de lecture V9) — ${indicateurs.length} indicateurs applicables · Édition du ${today}</div>
+  <div class="sub">${label} — ${org.nom} · ${LIBELLES_AUDIT[typeAudit]}<br>Référentiel national qualité (décret n° 2026-728, guide de lecture V9) — ${indicateurs.length} indicateurs applicables · Édition du ${today}</div>
+  ${alerteAudit}
 
   <h2 class="crit" style="font-size:16px">1. Organisme audité</h2>
   <div class="lvl">
@@ -335,7 +343,7 @@ function generateGuideAutres(
       const preuves = preuvesParIndicateur(ind.numero, type, ind.questionsPreuves);
       const vig = pointVigilance(ind.numero, type);
       html += `<h3 class="ind">Indicateur ${ind.numero} — ${ind.intitule.split(".")[0]} ${tagsHtml}</h3>
-      <div class="lvl"><strong>Niveau attendu :</strong> ${ind.niveauAttendu}</div>
+      <div class="lvl"><strong>Niveau attendu :</strong> ${ind.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero)}</em></div>
       <div class="dire"><strong>✅ Ce qu'il faut dire :</strong> « ${script} »</div>
       <p><strong>📁 Documents à présenter</strong></p>
       <ul class="docs">${preuves.map(p => `<li>${p}</li>`).join("")}</ul>
@@ -355,12 +363,12 @@ export function generateGuideAuditUniversal(
   catalog: DocEntry[],
   stagiaires: StagiaireInfo[] = [],
   type: TypeActionAudit,
-  typeAuditCFA: TypeAuditCFA = "initial"
+  typeAuditCFA: TypeAuditCFA = typeAuditEffectif(org)
 ): string {
   if (type === "CFA") {
     return generateGuideAuditCFA(org, formations, catalog, stagiaires, typeAuditCFA);
   }
-  return generateGuideAutres(org, formations, catalog, stagiaires, type);
+  return generateGuideAutres(org, formations, catalog, stagiaires, type, typeAuditCFA);
 }
 
 export const TYPE_ACTION_LABELS = ACTION_LABELS;

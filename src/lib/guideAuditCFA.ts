@@ -2,6 +2,8 @@
 // Réplique le DOCX Dreamers Team : 1 fiche par indicateur avec niveau attendu,
 // script, documents à présenter et points de vigilance.
 
+import { isStagiaireFormationTerminee } from "./docBuilder";
+import { typeAuditEffectif } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
@@ -10,7 +12,7 @@ export function generateGuideAuditCFA(
   formations: FormationInfo[],
   catalog: DocEntry[],
   stagiaires: StagiaireInfo[] = [],
-  typeAudit: TypeAuditCFA = 'initial'
+  typeAudit: TypeAuditCFA = typeAuditEffectif(org)
 ): string {
   const isNE = typeAudit === 'initial';
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
@@ -45,6 +47,7 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${styles}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
   <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9 · Édition ${today}</div>
+  ${!isNE && !stagiaires.some((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo))) ? `<div class="vigilance"><strong>⚠️ ${getTypeAuditLabel(typeAudit)} :</strong> aucun apprenti du dossier n'a terminé son parcours ; l'auditeur attend des preuves de mise en œuvre sur la période (émargements, évaluations, PV du conseil de perfectionnement, résultats chiffrés).</div>` : ""}
 
   <h2 class="crit" style="font-size:16px">Périmètre audité</h2>
   <div class="lvl"><strong>Organisme : ${org.nom}</strong> — SIRET ${org.siret} · NDA ${org.nda}<br>
