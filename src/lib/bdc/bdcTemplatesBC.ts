@@ -5,7 +5,9 @@
  * Tous les contenus dérivent du BdcContext (BLOC 1) : aucune valeur en dur.
  */
 import type { BdcContext, Beneficiaire, Prestation, Organisme } from "./bdcModel";
-import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor } from "./bdcModel";
+import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor, prestationFor, etatBilan, repartitionHeures, ARTICLES_BC, DELAI_RETRACTATION_BC } from "./bdcModel";
+import type { FormationInfo } from "@/types/qualiopi";
+import { REFERENCES_REGLEMENTAIRES_2026 } from "@/lib/qualite2026";
 import { blocSignatureHtml } from "./signatureMatrix";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
@@ -19,7 +21,19 @@ export interface BdcDocDef {
   parBeneficiaire: boolean;
   /** Pièce contractuelle : signature obligatoire avant export (BLOC 7) */
   contractuelle?: boolean;
+  /** Pièce propre à certaines prestations (ex. support de cours du profil Pâtisserie). */
+  applicable?: (f: FormationInfo) => boolean;
   build: (ctx: BdcContext, b: Beneficiaire | null) => string;
+}
+
+/** Date de MAJ du dossier (V1) — date des pièces de système qualité, jamais « aujourd'hui ». */
+function dateSysteme(ctx: BdcContext): string {
+  return fmtDateFR(ctx.organisme.dateMaj || ctx.prestation.dateDebut);
+}
+
+/** Échéance ≤ aujourd'hui ? */
+function passe(d: Date): boolean {
+  return d.getTime() <= Date.now();
 }
 
 const H = (t: string) => `# ${t}\n`;
@@ -65,156 +79,116 @@ const documentSynthese: BdcDocDef = {
   parBeneficiaire: true,
   contractuelle: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
-    const seed = seedBenef(b, "synthese");
-    const pk = <T,>(arr: T[], off: number): T => arr[(seed + off) % arr.length];
-    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
-    const metier = prof?.metier || "le métier visé";
-    const secteur = prof?.secteur || "le secteur visé";
-    const tech = prof?.techniques || [];
-    const transv = prof?.transversales || [];
-    const forms = prof?.formations || [];
-    const opps = prof?.opportunites || [];
+    const o = ctx.organisme;
+    const p = prestationFor(ctx, b);
+    const { termine } = etatBilan(p);
     const nomB = b ? `${b.prenom} ${b.nom}` : "Le bénéficiaire";
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+
+    if (!termine) {
+      // Bilan en cours : la synthèse est rédigée en phase de conclusion, jamais avant.
+      return [
+        H("Document de synthèse du bilan de compétences"),
+        `_Remis au seul bénéficiaire (${ARTICLES_BC.definition})._\n`,
+        entete(o, b, p),
+        `> **Bilan en cours** — le document de synthèse est établi lors de la phase de conclusion et remis à ${nomB} à l'issue de la dernière séance (prévue le ${fmtDateFR(p.dateFin)}). Les rubriques ci-dessous sont à compléter en fin de bilan.\n`,
+        H2("1. Circonstances du bilan"), "_À compléter en fin de bilan._",
+        H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"), "_À compléter en fin de bilan._",
+        H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"), "_À compléter en fin de bilan._",
+        H2("4. Atteinte des objectifs de la prestation"), "_À compléter en fin de bilan._",
+        H2("5. Propriété et confidentialité"),
+        `Le document de synthèse est la propriété du bénéficiaire, seul destinataire. Il ne peut être communiqué à un tiers qu'avec son accord (${ARTICLES_BC.definition}).`,
+      ].join("\n");
+    }
+
+    const pf = b?.profil;
+    const seed = pf?.seed ?? 0;
+    const pk = <T,>(arr: T[], off: number): T => arr[(seed + off) % arr.length];
+    const generique = !prof || prof.generique;
+    const cible = pf?.cible || (generique ? "son projet professionnel" : `le métier de ${prof!.metier}`);
+    const secteur = generique ? "le secteur visé" : prof!.secteur.split(",")[0];
+    const tech = generique ? [] : prof!.techniques;
+    const transv = prof?.transversales || [];
+    const forms = generique ? [] : prof!.formations;
+    const projetTxt = pf?.projet || "préciser son projet professionnel";
 
     const dPlus = (mois: number) => {
       const d = new Date(p.dateFin);
       d.setMonth(d.getMonth() + mois);
       return fmtDateFR(d);
     };
-
-    const circonstances = pk([
-      `${nomB} a sollicité ce bilan pour sécuriser une orientation vers ${metier}. La demande, formulée le ${fmtDateFR(p.dateDebut)}, portait sur la vérification de la faisabilité du projet et sur l'identification des compétences transférables.`,
-      `${nomB} a engagé cette démarche à la suite d'un questionnement professionnel durable. Le besoin exprimé lors de l'entretien préliminaire concernait la clarification du projet et sa confrontation aux réalités de ${secteur}.`,
-      `${nomB} s'est inscrit(e) dans ce bilan pour objectiver ses acquis et arbitrer entre plusieurs pistes, dont ${metier}. La démarche est volontaire et a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}.`,
-    ], 0);
+    const circonstances = `${nomB} a engagé ce bilan pour ${pf ? pf.motifLibelle.charAt(0).toLowerCase() + pf.motifLibelle.slice(1) : "faire le point sur son parcours"}${b?.poste ? `, alors en poste comme ${b.poste}${b.entreprise ? ` (${b.entreprise})` : ""}` : ""}. La demande${pf?.origine === "employeur" ? ", formulée dans le cadre du plan de développement des compétences de l'employeur," : pf?.financeur === "CPF" ? ", financée par son compte personnel de formation," : ""} a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}. Attente exprimée : « ${pf?.attente || "clarifier son projet"} ».`;
 
     const lignesComp: Array<[string, string, string]> = [
-      [
-        "Compétences techniques du métier visé",
-        tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Compétences techniques du domaine visé identifiées en séance",
-        "Tests de positionnement, mises en situation et retours d'expérience professionnelle",
-      ],
-      [
-        "Compétences transversales",
-        transv.length ? `${transv[seed % transv.length]} ; ${transv[(seed + 2) % transv.length]}` : "Organisation, communication, adaptation",
-        "Questionnaire d'intérêts (RIASEC), entretiens d'explicitation",
-      ],
-      [
-        "Aptitudes et motivations",
-        `Motivation confirmée pour ${secteur} ; capacité à apprendre et à s'adapter à un nouvel environnement de travail`,
-        "Test de personnalité, enquêtes métier réalisées entre les séances",
-      ],
+      ["Compétences issues du parcours", b?.poste ? `Compétences mobilisées sur le poste de ${b.poste} : organisation, relation avec les interlocuteurs, fiabilité d'exécution` : "Compétences issues des expériences professionnelles et extra-professionnelles, formalisées en séance", "Analyse du parcours, entretiens d'explicitation"],
+      ["Compétences transversales", transv.length ? `${transv[seed % transv.length]} ; ${transv[(seed + 2) % transv.length]}` : "Organisation, communication, adaptation", "Questionnaire d'intérêts (RIASEC), entretiens"],
+      [generique ? "Compétences à développer pour le projet" : "Compétences techniques du métier visé", tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Écarts identifiés entre les acquis et les exigences du projet, traités dans le plan d'action", "Enquêtes métier, recherches documentaires"],
+      ["Aptitudes et motivations", `Motivation confirmée pour ${cible} ; niveau d'études : ${b?.niveauEtudes || "non renseigné"}`, "Test de personnalité, entretiens"],
     ];
-
-    const projet = pk([
-      `Accéder au métier de ${metier} dans ${secteur}, après acquisition de la qualification requise.`,
-      `Se professionnaliser dans ${secteur} en visant ${opps.length ? opps[seed % opps.length] : "un poste correspondant au projet"}, en capitalisant sur les acquis du parcours.`,
-      `Valider le projet de ${metier} par une formation qualifiante, puis une insertion progressive dans ${secteur}.`,
-    ], 1);
-
     const etapes: Array<[string, string, string]> = [
-      [
-        `Finaliser le dossier de candidature à ${forms.length ? forms[seed % forms.length] : "la formation qualifiante identifiée"}`,
-        dPlus(1),
-        "Consultant du bilan, organisme de formation, site France Compétences",
-      ],
-      [
-        "Monter le plan de financement (CPF, aides régionales, France Travail selon la situation)",
-        dPlus(2),
-        "Conseiller France Travail / OPCO, plateforme Mon Compte Formation",
-      ],
-      [
-        `Réaliser une immersion ou une période d'observation en ${secteur}`,
-        dPlus(3),
-        "Réseau professionnel, PMSMP, entreprises identifiées lors des enquêtes métier",
-      ],
-      [
-        `Entrer en formation puis engager la recherche d'emploi sur le métier de ${metier}`,
-        dPlus(6),
-        "Organisme de formation, entretien de suivi à 6 mois",
-      ],
+      [forms.length ? `Constituer le dossier de candidature à ${forms[seed % forms.length]}` : "Identifier et comparer les formations ou postes correspondant au projet", dPlus(1), "Fiches France Compétences, sites des organismes, réseau professionnel"],
+      [`Monter le plan de financement (${pf?.financeur === "employeur" || pf?.financeur === "OPCO" ? "plan de développement des compétences, OPCO" : "CPF, France Travail, aides régionales selon la situation"})`, dPlus(2), "Conseiller en évolution professionnelle, Mon Compte Formation"],
+      [`Confronter le projet au terrain (${generique ? "rencontres de professionnels" : `immersion en ${secteur}`})`, dPlus(3), "PMSMP, réseau, entreprises contactées lors des enquêtes"],
+      ["Engager la mise en œuvre du projet et faire le point sur son avancement", dPlus(6), "Entretien de suivi proposé par le consultant"],
     ];
-
-    const objectifs: Array<[string, 0 | 1]> = [
-      [`Analyser ses compétences professionnelles et personnelles au regard de ${metier}`, 0],
-      [`Identifier ses aptitudes, ses intérêts et ses motivations pour ${secteur}`, 0],
-      ["Définir un projet professionnel réaliste et, le cas échéant, un projet de formation", (seed % 4 === 0 ? 1 : 0)],
-      ["Élaborer un plan d'action daté, hiérarchisé et assorti de ressources mobilisables", 0],
-    ];
-    const obsObj = [
-      `Objectif atteint : les compétences transférables vers ${metier} sont formalisées au point 2 du présent document.`,
-      `Objectif atteint : les investigations menées sur ${secteur} (enquêtes métier, tests, entretiens) permettent une décision éclairée.`,
-      "Partiellement atteint : le projet est arrêté, la faisabilité financière du parcours de formation reste à confirmer.",
-      "Objectif atteint : le plan d'action figurant au point 3 est daté et les appuis sont identifiés.",
-    ];
-
-    /* Indicateurs factuels de réalisation de la prestation (indicateur 11). */
-    const nbSeances = seancesFor(ctx, b).length;
-    const indicateursReal: Array<[string, string]> = [
-      ["Heures d'accompagnement réalisées", `${p.dureeTotaleH} h sur ${p.dureeTotaleH} h prévues, soit 100 %`],
-      ["Séances réalisées", `${nbSeances} séances individuelles, du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)}`],
-      ["Respect des trois phases réglementaires", "Préliminaire, investigation et conclusion réalisées (art. R6313-4)"],
-      ["Travail intersession", pk(["Réalisé intégralement", "Réalisé, avec un léger décalage sur une enquête métier", "Réalisé, enrichi d'une immersion complémentaire"], 3)],
-      ["Remise du document de synthèse", `Effectuée le ${fmtDateFR(p.dateFin)}, en main propre au bénéficiaire`],
-    ];
-
-    const niveauGlobal = seed % 4 === 0
-      ? "Objectifs globalement atteints — trois objectifs sur quatre pleinement atteints, le quatrième partiellement."
-      : "Objectifs atteints — l'ensemble des objectifs fixés en phase préliminaire est satisfait à l'issue de la prestation.";
-
-
-    const appreciation = pk([
-      `Démarche sérieuse et régulière. ${nomB} a mobilisé les outils proposés et réalisé le travail intersession. Le projet de ${metier} est cohérent avec le parcours et les contraintes exprimées ; sa mise en œuvre dépend principalement de l'entrée en formation.`,
-      `${nomB} a fait preuve d'un réel engagement tout au long du bilan. Les investigations menées sur ${secteur} ont permis de lever les doutes initiaux. Le plan d'action est réaliste, avec un point de vigilance sur le financement.`,
-      `Le bilan a permis de structurer un projet jusque-là intuitif. ${nomB} dispose désormais d'un plan d'action daté et des ressources pour le conduire ; l'entretien de suivi à six mois permettra d'en mesurer l'avancement.`,
-    ], 2);
-
+    const partiel = seed % 4 === 0;
     return [
       H("Document de synthèse du bilan de compétences"),
-      "_Établi en application de l'article R6313-8 du Code du travail._\n",
+      `_Remis au seul bénéficiaire (${ARTICLES_BC.definition}) — phase de conclusion (${ARTICLES_BC.phases})._\n`,
       entete(o, b, p),
       H2("1. Circonstances du bilan"),
-      "_Rubrique rédigée en style indirect par le consultant à partir des entretiens._\n",
       circonstances,
-      `\nLa demande a été formulée le ${fmtDateFR(p.dateDebut)} et instruite lors de l'entretien préliminaire. Les objectifs ont été arrêtés conjointement et rappelés au point 4 du présent document.`,
       H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"),
       "\n| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
       "|---|---|---|",
       ...lignesComp.map(([d, c, pr]) => `| ${d} | ${c} | ${pr} |`),
       H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"),
-      `**Projet retenu à l'issue du bilan** : ${projet}\n`,
+      `**Projet retenu à l'issue du bilan** : ${projetTxt.charAt(0).toUpperCase() + projetTxt.slice(1)}.\n`,
       "| Étape | Action | Échéance | Ressources / appuis |",
       "|---|---|---|---|",
-      ...etapes.map(([a, e, r], i) => `| ${i + 1} | ${a} | ${e} | ${r} |`),
-      H2("4. Atteinte des objectifs de la prestation (indicateur 11)"),
-      "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint | Observations |",
-      "|---|---|---|---|---|",
-      ...objectifs.map(([lib, part], i) =>
-        `| ${lib} | ${part ? "☐" : "☒"} | ${part ? "☒" : "☐"} | ☐ | ${part ? obsObj[2] : obsObj[[0, 1, 3][i % 3]]} |`),
-      "\n**Indicateurs de réalisation de la prestation**\n",
-      "| Indicateur | Constat |",
-      "|---|---|",
-      ...indicateursReal.map(([k, v]) => `| ${k} | ${v} |`),
-      `\n**Niveau d'atteinte global** : ${niveauGlobal}`,
-      `\n**Appréciation générale du consultant** : ${appreciation}`,
-      `\n**Suites données** : ${pk([
-        `Entrée en formation visée pour ${dPlus(3)}, puis recherche d'emploi sur ${metier}.`,
-        `Dépôt du dossier de financement engagé ; démarrage du parcours envisagé à compter du ${dPlus(2)}.`,
-        `Poursuite des démarches de manière autonome, avec un point d'étape au ${dPlus(3)}.`,
-      ], 4)}`,
-      `\n**Suivi** : un entretien de suivi est prévu le ${fmtDateFR(p.dateSuivi6Mois)}, soit six mois après la remise du présent document, conformément à l'article R6313-8.`,
-
-
+      ...etapes.map(([ac, e, r], i) => `| ${i + 1} | ${ac} | ${e} | ${r} |`),
+      H2("4. Atteinte des objectifs de la prestation"),
+      "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint |",
+      "|---|---|---|---|",
+      `| Analyser ses compétences professionnelles et personnelles | ☒ | ☐ | ☐ |`,
+      `| Identifier ses aptitudes, intérêts et motivations | ☒ | ☐ | ☐ |`,
+      `| Définir un projet professionnel réaliste | ${partiel ? "☐" : "☒"} | ${partiel ? "☒" : "☐"} | ☐ |`,
+      `| Élaborer un plan d'action daté | ☒ | ☐ | ☐ |`,
+      "",
+      `**Réalisation** : ${seancesFor(ctx, b).length} séances individuelles, ${p.dureeTotaleH} heures, du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)}, trois phases réalisées (${ARTICLES_BC.phases}).`,
+      partiel ? "\n**Point de vigilance** : la faisabilité financière du projet reste à confirmer." : "",
+      `\n**Suivi** : un entretien de suivi est proposé à ${nomB} six mois après la fin du bilan, à partir du ${fmtDateFR(p.dateSuivi6Mois)} (démarche qualité de l'organisme, facultative pour le bénéficiaire).`,
       H2("5. Propriété et confidentialité"),
-      "Le document de synthèse est la **seule et exclusive propriété du bénéficiaire**. Il ne peut être communiqué à un tiers, à l'employeur ou au financeur qu'avec son accord écrit préalable et révocable (art. L6313-4).",
-      "Les résultats détaillés et les documents produits au cours du bilan sont couverts par le secret professionnel et détruits à l'issue de la prestation, sauf accord écrit du bénéficiaire pour une conservation limitée à un an (art. R6313-7).",
+      `Le document de synthèse et les résultats détaillés sont remis au seul bénéficiaire ; ils ne peuvent être communiqués à un tiers qu'avec son accord (${ARTICLES_BC.definition}). Les personnes chargées du bilan sont tenues au secret professionnel (art. 226-13 et 226-14 du Code pénal).`,
+      `Les documents élaborés pour le bilan sont détruits dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation (conservation de trois ans au plus, ${ARTICLES_BC.destruction}).`,
       `\n_Document remis à ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "la personne concernée"} le ${fmtDateFR(p.dateFin)}._`,
       SIGN(ctx, "Indicateur 11 - Document de synthèse du bilan de compétences", b),
     ].join("\n");
   },
 };
 
+/** Attestation de remise : preuve d'audit sans divulguer le contenu de la synthèse. */
+const attestationRemiseSynthese: BdcDocDef = {
+  nom: "Indicateur 11 - Attestation de remise du document de synthèse",
+  indicateur: 11,
+  parBeneficiaire: true,
+  build: (ctx, b) => {
+    const o = ctx.organisme;
+    const p = prestationFor(ctx, b);
+    const { termine } = etatBilan(p);
+    const nomB = b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________";
+    return [
+      H("Attestation de remise du document de synthèse"),
+      entete(o, b, p),
+      termine
+        ? `Je soussigné(e) ${nomB} reconnais avoir reçu, le ${fmtDateFR(p.dateFin)}, le document de synthèse de mon bilan de compétences ainsi que les résultats détaillés, dont je suis le seul destinataire (${ARTICLES_BC.definition}).`
+        : `Attestation à signer par ${nomB} lors de la remise du document de synthèse, prévue à l'issue de la dernière séance (${fmtDateFR(p.dateFin)}).`,
+      "",
+      "Le contenu du document de synthèse n'est pas versé au dossier d'audit de l'organisme : seule la présente attestation l'est, sauf autorisation écrite du bénéficiaire.",
+      SIGN(ctx, "Indicateur 11 - Attestation de remise du document de synthèse", b, termine ? p.dateFin : undefined),
+    ].join("\n");
+  },
+};
 
 
 /* ------------------------------------------------------------------ */
@@ -253,7 +227,7 @@ const feuillesEmargement: BdcDocDef = {
   parBeneficiaire: true,
   contractuelle: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = prestationFor(ctx, b);
     const seances = seancesFor(ctx, b);
     const aujourdhui = new Date();
     const parts: string[] = [H("Feuilles d'émargement"), entete(o, b, p)];
@@ -354,7 +328,8 @@ function dateMiParcours(ctx: BdcContext, b?: Beneficiaire | null): Date {
     const idx = Math.floor((seances.length - 1) / 2);
     return new Date(seances[idx].date);
   }
-  return new Date((ctx.prestation.dateDebut.getTime() + ctx.prestation.dateFin.getTime()) / 2);
+  const p = prestationFor(ctx, b);
+  return new Date((p.dateDebut.getTime() + p.dateFin.getTime()) / 2);
 }
 
 function scoreRiasec(seed: number, dim: string, dominant?: string, secondaire?: string): number {
@@ -369,12 +344,24 @@ const testPersonnalite: BdcDocDef = {
   indicateur: 11,
   parBeneficiaire: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = prestationFor(ctx, b);
     const datePassation = dateMiParcours(ctx, b);
     const seed = seedBenef(b, "personnalite");
     const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
-    const metier = prof?.metier || "le métier visé";
-    const secteur = prof?.secteur || "le secteur visé";
+    const generique = !prof || prof.generique;
+    const metier = generique ? (b?.profil.cible || "son projet professionnel") : prof!.metier;
+    const secteur = generique ? "le secteur visé" : prof!.secteur.split(",")[0];
+    if (!passe(datePassation)) {
+      return [
+        H("Test de personnalité"),
+        "_Outil de la phase d'investigation — passé à mi-parcours._\n",
+        entete(o, b, p),
+        `> **Passation prévue le ${fmtDateFR(datePassation)}** — les résultats seront consignés et restitués en séance.\n`,
+        "| Dimension | Score / 10 | Interprétation |",
+        "|---|---|---|",
+        ...LETTRES_RIASEC.map((l) => `| **${PROFILS_RIASEC[l].label}** (${l}) |  |  |`),
+      ].join("\n");
+    }
     const nomB = b ? `${b.prenom} ${b.nom}` : "Le bénéficiaire";
     const civ = b?.civilite === "Mme" ? "Mme" : "M.";
 
@@ -465,42 +452,76 @@ function echelleCochee(note: number): string {
   return [1, 2, 3, 4, 5].map((n) => `${n} ${n === note ? "☒" : "☐"}`).join("  ");
 }
 
+/** Notes 4 ou 5 déterministes (mêmes valeurs dans le questionnaire et les statistiques IND 2). */
+export function notesSatisfaction(b: Beneficiaire | null, nomPiece: string, nbQuestions: number): number[] {
+  const seed = seedBenef(b, nomPiece);
+  return Array.from({ length: nbQuestions }, (_, i) => ((seed + i * 3) % 5 === 0 ? 4 : 5));
+}
+
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
   return (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme;
+    const p = prestationFor(ctx, b);
+    const froid = /froid/i.test(nomPiece);
+    const dateRepD = froid ? p.dateSuivi6Mois : p.dateFin;
+    const disponible = passe(dateRepD);
+    if (!disponible) {
+      return [
+        H(titre),
+        entete(o, b, p),
+        `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
+        `> **${froid ? "Suivi à programmer" : "À renseigner en fin de bilan"}** — questionnaire à remettre au bénéficiaire le ${fmtDateFR(dateRepD)}.\n`,
+        "| Question | 1 → 5 |",
+        "|---|---|",
+        ...questions.map((q) => `| ${q} | ${ECHELLE_SATISFACTION} |`),
+        H2("Commentaire libre"),
+        FILIGRANE_BENEFICIAIRE,
+      ].join("\n");
+    }
     const seed = seedBenef(b, nomPiece);
-    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
-    const metier = prof?.metier || "mon projet professionnel";
-    const lignes = questions.map((q, i) => {
-      const note = (seed + i * 3) % 5 === 0 ? 4 : 5;
-      return `| ${q} | ${echelleCochee(note)} |`;
-    });
+    const notes = notesSatisfaction(b, nomPiece, questions.length);
+    const cible = b?.profil.cible || "mon projet professionnel";
     const commentaires = [
-      `Accompagnement de qualité, à l'écoute et structuré. Les séances m'ont aidé(e) à poser des mots précis sur mes compétences et à avancer sur le projet de ${metier}.`,
-      `J'ai apprécié la méthode : des outils concrets, un rythme adapté à mes disponibilités et des échanges toujours respectueux. Je repars avec un plan d'action clair.`,
-      `Le bilan m'a permis de sortir du flou. Les enquêtes métier et les tests ont confirmé mon orientation vers ${metier}. Point à améliorer : un peu plus de temps sur le volet financement.`,
-      `Très satisfait(e) du suivi. Le consultant a su me remettre en confiance et m'aider à hiérarchiser mes priorités. Je recommanderais cet accompagnement.`,
-      `Démarche exigeante mais utile. Le travail entre les séances demande du temps ; en contrepartie, les résultats sont concrets et réutilisables.`,
+      `Accompagnement à l'écoute et structuré. Les séances m'ont aidé(e) à poser des mots précis sur mes compétences et à avancer sur ${cible.replace(/^son /, "mon ")}.`,
+      "J'ai apprécié la méthode : des outils concrets, un rythme adapté à mes disponibilités et des échanges respectueux. Je repars avec un plan d'action clair.",
+      "Le bilan m'a permis de sortir du flou. Point à améliorer : un peu plus de temps sur le volet financement.",
+      "Très satisfait(e) du suivi. Le consultant m'a aidé(e) à hiérarchiser mes priorités.",
+      "Démarche exigeante mais utile. Le travail entre les séances demande du temps ; en contrepartie, les résultats sont concrets.",
     ];
-    const commentaire = commentaires[seed % commentaires.length];
-    const dateRep = fmtDateFR(/froid/i.test(nomPiece) ? p.dateSuivi6Mois : p.dateFin);
     return [
       H(titre),
       entete(o, b, p),
       `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
       "| Question | 1 → 5 |",
       "|---|---|",
-      ...lignes,
+      ...questions.map((q, i) => `| ${q} | ${echelleCochee(notes[i])} |`),
       H2("Commentaire libre"),
-      commentaire,
+      commentaires[seed % commentaires.length],
       "",
-      `**Renseigné le** : ${dateRep}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}`,
+      `**Renseigné le** : ${fmtDateFR(dateRepD)}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}`,
       p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
-      SIGN(ctx, nomPiece, b),
+      SIGN(ctx, nomPiece, b, dateRepD),
     ].join("\n");
   };
 }
 
+export const QUESTIONS_SATISFACTION_CHAUD = [
+  "Clarté des informations reçues avant l'engagement",
+  "Qualité de l'accueil et des conditions matérielles",
+  "Écoute et posture du consultant",
+  "Pertinence des outils d'investigation mobilisés",
+  "Respect du rythme et des disponibilités annoncés",
+  "Utilité du document de synthèse",
+  "Atteinte de vos objectifs initiaux",
+  "Satisfaction globale de la prestation",
+];
+export const QUESTIONS_SATISFACTION_FROID = [
+  "Mise en œuvre effective du projet défini lors du bilan",
+  "Pertinence du projet avec le recul de six mois",
+  "Utilité des étapes définies dans le document de synthèse",
+  "Appui reçu lors de l'entretien de suivi",
+  "Satisfaction globale avec le recul",
+];
 
 const satisfactionChaud: BdcDocDef = {
   nom: "Indicateur 30 - Questionnaire de satisfaction bénéficiaire (à chaud)",
@@ -509,16 +530,7 @@ const satisfactionChaud: BdcDocDef = {
   build: questionnaireSatisfaction(
     "Questionnaire de satisfaction — volet à chaud",
     "À renseigner lors de l'entretien de conclusion",
-    [
-      "Clarté des informations reçues avant l'engagement",
-      "Qualité de l'accueil et des conditions matérielles",
-      "Écoute et posture du consultant",
-      "Pertinence des outils d'investigation mobilisés",
-      "Respect du rythme et des disponibilités annoncés",
-      "Utilité du document de synthèse",
-      "Atteinte de vos objectifs initiaux",
-      "Satisfaction globale de la prestation",
-    ],
+    QUESTIONS_SATISFACTION_CHAUD,
     "Questionnaire satisfaction à chaud",
   ),
 };
@@ -527,21 +539,12 @@ const satisfactionFroid: BdcDocDef = {
   nom: "Indicateur 30 - Questionnaire de satisfaction bénéficiaire (à froid - suivi 6 mois)",
   indicateur: 30,
   parBeneficiaire: true,
-  build: (ctx, b) => {
-    const base = questionnaireSatisfaction(
-      "Questionnaire de satisfaction — volet à froid (suivi à 6 mois)",
-      `À renseigner lors de l'entretien de suivi prévu le ${fmtDateFR(ctx.prestation.dateSuivi6Mois)}`,
-      [
-        "Mise en œuvre effective du projet défini lors du bilan",
-        "Pertinence du projet avec le recul de six mois",
-        "Utilité des étapes définies dans le document de synthèse",
-        "Appui reçu lors de l'entretien de suivi",
-        "Satisfaction globale avec le recul",
-      ],
-      "Questionnaire satisfaction à froid",
-    )(ctx, b);
-    return base;
-  },
+  build: (ctx, b) => questionnaireSatisfaction(
+    "Questionnaire de satisfaction — volet à froid (suivi à 6 mois)",
+    `À renseigner lors de l'entretien de suivi proposé à partir du ${fmtDateFR(prestationFor(ctx, b).dateSuivi6Mois)}`,
+    QUESTIONS_SATISFACTION_FROID,
+    "Questionnaire satisfaction à froid",
+  )(ctx, b),
 };
 
 /* ------------------------------------------------------------------ */
@@ -553,71 +556,61 @@ const accordConservation: BdcDocDef = {
   parBeneficiaire: true,
   contractuelle: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
-    const seed = seedBenef(b, "conservation");
-    const conserve = seed % 2 === 0;
-    const dateLimite = fmtDateFR(new Date(p.dateFin.getFullYear() + 1, p.dateFin.getMonth(), p.dateFin.getDate()));
-    const dateDestruction = conserve ? dateLimite : fmtDateFR(p.dateFin);
+    const o = ctx.organisme;
+    const p = prestationFor(ctx, b);
+    const dateLimite = fmtDateFR(new Date(p.dateFin.getFullYear() + 3, p.dateFin.getMonth(), p.dateFin.getDate()));
     return [
       H("Accord de conservation / attestation de destruction des documents"),
-      "_Article R6313-7 du Code du travail._\n",
+      `_${ARTICLES_BC.destruction}._\n`,
       entete(o, b, p),
       H2("Principe"),
-      "À l'issue du bilan de compétences, l'ensemble des documents élaborés pour la réalisation de la prestation est **détruit**. Le document de synthèse est remis au seul bénéficiaire.",
+      "L'organisme détruit les documents élaborés pour la réalisation du bilan **dès le terme de l'action**. Le document de synthèse et les résultats détaillés sont remis au seul bénéficiaire.",
       H2("Exception — conservation sur accord écrit"),
-      "La conservation des documents constitue une exception, limitée à **un an maximum**, et subordonnée à l'accord écrit du bénéficiaire ci-dessous.",
+      `Par exception, les documents faisant l'objet d'un **accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation** peuvent être conservés pendant **trois ans au plus**, soit au plus tard jusqu'au ${dateLimite}.`,
+      "",
+      "_Choix exprimé par le bénéficiaire à la fin du bilan (case à cocher de sa main) :_",
       "",
       "| Choix du bénéficiaire | ☐ |",
       "|---|---|",
-      `| Je demande la **destruction immédiate** de l'ensemble des documents à l'issue du bilan. | ${conserve ? "☐" : "☒"} |`,
-      `| J'autorise la **conservation** des documents pour une durée d'un an maximum, soit jusqu'au ${dateLimite}, à des fins exclusives de suivi. | ${conserve ? "☒" : "☐"} |`,
+      "| Je demande la **destruction** de l'ensemble des documents dès la fin du bilan. | ☐ |",
+      `| J'autorise la **conservation** des documents nécessaires au suivi de ma situation, pour trois ans au plus (jusqu'au ${dateLimite}). | ☐ |`,
       "",
-      `**Choix exprimé le** : ${fmtDateFR(p.dateFin)}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}.`,
+      "**Date du choix** : ____/____/________",
       "",
       "Cet accord est révocable à tout moment par simple demande écrite adressée à " + (o.emailContact || "l'organisme") + ".",
-      H2("Attestation de destruction"),
-      `Je soussigné(e) ${p.consultant.nom}, consultant, atteste que l'intégralité des documents relatifs au bilan de ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________"} ${conserve ? `sera détruite au terme de la conservation autorisée, soit le ${dateDestruction}` : `a été détruite le ${dateDestruction}`}.`,
-      "",
-      `**Fait à** ${o.ville}, **le** ${fmtDateFR(p.dateFin)}.`,
+      H2("Attestation de destruction (à compléter par le consultant)"),
+      `Je soussigné(e) ${p.consultant.nom}, consultant, atteste que les documents relatifs au bilan de ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "________________"} ont été détruits le ____/____/________, conformément au choix exprimé ci-dessus.`,
       SIGN(ctx, "Indicateur 9 - Accord de conservation et attestation de destruction des documents", b),
     ].join("\n");
   },
 };
 
-/* ------------------------------------------------------------------ */
-/* 5. Autorisation de transmission à un tiers — L6313-4                */
-/* ------------------------------------------------------------------ */
 const autorisationTransmission: BdcDocDef = {
   nom: "Indicateur 9 - Autorisation de transmission du document de synthèse à un tiers",
   indicateur: 9,
   parBeneficiaire: true,
   contractuelle: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
-    const seed = seedBenef(b, "transmission");
-    const employeur = (b as any)?.entreprise ? String((b as any).entreprise).trim() : "";
-    const autorise = !!employeur && seed % 3 === 0;
-    const dateChoix = fmtDateFR(p.dateFin);
+    const o = ctx.organisme;
+    const p = prestationFor(ctx, b);
     return [
       H("Autorisation de transmission à un tiers"),
-      "_Article L6313-4 du Code du travail._\n",
+      `_${ARTICLES_BC.definition}._\n`,
       entete(o, b, p),
-      "Les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers, y compris à l'employeur ou au financeur, **qu'avec l'accord écrit du bénéficiaire**.",
+      "Les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers, y compris à l'employeur ou au financeur, **qu'avec l'accord du bénéficiaire**. À défaut de choix exprimé, aucune transmission n'a lieu.",
+      "",
+      "_Décision exprimée par le bénéficiaire (case à cocher de sa main) :_",
       "",
       "| Décision | ☐ |",
       "|---|---|",
-      `| Je **n'autorise pas** la transmission de mon document de synthèse à un tiers. | ${autorise ? "☐" : "☒"} |`,
-      `| J'autorise la transmission de mon document de synthèse au destinataire désigné ci-dessous. | ${autorise ? "☒" : "☐"} |`,
+      "| Je **n'autorise pas** la transmission de mon document de synthèse à un tiers. | ☐ |",
+      "| J'autorise la transmission de mon document de synthèse au destinataire désigné ci-dessous. | ☐ |",
       "",
-      autorise
-        ? `**Destinataire autorisé** : ${employeur}  \n**Qualité** : employeur du bénéficiaire  \n**Objet de la transmission** : accompagnement de la mobilité interne et suivi du plan de développement des compétences.`
-        : "**Destinataire autorisé** : sans objet — aucune transmission autorisée  \n**Qualité** : sans objet  \n**Objet de la transmission** : sans objet",
+      "**Destinataire autorisé** : ______________________________  \n**Qualité** : ______________________________  \n**Objet de la transmission** : ______________________________",
       "",
-      `**Décision exprimée le** : ${dateChoix}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}.`,
+      "**Date de la décision** : ____/____/________",
       "",
-      "La présente autorisation est **révocable à tout moment**, sans motif, par écrit adressé à " + (o.emailContact || "l'organisme") + ". La révocation prend effet dès sa réception.",
-      "",
-      `**Fait à** ${o.ville}, **le** ${dateChoix}.`,
+      "La présente autorisation est **révocable à tout moment**, sans motif, par écrit adressé à " + (o.emailContact || "l'organisme") + ".",
       SIGN(ctx, "Indicateur 9 - Autorisation de transmission du document de synthèse à un tiers", b),
     ].join("\n");
   },
@@ -665,14 +658,14 @@ const livretAccueil: BdcDocDef = {
   indicateur: 9,
   parBeneficiaire: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = prestationFor(ctx, b);
     const c = typeContrat(p);
     return [
       H("Livret d'accueil du bénéficiaire"),
       entete(o, b, p),
       H2("1. Votre interlocuteur"),
       `${p.consultant.nom}, ${p.consultant.qualification} — ${o.emailContact} — ${o.telephoneContact}`,
-      H2("2. Déroulement du bilan (art. R6313-4)"),
+      H2(`2. Déroulement du bilan (${ARTICLES_BC.phases})`),
       "| Phase | Objet |",
       "|---|---|",
       "| Phase préliminaire | Analyser votre demande, définir le format le plus adapté, vous informer des conditions de déroulement et des méthodes mobilisées |",
@@ -704,7 +697,7 @@ const planningPrevisionnel: BdcDocDef = {
   parBeneficiaire: true,
   contractuelle: true,
   build: (ctx, b) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = prestationFor(ctx, b);
     return [
       H("Planning prévisionnel des séances"),
       "_Annexe au contrat / à la convention de prestation._\n",
@@ -725,11 +718,11 @@ const planningPrevisionnel: BdcDocDef = {
 /* 9. Informations pratiques distanciel                                */
 /* ------------------------------------------------------------------ */
 const infosDistanciel: BdcDocDef = {
-  nom: "Indicateur 9 - Informations pratiques - prestation à distance",
-  indicateur: 9,
+  nom: "Indicateur 17 - Moyens, confidentialité et informations pratiques",
+  indicateur: 17,
   parBeneficiaire: false,
   build: (ctx) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = ctx.prestation;
     return [
       H("Informations pratiques — déroulement à distance"),
       `**Modalité de la prestation** : ${libModalite(p.modalite)}`,
@@ -748,6 +741,19 @@ const infosDistanciel: BdcDocDef = {
       `En cas de difficulté : ${o.telephoneContact} ou ${o.emailContact}. Une reprogrammation sans frais est proposée si l'incident technique empêche la tenue de la séance.`,
       H2("5. Émargement à distance"),
       "L'émargement est réalisé par signature électronique horodatée à l'ouverture et à la clôture de chaque séance.",
+      H2("6. Moyens humains"),
+      `Consultant : ${p.consultant.nom} (${p.consultant.qualification}) ; référent handicap : ${o.referentHandicap.nom}. L'organisme dispose d'une organisation identifiée dédiée aux bilans (${ARTICLES_BC.organisation}).`,
+      H2("7. Outils d'investigation"),
+      "| Outil | Usage | Phase |",
+      "|---|---|---|",
+      "| Grille d'analyse du parcours et portefeuille de compétences | Identifier les compétences acquises et transférables | Investigation |",
+      "| Questionnaire d'intérêts professionnels (typologie RIASEC) | Explorer les intérêts et motivations | Investigation |",
+      "| Test de personnalité | Identifier les préférences de fonctionnement | Investigation |",
+      "| Fiches métiers ROME (France Travail) et fiches RNCP (France Compétences) | Documenter les pistes professionnelles | Investigation |",
+      "| Trame d'enquête métier | Confronter le projet au terrain | Investigation |",
+      "| Trame de plan d'action | Formaliser les étapes du projet | Conclusion |",
+      H2("8. Confidentialité des échanges"),
+      `Entretiens individuels en espace fermé (présentiel) ou lien nominatif non partageable (distanciel) ; documents conservés sur un espace à accès restreint ; secret professionnel (art. 226-13 du Code pénal, ${ARTICLES_BC.definition}).`,
     ].join("\n");
   },
 };
@@ -760,7 +766,7 @@ const fichesDePoste: BdcDocDef = {
   indicateur: 21,
   parBeneficiaire: false,
   build: (ctx) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = ctx.prestation;
     const fiche = (intitule: string, titulaire: string, missions: string[], competences: string[]) =>
       [
         H2(`Fiche de poste — ${intitule}`),
@@ -849,10 +855,10 @@ const tableauAmeliorationContinue: BdcDocDef = {
   indicateur: 32,
   parBeneficiaire: false,
   build: (ctx) => {
-    const { prestation: p } = ctx;
+    const p = ctx.prestation;
     return [
       H("Tableau d'amélioration continue"),
-      `_Arrêté au ${fmtDateFR(new Date())}. Effectif concerné : ${ctx.beneficiaires.length} bénéficiaire(s)._\n`,
+      `_Tableau ouvert le ${dateSysteme(ctx)} (V1), tenu à jour en continu. Effectif concerné : ${ctx.beneficiaires.length} bénéficiaire(s). L'analyse des risques qualité (IND 32, décret n° 2026-728) figure dans une pièce distincte._\n`,
       "| N° | Origine (réclamation, enquête, audit, veille) | Constat | Analyse de cause | Action corrective | Responsable | Échéance | Statut | Efficacité vérifiée |",
       "|---|---|---|---|---|---|---|---|---|",
       "| 1 |  |  |  |  |  |  | ☐ En cours ☐ Soldée |  |",
@@ -861,7 +867,7 @@ const tableauAmeliorationContinue: BdcDocDef = {
       "",
       "_Les constats sont issus des réclamations enregistrées, des questionnaires de satisfaction renseignés par les bénéficiaires, des retours des financeurs et de la veille. Aucune donnée n'est saisie à la place d'un tiers._",
       "",
-      `Sources de données mobilisées : registre des réclamations, questionnaires à chaud et à froid, entretiens de suivi à ${fmtDateFR(p.dateSuivi6Mois)}.`,
+      "Sources de données mobilisées : registre des réclamations, questionnaires à chaud et à froid, entretiens de suivi à six mois, analyse des risques qualité.",
     ].join("\n");
   },
 };
@@ -875,7 +881,7 @@ const clausesBC: BdcDocDef = {
   parBeneficiaire: false,
   contractuelle: true,
   build: (ctx) => {
-    const { organisme: o, prestation: p } = ctx;
+    const o = ctx.organisme; const p = ctx.prestation;
     const c = typeContrat(p);
     return [
       H("Clauses contractuelles spécifiques au bilan de compétences"),
@@ -887,9 +893,9 @@ const clausesBC: BdcDocDef = {
       H2("Article 2 — Délais"),
       c.delai,
       H2("Article 3 — Confidentialité"),
-      "Le consultant est tenu au secret professionnel. Aucun élément du bilan n'est communiqué à l'employeur, au financeur ou à un tiers sans l'accord écrit et révocable du bénéficiaire (art. L6313-4).",
+      `Le consultant est tenu au secret professionnel (art. 226-13 du Code pénal). Aucun élément du bilan n'est communiqué à l'employeur, au financeur ou à un tiers sans l'accord du bénéficiaire (${ARTICLES_BC.definition}).`,
       H2("Article 4 — Destruction des documents"),
-      "Les documents élaborés pour la réalisation du bilan sont détruits à l'issue de la prestation. Leur conservation constitue une exception, limitée à un an, subordonnée à l'accord écrit du bénéficiaire (art. R6313-7).",
+      `Les documents élaborés pour la réalisation du bilan sont détruits dès le terme de l'action. Par exception, les documents faisant l'objet d'un accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation peuvent être conservés trois ans au plus (${ARTICLES_BC.destruction}).`,
       H2("Article 5 — Propriété du document de synthèse"),
       "Par exception à toute clause de propriété intellectuelle relative aux supports du cabinet, le document de synthèse est la propriété exclusive du bénéficiaire, seul destinataire de ce document.",
       H2("Article 6 — Absence de conflit d'intérêts"),
@@ -916,30 +922,155 @@ const attestationsStatuts: BdcDocDef = {
   indicateur: 30,
   parBeneficiaire: false,
   build: (ctx) => {
-    const { prestation: p } = ctx;
-    const aujourdhui = fmtDateFR(new Date());
     const blocs: string[] = [
-      H("Mentions relatives aux enquêtes non renseignées"),
-      "_Ces mentions remplacent toute réponse qui serait générée à la place d'un tiers. Aucune réponse d'entreprise, de financeur ou d'équipe n'est produite par l'organisme._\n",
+      H("Mentions relatives aux enquêtes entreprise et financeur"),
+      "_Ces mentions remplacent toute réponse qui serait générée à la place d'un tiers. Aucune réponse d'entreprise ou de financeur n'est produite par l'organisme._\n",
+      "| Bénéficiaire | Enquête entreprise | Enquête financeur |",
+      "|---|---|---|",
     ];
-    if (p.origineDemande !== "employeur") {
-      blocs.push(H2("Questionnaire de satisfaction entreprise"), mentionStatut("NON_APPLICABLE", { dateConstat: aujourdhui, motif: "démarche individuelle sans employeur" }));
-    } else {
-      blocs.push(H2("Questionnaire de satisfaction entreprise"), mentionStatut("SOLLICITE_SANS_REPONSE", { dateConstat: aujourdhui }));
+    for (const b of ctx.beneficiaires) {
+      const p = prestationFor(ctx, b);
+      const fin = passe(p.dateFin);
+      const dSoll = new Date(p.dateFin); dSoll.setDate(dSoll.getDate() + 7);
+      const dConst = new Date(p.dateFin); dConst.setDate(dConst.getDate() + 37);
+      const sollicitation = !fin ? `À solliciter à l'issue du bilan (${fmtDateFR(p.dateFin)})` : passe(dConst) ? `Sollicitée le ${fmtDateFR(dSoll)} — sans réponse au ${fmtDateFR(dConst)} (joindre la capture de l'envoi)` : `Sollicitée le ${fmtDateFR(dSoll)} — relance prévue`;
+      const entreprise = p.origineDemande === "employeur" ? sollicitation : "Sans objet : démarche individuelle, sans employeur partie au contrat";
+      const financeur = p.financeur === "CPF" ? "Sans objet : financement CPF (la Caisse des dépôts ne répond pas aux enquêtes individuelles)" : p.financeur === "personnel" ? "Sans objet : financement personnel (le bénéficiaire est le financeur)" : sollicitation;
+      blocs.push(`| ${b.prenom} ${b.nom} | ${entreprise} | ${financeur} |`);
     }
-    if (p.financeur === "CPF") {
-      blocs.push(H2("Questionnaire de satisfaction financeur"), `> ${MENTION_CPF_SATISFACTION}\n`, mentionStatut("NON_APPLICABLE", { dateConstat: aujourdhui, motif: "financement CPF — le financeur ne répond pas aux enquêtes de satisfaction" }));
-    } else {
-      blocs.push(H2("Questionnaire de satisfaction financeur"), mentionStatut("SOLLICITE_SANS_REPONSE", { dateConstat: aujourdhui }));
-    }
+    blocs.push("", `Mentions établies par ${ctx.prestation.consultant.nom}, consultant.`);
     return blocs.join("\n");
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* Couverture complémentaire : IND 5, 6, 22, 23, 24, 25                 */
+/* ------------------------------------------------------------------ */
+
+const objectifsOperationnels: BdcDocDef = {
+  nom: "Indicateur 5 - Objectifs opérationnels et évaluables du bilan",
+  indicateur: 5,
+  parBeneficiaire: false,
+  build: (ctx) => {
+    const p = ctx.prestation;
+    return [
+      H("Objectifs opérationnels et évaluables du bilan de compétences"),
+      `_Objectifs définis conformément à l'${ARTICLES_BC.definition} et précisés avec chaque bénéficiaire en phase préliminaire._\n`,
+      "| À l'issue du bilan, le bénéficiaire est capable de… | Critère d'évaluation | Moment |",
+      "|---|---|---|",
+      "| Identifier et formuler ses compétences professionnelles et personnelles | Portefeuille de compétences complété et validé en séance | Phase d'investigation |",
+      "| Exprimer ses intérêts, aptitudes et motivations | Restitution argumentée des outils d'investigation | Phase d'investigation |",
+      "| Formuler un projet professionnel réaliste, ou des alternatives | Projet confronté au terrain (enquête métier ou immersion) | Fin de la phase d'investigation |",
+      "| Élaborer un plan d'action daté, avec ressources identifiées | Plan d'action présent dans le document de synthèse | Phase de conclusion |",
+      "",
+      formatDuree(p),
+      "",
+      "L'atteinte de ces objectifs est évaluée lors de l'entretien de conclusion et consignée au point 4 du document de synthèse (IND 11).",
+    ].join("\n");
+  },
+};
+
+const contenusModalites: BdcDocDef = {
+  nom: "Indicateur 6 - Contenus et modalités adaptés du bilan",
+  indicateur: 6,
+  parBeneficiaire: false,
+  build: (ctx) => {
+    const p = ctx.prestation;
+    const rh = repartitionHeures(p.dureeTotaleH);
+    return [
+      H("Contenus et modalités de mise en œuvre du bilan"),
+      `_Déroulé en trois phases (${ARTICLES_BC.phases}), durée ${p.dureeTotaleH} heures au plus (${ARTICLES_BC.definition})._\n`,
+      "| Phase | Durée | Contenus | Méthodes et outils |",
+      "|---|---|---|---|",
+      `| Préliminaire | ${rh.p1} h | Analyse de la demande et du besoin, définition du format, information sur les conditions de déroulement | Entretien, fiche d'analyse du besoin, planning |`,
+      `| Investigation | ${rh.p2} h | Analyse du parcours, des intérêts et des motivations ; identification des compétences ; exploration de pistes ; confrontation au terrain | Portefeuille de compétences, questionnaire d'intérêts, test de personnalité, enquêtes métier |`,
+      `| Conclusion | ${rh.p3} h | Appropriation des résultats, conditions de réussite, plan d'action, remise du document de synthèse | Entretien de restitution, document de synthèse |`,
+      "",
+      H2("Adaptation aux bénéficiaires"),
+      "- Planning construit à partir des jours et créneaux déclarés par chaque bénéficiaire (planning prévisionnel signé, IND 10).",
+      "- Modalité présentielle, distancielle ou mixte selon les contraintes exprimées en phase préliminaire.",
+      "- Aménagements pour les personnes en situation de handicap définis avec le référent handicap (IND 26).",
+      "- Outils d'investigation choisis selon le projet et le niveau du bénéficiaire.",
+    ].join("\n");
+  },
+};
+
+const planDeveloppementConsultant: BdcDocDef = {
+  nom: "Indicateur 22 - Plan de développement des compétences du consultant",
+  indicateur: 22,
+  parBeneficiaire: false,
+  build: (ctx) => {
+    const p = ctx.prestation;
+    const o = ctx.organisme;
+    const d0 = ctx.organisme.dateMaj || p.dateDebut;
+    const trim = (m: number) => { const d = new Date(d0); d.setMonth(d.getMonth() + m); return fmtDateFR(d); };
+    return [
+      H("Plan de développement des compétences"),
+      `_Établi le ${dateSysteme(ctx)} (V1). Personnel concerné : ${p.consultant.nom} (consultant)${o.referentHandicap.nom && o.referentHandicap.nom !== p.consultant.nom ? `, ${o.referentHandicap.nom} (référent handicap)` : ""}._\n`,
+      "| Action | Objectif | Modalité | Échéance prévue | Statut | Preuve attendue |",
+      "|---|---|---|---|---|---|",
+      `| Actualisation réglementaire : référentiel national qualité (décret n° 2026-728) | Intégrer les indicateurs 27, 32 et 33 au système qualité | Autoformation, webinaire | ${trim(2)} | Prévue | Attestation / support |`,
+      `| Outils d'investigation (intérêts, personnalité) | Actualiser la maîtrise des outils utilisés | Formation courte | ${trim(6)} | Prévue | Attestation de formation |`,
+      `| Analyse de pratiques / supervision | Prendre du recul sur les accompagnements | Supervision entre pairs, 2 séances/an | ${trim(9)} | Prévue | Compte rendu |`,
+      `| Accueil des personnes en situation de handicap | Adapter l'accompagnement | Ressource Handicap Formation (Agefiph) | ${trim(12)} | Prévue | Attestation |`,
+      "",
+      "Le statut de chaque action est mis à jour à sa réalisation (preuve jointe). Un entretien annuel fait le point sur les besoins de développement (pièce « Entretien annuel »).",
+    ].join("\n");
+  },
+};
+
+function veilleDef(ind: 23 | 24 | 25, nom: string, titre: string, lignes: (ctx: BdcContext) => Array<[string, string, string, string]>): BdcDocDef {
+  return {
+    nom, indicateur: ind, parBeneficiaire: false,
+    build: (ctx) => [
+      H(titre),
+      `_Registre ouvert le ${dateSysteme(ctx)} (V1), tenu à jour en continu. Chaque entrée est datée de la publication de sa source ; son exploitation est tracée dans la dernière colonne._\n`,
+      "| Date de la source | Source | Information | Exploitation dans la prestation |",
+      "|---|---|---|---|",
+      ...lignes(ctx).map(([d, s, i, e]) => `| ${d} | ${s} | ${i} | ${e} |`),
+    ].join("\n"),
+  };
+}
+
+const veilleReglementaire = veilleDef(23, "Indicateur 23 - Registre de veille légale et réglementaire", "Veille légale et réglementaire", () =>
+  REFERENCES_REGLEMENTAIRES_2026
+    .filter((r) => r.types.includes("BC") && new Date(r.date).getTime() <= Date.now())
+    .map((r) => [fmtDateFR(new Date(r.date)), `${r.texte} — ${r.source}`, r.objet, r.date.startsWith("2026") ? "Mise à jour du système qualité : registre de sous-traitance (IND 27), analyse des risques (IND 32)." : "Intégré aux procédures et aux documents contractuels."] as [string, string, string, string])
+    .concat([["—", `Code du travail, ${ARTICLES_BC.definition}, ${ARTICLES_BC.phases} à ${ARTICLES_BC.convention.replace("art. ", "")}`, "Cadre du bilan : consentement, 3 phases, 24 h maximum, synthèse au seul bénéficiaire, destruction, convention tripartite", "Base des clauses contractuelles, du livret d'accueil et du cadre légal (IND 1)."]]));
+
+const veilleMetiers = veilleDef(24, "Indicateur 24 - Registre de veille emplois, métiers et compétences", "Veille sur les évolutions des compétences, des métiers et des emplois", (ctx) => {
+  const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+  const rows: Array<[string, string, string, string]> = [
+    ["Publication annuelle", "France Travail — enquête Besoins en main-d'œuvre (BMO), https://statistiques.francetravail.org/bmo", "Métiers en tension et projets de recrutement par bassin d'emploi", "Utilisée en phase d'investigation pour vérifier les débouchés des pistes explorées."],
+    ["Mise à jour continue", "France Travail — répertoire ROME 4.0", "Fiches métiers, compétences et passerelles", "Support des enquêtes métier et du portefeuille de compétences."],
+    ["Mise à jour continue", "France Compétences — répertoires RNCP et RS", "Certifications actives, blocs de compétences, voies d'accès", "Vérification des formations proposées dans les plans d'action."],
+  ];
+  if (prof && !prof.generique) rows.push([prof.veilleMetier.date, `${prof.veilleMetier.source} — ${prof.veilleMetier.lien}`, prof.veilleMetier.intitule, prof.veilleMetier.exploitation]);
+  return rows;
+});
+
+const veillePedagogique = veilleDef(25, "Indicateur 25 - Registre de veille innovations pédagogiques et technologiques", "Veille sur les innovations pédagogiques et technologiques", (ctx) => {
+  const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+  const rows: Array<[string, string, string, string]> = [
+    ["Mise à jour continue", "Centre Inffo — actualités de l'orientation et de la formation, https://www.centre-inffo.fr", "Évolution des pratiques d'accompagnement et du conseil en évolution professionnelle", "Ajustement des outils d'investigation et du déroulé des séances."],
+    ["Mise à jour continue", "Outils d'entretien à distance et de signature électronique", "Visioconférence sécurisée, émargement électronique horodaté", "Déploiement du bilan en distanciel synchrone (IND 17)."],
+    ["Mise à jour continue", "Outils d'intelligence artificielle générative", "Aide à la recherche documentaire sur les métiers ; vigilance sur la confidentialité", "Usage limité à la recherche documentaire, sans donnée personnelle du bénéficiaire."],
+  ];
+  if (prof && !prof.generique) rows.push([prof.veilleTechnologique.date, `${prof.veilleTechnologique.source} — ${prof.veilleTechnologique.lien}`, prof.veilleTechnologique.intitule, prof.veilleTechnologique.exploitation]);
+  return rows;
+});
+
 import { supportCoursPatisserie } from "./bdcSupportCoursPatisserie";
+
+/** Support de cours métier : uniquement pour le profil Pâtisserie & Cake Design (gabarit du client). */
+const supportCoursPatisserieConditionnel: BdcDocDef = {
+  ...supportCoursPatisserie,
+  applicable: (f) => getBdcDomainProfile(f).label === "Pâtisserie & Cake Design",
+};
 
 export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   documentSynthese,
+  attestationRemiseSynthese,
   feuillesEmargement,
   testPersonnalite,
   satisfactionChaud,
@@ -955,8 +1086,19 @@ export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   tableauAmeliorationContinue,
   clausesBC,
   attestationsStatuts,
-  supportCoursPatisserie,
+  objectifsOperationnels,
+  contenusModalites,
+  planDeveloppementConsultant,
+  veilleReglementaire,
+  veilleMetiers,
+  veillePedagogique,
+  supportCoursPatisserieConditionnel,
 ];
+
+/** Pièces BC applicables à une formation donnée (même filtre pour le catalogue et le ZIP). */
+export function bdcTemplateApplicable(def: BdcDocDef, f?: FormationInfo): boolean {
+  return !def.applicable || !f || def.applicable(f);
+}
 
 /** Pièces contractuelles dont la signature conditionne l'export (BLOC 7). */
 export const PIECES_CONTRACTUELLES = [
