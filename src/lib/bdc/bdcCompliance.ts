@@ -57,6 +57,17 @@ export const PHRASES_PROTEGEES: string[] = [
   "actions de formation",
   "action de formation",
   "organisme de formation professionnelle",
+  // Libellés réglementaires du bilan (art. L6313-4, R6313-4) à ne jamais réécrire
+  "projet de formation",
+  "Projet de formation",
+  "formation qualifiante",
+  "formations qualifiantes",
+  "entrer en formation",
+  "Entrer en formation",
+  "entrée en formation",
+  "Entrée en formation",
+  "acquis de l'expérience",
+  "validation des acquis",
 ];
 
 

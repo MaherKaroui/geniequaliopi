@@ -152,7 +152,7 @@ export function profilDeclaratif(s: StagiaireInfo, f?: FormationInfo, domaine?: 
     projet = `accéder au métier de ${domaine.metier} (${domaine.secteur.split(",")[0]})`;
     cible = `le métier de ${domaine.metier}`;
   } else {
-    const depuis = poste ? ` à partir de son expérience de ${poste}` : "";
+    const depuis = poste ? ` à partir de son expérience professionnelle (${poste})` : "";
     projet = ({
       point: `consolider sa trajectoire professionnelle actuelle${depuis} et identifier les compétences à développer`,
       reconversion: `engager une reconversion vers un métier cohérent avec ses compétences transférables${depuis}`,

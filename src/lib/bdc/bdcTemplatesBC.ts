@@ -120,13 +120,13 @@ const documentSynthese: BdcDocDef = {
     const circonstances = `${nomB} a engagé ce bilan pour ${pf ? pf.motifLibelle.charAt(0).toLowerCase() + pf.motifLibelle.slice(1) : "faire le point sur son parcours"}${b?.poste ? `, alors en poste comme ${b.poste}${b.entreprise ? ` (${b.entreprise})` : ""}` : ""}. La demande${pf?.origine === "employeur" ? ", formulée dans le cadre du plan de développement des compétences de l'employeur," : pf?.financeur === "CPF" ? ", financée par son compte personnel de formation," : ""} a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}. Attente exprimée : « ${pf?.attente || "clarifier son projet"} ».`;
 
     const lignesComp: Array<[string, string, string]> = [
-      ["Compétences issues du parcours", b?.poste ? `Compétences mobilisées sur le poste de ${b.poste} : organisation, relation avec les interlocuteurs, fiabilité d'exécution` : "Compétences issues des expériences professionnelles et extra-professionnelles, formalisées en séance", "Analyse du parcours, entretiens d'explicitation"],
+      ["Compétences issues du parcours", b?.poste ? `Compétences mobilisées sur le poste occupé (${b.poste}) : organisation, relation avec les interlocuteurs, fiabilité d'exécution` : "Compétences issues des expériences professionnelles et extra-professionnelles, formalisées en séance", "Analyse du parcours, entretiens d'explicitation"],
       ["Compétences transversales", transv.length ? `${transv[seed % transv.length]} ; ${transv[(seed + 2) % transv.length]}` : "Organisation, communication, adaptation", "Questionnaire d'intérêts (RIASEC), entretiens"],
-      [generique ? "Compétences à développer pour le projet" : "Compétences techniques du métier visé", tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Écarts identifiés entre les acquis et les exigences du projet, traités dans le plan d'action", "Enquêtes métier, recherches documentaires"],
+      [generique ? "Compétences à développer pour le projet" : "Compétences techniques du métier visé", tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Écarts identifiés entre les compétences actuelles et les exigences du projet, traités dans le plan d'action", "Enquêtes métier, recherches documentaires"],
       ["Aptitudes et motivations", `Motivation confirmée pour ${cible} ; niveau d'études : ${b?.niveauEtudes || "non renseigné"}`, "Test de personnalité, entretiens"],
     ];
     const etapes: Array<[string, string, string]> = [
-      [forms.length ? `Constituer le dossier de candidature à ${forms[seed % forms.length]}` : "Identifier et comparer les formations ou postes correspondant au projet", dPlus(1), "Fiches France Compétences, sites des organismes, réseau professionnel"],
+      [forms.length ? `Constituer le dossier de candidature à ${forms[seed % forms.length]}` : "Identifier et comparer les formations qualifiantes ou postes correspondant au projet", dPlus(1), "Fiches France Compétences, sites des organismes, réseau professionnel"],
       [`Monter le plan de financement (${pf?.financeur === "employeur" || pf?.financeur === "OPCO" ? "plan de développement des compétences, OPCO" : "CPF, France Travail, aides régionales selon la situation"})`, dPlus(2), "Conseiller en évolution professionnelle, Mon Compte Formation"],
       [`Confronter le projet au terrain (${generique ? "rencontres de professionnels" : `immersion en ${secteur}`})`, dPlus(3), "PMSMP, réseau, entreprises contactées lors des enquêtes"],
       ["Engager la mise en œuvre du projet et faire le point sur son avancement", dPlus(6), "Entretien de suivi proposé par le consultant"],
@@ -251,7 +251,7 @@ const feuillesEmargement: BdcDocDef = {
         `**Cumul des heures réalisées à l'issue de la séance** : ${heuresFR(realisee ? cumulRealise : cumul)} sur ${heuresFR(p.dureeEntretiensH ?? seances.reduce((a, x) => a + x.duree, 0))} d'entretiens.`,
         "",
         realisee
-          ? blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date, lieu })
+          ? blocSignatureHtml(ctx, "Feuille d'émargement", b, { dateSeance: s.date, lieu: s.modalite === "distanciel" ? o.ville : lieu })
           : `<div class="bloc-signature" style="margin-top:18px;"><div style="font-size:11px;font-weight:bold;color:#0b2545;margin-bottom:4px;">Signatures — séance à venir</div><table style="border-collapse:collapse;width:100%;"><tr><td style="border:1px solid #94a3b8;padding:8px;width:50%;"><div style="font-size:10.5px;font-weight:bold;color:#0b2545;">Le bénéficiaire</div><div style="border-bottom:1px solid #94a3b8;height:38px;"></div></td><td style="border:1px solid #94a3b8;padding:8px;width:50%;"><div style="font-size:10.5px;font-weight:bold;color:#0b2545;">Le consultant</div><div style="border-bottom:1px solid #94a3b8;height:38px;"></div></td></tr></table></div>`,
         i < seances.length - 1 ? "\n<div style=\"page-break-after:always\"></div>\n" : "",
       );
@@ -455,7 +455,9 @@ function echelleCochee(note: number): string {
 /** Notes 4 ou 5 déterministes (mêmes valeurs dans le questionnaire et les statistiques IND 2). */
 export function notesSatisfaction(b: Beneficiaire | null, nomPiece: string, nbQuestions: number): number[] {
   const seed = seedBenef(b, nomPiece);
-  return Array.from({ length: nbQuestions }, (_, i) => ((seed + i * 3) % 5 === 0 ? 4 : 5));
+  // 4 ou 5 selon le bénéficiaire et la question ; la part de 4 varie d'un bénéficiaire à l'autre.
+  const seuil = 2 + (seed % 3); // 2 à 4 chances sur 10
+  return Array.from({ length: nbQuestions }, (_, i) => (((seed >>> (i % 16)) + i * 7) % 10 < seuil ? 4 : 5));
 }
 
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {

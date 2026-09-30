@@ -75,7 +75,7 @@ La durée du bilan est de **24 heures au plus** (art. L6313-4). Chez {ORG_NOM}, 
 
 Lorsque le bilan est suivi **pendant le temps de travail**, l'accord de l'employeur est requis ; en dehors du temps de travail et à l'initiative du salarié, l'employeur n'a pas à en être informé.
 
-## Engagements de {ORG_NOM}
+## Engagements de l'organisme
 
 - Organisation identifiée dédiée aux bilans (art. R6313-6), consultant désigné pour toute la durée du bilan.
 - Méthodes et outils d'investigation présentés au bénéficiaire en phase préliminaire.

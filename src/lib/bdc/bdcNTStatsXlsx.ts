@@ -52,7 +52,7 @@ function addMonths(d: Date, m: number): Date {
 }
 
 const subtitleOrg = (o: OrganismeInfo) =>
-  `Organisme : ${o.nom || ""} · SIRET : ${o.siret || ""} · NDA : ${o.nda || ""} · Mise à jour : ${o.dateMaj || ""}`;
+  `Organisme : ${o.nom || ""} · SIRET : ${o.siret || ""} · NDA : ${o.nda || ""} · Mise à jour : ${o.dateMaj ? fmt(parseFR(o.dateMaj)) : ""}`;
 
 const SEUIL_EFFECTIF = 5;
 const LIB_FINANCEUR: Record<string, string> = {
