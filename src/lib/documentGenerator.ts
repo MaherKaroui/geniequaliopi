@@ -1,3 +1,5 @@
+import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
+import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements } from "./qualite2026";
 import { resolveFormation } from "./formationResolue";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
@@ -136,7 +138,7 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   // Aucun héritage d'une formation d'exemple : champs vides déduits de la formation,
   // de sa fiche RNCP/RS et de l'organisme (code vide = non certifiant, IND 3/7/16 masqués).
   const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
-  return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant);
+  return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.codePostal);
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
@@ -1075,6 +1077,40 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_accompagnement_educatif_social_cfa": return genProcedureAccompagnementEducatifSocialCFA(o);
     case "procedure_accueil_tout_moment_cfa": return genProcedureAccueilToutMomentCFA(o);
     case "conseil_perfectionnement_cfa": return genConseilPerfectionnementCFA(o, f, stagiaires);
+    // === CFA — référentiel 2026 (décret n° 2026-728) ===
+    case "procedure_coordination_alternance_cfa": return genProcedureCoordinationAlternanceCFA(o, f);
+    case "tableau_missions_blocs_cfa": return genTableauMissionsBlocsCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "calendrier_alternance_cfa": return genCalendrierAlternanceCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "procedure_ruptures_sans_delai_cfa": return genProcedureRupturesSansDelaiCFA(o);
+    case "information_violences_mediateur_cfa": return genInformationViolencesMediateurCFA(o);
+    case "part_heures_permanents_cfa": return genPartHeuresPermanentsCFA(o, f, stagiaires);
+    case "justificatifs_intervenants_cfa": return genJustificatifsIntervenantsCFA(o, f, stagiaires);
+    case "veille_sourcee_cfa": return genVeilleSourceeCFA(o, f);
+    case "procedure_insertion_poursuite_etudes_cfa": return genProcedureInsertionPoursuiteEtudesCFA(o, f);
+    case "registre_sous_traitance_portage_cfa": return genRegistreSousTraitancePortage(o, params?.typePrestation ?? "CFA", f, stagiaires);
+    case "clauses_qualite_contrat_cfa": return genClausesQualiteContrat(o, params?.typePrestation ?? "CFA");
+    case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f);
+    case "procedure_evaluation_enseignements_cfa": return genProcedureEvaluationEnseignements(o, f);
+    case "grille_evaluation_enseignements_cfa": {
+      const s0 = stagiaires[params?.stagiaireIdx ?? 0] || stagiaires[0];
+      const blocs = blocsCertification(f);
+      const bi = params?.blocIdx ?? 0;
+      const fin = finBlocApprenti(f, s0, bi, blocs.length);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      return genGrilleEvaluationEnseignements(o, f, s0, blocs[bi]?.titre || f.intitule, fin.toLocaleDateString("fr-FR"), fin.getTime() <= today.getTime());
+    }
+    case "synthese_evaluation_enseignements_cfa": {
+      const blocs = blocsCertification(f);
+      const bi = params?.blocIdx ?? 0;
+      const valides = stagiaires.filter((x) => (x.nom || "").trim());
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      // Seuls les apprentis ayant terminé le bloc sont pris en compte ; réunion 15 jours après la dernière fin de bloc.
+      const finis = valides.filter((x) => finBlocApprenti(f, x, bi, blocs.length).getTime() <= today.getTime());
+      const derniere = finis.reduce((m, x) => Math.max(m, finBlocApprenti(f, x, bi, blocs.length).getTime()), 0);
+      const reunion = new Date(derniere + 15 * 86400000);
+      if (reunion.getTime() > today.getTime()) reunion.setTime(today.getTime());
+      return genSyntheseEvaluationEnseignements(o, f, finis, blocs[bi]?.titre || f.intitule, reunion.toLocaleDateString("fr-FR"), finis.length > 0);
+    }
     case "qcm_mission_cfa": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;

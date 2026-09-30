@@ -49,7 +49,8 @@ export function buildFullCatalog(
   stagiaires: StagiaireInfo[],
   formateurs: FormateurInfo[],
   typesActions?: ActionType[],
-  dirigeantNom?: string
+  dirigeantNom?: string,
+  orgCodePostal?: string
 ): DocEntry[] {
   const d: DocEntry[] = [];
   const add = (id: string, nom: string, c: number, i: number, template: string, params?: Record<string, any>) =>
@@ -507,7 +508,18 @@ export function buildFullCatalog(
   // ===== CFA — APPRENTISSAGE (placeholder) =====
   // =============================================
   if (isCFA) {
-    // (Bloc 'DOCUMENTS PRIORITAIRES CFA' retiré : Contrat par bloc + Dossier d'inscription doublons)
+    // Pièces régionales (Île-de-France) seulement pour un CFA francilien.
+    const isIDF = /^(75|77|78|91|92|93|94|95)/.test((orgCodePostal || "").replace(/\s/g, ""));
+    const isNTCFormation = formations.some(f => (f.codeRNCP || "").toUpperCase() === "RNCP39063" || /n[ée]gociateur technico/i.test(f.intitule || ""));
+    // Titre professionnel (ministère du Travail) : seuls concernés par le DP et le livret ECF.
+    const isTitrePro = formations.some(f => /^\s*TP\b|titre professionnel/i.test(f.intitule || "") || /minist[èe]re du travail/i.test(getRNCPByCode(f.codeRNCP || "")?.certificateur || ""));
+    const todayCFA = new Date(); todayCFA.setHours(0, 0, 0, 0);
+    const apprentiTermine = (s: StagiaireInfo, f: FormationInfo) => {
+      const fin = (s.dateFinFormation || f.dateFin || "").trim();
+      const m = fin.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(fin + "T00:00:00");
+      return !isNaN(d.getTime()) && d.getTime() < todayCFA.getTime();
+    };
 
     // ===== CRITÈRE 1 — INFORMATION DU PUBLIC (CFA) =====
 
@@ -516,7 +528,7 @@ export function buildFullCatalog(
     add("cfa_c1i1_plaquette_commerciale", "CT1 - IND 1 PLAQUETTE COMMERCIALE CFA", 1, 1, "plaquette_commerciale_cfa");
     add("cfa_c1i1_procedure_inscription", "CT1 - IND 1 PROCÉDURE D'INSCRIPTION CFA", 1, 1, "procedure_inscription_cfa");
     add("cfa_c1i1_procedure_formation", "CT1 - IND 1 PROCÉDURE DE FORMATION CFA", 1, 1, "procedure_formation_cfa");
-    add("cfa_c1i1_cgv", "CT1 - IND 1 CONDITIONS GÉNÉRALES DE VENTE CFA", 1, 1, "cgv");
+    add("cfa_c1i1_cgv", "CT1 - IND 1 CONDITIONS GÉNÉRALES DE VENTE CFA", 1, 1, "cgv_cfa", { genericStagiaire: true, stagiaireIdx: 0 });
 
     // IND 2 — Indicateurs de résultats CFA
     add("cfa_c1i2_indicateurs_resultats", "CT1 - IND 2 INDICATEURS DE RÉSULTATS CFA", 1, 2, "indicateurs_resultats_cfa");
@@ -525,6 +537,9 @@ export function buildFullCatalog(
     add("cfa_c1i3_titre_rncp", "CT1 - IND 3 FICHE TITRE RNCP", 1, 3, "titre_rncp_cfa");
     add("cfa_c1i3_matiere_titre", "CT1 - IND 3 MATIÈRE DU TITRE", 1, 3, "matiere_titre_cfa");
     add("cfa_c1i3_tableau_croise", "CT1 - IND 3 TABLEAU CROISÉ COMPÉTENCES PROGRAMME", 1, 3, "tableau_croise_cfa");
+    if (formations.some(f => isCodeRsrncp(f.codeRNCP))) {
+      add("cfa_c1i3_taux_obtention", "CT1 - IND 3 TAUX D'OBTENTION DE LA CERTIFICATION", 1, 3, "taux_obtention_certification", { fi: 0 });
+    }
 
     // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION (CFA) =====
 
@@ -574,7 +589,7 @@ export function buildFullCatalog(
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        if (isCodeRsrncp(f.codeRNCP)) {
+        if (isCodeRsrncp(f.codeRNCP) && apprentiTermine(s, f)) {
           add(`cfa_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
         }
       });
@@ -591,10 +606,6 @@ export function buildFullCatalog(
     add("cfa_c3i9_pdf_guide_numerique_psh", "CT3 - IND 9 GUIDE NUMÉRIQUE PSH", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_GUIDE_NUMERIQUE_PSH.pdf" });
     add("cfa_c3i9_pdf_droit_apprentis", "CT3 - IND 9 DROIT DES APPRENTIS", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_DROIT_DES_APPRENTIS.pdf" });
     add("cfa_c3i9_suivi_inscriptions_excel", "CT3 - IND 9 SUIVI DES INSCRIPTIONS (Excel)", 3, 9, "suivi_inscriptions_excel");
-    // Livre d'apprentissage — un par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i9_livre_apprentissage_${si}`, `CT3 - IND 9 LIVRE D'APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "livre_apprentissage_cfa", { stagiaireIdx: si });
-    });
     // Convocation à la formation CFA — un par stagiaire
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_convocation_${si}`, `CT3 - IND 9 CONVOCATION À LA FORMATION – ${s.prenom} ${s.nom}`, 3, 9, "convocation_cfa", { stagiaireIdx: si });
@@ -608,10 +619,6 @@ export function buildFullCatalog(
     // Droit à l'image — un par stagiaire
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_droit_image_${si}`, `CT3 - IND 9 DEMANDE D'AUTORISATION DROIT À L'IMAGE – ${s.prenom} ${s.nom}`, 3, 9, "droit_image_cfa", { stagiaireIdx: si });
-    });
-    // Convention de formation par apprentissage — un par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
     });
     // CERFA 10103*14 — Contrat d'apprentissage rempli (un par stagiaire)
     stagiaires.forEach((s, si) => {
@@ -652,7 +659,7 @@ export function buildFullCatalog(
     add("cfa_c3i10_aff_convention_egalite_hf", "CT3 - IND 10 📁 AFFICHAGE – Convention Égalité Hommes Femmes", 3, 10, "pdf_static", { pdfUrl: "/pdfs/convention_egalite_hf.pdf" });
     add("cfa_c3i10_aff_declaration_droits_homme", "CT3 - IND 10 📁 AFFICHAGE – Déclaration des Droits de l'Homme", 3, 10, "pdf_static", { pdfUrl: "/pdfs/declaration_droits_homme.pdf" });
     add("cfa_c3i10_aff_lgbt_affiche", "CT3 - IND 10 📁 AFFICHAGE – Affiche LGBT", 3, 10, "pdf_static", { pdfUrl: "/pdfs/lgbt_affiche.pdf" });
-    add("cfa_c3i10_aff_aide_financiere_apprenti_idf", "CT3 - IND 10 📁 AFFICHAGE – Aide Financière Apprenti Île-de-France", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financiere_apprenti_idf.pdf" });
+    if (isIDF) add("cfa_c3i10_aff_aide_financiere_apprenti_idf", "CT3 - IND 10 📁 AFFICHAGE – Aide Financière Apprenti Île-de-France", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financiere_apprenti_idf.pdf" });
     add("cfa_c3i10_aff_racisme_antisemitisme", "CT3 - IND 10 📁 AFFICHAGE – Racisme et Antisémitisme", 3, 10, "pdf_static", { pdfUrl: "/pdfs/racisme_antisemitisme.pdf" });
     add("cfa_c3i10_aff_harcelement_reseaux_sociaux", "CT3 - IND 10 📁 AFFICHAGE – Harcèlement Réseaux Sociaux", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_reseaux_sociaux.pdf" });
     add("cfa_c3i10_aff_harcelement_sur_site", "CT3 - IND 10 📁 AFFICHAGE – Affiche Non au Harcèlement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_sur_site.jpg" });
@@ -662,14 +669,11 @@ export function buildFullCatalog(
     add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Maintien en formation 6 mois (rupture de contrat)", 3, 10, "procedure_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
     add("cfa_c3i10_mission5_cas_rupture_pdf", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Les cas de rupture du contrat d'apprentissage (PDF)", 3, 10, "cas_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
     // --- IND 10 — Mission 6 : aides sociales et matérielles aux apprentis ---
-    add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
-    add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    if (isIDF) add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    if (isIDF) add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
     add("cfa_c3i10_mission6_sante_psy", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Santé Psy Étudiant", 3, 10, "pdf_static", { pdfUrl: "/pdfs/sante_psy_etudiant.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
-    add("cfa_c3i10_mission6_carte_imagine_r", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Carte Imagine R Scolaire", 3, 10, "pdf_static", { pdfUrl: "/pdfs/carte_imagine_r.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    if (isIDF) add("cfa_c3i10_mission6_carte_imagine_r", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Carte Imagine R Scolaire", 3, 10, "pdf_static", { pdfUrl: "/pdfs/carte_imagine_r.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
     // --- IND 10 — Dossier Livret d'Apprentissage et Maître d'Apprentissage ---
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i10_livret_apprentissage_${si}`, `CT3 - IND 10 📁 LIVRETS – Livret d'Apprentissage – ${s.prenom} ${s.nom}`, 3, 10, "livret_apprentissage_ind10_cfa", { stagiaireIdx: si });
-    });
     add("cfa_c3i10_livret_maitre_apprentissage", "CT3 - IND 10 📁 LIVRETS – Livret du Maître d'Apprentissage", 3, 10, "livret_maitre_apprentissage_cfa");
     // --- IND 10 — Mission 1 : Orientation & Handicap ---
     add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Livret Référent Handicap (orientation/réorientation)", 3, 10, "livret_referent_handicap_cfa", { folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
@@ -710,7 +714,7 @@ export function buildFullCatalog(
     add("cfa_mission10_fiche_poste_referent_mobilite", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Fiche de poste Référent Mobilité Nationale", 3, 10, "fiche_poste_referent_mobilite_nationale", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
 
     // Mission 11 — Suivi & accompagnement de la formation à distance
-    add("cfa_mission11_suivi_distance", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure de suivi & accompagnement à distance", 3, 10, "procedure_accueil_tout_moment_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" });
+    add("cfa_mission11_suivi_distance", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure de suivi & accompagnement à distance", 3, 10, "accompagnement_distanciel_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" });
 
     // Mission 12 — Évaluation des compétences acquises (contrôle continu)
     add("cfa_mission12_attestation_formation_ma", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Attestation de formation du Maître d'Apprentissage (évaluation)", 3, 10, "attestation_formation_maitre_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences" });
@@ -721,7 +725,6 @@ export function buildFullCatalog(
 
     // Mission 14 — Accès aux aides des apprentis
     add("cfa_mission14_acces_aides", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Procédure d'accompagnement à l'accès aux aides", 3, 10, "procedure_accompagnement_educatif_social_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" });
-    add("cfa_mission14_conseil_perfectionnement", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Compte-rendu Conseil de perfectionnement (suivi des aides)", 3, 10, "conseil_perfectionnement_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" });
 
     // ===== EXERCICES — QCM 10 questions par mission, par stagiaire (L.6231-2) =====
     const MISSIONS_FOLDERS: { num: number; folder: string; titre: string; critere: number; ind: number }[] = [
@@ -734,7 +737,7 @@ export function buildFullCatalog(
       { num: 7,  folder: "14_MISSIONS_CFA/Mission_7_Mixite_Egalite_FH",                  titre: "Mission 7 – Mixité & Égalité F/H",                         critere: 3, ind: 10 },
       { num: 8,  folder: "14_MISSIONS_CFA/Mission_8_Egalite_Pro_Mixite_Metiers",         titre: "Mission 8 – Égalité pro & mixité des métiers",             critere: 3, ind: 10 },
       { num: 9,  folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations",          titre: "Mission 9 – Diversité & lutte contre les discriminations", critere: 3, ind: 10 },
-      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale", titre: "Mission 10 – Mobilité nationale & internationale",         critere: 3, ind: 10 },
+      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale",               titre: "Mission 10 – Mobilité nationale & internationale",         critere: 3, ind: 10 },
       { num: 11, folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance",                titre: "Mission 11 – Suivi formation à distance",                  critere: 3, ind: 10 },
       { num: 12, folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences",            titre: "Mission 12 – Évaluation des compétences",                  critere: 3, ind: 10 },
       { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation",     titre: "Mission 13 – Accompagnement post-formation",               critere: 3, ind: 10 },
@@ -754,8 +757,7 @@ export function buildFullCatalog(
     });
 
     // Documents CFA complémentaires (autres critères)
-    add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
-    add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
+    add("cfa_procedure_psh", "CT6 - IND 26 PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", 6, 26, "procedure_psh_cfa");
     // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
     // Émargement CFA / Temps de connexion selon modalité — UNE FEUILLE PAR APPRENTI
     formations.forEach((f, fi) => {
@@ -777,9 +779,8 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       const rncp = getRNCPByCode(f.codeRNCP || '');
       stagiaires.forEach((s, si) => {
-        // Tests début/fin
-        add(`cfa_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "debut" });
-        add(`cfa_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "fin" });
+        // Test de fin (le test d'entrée figure en IND 8) — corrigé et barème inclus
+        add(`cfa_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST DE FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "fin" });
 
         // Exercices pratiques : 5 par matière par bloc RNCP
         if (rncp && rncp.blocsCompetences.length > 0) {
@@ -817,17 +818,10 @@ export function buildFullCatalog(
         add(`cfa_c3i11_examen_blanc_${fi}_${si}`, `CT3 - IND 11 EXAMEN BLANC – ${s.prenom} ${s.nom}`, 3, 11, "examen_blanc_cfa_stagiaire", { fi, stagiaireIdx: si });
         // Grille d'acquisition
         add(`cfa_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_cfa_stagiaire", { fi, stagiaireIdx: si });
-        // Attestation de réussite
-        add(`cfa_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_cfa_stagiaire", { fi, stagiaireIdx: si });
       });
     });
     add("cfa_fiche_autoevaluation", "CT3 - IND 11 FICHE AUTOÉVALUATION APPRENTI", 3, 11, "fiche_autoevaluation_apprenti");
 
-    // ===== IND 11 — DOCUMENTS OFFICIELS MINISTÈRE (Suivi) =====
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i11_dp_officiel_${si}`, `CT3 - IND 11 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 11, "dp_officiel", { stagiaireIdx: si });
-      add(`cfa_c3i11_ecf_officiel_${si}`, `CT3 - IND 11 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 11, "ecf_officiel", { stagiaireIdx: si });
-    });
 
     // ===== IND 12 — ENGAGEMENT DES BÉNÉFICIAIRES (CFA) =====
     add("cfa_procedure_abandon", "CT3 - IND 12 PROCÉDURE D'ABANDON CFA", 3, 12, "procedure_abandon_cfa");
@@ -855,26 +849,24 @@ export function buildFullCatalog(
       );
     });
     add("cfa_c3i12_suivi_public_excel", "CT3 - IND 12 SUIVI DU PUBLIC ET DU BÉNÉFICIAIRE (Excel)", 3, 12, "suivi_public_beneficiaire_excel");
-    add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI PFMP (Excel)", 3, 12, "suivi_pfmp_excel");
-    // Ressources PERFORMER SCHOOL (alignement ZIP de référence)
+    add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI DES PÉRIODES EN ENTREPRISE (Excel)", 3, 12, "suivi_pfmp_excel");
+    // Ressources documentaires
     add("cfa_c3i12_cesdh", "CT3 - IND 12 📁 RESSOURCES – Convention européenne des droits de l'homme (CESDH)", 3, 12, "pdf_static", { pdfUrl: "/pdfs/cesdh.pdf" });
-    add("cfa_c3i12_guide_utilisateur_extranet", "CT3 - IND 12 📁 RESSOURCES – Guide utilisateur Extranet", 3, 12, "pdf_static", { pdfUrl: "/pdfs/guide_utilisateur_extranet.pdf" });
     add("cfa_c3i12_precis_apprentissage", "CT3 - IND 12 📁 RESSOURCES – Précis de l'apprentissage", 3, 12, "pdf_static", { pdfUrl: "/pdfs/precis_apprentissage.pdf" });
     add("cfa_c3i12_livret_accompagnez_alternants", "CT3 - IND 12 📁 RESSOURCES – Livret Accompagnez vos alternants", 3, 12, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
     
     add("cfa_c3i12_procedure_rupture_reorientation_echecs", "CT3 - IND 12 📁 GESTION ABANDON – Procédure rupture, réorientation et échecs", 3, 12, "procedure_rupture_reorientation_echecs_cfa", { folder: "Gestion_Abandon" });
     add("cfa_c3i12_feuille_emargement_gestion_abandon", "CT3 - IND 12 📁 GESTION ABANDON – Feuille d'émargement (suivi abandon)", 3, 12, "feuille_emargement_gestion_abandon_cfa", { folder: "Gestion_Abandon" });
 
-    // ===== IND 12 — DOCUMENTS OFFICIELS MINISTÈRE (Évaluation) =====
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i12_ecf_officiel_${si}`, `CT3 - IND 12 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 12, "ecf_officiel", { stagiaireIdx: si });
-      add(`cfa_c3i12_dp_officiel_${si}`, `CT3 - IND 12 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 12, "dp_officiel", { stagiaireIdx: si });
-    });
 
     // ===== IND 13 — COORDINATION ALTERNANCE (CFA) =====
+    add("cfa_c3i13_procedure_coordination", "CT3 - IND 13 PROCÉDURE DE COORDINATION CFA – ENTREPRISE – APPRENTI", 3, 13, "procedure_coordination_alternance_cfa");
     // Un fichier par stagiaire pour chaque type de document
     stagiaires.forEach((s, si) => {
       const nom = `${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim() || `Apprenti ${si + 1}`;
+      add(`cfa_c3i13_missions_blocs_${si}`, `CT3 - IND 13 TABLEAU MISSIONS EN ENTREPRISE ↔ BLOCS DE COMPÉTENCES — ${nom}`, 3, 13, "tableau_missions_blocs_cfa", { stagiaireIdx: si });
+      add(`cfa_c3i13_calendrier_alternance_${si}`, `CT3 - IND 13 CALENDRIER D'ALTERNANCE — ${nom}`, 3, 13, "calendrier_alternance_cfa", { stagiaireIdx: si });
+      add(`cfa_c3i13_grille_competences_${si}`, `CT3 - IND 13 GRILLE DE COMPÉTENCES ALTERNANCE — ${nom}`, 3, 13, "grille_competences_alternance_cfa", { stagiaireIdx: si });
       add(`cfa_c3i13_suivi_ent_${si}`, `CT3 - IND 13 SUIVI EN ENTREPRISE — ${nom}`, 3, 13, "suivi_entreprise_cfa", { stagiaireIdx: si });
       add(
         `cfa_c3i13_outils_suivi_excel_${si}`,
@@ -886,17 +878,14 @@ export function buildFullCatalog(
     });
 
     // ===== IND 14 — ACCOMPAGNEMENT SOCIO-PROFESSIONNEL (CFA) =====
-    formations.forEach((f, fi) => {
-      add(`cfa_c3i14_suivi3mois_${fi}`, `CT3 - IND 14 SUIVI À 3 MOIS`, 3, 14, "suivi_3_mois", { fi });
-      add(`cfa_c3i14_insertion_${fi}`, `CT3 - IND 14 QUESTIONNAIRE INSERTION`, 3, 14, "questionnaire_insertion", { fi });
-    });
+    add("cfa_c3i14_procedure_ruptures", "CT3 - IND 14 PROCÉDURE DE TRAITEMENT SANS DÉLAI DES SITUATIONS DE RUPTURE (difficultés, violences, discriminations)", 3, 14, "procedure_ruptures_sans_delai_cfa");
     // Webinaires uniquement si distanciel
     formations.forEach((f) => {
       const moda = (f.modalites || '').toLowerCase();
       const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
       if (isDistanciel) {
         add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
-        add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
+        if (isNTCFormation) add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
       }
     });
 
@@ -964,7 +953,7 @@ export function buildFullCatalog(
       );
     });
 
-    add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
+    if (isIDF) add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
     add("cfa_c3i14_pages_site_aides_ateliers", "CT3 - IND 14 PAGES SITE – AIDES, ATELIERS CV & ENTRETIEN", 3, 14, "pages_site_aides_ateliers_cfa");
 
     // ===== IND 14 — DOSSIER CITOYENNETÉ (Vie Publique) =====
@@ -1056,19 +1045,22 @@ export function buildFullCatalog(
     add("cfa_c3i15_droits_devoirs_apprenti", "CT3 - IND 15 DROITS ET DEVOIRS DE L'APPRENTI", 3, 15, "droits_devoirs_apprenti_cfa");
     add("cfa_c3i15_regles_sante_securite", "CT3 - IND 15 RÈGLES SANTÉ ET SÉCURITÉ EN MILIEU PROFESSIONNEL", 3, 15, "regles_sante_securite_cfa");
     add("cfa_c3i15_sst_livret", "CT3 - IND 15 📁 LIVRET SST – Sauveteur Secouriste du Travail", 3, 15, "pdf_static", { pdfUrl: "/pdfs/sst_livret.pdf" });
+    add("cfa_c3i15_violences_mediateur", "CT3 - IND 15 PRÉVENTION ET SIGNALEMENT DES VIOLENCES, HARCÈLEMENT, DISCRIMINATIONS — MÉDIATEUR DE L'APPRENTISSAGE", 3, 15, "information_violences_mediateur_cfa");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i15_attestation_sst_${si}`, `CT3 - IND 15 ATTESTATION DE REMISE DU LIVRET SST – ${s.prenom} ${s.nom}`, 3, 15, "attestation_remise_livret_sst_cfa", { stagiaireIdx: si });
+    });
 
     // ===== IND 8 — Positionnement et évaluation des acquis à l'entrée (CFA) =====
     formations.forEach((f, fi) => {
       add(`cfa_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION`, 2, 8, "test_positionnement_debut_trame", { fi });
-      add(`cfa_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION`, 2, 8, "test_positionnement_fin_trame", { fi });
+      add(`cfa_c2i8_trame_fin_${fi}`, `CT3 - IND 11 TEST DE FIN DE FORMATION (trame)`, 3, 11, "test_positionnement_fin_trame", { fi });
       add(`cfa_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION`, 2, 8, "procedure_eval_debut", { fi });
-      add(`cfa_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 2, 8, "procedure_eval_fin", { fi });
+      add(`cfa_c2i8_procedure_fin_${fi}`, `CT3 - IND 11 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 3, 11, "procedure_eval_fin", { fi });
       add(`cfa_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX`, 2, 8, "grille_niveaux_positionnement", { fi });
     });
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        add(`cfa_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`cfa_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+        add(`cfa_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DE POSITIONNEMENT D'ENTRÉE – ${s.prenom} ${s.nom}`, 2, 8, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "debut" });
       });
     });
 
@@ -1077,14 +1069,8 @@ export function buildFullCatalog(
     // IND 17 — Moyens humains, techniques et environnement
     const cfaModaLower = (formations[0]?.modalites || '').toLowerCase();
     const cfaIsPureDistanciel = cfaModaLower.includes('distanciel') && !cfaModaLower.includes('mixte') && !cfaModaLower.includes('présentiel') && !cfaModaLower.includes('presentiel');
-    if (!cfaIsPureDistanciel) {
-      add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
-    }
-    add("cfa_c4i17_facture_pack_office", "CT4 - IND 17 FACTURE PACK OFFICE", 4, 17, "facture_pack_office_docx");
-    add("cfa_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
-    add("cfa_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
-    add("cfa_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
-    add("cfa_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
+    // Inventaire des moyens établi par le CFA ; bail, factures et attestations restent des pièces fournies par l'organisme.
+    add("cfa_c4i17_inventaire_moyens", `CT4 - IND 17 INVENTAIRE DES MOYENS HUMAINS, TECHNIQUES ET PÉDAGOGIQUES${cfaIsPureDistanciel ? " (FORMATION À DISTANCE)" : ""}`, 4, 17, "inventaire_moyens_cfa");
 
     const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
 
@@ -1108,16 +1094,21 @@ export function buildFullCatalog(
     add("cfa_c4i20_convocation_conseil_perfectionnement", "CT4 - IND 20 CONVOCATION AU CONSEIL DE PERFECTIONNEMENT", 4, 20, "convocation_conseil_perfectionnement");
     add("cfa_c4i20_pv_conseil_perfectionnement", "CT4 - IND 20 PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", 4, 20, "pv_conseil_perfectionnement");
     add("cfa_c4i20_fiche_referent_mobilite", "CT4 - IND 20 FICHE RÉFÉRENT MOBILITÉ NATIONALE ET INTERNATIONALE", 4, 20, "fiche_referent_mobilite_cfa");
+    add("cfa_c4i20_lettre_mission_mobilite", "CT4 - IND 20 LETTRE DE MISSION – RÉFÉRENT MOBILITÉ", 4, 20, "lettre_mission_referent_mobilite_cfa");
+    add("cfa_c4i20_lettre_mission_handicap", "CT4 - IND 20 LETTRE DE MISSION – RÉFÉRENT HANDICAP", 4, 20, "lettre_mission_referent_handicap_cfa");
+    add("cfa_c4i20_part_heures_permanents", "CT4 - IND 20 PART DES HEURES ASSURÉES PAR DES PERMANENTS ET SUPERVISION PÉDAGOGIQUE", 4, 20, "part_heures_permanents_cfa");
 
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
 
     // IND 21 — Compétences des intervenants
     add("cfa_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
+    add("cfa_c5i21_justificatifs_intervenants", "CT5 - IND 21 DOSSIER DE COMPÉTENCES DES INTERVENANTS (CV, DIPLÔMES, EXPÉRIENCE)", 5, 21, "justificatifs_intervenants_cfa");
+    add("cfa_c5i21_grille_recrutement", "CT5 - IND 21 GRILLE DE RECRUTEMENT FORMATEUR", 5, 21, "grille_recrutement_formateur_cfa");
+    add("cfa_c5i21_grille_evaluation_pedagogique", "CT5 - IND 21 GRILLE D'ÉVALUATION PÉDAGOGIQUE DES INTERVENANTS", 5, 21, "grille_evaluation_pedagogique_cfa");
 
     // IND 22 — Entretien et développement des compétences
     add("cfa_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
     
-    add("cfa_c5i22_attestation_fin_formation", "CT5 - IND 22 ATTESTATION DE FIN DE FORMATION\u00a0", 5, 22, "attestation_fin_formation");
 
     uniqueFormateursCFA.forEach((fName) => {
       const fname = String(fName).trim();
@@ -1133,33 +1124,26 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("cfa_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("cfa_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("cfa_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
-    add("cfa_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
-    add("cfa_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
-    add("cfa_c6i23_preuves_veille", "CT6 - IND 23 PREUVES DE VEILLE RÉGLEMENTAIRE", 6, 23, "preuves_veille_reglementaire");
+    add("cfa_c6i23_veille_sourcee", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE SOURCÉE (dont décret n° 2026-728)", 6, 23, "veille_sourcee_cfa");
 
     // IND 24 — Veille métiers et emplois
     add("cfa_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("cfa_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    if (formations.some(f => /excel|word|powerpoint/i.test(f.intitule || ''))) {
-      add("cfa_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
-    }
-    add("cfa_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
     add("cfa_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
-    add("cfa_c6i26_screenshot_agefiph", "CT6 - IND 26 INSCRIPTION NEWSLETTER AGEFIPH", 6, 26, "screenshot_agefiph");
     add("cfa_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("cfa_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("cfa_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
-    add("cfa_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "diplome_referent_handicap_docx");
-    add("cfa_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
+    if (isIDF) add("cfa_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("cfa_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
     add("cfa_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
 
     // IND 27 — Sous-traitance et partenariats
+    add("cfa_c6i27_registre_sous_traitance", "CT6 - IND 27 REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL", 6, 27, "registre_sous_traitance_portage_cfa", { typePrestation: "CFA" });
+    add("cfa_c6i27_clauses_qualite", "CT6 - IND 27 ANNEXE – CLAUSES QUALITÉ DES CONTRATS DE SOUS-TRAITANCE ET DE PORTAGE", 6, 27, "clauses_qualite_contrat_cfa", { typePrestation: "CFA" });
     add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
     if (hasExternalFormateur) add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
     add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
@@ -1186,11 +1170,19 @@ export function buildFullCatalog(
     }
 
     // IND 28 — Mobilisation des acteurs économiques et sociaux
+    add("cfa_c6i28_annuaire_entreprises", "CT6 - IND 28 ANNUAIRE DES ENTREPRISES PARTENAIRES", 6, 28, "annuaire_entreprises_partenaires_cfa");
+    add("cfa_c6i28_cr_coconstruction", "CT6 - IND 28 COMPTE RENDU DE CO-CONSTRUCTION DE L'INGÉNIERIE AVEC LES PARTENAIRES", 6, 28, "cr_coconstruction_branche_cfa");
     add("cfa_c6i28_orientation_pour_tous", "CT6 - IND 28 📁 ORIENTATION POUR TOUS", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/orientation_pour_tous.png" });
     add("cfa_c6i28_maitre_apprentissage_fiche", "CT6 - IND 28 📁 FICHE MAÎTRE D'APPRENTISSAGE 2025", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/maitre_apprentissage_fiche_2025.pdf" });
     add("cfa_c6i28_reseau_partenaires", "CT6 - IND 28 📁 RÉSEAU DE PARTENAIRES SOCIO-ÉCONOMIQUES", 6, 28, "pdf_static", { pdfUrl: "/__l5e/assets-v1/11ae6dae-236e-44e0-bdb6-9c31dabdf1ef/reseau_partenaires_socio_economiques.pdf" });
 
-    // IND 29 — Insertion professionnelle et accompagnement
+    // IND 29 — Insertion professionnelle et poursuite d'études
+    add("cfa_c6i29_procedure_insertion", "CT6 - IND 29 PROCÉDURE INSERTION PROFESSIONNELLE ET POURSUITE D'ÉTUDES", 6, 29, "procedure_insertion_poursuite_etudes_cfa");
+    add("cfa_c6i29_suivi_insertion", "CT6 - IND 29 SUIVI DE L'INSERTION PROFESSIONNELLE DES APPRENTIS", 6, 29, "suivi_insertion_pro_cfa");
+    formations.forEach((f, fi) => {
+      add(`cfa_c6i29_suivi3mois_${fi}`, `CT6 - IND 29 SUIVI À 3 MOIS`, 6, 29, "suivi_3_mois", { fi });
+      add(`cfa_c6i29_insertion_${fi}`, `CT6 - IND 29 QUESTIONNAIRE D'INSERTION`, 6, 29, "questionnaire_insertion", { fi });
+    });
     add("cfa_c6i29_savoir_se_vendre", "CT6 - IND 29 📁 SAVOIR SE VENDRE – GUIDE MYCVFACTORY", 6, 29, "pdf_static", { pdfUrl: "/pdfs/citoyennete/savoir_se_vendre_guide.pdf" });
     add("cfa_c6i29_atelier_entretien", "CT6 - IND 29 📁 ATELIER D'ENTRETIEN D'EMBAUCHE", 6, 29, "pdf_static", { pdfUrl: "/__l5e/assets-v1/e2494eb0-5ff2-46ca-b54d-c50a9636f2ca/atelier_entretien_embauche.pdf" });
     add("cfa_c6i29_15_idees_cv", "CT6 - IND 29 📁 15 IDÉES POUR UN CV", 6, 29, "pdf_static", { pdfUrl: "/pdfs/citoyennete/15_idees_pour_un_cv.pdf" });
@@ -1242,10 +1234,6 @@ export function buildFullCatalog(
     add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
     
 
-    // ===== IND 30 — DOCUMENTS OFFICIELS MINISTÈRE (Certification) =====
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c7i30_dp_officiel_${si}`, `CT7 - IND 30 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 7, 30, "dp_officiel", { stagiaireIdx: si });
-    });
     add("cfa_c7i30_pv_session_global", "CT7 - IND 30 PROCÈS-VERBAL GLOBAL DE SESSION", 7, 30, "pv_session_global");
 
     // IND 31 — Réclamations et dysfonctionnements
@@ -1256,17 +1244,34 @@ export function buildFullCatalog(
     // IND 32 — Amélioration continue
     add("cfa_c7i32_tableau_amelioration_excel", "CT7 - IND 32 TABLEAU D'AMÉLIORATION CONTINUE", 7, 32, "tableau_amelioration_continue_excel");
     add("cfa_c7i32_procedure_amelioration", "CT7 - IND 32 PROCÉDURE AMÉLIORATION CONTINUE", 7, 32, "procedure_amelioration_continue");
+    add("cfa_c7i32_analyse_risques", "CT7 - IND 32 ANALYSE DES RISQUES SUR LA QUALITÉ DES FORMATIONS", 7, 32, "analyse_risques_qualite_cfa", { typePrestation: "CFA" });
+
+    // IND 33 — Évaluation des contenus et des enseignements par les apprentis (décret n° 2026-728)
+    add("cfa_c7i33_procedure", "CT7 - IND 33 PROCÉDURE D'ÉVALUATION DES CONTENUS ET DES ENSEIGNEMENTS", 7, 33, "procedure_evaluation_enseignements_cfa");
+    {
+      const f0 = formations[0];
+      const fiche33 = getRNCPByCode(f0?.codeRNCP || "");
+      const blocs33 = fiche33?.blocsCompetences?.length ? fiche33.blocsCompetences.map(b => b.titre)
+        : (f0?.referentiel?.blocs?.length ? f0.referentiel.blocs.map(b => `${b.code} — ${b.intitule}`) : [f0?.intitule || "Formation"]);
+      blocs33.forEach((titre, bi) => {
+        const court = titre.length > 60 ? titre.slice(0, 60) + "…" : titre;
+        stagiaires.forEach((s, si) => {
+          add(`cfa_c7i33_grille_b${bi}_${si}`, `CT7 - IND 33 ÉVALUATION DES ENSEIGNEMENTS – ${court} – ${s.prenom} ${s.nom}`, 7, 33, "grille_evaluation_enseignements_cfa", { stagiaireIdx: si, blocIdx: bi });
+        });
+        add(`cfa_c7i33_synthese_b${bi}`, `CT7 - IND 33 SYNTHÈSE PARTAGÉE AVEC L'ÉQUIPE PÉDAGOGIQUE – ${court}`, 7, 33, "synthese_evaluation_enseignements_cfa", { blocIdx: bi });
+      });
+    }
 
     // ===========================================================
-    // ===== GAPS AUDIT QUALIOPI CFA (Dreamers Team / V9) =======
+    // ===== PIÈCES COMPLÉMENTAIRES AUDIT QUALIOPI CFA ==========
     // ===========================================================
     // IND 13 — Grille de compétences alternance nominative (retirée)
     // IND 16 — Procédure de respect des exigences du certificateur
     const hasRsrncpCFAGap = formations.some(f => isCodeRsrncp(f.codeRNCP));
     if (hasRsrncpCFAGap) {
       add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
-      // IND 16 — DP & ECF officiels par stagiaire
-      stagiaires.forEach((s, si) => {
+      // IND 16 — DP & ECF officiels par stagiaire (titres professionnels uniquement)
+      if (isTitrePro) stagiaires.forEach((s, si) => {
         add(`cfa_c3i16_dp_officiel_${si}`, `CT3 - IND 16 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 16, "dp_officiel", { stagiaireIdx: si });
         add(`cfa_c3i16_ecf_officiel_${si}`, `CT3 - IND 16 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 16, "ecf_officiel", { stagiaireIdx: si });
       });
@@ -1305,9 +1310,9 @@ export function buildFullCatalog(
     add("cfa_siteweb_livret_accueil", "📁 SITE WEB – Livret d'accueil de l'apprenti", 3, 9, "livret_accueil_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_livret_apprentissage", "📁 SITE WEB – Livret d'apprentissage", 2, 5, "livret_apprentissage_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     
-    add("cfa_siteweb_aides_sociales", "📁 SITE WEB – Aides sociales (ARA, équipement, santé psy, Imagine R)", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/aides_sociales.pdf" });
-    add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 3, 14, "site_web_atelier_entretien_cfa");
-    add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 3, 14, "site_web_atelier_cv_cfa");
+    if (isIDF) add("cfa_siteweb_aides_sociales", "📁 SITE WEB – Aides sociales (ARA, équipement, santé psy, Imagine R)", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/aides_sociales.pdf" });
+    add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 6, 29, "site_web_atelier_entretien_cfa");
+    add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 6, 29, "site_web_atelier_cv_cfa");
   }
 
   // ===== Bilan de compétences =====
