@@ -34,7 +34,7 @@ import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
 function stagSig(s: StagiaireInfo): string {
   return s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.prenom} ${s.nom}</p>`;
+    : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
 }
 
 function orgSig(o: OrganismeInfo): string {
@@ -92,7 +92,7 @@ function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
   if (url) {
     return `<img src="${url}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
   }
-  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${f.formateur}</p>`;
+  return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
 }
 
 function respEntrepriseSig(s: StagiaireInfo): string {
@@ -100,7 +100,7 @@ function respEntrepriseSig(s: StagiaireInfo): string {
   if (s.signatureResponsableUrl) {
     return `<img src="${s.signatureResponsableUrl}" alt="Signature responsable entreprise" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
   }
-  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.responsableEntreprise || 'le responsable'}</p>`;
+  return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
 }
 
 function modaliteTexte(f: FormationInfo): string {
@@ -425,7 +425,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
   const sigDate = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   const respSigHtml = s.signatureResponsableUrl
     ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${respEntreprise}</p>`;
+    : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   let extra = `
     <h2>CONVENTION DE FORMATION PROFESSIONNELLE TRIPARTITE</h2>
     <p style="font-style:italic">(Articles L.6353-1 et L.6353-2 du Code du travail)</p>
@@ -527,7 +527,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
       let tableRows = '';
       stagiaires.forEach(s => {
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
-        const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+        const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : ``;
         const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
         const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;

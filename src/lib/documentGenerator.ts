@@ -3225,7 +3225,7 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const blocs = [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h00' }];
   const sigHeaders = blocs.map(b => `Signature ${b.label} (${b.horaire})`);
   const rows = stagiaires.map(s => {
-    const sig = `Signé ${s.prenom[0]}.${s.nom}`;
+    const sig = "";
     return [s.nom, s.prenom, s.entreprise, ...blocs.map(() => sig)];
   });
   if (rows.length < 5) { for (let i = rows.length; i < 5; i++) rows.push(["", "", "", ...blocs.map(() => "")]); }
@@ -3460,7 +3460,9 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   };
 
   let extra = '';
+  const outilClasse = (o.outilsUtilises || 'Classe virtuelle').split(/[,;/]/)[0].trim() || 'Classe virtuelle';
   extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Plateforme :</strong> ${o.outilsUtilises || 'Classe virtuelle'}</p>`;
+  extra += `<p style="font-size:11px;color:#555"><em>Relevé établi par le formateur à partir de la liste des participants de chaque classe virtuelle. L'export des journaux de l'outil (rapport de participation) est conservé et joint en annexe.</em></p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
   if (isCFA) extra += `<p><em>Rythme d'alternance : ${f.rythmeAlternance}. Seules les semaines en CFA apparaissent dans le relevé (les semaines en entreprise ne génèrent pas de connexion LMS).</em></p>`;
 
@@ -3488,7 +3490,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       // Jour futur → ligne vide
       if (!isFrLongDayPast(day)) {
         extra += tableHTML(
-          ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
+          ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
           [["—", "—", "—", "—", "—", "—", "⏳ À venir"]]
         );
         renderedDays++;
@@ -3502,8 +3504,8 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const mTotal = d.dureeTotalMin % 60;
 
       extra += tableHTML(
-        ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-        [[d.ip, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
+        ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
+        [[outilClasse, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, 'Présent(e)']]
       );
       renderedDays++;
     });
@@ -6890,7 +6892,7 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${s.prenom} ${s.nom}</p>`;
   const respSigHtml = s.signatureResponsableUrl
     ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${responsable}</p>`;
+    : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
 
   const sigBlock = `<div class="signature-block" style="display:flex;justify-content:space-between;margin-top:30px;gap:10px">
     <div class="sig-box" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;text-align:center"><p class="sig-label" style="font-weight:700">L'Accompagnateur VAE</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(dateAnalyse)}</p><p style="margin-top:20px">Signature :</p>${accompSigHtml}</div>
@@ -7864,7 +7866,7 @@ function genFeuilleEmargementGestionAbandon(o: OrganismeInfo, f: FormationInfo, 
       const name = `${st.prenom} ${st.nom.toUpperCase()}`;
       const sig = st.signatureUrl
         ? `<img src="${st.signatureUrl}" alt="sig" style="max-height:38px;max-width:100px;object-fit:contain" />`
-        : `<span style="font-style:italic;color:#666">Signé ${st.prenom[0]}.${st.nom}</span>`;
+        : ``;
       const cell = past ? sig : '<span style="color:#bbb;font-style:italic">— en attente —</span>';
       const bg = i % 2 === 0 ? '#ffffff' : '#f5f9ff';
       rows += `<tr style="background:${bg}"><td>${name}</td><td>Apprenti(e)</td><td style="padding:10px 6px">${cell}</td></tr>`;
@@ -9629,7 +9631,7 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
         const stagSigHtml = s.signatureUrl
           ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
-          : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+          : ``;
         const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
         const formateurSigHtml = fmtSigUrl
           ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`

@@ -998,7 +998,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/stagiaire|apprenant|apprenti|candidat|bénéficiaire|participant/i.test(l)) {
     return urls.stagiaireSignatureUrl
       ? sigImg(urls.stagiaireSignatureUrl, "Signature stagiaire")
-      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+      : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Formateur (but not "Formateur" in a general sentence)
   if (/formateur/i.test(l)) {
@@ -1008,7 +1008,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/entreprise|employeur|maître/i.test(l)) {
     return urls.responsableEntrepriseSignatureUrl
       ? sigImg(urls.responsableEntrepriseSignatureUrl, "Signature responsable entreprise")
-      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+      : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Dirigeant / Directeur (priority over "référent" so a combined label
   // like "Dirigeant / Référent handicap" still gets the dirigeant signature + tampon)
@@ -1017,7 +1017,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   }
   // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
   if (/pédagogique|qualité|handicap|référent/i.test(l)) {
-    return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+    return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Responsable (of org) → tampon only
   if (/responsable/i.test(l)) {
@@ -1027,7 +1027,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/client|accord/i.test(l)) {
     return urls.stagiaireSignatureUrl
       ? sigImg(urls.stagiaireSignatureUrl, "Signature client")
-      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+      : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Default: tampon only
   return tamponImg(urls.tamponUrl);
