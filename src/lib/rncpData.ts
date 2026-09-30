@@ -15,6 +15,9 @@ export interface RNCPFiche {
   codesROME: string[];
   voiesAcces: string[];
   dureeIndicative: string;
+  /** Fiche échue ou remplacée : ne plus la proposer pour un nouveau parcours. */
+  inactif?: boolean;
+  remplacePar?: string;
 }
 
 export const RNCP_FICHES: RNCPFiche[] = [
@@ -483,11 +486,13 @@ export const RNCP_FICHES: RNCPFiche[] = [
   },
   {
     code: "RNCP31041",
-    intitule: "CAP Esthétique Cosmétique Parfumerie",
+    intitule: "CAP Esthétique Cosmétique Parfumerie (fiche inactive — remplacée par RNCP39030)",
     niveau: "Niveau 3 (CAP)",
     certificateur: "Ministère de l'Éducation nationale et de la Jeunesse",
-    dateEnregistrement: "2017-07-05",
-    dateEcheance: "2028-12-31",
+    dateEnregistrement: "05/07/2017",
+    dateEcheance: "23/05/2024",
+    inactif: true,
+    remplacePar: "RNCP39030",
     codeNSF: "336",
     formacodes: "42032, 42040, 42056",
     resume: "Le titulaire du CAP Esthétique Cosmétique Parfumerie est un professionnel qualifié qui réalise des soins esthétiques du visage et du corps, des épilations, des maquillages, des manucures et des conseils de vente de produits cosmétiques et de parfumerie. Il accueille, conseille et fidélise la clientèle dans le respect des protocoles d'hygiène et de sécurité.",
@@ -1932,4 +1937,20 @@ export const RNCP_FICHES: RNCPFiche[] = [
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
   return RNCP_FICHES.find(f => f.code.toLowerCase() === code.toLowerCase());
+}
+
+/** Échéance d'une fiche (jj/mm/aaaa ou aaaa-mm-jj) en Date, null si illisible. */
+function echeanceRNCP(f: RNCPFiche): Date | null {
+  const t = (f.dateEcheance || "").trim();
+  const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const d = m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(t);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/** Vrai si la fiche est connue, non marquée inactive et non échue à la date donnée. */
+export function isRNCPActif(code: string, at: Date = new Date()): boolean {
+  const f = getRNCPByCode(code || "");
+  if (!f || f.inactif) return false;
+  const e = echeanceRNCP(f);
+  return !e || e.getTime() >= new Date(at.getFullYear(), at.getMonth(), at.getDate()).getTime();
 }
