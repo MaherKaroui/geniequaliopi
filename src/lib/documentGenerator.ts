@@ -26,7 +26,7 @@ import { genChiffreAffairesSession } from "./templatesCA";
 import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne, genChecklistFormateur } from "./templatesCritere6";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
-import { genDeroulePedagogique, genFactureOPCO, genTauxObtentionCertification, genCertificatRealisationStagiaire } from "./templatesAF";
+import { genDeroulePedagogique, genFactureOPCO, genTauxObtentionCertification, genCertificatRealisationStagiaire, genCertificatRealisation as genCertificatRealisationAF } from "./templatesAF";
 import { genECFGotrm, genDPGotrm } from "./gotrm/ecfDp";
 
 import { getRNCPByCode } from "./rncpData";
@@ -3715,11 +3715,16 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
 
     extra += `<p><strong>Réponse du stagiaire :</strong> ${ans.reponse}</p>`;
+    if ((q as any).reponseAttendue) extra += `<p style="color:#475569"><strong>Corrigé / éléments attendus :</strong> ${(q as any).reponseAttendue}</p>`;
     extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
   });
 
   extra += `<h3>Total : ${totalScore} /10</h3>`;
+  if (isDebut) {
+    const g = groupeNiveauDepuisScore(totalScore);
+    extra += `<p><strong>Positionnement :</strong> ${g.groupe} – ${g.niveau} (barème : 0 à 3,5 débutant ; 4 à 6,5 intermédiaire ; 7 à 10 avancé).<br><strong>Adaptation du parcours :</strong> ${g.adaptation}</p>`;
+  }
 
   const comment = generateFormateurComment(s, f, totalScore, isDebut, si);
 
@@ -3976,6 +3981,20 @@ function genProcedureEvaluation(o: OrganismeInfo, f: FormationInfo, type: "debut
   ] });
 }
 
+/** Groupe de niveau déduit de la note du test de positionnement d'entrée (/10). */
+function groupeNiveauDepuisScore(score: number): { groupe: string; niveau: string; adaptation: string } {
+  if (score >= 7) return { groupe: "Groupe 3", niveau: "AVANCÉ", adaptation: "exercices d'approfondissement et cas complexes ; possibilité d'alléger les rappels de base." };
+  if (score >= 4) return { groupe: "Groupe 2", niveau: "INTERMÉDIAIRE", adaptation: "parcours standard avec consolidation ciblée des points partiellement acquis." };
+  return { groupe: "Groupe 1", niveau: "DÉBUTANT", adaptation: "apports de base renforcés, exercices progressifs et point individuel à mi-parcours." };
+}
+
+/** Note du test de positionnement d'entrée, identique à celle du test individuel. */
+function scorePositionnementDebut(f: FormationInfo, s: StagiaireInfo, si: number): number {
+  const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
+  const answers = generateStagiaireOpenAnswers(qo.debut, si, true, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
+  return answers.reduce((sum, a) => sum + a.score, 0);
+}
+
 function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = `<div class="section"><p><strong>Présentation du document</strong><br>Ce document vise à définir et présenter les différents groupes de niveaux existants au sein de la société ${o.nom}.</p></div>`;
 
@@ -3984,7 +4003,7 @@ function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stag
     ["GROUPE", "NIVEAU", "COMPÉTENCES MAÎTRISÉES AVANT LA FORMATION"],
     [
       ["Groupe 3", "AVANCÉ", "Déjà formé(e) / pratique régulière et autonome dans le domaine"],
-      ["Groupe 2", "AMATEUR", "Déjà suivi une formation / déjà pratiqué en autodidacte"],
+      ["Groupe 2", "INTERMÉDIAIRE", "Déjà suivi une formation / déjà pratiqué en autodidacte"],
       ["Groupe 1", "DÉBUTANT", "Jamais suivi de formation dans ce domaine / aucune pratique"],
     ]
   );
@@ -3992,14 +4011,13 @@ function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stag
   // Assign stagiaires to groups based on their profile
   if (stagiaires.length > 0) {
     extra += `<h3>Répartition des stagiaires – ${f.intitule}</h3>`;
+    // Groupe calculé depuis la note réelle du test de positionnement d'entrée (plus d'affectation par rang).
     const rows = stagiaires.map((s, i) => {
-      const profiles = ['bon', 'excellent', 'moyen', 'bon', 'debutant', 'excellent', 'bon', 'moyen', 'bon', 'moyen'];
-      const level = profiles[i % profiles.length];
-      const groupe = level === 'excellent' ? 'Groupe 3' : level === 'bon' ? 'Groupe 2' : level === 'moyen' ? 'Groupe 2' : 'Groupe 1';
-      const niveau = level === 'excellent' ? 'AVANCÉ' : level === 'bon' || level === 'moyen' ? 'AMATEUR' : 'DÉBUTANT';
-      return [s.prenom + " " + s.nom, groupe, niveau];
+      const note = scorePositionnementDebut(f, s, i);
+      const g = groupeNiveauDepuisScore(note);
+      return [s.prenom + " " + s.nom, `${Number.isInteger(note) ? note : note.toFixed(1)} /10`, g.groupe, g.niveau, g.adaptation];
     });
-    extra += tableHTML(["Stagiaire", "Groupe", "Niveau"], rows);
+    extra += tableHTML(["Stagiaire", "Note d'entrée", "Groupe", "Niveau", "Adaptation du parcours"], rows);
   }
 
   return buildDocument({ org: o, title: "GRILLE DE NIVEAUX", subtitle: f.intitule, formation: f, showFormationInfo: false, extraHtml: extra });
@@ -8985,15 +9003,8 @@ function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires:
 }
 
 function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
-  return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, sections: [
-    { heading: "", content: `<p style="text-align:center;font-size:14px;margin:30px 0">Je soussigné(e) <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong>${o.nda ? ` (NDA : ${o.nda})` : ""}, atteste que l'action de formation suivante a été réalisée :</p>
-    <p style="text-align:center;font-size:15px;font-weight:bold;margin:15px 0">« ${f.intitule} »</p>` },
-    { heading: "Informations de la formation", content: `<p><strong>Bénéficiaire :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Durée prévue :</strong> ${f.duree}<br><strong>Durée réalisée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Formateur :</strong> ${f.formateur}</p>` },
-    { heading: "Nature de l'action", content: "<p>☐ Action de formation ☐ Bilan de compétences ☐ VAE ☐ Action d'apprentissage</p>" },
-    { heading: "", content: `<p style="text-align:center;margin-top:20px;font-style:italic">Ce certificat est délivré conformément aux dispositions de l'article L.6353-1 du Code du travail.</p>` },
-  ], signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Le/La Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`] } })
-    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
+  // Un seul modèle de certificat de réalisation dans tout le générateur (templatesAF).
+  return genCertificatRealisationAF(o, f, stagiaires);
 }
 
 function genSuiviAbsences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {

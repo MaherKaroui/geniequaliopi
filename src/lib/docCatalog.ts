@@ -25,7 +25,7 @@ function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
   }
   return n;
 }
-import { getEvalContent } from "./evalContent";
+import { getEvalContent, hasEvalContentDedie } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdc/bdcTemplatesBC";
 
@@ -277,7 +277,9 @@ export function buildFullCatalog(
 
 
         // EXAMEN FINAL — 1 vrai examen de synthèse daté de la fin de formation
-        if (nbExContent > 0 || (evalData?.qcmFinal?.length || 0) > 0) {
+        // Examen final uniquement si la formation dispose d'un contenu d'évaluation dédié
+        // (le contenu générique produisait un « QCM » fait de questions de satisfaction).
+        if (hasEvalContentDedie(f.intitule)) {
           add(
             `af_c3i11_examen_final_${fi}_${si}`,
             `CT3 - IND 11 EXAMEN FINAL – ${s.prenom} ${s.nom}`,

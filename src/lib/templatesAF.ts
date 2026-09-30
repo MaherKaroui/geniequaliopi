@@ -2,7 +2,7 @@
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays, getStagiaireDuree } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 import { getTauxObtention, getCommentaireIndicateurs } from "./indicateursResultats";
@@ -183,17 +183,23 @@ export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.map(s => `
+  // Modèle unique aligné sur le certificat de réalisation du ministère du Travail :
+  // nature de l'action cochée, durée RÉALISÉE propre à chaque stagiaire (dates individuelles).
+  const isCFA = (o.typesActions || []).includes("apprentissage") || !!(f.rythmeAlternance || "").trim();
+  const extra = stagiaires.map(s => `
     <div class="section" style="padding:25px"><p style="text-align:center;font-size:16px;margin-bottom:15px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
-    <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong>${o.nda ? ` (NDA : ${o.nda})` : ""},</p>
-    <p>atteste que <strong>${s.prenom} ${s.nom}</strong></p>
-    <p>a bien suivi l'action de formation ci-dessous :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
-    <p><strong>Nature de l'action :</strong> Action de formation au sens de l'article L.6313-1 du Code du travail</p>
+    <p>Je soussigné(e) <strong>${o.dirigeant}</strong>, représentant légal du dispensateur de l'action concourant au développement des compétences <strong>${o.nom}</strong>${o.nda ? ` (déclaration d'activité n° ${o.nda})` : ""}${o.siret ? `, SIRET ${o.siret}` : ""},</p>
+    <p>atteste que <strong>${[s.civilite, s.prenom, s.nom].filter(Boolean).join(" ")}</strong>${s.entreprise?.trim() ? `, salarié(e) de l'entreprise ${s.entreprise}` : ""},</p>
+    <p>a suivi l'action <strong>« ${f.intitule} »</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ""}</p>
+    <p><strong>Nature de l'action concourant au développement des compétences :</strong><br>
+    ${isCFA ? "☐" : "☒"} action de formation &nbsp; ☐ bilan de compétences &nbsp; ☐ action de VAE &nbsp; ${isCFA ? "☒" : "☐"} action de formation par apprentissage</p>
+    <p><strong>Qui s'est déroulée du</strong> ${formatDate(getStagiaireDateDebut(s, f))} <strong>au</strong> ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <strong>Pour une durée réalisée de</strong> ${getStagiaireDuree(s, f)}${/distanciel|foad/i.test(f.modalites || "") ? " (formation à distance, relevés de connexion à l'appui)" : ""}.</p>
+    <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
-  return buildDocument({ org: o, title: "CERTIFICATS DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Cachet"], names: [o.dirigeant, ""] } })
+  return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
+    signatures: { type: "2", labels: ["Le représentant légal du dispensateur", "Cachet"], names: [o.dirigeant, ""] } })
     .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
