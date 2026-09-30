@@ -40,8 +40,10 @@ function phasesDates(f: FormationInfo) {
   return { p1: { start: fmt(d0), end: fmt(p1End) }, p2: { start: fmt(p2Start), end: fmt(p2End) }, p3: { start: fmt(p3Start), end: fmt(dEnd) } };
 }
 
-type BdcDomainProfile = {
+export type BdcDomainProfile = {
   label: string;
+  /** true = intitulé sans domaine métier reconnu : aucun métier n'est imposé aux bénéficiaires. */
+  generique?: boolean;
   metier: string;
   secteur: string;
   missions: string[];
@@ -162,10 +164,13 @@ export function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
       veilleTechnologique: { intitule: "Digitalisation des lignes (Industrie 4.0), supervision SCADA et fibres recyclées", source: "ATIP – Association Technique de l'Industrie Papetière", lien: "https://www.atip.asso.fr", date: "Février 2025", exploitation: "Présentée pour identifier les compétences numériques attendues (supervision, maintenance prédictive, indicateurs de performance), les évolutions des matières premières (taux de fibres recyclées, désencrage) et les besoins de qualification associés." },
     };
   }
+  // Intitulé sans domaine métier (« Bilan de compétences ») : profil neutre, le projet
+  // est propre à chaque bénéficiaire (profil déclaratif, bdcModel.profilDeclaratif).
   return {
     label: f.intitule || "Bilan de compétences",
-    metier: `professionnel(le) du domaine ${f.intitule || "visé"}`,
-    secteur: f.intitule || "secteur professionnel visé",
+    generique: true,
+    metier: "le métier ciblé par son projet",
+    secteur: "le secteur d'activité visé",
     missions: ["analyser les activités clés du métier visé", "identifier les compétences transférables", "vérifier les conditions réelles d'exercice", "rencontrer ou interroger un professionnel", "formaliser un plan d'action réaliste"],
     techniques: ["analyse du parcours et portefeuille de compétences", "enquête métier et recherche documentaire", "identification des écarts de compétences", "construction d'un projet réaliste", "formalisation du plan d'action"],
     transversales: ["communication professionnelle", "organisation", "adaptabilité", "autonomie", "capacité d'analyse"],
@@ -174,7 +179,7 @@ export function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
     opportunites: ["reconversion sécurisée", "mobilité interne ou externe", "formation qualifiante", "création d'activité", "spécialisation progressive"],
     axes: ["clarifier le projet professionnel", "renforcer les compétences transférables", "confronter le projet au marché", "organiser les étapes de transition"],
     veilleReglementaire: { intitule: "Évolutions des dispositifs de reconversion et financement", source: "Ministère du Travail – formation professionnelle", lien: "https://travail-emploi.gouv.fr", date: "Janvier 2025", exploitation: "Exploitée pour sécuriser les choix de financement, CPF, transition professionnelle et accompagnement post-bilan." },
-    veilleMetier: { intitule: `Tendances emploi et compétences dans le secteur ${f.intitule || "visé"}`, source: "France Travail – fiches métiers et marché du travail", lien: "https://www.francetravail.fr", date: "Février 2025", exploitation: "Utilisée pour vérifier les débouchés, compétences attendues et conditions d'accès au métier visé." },
+    veilleMetier: { intitule: "Tendances emploi et compétences : métiers en tension et besoins en main-d'œuvre", source: "France Travail – fiches métiers et marché du travail", lien: "https://www.francetravail.fr", date: "Février 2025", exploitation: "Utilisée pour vérifier les débouchés, compétences attendues et conditions d'accès au métier visé." },
     veilleTechnologique: { intitule: "Outils numériques de recherche métier, CV et suivi du plan d'action", source: "France Compétences – ressources orientation et compétences", lien: "https://www.francecompetences.fr", date: "Mars 2025", exploitation: "Présentée pour structurer les recherches, suivre les candidatures et documenter les compétences à développer." },
   };
 }

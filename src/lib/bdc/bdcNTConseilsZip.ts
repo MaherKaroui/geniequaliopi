@@ -19,7 +19,9 @@ import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
-import { buildBdcContext, fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, regionFromCodePostal } from "./bdcModel";
+import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, type BdcContext, type Beneficiaire } from "./bdcModel";
+import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "@/lib/qualite2026";
+import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
@@ -49,9 +51,9 @@ function antiFabricationPour(nom: string): boolean {
 }
 
 
-import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
+import { BDC_TEMPLATES_MANQUANTS, bdcTemplateApplicable } from "./bdcTemplatesBC";
 import { autofillDocument } from "../autofill";
-import { validerDossierBDC, calculerCouverture, INDICATEURS_NON_APPLICABLES_BC } from "./bdcValidation";
+import { validerDossierBDC } from "./bdcValidation";
 
 
 const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -113,6 +115,21 @@ function minusBusinessDays(d: Date, n: number, skipHolidays = false): Date {
   return r;
 }
 
+/** Profil de domaine métier, ou null si l'intitulé n'en désigne aucun (« Bilan de compétences »). */
+function domaineMetier(formation?: FormationInfo) {
+  if (!formation) return null;
+  const p = getBdcDomainProfile(formation);
+  return p.generique ? null : p;
+}
+
+/** Contexte BDC + bénéficiaire correspondant au stagiaire (dates, profil, séances propres). */
+function benCtx(org: OrganismeInfo, formation: FormationInfo | undefined, s: StagiaireInfo, stagiaires?: StagiaireInfo[]): { ctx: BdcContext; b: Beneficiaire | null } {
+  const liste = stagiaires && stagiaires.some((x) => x.nom === s.nom && x.prenom === s.prenom) ? stagiaires : [s];
+  const ctx = buildBdcContext(org, formation || ({} as FormationInfo), liste);
+  const b = ctx.beneficiaires.find((x) => x.nom === (s.nom || "") && x.prenom === (s.prenom || "")) || ctx.beneficiaires[0] || null;
+  return { ctx, b };
+}
+
 interface DatesCtx {
   dateConvention: string;    // J-14 ouvrés avant début
   dateOutilPrep: string;     // J-20 ouvrés (weekends + jours fériés) avant début
@@ -134,8 +151,11 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
   const fin = parseDateFR(s?.dateFinFormation)
     || parseDateFR(formation?.dateFin)
     || debut;
-  const conv = minusBusinessDays(debut, 14);
-  const outilPrep = minusBusinessDays(debut, 20, true);
+  const maj = parseDateFR(org?.dateMaj);
+  const plancher = (d: Date) => (maj && d < maj && maj <= debut ? new Date(maj) : d);
+  const conv = plancher(minusBusinessDays(debut, 14));
+  const outilPrepBrut = plancher(minusBusinessDays(debut, 20, true));
+  const outilPrep = outilPrepBrut > conv ? conv : outilPrepBrut;
   const mi = new Date((debut.getTime() + fin.getTime()) / 2);
   const bilanTermine = fin.getTime() <= today.getTime();
   const versionD = parseDateFR(org?.dateMaj) || new Date(debut.getFullYear(), 0, 1);
@@ -152,8 +172,8 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
 }
 
 /** Substitutions globales : remplace tous les marqueurs NT Conseils par les données organisme/bénéficiaire. */
-function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo, nbBeneficiaires?: number): string {
-  let txt = src;
+function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo, _nbBeneficiaires?: number): string {
+  let txt = src.normalize("NFC");
   const orgNom = org.nom || "[Organisme]";
   const orgAdresse = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ");
   const orgEmail = org.email || "contact@organisme.fr";
@@ -176,7 +196,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     [/93200\s*Saint[-\s]?\s*Denis/gi, [org.codePostal, org.ville].filter(Boolean).join(" ") || "[CP Ville]"],
     [/\b93200\b/g, org.codePostal || "[CP]"],
     [/Saint[-\s]?\s*Denis/gi, villeOrg],
-    [/Tribunal\s+de\s+Grande\s+Instance\s+de\s+Nanterre/gi, `Tribunal Judiciaire de ${villeOrg}`],
+    [/Tribunal\s+de\s+Grande\s+Instance\s+de\s+Nanterre/gi, tribunalFromCodePostal(org.codePostal)],
     [/902\s*274\s*448\s*000\s*31/g, orgSiret],
     [/902\s*274\s*448/g, orgSiret.replace(/\s/g,"").slice(0,9) || orgSiret],
     [/contact\.ntconseil@gmail\.com/gi, orgEmail],
@@ -251,12 +271,48 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     txt = txt.replace(/22\/02\/2024/g, short);
     txt = txt.replace(/22\/04\/2024/g, short);
   }
-  // Durée de la prestation (24 heures par défaut dans la trame NT Conseils)
-  const duree = (formation?.duree || "").trim();
-  if (duree) {
-    const dureeNorm = /heure/i.test(duree) ? duree : `${duree} heures`;
-    txt = txt.replace(/24\s*heures\s*\/\s*2\s*heures\s*par\s*semaine/gi, dureeNorm);
-    txt = txt.replace(/(?<!\d)24\s*heures/gi, dureeNorm);
+  // Durée de la prestation : durée saisie plafonnée à 24 h (art. L6313-4), identique dans toutes les pièces.
+  const dureeH = dureeBilanH(formation);
+  const dureeNorm = `${dureeH} heures`;
+  const rh = repartitionHeures(dureeH);
+  txt = txt.replace(/24\s*heures\s*\/\s*2\s*heures\s*par\s*semaine/gi, dureeNorm);
+  txt = txt.replace(/(?<!\d)24\s*heures/gi, dureeNorm);
+  txt = txt
+    .replace(/\{H_P1\}/g, String(rh.p1)).replace(/\{H_P2\}/g, String(rh.p2)).replace(/\{H_P3\}/g, String(rh.p3)).replace(/\{H_TOTAL\}/g, String(dureeH))
+    .replace(/\{REPARTITION_HEURES\}/g, `phase préliminaire ${rh.p1} h, phase d'investigation ${rh.p2} h, phase de conclusion ${rh.p3} h`)
+    .replace(/\{DATE_MAJ\}/g, dates.dateVersion)
+    .replace(/\{ORG_NDA_PHRASE\}/g, phraseNda)
+    .replace(/\{TRIBUNAL\}/g, tribunalFromCodePostal(org.codePostal))
+    .replace(/\{CONSULTANT\}/g, formation?.formateur || org.responsablePedagogique || dirigeant);
+
+  // Convention : bipartite / tripartite selon le financeur réel du bénéficiaire.
+  {
+    const pf = s ? profilDeclaratif(s, formation) : null;
+    const tripartite = pf?.origine === "employeur";
+    const entreprise = (s?.entreprise || "").trim();
+    const financement: Record<string, string> = {
+      CPF: "Financement : compte personnel de formation du bénéficiaire, via la plateforme Mon Compte Formation.",
+      employeur: `Financement : ${entreprise || "l'employeur"} prend en charge le coût du bilan au titre de son plan de développement des compétences ; paiement à réception de la facture, après réalisation.`,
+      OPCO: `Financement : ${entreprise || "l'employeur"} prend en charge le coût du bilan au titre de son plan de développement des compétences, avec la participation de son OPCO ; paiement à réception de la facture.`,
+      personnel: "Financement : le bénéficiaire finance personnellement la prestation. Aucune somme n'est exigée avant l'expiration du délai de rétractation ; l'acompte éventuel est ensuite plafonné à 30 % du prix.",
+      "France Travail": "Financement : compte personnel de formation du bénéficiaire, avec abondement éventuel de France Travail selon la décision de son conseiller.",
+      "Région": "Financement : dispositif régional, selon la décision de prise en charge notifiée au bénéficiaire.",
+      "Transitions Pro": "Financement : association Transitions Pro, selon la décision de prise en charge.",
+    };
+    txt = txt
+      .replace(/\{CONVENTION_TITRE\}/g, tripartite ? "CONVENTION TRIPARTITE DE BILAN DE COMPÉTENCES" : "CONTRAT DE PRESTATION DE BILAN DE COMPÉTENCES")
+      .replace(/\{CONVENTION_EMPLOYEUR\}/g, tripartite ? `- **${entreprise || "L'employeur"}**, employeur du bénéficiaire${s?.responsableEntreprise ? `, représenté par ${s.responsableEntreprise}` : ""}${s?.siretEntreprise ? ` — SIRET ${s.siretEntreprise}` : ""}\n\nci-après « l'employeur »,\n\n` : "")
+      .replace(/\{CONVENTION_ACCORD\}/g, "")
+      .replace(/\{CONVENTION_BASE\}/g, tripartite
+        ? "l'article R6313-8 du Code du travail (bilan réalisé dans le cadre du plan de développement des compétences)"
+        : pf?.financeur === "CPF" || pf?.financeur === "France Travail"
+          ? "des articles L6353-3 à L6353-7 du Code du travail et des conditions générales d'utilisation de Mon Compte Formation"
+          : "des articles L6353-3 à L6353-7 du Code du travail")
+      .replace(/\{CONVENTION_FINANCEMENT\}/g, financement[pf?.financeur || "CPF"] || financement.CPF)
+      .replace(/\{CONVENTION_DELAI\}/g, tripartite
+        ? "Le salarié dispose de 10 jours à compter de la transmission de la présente convention pour l'accepter en la signant ; l'absence de réponse vaut refus, lequel ne constitue ni une faute ni un motif de licenciement (art. R6313-8). Le bilan ne débute qu'après signature des trois parties."
+        : DELAI_RETRACTATION_BC)
+      .replace(/\{CONVENTION_EXEMPLAIRES\}/g, tripartite ? "trois" : "deux");
   }
 
   // dates dynamiques
@@ -271,11 +327,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   txt = txt.replace(/\{ORG_NOM\}/g, orgNom);
   txt = txt.replace(/\{DIRIGEANT_ORG\}/g, dirigeantUpper);
   txt = txt.replace(/\{LIEU_FORMATION\}/g, (formation?.lieu || orgAdresse || "[Lieu de formation]"));
-  txt = txt.replace(/\{DUREE_FORMATION\}/g, (() => {
-    const d = (formation?.duree || "").trim();
-    if (!d) return "24 heures";
-    return /heure/i.test(d) ? d : `${d} heures`;
-  })());
+  txt = txt.replace(/\{DUREE_FORMATION\}/g, dureeNorm);
 
   // ----- Placeholders IND 1 (Présentation du bilan) automatisés depuis la formation -----
   const toBullets = (raw: string, fallback: string[]): string => {
@@ -324,15 +376,17 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   })());
   txt = txt.replace(/\{BDC_DUREE_HORAIRES\}/g, (() => {
     const d = (formation?.duree || "").trim();
-    const dureeTxt = d ? (/heure/i.test(d) ? d : `${d} heures`) : "18 heures sur 2 à 5 mois";
+    void d;
     return [
-      "Un premier entretien préalable à l'inscription (1h) gratuit et sans engagement est prévu afin de vérifier que le bilan de compétences répondra aux attentes du bénéficiaire. Une fois l'inscription finalisée, la prestation est de " + dureeTxt + " répartie de la façon suivante :",
+      "Un premier entretien préalable à l'inscription, gratuit et sans engagement, vérifie que le bilan de compétences répondra aux attentes du bénéficiaire. Une fois l'inscription finalisée, la prestation comprend " + dureeNorm + " d'entretiens individuels avec le consultant, répartis en trois phases :",
       "",
-      "- 12h d'entretien individuel (6 rdv de 2 heures ou fréquence personnalisée) réparties sur 3 mois maximum",
+      `- phase préliminaire : ${rh.p1} h`,
       "",
-      "- 6h de travail personnel guidé, de recherche et d'enquête terrain",
+      `- phase d'investigation : ${rh.p2} h (le travail personnel entre les séances n'est pas décompté)`,
       "",
-      "- Le suivi à 6 mois est inclus dans la prestation mais n'est pas comptabilisé dans les heures d'accompagnement",
+      `- phase de conclusion : ${rh.p3} h, avec remise du document de synthèse`,
+      "",
+      "- un entretien de suivi est proposé six mois après la fin du bilan (hors durée facturée)",
     ].join("\n");
   })());
   txt = txt.replace(/\{BDC_LIEU\}/g, (() => {
@@ -352,7 +406,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   })());
   txt = txt.replace(/\{BDC_DELAI_ACCES\}/g, (() => {
     const d = (formation?.delaiAcces || "").trim();
-    if (!d) return "un temps minimum d'un mois";
+    if (!d) return "un délai minimum de 11 jours ouvrés entre l'inscription et le démarrage";
     return /jour|mois|semaine/i.test(d) ? d : `un délai de ${d}`;
   })());
 
@@ -366,12 +420,12 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_TELEPHONE\}/g, orgTel || "");
 
   // Placeholders Entretien annuel / recrutement (IND 21) — alimentés depuis l'organisme + la formation
-  const profileBdc = formation ? getBdcDomainProfile(formation) : null;
+  const profileBdc = domaineMetier(formation);
   const secteurTxt = profileBdc ? `(notamment ${profileBdc.secteur})` : "";
   const secteurPhrase = profileBdc ? ` (notamment dans le secteur ${profileBdc.secteur})` : "";
   const secteurPhrase2 = profileBdc ? ` autour du métier de ${profileBdc.metier} et de secteurs voisins` : " sur des domaines variés";
   txt = txt
-    .replace(/\{ENTRETIEN_DATE\}/g, dates.dateConvention || fmtShortDate(new Date()))
+    .replace(/\{ENTRETIEN_DATE\}/g, dates.dateVersion)
     .replace(/\{ORG_DIRIGEANT\}/g, dirigeant)
     .replace(/\{ORG_NOM\}/g, orgNom)
     .replace(/\{BDC_METIER\}/g, profileBdc?.metier || "le métier visé")
@@ -447,18 +501,6 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 </table>`;
   txt = txt.replace(/\{SIGNATURES_ORG_STAGIAIRE\}/g, signaturesHtml);
 
-  // Bloc "QUELQUES CHIFFRES" : nombre de bénéficiaires automatisé + stats détaillées
-  const nbBen = Math.max(1, nbBeneficiaires ?? 1);
-  const chiffresBloc =
-    `| **${nbBen}**§§BR§§Bénéficiaire${nbBen > 1 ? "s" : ""} accompagné${nbBen > 1 ? "s" : ""} | **100 %** de bilans réalisés jusqu'à leur terme |\n` +
-    `|---|---|\n` +
-    `| **96 %** de satisfaction globale | **93 %** de recommandations |\n` +
-    `| **89 %** de suivis à 6 mois réalisés | **82 %** des bénéficiaires ont confirmé ou concrétisé leur projet professionnel |`;
-  txt = txt.replace(
-    /\|\s*\*\*1\*\*§§BR§§Bénéficiaire\s*\|\s*Taux de satisfaction bénéficiaires\s*:§§BR§§\*\*100\s*%\*\*\s*\|\s*\n\|---\|---\|/,
-    chiffresBloc
-  );
-
   return txt;
 }
 
@@ -490,15 +532,20 @@ function buildOutilPreparatoireMd(
   s: StagiaireInfo,
   org: OrganismeInfo,
   dates: DatesCtx,
+  formation?: FormationInfo,
 ): string {
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
   const email = s.email || "";
   const tel = s.telephone || "";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui" ? "Oui" : "Non";
+  const handicap = s.rqth === "oui" ? "Oui" : "Non";
   const civ = s.civilite === "Mme" ? "Madame" : "Monsieur";
-  const seed = hashStr(`${s.prenom}|${s.nom}|${s.email}`);
+  const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
+  const seed = pf.seed;
+  const rh = repartitionHeures(dureeBilanH(formation));
+  const joursTxt = pf.jours.join(", ");
+  const creneauxTxt = pf.creneaux.map((c) => (c === "apres-midi" ? "après-midi" : c)).join(" et ");
 
   const motivations = [
     `Faire le point sur mon parcours${poste ? ` de ${poste}` : ""} et clarifier mes axes d'évolution`,
@@ -547,16 +594,24 @@ function buildOutilPreparatoireMd(
     "Convention à émettre après validation du devis par le bénéficiaire.",
   ];
 
-  const motivation = pick(motivations, seed, 0);
-  const objectif = pick(objectifs, seed, 1);
-  const rythme = pick(rythmes, seed, 2);
+  void motivations; void objectifs; void rythmes;
+  const motivation = `${pf.motifLibelle}${poste ? ` (poste actuel : ${poste})` : ""}`;
+  const objectif = pf.attente;
+  const rythme = `${rh.p1 + rh.p2 + rh.p3} heures d'entretiens : ${rh.p1} h en phase préliminaire, ${rh.p2} h en investigation, ${rh.p3} h en conclusion ; séances le ${joursTxt}, ${creneauxTxt}`;
   const modalite = pick(modalites, seed, 3);
   const env = pick(environnements, seed, 4);
   const equipe = pick(equipes, seed, 5);
-  const remarque = pick(remarques, seed, 6);
-  const admin = pick(adminNotes, seed, 7);
+  void remarques; void adminNotes;
+  const remarque = `Disponibilités déclarées : ${joursTxt}, ${creneauxTxt}.${entreprise && pf.origine !== "employeur" ? " Démarche personnelle, sans information de l'employeur." : ""}`;
+  const admin = ({
+    CPF: "Financement CPF : inscription à valider sur Mon Compte Formation (démarrage au plus tôt 11 jours ouvrés après validation).",
+    employeur: "Financement employeur : convention tripartite à émettre ; délai de 10 jours laissé au salarié.",
+    OPCO: "Financement employeur avec participation OPCO : convention tripartite à émettre.",
+    personnel: "Financement personnel : contrat à émettre, délai de rétractation à respecter avant tout paiement.",
+    "France Travail": "Financement CPF avec abondement France Travail : accord du conseiller à joindre.",
+  } as Record<string, string>)[pf.financeur] || "Plan de financement à confirmer.";
 
-  const initiative = (s as any).financement && /entreprise|employeur|opco/i.test(String((s as any).financement)) ? "Non — à l'initiative de l'employeur" : "Oui";
+  const initiative = pf.origine === "employeur" ? "Non — à l'initiative de l'employeur (plan de développement des compétences)" : "Oui";
   const contacts = [email, tel].filter(Boolean).join(" · ") || "[Contacts à compléter]";
   const carac = poste ? `Poste actuel : ${poste}${entreprise ? ` — ${entreprise}` : ""}` : "Situation professionnelle à préciser en entretien";
 
@@ -614,37 +669,27 @@ function buildFicheAnalyseBesoinMd(
   const email = s.email || "—";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const anciennete = (s as any).anciennete || "Plusieurs années d'expérience";
-  const consultant = org.responsablePedagogique || org.dirigeant || "Le consultant désigné";
-  const financ = String((s as any).financement || "").toLowerCase();
-  const isSalarie = !!entreprise || /salari|employeur|opco|cpf/i.test(financ);
-  const isDE = /france\s*travail|demandeur|pole/i.test(financ);
-  const isIndep = /indep|libér|auto/i.test(financ);
+  const anciennete = poste ? "Expérience professionnelle sur le poste actuel" : "—";
+  const consultant = formation?.formateur || org.responsablePedagogique || org.dirigeant || "Le consultant désigné";
+  const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
+  const isSalarie = pf.situation === "salarie";
+  const isDE = pf.situation === "demandeur_emploi";
+  const isIndep = pf.situation === "independant";
   const isAutreSitu = !isSalarie && !isDE && !isIndep;
-  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui";
-  const seed = hashStr(`fab|${s.prenom}|${s.nom}`);
-  const origines = ["CPF", "Employeur", "France Travail", "Initiative personnelle", "OPCO"];
-  const origine = financ
-    ? (/employeur|entreprise/.test(financ) ? "Employeur"
-      : /france\s*travail|pole/.test(financ) ? "France Travail"
-      : /cpf/.test(financ) ? "CPF"
-      : /opco/.test(financ) ? "OPCO"
-      : "Initiative personnelle")
-    : pick(origines, seed, 0);
-  const objets = [
-    "Faire le point sur mes compétences",
-    "Préparer une reconversion professionnelle",
-    "Évoluer dans mon métier",
-    "Confirmer un projet professionnel",
-    "Identifier des pistes d'évolution",
-  ];
-  const objet = pick(objets, seed, 1);
-  const formationInit = pick([
-    "Bac général puis formation professionnelle continue",
-    "BTS suivi de plusieurs formations qualifiantes",
-    "CAP et certifications complémentaires en alternance",
-    "Bac+3 dans le domaine puis formations courtes spécialisées",
-  ], seed, 2);
+  const handicap = s.rqth === "oui";
+  const seed = pf.seed;
+  const origine = pf.origine === "employeur" ? (pf.financeur === "OPCO" ? "OPCO" : "Employeur")
+    : pf.origine === "prescripteur" ? "France Travail"
+    : pf.financeur === "CPF" ? "CPF" : "Initiative personnelle";
+  const objetParMotif: Record<string, string> = {
+    point: "Faire le point sur mes compétences",
+    reconversion: "Préparer une reconversion professionnelle",
+    evolution: "Évoluer dans mon métier",
+    confirmer: "Confirmer un projet professionnel",
+    pistes: "Identifier des pistes d'évolution",
+  };
+  const objet = objetParMotif[pf.motif];
+  const formationInit = `Niveau d'études : ${pf.niveauEtudes}`;
   const experiences = poste
     ? `${anciennete} sur le poste de ${poste}${entreprise ? ` au sein de ${entreprise}` : ""}, expériences antérieures en service et coordination`
     : "Plusieurs postes successifs dans le secteur ciblé, avec montée en responsabilités";
@@ -654,27 +699,19 @@ function buildFicheAnalyseBesoinMd(
     "Maîtrise des outils bureautiques, capacités d'analyse et de synthèse",
     "Sens du service, autonomie, adaptation et résolution de problèmes",
   ], seed, 3);
-  const attente = pick([
-    "Clarifier mon projet professionnel et valider sa faisabilité",
-    "Identifier les compétences à renforcer et les formations à mobiliser",
-    "Construire un plan d'action concret et réaliste",
-    "Prendre du recul sur mon parcours et structurer mes choix",
-  ], seed, 4);
-  const objectifsB = pick([
-    "Disposer d'un projet validé et d'un plan d'action sur 12 mois",
-    "Décider sereinement entre évolution interne et mobilité externe",
-    "Engager une démarche de reconversion avec un parcours de formation identifié",
-  ], seed, 5);
-  const contraintesH = pick(["En dehors des heures de bureau", "Le mercredi et le samedi matin", "Soirs après 18h"], seed, 6);
+  const attente = pf.attente;
+  const objectifsB = pf.resultatAttendu;
+  const contraintesH = `Disponible le ${pf.jours.join(", ")}, ${pf.creneaux.map((c) => (c === "apres-midi" ? "après-midi" : c)).join(" et ")}`;
   const contraintesG = pick(["Aucune contrainte particulière", `Déplacements limités à ${org.ville || "la région"}`, "Privilégier le distanciel"], seed, 7);
   const contraintesP = pick(["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"], seed, 8);
   const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
   const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
-  const dureeTxt = (formation?.duree || "").trim() || "24";
-  const dureeH = /heure/i.test(dureeTxt) ? dureeTxt.match(/\d+/)?.[0] || "24" : dureeTxt;
-  const rythme = pick(["2 séances de 2h par semaine", "1 séance de 3h hebdomadaire", "Séances bimensuelles de 3h"], seed, 9);
+  const dureeH = String(dureeBilanH(formation));
+  const nbSeances = benCtx(org, formation, s).ctx.seancesParBeneficiaire;
+  const seancesB = Object.values(nbSeances)[0] || [];
+  const rythme = seancesB.length ? `${seancesB.length} séances individuelles de 2 à 3 heures, du ${fmtShortDate(seancesB[0].date)} au ${fmtShortDate(seancesB[seancesB.length - 1].date)} (planning prévisionnel annexé)` : "Séances de 2 à 3 heures selon le planning prévisionnel";
   const amenagements = handicap
     ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
     : "Aucun aménagement spécifique requis à ce jour";
@@ -812,36 +849,28 @@ function buildFichePrealableMd(
   const email = s.email || "—";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const anciennete = (s as any).anciennete || "Plusieurs années d'expérience";
-  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui";
-  const financ = String((s as any).financement || "").toLowerCase();
-  const seed = hashStr(`prea|${s.prenom}|${s.nom}`);
+  const anciennete = poste ? "Expérience professionnelle sur le poste actuel" : "—";
+  const handicap = s.rqth === "oui";
+  const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
+  const seed = pf.seed;
 
-  const isSalarie = !!entreprise || /salari|employeur|opco/i.test(financ);
-  const isDE = /france\s*travail|demandeur|pole/i.test(financ);
-  const isIndep = /indep|libér|auto/i.test(financ);
-  const isFonc = /fonctionn/i.test(financ);
+  const isSalarie = pf.situation === "salarie";
+  const isDE = pf.situation === "demandeur_emploi";
+  const isIndep = pf.situation === "independant";
+  const isFonc = pf.situation === "fonctionnaire";
   const isAutreSitu = !isSalarie && !isDE && !isIndep && !isFonc;
 
-  const sources = ["Internet", "Réseaux sociaux", "Recommandation", "Employeur", "France Travail"];
-  const source = pick(sources, seed, 0);
-  const finModes = ["CPF", "Employeur", "France Travail", "OPCO", "Financement personnel"];
-  const fin = financ
-    ? (/cpf/.test(financ) ? "CPF"
-      : /employeur|entreprise/.test(financ) ? "Employeur"
-      : /france\s*travail|pole/.test(financ) ? "France Travail"
-      : /opco/.test(financ) ? "OPCO"
-      : "Financement personnel")
-    : pick(finModes, seed, 1);
+  const source = pf.source;
+  const fin = ({ CPF: "CPF", employeur: "Employeur", OPCO: "OPCO", "France Travail": "France Travail", personnel: "Financement personnel" } as Record<string, string>)[pf.financeur] || "CPF";
 
-  const motifs = [
-    "Faire le point sur ma carrière",
-    "Changer de métier",
-    "Évoluer professionnellement",
-    "Identifier mes compétences",
-    "Confirmer un projet professionnel",
-  ];
-  const motif = pick(motifs, seed, 2);
+  const motifParCle: Record<string, string> = {
+    point: "Faire le point sur ma carrière",
+    reconversion: "Changer de métier",
+    evolution: "Évoluer professionnellement",
+    pistes: "Identifier mes compétences",
+    confirmer: "Confirmer un projet professionnel",
+  };
+  const motif = motifParCle[pf.motif];
   const situation = pick([
     `Engagé(e) depuis ${anciennete}${poste ? ` sur le poste de ${poste}` : ""}${entreprise ? ` chez ${entreprise}` : ""}, je souhaite prendre du recul sur mon parcours et clarifier la suite à donner.`,
     `Après une période riche en expériences professionnelles, je ressens le besoin de structurer mes choix d'évolution et de valider un projet à moyen terme.`,
@@ -854,15 +883,14 @@ function buildFichePrealableMd(
     "Élaborer un plan d'action",
     "Mieux me connaître",
   ];
-  const attente = pick(attentes, seed, 4);
-  const resultats = pick([
-    "Un projet professionnel formalisé et un plan d'action sur 6 à 12 mois.",
-    "Une décision éclairée sur la suite à donner à mon parcours et les formations à engager.",
-    "Une feuille de route claire avec des étapes concrètes et des contacts identifiés.",
-  ], seed, 5);
+  const attente = /compétences transférables/.test(pf.attente) ? "Identifier mes compétences et aptitudes"
+    : /plan d'action/.test(pf.attente) ? "Élaborer un plan d'action"
+    : /recul/.test(pf.attente) ? "Mieux me connaître"
+    : pf.motif === "confirmer" ? "Valider un projet existant" : "Construire un projet professionnel";
+  void attentes;
+  const resultats = pf.resultatAttendu;
 
-  const niveaux = ["Sans diplôme", "CAP/BEP", "Bac", "Bac +2", "Bac +3", "Bac +5 et plus"];
-  const niveau = pick(niveaux, seed, 6);
+  const niveau = pf.niveauEtudes;
 
   const exps = pick([
     `Plusieurs postes successifs dans le secteur, avec une montée en responsabilités progressive.`,
@@ -882,10 +910,10 @@ function buildFichePrealableMd(
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
   const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
 
-  const jours = ["Mardi", "Mercredi", "Jeudi", "Samedi"];
-  const joursSel = new Set([pick(jours, seed, 9), pick(jours, seed, 11)]);
+  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+  const joursSel = new Set(pf.jours.map((j) => j.charAt(0).toUpperCase() + j.slice(1)));
   const creneaux = ["Matin", "Après-midi", "Soirée"];
-  const creneauSel = pick(creneaux, seed, 10);
+  const creneauxSel = new Set<string>(pf.creneaux.map((c) => (c === "apres-midi" ? "Après-midi" : c === "soir" ? "Soirée" : "Matin")));
   const obs = pick([
     "Bénéficiaire motivé(e), démarche réfléchie et exprimée clairement.",
     "Bonne capacité d'autonomie attendue dans les phases d'investigation.",
@@ -969,7 +997,7 @@ ${chk(attente === "Mieux me connaître")} Mieux me connaître
 
 **Jours disponibles :** ${jours.map((j) => `${chk(joursSel.has(j))} ${j}`).join(" · ")}
 
-**Créneaux souhaités :** ${creneaux.map((c) => `${chk(c === creneauSel)} ${c}`).join(" · ")}
+**Créneaux souhaités :** ${creneaux.map((c) => `${chk(creneauxSel.has(c))} ${c}`).join(" · ")}
 
 **8. Observations complémentaires**
 
@@ -983,7 +1011,7 @@ ${obs}
 `;
 }
 
-const TEST_POSITIONNEMENT_KEY = "Indicateur 8/Indicateur 8 - Test de positionnement";
+const TEST_POSITIONNEMENT_KEY = "Indicateur 4/Indicateur 4 - Auto-diagnostic préliminaire";
 
 function buildTestPositionnementMd(
   s: StagiaireInfo,
@@ -994,11 +1022,12 @@ function buildTestPositionnementMd(
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const seed = hashStr(`pos|${s.prenom}|${s.nom}|${s.email}`);
-  const orgNom = org.nom || "NT CONSEILS";
+  const pfd = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
+  const seed = pfd.seed;
+  const orgNom = org.nom || "[Organisme]";
 
-  // Profil domaine basé sur l'intitulé de la formation (ex: Pâtisserie & Cake Design)
-  const profile = formation ? getBdcDomainProfile(formation) : null;
+  // Profil métier seulement si l'intitulé désigne un domaine (ex. Pâtisserie & Cake Design)
+  const profile = domaineMetier(formation);
   const metier = profile?.metier || "le métier visé";
   const secteur = profile?.secteur || "le secteur visé";
   void (profile?.missions || []);
@@ -1054,7 +1083,7 @@ function buildTestPositionnementMd(
     `Un travail de fond sur mes compétences transférables${profile ? ` vers ${metier}` : ""}, une validation par des enquêtes métier, et la sécurisation du financement (CPF, autres dispositifs).`,
   ];
 
-  const motivation = pick(motivationsArr, seed, 0);
+  const motivation = pfd.motif === "reconversion" ? motivationsArr[1] : pfd.motif === "confirmer" ? motivationsArr[3] : pfd.motif === "evolution" ? motivationsArr[2] : motivationsArr[0];
   const parcours = pick(parcoursArr, seed, 1);
   const pointsForts = pick(pointsFortsArr, seed, 2);
   const objectifs = pick(objectifsArr, seed, 3);
@@ -1106,7 +1135,9 @@ function buildTestPositionnementMd(
 
   return accordCivilite(`**[${orgNom}]{.underline}**
 
-**TEST DE POSITIONNEMENT**
+**AUTO-DIAGNOSTIC PRÉLIMINAIRE**
+
+_Réalisé lors de l'entretien de la phase préliminaire (art. R6313-4) : il sert à analyser la demande et le besoin, pas à évaluer des acquis._
 
 **Bénéficiaire : ${nom}**${poste ? `\n\n**Poste actuel : ${poste}**` : ""}${entreprise ? `\n\n**Entreprise : ${entreprise}**` : ""}
 
@@ -1134,12 +1165,12 @@ Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
 
 ${attentes}
 
-**GRILLE D'ÉVALUATION DU POSITIONNEMENT INITIAL** _(cotation de 1 à 5 : 1 = très insuffisant, 5 = très satisfaisant)_
+**GRILLE D'ANALYSE DE LA DEMANDE** _(cotation de 1 à 5 : 1 = très insuffisant, 5 = très satisfaisant)_
 
 | Critère évalué | Note | Observation du consultant |
 |---|---|---|
 ${criteres.map((c) => `| ${c.libelle} | **${c.note}/5** | ${c.obs} |`).join("\n")}
-| **TOTAL** | **${totalNote}/${criteres.length * 5}** | Soit ${moyenne20}/20 — niveau de positionnement : **${niveau}** |
+| **TOTAL** | **${totalNote}/${criteres.length * 5}** | Soit ${moyenne20}/20 — maturité du projet : **${niveau}** |
 
 **APPRÉCIATION DU CONSULTANT**
 
@@ -1149,7 +1180,7 @@ ${appreciation}
 
 **Consultant :** ${consultantNom}
 
-**Date de passation :** ${datePassation}
+**Date de l'entretien préliminaire :** ${datePassation}
 
 | Signature du bénéficiaire | Signature du consultant |
 |---|---|
@@ -1162,15 +1193,11 @@ ${appreciation}
 function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string {
   const orgNom = org.nom || "[Organisme]";
   const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
-  const dureeStr = (formation?.duree || "").trim();
-  const total = (() => {
-    const m = dureeStr.match(/(\d+)/);
-    const v = m ? parseInt(m[1], 10) : 24;
-    return v > 0 ? v : 24;
-  })();
-  const hPrelim = Math.max(2, Math.round(total * 0.15));
-  const hConclu = Math.max(2, Math.round(total * 0.20));
-  const hInvest = Math.max(2, total - hPrelim - hConclu);
+  const total = dureeBilanH(formation);
+  const rh = repartitionHeures(total);
+  const hPrelim = rh.p1;
+  const hConclu = rh.p3;
+  const hInvest = rh.p2;
   const hAccomp = total;
 
 
@@ -1178,12 +1205,12 @@ function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?:
 
 **PROGRAMME DÉTAILLÉ DU BILAN DE COMPÉTENCES — LES 3 PHASES**
 
-*Référence réglementaire : articles L.6313-4 et R.6313-4 à R.6313-8 du Code du travail*
+*Référence réglementaire : articles L6313-4 et R6313-4 à R6313-8 du Code du travail*
 
 Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
 Durée totale : **${total} heures** d'accompagnement individuel avec le consultant (dont ${hAccomp} h réparties sur les 3 phases), le travail personnel guidé entre les séances n'étant pas décompté de la durée facturée.
 Consultant référent : ${consultant}
-Modalités générales : prestation **strictement individuelle**, en présentiel dans nos locaux et/ou en visioconférence (au choix du bénéficiaire), séances de 2 à 3 heures espacées de 7 à 15 jours, sur une amplitude maximale de 3 mois. Confidentialité absolue : aucun document n'est transmis à un tiers sans l'accord écrit du bénéficiaire.
+Modalités générales : prestation **strictement individuelle**, en présentiel dans nos locaux et/ou en visioconférence (au choix du bénéficiaire), séances de 2 à 3 heures espacées de 7 à 15 jours, selon le planning prévisionnel signé. Confidentialité absolue : aucun document n'est transmis à un tiers sans l'accord écrit du bénéficiaire.
 
 ---
 
@@ -1191,7 +1218,7 @@ Modalités générales : prestation **strictement individuelle**, en présentiel
 
 | **Objectifs (art. R.6313-4)** | **Contenu / Déroulé** | **Modalités & outils** | **Livrables** |
 |---|---|---|---|
-| • Analyser la demande et le besoin du bénéficiaire§§BR§§• Déterminer le format le plus adapté à la situation et au besoin§§BR§§• Définir conjointement les modalités de déroulement du bilan§§BR§§• Informer sur les conditions de déroulement, méthodes et techniques utilisées | • Accueil, présentation de l'organisme et du cadre déontologique§§BR§§• Recueil de la demande, du contexte et des attentes§§BR§§• Vérification de l'engagement et du consentement§§BR§§• Co-construction du planning des séances§§BR§§• Information sur le financement (CPF, plan de développement, autre) | Entretien individuel en face à face ou visio (1 à 2 séances de 2 h)§§BR§§Fiche préalable au bilan§§BR§§Fiche d'analyse de besoin§§BR§§Test de positionnement§§BR§§Convention tripartite ou bilatérale | Fiche d'analyse de besoin signée§§BR§§Convention de prestation§§BR§§Planning individualisé des séances |
+| • Analyser la demande et le besoin du bénéficiaire§§BR§§• Déterminer le format le plus adapté à la situation et au besoin§§BR§§• Définir conjointement les modalités de déroulement du bilan§§BR§§• Informer sur les conditions de déroulement, méthodes et techniques utilisées | • Accueil, présentation de l'organisme et du cadre déontologique§§BR§§• Recueil de la demande, du contexte et des attentes§§BR§§• Vérification de l'engagement et du consentement§§BR§§• Co-construction du planning des séances§§BR§§• Information sur le financement (CPF, plan de développement, autre) | Entretien individuel en face à face ou visio (1 à 2 séances de 2 h)§§BR§§Fiche préalable au bilan§§BR§§Fiche d'analyse de besoin§§BR§§Auto-diagnostic préliminaire§§BR§§Convention tripartite ou bilatérale | Fiche d'analyse de besoin signée§§BR§§Convention de prestation§§BR§§Planning individualisé des séances |
 
 ---
 
@@ -1213,7 +1240,7 @@ Modalités générales : prestation **strictement individuelle**, en présentiel
 
 ---
 
-**SUIVI À 6 MOIS** *(hors durée réglementaire — inclus dans la prestation)*
+**SUIVI À 6 MOIS** *(proposé au bénéficiaire, hors durée facturée — démarche qualité de l'organisme)*
 
 | **Objectif** | **Modalités** | **Livrable** |
 |---|---|---|
@@ -1227,7 +1254,7 @@ Le déroulé, le rythme, la durée des séances et les supports sont adaptés à
 
 **CONFIDENTIALITÉ**
 
-Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits au terme d'un an, sauf demande contraire du bénéficiaire.
+Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation (conservation de trois ans au plus, art. R6313-7).
 `;
 }
 
@@ -1240,14 +1267,11 @@ function buildPhaseMd(
 ): string {
   const orgNom = org.nom || "[Organisme]";
   const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
-  const total = (() => {
-    const m = (formation?.duree || "").trim().match(/(\d+)/);
-    const v = m ? parseInt(m[1], 10) : 24;
-    return v > 0 ? v : 24;
-  })();
-  const hPrelim = Math.max(2, Math.round(total * 0.15));
-  const hConclu = Math.max(2, Math.round(total * 0.20));
-  const hInvest = Math.max(2, total - hPrelim - hConclu);
+  const total = dureeBilanH(formation);
+  const rh = repartitionHeures(total);
+  const hPrelim = rh.p1;
+  const hConclu = rh.p3;
+  const hInvest = rh.p2;
 
   const head = (titre: string, duree: number, ref: string) => `**[${orgNom}]{.underline}**
 
@@ -1352,7 +1376,7 @@ Portefeuille de compétences · Restitution écrite des tests · Fiches métiers
 
 **Document de synthèse** (propriété exclusive du bénéficiaire) · Plan d'action personnalisé · Certificat de réalisation · Questionnaire de satisfaction à chaud.
 
-**SUIVI À 6 MOIS** *(hors durée réglementaire — inclus dans la prestation)*
+**SUIVI À 6 MOIS** *(proposé au bénéficiaire, hors durée facturée — démarche qualité de l'organisme)*
 
 | **Objectif** | **Modalités** | **Livrable** |
 |---|---|---|
@@ -1360,7 +1384,7 @@ Portefeuille de compétences · Restitution écrite des tests · Fiches métiers
 
 **CONFIDENTIALITÉ**
 
-Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits au terme d'un an, sauf demande contraire du bénéficiaire.
+Conformément à l'article L.6313-4 du Code du travail, les résultats détaillés et le document de synthèse ne peuvent être communiqués à un tiers qu'avec l'accord écrit du bénéficiaire. Les documents élaborés durant le bilan sont détruits dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation (conservation de trois ans au plus, art. R6313-7).
 `;
 }
 
@@ -1373,95 +1397,51 @@ function buildFichePedagogiqueMd(
   org: OrganismeInfo,
   dates: DatesCtx,
   formation?: FormationInfo,
+  stagiaires?: StagiaireInfo[],
 ): string {
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
   const orgNom = org.nom || "[Organisme]";
-  const lieu = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ") || "[Adresse]";
-  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
-  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
-  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
-  const dureeStr = (formation?.duree || "").trim();
-  const dureeTotale = (() => {
-    const m = dureeStr.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : 18;
-  })();
+  const consultant = formation?.formateur || org.responsablePedagogique || org.dirigeant || "[Consultant]";
+  const { ctx, b } = benCtx(org, formation, s, stagiaires);
+  const seances = seancesFor(ctx, b);
+  const p = prestationFor(ctx, b);
+  const lieuPres = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ") || p.lieu;
+  const contenus: Record<1 | 2 | 3, Array<{ titre: string; objectifs: string[]; programme: string[] }>> = {
+    1: [
+      { titre: "Accueil et cadrage", objectifs: ["ACCUEILLIR", "ANALYSER LA DEMANDE", "CONTRACTUALISER"], programme: ["Présentation du cadre déontologique et des modalités du bilan.", "Recueil et analyse de la demande, des attentes et du contexte.", "Validation du planning prévisionnel des séances."] },
+    ],
+    2: [
+      { titre: "Parcours et compétences", objectifs: ["ANALYSER", "IDENTIFIER", "VALORISER"], programme: ["Analyse du parcours professionnel et extra-professionnel.", "Identification des compétences techniques et comportementales.", "Construction du portefeuille de compétences."] },
+      { titre: "Intérêts, valeurs, personnalité", objectifs: ["EXPLORER", "DIAGNOSTIQUER", "PRIORISER"], programme: ["Passation et restitution du questionnaire d'intérêts et du test de personnalité.", "Clarification des valeurs professionnelles et des freins éventuels.", "Hiérarchisation des motivations et des critères de choix."] },
+      { titre: "Pistes professionnelles", objectifs: ["DÉVELOPPER", "CONFRONTER", "VALIDER"], programme: ["Émergence de deux ou trois pistes professionnelles.", "Recherche documentaire (fiches ROME, RNCP, marché de l'emploi).", "Préparation et bilan des enquêtes métier."] },
+    ],
+    3: [
+      { titre: "Plan d'action", objectifs: ["STRUCTURER", "PLANIFIER", "SÉCURISER"], programme: ["Analyse des leviers et des freins du projet.", "Élaboration du plan d'action daté et des financements mobilisables.", "Préparation des étapes à 6 et 12 mois."] },
+      { titre: "Synthèse", objectifs: ["SYNTHÉTISER", "RESTITUER", "SUIVRE"], programme: ["Appropriation des résultats détaillés.", "Remise du document de synthèse au bénéficiaire.", "Proposition de l'entretien de suivi à six mois."] },
+    ],
+  };
+  const rang: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
+  const aujourdhui = Date.now();
+  const blocks = seances.map((se) => {
+    const liste = contenus[se.phase];
+    const c = liste[Math.min(rang[se.phase]++, liste.length - 1)];
+    const realisee = se.date.getTime() <= aujourdhui;
+    return `**SÉANCE ${se.numero} — Phase ${se.phase === 1 ? "préliminaire" : se.phase === 2 ? "d'investigation" : "de conclusion"} — ${c.titre}**
 
-  const sessions = [
-    { titre: "Phase préliminaire — Accueil et cadrage",
-      objectifs: ["ACCUEILLIR", "ANALYSER LA DEMANDE", "CONTRACTUALISER"],
-      programme: [
-        "Présentation du cadre déontologique et des modalités du bilan.",
-        "Recueil et analyse de la demande, attentes et contexte.",
-        "Formalisation du document de contractualisation et planning.",
-      ] },
-    { titre: "Phase d'investigation — Parcours et compétences",
-      objectifs: ["ANALYSER", "IDENTIFIER", "VALORISER"],
-      programme: [
-        "Analyse du parcours professionnel passé.",
-        "Identification des compétences techniques et comportementales.",
-        "Exploration des réalisations et des succès professionnels.",
-      ] },
-    { titre: "Phase d'investigation — Intérêts, valeurs, personnalité",
-      objectifs: ["EXPLORER", "DIAGNOSTIQUER", "PRIORISER"],
-      programme: [
-        "Passation et restitution des tests d'intérêts et de personnalité.",
-        "Clarification des valeurs professionnelles et freins éventuels.",
-        "Hiérarchisation des motivations et critères de choix.",
-      ] },
-    { titre: "Phase d'investigation — Pistes professionnelles",
-      objectifs: ["DEVELOPPER", "CONFRONTER", "VALIDER"],
-      programme: [
-        "Émergence et formalisation de 2 à 3 pistes professionnelles.",
-        "Recherche documentaire métiers, formations et marché de l'emploi.",
-        "Préparation des enquêtes terrain auprès de professionnels.",
-      ] },
-    { titre: "Phase de conclusion — Plan d'action",
-      objectifs: ["STRUCTURER", "PLANIFIER", "SÉCURISER"],
-      programme: [
-        "Élaboration du plan d'action chiffré et calendaire.",
-        "Identification des dispositifs de financement (CPF, autres).",
-        "Préparation des étapes clés sur 6 / 12 / 18 mois.",
-      ] },
-    { titre: "Phase de conclusion — Synthèse et suivi",
-      objectifs: ["SYNTHÉTISER", "RESTITUER", "SUIVI"],
-      programme: [
-        "Rédaction conjointe du document de synthèse du bilan.",
-        "Restitution finale et remise officielle de la synthèse.",
-        "Programmation de l'entretien de suivi à 6 mois.",
-      ] },
-  ];
-
-  const span = fin.getTime() - debut.getTime();
-  const sessionDates = sessions.map((_, idx) =>
-    sessions.length === 1 ? debut : new Date(debut.getTime() + (span * idx) / (sessions.length - 1))
-  );
-  const dureeSeance = Math.max(2, Math.round(dureeTotale / sessions.length));
-
-  const blocks = sessions.map((sess, idx) => {
-    const dateStr = fmtShortDate(sessionDates[idx]);
-    const num = idx + 1;
-    const objLine = sess.objectifs.map(o => `• ${o}`).join(" — ");
-    const prog = sess.programme.map(p => `- ${p}`).join("\n");
-    return `**SÉANCE ${num} — ${sess.titre}**
-
-| **Date :** ${dateStr} | **Objectifs de la séance :** ${objLine} |
+| **Date :** ${fmtShortDate(se.date)} — ${se.heureDebut} à ${se.heureFin} | **Objectifs de la séance :** ${c.objectifs.map((o) => `• ${o}`).join(" — ")} |
 |---|---|
-| **Lieu :** ${lieu} | **Numéro de séance :** ${num} |
-| **Nom du consultant :** ${consultant} | **Durée de la séance :** ${dureeSeance} heures |
+| **Lieu :** ${se.modalite === "distanciel" ? "Visioconférence (lien nominatif)" : lieuPres} | **Numéro de séance :** ${se.numero} sur ${seances.length} |
+| **Nom du consultant :** ${consultant} | **Durée de la séance :** ${se.duree} heure${se.duree > 1 ? "s" : ""} |
 
 **Programme de la séance :**
 
-${prog}
+${c.programme.map((l) => `- ${l}`).join("\n")}
 
-**Remarques et observations :**
-
-| **Retard ou absence :** |
-|---|
-|   |
+**Remarques et observations :** ${realisee ? "séance réalisée conformément au planning." : "séance à venir."}
 `;
   }).join("\n\n");
-
-  return `**[${orgNom}]{.underline}**
+  const total = seances.reduce((a, x) => a + x.duree, 0);
+  return `**${orgNom}**
 
 **FICHE PÉDAGOGIQUE**
 
@@ -1469,7 +1449,7 @@ Bénéficiaire : **${nom}**
 
 Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
 
-Durée totale : ${dureeTotale} heures réparties sur ${sessions.length} séances
+Durée totale : ${total} heures réparties sur ${seances.length} séances (planning prévisionnel signé)
 
 ${blocks}
 `;
@@ -1482,6 +1462,7 @@ function buildEntretienIntermediaireMd(
   org: OrganismeInfo,
   dates: DatesCtx,
   formation?: FormationInfo,
+  stagiaires?: StagiaireInfo[],
 ): string {
   const orgNom = org.nom || "[Organisme]";
   const civ = s.civilite === "Mme" ? "Mme" : "M.";
@@ -1489,12 +1470,49 @@ function buildEntretienIntermediaireMd(
   const email = s.email || "";
   const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
   const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
-  const milieu = new Date((debut.getTime() + fin.getTime()) / 2);
-  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "le consultant").toString();
+  const { ctx, b } = benCtx(org, formation, s, stagiaires);
+  const seancesB = seancesFor(ctx, b);
+  const milieu = seancesB.length ? new Date(seancesB[Math.floor((seancesB.length - 1) / 2)].date) : new Date((debut.getTime() + fin.getTime()) / 2);
+  const consultant = (formation?.formateur || org.responsablePedagogique || org.dirigeant || "le consultant").toString();
 
-  const profile = formation ? getBdcDomainProfile(formation) : null;
+  const profile = domaineMetier(formation);
   const metier = profile?.metier || "le métier visé";
-  const seed = hashStr(`enti|${s.prenom}|${s.nom}|${s.email}`);
+  const seed = b?.profil.seed ?? hashStr(`enti|${s.prenom}|${s.nom}|${s.email}`);
+  if (milieu.getTime() > Date.now()) {
+    return `**${orgNom}**
+
+**ENTRETIEN INTERMÉDIAIRE\\
+BÉNÉFICIAIRE**
+
+**Date prévue de l'entretien :** ${fmtShortDate(milieu)} (séance médiane du planning)
+
+**Bénéficiaire :** ${civ} ${nomComplet}
+
+**Date de début de prestation :** ${fmtShortDate(debut)}
+
+**Date de fin de prestation :** ${fmtShortDate(fin)}
+
+**La prestation correspond-elle à vos attentes ?**
+
+_[À compléter lors de l'entretien]_
+
+**Quels éléments appréciez-vous le plus ?**
+
+_[À compléter lors de l'entretien]_
+
+**Quels éléments appréciez-vous le moins ?**
+
+_[À compléter lors de l'entretien]_
+
+**Le consultant communique-t-il d'une façon claire et dynamique ?**
+
+_[À compléter lors de l'entretien]_
+
+**Avez-vous des remarques à nous formuler ?**
+
+_[À compléter lors de l'entretien]_
+`;
+  }
   const pickP = (arr: string[], off: number) => arr.length ? arr[(seed + off) % arr.length] : "";
   const technique = profile ? pickP(profile.techniques, 0) : "";
   const transv = profile ? pickP(profile.transversales, 1) : "";
@@ -1570,242 +1588,14 @@ ${remarques}
 `, s.civilite);
 }
 
-// ===== Questionnaires de satisfaction (IND 30) =====
-
-const SAT_ENTREPRISE_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise";
-const SAT_FINANCEUR_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur";
-const SAT_INTERNE_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne";
-
-function row4(label: string, score: 1 | 2 | 4 | 5): string {
-  const s = (v: 1 | 2 | 4 | 5) => (v === score ? "**X**" : "");
-  return `| ${label} | ${s(1)} | ${s(2)} | ${s(4)} | ${s(5)} |`;
-}
-function row10(score: number): string {
-  const cells = Array.from({ length: 10 }, (_, i) => (i + 1 === score ? "**X**" : ""));
-  return `| ${cells.join(" | ")} |`;
-}
-
-function buildSatisfactionEntrepriseMd(
-  s: StagiaireInfo,
-  _org: OrganismeInfo,
-  _dates: DatesCtx,
-  formation?: FormationInfo,
-): string {
-  const civ = s.civilite === "Mme" ? "Mme" : "M.";
-  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
-  const entreprise = (s.entreprise || "").trim();
-  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
-  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
-  const seed = hashStr(`sat-ent|${s.prenom}|${s.nom}|${s.email}`);
-  const sc = (off: number): 4 | 5 => ((seed + off) % 4 === 0 ? 4 : 5);
-  const note10 = 8 + ((seed >> 2) % 3);
-  // Aucun contenu du projet du bénéficiaire ne peut figurer ici (art. L6313-4) :
-  // l'entreprise n'a pas connaissance du document de synthèse.
-  const commentaire = `RAS — Relation avec l'organisme fluide, informations administratives claires et transmises dans les délais. Aucun point d'insatisfaction à signaler.`;
-
-  // Sans employeur au dossier, la pièce est sans objet : mention de non-applicabilité.
-  if (!entreprise) {
-    return `**QUESTIONNAIRE SATISFACTION\\
-ENTREPRISE**
-
-*${civ} ${nomComplet} a réalisé un bilan de compétences dans le cadre d'une démarche strictement individuelle, du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.*
-
-${mentionStatut("NON_APPLICABLE", { motif: "démarche individuelle : aucun employeur ni commanditaire n'est partie à la prestation", dateConstat: fmtShortDate(fin) })}
-`;
-  }
-
-  return `**QUESTIONNAIRE SATISFACTION\\
-ENTREPRISE**
-
-*Ce questionnaire a pour objectif d'évaluer avec vous les bilans de compétences que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes.*
-
-*${civ} ${nomComplet}${entreprise ? ` (${entreprise})` : ""}§§BR§§a participé à notre formation Bilan de compétences§§BR§§durant la période du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.*
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-| **Concernant ce bilan de compétences, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-${row4("Informations obtenues avant le début de la prestation (programme / tarifs)", sc(0))}
-${row4("Programme et méthodes pédagogiques", sc(1))}
-${row4("Compétences acquises par le bénéficiaire", sc(2))}
-${row4("Informations obtenues au terme de la prestation", sc(3))}
-${row4("Gestion administrative globale du dossier du bénéficiaire", sc(4))}
-${row4("Adéquation globale de la prestation vis-à-vis de vos attentes", sc(5))}
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la prestation écoulée ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-${row10(note10)}
-
-*Pas du tout satisfait → Très satisfait*
-
-| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
-|---|
-| ${commentaire} |
-`;
-}
-
-function buildSatisfactionFinanceurMd(
-  s: StagiaireInfo,
-  org: OrganismeInfo,
-  _dates: DatesCtx,
-  formation?: FormationInfo,
-): string {
-  const civ = s.civilite === "Mme" ? "Mme" : "M.";
-  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
-  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
-  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
-  const seed = hashStr(`sat-fin|${s.prenom}|${s.nom}|${s.email}`);
-  const sc = (off: number): 4 | 5 => ((seed + off) % 5 === 0 ? 4 : 5);
-  const note10 = 8 + ((seed >> 1) % 3);
-  const orgNom = org.nom || "[Organisme]";
-  const profilFinanceur = "☒ CPF (Compte Personnel de Formation)  ☐ France Travail  ☐ Région  ☐ Entreprise  ☐ Autre";
-  const commentaire = `RAS — Dossier traité avec rigueur et dans les délais. L'organisme ${orgNom} a fourni l'ensemble des pièces administratives demandées (convention, attestation, certificat de réalisation). Aucun point d'insatisfaction à signaler.`;
-
-  return `**QUESTIONNAIRE SATISFACTION\\
-FINANCEUR**
-
-*Ce questionnaire a pour objectif d'évaluer avec vous la prestation que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes.*
-
-*${civ} ${nomComplet}§§BR§§a participé à notre prestation : Bilan de compétences§§BR§§durant la période du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.§§BR§§Cette prestation a été financée par vos soins.*
-
-**Profil financeur :** ${profilFinanceur}
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-| **Concernant cette prestation, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-${row4("Informations obtenues avant le début du bilan de compétences (programme / tarifs)", sc(0))}
-${row4("Informations obtenues au terme de la prestation", sc(1))}
-${row4("Gestion administrative globale du dossier du bénéficiaire", sc(2))}
-${row4("Contacts avec l'organisme de formation", sc(3))}
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la formation écoulée ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-${row10(note10)}
-
-*Pas du tout satisfait → Très satisfait*
-
-| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
-|---|
-| ${commentaire} |
-`;
-}
-
-function buildSatisfactionInterneMd(
-  s: StagiaireInfo,
-  org: OrganismeInfo,
-  _dates: DatesCtx,
-  _formation?: FormationInfo,
-): string {
-  const seed = hashStr(`sat-int|${s.prenom}|${s.nom}|${s.email}`);
-  const sc = (off: number): 4 | 5 => ((seed + off) % 4 === 0 ? 4 : 5);
-  const note10 = 8 + ((seed >> 3) % 3);
-  const orgNom = org.nom || "notre organisme";
-
-  const sec = (title: string, rows: string[]) => `**${title}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-${rows.join("\n")}
-`;
-
-  const s1 = sec("1) [Perception de l'image du service]{.underline}", [
-    row4("Mon service a une bonne image à l'extérieur.", sc(1)),
-    row4("Mon service communique suffisamment avec la population du territoire.", sc(2)),
-    row4("Je suis fier de travailler dans mon service.", sc(3)),
-    row4("Je suis optimiste sur l'avenir de mon service.", sc(4)),
-  ]);
-  const s2 = sec("2) [Qualité perçue de la prise en charge]{.underline}", [
-    row4("Mon service est fortement attaché à satisfaire les clients.", sc(5)),
-    row4("J'ai une bonne image de la qualité de prise en charge proposée par mon service.", sc(6)),
-    row4("Mes horaires de travail sont adaptés à la prise en charge des clients.", sc(7)),
-  ]);
-  const s3 = sec("3) [Organisation et cadre de travail]{.underline}", [
-    row4("L'organisation du travail est adaptée à la prise en charge des clients.", sc(8)),
-    row4("Les conditions d'hygiène et de sécurité sont satisfaisantes.", sc(9)),
-    row4("Les équipements et matériels utilisés permettent de répondre aux besoins des clients.", sc(10)),
-    row4("Mon travail quotidien correspond à ce qui est décrit dans ma fiche de poste.", sc(11)),
-    row4("La coordination entre les équipes est satisfaisante.", sc(12)),
-    row4("L'existence de procédures m'aide à la réalisation de mes tâches professionnelles.", sc(13)),
-  ]);
-  const s4 = sec("4) [Management, ambiance de travail]{.underline}", [
-    row4("Les personnels d'encadrement sont fortement impliqués dans la recherche de la satisfaction des clients.", sc(14)),
-    row4("Les personnels d'encadrement sont à l'écoute des remarques que je leur transmets.", sc(15)),
-    row4("J'ai la possibilité de m'exprimer pour améliorer mes pratiques professionnelles.", sc(16)),
-    row4("J'ai suffisamment de marge de manœuvre pour répondre aux besoins des clients.", sc(17)),
-    row4("L'ambiance de travail est bonne.", sc(18)),
-    row4("Mon travail est reconnu de manière appropriée.", sc(19)),
-    row4("Mon service prend en compte le mieux possible la conciliation vie professionnelle et vie personnelle.", sc(20)),
-    row4("Je dispose d'espaces de paroles identifiés où je peux échanger librement.", sc(21)),
-  ]);
-  const s5 = sec("5) [Formation et intégration des salariés]{.underline}", [
-    row4("Je dispose des compétences et connaissances requises pour mon poste.", sc(22)),
-    row4("Je suis satisfait des formations proposées par mon service.", sc(23)),
-    row4("L'intégration du personnel nouveau est satisfaisante.", sc(24)),
-  ]);
-  const s6 = sec("6) [Information, participation et communication interne]{.underline}", [
-    row4("Les informations que je reçois me permettent de savoir ce qui se passe dans mon service.", sc(25)),
-    row4("Je suis informé des orientations, des projets de mon service.", sc(26)),
-    row4("Je connais mes droits et mes obligations.", sc(27)),
-  ]);
-  const sFin = sec("[Questions finales]{.underline}", [
-    row4("En résumé, toutes les conditions sont réunies dans mon service pour que je puisse satisfaire les clients.", sc(28)),
-  ]);
-
-  return `**QUESTIONNAIRE SATISFACTION INTERNE**
-
-En réalisant cette enquête, nous souhaitons vous associer à la dynamique d'amélioration de la qualité dans et de notre service. Votre participation est précieuse.
-
-Merci d'accepter de participer à la démarche et de consacrer quelques minutes à ce questionnaire.
-
-À l'issue de l'enquête, nous vous présenterons les résultats pour l'ensemble du service.
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-${s1}
-${s2}
-${s3}
-${s4}
-${s5}
-${s6}
-${sFin}
-
-**Sur 10, quel est votre niveau de satisfaction générale concernant votre poste ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-${row10(note10)}
-
-*Pas du tout satisfait → Très satisfait*
-
-| **Avez-vous des remarques, des suggestions ou des commentaires à effectuer ?** |
-|---|
-| RAS — Bonne dynamique d'équipe et organisation claire chez ${orgNom}. Les conditions de travail sont satisfaisantes et permettent un accompagnement de qualité des bénéficiaires. |
-`;
-}
-
-/** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
-function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
+function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo, stagiaires?: StagiaireInfo[]): string | null {
   if (!s) return null;
-  if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
-  if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
-  if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation);
-  if (key === ENTRETIEN_INTER_KEY) return buildEntretienIntermediaireMd(s, org, dates, formation);
-  if (key === SAT_ENTREPRISE_KEY) return buildSatisfactionEntrepriseMd(s, org, dates, formation);
-  if (key === SAT_FINANCEUR_KEY) return buildSatisfactionFinanceurMd(s, org, dates, formation);
-  if (key === SAT_INTERNE_KEY) return buildSatisfactionInterneMd(s, org, dates, formation);
+  if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates, formation);
   if (key === FICHE_ANALYSE_BESOIN_KEY) return buildFicheAnalyseBesoinMd(s, org, dates, formation);
   if (key === FICHE_PREALABLE_KEY) return buildFichePrealableMd(s, org, dates, formation);
+  if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
+  if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation, stagiaires);
+  if (key === ENTRETIEN_INTER_KEY) return buildEntretienIntermediaireMd(s, org, dates, formation, stagiaires);
   return null;
 }
 
@@ -2125,6 +1915,7 @@ export function renderBdcNTDocHtml(
   stagiaire: StagiaireInfo | null,
   formation?: FormationInfo,
   nbBeneficiaires?: number,
+  stagiaires?: StagiaireInfo[],
 ): string {
   const raw = BDC_NT_SOURCE[key];
   const title = bdcDocTitle(key);
@@ -2132,7 +1923,7 @@ export function renderBdcNTDocHtml(
     return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
   const dates = computeDates(stagiaire || undefined, org, formation);
-  const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation);
+  const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation, stagiaires);
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation, nbBeneficiaires);
   // BLOCS 3/5/6/9 — vocabulaire BC, droit à jour, anti-fabrication, corrections de rendu
@@ -2274,6 +2065,18 @@ function mapAssetPathToCriterePath(zipPath: string): string {
   return zipPath;
 }
 
+/** Anonymise une pièce nominative sensible (synthèse, test) pour le dossier d'audit. */
+function anonymiser(md: string, s: StagiaireInfo): string {
+  const initiales = `${(s.prenom || "").charAt(0)}. ${(s.nom || "").charAt(0)}.`.trim();
+  let out = md;
+  const noms = [`${s.prenom} ${s.nom}`, `${s.nom} ${s.prenom}`, s.nom, s.prenom].filter((x) => x && x.trim().length > 1);
+  for (const n of noms) out = out.split(n).join(initiales);
+  return out.replace(/^.*Né\(e\) le.*$/gm, "");
+}
+
+/** Pièces nominatives dont le contenu n'est versé au dossier d'audit qu'anonymisé (art. L6313-4). */
+const PIECES_CONFIDENTIELLES = /document de synth[èe]se du bilan|test de personnalit[ée]/i;
+
 export async function buildBDCNTConseilsZip(
   org: OrganismeInfo,
   formation: FormationInfo,
@@ -2283,46 +2086,34 @@ export async function buildBDCNTConseilsZip(
   const zip = new JSZip();
   const keys = Object.keys(BDC_NT_SOURCE).sort();
   const benList = beneficiaires.length > 0 ? beneficiaires : [{
-    civilite: "M.", nom: "BENEFICIAIRE", prenom: "Modèle", email: "", telephone: "",
+    civilite: "", nom: "BÉNÉFICIAIRE", prenom: "Modèle", email: "", telephone: "",
     entreprise: "", poste: "", dateNaissance: "",
   } as StagiaireInfo];
 
-  // MESSAGE 23 — le LISEZMOI est écrit en fin de génération, avec le décompte
-  // réel des fichiers et le nom de l'organisme du dossier (jamais celui d'un tiers).
-
-
   let step = 0;
-  const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length;
+  const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length + BDC_TEMPLATES_MANQUANTS.length * benList.length + 10;
   const advance = (msg: string) => {
     step++;
     reporter?.setProgress(Math.min(99, (step / Math.max(1, totalSteps)) * 100));
     reporter?.setMessage(msg);
   };
 
-  // BLOC 1 — source unique de vérité + collecte des rendus pour la validation (BLOC 2)
+  // Source unique de vérité + collecte des rendus pour le contrôle de cohérence (console)
   const bdcCtx = buildBdcContext(org, formation, benList);
   const renduParDocument: Record<string, string> = {};
   const renduParBeneficiaire: Record<string, string[]> = {};
   const nomsDocuments: string[] = [];
-
   const collect = (title: string, md: string, s: StagiaireInfo | null) => {
     const key = s ? `${title} — ${s.prenom} ${s.nom}` : title;
     renduParDocument[key] = md;
     nomsDocuments.push(title);
-    if (s) {
-      const id = `${s.prenom} ${s.nom}`;
-      (renduParBeneficiaire[id] ||= []).push(md);
-    }
+    if (s) (renduParBeneficiaire[`${s.prenom} ${s.nom}`] ||= []).push(md);
   };
 
-  // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
-    // BLOCS 3/5/6/9
     md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title) });
-
-    // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
       md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
     }
@@ -2331,71 +2122,43 @@ export async function buildBDCNTConseilsZip(
       md = md.replace(/(^|\n)\s*Signature\s*$/m, `$1Signature${tampon}`);
       if (!/<img[^>]+Tampon/i.test(md)) md += tampon;
     }
-
     collect(title, md, s);
     const html = mdToHtml(md, title, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
     return await htmlToWordBlob(html);
   };
+  const dossier = (ind: number) => `Critere_${critereForIndicateur(ind)}/Indicateur_${ind}`;
 
-
+  // === 1. Pièces de la trame (source nettoyée — même rendu que le catalogue) ===
   for (const key of keys) {
     const folder = key.includes("/") ? key.split("/")[0] : "";
-    const critereFolder = mapFolderToCriterePath(folder);
+    const critereFolder = mapFolderToCriterePath(folder) || dossier(indicateurFromKey(key));
     const baseName = fileTitle(key);
-    const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
     const raw = BDC_NT_SOURCE[key];
-    const tplMapping = BDC_TEMPLATES[key];
-
-    if (isPerBen) {
+    if (BDC_NT_PER_BENEFICIAIRE.has(key)) {
       for (const s of benList) {
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
-        const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
-        let blob: Blob;
-        let ext: "docx" | "xlsx" = "docx";
-        if (tplMapping) {
-          const r = await renderBdcTemplateIfMapped(key, org, formation, s);
-          blob = r!.blob; ext = r!.extension;
-        } else {
-          const dts = computeDates(s, org, formation);
-          const personalized = getPersonalizedRaw(key, s, org, dts, formation);
-          blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
-        }
-        const path = critereFolder
-          ? `${critereFolder}/${benFolder}/${baseName}.${ext}`
-          : `Divers/${benFolder}/${baseName}.${ext}`;
-        zip.file(path, blob);
-
+        const dts = computeDates(s, org, formation);
+        const personalized = getPersonalizedRaw(key, s, org, dts, formation, benList);
+        const blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
+        zip.file(`${critereFolder}/Bénéficiaire - ${s.prenom} ${s.nom}/${baseName}.docx`, blob);
       }
     } else {
       advance(baseName);
-      let blob: Blob;
-      let ext: "docx" | "xlsx" = "docx";
+      const tplMapping = BDC_TEMPLATES[key];
       if (tplMapping) {
         const r = await renderBdcTemplateIfMapped(key, org, formation, null);
-        blob = r!.blob; ext = r!.extension;
-      } else {
-        blob = await genDocx(raw, baseName, null);
+        if (r) { zip.file(`${critereFolder}/${baseName}.${r.extension}`, r.blob); continue; }
       }
-      const path = critereFolder ? `${critereFolder}/${baseName}.${ext}` : `${baseName}.${ext}`;
-      zip.file(path, blob);
+      zip.file(`${critereFolder}/${baseName}.docx`, await genDocx(raw, baseName, null));
     }
   }
 
-
-  // === Indicateur 10 : programme détaillé des 3 phases du bilan de compétences ===
-
+  // === 2. Programme des 3 phases (IND 6) et fiches par phase (IND 10) ===
   {
-    const baseName = "Indicateur 10 - Programme des 3 phases du bilan de compétences";
-    advance(baseName);
-    const dates = computeDates(benList[0], org, formation);
-    const md = buildProgrammePhasesMd(org, dates, formation);
-    const blob = await genDocx(md, baseName, null);
-    zip.file(`${mapFolderToCriterePath("Indicateur 10")}/${baseName}.docx`, blob);
-  }
-
-  // === Indicateur 10 : une fiche détaillée par phase réglementaire ===
-  {
-    const dates = computeDates(benList[0], org, formation);
+    const dates = computeDates(undefined, org, formation);
+    const nomProg = "Indicateur 6 - Programme des 3 phases du bilan de compétences";
+    advance(nomProg);
+    zip.file(`${dossier(6)}/${nomProg}.docx`, await genDocx(buildProgrammePhasesMd(org, dates, formation), nomProg, null));
     const phases: Array<{ n: 1 | 2 | 3; nom: string }> = [
       { n: 1, nom: "Indicateur 10 - Phase 1 - Phase préliminaire" },
       { n: 2, nom: "Indicateur 10 - Phase 2 - Phase d'investigation" },
@@ -2403,23 +2166,17 @@ export async function buildBDCNTConseilsZip(
     ];
     for (const p of phases) {
       advance(p.nom);
-      const md = buildPhaseMd(p.n, org, dates, formation);
-      const blob = await genDocx(md, p.nom, null);
-      zip.file(`${mapFolderToCriterePath("Indicateur 10")}/${p.nom}.docx`, blob);
+      zip.file(`${dossier(10)}/${p.nom}.docx`, await genDocx(buildPhaseMd(p.n, org, dates, formation), p.nom, null));
     }
   }
 
-
-
-  // Static assets — si un template automatisé existe pour la clé, on l'utilise à la place.
+  // === 3. Ressources statiques (calendrier annuel, contacts Agefiph) ===
   for (const a of BDC_NT_STATIC_ASSETS) {
     advance(a.zipPath.split("/").pop() || a.zipPath);
     try {
-      // Cherche un template mappé via le nom de l'asset (sans extension)
       const keyNoExt = a.zipPath.replace(/\.(xlsx|docx|pdf)$/i, "");
-      const tplMapping = BDC_TEMPLATES[keyNoExt];
       let buf: ArrayBuffer | null = null;
-      if (tplMapping) {
+      if (BDC_TEMPLATES[keyNoExt]) {
         const r = await renderBdcTemplateIfMapped(keyNoExt, org, formation, null);
         if (r) buf = await r.blob.arrayBuffer();
       }
@@ -2429,74 +2186,100 @@ export async function buildBDCNTConseilsZip(
       }
       if (buf) zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
     } catch (e) {
-      console.warn("[BDC NT] asset failed", a.src, e);
+      console.warn("[BDC] ressource indisponible", a.src, e);
     }
   }
 
-  // === MESSAGE 21 : les 4 classeurs autrefois importés sont désormais produits ===
+  // === 4. Classeurs (suivi de l'adaptation, contacts handicap, dysfonctionnements…) ===
   for (const c of BDC_CLASSEURS) {
     advance(c.name);
     try {
       const html = c.build(bdcCtx);
-      zip.file(`Critere_${critereForIndicateur(c.indicateur)}/Indicateur_${c.indicateur}/${c.name}`, htmlToXlsxBlob(html));
-      // MESSAGE 22 : le contrôle de cohérence doit lire aussi les .xlsx
+      zip.file(`${dossier(c.indicateur)}/${c.name}`, htmlToXlsxBlob(html));
       collect(c.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
       console.warn("[BDC] classeur échoué", c.name, e);
     }
   }
 
-  // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
-  const ind2Folder = mapFolderToCriterePath("Indicateur 2");
+  // === 5. IND 2 : indicateurs calculés à partir des pièces réelles ===
   for (const file of BDC_NT_STATS_FILES) {
     advance(file.name);
     try {
       const html = file.build(org, formation, benList);
-      const blob = htmlToXlsxBlob(html);
-      zip.file(`${ind2Folder}/${file.name}`, blob);
+      zip.file(`${dossier(2)}/${file.name}`, htmlToXlsxBlob(html));
       collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
-      console.warn("[BDC NT] stats xlsx failed", file.name, e);
+      console.warn("[BDC] indicateurs IND 2 échoués", file.name, e);
     }
   }
 
+  // === 6. Suivi à 6 mois par bénéficiaire (IND 30) ===
+  for (let i = 0; i < benList.length; i++) {
+    const s = benList[i];
+    advance(`Compte rendu de suivi à 6 mois — ${s.prenom} ${s.nom}`);
+    try {
+      const html = buildSuivi6MoisIndividuel(org, formation, s, i);
+      zip.file(`${dossier(30)}/Bénéficiaire - ${s.prenom} ${s.nom}/Indicateur 30 - Compte rendu de suivi à 6 mois.docx`, await htmlToWordBlob(html));
+    } catch (e) {
+      console.warn("[BDC] suivi 6 mois échoué", e);
+    }
+  }
 
-  // === BLOC 4 : pièces obligatoires manquantes (document de synthèse, émargements, etc.) ===
+  // === 7. Pièces obligatoires BC (synthèse, émargements, veilles, plan de développement…) ===
   for (const def of BDC_TEMPLATES_MANQUANTS) {
-    const dossier = `Critere_${critereForIndicateur(def.indicateur)}/Indicateur_${def.indicateur}`;
+    if (!bdcTemplateApplicable(def, formation)) continue;
+    const dossierDef = dossier(def.indicateur);
     if (def.parBeneficiaire) {
       for (let i = 0; i < benList.length; i++) {
         const s = benList[i];
         const b = bdcCtx.beneficiaires[i] ?? null;
         advance(`${def.nom} — ${s.prenom} ${s.nom}`);
         try {
-          const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+          let md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
           collect(def.nom, md, s);
+          // Confidentialité (L6313-4) : la synthèse et les résultats de tests ne sont versés
+          // au dossier d'audit qu'anonymisés ; l'attestation de remise reste nominative.
+          const confidentiel = PIECES_CONFIDENTIELLES.test(def.nom);
+          if (confidentiel) md = `> _Copie anonymisée versée au dossier qualité — l'original nominatif est remis au seul bénéficiaire (art. L6313-4 du Code du travail)._\n\n${anonymiser(md, s)}`;
           const dates = computeDates(s, org, formation);
-          const html = mdToHtml(md, def.nom, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
-          zip.file(`${dossier}/Bénéficiaire - ${s.prenom} ${s.nom}/${def.nom}.docx`, await htmlToWordBlob(html));
+          const html = mdToHtml(md, def.nom, org, confidentiel ? null : s).replace("</body>", buildFooter(org, dates) + "</body>");
+          zip.file(`${dossierDef}/Bénéficiaire - ${s.prenom} ${s.nom}/${def.nom}${confidentiel ? " (anonymisé)" : ""}.docx`, await htmlToWordBlob(html));
         } catch (e) {
-          console.warn("[BDC] template manquant échoué", def.nom, e);
+          console.warn("[BDC] pièce échouée", def.nom, e);
         }
       }
     } else {
       advance(def.nom);
       try {
-        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, bdcCtx.beneficiaires[0] ?? null), bdcCtx, bdcCtx.beneficiaires[0] ?? null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, null), bdcCtx, null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
         collect(def.nom, md, null);
-        const dates = computeDates(benList[0], org, formation);
+        const dates = computeDates(undefined, org, formation);
         const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
-        zip.file(`${dossier}/${def.nom}.docx`, await htmlToWordBlob(html));
+        zip.file(`${dossierDef}/${def.nom}.docx`, await htmlToWordBlob(html));
       } catch (e) {
-        console.warn("[BDC] template manquant échoué", def.nom, e);
+        console.warn("[BDC] pièce échouée", def.nom, e);
       }
     }
   }
 
-  // === LISEZMOI — décompte réel, organisme du dossier (MESSAGE 23) ===
+  // === 8. Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32 ===
   {
-    const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((f) => !f.endsWith("/"));
-    const nominatifs = fichiers.filter((f) => /Bénéficiaire - /.test(f)).length;
+    const pieces2026: Array<{ ind: number; nom: string; html: string }> = [
+      { ind: 27, nom: "Indicateur 27 - Registre de sous-traitance et de portage salarial", html: genRegistreSousTraitancePortage(org, "BC", formation, benList) },
+      { ind: 27, nom: "Indicateur 27 - Annexe clauses qualité des contrats de sous-traitance", html: genClausesQualiteContrat(org, "BC") },
+      { ind: 32, nom: "Indicateur 32 - Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
+    ];
+    for (const p of pieces2026) {
+      advance(p.nom);
+      zip.file(`${dossier(p.ind)}/${p.nom}.docx`, await htmlToWordBlob(p.html));
+    }
+  }
+
+  // === LISEZMOI ===
+  {
+    const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((x) => !x.endsWith("/"));
+    const nominatifs = fichiers.filter((x) => /Bénéficiaire - /.test(x)).length;
     const readme = [
       `DOSSIER BILAN DE COMPÉTENCES — ${(org.nom || "").toUpperCase()}`,
       "=".repeat(40),
@@ -2504,67 +2287,30 @@ export async function buildBDCNTConseilsZip(
       `Organisme : ${org.nom}`,
       `SIRET : ${org.siret}    NDA : ${org.nda}`,
       `Bénéficiaires : ${benList.length}`,
-      `Édition du ${fmtDateFR(new Date())}`,
+      `Référentiel : référentiel national qualité, décret n° 2026-728 (33 indicateurs) — indicateurs non applicables au bilan de compétences : 3, 7, 8, 13, 14, 15, 16, 20, 28, 29, 33.`,
       "",
       "Structure :",
       "  - Critere_X / Indicateur_Y / documents collectifs",
       "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+      "  - Les documents de synthèse et tests sont versés anonymisés (art. L6313-4) ; l'attestation de remise est nominative.",
       "",
-      `Fichiers du dossier : ${fichiers.length + 2}`,
-      `Dont pièces nominatives : ${nominatifs} (${benList.length ? Math.round(nominatifs / benList.length) : 0} par bénéficiaire)`,
-      "",
-      "Le fichier 00_CONTROLE_DE_COHERENCE.txt liste les règles bloquantes et les alertes.",
-      "Aucune donnée du dossier ne doit être postérieure à la date d'édition ci-dessus.",
+      `Fichiers du dossier : ${fichiers.length + 1}`,
+      `Dont pièces nominatives : ${nominatifs}`,
     ].join("\n");
     zip.file("LISEZMOI.txt", readme);
-    collect("LISEZMOI", readme, null);
   }
 
-  // === BLOC 2 + BLOC 8 : rapport de contrôle de cohérence et couverture des indicateurs ===
+  // Contrôle de cohérence : conservé pour l'outil (console), jamais versé au dossier d'audit.
   try {
-    const rapport = validerDossierBDC(bdcCtx, {
-      parDocument: renduParDocument,
-      parBeneficiaire: renduParBeneficiaire,
-      noms: nomsDocuments,
-    });
-    const couverture = calculerCouverture(nomsDocuments);
-    const applicables = couverture.filter((c) => c.statut !== "non_applicable");
-    const lignes: string[] = [
-      "CONTRÔLE DE COHÉRENCE DU DOSSIER — BILAN DE COMPÉTENCES",
-      "=======================================================",
-      `Arrêté au ${fmtDateFR(new Date())}`,
-      `Organisme : ${bdcCtx.organisme.raisonSociale} — SIRET ${bdcCtx.organisme.siret}`,
-      mentionNDA(bdcCtx.organisme),
-      `Bénéficiaires : ${bdcCtx.beneficiaires.length}`,
-      `Nature de l'engagement : ${typeContrat(bdcCtx.prestation).libelle}`,
-      `Financeur : ${bdcCtx.prestation.financeur}`,
-      `Prix : ${formatPrix(bdcCtx.organisme, bdcCtx.prestation)}`,
-      formatDuree(bdcCtx.prestation),
-      "",
-      "RÈGLES BLOQUANTES",
-      "-----------------",
-      ...rapport.bloquantes.map((x) => `[${x.ok ? "OK " : "KO "}] ${x.code} — ${x.libelle}${x.ok ? "" : ` → ${x.message || ""}`}${x.details?.length ? `\n        ${x.details.join("\n        ")}` : ""}`),
-      "",
-      "ALERTES",
-      "-------",
-      ...rapport.alertes.map((x) => `[${x.ok ? "OK " : "!! "}] ${x.code} — ${x.libelle}${x.ok ? "" : ` → ${x.message || ""}`}`),
-      "",
-      "COUVERTURE DES INDICATEURS",
-      "--------------------------",
-      `Indicateurs applicables : ${applicables.length} — non applicables en BC : ${INDICATEURS_NON_APPLICABLES_BC.join(", ")}`,
-      ...couverture.map((c) => `Indicateur ${String(c.indicateur).padStart(2, "0")} (C${c.critere}) : ${c.statut.toUpperCase()}${c.piecesAttendues.length ? ` — attendu : ${c.piecesAttendues.join(" ; ")}` : ""}`),
-      "",
-      `EXPORT ${rapport.exportAutorise ? "CONFORME" : "NON CONFORME — corriger les règles KO ci-dessus"}`,
-    ];
-    zip.file("00_CONTROLE_DE_COHERENCE.txt", lignes.join("\n"));
+    const rapport = validerDossierBDC(bdcCtx, { parDocument: renduParDocument, parBeneficiaire: renduParBeneficiaire, noms: nomsDocuments });
+    const ko = rapport.bloquantes.filter((x) => !x.ok);
+    if (ko.length) console.warn("[BDC] contrôle de cohérence — règles KO :", ko.map((x) => `${x.code} ${x.message || ""}`));
   } catch (e) {
-    console.warn("[BDC] rapport de cohérence échoué", e);
+    console.warn("[BDC] contrôle de cohérence échoué", e);
   }
-
 
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
-  // STORE + streamFiles : PDF/XLSX déjà compressés → ZIP plus rapide et moins de RAM
   const blob = await zip.generateAsync(
     { type: "blob", compression: "STORE", streamFiles: true },
     (meta) => reporter?.setProgress(Math.min(100, 99 + meta.percent / 100))

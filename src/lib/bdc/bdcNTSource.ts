@@ -6,12 +6,9 @@ export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
   "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire",
   "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique",
   "Indicateur 10/Indicateur 10 - Suivi de l_adaptation \u00e0 l_accompagnement",
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne",
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise",
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur",
   "Indicateur 5/Indicateur 5 - Outil pr\u00e9paratoire",
-  "Indicateur 8/Indicateur 8 - Mail test de positionnement",
-  "Indicateur 8/Indicateur 8 - Test de positionnement",
+  "Indicateur 4/Indicateur 4 - Mail auto-diagnostic préliminaire",
+  "Indicateur 4/Indicateur 4 - Auto-diagnostic préliminaire",
   "Indicateur 9/Indicateur 9 - CGV",
   "Indicateur 9/Indicateur 9 - Certificat de r\u00e9alisation",
   "Indicateur 9/Indicateur 9 - Droit \u00e0 l_image",
@@ -23,319 +20,70 @@ export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
 ]);
 
 export const BDC_NT_SOURCE: Record<string, string> = {
-  "Indicateur 1/1. Process g\u00e9n\u00e9ral": `# 1. Diffusion de l'information
+  "Indicateur 1/1. Process g\u00e9n\u00e9ral": `# Process général du bilan de compétences — {ORG_NOM}
 
-Lorsqu\\'une demande concernant la prestation arrive, ABDULHALIK
-ANTTOISSE envoie systématiquement le PDF de présentation du bilan de
-compétences intitulé « Présentation du bilan ». Cette première
-communication permet au bénéficiaire de prendre connaissance de l'offre
-proposée.
+_Version du {DATE_MAJ}. Ce process décrit le parcours d'un bénéficiaire, de la première demande au suivi à six mois ; chaque étape renvoie à la pièce du dossier qualité qui en garde la trace._
 
-Si aucun retour n'est reçu sous trois jours, ABDULHALIK ANTTOISSE
-effectue une relance téléphonique afin de s\\'assurer que le mail a bien
-été reçu et répondre aux éventuelles questions du bénéficiaire.
+| Étape | Qui | Quand | Pièce du dossier (indicateur) |
+|---|---|---|---|
+| 1. Information du public : présentation du bilan, cadre légal, tarifs, délais, accessibilité | {ORG_DIRIGEANT} | Avant toute inscription | Présentation du bilan, cadre légal, calendrier annuel (IND 1) ; indicateurs de résultats (IND 2) |
+| 2. Entretien préalable gratuit : analyse de la demande, vérification que le bilan est la réponse adaptée | Consultant | Avant la contractualisation | Fiche préalable, fiche d'analyse du besoin, auto-diagnostic préliminaire, outil préparatoire (IND 4) |
+| 3. Définition des objectifs et du déroulé adaptés au bénéficiaire | Consultant | Phase préliminaire | Objectifs opérationnels (IND 5), contenus et modalités, programme des 3 phases (IND 6) |
+| 4. Contractualisation : contrat (bénéficiaire) ou convention tripartite (employeur), planning prévisionnel, CGV, règlement intérieur | {ORG_DIRIGEANT} | Avant la première séance ; rétractation ou délai de 10 jours respectés | Convention, planning signé (IND 10) ; CGV, règlement intérieur, livret d'accueil (IND 9) |
+| 5. Réalisation des trois phases, émargement de chaque séance, adaptation du rythme | Consultant | Du premier au dernier entretien | Fiche pédagogique, entretien intermédiaire, suivi de l'adaptation (IND 10) ; émargements (IND 11) |
+| 6. Prévention des abandons : relance après toute absence, entretien en cas d'arrêt | Consultant | En continu | Process et guide d'entretien des abandons (IND 12) |
+| 7. Phase de conclusion : remise du document de synthèse au seul bénéficiaire | Consultant | Dernière séance | Document de synthèse, attestation de remise (IND 11) ; accord de conservation (IND 9) |
+| 8. Recueil des appréciations et traitement des réclamations | {REF_QUALITE} | Fin de bilan, puis à six mois | Questionnaires à chaud et à froid (IND 30) ; procédure de réclamation (IND 31) |
+| 9. Amélioration continue et analyse des risques qualité | {REF_QUALITE} | En continu, revue annuelle | Tableau d'amélioration continue, analyse des risques (IND 32) |
 
-# 2. Analyse du besoin
-
-Lorsque le bénéficiaire manifeste un intérêt pour le bilan de
-compétences, ABDULHALIK ANTTOISSE procède à une analyse approfondie de
-son besoin ou de celui de l'entreprise. Ce travail se fait à l'aide du
-document « Analyse des besoins ».
-
-Si le bénéficiaire se trouve en situation de handicap, une analyse
-spécifique est menée afin d'identifier les besoins particuliers et, si
-nécessaire, définir avec lui les aménagements et adaptations appropriés.
-Ces échanges s'appuient sur les documents « Accueil des bénéficiaires en
-situation de handicap -- entretien » et « Accueil des bénéficiaires en
-situation de handicap -- bilan ».
-
-Dans le cas où les adaptations ne sont pas envisageables, ABDULHALIK
-ANTTOISSE oriente le bénéficiaire vers un organisme compétent, en
-s'appuyant sur « Partenaires nationaux handicap » et « Contacts et suivi
-handicap ».
-
-# 3. Contractualisation de la prestation
-
-Après réalisation de l'analyse des besoins, ABDULHALIK ANTTOISSE
-contractualise la prestation à venir avec le bénéficiaire. Cette étape
-se formalise par la signature de documents tels que le « Contrat de
-formation », la « Convention de formation » et le « Programme de
-formation ».
-
-# 4. Information des publics bénéficiaires
-
-Une fois le délai de rétractation de dix jours écoulé, ABDULHALIK
-ANTTOISSE informe les publics bénéficiaires sur les conditions de
-déroulement de la prestation. Il leur transmet notamment le « Livret
-d'accueil », les « Informations périphériques à la prestation », le
-« Mail type début de prestation », le « Règlement intérieur » ainsi que
-le document relatif au « Droit à l'image ».
-
-# 5. Mise à disposition des moyens
-
-Avant le début de la prestation, ABDULHALIK ANTTOISSE veille à la mise à
-disposition des moyens techniques adaptés et à l'existence d'un
-environnement approprié pour le bon déroulement de la formation. Il
-s'assure de tout cela grâce à la « Liste de vérification », le document
-« Moyens techniques et environnement » et le « Mail type aide à la
-connexion ».
-
-Si la prestation implique des sous-traitants, il contractualise
-également avec eux via le « Contrat de sous-traitance ».
-
-# 6. Réalisation du test de positionnement
-
-Lors de la première heure de la prestation, ABDULHALIK ANTTOISSE réalise
-un test de positionnement. Ce test permet d'évaluer le niveau initial du
-bénéficiaire, en s'appuyant sur le document « Test de positionnement ».
-
-# 7. Réalisation de la formation
-
-La prestation se déroule selon un séquençage précis, documenté dans
-« Séquençage de la prestation ». Pendant la formation, ABDULHALIK
-ANTTOISSE assure le suivi de l'accompagnement mis en place si besoin, en
-utilisant des outils tels que la « Fiche pédagogique » et le « Suivi de
-l'adaptation à l'accompagnement et à l'apprentissage ».
-
-En cas d'abandon, il contacte le bénéficiaire pour en comprendre les
-raisons et assure le suivi grâce au « Guide d'entretien des abandons ».
-Si des difficultés ou réclamations surviennent, il les traite
-directement et assure leur suivi à l'aide du « Tableau des
-dysfonctionnements ».
-
-# 8. Réalisation de l'évaluation finale
-
-Lors de la dernière heure de la prestation, ABDULHALIK ANTTOISSE procède
-à l'évaluation finale et corrige les réponses en les argumentant, en
-s'appuyant sur le document « Évaluation finale ».
-
-# 9. Mise à disposition du bénéficiaire des ressources pédagogiques
-
-À la fin de la prestation, les apprenants reçoivent une fiche
-récapitulative et les ressources pédagogiques nécessaires, conformément
-au document « Ressources pédagogiques ».
-
-# 10. Évaluation de la satisfaction des parties prenantes
-
-Après la prestation, ABDULHALIK ANTTOISSE envoie un questionnaire de
-satisfaction à l'ensemble des parties prenantes : apprenants,
-entreprises, financeurs et équipes pédagogiques. Les questionnaires
-utilisés sont « Questionnaire satisfaction apprenant », « Questionnaire
-satisfaction entreprise », « Questionnaire satisfaction financeur » et
-« Questionnaire satisfaction équipe pédagogique ».
-
-Il profite de cet envoi pour joindre le « Certificat de réalisation ».
-Si aucun retour n'est reçu après sept jours, il effectue une relance.
-
-# 11. Analyse de la satisfaction des parties prenantes
-
-Dès réception des questionnaires de satisfaction, ABDULHALIK ANTTOISSE
-analyse les réponses en équipe, en se référant aux documents « Mesures
-d'amélioration apprenant », « Mesures d'amélioration entreprise »,
-« Mesures d'amélioration financeur », « Mesures d'amélioration équipe
-pédagogique » et « Template réunion ».
-
-Si cela s'avère nécessaire, il met en œuvre de nouvelles mesures pour
-assurer l'amélioration continue des formations et de l'organisme, en
-utilisant le « Tableau d'amélioration continue ».
+**Destruction des documents** : dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi (trois ans au plus, art. R6313-7 du Code du travail).
 `,
-  "Indicateur 1/Indicateur 1 - Cadre l\u00e9gal et r\u00e9glementaire": `# Analyse et valorisation de votre parcours professionnel
+  "Indicateur 1/Indicateur 1 - Cadre l\u00e9gal et r\u00e9glementaire": `# {ORG_NOM}
 
 ## Cadre légal et réglementaire du bilan de compétences
 
-Le bilan de compétences est un dispositif permettant d'analyser vos
-compétences professionnelles et personnelles, ainsi que vos aptitudes et
-vos motivations. Il constitue un véritable appui pour élaborer un projet
-d'évolution professionnelle, voire de formation, et peut se révéler être
-un tremplin pour votre carrière.
+_Document d'information remis avant tout engagement — version du {DATE_MAJ}._
 
-## Qu'est-ce que le bilan de compétences ?
+## Définition
 
-Le bilan de compétences offre la possibilité de faire le point sur votre
-parcours professionnel. Il vise à vous aider à définir un projet
-professionnel cohérent ou à valider un projet de formation. Il
-intervient souvent lors d'une période de transition, qu'il s'agisse d'un
-licenciement, d'un départ de l'entreprise, d'une volonté d'évolution de
-poste ou d'un souhait de réorientation vers un autre métier. Ce
-dispositif vous permet de répondre à vos interrogations en matière de
-gestion de carrière et favorise la recherche d'un emploi épanouissant.
+Le bilan de compétences permet à un actif d'analyser ses compétences professionnelles et personnelles, ses aptitudes et ses motivations afin de définir un projet professionnel et, le cas échéant, un projet de formation (art. L6313-1 et L6313-4 du Code du travail). Il ne peut être réalisé qu'avec le **consentement** du bénéficiaire ; le refus d'un salarié d'y consentir ne constitue ni une faute ni un motif de licenciement.
 
-Tout au long du bilan, un consultant vous accompagne pour valoriser
-votre expérience et votre profil, quels que soient votre âge, votre
-statut ou votre niveau d'études. Le bilan de compétences peut être
-réalisé pendant ou en dehors du temps de travail, au sein d'un organisme
-agréé de votre choix, qui garantit la confidentialité totale de la
-démarche.
+## Déroulement : trois phases obligatoires (art. R6313-4)
 
-## Objectifs du bilan de compétences
+- **Phase préliminaire** : analyser la demande et le besoin, déterminer le format le plus adapté, définir conjointement les modalités de déroulement.
+- **Phase d'investigation** : construire le projet professionnel et en vérifier la pertinence, ou élaborer une ou plusieurs alternatives.
+- **Phase de conclusion** : s'approprier les résultats détaillés, recenser les conditions et moyens favorisant la réalisation du projet, prévoir les principales étapes de sa mise en œuvre.
 
-Le bilan de compétences poursuit plusieurs objectifs :
+La durée du bilan est de **24 heures au plus** (art. L6313-4). Chez {ORG_NOM}, elle est de {DUREE_FORMATION}.
 
-- Analyser ses compétences personnelles et professionnelles, ses
-  aptitudes et ses motivations ;
+## Résultats et confidentialité
 
-- Définir un projet professionnel ou, le cas échéant, un projet de
-  formation ;
+- Les résultats détaillés et le **document de synthèse** sont remis au **seul bénéficiaire** ; ils ne peuvent être communiqués à un tiers qu'avec son accord (art. L6313-4).
+- Les personnes chargées du bilan sont tenues au **secret professionnel** (art. 226-13 et 226-14 du Code pénal).
+- Les documents élaborés pour le bilan sont **détruits dès le terme de l'action** ; par exception, ils peuvent être conservés trois ans au plus sur accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation (art. R6313-7).
+- Un employeur ne peut pas réaliser lui-même le bilan de ses salariés (art. R6313-5).
 
-- Utiliser ses atouts comme levier de négociation pour un emploi, une
-  formation ou une évolution de carrière.
+## Financements mobilisables en 2026
 
-## Conditions d'accès au bilan de compétences
+| Situation | Dispositif | Formalité |
+|---|---|---|
+| Actif (salarié, indépendant, demandeur d'emploi) à son initiative | Compte personnel de formation (CPF), via Mon Compte Formation | Inscription sur la plateforme ; début de la prestation au plus tôt 11 jours ouvrés après la validation |
+| Salarié, à l'initiative de l'employeur | Plan de développement des compétences (financement employeur, éventuellement OPCO) | Convention tripartite ; le salarié dispose de 10 jours pour l'accepter (art. R6313-8) |
+| Salarié en congé de reclassement | Financement employeur | Convention tripartite (art. R6313-8) |
+| Demandeur d'emploi | CPF, éventuellement abondé par France Travail | Échange préalable avec le conseiller France Travail |
+| Tout public | Financement personnel | Contrat de prestation ; rétractation de 10 jours (art. L6353-5), 14 jours à distance (art. L221-18 du Code de la consommation) |
 
-Le bilan de compétences est accessible à différents publics :
+Lorsque le bilan est suivi **pendant le temps de travail**, l'accord de l'employeur est requis ; en dehors du temps de travail et à l'initiative du salarié, l'employeur n'a pas à en être informé.
 
-- Salariés du secteur privé, en contrat à durée indéterminée ou
-  déterminée ;
+## Engagements de l'organisme
 
-- Demandeurs d'emploi, après une demande auprès de Pôle emploi, de
-  l'APEC ou de Cap emploi ;
+- Organisation identifiée dédiée aux bilans (art. R6313-6), consultant désigné pour toute la durée du bilan.
+- Méthodes et outils d'investigation présentés au bénéficiaire en phase préliminaire.
+- Neutralité : aucune orientation vers une prestation de l'organisme.
+- Accessibilité : un référent handicap étudie toute demande d'adaptation avant le démarrage.
+- Qualité : organisme engagé dans la démarche de certification qualité (référentiel national qualité, décret n° 2026-728 du 1er août 2026).
 
-- Salariés du secteur public (fonctionnaires, agents non
-  titulaires\\...), selon des textes spécifiques mais dans des conditions
-  proches de celles des salariés du privé (par exemple, congé de 24
-  heures).
-
-Lorsque le salarié est à l'initiative du bilan, il peut mobiliser ses
-droits à la formation et réaliser le bilan en dehors de son temps de
-travail, sans obligation d'informer l'employeur. En revanche, s'il
-souhaite le faire sur son temps de travail, il doit obtenir l'accord
-préalable de son employeur selon les modalités d'utilisation de ses
-droits à la formation.
-
-- Pour un salarié en CDI : il doit justifier de cinq années de salariat
-  (consécutives ou non), dont douze mois dans l'entreprise actuelle. Un
-  délai de franchise de cinq ans est requis entre deux bilans.
-
-- Pour un salarié en CDD : il doit justifier de vingt-quatre mois de
-  salariat (consécutifs ou non) au cours des cinq dernières années, dont
-  quatre mois au cours des douze derniers mois.
-
-Si l'initiative vient de l'entreprise, le bilan de compétences ne peut
-être réalisé qu'avec le consentement du salarié. Une convention
-tripartite est alors signée entre le salarié, l'employeur et l'organisme
-prestataire, précisant notamment les objectifs, le contenu, la durée,
-les modalités de réalisation et de restitution des résultats, ainsi que
-le coût et les modalités de règlement du bilan. Le salarié dispose d'un
-délai de dix jours pour accepter la convention. L'absence de réponse
-vaut refus, sans conséquence fautive ni motif de licenciement. Lorsque
-le bilan est réalisé sur le temps de travail, il est assimilé à
-l'exécution normale du contrat, et son coût est pris en charge par
-l'employeur, sauf mobilisation des droits à la formation.
-
-## Conditions spécifiques selon le statut
-
-- Pour les intérimaires : cinq ans d'ancienneté et 2 028 heures dans
-  l'entreprise de travail temporaire concernée sont exigés. Un
-  intérimaire ayant travaillé trois ans dans la même branche, dont un an
-  dans l'agence actuelle, peut également bénéficier d'un bilan.
-
-- Pour les salariés du secteur public : depuis 2007, le droit à la
-  formation permet d'accéder à un bilan professionnel après dix ans de
-  service, notamment dans une perspective d'évolution géographique ou
-  professionnelle.
-
-- Pour les demandeurs d'emploi : le bilan est accessible après trois ans
-  d'expérience professionnelle, pour les personnes de moins de 55 ans au
-  chômage depuis plus de six mois.
-
-- Pour les personnes de plus de 45 ans : le droit au bilan est
-  automatique sur demande. Une ancienneté de vingt ans ouvre également
-  ce droit.
-
-Lorsque le bilan est réalisé sur le temps de travail, il est considéré
-comme une activité normale et son coût est pris en charge par
-l'employeur, sauf si les droits à la formation sont mobilisés.
-
-## Déroulement du bilan de compétences
-
-Le bilan de compétences se déroule en trois phases obligatoires, sous la
-conduite d'un prestataire, avec une durée adaptée à chaque étape selon
-les besoins du bénéficiaire :
-
-1.  Phase préliminaire :
-
-2.  Confirmer l'engagement du bénéficiaire dans la démarche ;
-
-3.  Définir et analyser la nature des besoins ;
-
-4.  Informer sur les conditions de déroulement, les méthodes et les
-    techniques utilisées.
-
-5.  Phase d'investigation :
-
-6.  Analyser les motivations et intérêts professionnels et personnels ;
-
-7.  Identifier les compétences et aptitudes, et éventuellement évaluer
-    les connaissances générales ;
-
-8.  Déterminer les possibilités d'évolution professionnelle.
-
-9.  Phase de conclusion :
-
-10. Restituer les résultats détaillés de la phase d'investigation au
-    travers d'entretiens personnalisés ;
-
-11. Recenser les facteurs favorisant ou non la réalisation d'un projet
-    professionnel ou de formation ;
-
-12. Prévoir, si besoin, les étapes principales de la mise en œuvre du
-    projet.
-
-## Durée et lieu du bilan de compétences
-
-La durée du bilan varie selon les besoins individuels, sans excéder
-vingt-quatre heures, généralement réparties sur plusieurs semaines. Le
-bilan de compétences est obligatoirement réalisé par un prestataire
-extérieur à l'entreprise ; il ne peut être organisé en interne pour les
-salariés. Le recours à un organisme de formation agréé est
-indispensable.
-
-## Financement du bilan de compétences
-
-Le coût d'un bilan de compétences varie entre 1 000 et 3 000 euros.
-Plusieurs dispositifs existent pour en permettre le financement, selon
-la situation professionnelle du bénéficiaire.
-
-### 1. Financement dans le cadre du Congé individuel de formation (CIF)
-
-Le CIF permet à tout salarié de suivre, à son initiative, des actions de
-formation, dont le bilan de compétences. Deux cas sont distingués :
-
-- Salariés en CDI : cinq ans d'activité professionnelle doivent être
-  justifiés, dont douze mois dans l'entreprise actuelle.
-
-- Salariés en CDD : vingt-quatre mois d'activité salariée, dont quatre
-  mois au cours des douze derniers mois.
-
-Le CIF peut être réalisé en dehors du temps de travail (sans
-autorisation de l'employeur) ou sur le temps de travail (avec
-autorisation). Pour cela, il faut s'adresser à un OPCA.
-
-### 2. Financement par un OPACIF (ex : FONGECIF)
-
-Un organisme tel que le FONGECIF peut prendre en charge l'intégralité du
-coût du bilan de compétences. Le coût moyen est d'environ 1 800 € TTC,
-mais il varie selon les cabinets, les régions et les exigences des
-financeurs. Les salariés n'ont alors rien à payer, mais il n'y a pas
-d'indemnité pendant ou hors temps de travail.
-
-### 3. Financement au titre du plan de formation de l'entreprise
-
-Les entreprises de plus de cinquante salariés doivent prévoir des
-actions de formation pour leur personnel. Le bilan de compétences peut
-ainsi être demandé par l'employeur, avec l'accord du salarié, ou par le
-salarié lors de l'entretien annuel. Chaque demande donne lieu à une
-convention tripartite clarifiant les modalités d'accomplissement du
-bilan.
-
-### 4. Financement pour les demandeurs d'emploi
-
-Les demandeurs d'emploi peuvent bénéficier d'un financement dans le
-cadre de l'Aide Individuelle à la Formation (AIF) de Pôle Emploi, afin
-de compléter le financement d'une formation, notamment via le DIF
-portable (Droit individuel à la formation). Enfin, il est également
-possible de mobiliser son Compte personnel de formation (CPF) pour
-réaliser un bilan de compétences.
+{ORG_NDA_PHRASE}
 `,
   "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `# {ORG_NOM}
 
@@ -347,7 +95,7 @@ SIRET : {ORG_SIRET}
 
 **Construction et sécurisation du projet professionnel**
 
-**Durée totale : {DUREE_FORMATION} sur 1 mois maximum**
+**Durée totale : {DUREE_FORMATION} d'entretiens individuels, répartis sur la période du bilan**
 **Tarif : {BDC_TARIF_RAW}**
 
 # 1. PRÉSENTATION
@@ -434,11 +182,11 @@ Le bilan de compétences permet au bénéficiaire :
 
 Tarif total du bilan de compétences : {BDC_TARIF_RAW}
 
-Ce tarif comprend l'intégralité de la prestation de bilan de compétences d'une durée de {DUREE_FORMATION} réparties sur 1 mois maximum, comprenant notamment :
+Ce tarif comprend l'intégralité de la prestation de bilan de compétences d'une durée de {DUREE_FORMATION} d'entretiens individuels, comprenant notamment :
 
-- Les 18 heures d'entretiens individuels avec le consultant ;
+- Les {DUREE_FORMATION} d'entretiens individuels avec le consultant ({REPARTITION_HEURES}) ;
 
-- Les 6 heures de travail personnel guidé ;
+- L'accompagnement du travail personnel entre les séances (non décompté de la durée facturée) ;
 
 - Les outils et supports d'investigation effectivement utilisés selon les besoins du bénéficiaire ;
 
@@ -468,7 +216,7 @@ Les conditions de financement et les éventuels restes à charge sont communiqu�
 
 # 6. DURÉE ET ORGANISATION
 
-Durée totale : {DUREE_FORMATION} réparties sur 1 mois maximum.
+Durée totale : {DUREE_FORMATION} d'entretiens individuels ({REPARTITION_HEURES}).
 
 Un entretien préalable à l'inscription, gratuit et sans engagement, peut être réalisé afin d'analyser la demande, de présenter la prestation et de vérifier son adéquation avec les attentes du bénéficiaire.
 
@@ -476,9 +224,9 @@ Cet entretien préalable n'est pas comptabilisé dans les {DUREE_FORMATION} du b
 
 ## Répartition des {DUREE_FORMATION}
 
-- 18 heures d'entretiens individuels avec le consultant ;
+- {DUREE_FORMATION} d'entretiens individuels avec le consultant ;
 
-- 6 heures de travail personnel guidé.
+- du travail personnel guidé entre les séances, non décompté de la durée facturée.
 
 Le calendrier est individualisé et défini avec le bénéficiaire.
 
@@ -486,7 +234,7 @@ Pour les inscriptions réalisées via EDOF, un délai minimum de 14 jours est ap
 
 # 7. PHASE 1 – PHASE PRÉLIMINAIRE
 
-## Durée : 2 heures
+## Durée : {H_P1} heures
 
 Cette première phase permet d'analyser la demande du bénéficiaire et de définir les modalités de déroulement du bilan.
 
@@ -518,19 +266,19 @@ Cette première phase permet d'analyser la demande du bénéficiaire et de défi
 
 Formalisation des besoins et des objectifs individualisés du bénéficiaire.
 
-Durée : 2 heures d'entretien individuel.
+Durée : {H_P1} heures d'entretien individuel.
 
 # 8. PHASE 2 – PHASE D'INVESTIGATION
 
-## Durée totale : 18 heures
+## Durée totale : {H_P2} heures d'entretiens individuels
 
 La phase d'investigation constitue la partie principale du bilan.
 
-Elle comprend : 12 heures d'entretiens individuels + 6 heures de travail personnel guidé.
+Elle comprend {H_P2} heures d'entretiens individuels, complétées par du travail personnel guidé entre les séances (non décompté).
 
 ## Séance 1 – Analyse du parcours personnel et professionnel
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -556,7 +304,7 @@ Première cartographie du parcours, des expériences et des acquis du bénéfici
 
 ## Séance 2 – Motivations, intérêts et valeurs professionnelles
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -594,7 +342,7 @@ Les outils réellement utilisés sont adaptés au bénéficiaire et tracés dans
 
 ## Séance 3 – Identification et analyse des compétences
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -622,7 +370,7 @@ Les outils réellement utilisés sont adaptés au bénéficiaire et tracés dans
 
 ## Séance 4 – Exploration des pistes professionnelles
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 Les pistes étudiées sont déterminées en fonction des éléments identifiés au cours des étapes précédentes et ne sont pas imposées à l'avance.
 
@@ -652,7 +400,7 @@ Sélection argumentée de pistes professionnelles à approfondir.
 
 ## Séance 5 – Enquête et confrontation des projets à la réalité
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -696,7 +444,7 @@ Sélection argumentée de pistes professionnelles à approfondir.
 
 ## Séance 6 – Construction et validation du projet professionnel
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -724,9 +472,9 @@ Formalisation d'un projet professionnel principal et, lorsque cela est pertinent
 
 # 9. TRAVAIL PERSONNEL GUIDÉ
 
-## Durée : 6 heures
+## Travail personnel guidé
 
-Le bénéficiaire réalise 6 heures de travail personnel guidé, réparties sur la durée du bilan.
+Le bénéficiaire réalise un travail personnel guidé entre les séances (recherches, enquêtes métier) ; ce temps n'est pas décompté de la durée facturée.
 
 Selon les besoins identifiés, ce travail peut comprendre :
 
@@ -762,7 +510,7 @@ Le consultant donne les consignes et ressources nécessaires. Les travaux réali
 
 # 10. PHASE 3 – PHASE DE CONCLUSION
 
-## Durée : 4 heures
+## Durée : {H_P3} heures
 
 La phase de conclusion permet au bénéficiaire de s'approprier les résultats détaillés de la phase d'investigation et de formaliser son projet.
 
@@ -796,18 +544,18 @@ La phase de conclusion permet au bénéficiaire de s'approprier les résultats d
 
 - Organisation du suivi post-bilan.
 
-Durée : 4 heures d'entretien individuel.
+Durée : {H_P3} heures d'entretien individuel.
 
 # 11. RÉPARTITION DES 24 HEURES
 
 | Phase | Entretiens individuels | Travail personnel | Total |
 |---|---|---|---|
-| Phase préliminaire | 2 h | – | 2 h |
-| Phase d'investigation | 12 h | 6 h | 18 h |
-| Phase de conclusion | 4 h | – | 4 h |
-| TOTAL | 18 h | 6 h | 24 h |
+| Phase préliminaire | {H_P1} h | – | {H_P1} h |
+| Phase d'investigation | {H_P2} h | non décompté | {H_P2} h |
+| Phase de conclusion | {H_P3} h | – | {H_P3} h |
+| TOTAL | {H_TOTAL} h | – | {H_TOTAL} h |
 
-Durée totale : 24 heures sur 1 mois maximum.
+Durée totale : {DUREE_FORMATION}.
 
 # 12. MÉTHODES ET MOYENS D'ACCOMPAGNEMENT
 
@@ -1123,133 +871,74 @@ bénéficiaires :**
 | - Externe                                                             |
 +-----------------------------------------------------------------------+
 `,
-  "Indicateur 10/Indicateur 10 - Convention de prestation": `**[NT CONSEILS]{.underline}**
+  "Indicateur 10/Indicateur 10 - Convention de prestation": `**{ORG_NOM}**
 
-**CONVENTION DE PRESTATION\\
-BILAN DE COMPETENCES**
+**{CONVENTION_TITRE}**
 
 **ENTRE LES SOUSSIGNÉS :**
 
-\\- **{CIV_NOM_BENEF}**
+- **{CIV_NOM_BENEF}**
 
 {BENEF_INFOS_BLOC}
 
-Ci-dessus désigné le bénéficiaire,
+ci-après « le bénéficiaire »,
 
-Et
+{CONVENTION_EMPLOYEUR}- **{ORG_NOM}**, représenté par {DIRIGEANT_ORG}, SIRET {ORG_SIRET}
 
-\\- **NT CONSEILS**
+{ORG_NDA_PHRASE}
 
-Représenté par ABDOULHALIK ANTTOISSE
+ci-après « l'organisme »,
 
-N° SIRET : {ORG_SIRET}
+est conclu{CONVENTION_ACCORD} le présent document en application de {CONVENTION_BASE} et de l'article L6313-4 du Code du travail.
 
-N° Déclaration d'activité : {ORG_NDA}
+**1. Objet**
 
-Enregistré auprès du préfet de la région ÎLE DE FRANCE
+L'organisme réalise un bilan de compétences au profit du bénéficiaire, qui atteste du caractère volontaire de sa démarche et y consent.
 
-est signée la présente convention en application des dispositions de
-l'article R6313-8 du Code du travail relatif au bilan de compétences
-dans le cadre de la formation professionnelle continue.
+**2. Conditions de réalisation**
 
-**1**. L'employeur ci-dessus désigné prend en charge les frais afférents
-au bilan de compétences réalisé par \\" bénéficiaire \\" à sa demande ou
-avec son accord, et mis en œuvre par
+- Durée : {DUREE_FORMATION} d'entretiens individuels avec le consultant ({REPARTITION_HEURES})
+- Dates : du {DATE_DEBUT} au {DATE_FIN}, selon le planning prévisionnel annexé
+- Lieu / modalité : {LIEU_FORMATION}
+- Consultant : {CONSULTANT}
 
-**NT CONSEILS**
+**3. Déroulement (art. R6313-4)**
 
-**2**. Les conditions de réalisation du bilan sont :
+Le bilan comprend une phase préliminaire, une phase d'investigation et une phase de conclusion, à l'issue de laquelle le document de synthèse est remis au seul bénéficiaire.
 
-\\- Durée : 24 Heures
+**4. Méthodes et outils**
 
-\\- Lieu de réalisation du bilan : Centre
+Entretiens individuels, portefeuille de compétences, questionnaire d'intérêts, test de personnalité, enquêtes métier, travail personnel guidé entre les séances, restitution individuelle. Les outils sont choisis selon les objectifs et les besoins du bénéficiaire.
 
-\\- Dates : 19/02/2024 au 22/04/2024
+**5. Prix et financement**
 
-\\- Objectifs de l'entreprise : Évaluer les compétences du candidat et
-l'accompagner.
+Prix : {BDC_TARIF_RAW}. {CONVENTION_FINANCEMENT}
 
-Le bénéficiaire atteste du caractère volontaire de sa démarche et
-s'engage à se rendre aux rendez-vous fixés de manière assidue, à
-prévenir en cas d'empêchement, et à fournir toute information utile à la
-mise en œuvre efficace de son bilan de compétences.
+**6. Délais**
 
-**3.** L'employeur et le bénéficiaire déclarent avoir été informés de la
-méthodologie développée par le **NT CONSEILS**
+{CONVENTION_DELAI}
 
-. Le bilan de compétences comprend 3 phases :
+**7. Confidentialité et transmission**
 
-→ une phase préliminaire,
+Le consultant est tenu au secret professionnel. Le document de synthèse et les résultats détaillés ne sont communiqués à aucun tiers, y compris l'employeur ou le financeur, sans l'accord du bénéficiaire.
 
-→ une phase d'investigation,
+**8. Conservation et destruction des documents (art. R6313-7)**
 
-→ une phase de conclusion.
+Les documents élaborés pour le bilan sont détruits dès le terme de l'action. Par exception, ils peuvent être conservés trois ans au plus sur accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation.
 
-**4.** Les modalités de déroulement de la prestation sont les
-suivantes :
+**9. Interruption**
 
-- Moyens utilisés : Entretiens individuels, questionnaires et outils d'investigation, outils d'auto-évaluation, supports de restitution.
+En cas d'abandon ou d'empêchement, seules les séances réalisées sont dues (ou prises en charge) ; un entretien d'abandon est proposé au bénéficiaire.
 
-- Outils utilisés : Fiche d'analyse de besoin, tests de positionnement, grille d'analyse de compétences, outils d'exploration des métiers.
+**10. Différends**
 
-- Méthodes utilisées : Entretiens individuels, questionnaires et outils d'investigation adaptés, exploration d'auto-évaluation, analyse du parcours, analyse des compétences, enquêtes métiers lorsque pertinentes, travail personnel guidé, restitutions individuelles.
+À défaut de règlement amiable, le litige relève du {TRIBUNAL}. Le bénéficiaire consommateur peut également recourir gratuitement à un médiateur de la consommation.
 
-- Modalités pédagogiques : L'accompagnement repose principalement sur une démarche individualisée comprenant : entretiens individuels, questionnaires et outils d'investigation adaptés, exploration d'auto-évaluation, analyse du parcours, analyse des compétences, enquêtes métiers lorsque pertinentes, travail personnel guidé et restitutions individuelles. Les méthodes et outils sont sélectionnés en fonction des objectifs et besoins propres à chaque bénéficiaire.
+Annexe : planning prévisionnel des séances.
 
-- Postures utilisées : Écoute active, bienveillance, neutralité, confidentialité et posture d'accompagnement à l'autonomie.
-
-**5.** La mission de **NT CONSEILS**
-
-consiste à :
-
-→ Rencontrer individuellement le bénéficiaire signataire afin qu'il
-bénéficie d'un bilan de compétences avec des entretiens d\\'une durée de
-1 à 3h.
-
-→ Organiser le bilan de compétences en trois phases : Phase
-préliminaire, phase d'investigation et phase de conclusion, avec remise
-d'un document de synthèse.
-
-→ Guider le bénéficiaire dans ses recherches personnelles
-
-→ Mettre à disposition des moyens documentaire et un soutien logistique
-
-**6**. La décision de transmission du document de synthèse à l'employeur
-appartient au bénéficiaire.
-
-**NT CONSEILS** s'interdit de transmettre tout document ou renseignement
-élaboré dans le cadre du bilan de compétences, sauf information
-préalable avant démarrage de la prestation, doublée d'un accord express
-du bénéficiaire signataire en fin de prestation.
-
-Dans le cadre des dispositifs réglementant les bilans de compétence, sur
-demande du bénéficiaire, le dossier peut être conservé par **NT
-CONSEILS** sur une durée d'un an maximum, après quoi il sera détruit.
-
-**7**. En contrepartie de cette prestation de bilan de compétences :
-
-L'employeur s'acquittera des coûts suivants :
-
-Le paiement sera dû à réception de la facture.
-
-**8.** Le planning prévisionnel figure en pièce-jointe.
-
-**9.** Différents éventuels : Si une contestation ou un différend ne
-peuvent être réglés à l'amiable, le tribunal de NANTERRE sera seul
-compétent pour régler le litige.
-
-**10. CONFIDENTIALITÉ ET NEUTRALITÉ**
-
-Le consultant s'engage à respecter la confidentialité des informations recueillies tout au long du bilan de compétences. Les échanges, documents et données personnels du bénéficiaire sont protégés et ne sont communiqués à aucun tiers sans son accord express et préalable. Le consultant exerce sa mission dans une stricte neutralité, sans parti pris, en faveur de la libre expression et de l'autonomie du bénéficiaire.
-
-**11. CONSENTEMENT**
-
-Le bénéficiaire déclare avoir été informé des objectifs, modalités et déroulement de la prestation de bilan de compétences. Il donne son consentement libre et éclairé à la réalisation du bilan, à la collecte et au traitement des informations nécessaires à son accompagnement, et au respect des présentes conditions.
-
-Fait à {VILLE_ORG}, le {DATE_CONVENTION} en double exemplaires.
+Fait à {VILLE_ORG}, le {DATE_CONVENTION}, en {CONVENTION_EXEMPLAIRES} exemplaires.
 
 {SIGNATURES_ORG_STAGIAIRE}
-
 `,
   "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire": `**NT CONSEILS**
 
@@ -1337,7 +1026,7 @@ Prestation : Bilan de compétences
 
 
 
-Date de l'entretien : 19/02/2024
+Date de l'entretien : ____/____/________
 
 Prestation : Bilan de compétences
 
@@ -1427,8 +1116,7 @@ Mail : {ORG_MAIL}
 
 Dans le cadre de nos actions, plusieurs indicateurs de résultats sont
 définis afin d'évaluer l'efficacité de notre accompagnement et de
-communiquer de manière transparente sur notre site internet
-(actuellement en cours de développement) ainsi que sur l'ensemble de nos
+communiquer de manière transparente sur notre site internet ainsi que sur l'ensemble de nos
 supports de communication, tels que la plaquette, le flyer et les
 réseaux sociaux.
 
@@ -1457,7 +1145,7 @@ Pour chacun de ces indicateurs, un outil spécifique est mis en place
 afin de collecter les informations nécessaires, garantissant ainsi la
 fiabilité et la précision des données recueillies.
 `,
-  "Indicateur 21/Indicateur 21 - Entretien annuel": `**ENTRETIEN ANNUEL**
+  "Indicateur 22/Indicateur 22 - Entretien annuel": `**ENTRETIEN ANNUEL**
 
 **Date de l\'entretien :** {ENTRETIEN_DATE}
 
@@ -1465,7 +1153,7 @@ fiabilité et la précision des données recueillies.
 
 **Poste occupé :** Consultant(e) — Bilan de compétences / Formateur(rice) référent(e)
 
-**Depuis le :** Janvier 2023
+**Depuis le :** {DATE_MAJ}
 
 **Entretien réalisé par :** Direction — {ORG_NOM}
 
@@ -1547,228 +1235,49 @@ Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui**
 | Bonne adéquation entre les missions confiées et mes appétences professionnelles. |
 | Je remercie la direction pour l\'écoute et la qualité du cadre de travail. |
 `,
-  "Indicateur 21/Indicateur 21 - Entretien de recrutement": `**ENTRETIEN DE RECRUTEMENT**
+  "Indicateur 21/Indicateur 21 - Entretien de recrutement": `**ENTRETIEN DE RECRUTEMENT — TRAME**
 
-**Nom et prénom du candidat :** Marion LAURENT
+_Trame utilisée pour tout recrutement de consultant (salarié, sous-traitant ou salarié porté). Elle est complétée pendant l'entretien et conservée avec le CV et les diplômes du candidat (IND 21)._
 
-**Date de l\'entretien :** {ENTRETIEN_DATE}
+**Nom et prénom du candidat :** ______________________________
+
+**Date de l'entretien :** ____/____/________
 
 **Pour le poste de :** Consultant(e) en bilan de compétences
 
-**PRÉSENTATION ET PARCOURS**
+**Entretien conduit par :** {ORG_DIRIGEANT} — {ORG_NOM}
 
-| **Parlez-moi de vous** |
-|---|
-| Je suis titulaire d\'un Master 2 en Psychologie du travail et formée à l\'accompagnement du changement professionnel. |
-| J\'ai exercé pendant 6 ans en cabinet conseil RH (accompagnement individuel, bilans de compétences, outplacement) auprès d\'un public diversifié (salariés, demandeurs d\'emploi, indépendants). |
-| J\'ai également animé des ateliers collectifs autour de la reconversion et de la construction de projet professionnel{BDC_SECTEUR_TXT_PHRASE}. |
-| Je souhaite aujourd\'hui rejoindre une structure à taille humaine, engagée sur la qualité (Qualiopi) et le suivi personnalisé. |
+**1. Parcours et qualifications**
 
-**MOTIVATIONS**
+| Question | Réponse du candidat |
+|---|---|
+| Diplômes et certifications (psychologie du travail, conseil en évolution professionnelle, GRH…) | |
+| Expérience de conduite de bilans de compétences (nombre, publics) | |
+| Outils d'investigation maîtrisés (intérêts, personnalité, portefeuille de compétences) | |
+| Connaissance du cadre légal (L6313-4, R6313-4 à R6313-8) et du référentiel national qualité | |
 
-| **Pourquoi avez-vous postulé pour ce poste ? Qu\'en attendez-vous ?** |
-|---|
-| Votre approche du bilan de compétences (cadre méthodique, qualité des supports, suivi à 6 mois) correspond pleinement à ma façon de travailler. |
-| Je souhaite m\'investir dans un projet pédagogique cohérent et exigeant, avec des bénéficiaires accompagnés sur la durée. |
-| J\'attends de ce poste une stabilité, une autonomie dans la conduite des bilans et la possibilité de contribuer à l\'amélioration continue de l\'offre. |
+**2. Mise en situation**
 
-**COMPÉTENCES**
+| Exercice | Observation |
+|---|---|
+| Conduite d'un entretien de phase préliminaire (cas fictif) | |
+| Rédaction d'un extrait de document de synthèse à partir d'éléments fournis | |
 
-| **Quelles compétences pourriez-vous apporter pour ce poste ?** |
-|---|
-| Maîtrise des outils d\'investigation (tests d\'intérêts, de personnalité, de valeurs) et des méthodes d\'analyse de parcours. |
-| Solide connaissance des dispositifs de financement (CPF, autres) et du cadre réglementaire du bilan de compétences. |
-| Compétences pédagogiques en présentiel et à distance (visioconférence, outils numériques). |
-| Capacité à conduire des enquêtes métier{BDC_SECTEUR_TXT_PHRASE2}. |
-| Rigueur administrative (conventions, attestations, certificats) et appétence pour la démarche qualité. |
+**3. Déontologie**
 
-**ADÉQUATION ET DISPONIBILITÉ**
+| Point vérifié | Oui / Non |
+|---|---|
+| Engagement de confidentialité et de secret professionnel | |
+| Neutralité : absence d'orientation vers une prestation de l'organisme | |
+| Disponibilités compatibles avec le planning des bénéficiaires | |
 
-**Mobilité géographique :** Oui
+**4. Décision**
 
-**Favorable au travail à distance :** Oui (mixte présentiel/distanciel)
+**Le candidat est-il en adéquation avec le poste ?** ☐ Oui ☐ Non
 
-**Dates de disponibilité :** Sous 1 mois (préavis en cours)
+**Justification :** ______________________________________________
 
-**Prétentions salariales :** 38 — 42 K€ bruts annuels, négociables selon le package global
-
-**Êtes-vous engagé dans un autre processus de recrutement ?** Oui, un second entretien est prévu dans un autre cabinet, mais votre poste est mon premier choix.
-
-**SYNTHÈSE**
-
-| **Avez-vous des questions ?** |
-|---|
-| Quelle est la composition actuelle de l\'équipe pédagogique et comment se répartit la charge de bilans ? |
-| Quels sont les outils utilisés pour la digitalisation des supports et le suivi des bénéficiaires ? |
-| Quelle est la trajectoire de l\'organisme à 2 ou 3 ans (volumes, nouvelles certifications, public visé) ? |
-
-| **Premières impressions suite à l\'entretien** |
-|---|
-| Candidate posée, structurée et clairement professionnelle. Discours cohérent et factuel sur son parcours et ses motivations. |
-| Bonne compréhension du cadre Qualiopi et du métier de consultant BDC. |
-| Posture chaleureuse et bienveillante, en adéquation avec notre culture interne. |
-
-**Le candidat est-il en adéquation avec le poste ?** Oui
-
-**Le candidat est-il en adéquation avec l\'entreprise ?** Oui
-
-| **Explications qui justifient ces réponses** |
-|---|
-| Profil expérimenté avec une réelle pratique du bilan de compétences et une bonne maîtrise des outils. |
-| Valeurs partagées : qualité de l\'accompagnement, écoute, rigueur, amélioration continue. |
-| Disponibilité compatible avec nos besoins et prétentions cohérentes avec la grille interne. |
-
-| **Impressions à valider lors d\'éventuels prochains entretiens** |
-|---|
-| Mise en situation : conduite d\'un entretien de phase préliminaire avec un bénéficiaire fictif. |
-| Vérification de la capacité à structurer un livret de synthèse à partir d\'éléments fournis. |
-| Échange avec l\'équipe pédagogique pour valider la posture en équipe. |
-
-| **Commentaires divers** |
-|---|
-| Références professionnelles à contacter (avec accord de la candidate). |
-| Confirmer la date de prise de poste après le second entretien. |
-| Prévoir un parcours d\'intégration de 2 semaines (accompagnement sur les outils internes et la démarche Qualiopi). |
-`,
-  "Indicateur 21/Indicateur 21 - Fiche de poste comptable": `**FICHE DE POSTE — COMPTABLE**
-
-**ACTIVITÉ PRINCIPALE**
-
-Rigoureux, le comptable veille aux dépenses quotidiennes de l'organisme de formation, ses recettes et aux coûts des investissements nécessaires. En maîtrisant la « comptabilité analytique » le comptable étudie les coûts de revient ou le chiffre d'affaires par produit. Le comptable est également celui qui synthétise les données chiffrées de l'entreprise et en réfère aux dirigeants.
-
-**MISSIONS PRINCIPALES**
-
-- Consigner et rassembler les données commerciales et financières
-- Faire des balances de comptes, comptes de résultat et autres bilans
-- Vérifier l'exactitude des écritures comptables
-- Rendre compte des chiffres auprès des responsables de la structure
-
-**QUALITÉS REQUISES**
-
-- Organiser et prioriser son travail en fonction des enjeux
-- Savoir respecter les délais, être rigoureux et précis
-- Savoir s'intégrer dans une chaine de décisions comptables
-- Adapter ses explications aux divers interlocuteurs
-
-**COMPÉTENCES REQUISES**
-
-- Maitrise des techniques et des règles de la comptabilité publique et générale
-- Maitrise de la gestion financière
-- Maitrise du régime de la TVA
-- Maitrise des règles de conservation des pièces comptables
-- Maitrise des grands principes des charges sociales
-`,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable administratif": `**FICHE DE POSTE — RESPONSABLE ADMINISTRATIF**
-
-**ACTIVITÉ PRINCIPALE**
-
-Le responsable administratif est un acteur central de l'entreprise qui facilite les tâches quotidiennes et assure la liaison entre les différents services. Il exerce au plus près de la direction, en toute confiance et transparence.
-
-Selon sa formation initiale, le responsable administratif peut également revêtir un rôle financier : élaboration et suivi des budgets, répartition des financements entre les services, rédaction d'études prévisionnelles…
-
-**MISSIONS PRINCIPALES**
-
-- Encadrer et coordonner le travail des différentes équipes du service administratif
-- Assurer la liaison entre la direction et les équipes opérationnelles
-- Rédiger des plans stratégiques et des rapports de suivi
-- Proposer de nouvelles méthodes et nouveaux outils de gestion
-- Préparer les réunions et en rédiger le compte-rendu
-
-**QUALITÉS REQUISES**
-
-- Être discret (sens du secret professionnel)
-- Être fiable et organisé
-- Savoir se montrer adaptable et réactif
-- Résistance à la pression
-
-**COMPÉTENCES REQUISES**
-
-- Gestion administrative
-- Techniques de prise de notes, expression écrite et orthographe irréprochables
-- Maitrise des outils bureautiques et collaboratifs
-`,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable commercial": `**FICHE DE POSTE — RESPONSABLE COMMERCIAL**
-
-**ACTIVITÉ PRINCIPALE**
-
-Le responsable commercial propose à la direction diverses stratégies de façon à développer les prestations vendues par l'organisme de formation et ainsi augmenter son chiffre d'affaires. Pour ce faire, il met en place diverses actions : fixer le nombre de ventes, établir une politique de fidélisation des apprenants, être présent sur les salons ou dans les villes situées à proximité de la société lors d'événements locaux…
-
-Le responsable commercial anime et coordonne également une équipe de collaborateurs, analyse et évalue les résultats obtenus.
-
-**MISSIONS PRINCIPALES**
-
-- Établir une stratégie commerciale
-- Prospecter de nouveaux clients
-- Fidéliser la clientèle
-- Manager et animer une équipe
-
-**QUALITÉS REQUISES**
-
-- Excellente connaissance du secteur de la formation professionnelle
-- Être fiable et organisé
-- Avoir un esprit critique
-- Savoir motiver ses collaborateurs
-
-**COMPÉTENCES REQUISES**
-
-- Compétences commerciales et de négociation
-- Techniques de prise de notes, expression écrite et orthographe irréprochables
-- Maitrise des outils bureautiques et collaboratifs
-`,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable communication": `**FICHE DE POSTE — RESPONSABLE COMMUNICATION**
-
-**ACTIVITÉ PRINCIPALE**
-
-Le responsable communication gère les communications de l'organisme de formation aussi bien en interne qu'en externe. Il est chargé de valoriser l'image de la structure. Il lui revient de déterminer les modes de communication à privilégier, les valeurs à promouvoir ou encore les partenaires à associer en gérant un ou plusieurs supports d'information.
-
-Le responsable communication joue un rôle clé au sein de l'organisme de formation : celui de diffuser l'image de marque et de coordonner les actions de communication. Il constitue un lien entre la direction, les intervenants et les apprenants/partenaires.
-
-**MISSIONS PRINCIPALES**
-
-- Assurer les différentes formes de communication dans l'organisme de formation
-- Concevoir les actions marketing pour la promotion de la structure
-- Définir les campagnes de communication, notamment sur les réseaux sociaux
-- Garantir la cohérence du message véhiculé
-
-**QUALITÉS REQUISES**
-
-- Excellente connaissance du secteur de la formation professionnelle
-- Qualité d'écoute, d'aisance relationnelle et d'ouverture d'esprit
-- Avoir du charisme et le contact facile
-- Être rigoureux et avoir le sens de l'organisation
-
-**COMPÉTENCES REQUISES**
-
-- Savoir gérer un budget et des ressources
-- Maitriser les logiciels de PAO ainsi que les outils de communication
-- Capacité de management
-`,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable veille": `**FICHE DE POSTE — RESPONSABLE VEILLE**
-
-**ACTIVITÉ PRINCIPALE**
-
-Le chargé de veille documentaire a pour mission de concevoir, de mettre en place et d'assurer l'évolution de tous les outils de veille concurrentielle, juridique ou technologique…
-
-Son rôle est de détecter et d'anticiper les changements pouvant survenir dans un environnement technique en constante évolution, et susceptibles d'affecter l'activité de l'entreprise. De même, le chargé de veille documentaire doit signaler les opportunités pouvant se présenter, tout en prévenant des risques éventuels.
-
-**MISSIONS PRINCIPALES**
-
-- Organiser la veille de l'organisme de formation
-- Réaliser la veille sur les thématiques légale et réglementaire, métier et pédagogique et technologique
-- Anticiper les changements à venir dans la formation professionnelle
-- Rendre compte de cette veille à tous les intervenants internes de la structure
-
-**QUALITÉS REQUISES**
-
-- Être rigoureux et précis
-- Excellente capacité d'analyse et de communication écrite
-- Adapter ses explications aux divers interlocuteurs
-
-**COMPÉTENCES REQUISES**
-
-- Maitrise du monde de la formation professionnelle
-- Excellente capacité de classement et d'archivage
-- Maitrise des outils informatiques
+**Pièces à recueillir avant la première intervention :** CV, copies des diplômes, attestation d'activité ou Kbis (sous-traitant), contrat signé avec l'annexe « Clauses qualité » (IND 27).
 `,
   "Indicateur 21/Indicateur 21 - Process Recrutement": `**PROCESS RECRUTEMENT**
 
@@ -1798,31 +1307,29 @@ Une fois la sélection du candidat faite, je m'assure du respect des nombreuses 
 
 J'intègre mon nouveau salarié dans l'entreprise. Je lui remets un livret d'accueil (s'il existe) et je le présente aux autres collaborateurs.
 `,
-  "Indicateur 23 & 24 & 25 - Process Veilles": `**PROCESS VEILLES**
+  "Indicateur 23/Indicateur 23 - Process Veilles": `**PROCESS VEILLES**
 
-Je structure ma veille. J'identifie des sources me permettant de
-réaliser mes veilles « légale et réglementaire », « compétences et
-métiers » et « pédagogique et technologique »
+**Objet :** organiser les trois veilles exigées par le référentiel national qualité — légale et réglementaire (IND 23), emplois, métiers et compétences (IND 24), innovations pédagogiques et technologiques (IND 25).
 
-FORMALERTE
+**1. Sources identifiées**
 
-« Le système de veille »
+| Veille | Sources principales | Fréquence |
+|---|---|---|
+| Légale et réglementaire | Légifrance (Journal officiel), travail-emploi.gouv.fr, France Compétences, Centre Inffo | Mensuelle |
+| Emplois, métiers, compétences | France Travail (ROME, enquête BMO), France Compétences (RNCP / RS), observatoires de branche | Trimestrielle |
+| Pédagogique et technologique | Centre Inffo, communautés de consultants, éditeurs d'outils d'évaluation | Trimestrielle |
 
-Si cette exploitation a mené à une amélioration continue de mes
-formations ou de mon organisme, j'en assure le suivi
+**2. Traitement**
 
-« Tableau d'amélioration continue »
+Chaque information retenue est inscrite dans le registre de veille correspondant avec sa date, sa source et son exploitation (quel impact sur la prestation ?).
 
-Une fois l'article catégorisé, j'en assure l'éventuelle exploitation
-(quel impact sur mes formations ?)
+**3. Exploitation**
 
-« Les veilles »
+Lorsqu'une information entraîne une modification (procédure, contrat, outil, contenu), l'action est inscrite au tableau d'amélioration continue (IND 32) et suivie jusqu'à sa clôture.
 
-Une fois ces sources identifiées, je prends le temps de les consulter
-tous les jours/semaines/mois. Dès qu'un article m'intéresse, je le
-catégorise
+**4. Diffusion**
 
-« Les veilles »
+Les évolutions sont communiquées aux intervenants lors de la réunion qualité et, le cas échéant, aux bénéficiaires (mise à jour des documents d'information).
 `,
   "Indicateur 26/Indicateur 26 - Formations sur le handicap": `**LISTE DES FORMATIONS\\
 SUR LE HANDICAP**
@@ -1851,7 +1358,7 @@ NATIONAUX**
 
 | **LE CNFPT**§§BR§§![CNFPT](/pdfs/bdc_nt/handicap/cnfpt.jpg) | Le CNFPT un établissement public national au service des collectivités territoriales et de leurs agents (1 800 000 emplois répartis sur 230 métiers).§§BR§§§§BR§§<https://www.cnfpt.fr/> |
 |---|---|
-| **Pôle Emploi**§§BR§§![Pôle Emploi](/pdfs/bdc_nt/handicap/pole_emploi.jpg) | Pôle Emploi, l'Agefiph et les opérateurs qu'elle finance, en particulier les Cap Emploi, collaborent depuis de nombreuses années pour développer l'emploi des personnes handicapées en milieu ordinaire de travail, et ce en référence aux termes des conventions signées avec l'Etat et l'Unedic.§§BR§§§§BR§§<https://www.pole-emploi.fr/accueil/> |
+| **France Travail** | Pôle Emploi, l'Agefiph et les opérateurs qu'elle finance, en particulier les Cap Emploi, collaborent depuis de nombreuses années pour développer l'emploi des personnes handicapées en milieu ordinaire de travail, et ce en référence aux termes des conventions signées avec l'Etat et l'Unedic.§§BR§§§§BR§§<https://www.pole-emploi.fr/accueil/> |
 | **AGEFIPH**§§BR§§![AGEFIPH](/pdfs/bdc_nt/handicap/agefiph.jpg) | Le FIPHFP collabore avec l'Agefiph (Association de Gestion du Fonds pour l'Insertion Professionnelle des personnes Handicapées) depuis 2008, par le biais de deux conventions de partenariat successives : 2008-2010 et 2011-2013, cette dernière convention ayant fait l'objet d'un avenant de prolongation des actions partenariales jusqu'à fin 2014.§§BR§§§§BR§§<https://www.agefiph.fr/> |
 | **MDPH**§§BR§§![MDPH](/pdfs/bdc_nt/handicap/mdph.jpg) | Créées par la loi pour l'égalité des droits et des chances, la participation et la citoyenneté des personnes handicapées du 11 février 2005, les maisons départementales des personnes handicapées (MDPH) sont chargées de l'accueil et de l'accompagnement des personnes handicapées et de leurs proches.§§BR§§§§BR§§<https://handicap.gouv.fr/les-aides-et-les-prestations/maison-departementale-du-handicap/article/maison-departementale-des-personnes-handicapees-mdph> |
 | **Missions locales**§§BR§§![Missions locales](/pdfs/bdc_nt/handicap/missions_locales.jpg) | Présentes sur l'ensemble du territoire national, les missions locales exercent une mission de service public de proximité afin de permettre à tous les jeunes de 16 à 25 ans de surmonter les difficultés qui font obstacle à leur insertion professionnelle et sociale.§§BR§§§§BR§§<https://www.mission-locale.fr/> |
@@ -1931,9 +1438,8 @@ donneur d'ordre »
 
 **Et**
 
-2 -- « Nom de l'organisme de formation sous-traitant », « adresse »
-SIRET XXX, organisme de formation enregistré sous le numéro XXX auprès
-du Préfet de la région XXX,
+2 -- Raison sociale du sous-traitant : ______________________, adresse : ______________________,
+SIRET ______________________, déclaration d'activité n° ______________________ (le cas échéant),
 
 ci-après « le sous-traitant »
 
@@ -1975,7 +1481,7 @@ Le sous-traitant s'engage à :
   d'ordre ;
 
 - Communiquer au donneur d'ordre ses besoins en matériel (projecteur,
-  tableau, photocopies de supports...) au moins XXX jours avant le début
+  tableau, photocopies de supports...) au moins 7 jours avant le début
   de la prestation ;
 
 - Assurer l'évaluation des bénéficiaires à l'issue de l'action de
@@ -2003,12 +1509,12 @@ Le donneur d'ordre s'engage à :
 - Transmettre au sous-traitant une copie des questionnaires de
   satisfaction remplis par les bénéficiaires à l'issue de la formation
 
-- Prévenir le sous-traitant au moins XXX jours à l'avance en cas
+- Prévenir le sous-traitant au moins 7 jours à l'avance en cas
   d'annulation ou de report de la prestation ;
 
 **Article 6 : Modalités financières**
 
-Le sous-traitant percevra une rémunération de XXX euros HT par journée /
+Le sous-traitant percevra une rémunération de ________ euros HT par journée /
 par session / par bénéficiaire.
 
 Le paiement sera effectué à réception de la facture.
@@ -2020,7 +1526,7 @@ Le paiement sera effectué à réception de la facture.
   contenu de la prestation ;
 
 - Le sous-traitant déclare avoir souscrit une police d'assurance
-  responsabilité civile professionnelle (RCP) auprès de la compagnie XXX
+  responsabilité civile professionnelle (RCP) auprès de la compagnie ______________________
 
 - Le sous-traitant dispose d'une propriété intellectuelle et/ou
   artistique sur le contenu de sa prestation. Le donneur d'ordre
@@ -2084,7 +1590,7 @@ le contractualise
 |                                                              |            |
 | 2)  Avoir un numéro d'activité                               |            |
 |                                                              |            |
-| 3)  Être certifié Datadock                                   |            |
+| 3)  Avoir déposé un bilan pédagogique et financier            |            |
 +--------------------------------------------------------------+------------+
 | **Question 3 : Quels sont les 4 types d'actions couverts par | **/1**     |
 | Qualiopi ?**                                                 |            |
@@ -2400,157 +1906,6 @@ le contractualise
 
 - « Tableau d'amélioration continue »
 `,
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise": `**QUESTIONNAIRE SATISFACTION\\
-ENTREPRISE**
-
-*Ce questionnaire a pour objectif d'évaluer avec vous les bilans de compétences que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes. Aussi votre avis nous étant précieux, nous vous demandons de bien vouloir répondre avec soin à toutes les questions posées et de nous le renvoyer par courrier ou email.*
-
-*M. ZOCLY Marc§§BR§§a participé à notre formation Bilan de compétences§§BR§§durant la période du 19/02/2024 au 22/04/2024*
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-| **Concernant ce bilan de compétences, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Informations obtenues avant le début de la prestation (programme / tarifs) | ☐ | ☐ | ☐ | ☐ |
-| Programme et méthodes pédagogiques | ☐ | ☐ | ☐ | ☐ |
-| Compétences acquises par le bénéficiaire | ☐ | ☐ | ☐ | ☐ |
-| Informations obtenues au terme de la prestation | ☐ | ☐ | ☐ | ☐ |
-| Gestion administrative globale du dossier du bénéficiaire | ☐ | ☐ | ☐ | ☐ |
-| Adéquation globale de la prestation vis-à-vis de vos attentes | ☐ | ☐ | ☐ | ☐ |
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la prestation écoulée ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-
-*Pas du tout satisfait → Très satisfait*
-
-| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
-|---|
-| §§BR§§§§BR§§§§BR§§ |
-`,
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur": `**QUESTIONNAIRE SATISFACTION\\
-FINANCEUR**
-
-*Ce questionnaire a pour objectif d'évaluer avec vous la prestation que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes. Aussi votre avis nous étant précieux, nous vous demandons de bien vouloir répondre avec soin à toutes les questions posées et de nous le renvoyer par courrier ou email.*
-
-*M. ou Mme ......................................................§§BR§§a participé à notre prestation : Bilan de compétences§§BR§§durant la période du .............................. au ..............................§§BR§§Cette prestation a été financée par vos soins.*
-
-**Profil financeur :** Pôle Emploi / Région / Entreprise / Autre à préciser *..............................*
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-| **Concernant cette prestation, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Informations obtenues avant le début du bilan de compétences (programme / tarifs) | ☐ | ☐ | ☐ | ☐ |
-| Informations obtenues au terme de la prestation | ☐ | ☐ | ☐ | ☐ |
-| Gestion administrative globale du dossier du bénéficiaire | ☐ | ☐ | ☐ | ☐ |
-| Contacts avec l'organisme de formation | ☐ | ☐ | ☐ | ☐ |
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la formation écoulée ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-
-*Pas du tout satisfait → Très satisfait*
-
-| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
-|---|
-| §§BR§§§§BR§§§§BR§§ |
-`,
-  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne": `**QUESTIONNAIRE SATISFACTION INTERNE**
-
-En réalisant cette enquête, nous souhaitons vous associer à la dynamique d'amélioration de la qualité dans et de notre service. Votre participation est précieuse.
-
-Merci d'accepter de participer à la démarche et de consacrer quelques minutes à ce questionnaire.
-
-À l'issue de l'enquête, nous vous présenterons les résultats pour l'ensemble du service.
-
-**Critères de satisfaction :**
-
-*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
-
-**1) [Perception de l'image du service]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Mon service a une bonne image à l'extérieur. | ☐ | ☐ | ☐ | ☐ |
-| Mon service communique suffisamment avec la population du territoire. | ☐ | ☐ | ☐ | ☐ |
-| Je suis fier de travailler dans mon service. | ☐ | ☐ | ☐ | ☐ |
-| Je suis optimiste sur l'avenir de mon service. | ☐ | ☐ | ☐ | ☐ |
-
-**2) [Qualité perçue de la prise en charge]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Mon service est fortement attaché à satisfaire les clients. | ☐ | ☐ | ☐ | ☐ |
-| J'ai une bonne image de la qualité de prise en charge proposée par mon service. | ☐ | ☐ | ☐ | ☐ |
-| Mes horaires de travail sont adaptés à la prise en charge des clients. | ☐ | ☐ | ☐ | ☐ |
-
-**3) [Organisation et cadre de travail]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| L'organisation du travail est adaptée à la prise en charge des clients. | ☐ | ☐ | ☐ | ☐ |
-| Les conditions d'hygiène et de sécurité sont satisfaisantes. | ☐ | ☐ | ☐ | ☐ |
-| Les équipements et matériels utilisés permettent de répondre aux besoins des clients. | ☐ | ☐ | ☐ | ☐ |
-| Mon travail quotidien correspond à ce qui est décrit dans ma fiche de poste. | ☐ | ☐ | ☐ | ☐ |
-| La coordination entre les équipes est satisfaisante. | ☐ | ☐ | ☐ | ☐ |
-| L'existence de procédures m'aide à la réalisation de mes tâches professionnelles. | ☐ | ☐ | ☐ | ☐ |
-
-**4) [Management, ambiance de travail]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Les personnels d'encadrement sont fortement impliqués dans la recherche de la satisfaction des clients. | ☐ | ☐ | ☐ | ☐ |
-| Les personnels d'encadrement sont à l'écoute des remarques que je leur transmets. | ☐ | ☐ | ☐ | ☐ |
-| J'ai la possibilité de m'exprimer pour améliorer mes pratiques professionnelles. | ☐ | ☐ | ☐ | ☐ |
-| J'ai suffisamment de marge de manœuvre pour répondre aux besoins des clients. | ☐ | ☐ | ☐ | ☐ |
-| L'ambiance de travail est bonne. | ☐ | ☐ | ☐ | ☐ |
-| Mon travail est reconnu de manière appropriée. | ☐ | ☐ | ☐ | ☐ |
-| Mon service prend en compte le mieux possible la conciliation vie professionnelle et vie personnelle. | ☐ | ☐ | ☐ | ☐ |
-| Je dispose d'espaces de paroles identifiés où je peux échanger librement. | ☐ | ☐ | ☐ | ☐ |
-
-**5) [Formation et intégration des salariés]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Je dispose des compétences et connaissances requises pour mon poste. | ☐ | ☐ | ☐ | ☐ |
-| Je suis satisfait des formations proposées par mon service. | ☐ | ☐ | ☐ | ☐ |
-| L'intégration du personnel nouveau est satisfaisante. | ☐ | ☐ | ☐ | ☐ |
-
-**6) [Information, participation et communication interne]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| Les informations que je reçois me permettent de savoir ce qui se passe dans mon service. | ☐ | ☐ | ☐ | ☐ |
-| Je suis informé des orientations, des projets de mon service. | ☐ | ☐ | ☐ | ☐ |
-| Je connais mes droits et mes obligations. | ☐ | ☐ | ☐ | ☐ |
-
-**[Questions finales]{.underline}**
-
-|  | **1** | **2** | **4** | **5** |
-|---|:---:|:---:|:---:|:---:|
-| En résumé, toutes les conditions sont réunies dans mon service pour que je puisse satisfaire les clients. | ☐ | ☐ | ☐ | ☐ |
-
-**Sur 10, quel est votre niveau de satisfaction générale concernant votre poste ?**
-
-| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-
-*Pas du tout satisfait → Très satisfait*
-
-| **Avez-vous des remarques, des suggestions ou des commentaires à effectuer ?** |
-|---|
-| §§BR§§§§BR§§§§BR§§ |
-`,
   "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin": `**FICHE D'ANALYSE DU BESOIN** — Bilan de compétences (générée automatiquement par bénéficiaire).`,
   "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences": `**FICHE PRÉALABLE AU BILAN DE COMPÉTENCES** (générée automatiquement par bénéficiaire).`,
   "Indicateur 4/Indicateur 4 - Mail type handicap": `**MAIL TYPE\\
@@ -2596,13 +1951,13 @@ _NT CONSEILS ET VOUS À VOTRE ÉCOUTE POUR UN AVENIR MEILLEUR_
 
   "Indicateur 5/Indicateur 5 - Outil pr\u00e9paratoire": `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
 
-**Date de l'entretien :** 16­/02/2024
+**Date de l'entretien :** ____/____/________
 
-**Bénéficiaire : Mohamed Galaoui**
+**Bénéficiaire :** ______________________________
 
-**Contacts : Mohamed.galaoui1@gmail.com**
+**Contacts :** ______________________________
 
-**Dates du bilan de compétences souhaitées : début /02/2024**
+**Dates du bilan de compétences souhaitées :** ______________________________
 
 1)  **Bénéficiaire**
 
@@ -2659,7 +2014,7 @@ _NT CONSEILS ET VOUS À VOTRE ÉCOUTE POUR UN AVENIR MEILLEUR_
 | Sérieux                                                               |
 +-----------------------------------------------------------------------+
 `,
-  "Indicateur 8/Indicateur 8 - Mail test de positionnement": `**[NT CONSEILS]{.underline}**
+  "Indicateur 4/Indicateur 4 - Mail auto-diagnostic préliminaire": `**[NT CONSEILS]{.underline}**
 
 **\\
 TEST DE POSITIONNEMENT**
@@ -2679,7 +2034,7 @@ vous avez la moindre question concernant la prestation à venir.
 
 ABDOULHALIK ANTTOISSE
 `,
-  "Indicateur 8/Indicateur 8 - Test de positionnement": `**[NT CONSEILS]{.underline}**
+  "Indicateur 4/Indicateur 4 - Auto-diagnostic préliminaire": `**[NT CONSEILS]{.underline}**
 
 **TEST DE POSITIONNEMENT**
 
@@ -2731,17 +2086,15 @@ et mes domaines d\\'amélioration, à explorer de nouvelles opportunités
 professionnelles et à élaborer un plan d\\'action concret pour atteindre
 mes objectifs professionnels.
 `,
-  "Indicateur 9/Indicateur 9 - CGV": `**CONDITIONS GÉNÉRALES DE VENTE\\
+  "Indicateur 9/Indicateur 9 - CGV": `**CONDITIONS GÉNÉRALES DE VENTE\\
 FORMATION PROFESSIONNELLE CONTINUE**
 
-Déclaration d'activité́ en cours d'attribution auprès du préfet de
-
-la région ÎLE DE FRANCE.
+{ORG_NDA_PHRASE}
 
 **1. OBJET ET CHAMP CONTRACTUEL**
 
 1.1. Les présentes conditions générales de vente (CGV) ont pour objet de
-fixer les conditions dans lesquelles **NT CONSEILS** s'engage à vendre
+fixer les conditions dans lesquelles **NT CONSEILS** s'engage à vendre
 une prestation de bilan de compétences dans le cadre de la formation
 professionnelle continue.
 
@@ -2751,22 +2104,22 @@ d\\'achat.
 
 1.3. Pour certaines prestations, des conditions particulières de vente
 précisent ou complètent les présentes CGV. Les conditions particulières
-de vente peuvent figurer à la suite des présentes CGV ou sur le devis ou
+de vente peuvent figurer à la suite des présentes CGV ou sur le devis ou
 le bon de commande ou être transmises au client en accompagnement de
 l'un de ces documents. En cas de contradiction entre les conditions
 particulières de vente et les présentes CGV, les dispositions des
 conditions particulières de vente priment.
 
-1.4. Dans le cas où l'une quelconque des dispositions des présentes CGV
+1.4. Dans le cas où l'une quelconque des dispositions des présentes CGV
 serait déclarée nulle ou non écrite, les autres dispositions resteront
-intégralement en vigueur et seront interprétées de façon à respecter
+intégralement en vigueur et seront interprétées de façon à respecter
 l'intention originelle des parties.
 
-1.5. **NT CONSEILS** peut modifier à tout moment les présentes CGV. Les
-CGV applicables sont celles qui ont été remises au client et acceptées
+1.5. **NT CONSEILS** peut modifier à tout moment les présentes CGV. Les
+CGV applicables sont celles qui ont été remises au client et acceptées
 par ce dernier.
 
-**2. DÉFINITIONS**
+**2. DÉFINITIONS**
 
 Client : co-contractant de **NT CONSEILS**
 
@@ -2778,23 +2131,23 @@ création/reprise d'entreprise.
 **3. PRISE EN COMPTE DES INSCRIPTIONS**
 
 3.1. Pour les clients personnes morales : l'inscription n'est validée
-qu'à réception, d'une part, de l'acompte, s'il y a lieu (montant indiqué
+qu'à réception, d'une part, de l'acompte, s'il y a lieu (montant indiqué
 sur la convention de prestation ou le bon de commande valant convention
 de prestation) et, d'autre part, de la convention ou du bon de commande
-valant convention de prestation, signé et revêtu du cachet de
+valant convention de prestation, signé et revêtu du cachet de
 l'entreprise si applicable.
 
-3.2. Pour les personnes physiques : l'inscription n'est validée qu'à
-réception, d'une part, du contrat de prestation signé et, d'autre part,
+3.2. Pour les personnes physiques : l'inscription n'est validée qu'à
+réception, d'une part, du contrat de prestation signé et, d'autre part,
 d'un acompte de 30% du prix de la formation. Le versement de cet acompte
-ne peut être exigé qu'à l'expiration du délai de rétraction de 10 jours
-qui court à compter de la signature de ce contrat.
+ne peut être exigé qu'à l'expiration du délai de rétraction de 10 jours
+qui court à compter de la signature de ce contrat.
 
-**4. RESPONSABILITÉ**
+**4. RESPONSABILITÉ**
 
-4.1. Toute inscription à une prestation implique le respect par le
+4.1. Toute inscription à une prestation implique le respect par le
 bénéficiaire du règlement intérieur applicable aux locaux concernés,
-lequel est porté à sa connaissance.
+lequel est porté à sa connaissance.
 
 4.2. **NT CONSEILS** ne peut être tenue responsable d'aucun dommage ou
 perte d'objets et effets personnels apportés par les apprenants.
@@ -2806,7 +2159,7 @@ personnelle et/ou professionnelle le couvre lors de sa prestation.
 
 5.1. Les prix sont indiqués sur le bon de commande et/ou la convention
 de prestation Ils sont indiqués en HT et en TTC ou, net de taxes. **NT
-CONSEILS** n'étant pas assujettie à la TVA par application de l'article
+CONSEILS** n'étant pas assujettie à la TVA par application de l'article
 261 al 4-4 du Code général des impôts.
 
 5.2. Les modalités de facturation et de paiement sont précisées sur le
@@ -2819,60 +2172,60 @@ bon de commande et/ou la convention de prestation.
 
 - De faire la demande de prise en charge avant le début de la prestation
   et de s'assurer de la bonne fin de cette demande et du paiement par
-  l'organisme qu'il a désigné́ ;
+  l'organisme qu'il a désigné ;
 
 - D'indiquer explicitement sur le bon de commande et/ou la convention de
-  prestation quel sera l'organisme tiers à facturer, en indiquant
+  prestation quel sera l'organisme tiers à facturer, en indiquant
   précisément son nom et son adresse.
 
 6.2. Si le dossier de prise en charge de l\\'organisme tiers ne parvient
-pas à **NT CONSEILS** avant le premier jour de la formation, les frais
+pas à **NT CONSEILS** avant le premier jour de la formation, les frais
 de formation sont intégralement facturés au client. En cas de prise en
-charge partielle par un organisme tiers, le reliquat est facturé au
+charge partielle par un organisme tiers, le reliquat est facturé au
 client.
 
-6.3. Dans le cas où l\\'organisme tiers n\\'accepte pas de payer la charge
-qui aurait été́ la sienne suite à des absences, un abandon ou pour
-quelque raison que ce soit, le client est redevable de l'intégralité́ du
-prix de la formation, qui lui est donc facturé.
+6.3. Dans le cas où l\\'organisme tiers n\\'accepte pas de payer la charge
+qui aurait été la sienne suite à des absences, un abandon ou pour
+quelque raison que ce soit, le client est redevable de l'intégralité du
+prix de la formation, qui lui est donc facturé.
 
 **7. PENALITES DE RETARD ET SANCTIONS EN CAS DE DEFAUT DE PAIEMENT**
 
-7.1. Toute somme non payée à l'échéance donne lieu au paiement par le
-client de pénalités de retard fixées à trois fois le taux d'intérêt
+7.1. Toute somme non payée à l'échéance donne lieu au paiement par le
+client de pénalités de retard fixées à trois fois le taux d'intérêt
 légal en vigueur. Ces pénalités sont exigibles de plein droit sans
 qu'aucun rappel ne soit nécessaire le jour suivant la date de paiement
 prévue.
 
-7.2. Une indemnité́ forfaitaire de 40 euros est due pour frais de
+7.2. Une indemnité forfaitaire de 40 euros est due pour frais de
 recouvrement en cas de retard de paiement, sauf s'il s'agit de
 particuliers.
 
-7.3. En cas de non-paiement intégral d'une facture venue à échéance,
+7.3. En cas de non-paiement intégral d'une facture venue à échéance,
 après mise en demeure restée sans effet dans les 5 jours calendaires,
-**NT CONSEILS** se réserve la faculté́ de suspendre toute prestation en
-cours et /ou à venir.
+**NT CONSEILS** se réserve la faculté de suspendre toute prestation en
+cours et /ou à venir.
 
 **8. CONVOCATION ET ATTESTATION DE PRESENCE**
 
 8.1. Une lettre de convocation indiquant le lieu exact et les horaires
 de la prestation est adressée au client. **NT CONSEILS** ne peut être
 tenue responsable de la non-réception de celle-ci par les destinataires,
-notamment en cas d'absence du bénéficiaire à la prestation.
+notamment en cas d'absence du bénéficiaire à la prestation.
 
-8.2. Une attestation de présence, établie en conformité́ avec les
+8.2. Une attestation de présence, établie en conformité avec les
 feuilles d'émargement, est adressée au client et/ou au bénéficiaire
 après chaque formation.
 
 **9. REFUS DE COMMANDE**
 
-Dans le cas où un client passerait une commande, sans avoir procédé́ au
+Dans le cas où un client passerait une commande, sans avoir procédé au
 paiement des commandes précédentes, **NT CONSEILS** sera en droit de
 refuser d'honorer la commande et de délivrer la prestation concernée,
-sans que le client puisse prétendre à une quelconque indemnité́, pour
+sans que le client puisse prétendre à une quelconque indemnité, pour
 quelque raison que ce soit.
 
-**10. ANNULATION -- REPORT -- CESSATION ANTICIPÉE- ABSENCES**
+**10. ANNULATION -- REPORT -- CESSATION ANTICIPÉE- ABSENCES**
 
 Toute annulation doit faire l'objet d'une demande écrite (e-mail,
 courrier).
@@ -2881,24 +2234,24 @@ courrier).
 
 Lorsque la demande d'annulation est reçue par **NT CONSEILS** entre 30
 et 15 jours calendaires avant le début de la prestation, **NT CONSEILS**
-retient l'acompte (ou le facture s'il n'a pas été payé).
+retient l'acompte (ou le facture s'il n'a pas été payé).
 
-Dans le cas où la demande est reçue entre 15 et 1 jours calendaires
-avant le début de la prestation, évidence pro retient l'acompte (ou la
-facture s'il n'a pas été payé) et facture 50 % du prix total de la
-prestation à titre d'indemnisation, déduction faite le cas échéant des
-sommes déjà̀ facturées et/ou payées.
+Dans le cas où la demande est reçue entre 15 et 1 jours calendaires
+avant le début de la prestation, **NT CONSEILS** retient l'acompte (ou la
+facture s'il n'a pas été payé) et facture 50 % du prix total de la
+prestation à titre d'indemnisation, déduction faite le cas échéant des
+sommes déjà facturées et/ou payées.
 
-Toute annulation à la date du début de la prestation ou non présentation
-du bénéficiaire entraine la facturation du prix total de la prestation à
-titre d'indemnisation, déduction faite le cas échéant des sommes déjà̀
+Toute annulation à la date du début de la prestation ou non présentation
+du bénéficiaire entraine la facturation du prix total de la prestation à
+titre d'indemnisation, déduction faite le cas échéant des sommes déjà
 facturées et/ou payées.
 
 Une fois la prestation commencée, toute annulation ou interruption
 entraîne la facturation du prix total de la prestation, déduction faite
-le cas échéant des sommes déjà̀ facturées et/ou payées.
+le cas échéant des sommes déjà facturées et/ou payées.
 
-Les sommes dues par le client à titre d'indemnisation sont mentionnées
+Les sommes dues par le client à titre d'indemnisation sont mentionnées
 comme telles sur la facture. Elles ne peuvent en aucun cas être imputées
 sur le montant de la participation au développement de la formation
 professionnelle.
@@ -2907,29 +2260,29 @@ professionnelle.
 
 Lorsque la demande d'annulation est reçue par **NT CONSEILS** après
 l'expiration du délai de rétractation et avant le début de la prestation
-**NT CONSEILS** retient l'acompte (ou le facture s'il n'a pas été
+**NT CONSEILS** retient l'acompte (ou le facture s'il n'a pas été
 perçu), s'il y a lieu, sauf cas de force majeure.
 
 Une fois la prestation commencée, lorsque, par suite de cas de force
 majeure dûment reconnu (évènement imprévisible, insurmontable et
-étranger à la personne), le client personne physique est dans
-l\\'impossibilité́ de poursuivre la prestation, la convention est résilié́
+étranger à la personne), le client personne physique est dans
+l\\'impossibilité de poursuivre la prestation, la convention est résilié
 de plein droit et les prestations de formation effectivement dispensées
 sont facturées au *prorata temporis* de leur valeur prévue à la
-convention, déduction faite le cas échéant des sommes déjà̀ facturées
+convention, déduction faite le cas échéant des sommes déjà facturées
 et/ou payées. En l'absence de force majeure, une fois la prestation
 commencée, toute annulation, abandon ou interruption entraîne la
 facturation du prix total de la prestation, déduction faite le cas
-échéant des sommes déjà̀ facturées et/ou payées.
+échéant des sommes déjà facturées et/ou payées.
 
-Les sommes dues par le client à titre d'indemnisation sont mentionnées
+Les sommes dues par le client à titre d'indemnisation sont mentionnées
 comme telles sur la facture.
 
 10.3. Dispositions particulières aux formations linguistiques
 
 Par dérogation aux présentes conditions générales de vente, toute
-annulation d'un cours linguistique programmé doit être enregistrée au
-moins 2 jours ouvrés à l'avance. Toutes les heures prévues dans la
+annulation d'un cours linguistique programmé doit être enregistrée au
+moins 2 jours ouvrés à l'avance. Toutes les heures prévues dans la
 convention sont facturées. Les OPCO ne remboursent que les heures
 effectuées.
 
@@ -2939,67 +2292,67 @@ En cas d'annulation par **NT CONSEILS** les sommes versées sont
 remboursées au client.
 
 En cas de report, **NT CONSEILS** propose de nouvelles dates : si le
-client les accepte, les sommes déjà̀ versées sont imputées sur le prix de
+client les accepte, les sommes déjà versées sont imputées sur le prix de
 la nouvelle session d'accompagnement ; si le client les refuse, ces
 sommes lui sont remboursées.
 
 En cas de cessation anticipée de la prestation par l'établissement pour
-un motif indépendant de sa volonté́, la convention est résiliée de plein
+un motif indépendant de sa volonté, la convention est résiliée de plein
 droit et les prestations de formation effectivement dispensées sont
 facturées au prorata temporis de leur valeur prévue à la convention,
-déduction faite le cas échéant des sommes déjà̀ facturées et/ou payées.
+déduction faite le cas échéant des sommes déjà facturées et/ou payées.
 
 Dans tous les cas, l'annulation ou le report de la prestation ne peut
-donner lieu au versement de dommages et intérêts à quelque titre que ce
+donner lieu au versement de dommages et intérêts à quelque titre que ce
 soit.
 
-**11. PROPRIÉTÉ INTELLECTUELLE**
+**11. PROPRIÉTÉ INTELLECTUELLE**
 
-**NT CONSEILS** est seule titulaire des droits de propriété́
-intellectuelle sur l'ensemble des prestations qu'elle propose à ses
+**NT CONSEILS** est seule titulaire des droits de propriété
+intellectuelle sur l'ensemble des prestations qu'elle propose à ses
 clients. Tous les contenus et supports pédagogiques, quelle qu'en soit
 la forme (papier, numérique, \\...), utilisés dans le cadre des
-prestations, appartiennent à titre exclusif à **NT CONSEILS**
+prestations, appartiennent à titre exclusif à **NT CONSEILS**
 
 Toute utilisation, représentation, reproduction intégrale ou partielle,
 traduction, transformation et, plus généralement, toute exploitation non
 expressément autorisée par **NT CONSEILS** est illicite et pourra donner
-à des poursuites civiles et/ou pénales sur le fondement du code de la
-propriété́ intellectuelle.
+à des poursuites civiles et/ou pénales sur le fondement du code de la
+propriété intellectuelle.
 
-**12. CONFIDENTIALITÉ**
+**12. CONFIDENTIALITÉ**
 
 **NT CONSEILS**, le client et le bénéficiaire s'engagent réciproquement
-à garder confidentiels les informations et documents, quelles que soient
+à garder confidentiels les informations et documents, quelles que soient
 leur forme et leur nature (économiques, techniques, commerciaux, \\...),
 auxquels ils pourraient avoir eu accès dans le cadre de l'exécution de
-la prestation ou à l'occasion des échanges intervenus antérieurement à
+la prestation ou à l'occasion des échanges intervenus antérieurement à
 la conclusion du contrat.
 
 **13. INFORMATIQUE ET LIBERTES**
 
-Des données à caractère personnel sont collectées afin de pouvoir
-répondre à la demande du client et du bénéficiaire et de les tenir
+Des données à caractère personnel sont collectées afin de pouvoir
+répondre à la demande du client et du bénéficiaire et de les tenir
 informés des offres de service de **NT CONSEILS** aucune information
-personnelle n'est cédée à des tiers.
+personnelle n'est cédée à des tiers.
 
-Conformément à la loi informatique et libertés du 6 janvier 1978, le
+Conformément à la loi informatique et libertés du 6 janvier 1978, le
 client et le bénéficiaire disposent d'un droit d'accès qu'ils peuvent
-exercer auprès du correspondant à la protection des données à caractère
+exercer auprès du correspondant à la protection des données à caractère
 personnel. Ils disposent également d'un droit de modification, de
-rectification et de suppression des données à caractère personnel les
+rectification et de suppression des données à caractère personnel les
 concernant qu'ils peuvent exercer auprès du service en charge de la
-prestation ou, en cas de difficulté́, auprès du **NT CONSEILS.**
+prestation ou, en cas de difficulté, auprès du **NT CONSEILS.**
 
-**14. DROIT APPLICABLE-TRIBUNAUX COMPÉTENTS**
+**14. DROIT APPLICABLE-TRIBUNAUX COMPÉTENTS**
 
 Toutes les contestations relatives aux ventes de biens et services
 conclus
 
-Par **NT CONSEILS**, ainsi qu'à l'application ou à l'interprétation des
+Par **NT CONSEILS**, ainsi qu'à l'application ou à l'interprétation des
 présentes conditions générales de vente sont régies par la loi
 française. Tout litige relatif aux contrats ou conventions fera l'objet
-au préalable d'une concertation afin de trouver une solution amiable, à
+au préalable d'une concertation afin de trouver une solution amiable, à
 défaut la partie la plus diligente saisira le tribunal compétent.
 
 **15. RELATION CLIENTS**
@@ -3016,7 +2369,7 @@ dispensateur de l'action bilan de compétences :
 
 Atteste que :
 
-> M**. ZOCLY Marc**
+> **{CIV_NOM_BENEF}**
 >
 > à suivi le bilan de compétences proposé par **NT CONSEILS**
 >
@@ -3097,8 +2450,7 @@ mentionnés aux articles 2 et 3.
 ## Article 6 : Litiges
 
 Les Parties s'efforceront de régler à l'amiable tout litige découlant du
-présent contrat. En cas de désaccord persistant, le Tribunal de Grande
-Instance de Nanterre sera compétent et seul le droit français sera
+présent contrat. En cas de désaccord persistant, le {TRIBUNAL} sera compétent et seul le droit français sera
 applicable.
 
 Fait à Saint- Denis le 01/01/2026, en deux exemplaires originaux.

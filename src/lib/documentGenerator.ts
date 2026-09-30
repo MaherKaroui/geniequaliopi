@@ -4,7 +4,10 @@ import { resolveFormation } from "./formationResolue";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
-import { generateBdcNTCalendrierAnnuel, generateBdcNTSuiviAdaptation, generateBdcNTContactsHandicap, generateBdcNTTableauDysfonctionnements } from "@/lib/bdc/bdcNTXlsx";
+import { generateBdcNTCalendrierAnnuel } from "@/lib/bdc/bdcNTXlsx";
+import { BDC_CLASSEURS } from "@/lib/bdc/bdcClasseursXlsx";
+import { buildBdcContext } from "@/lib/bdc/bdcModel";
+import { genAnalyseRisquesQualite as genAnalyseRisquesQualiteBC, genRegistreSousTraitancePortage as genRegistreSousTraitanceBC, genClausesQualiteContrat as genClausesQualiteBC } from "@/lib/qualite2026";
 import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTStatsXlsx";
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
@@ -272,7 +275,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const sourceKey = params?.sourceKey as string;
       const si = params?.stagiaireIdx;
       const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
-      return renderBdcNTDocHtml(sourceKey, o, s, f, stagiaires.length);
+      return renderBdcNTDocHtml(sourceKey, o, s, f, stagiaires.length, stagiaires);
     }
     case "bdc_nt_programme_phases":
       return renderBdcNTProgrammePhasesHtml(o, f, stagiaires[0] || null);
@@ -289,12 +292,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
 
     case "bdc_nt_calendrier_annuel":
       return generateBdcNTCalendrierAnnuel(o);
-    case "bdc_nt_suivi_adaptation":
-      return generateBdcNTSuiviAdaptation(o, f, stagiaires);
-    case "bdc_nt_contacts_handicap":
-      return generateBdcNTContactsHandicap(o);
-    case "bdc_nt_tableau_dysfonctionnements":
-      return generateBdcNTTableauDysfonctionnements(o);
+    case "bdc_classeur": {
+      const cl = BDC_CLASSEURS[Number(params?.classeurIdx ?? 0)] || BDC_CLASSEURS[0];
+      return cl.build(buildBdcContext(o, f, stagiaires));
+    }
+    case "bdc_q2026": {
+      const piece = String(params?.piece || "risques");
+      if (piece === "registre") return genRegistreSousTraitanceBC(o, "BC", f, stagiaires);
+      if (piece === "clauses") return genClausesQualiteBC(o, "BC");
+      return genAnalyseRisquesQualiteBC(o, "BC", f);
+    }
     case "bdc_nt_stats_xlsx": {
       const idx = Number(params?.statsIndex ?? 0);
       return BDC_NT_STATS_FILES[idx]?.build(o, f, stagiaires) || BDC_NT_STATS_FILES[0].build(o, f, stagiaires);

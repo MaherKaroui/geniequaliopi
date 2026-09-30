@@ -27,7 +27,8 @@ function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
 }
 import { getEvalContent } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
-import { BDC_TEMPLATES_MANQUANTS } from "./bdc/bdcTemplatesBC";
+import { BDC_TEMPLATES_MANQUANTS, bdcTemplateApplicable } from "./bdc/bdcTemplatesBC";
+import { BDC_CLASSEURS } from "./bdc/bdcClasseursXlsx";
 
 import { BDC_NT_STATS_FILES } from "./bdc/bdcNTStatsXlsx";
 import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
@@ -1316,11 +1317,9 @@ export function buildFullCatalog(
   }
 
   // ===== Bilan de compétences =====
-  // Le dossier BDC complet (trame NT Conseils — 51 docs + 5 trames Excel/PDF) est généré
-  // exclusivement via le bouton "Télécharger le dossier complet" (buildBDCNTConseilsZip).
-  // Aucune entrée individuelle dans le catalogue pour les BDC.
+  // Mêmes pièces et même classement que le ZIP d'audit (buildBDCNTConseilsZip).
   if (isBDC) {
-    // Un document de catalogue par fichier source BDC (NT Conseils).
+    // Un document de catalogue par pièce de la trame BC (source nettoyée).
     // Classement automatique : critère ← indicateur extrait de la clé.
     const bdcKeys = Object.keys(BDC_NT_SOURCE).sort();
     const slug = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -1356,27 +1355,32 @@ export function buildFullCatalog(
         { statsIndex: idx },
       );
     });
-    // CR individuel d'entretien à 6 mois — un fichier par bénéficiaire (cohérent avec le suivi global)
+    // Compte rendu de suivi à 6 mois — un fichier par bénéficiaire (IND 30, comme dans le ZIP)
     stagiaires.forEach((s, si) => {
       add(
-        `bdc_nt_ind2_cr6mois_s${si}`,
-        `CT1 - IND 2 CR entretien à 6 mois – ${s.prenom} ${s.nom}`,
-        1, 2, "bdc_nt_cr6mois_stagiaire",
+        `bdc_nt_ind30_cr6mois_s${si}`,
+        `CT7 - IND 30 Compte rendu de suivi à 6 mois – ${s.prenom} ${s.nom}`,
+        7, 30, "bdc_nt_cr6mois_stagiaire",
         { stagiaireIdx: si },
       );
     });
-    // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
-    add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
-    // Programme réglementaire des 3 phases du bilan (Art. R.6313-4 à R.6313-8)
-    add("bdc_nt_programme_phases", "CT3 - IND 10 Programme des 3 phases du bilan de compétences", 3, 10, "bdc_nt_programme_phases");
+    // Classeurs (cahier de contacts, suivi de l'adaptation, contacts handicap, dysfonctionnements)
+    BDC_CLASSEURS.forEach((cl, idx) => {
+      add(`bdc_classeur_${idx}`, `CT${critereForIndicateur(cl.indicateur)} - IND ${cl.indicateur} ${cl.name.replace(/^Indicateur\s+\d+\s*-\s*/, "").replace(/\.xlsx$/i, "")} (Excel)`, critereForIndicateur(cl.indicateur), cl.indicateur, "bdc_classeur", { classeurIdx: idx });
+    });
+    // Programme réglementaire des 3 phases du bilan (art. R6313-4) — contenus et modalités (IND 6)
+    add("bdc_nt_programme_phases", "CT2 - IND 6 Programme des 3 phases du bilan de compétences", 2, 6, "bdc_nt_programme_phases");
     add("bdc_nt_phase_1", "CT3 - IND 10 Phase 1 – Phase préliminaire", 3, 10, "bdc_nt_phase", { phase: 1 });
     add("bdc_nt_phase_2", "CT3 - IND 10 Phase 2 – Phase d'investigation", 3, 10, "bdc_nt_phase", { phase: 2 });
     add("bdc_nt_phase_3", "CT3 - IND 10 Phase 3 – Phase de conclusion & suivi à 6 mois", 3, 10, "bdc_nt_phase", { phase: 3 });
-    add("bdc_nt_contacts_handicap", "CT6 - IND 26 Contacts & suivi handicap (Excel)", 6, 26, "bdc_nt_contacts_handicap");
-    add("bdc_nt_tableau_dysfonctionnements", "CT7 - IND 31 Tableau d'analyse des appréciations & réclamations (Excel)", 7, 31, "bdc_nt_tableau_dysfonctionnements");
-    // BLOC 4 — pièces obligatoires BC (synthèse R6313-8, émargements, satisfaction, RGPD…)
+    // Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32
+    add("bdc_q2026_registre_st", "CT6 - IND 27 Registre de sous-traitance et de portage salarial", 6, 27, "bdc_q2026", { piece: "registre" });
+    add("bdc_q2026_clauses", "CT6 - IND 27 Annexe clauses qualité des contrats de sous-traitance", 6, 27, "bdc_q2026", { piece: "clauses" });
+    add("bdc_q2026_risques", "CT7 - IND 32 Analyse des risques sur la qualité des prestations", 7, 32, "bdc_q2026", { piece: "risques" });
+    // Pièces obligatoires BC (synthèse, attestation de remise, émargements, satisfaction, veilles…)
     BDC_TEMPLATES_MANQUANTS.forEach((def, idx) => {
+      if (!bdcTemplateApplicable(def, formations[0])) return;
       const ind = def.indicateur;
       const crit = critereForIndicateur(ind);
       const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&et]+\s*\d+)*\s*-\s*/i, "");

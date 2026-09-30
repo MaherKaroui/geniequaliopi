@@ -6,7 +6,7 @@
  * à la date d'édition.
  */
 import type { BdcContext, Beneficiaire } from "./bdcModel";
-import { fmtDateFR, seancesFor } from "./bdcModel";
+import { fmtDateFR, seancesFor, prestationFor } from "./bdcModel";
 import { calculerDatesDossier } from "../moteurDates";
 
 const ESC = (v: unknown) =>
@@ -51,23 +51,23 @@ const nomBen = (b: Beneficiaire) => `${b.prenom} ${b.nom.toUpperCase()}`.trim();
 /* Indicateur 4 — Cahier de contacts                                    */
 /* ------------------------------------------------------------------ */
 export function buildCahierContacts(ctx: BdcContext): string {
-  const d = calculerDatesDossier({
-    dateDebut: ctx.prestation.dateDebut,
-    dateFin: ctx.prestation.dateFin,
-    dureeTotaleH: ctx.prestation.dureeTotaleH,
+  const rows = ctx.beneficiaires.flatMap((b) => {
+    const p = prestationFor(ctx, b);
+    const d = calculerDatesDossier({ dateDebut: p.dateDebut, dateFin: p.dateFin, dureeTotaleH: p.dureeTotaleH });
+    const futur = (x: Date) => x.getTime() > Date.now();
+    return [
+      [
+        fmtDateFR(d.entretienPrealable), nomBen(b), b.telephone || "—", b.email || "—",
+        "Demande d'information — bilan de compétences", "Entretien préalable d'information (gratuit, sans engagement)",
+        p.consultant.nom, futur(d.entretienPrealable) ? "Prévu" : "Analyse du besoin réalisée",
+      ],
+      [
+        fmtDateFR(d.contractualisation), nomBen(b), b.telephone || "—", b.email || "—",
+        "Contractualisation", p.origineDemande === "employeur" ? "Envoi de la convention tripartite, des CGV et du règlement intérieur" : "Envoi du contrat, des CGV et du règlement intérieur",
+        p.consultant.nom, futur(d.contractualisation) ? "Prévu" : "Signé avant démarrage",
+      ],
+    ];
   });
-  const rows = ctx.beneficiaires.flatMap((b) => [
-    [
-      fmtDateFR(d.entretienPrealable), nomBen(b), b.telephone || "—", b.email || "—",
-      "Demande d'information — bilan de compétences", "Entretien préalable d'information (gratuit, sans engagement)",
-      ctx.prestation.consultant.nom, "Analyse du besoin engagée",
-    ],
-    [
-      fmtDateFR(d.contractualisation), nomBen(b), b.telephone || "—", b.email || "—",
-      "Contractualisation", "Envoi de la convention, des CGV et du règlement intérieur",
-      ctx.prestation.consultant.nom, "Convention signée avant démarrage",
-    ],
-  ]);
   return classeur(
     "CAHIER DE CONTACTS ET ANALYSE DU BESOIN",
     sousTitre(ctx),
@@ -94,7 +94,7 @@ export function buildContactsHandicap(ctx: BdcContext): string {
     nomBen(b),
     b.situationHandicap ? "Situation déclarée" : "Aucune situation déclarée",
     b.situationHandicap ? (b.amenagements || "À formaliser avec le référent handicap") : "Sans objet",
-    b.situationHandicap ? fmtDateFR(ctx.prestation.dateDebut) : "—",
+    b.situationHandicap ? fmtDateFR(prestationFor(ctx, b).dateDebut) : "—",
   ]);
   return classeur(
     "CONTACTS ET SUIVI HANDICAP",
@@ -107,14 +107,14 @@ export function buildContactsHandicap(ctx: BdcContext): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* Indicateur 12 — Suivi de l'adaptation                                */
+/* Indicateur 10 — Suivi de l'adaptation                                */
 /* ------------------------------------------------------------------ */
 export function buildSuiviAdaptation(ctx: BdcContext): string {
   const rows = ctx.beneficiaires.map((b) => {
     const seances = seancesFor(ctx, b);
     return [
       nomBen(b),
-      seances.length ? fmtDateFR(seances[0].date) : fmtDateFR(ctx.prestation.dateDebut),
+      seances.length ? fmtDateFR(seances[0].date) : fmtDateFR(prestationFor(ctx, b).dateDebut),
       b.situationHandicap ? "Situation de handicap déclarée" : "Contraintes professionnelles et familiales",
       b.amenagements || "Aucun besoin d'adaptation exprimé lors de l'analyse du besoin",
       `Créneaux : ${b.joursDisponibles.join(", ") || "—"}`,
@@ -136,29 +136,15 @@ export function buildSuiviAdaptation(ctx: BdcContext): string {
 /* Indicateur 31 — Tableau des dysfonctionnements                       */
 /* ------------------------------------------------------------------ */
 export function buildDysfonctionnements(ctx: BdcContext): string {
-  const d = calculerDatesDossier({
-    dateDebut: ctx.prestation.dateDebut,
-    dateFin: ctx.prestation.dateFin,
-    dureeTotaleH: ctx.prestation.dureeTotaleH,
-  });
-  const rows = ctx.beneficiaires.map((b, i) => [
-    `DYS-${new Date(ctx.prestation.dateDebut).getFullYear()}-${String(i + 1).padStart(3, "0")}`,
-    fmtDateFR(d.entretienIntermediaire),
-    "Remarque recueillie en entretien intermédiaire",
-    nomBen(b),
-    "Prestation : bilan de compétences",
-    "Remarque du bénéficiaire consignée en entretien intermédiaire (à retranscrire depuis les notes du consultant)",
-    "Ajustement du rythme et des supports de la phase d'investigation",
-    ctx.prestation.consultant.nom,
-    "☐ En cours ☐ Soldée",
-  ]);
+  // Registre tenu au fil de l'eau : aucune ligne n'est inventée par l'outil.
+  const vide = ["", "", "", "", "", "", "", "", "☐ En cours ☐ Soldée"];
   return classeur(
-    "TABLEAU DES DYSFONCTIONNEMENTS, RÉCLAMATIONS ET ALÉAS",
+    "REGISTRE DES DYSFONCTIONNEMENTS, RÉCLAMATIONS ET ALÉAS",
     sousTitre(ctx),
     "Dysfonctionnements",
     ["Référence", "Date du constat", "Origine", "Bénéficiaire", "Prestation", "Description", "Action corrective", "Responsable", "Statut"],
-    rows,
-    ["Les réclamations formelles sont également reportées au registre des réclamations (indicateur 31)."],
+    [vide, vide, vide],
+    ["Registre ouvert à la date de mise à jour du dossier et tenu au fil de l'eau. Toute réclamation, difficulté ou aléa y est inscrit dans les 48 heures ; l'action corrective est reportée au tableau d'amélioration continue (IND 32)."],
   );
 }
 
@@ -173,8 +159,8 @@ export interface ClasseurDef {
 export const BDC_CLASSEURS: ClasseurDef[] = [
   { name: "Indicateur 4 - Cahier de contacts et analyse du besoin.xlsx", indicateur: 4, build: buildCahierContacts },
   { name: "Indicateur 26 - Contacts et suivi handicap.xlsx", indicateur: 26, build: buildContactsHandicap },
-  { name: "Indicateur 12 - Suivi de l'adaptation à l'accompagnement.xlsx", indicateur: 12, build: buildSuiviAdaptation },
-  { name: "Indicateur 31 - Tableau des dysfonctionnements.xlsx", indicateur: 31, build: buildDysfonctionnements },
+  { name: "Indicateur 10 - Suivi de l'adaptation à l'accompagnement.xlsx", indicateur: 10, build: buildSuiviAdaptation },
+  { name: "Indicateur 31 - Registre des dysfonctionnements, réclamations et aléas.xlsx", indicateur: 31, build: buildDysfonctionnements },
 ];
 
 /** Texte brut d'un classeur, pour le contrôle de cohérence (MESSAGE 22). */
