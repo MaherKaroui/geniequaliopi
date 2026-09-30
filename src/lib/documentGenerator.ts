@@ -1,7 +1,7 @@
 import { mot } from "./resolveurFormation";
 import { resolveFormation } from "./formationResolue";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
-import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille } from "./veilleExploitee";
+import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "./qualite2026";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
@@ -12793,9 +12793,11 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
 <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Amélioration Continue</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse">
 <tr style="background:#1e3a7b;color:#fff;font-weight:bold;text-align:center">
+  <th>Réf.</th>
   <th>Date d'ouverture</th>
   <th>Origine Amélioration</th>
   <th>Description du contexte ou de l'anomalie</th>
+  <th>Risque qualité associé (IND 32)</th>
   <th>ACTION</th>
   <th>Qui réalise l'action</th>
   <th>Délais de mise en place</th>
@@ -12803,70 +12805,36 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   <th>Commentaires / avancement</th>
 </tr>`;
 
-  const t = (f.intitule || "").toLowerCase();
-  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
-  const isEsth = t.includes("esthétique") || t.includes("cosmétique");
-  const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
-  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
-  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
-  const isCRM = t.includes("crm") || t.includes("hubspot");
-  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
-  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
-  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
-  const isFLE = t.includes("français") || mot(t, "fle");
-  const isWord = t.includes("word");
-  const formName = f.intitule || "la formation";
-
-  let actions: Array<{ date: string; origine: string; desc: string; action: string; qui: string; delai: string; cloture: string; commentaire: string }> = [];
-
-  if (isAnglaisA1) {
-    actions = [
-      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Rythme trop rapide pour les grands débutants, vocabulaire non retenu entre les séances", action: "Réduction du volume de vocabulaire par séance (max 10 mots) et ajout de révisions systématiques en début de cours avec flashcards", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -30)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "Flashcards créées, rythme adapté, retours positifs" },
-      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Supports trop textuels et intimidants pour des débutants, manque de visuels", action: "Refonte complète des supports avec images, pictogrammes, codes couleur et fichiers audio de prononciation", qui: o.referentQualite, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, -100)), commentaire: "Supports visuels créés avec audio intégré" },
-      { date: fmtDate(addDays(baseDate, -110)), origine: "Veille pédagogique", desc: "Nouvelles ressources CECRL volume compagnon pour le niveau A1 (descripteurs actualisés)", action: "Mise à jour des grilles d'évaluation A1 et des objectifs pédagogiques selon le CECRL actualisé", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -20)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "Grilles mises à jour avec nouveaux descripteurs A1" },
-      { date: fmtDate(addDays(baseDate, -90)), origine: "Retour entreprises", desc: "Besoin de vocabulaire professionnel de base : se présenter, répondre au téléphone, accueillir un visiteur", action: "Création d'un module vocabulaire professionnel A1 avec jeux de rôle simples (accueil, téléphone, présentation)", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -15)), cloture: fmtDate(addDays(baseDate, -20)), commentaire: "Module créé avec 6 scénarios de base" },
-      { date: fmtDate(addDays(baseDate, -75)), origine: "Audit interne", desc: "Exercices d'écoute trop rapides et inadaptés au niveau grand débutant", action: "Enregistrement de 20 dialogues lents et articulés avec sous-titres, adaptés au niveau A1", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -15)), commentaire: "Dialogues enregistrés par native speaker" },
-      { date: fmtDate(addDays(baseDate, -60)), origine: "Satisfaction", desc: "Souhait d'accéder à des exercices entre les séances pour réviser le vocabulaire", action: "Mise en place d'un accès à une application de révision (Duolingo/Memrise) entre les sessions", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -12)), commentaire: "Licences activées avant démarrage" },
-      { date: fmtDate(addDays(baseDate, -45)), origine: "Dysfonctionnement", desc: "Casques audio défectueux empêchant les exercices de compréhension orale", action: "Remplacement des casques et achat de casques de réserve", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -14)), commentaire: "Matériel reçu et testé" },
-    ];
-  } else if (isAnglais) {
-    actions = [
-      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de mises en situation orales professionnelles", action: "Ajout de jeux de rôle (réunion, appel client, présentation) à chaque séance", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -30)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "Jeux de rôle intégrés" },
-      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Vocabulaire trop généraliste, pas assez orienté métier", action: "Création de glossaires métier (commerce, santé, tech) avec exercices", qui: o.referentQualite, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, -100)), commentaire: "3 glossaires créés" },
-      { date: fmtDate(addDays(baseDate, -110)), origine: "Veille", desc: "Évolution du format TOEIC 2025", action: "Mise à jour des examens blancs et grilles de scoring TOEIC", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -20)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "Examen blanc V2025 créé" },
-      { date: fmtDate(addDays(baseDate, -90)), origine: "Retour entreprises", desc: "Besoin de modules téléphone et visioconférence en anglais", action: "Développement d'un module communication à distance en anglais", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -15)), cloture: fmtDate(addDays(baseDate, -20)), commentaire: "Module livré" },
-      { date: fmtDate(addDays(baseDate, -75)), origine: "Audit", desc: "Supports audio de compréhension orale obsolètes", action: "Renouvellement avec podcasts BBC et vidéos TED récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -15)), commentaire: "Sélection finalisée" },
-      { date: fmtDate(addDays(baseDate, -60)), origine: "Satisfaction", desc: "Souhait d'accès à une plateforme e-learning entre les séances", action: "Mise en place d'un accès Babbel/Gymglish pour les intersessions", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -12)), commentaire: "Licences activées" },
-      { date: fmtDate(addDays(baseDate, -45)), origine: "Dysfonctionnement", desc: "Casques audio défectueux en salle multimédia", action: "Remplacement des casques et achat de casques de réserve", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -14)), commentaire: "Matériel reçu et testé" },
-    ];
-  } else {
-    actions = [
-      { date: dateOuverture, origine: "Analyse indicateurs", desc: `Taux de satisfaction stagiaires inférieur à l'objectif sur la formation ${formName}`, action: `Mise à jour des supports pédagogiques et adaptation du rythme de ${formName}`, qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -30)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "Supports refondus, satisfaction projetée à 95%" },
-      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Risque de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, -100)), commentaire: "Box installée, connexion sécurisée avant démarrage" },
-      { date: fmtDate(addDays(baseDate, -110)), origine: "Satisfaction parties prenantes", desc: `Demande de formats plus courts et intensifs pour ${formName}`, action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -20)), cloture: fmtDate(addDays(baseDate, -25)), commentaire: "3 formations intensives créées et planifiées" },
-      { date: fmtDate(addDays(baseDate, -90)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, -15)), cloture: fmtDate(addDays(baseDate, -20)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
-      { date: fmtDate(addDays(baseDate, -75)), origine: "Entretien formateur", desc: `Besoin de formation continue sur les outils pédagogiques de ${formName}`, action: "Inscription aux formations outils numériques et innovation pédagogique", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -15)), commentaire: "Formation suivie avant démarrage" },
-      { date: fmtDate(addDays(baseDate, -60)), origine: "Enquête satisfaction", desc: `Souhait de plus de cas pratiques professionnels en ${formName}`, action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -12)), commentaire: "Exercices intégrés au programme" },
-      { date: fmtDate(addDays(baseDate, -45)), origine: "Dysfonctionnement", desc: "Retard historique dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, -10)), cloture: fmtDate(addDays(baseDate, -14)), commentaire: "Outil opérationnel pour cette session" },
-    ];
-  }
-
-  actions.forEach(a => {
-    xlsHtml += `<tr>
-  <td>${a.date}</td>
-  <td>${a.origine}</td>
-  <td>${a.desc}</td>
-  <td>${a.action}</td>
-  <td>${a.qui}</td>
-  <td>${a.delai}</td>
-  <td>${a.cloture}</td>
-  <td>${a.commentaire}</td>
-</tr>`;
+  // Actions RÉELLES, reliées aux sources du dossier (plus d'historique inventé de réclamations
+  // ou d'enquêtes antérieures à la première session) :
+  //  - chaque information de veille exploitée (IND 23-24-25) → action AC-Vnn du compte rendu ;
+  //  - l'analyse des risques qualité (IND 32, décret n° 2026-728) → actions de maîtrise AC-Rnn.
+  const typeAct: "AF" | "CFA" | "VAE" | "BC" = (o.typesActions || []).includes("apprentissage") ? "CFA" : (o.typesActions || []).includes("vae") ? "VAE" : (o.typesActions || []).includes("bilans-competences") ? "BC" : "AF";
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const veilles = (["reglementaire", "metier", "technologique"] as const).flatMap((th) =>
+    entreesVeille(o, f, th, typeAct).map((e) => ({ e, ind: th === "reglementaire" ? 23 : th === "metier" ? 24 : 25 })));
+  const risquesAction: Array<[string, string, string]> = [
+    ["Décrochage ou abandon en cours de parcours", "Relance sous 48 h après une absence, entretien d'étape, procédure d'abandon", o.responsablePedagogique || o.dirigeant],
+    ["Information du public incomplète ou non datée", "Contrôle des 10 items du programme et de la date de mise à jour avant chaque session", o.responsablePedagogique || o.dirigeant],
+    ["Besoin de compensation du handicap non identifié", "Question systématique dans l'évaluation des besoins et entretien avec le référent handicap", o.referentHandicap || o.dirigeant],
+    ["Évolution réglementaire non prise en compte", "Veille mensuelle tracée et compte rendu d'exploitation (IND 23)", o.referentQualite || o.dirigeant],
+  ];
+  const lignes: string[][] = [];
+  veilles.forEach(({ e, ind }, i) => {
+    const clos = e.statut === "Réalisé";
+    lignes.push([`AC-V${String(i + 1).padStart(2, "0")}`, e.priseEnCompte, `Veille IND ${ind}`, `${e.titre} — ${e.impact}`, ind === 23 ? "Évolution réglementaire non prise en compte" : ind === 24 ? "Contenus décalés des besoins du métier" : "Méthodes et outils pédagogiques obsolètes", e.action, e.pilote, e.echeance, clos ? e.echeance : "", clos ? `Clôturé — ${e.diffusion}` : "En cours"]);
+  });
+  const dateRisques = formatDate((o.dateMaj || todayIso) <= todayIso ? (o.dateMaj || todayIso) : todayIso);
+  risquesAction.forEach(([risque, action, qui], i) => {
+    lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `Risque coté « élevé » dans la cartographie des risques de ${o.nom}`, risque, action, qui, "Permanent — revue annuelle", "", "Mesure de maîtrise en place ; efficacité revue à la revue qualité annuelle"]);
+  });
+  lignes.forEach((l) => {
+    xlsHtml += `<tr>${l.map((c) => `<td>${c}</td>`).join("")}</tr>`;
   });
 
   // Add empty rows for future entries
   for (let i = 0; i < 5; i++) {
-    xlsHtml += `<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+    xlsHtml += `<tr>${"<td></td>".repeat(10)}</tr>`;
   }
 
   xlsHtml += `</table>
