@@ -1557,18 +1557,9 @@ export function buildFullCatalog(
       add(`mail_convocation_${si}`, `MAIL - CONVOCATION – ${s.prenom} ${s.nom}`, 0, 0, "mail_convocation", { stagiaireIdx: si });
       add(`mail_envoi_contrat_convocation_ri_${si}`, `MAIL - ENVOI CONTRAT + CONVOCATION + RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoi_contrat_convocation_ri", { stagiaireIdx: si });
       add(`mail_envoie_sc_${si}`, `MAIL - ENVOI SC ET RESSOURCES – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoie_sc_ressources", { stagiaireIdx: si });
-      add(`mail_deroulement_examen_${si}`, `MAIL - DÉROULEMENT EXAMEN VTC (RS5637) – ${s.prenom} ${s.nom}`, 0, 0, "mail_deroulement_examen_vtc", { stagiaireIdx: si });
       add(`mail_fin_formation_${si}`, `MAIL - BILAN À CHAUD – ${s.prenom} ${s.nom}`, 0, 0, "mail_fin_formation", { stagiaireIdx: si });
       add(`mail_bilan_froid_${si}`, `MAIL - BILAN À FROID (3 mois après) – ${s.prenom} ${s.nom}`, 0, 0, "mail_bilan_froid_3mois", { stagiaireIdx: si });
-      add(`mail_invitation_formateur_externe_${si}`, `MAIL - INVITATION FORMATEUR EXTERNE (Nabih Ouardani) – Session ${s.prenom} ${s.nom}`, 0, 0, "mail_invitation_formateur_externe", { stagiaireIdx: si });
     });
-    // Mail conversation élève ↔ formateur Nabih (1 seul stagiaire)
-    if (stagiaires[0]) {
-      const s0 = stagiaires[0];
-      add(`mail_questions_vtc_${0}`, `MAIL - QUESTIONS FORMATION VTC (Échange ${s0.prenom} ${s0.nom} ↔ Nabih)`, 0, 0, "mail_questions_formation_vtc", { stagiaireIdx: 0 });
-    }
-    // Mail conversation Bilal Nouira ↔ Start Formation (demande aménagement MDPH)
-    add(`mail_amenagement_mdph_bilal`, `MAIL - DEMANDE AMÉNAGEMENT MDPH (Échange Bilal Nouira ↔ Start Formation)`, 0, 0, "mail_amenagement_mdph_bilal");
   }
 
   // ===== MAIL — Envois hebdomadaires QCM 14 missions (CFA uniquement) =====
@@ -1644,6 +1635,10 @@ export function buildFullCatalog(
   // Cela évite l'apparition d'un dossier "Critere_0" dans les ZIP et garde l'UI
   // cohérente avec la section MAILS.
   const MAIL_DOCX_TEMPLATES = new Set<string>([
+    // Mails HTML génériques (sans donnée d'un autre organisme) : preuves IND 4, 9 et 13
+    "mail_rdv_evaluation_besoins",
+    "mail_envoi_contrat_convocation_ri",
+    "mail_visite_entreprise_cfa",
     "mail_pre_inscription",
     "mail_inscription",
     "mail_convocation",
