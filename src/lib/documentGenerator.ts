@@ -7,7 +7,6 @@ import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
 import { entreesNonApplicables, motifNonApplicable, genDeclarationNonApplicabilite } from "./nonApplicabilite";
-import { INDICATEURS_REFERENCE as REF_RNQ } from "./qualiopiReference";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
