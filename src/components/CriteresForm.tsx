@@ -30,7 +30,7 @@ const CriteresForm = ({ data, onChange }: CriteresFormProps) => {
     <div className="space-y-6">
       <div className="mb-6">
         <h2 className="text-xl font-bold">Critères & Indicateurs Qualiopi</h2>
-        <p className="text-sm text-muted-foreground">Répondez aux 32 indicateurs des 7 critères</p>
+        <p className="text-sm text-muted-foreground">Répondez aux 33 indicateurs des 7 critères</p>
       </div>
 
       <Accordion type="single" collapsible className="space-y-3">

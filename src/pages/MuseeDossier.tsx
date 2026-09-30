@@ -420,7 +420,7 @@ export default function MuseeDossier() {
           <h1 className="text-2xl font-serif tracking-widest text-amber-200 drop-shadow">
             🏛️ MUSÉE DU DOSSIER
           </h1>
-          <p className="text-xs text-amber-100/60 italic mt-1">Galerie virtuelle Qualiopi · 7 critères · 32 indicateurs</p>
+          <p className="text-xs text-amber-100/60 italic mt-1">Galerie virtuelle Qualiopi · 7 critères · 33 indicateurs</p>
         </div>
         <div className="bg-background/80 backdrop-blur px-3 py-2 rounded-md text-xs text-muted-foreground pointer-events-auto">
           🖱️ Clic-glisser pour pivoter · Molette pour zoomer · Clic sur un cadre

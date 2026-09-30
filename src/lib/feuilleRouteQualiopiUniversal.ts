@@ -50,7 +50,7 @@ export function generateFeuilleRouteQualiopiUniversal(
 
   const rows: (string | number)[][] = [];
   rows.push([`PRÉPARATION AUDIT QUALIOPI — ${label} — ${org.nom} — ${frDate(new Date().toISOString())}`]);
-  rows.push([`Référentiel National Qualité V9 — 7 critères / ${indicateurs.length} indicateurs applicables au périmètre « ${label} ». Indicateurs spécifiques surlignés en orange.`]);
+  rows.push([`Référentiel national qualité (décret n° 2026-728, guide de lecture V9) — 7 critères / ${indicateurs.length} indicateurs applicables au périmètre « ${label} ». Indicateurs spécifiques surlignés en orange.`]);
   rows.push([]);
   const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Type"];
   rows.push(header);

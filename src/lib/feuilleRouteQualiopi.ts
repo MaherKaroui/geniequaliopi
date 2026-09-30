@@ -1,5 +1,5 @@
 // Génère une "Feuille de route Qualiopi" Excel (.xlsx) sur le même modèle que
-// la trame officielle CFA (32 indicateurs, 7 critères) — listant pour chaque
+// la trame officielle CFA (33 indicateurs, 7 critères) — listant pour chaque
 // indicateur les documents que l'application produit déjà.
 //
 // Colonnes :
@@ -87,7 +87,7 @@ export function generateFeuilleRouteQualiopi(
 
   const rows: (string | number)[][] = [];
   rows.push([
-    `FEUILLE DE ROUTE QUALIOPI — ${organisme.nom || "Organisme"} — Référentiel National Qualité (7 critères / 32 indicateurs) — ${frDate()}`,
+    `FEUILLE DE ROUTE QUALIOPI — ${organisme.nom || "Organisme"} — Référentiel National Qualité (7 critères / 33 indicateurs) — ${frDate()}`,
   ]);
   rows.push([]);
   rows.push(header);

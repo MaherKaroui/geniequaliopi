@@ -1,5 +1,5 @@
-// Référentiel National Qualité V9 — Spécialisation CFA (audit initial nouvel entrant)
-// Source : préparation audit Qualiopi CFA — 32 indicateurs avec niveau attendu,
+// Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — Spécialisation CFA
+// Guide de lecture V9 du 08/01/2024 — 33 indicateurs avec niveau attendu,
 // script "ce qu'il faut dire", preuves attendues, statut nouvel entrant et pondération.
 
 export interface IndicateurCFA {
@@ -178,28 +178,35 @@ export const INDICATEURS_CFA: IndicateurCFA[] = [
     ceQuIlFautDire: "Nous mobilisons un réseau socio-économique (entreprises partenaires, maîtres d'apprentissage, branches pro). Notre annuaire et le CR de coconstruction avec la branche en témoignent.",
     preuves: ["Annuaire entreprises partenaires CFA", "CR coconstruction avec une branche pro", "Fiche maître d'apprentissage"] },
 
+  { numero: 29, critere: 6, titre: "[Spécifique] Insertion professionnelle et poursuite d'études",
+    nouvelEntrant: false, ponderable: false,
+    niveauAttendu: "Démontrer la mise en œuvre d'actions concourant à l'insertion professionnelle ou à la poursuite d'études des apprentis (aide à la recherche d'employeur, préparation aux entretiens, suivi des sortants, publication InserJeunes). NC MAJEURE.",
+    ceQuIlFautDire: "Nous accompagnons chaque apprenti vers l'emploi ou la poursuite d'études : ateliers CV et entretien, mise en relation avec nos entreprises partenaires, suivi des sortants à 3 et 6 mois. Nos résultats sont publiés via InserJeunes.",
+    preuves: ["Procédure insertion professionnelle et poursuite d'études", "Suivi des sortants à 3 et 6 mois", "Questionnaire d'insertion", "Ateliers CV / entretien", "Lien InserJeunes"] },
+
   // ===== CRITÈRE 7 =====
-  { numero: 29, critere: 7, titre: "Recueil des appréciations des parties prenantes",
+  { numero: 30, critere: 7, titre: "Recueil des appréciations des parties prenantes",
     nouvelEntrant: false, ponderable: false,
-    niveauAttendu: "Démontrer la sollicitation des appréciations à une fréquence pertinente (bénéficiaires, financeurs, équipes pédagogiques, entreprises). Financeur : au moins une fois par an. NC MAJEURE si absence d'une partie prenante.",
-    ceQuIlFautDire: "Nous recueillons les appréciations de chaque partie prenante avec des questionnaires distincts : apprenant, commanditaire (entreprise / maître d'apprentissage), financeur (OPCO).",
-    preuves: ["Questionnaire satisfaction apprenant", "Questionnaire satisfaction entreprise / maître d'apprentissage", "Questionnaire satisfaction financeur (OPCO)"],
-    vigilance: "Préparer clairement les questionnaires distincts par partie prenante." },
-  { numero: 30, critere: 7, titre: "Traitement des difficultés, réclamations et aléas",
+    niveauAttendu: "Démontrer la sollicitation des appréciations à une fréquence pertinente (bénéficiaires, financeurs, équipes pédagogiques, entreprises). Financeur : au moins une fois par an. NC MAJEURE si une partie prenante n'est pas sollicitée.",
+    ceQuIlFautDire: "Nous recueillons les appréciations de chaque partie prenante avec des questionnaires distincts : apprenant, entreprise / maître d'apprentissage, financeur (OPCO) et équipe pédagogique.",
+    preuves: ["Questionnaire satisfaction apprenant", "Questionnaire satisfaction entreprise / maître d'apprentissage", "Questionnaire satisfaction financeur (OPCO)", "Questionnaire équipe pédagogique"],
+    vigilance: "Préparer un questionnaire distinct par partie prenante." },
+  { numero: 31, critere: 7, titre: "Traitement des difficultés, réclamations et aléas",
     nouvelEntrant: false, ponderable: true,
-    niveauAttendu: "Démontrer la mise en place de modalités de traitement des aléas, difficultés et réclamations (accusé de réception, réponses, registre, suivi). NC mineure.",
-    ceQuIlFautDire: "Nous disposons d'un dispositif complet : bilans à chaud et à froid, questionnaires, évaluation formateur, et un tableau de relances. CR et PV tracent le traitement.",
-    preuves: ["Bilan à chaud / à froid", "Tableau de relances des appréciations", "Compte-rendu de formation / PV global", "Formulaire de réclamation"] },
-  { numero: 31, critere: 7, titre: "Mise en œuvre de mesures d'amélioration",
-    nouvelEntrant: false, ponderable: false,
-    niveauAttendu: "Démontrer la mise en place d'une démarche d'amélioration continue à partir de l'analyse des appréciations et réclamations. NC MAJEURE.",
-    ceQuIlFautDire: "Les réclamations sont recueillies, tracées et traitées dans notre outil de suivi des dysfonctionnements, qui alimente nos actions correctives.",
-    preuves: ["Formulaire de dépôt de réclamation", "Gestion des réclamations et dysfonctionnements", "Suivi des dysfonctionnements internes/externes"] },
-  { numero: 32, critere: 7, titre: "[Spécifique] Amélioration de l'insertion / réduction des ruptures",
+    niveauAttendu: "Démontrer la mise en place de modalités de traitement des aléas, difficultés et réclamations (accusé de réception, réponse, registre, suivi). NC mineure.",
+    ceQuIlFautDire: "Toute réclamation est enregistrée, accusée, traitée et tracée dans notre registre ; les aléas de session sont consignés et analysés en revue qualité.",
+    preuves: ["Formulaire de réclamation", "Procédure de traitement des réclamations", "Registre / suivi des dysfonctionnements", "Compte rendu de formation"] },
+  { numero: 32, critere: 7, titre: "Amélioration continue et analyse des risques qualité",
     nouvelEntrant: true, ponderable: false,
-    niveauAttendu: "Démontrer la mise en œuvre de mesures d'amélioration (insertion, réduction des ruptures). Nouvel entrant : audité à la surveillance. NC MAJEURE.",
-    ceQuIlFautDire: "Notre plan d'action insertion / réduction des ruptures est formalisé et intègre la prévention des ruptures et l'appui à l'insertion. Nouvel entrant : les résultats seront vérifiés à la surveillance.",
-    preuves: ["Plan d'action insertion / réduction des ruptures CFA", "Tableau d'amélioration continue", "Procédure amélioration continue"] },
+    niveauAttendu: "Démontrer une démarche d'amélioration continue alimentée par l'analyse des appréciations et des réclamations, ET (décret 2026-728) une analyse des risques sur la qualité des formations délivrées : cartographie, cotation, mesures de maîtrise, pilotes, revue. Nouvel entrant : démarche formalisée. NC MAJEURE.",
+    ceQuIlFautDire: "Nos appréciations et réclamations alimentent un tableau d'amélioration continue. Depuis le décret 2026-728, nous tenons aussi une analyse des risques qualité (probabilité × gravité, mesures, pilote, échéance) revue à chaque conseil de perfectionnement.",
+    preuves: ["Tableau d'amélioration continue", "Analyse des risques sur la qualité des formations", "Procédure d'amélioration continue", "Plan d'action insertion / réduction des ruptures"] },
+  { numero: 33, critere: 7, titre: "[Spécifique] Évaluation des contenus et des enseignements par les apprenants",
+    nouvelEntrant: true, ponderable: true,
+    niveauAttendu: "Démontrer un dispositif d'évaluation des contenus et des enseignements par les apprenants, DISTINCT du questionnaire de satisfaction ; le partage des résultats avec l'équipe pédagogique ; la démarche d'amélioration qui en découle et la mesure périodique de son efficacité. Indicateur créé par le décret 2026-728 (pondération à confirmer par le guide de lecture à paraître).",
+    ceQuIlFautDire: "À la fin de chaque bloc, les apprentis évaluent les contenus et les enseignements avec une grille dédiée, distincte de la satisfaction. Les résultats sont présentés à l'équipe pédagogique, donnent lieu à un plan d'action, dont nous mesurons l'efficacité à l'évaluation suivante.",
+    preuves: ["Procédure d'évaluation des contenus et des enseignements", "Grille d'évaluation des enseignements par apprenant", "Synthèse partagée avec l'équipe pédagogique", "Plan d'action et mesure d'efficacité"],
+    vigilance: "Ne pas confondre avec le questionnaire de satisfaction (IND 30) : l'auditeur vérifiera que les deux outils sont distincts." },
 ];
 
 export function getIndicateurCFA(num: number): IndicateurCFA | undefined {

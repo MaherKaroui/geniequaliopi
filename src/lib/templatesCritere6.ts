@@ -69,8 +69,8 @@ function genericVeilleRows(
         `<a href="https://travail-emploi.gouv.fr/referentiel-national-qualite-guide-de-lecture-qualiopi" target="_blank" rel="noopener">Ministère du Travail – Guide Qualiopi V9</a>`,
         `Référentiel National Qualité — Guide de lecture Qualiopi V9 appliqué à « ${sujet} »${rncp}`,
         veilleMonthYear(f, 8),
-        `Cadre obligatoire pour les organismes dispensant la formation « ${sujet} ». Détaille les 32 indicateurs et leurs preuves attendues.`,
-        `Preuve : guide Qualiopi V9 archivé. Action : revue interne des 32 indicateurs adaptée au contenu de « ${sujet} ».`,
+        `Cadre obligatoire pour les organismes dispensant la formation « ${sujet} ». Détaille les 33 indicateurs et leurs preuves attendues.`,
+        `Preuve : guide Qualiopi V9 archivé. Action : revue interne des 33 indicateurs adaptée au contenu de « ${sujet} ».`,
       ],
       [
         `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006195856" target="_blank" rel="noopener">Légifrance – Code du travail (Formation pro.)</a>`,

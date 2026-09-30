@@ -388,7 +388,7 @@ const QualiopiCheck = () => {
                 <Sparkles className="w-4 h-4 mr-2" /> Audit IA (réel)
               </Button>
               <Button variant={tab === "checklist" ? "default" : "outline"} onClick={() => setTab("checklist")} className="justify-start">
-                <ShieldCheck className="w-4 h-4 mr-2" /> Checklist 32 indicateurs
+                <ShieldCheck className="w-4 h-4 mr-2" /> Checklist 33 indicateurs
               </Button>
               <Button variant={tab === "incoherences" ? "default" : "outline"} onClick={() => setTab("incoherences")} className="justify-start">
                 <Search className="w-4 h-4 mr-2" /> Détecteur d'incohérences

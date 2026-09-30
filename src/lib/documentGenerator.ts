@@ -1,3 +1,4 @@
+import { resolveFormation } from "./formationResolue";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel, generateBdcNTSuiviAdaptation, generateBdcNTContactsHandicap, generateBdcNTTableauDysfonctionnements } from "@/lib/bdc/bdcNTXlsx";
@@ -132,14 +133,9 @@ export function getEmargementBlocs(_f: FormationInfo, _dow?: number): { label: s
 }
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
-  const selectedFormation = userFormation.intitule
-    ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
-    : SAMPLE_FORMATIONS[0];
-  // Le code certification ne doit jamais hériter de l'exemple par défaut :
-  // un code vide signifie formation non RS/RNCP (IND 7 et 16 masqués).
-  if (userFormation.intitule) {
-    selectedFormation.codeRNCP = (userFormation.codeRNCP || "").trim();
-  }
+  // Aucun héritage d'une formation d'exemple : champs vides déduits de la formation,
+  // de sa fiche RNCP/RS et de l'organisme (code vide = non certifiant, IND 3/7/16 masqués).
+  const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
   return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant);
 }
 
@@ -164,12 +160,7 @@ export async function preloadAIDPForAllStagiaires(
   userFormation: FormationInfo,
   userStagiaires: StagiaireInfo[],
 ): Promise<void> {
-  const selectedFormation = userFormation.intitule
-    ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
-    : SAMPLE_FORMATIONS[0];
-  if (userFormation.intitule) {
-    selectedFormation.codeRNCP = (userFormation.codeRNCP || "").trim();
-  }
+  const selectedFormation = resolveFormation(userFormation, undefined, userStagiaires);
   const stagiaires = mergeStagiaires(userStagiaires);
   // Limit concurrency to 3 to éviter rate limit
   const BATCH = 3;
@@ -212,13 +203,7 @@ function stripEmojis(html: string): string {
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
-  const selectedFormation = userFormation.intitule
-    ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
-    : SAMPLE_FORMATIONS[0];
-  // Code certification jamais hérité de l'exemple : vide = non RS/RNCP (IND 7/16 masqués)
-  if (userFormation.intitule) {
-    selectedFormation.codeRNCP = (userFormation.codeRNCP || "").trim();
-  }
+  const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
   const formations = [selectedFormation];
   let stagiaires = mergeStagiaires(userStagiaires);
   // SITE WEB / SPÉCIMEN : injecte un stagiaire-modèle vierge (sans nom/prénom)
@@ -326,7 +311,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
     case "organigramme": return genOrganigramme(o, selectedFormation);
-    // Génération rapide uniquement — volontairement hors buildFullCatalog (hors 32 indicateurs)
+    // Génération rapide uniquement — volontairement hors buildFullCatalog (hors 33 indicateurs)
     case "ca_session": return genChiffreAffairesSession(o, f, stagiaires);
     case "charte_qualite": return genCharteQualite(o);
     case "politique_qualite": return genPolitiqueQualite(o);

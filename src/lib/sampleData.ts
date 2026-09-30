@@ -1201,19 +1201,31 @@ export function getFormationDays(f: FormationInfo): string[] {
   return days.length > 0 ? days : ["Jour 1", "Jour 2", "Jour 3"];
 }
 
+/**
+ * Complète l'organisme saisi SANS jamais injecter les données d'un autre organisme
+ * (l'ancien repli sur « FormaPro Excellence » faisait sortir son NDA, ses référents…
+ * dans les dossiers). Un champ vide reste vide, sauf les rôles internes qui reviennent
+ * au dirigeant (convention des dossiers : un OF unipersonnel cumule les fonctions).
+ */
 export function mergeOrganisme(userOrg: OrganismeInfo): OrganismeInfo {
-  const merged = { ...SAMPLE_ORGANISME };
-  // Fields that should NOT fallback to sample data when left empty by user
-  const noFallbackFields: (keyof OrganismeInfo)[] = ["telephone", "siteWeb"];
-  for (const key of Object.keys(userOrg) as (keyof OrganismeInfo)[]) {
-    const val = userOrg[key];
-    if (val && ((typeof val === "string" && val.trim() !== "") || (Array.isArray(val) && val.length > 0))) {
-      (merged as any)[key] = val;
-    } else if (noFallbackFields.includes(key)) {
-      // If user left these fields empty, keep them empty (don't use sample data)
-      (merged as any)[key] = "";
-    }
+  const u: Partial<OrganismeInfo> = userOrg || {};
+  const txt = (x: unknown) => (typeof x === "string" ? x.trim() : "");
+  const rempli = (x: unknown) => (typeof x === "string" ? x.trim() !== "" : Array.isArray(x) ? x.length > 0 : x != null && x !== false);
+  // Aucune saisie : aperçu de démonstration de l'application.
+  if (!Object.values(u).some(rempli)) return { ...SAMPLE_ORGANISME };
+  const merged: OrganismeInfo = {
+    nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "", siteWeb: "", nda: "",
+    dirigeant: "", responsablePedagogique: "", referentHandicap: "", referentQualite: "", poleAdministratif: "",
+    relationEntreprises: "", referentMobilite: "", domainesFormation: "", typesActions: ["actions-formation"],
+    certifications: "", outilsUtilises: "", version: "1", dateMaj: new Date().toISOString().slice(0, 10),
+  };
+  for (const key of Object.keys(u) as (keyof OrganismeInfo)[]) {
+    if (rempli(u[key])) (merged as any)[key] = u[key];
   }
+  const dirigeant = txt(u.dirigeant);
+  const roles: (keyof OrganismeInfo)[] = ["responsablePedagogique", "referentHandicap", "referentQualite", "poleAdministratif", "relationEntreprises", "referentMobilite"];
+  for (const r of roles) if (!txt(merged[r])) (merged as any)[r] = dirigeant;
+  if (!txt(merged.outilsUtilises)) merged.outilsUtilises = "Google Meet, Zoom, messagerie électronique";
   return merged;
 }
 

@@ -44,7 +44,7 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${styles}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
-  <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel National Qualité V9 — 7 critères / 32 indicateurs · Édition ${today}</div>
+  <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9 · Édition ${today}</div>
 
   <h2 class="crit" style="font-size:16px">Périmètre audité</h2>
   <div class="lvl"><strong>Organisme : ${org.nom}</strong> — SIRET ${org.siret} · NDA ${org.nda}<br>

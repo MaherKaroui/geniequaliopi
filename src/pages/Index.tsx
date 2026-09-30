@@ -166,13 +166,13 @@ const Index = () => {
               <span className="text-gradient-hero">Qualiopi</span> Generator
             </h1>
             <p className="text-lg text-muted-foreground mt-3 max-w-lg mx-auto">
-              Générez automatiquement votre dossier Qualiopi complet : ~500 documents de preuves pour les 7 critères et 32 indicateurs du RNQ.
+              Générez automatiquement votre dossier Qualiopi complet : ~500 documents de preuves pour les 7 critères et 33 indicateurs du RNQ.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
             {[
               { title: "~500 documents", desc: "Dossier complet prêt pour audit avec toutes les preuves" },
-              { title: "32 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
+              { title: "33 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
               { title: "Pré-rempli", desc: "Documents remplis avec données réalistes et signatures" },
             ].map((item, i) => (
               <div key={i} className="p-5 bg-card rounded-xl border shadow-card">

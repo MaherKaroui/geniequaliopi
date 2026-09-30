@@ -202,7 +202,7 @@ function generateGuideAutres(
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${STYLES}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
-  <div class="sub">${label} — ${org.nom}<br>Référentiel National Qualité V9 — ${indicateurs.length} indicateurs applicables · Édition du ${today}</div>
+  <div class="sub">${label} — ${org.nom}<br>Référentiel national qualité (décret n° 2026-728, guide de lecture V9) — ${indicateurs.length} indicateurs applicables · Édition du ${today}</div>
 
   <h2 class="crit" style="font-size:16px">1. Organisme audité</h2>
   <div class="lvl">

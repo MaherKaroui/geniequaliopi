@@ -1,5 +1,5 @@
 // Book Qualiopi CFA — version spécialisée du Book pour les CFA (audit initial nouvel entrant).
-// Réplique l'esprit de la FICHE MÉMO + GUIDE Dreamers Team : 32 indicateurs, 7 critères,
+// Réplique l'esprit de la FICHE MÉMO + GUIDE Dreamers Team : 33 indicateurs, 7 critères,
 // avec pour chacun le niveau attendu V9, le script "ce qu'il faut dire", les preuves
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
@@ -61,7 +61,7 @@ li{margin:3px 0;font-size:12.5px}
 
   // Cover
   const logo = org.logoUrl ? `<div style="margin-bottom:18px"><img src="${org.logoUrl}" alt="Logo" style="max-height:90px;max-width:240px;object-fit:contain"/></div>` : "";
-  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · ${getTypeAuditLabel(typeAudit)}</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel National Qualité V9 — 7 critères / 32 indicateurs</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
+  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · ${getTypeAuditLabel(typeAudit)}</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
 
   // Présentation OF / Formations / Stagiaires
   const fmt = (d?: string) => d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "—";

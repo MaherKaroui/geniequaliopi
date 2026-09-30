@@ -10,6 +10,7 @@ import { generateGuideAuditCFA } from "@/lib/guideAuditCFA";
 import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type TypeActionAudit } from "@/lib/guideAuditUniversal";
 import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
+import { resolveFormation } from "@/lib/formationResolue";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronRight, X, Loader2, FolderOpen, RefreshCw, Archive, AlertTriangle, Cloud } from "lucide-react";
@@ -188,10 +189,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     setDocRefDate(mergedOrganisme?.dateMaj);
   }, [mergedOrganisme?.dateMaj]);
   const selectedFormation = useMemo(() => (
-    formation.intitule
-      ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(formation).filter(([, value]) => value && String(value).trim())) }
-      : SAMPLE_FORMATIONS[0]
-  ), [formation]);
+    resolveFormation(formation, organisme, stagiaires)
+  ), [formation, organisme, stagiaires]);
   const allStagiaires = useMemo(() => mergeStagiaires(stagiaires), [stagiaires]);
   const catalog = useMemo(() => getFullCatalog(organisme, formation, stagiaires), [organisme, formation, stagiaires]);
   const progress = catalog.length ? Math.round((generated.size / catalog.length) * 100) : 0;
@@ -1552,7 +1551,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         <div>
           <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
           <p className="text-sm text-muted-foreground">
-            {catalog.length} documents • 7 critères • 32 indicateurs
+            {catalog.length} documents • 7 critères • 33 indicateurs
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -1686,7 +1685,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               Télécharger ({exportFormat === "pdf" ? "PDF" : "Word"})
             </Button>
             <Button size="sm" onClick={handleDownloadFeuilleRoute} className="flex-1 h-9 text-xs bg-emerald-600 hover:bg-emerald-700 text-white min-w-[180px]">
-              Feuille de route Excel (32 indicateurs)
+              Feuille de route Excel (33 indicateurs)
             </Button>
           </div>
         </div>
@@ -1703,7 +1702,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   PRÉPA AUDIT QUALIOPI CFA
                 </h3>
                 <p className="text-xs text-orange-900/70 mt-1.5 leading-relaxed">
-                  Pack spécial CFA : 32 indicateurs V9 avec niveau attendu,
+                  Pack spécial CFA : 33 indicateurs (décret 2026-728) avec niveau attendu,
                   script « ce qu'il faut dire », preuves et points de vigilance. Format Dreamers Team.
                   Inclut les détails de l'organisme, de la formation et des apprenants audités.
                 </p>
@@ -1745,7 +1744,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-orange-200 p-3 flex flex-col gap-2 hover:border-orange-400 transition-colors">
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-orange-900">Feuille de route</h4>
-                  <p className="text-[11px] text-orange-900/60 leading-snug">Tableau Excel de suivi des 32 indicateurs</p>
+                  <p className="text-[11px] text-orange-900/60 leading-snug">Tableau Excel de suivi des 33 indicateurs</p>
                 </div>
                 <div className="flex gap-1.5">
                   <Button variant="ghost" size="sm" onClick={handlePreviewFeuilleRouteCFA} className="flex-1 h-8 text-xs text-orange-700 hover:bg-orange-100">

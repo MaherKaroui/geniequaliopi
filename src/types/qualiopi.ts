@@ -188,7 +188,7 @@ export interface CritereInfo {
   indicateurs: { numero: number; titre: string }[];
 }
 
-// ===== AFNOR QUALIOPI V9 - Référentiel National Qualité officiel =====
+// ===== Référentiel national qualité — décret n° 2026-728 (en vigueur au 01/11/2026), 33 indicateurs =====
 export const CRITERES_INFO: CritereInfo[] = [
   {
     numero: 1, titre: "Information du public",
@@ -254,7 +254,8 @@ export const CRITERES_INFO: CritereInfo[] = [
     indicateurs: [
       { numero: 30, titre: "Recueil des appréciations des parties prenantes" },
       { numero: 31, titre: "Traitement des difficultés, réclamations et aléas" },
-      { numero: 32, titre: "Mesures d'amélioration issues de l'analyse des appréciations" },
+      { numero: 32, titre: "Amélioration continue et analyse des risques sur la qualité" },
+      { numero: 33, titre: "Évaluation des contenus et des enseignements par les apprenants (CFA)" },
     ]
   },
 ];
@@ -315,7 +316,7 @@ export const CRITERES: CritereData[] = [
       { numero: 24, titre: "Veille sur les évolutions des compétences, métiers et emplois", niveauAttendu: "Veille sur les évolutions des compétences, des métiers et des emplois.", preuves: "Tableaux de veille métiers, analyses sectorielles, études prospectives.", reponse: "" },
       { numero: 25, titre: "Veille sur les innovations pédagogiques et technologiques", niveauAttendu: "Veille sur les innovations pédagogiques et technologiques.", preuves: "Fiches innovation, benchmark outils, veille pédagogique.", reponse: "" },
       { numero: 26, titre: "Accueil et accompagnement des publics en situation de handicap", niveauAttendu: "Mobilisation des expertises, outils et réseaux pour accueillir et accompagner les publics handicapés.", preuves: "Procédure handicap, réseau partenaires, aménagements.", reponse: "" },
-      { numero: 27, titre: "Conformité de la sous-traitance et du portage salarial", niveauAttendu: "Respect de la conformité au RNQ pour la sous-traitance.", preuves: "Contrats sous-traitance, vérification conformité, audits.", reponse: "" },
+      { numero: 27, titre: "Conformité de la sous-traitance et du portage salarial", niveauAttendu: "Respect de la conformité au RNQ par le sous-traitant ou le salarié porté, tracé dans chaque contrat de sous-traitance (décret n° 2026-728).", preuves: "Contrats de sous-traitance / portage avec clause Qualiopi, charte qualité, contrôles.", reponse: "" },
       { numero: 28, titre: "Formation en situation de travail et réseau partenaires", niveauAttendu: "Mobilisation du réseau de partenaires socio-économiques.", preuves: "Conventions partenariats, accueil entreprise, ingénierie FEST.", reponse: "" },
       { numero: 29, titre: "Insertion professionnelle et poursuite d'étude", niveauAttendu: "Actions concourant à l'insertion professionnelle ou la poursuite d'étude.", preuves: "Taux d'insertion, partenariats entreprises, suivi des diplômés.", reponse: "" },
     ]
@@ -325,7 +326,8 @@ export const CRITERES: CritereData[] = [
     indicateurs: [
       { numero: 30, titre: "Recueil des appréciations des parties prenantes", niveauAttendu: "Recueil des appréciations : bénéficiaires, financeurs, équipes pédagogiques, entreprises.", preuves: "Questionnaires de satisfaction, enquêtes, synthèses retours.", reponse: "" },
       { numero: 31, titre: "Traitement des difficultés, réclamations et aléas", niveauAttendu: "Modalités de traitement des difficultés, réclamations et aléas.", preuves: "Registre réclamations, procédure de traitement, fiches réclamation.", reponse: "" },
-      { numero: 32, titre: "Mesures d'amélioration issues de l'analyse des appréciations", niveauAttendu: "Mesures d'amélioration à partir de l'analyse des appréciations et réclamations.", preuves: "Plan d'amélioration, fiches action, revue de direction, audits.", reponse: "" },
+      { numero: 32, titre: "Amélioration continue et analyse des risques sur la qualité", niveauAttendu: "Démarche d'amélioration continue à partir de l'analyse des appréciations et réclamations, et analyse des risques sur la qualité des formations délivrées (décret n° 2026-728).", preuves: "Tableau d'amélioration continue, analyse des risques qualité, fiches action, revue de direction.", reponse: "" },
+      { numero: 33, titre: "Évaluation des contenus et des enseignements par les apprenants (CFA)", niveauAttendu: "Dispositif d'évaluation des contenus et des enseignements par les apprenants, distinct de la satisfaction, résultats partagés avec l'équipe pédagogique, plan d'amélioration dont l'efficacité est mesurée.", preuves: "Grille d'évaluation des enseignements, synthèse partagée, plan d'action, mesure d'efficacité.", reponse: "" },
     ]
   }
 ];
