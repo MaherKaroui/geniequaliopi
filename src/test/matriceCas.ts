@@ -110,6 +110,8 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
     }
     const t = texte(html);
     for (const re of TROUS) if (re.test(t)) add("trou", d, extrait(t, re));
+    // Formes neutres non résolues (« le/la », « inscrit(e) ») dans un document individuel.
+    if (typeof d.params?.stagiaireIdx === "number" && /[Ll]e\/[Ll]a|[a-zé]\((e|ne|trice|euse|ère)\)/.test(t)) add("genre-residuel", d, extrait(t, /[Ll]e\/[Ll]a|[a-zé]\((e|ne|trice|euse|ère)\)/));
     // Un organisme sans certificat ne peut pas se dire « certifié Qualiopi ».
     if (!/quiz/i.test(d.id) && !(c.org.numeroCertificatQualiopi || "").trim() && /(organisme|est|sommes|CERTIFIÉ)\s+(de formation\s+)?certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i.test(t)) add("qualiopi-non-certifie", d, extrait(t, /certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i));
     for (const f of FUITES) if (t.includes(f)) {

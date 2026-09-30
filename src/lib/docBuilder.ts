@@ -1174,10 +1174,10 @@ export function buildDocument(config: DocBuildConfig): string {
   }
   body += footer(config.org);
   let result = htmlWrap(body);
+  // Sans stagiaire désigné, les formes neutres (« le/la », « (e) ») sont laissées à la passe
+  // finale de generateDocumentById, qui connaît le stagiaire concerné par le document.
   if (config.stagiaires && config.stagiaires.length > 0) {
     result = applyGender(result, config.stagiaires[0]);
-  } else {
-    result = applyGender(result, null);
   }
   return result;
 }
@@ -1275,12 +1275,20 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
   ];
   // Generic catch-all for any remaining (e) on past participles: word ending in é(e), i(e), u(e)
   let result = html;
+  // Conserve la majuscule du texte d'origine (« Le/La Stagiaire » → « La stagiaire »).
+  const casse = (orig: string, rempl: string) => (orig && orig[0] === orig[0].toUpperCase() && orig[0] !== orig[0].toLowerCase() ? rempl.charAt(0).toUpperCase() + rempl.slice(1) : rempl);
   for (const [regex, masc, fem] of replacements) {
-    result = result.replace(regex, isFem ? fem : masc);
+    result = result.replace(regex, (m) => casse(m, isFem ? fem : masc));
   }
   // Catch remaining patterns like "xxxé(e)" not in our list
   result = result.replace(/([éi])\(e\)/g, isFem ? "$1e" : "$1");
   result = result.replace(/([u])\(e\)/g, isFem ? "$1e" : "$1");
+  // Formes génériques restantes : présent(e), apprenant(e), candidat(e), seul(e), collaborateur(trice)…
+  result = result.replace(/([A-Za-zÀ-ÿ]+)teur\(trice\)/g, isFem ? "$1trice" : "$1teur");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)eur\(euse\)/g, isFem ? "$1euse" : "$1eur");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)er\(ère\)/g, isFem ? "$1ère" : "$1er");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)(ien|en|on)\(ne\)/g, isFem ? "$1$2ne" : "$1$2");
+  result = result.replace(/([A-Za-zÀ-ÿ]+[a-zà-ÿ])\(e\)/g, isFem ? "$1e" : "$1");
   // Catch M./Mme patterns
   result = result.replace(/M\.\/Mme/g, isFem ? "Mme" : "M.");
   // Catch "il/elle" variants with capitals

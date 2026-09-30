@@ -428,9 +428,9 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
 
 export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const respEntreprise = s.responsableEntreprise || "Le Responsable";
+  // Le poste saisi est celui du stagiaire, pas du signataire : on n'invente pas de qualité.
+  const respEntreprise = s.responsableEntreprise?.trim() || "son représentant légal";
   const entrepriseNom = s.entreprise || "_______________";
-  const poste = s.poste || "_______________";
   const sigDate = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   const respSigHtml = s.signatureResponsableUrl
     ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
@@ -443,7 +443,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}, en qualité de Dirigeant<br>Email : ${o.email}</p>
     <p>Ci-après dénommé « l'Organisme de formation »,</p>
     <h4>2. L'Entreprise</h4>
-    <p><strong>${entrepriseNom}</strong><br>Représentée par : ${respEntreprise}${poste !== "_______________" ? `, en qualité de ${poste}` : ""}</p>
+    <p><strong>${entrepriseNom}</strong>${s.siretEntreprise ? `<br>SIRET : ${s.siretEntreprise}` : ""}${s.adresseEntreprise ? `<br>Adresse : ${s.adresseEntreprise}` : ""}<br>Représentée par : ${respEntreprise}${s.emailResponsable ? ` (${s.emailResponsable})` : ""}</p>
     <p>Ci-après dénommée « l'Entreprise »,</p>
     <h4>3. Le/La Stagiaire</h4>
     <p><strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br>Poste occupé : ${s.poste}` : ""}${s.email ? `<br>Email : ${s.email}` : ""}${s.telephone ? `${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}` : ""}</p>

@@ -156,8 +156,11 @@ export function generateDocumentById(docId: string, template: string, params: Re
   let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
   // Apply gender adaptation based on the relevant stagiaire
   const stagiaires = mergeStagiaires(userStagiaires);
-  const si = params?.stagiaireIdx ?? 0;
-  const targetStagiaire = stagiaires[si] || stagiaires[0] || null;
+  // Genre du document : celui du stagiaire concerné ; document collectif ou de système
+  // (procédure, livret…) : forme générique, jamais le genre du premier stagiaire de la liste.
+  const targetStagiaire = typeof params?.stagiaireIdx === "number"
+    ? (stagiaires[params.stagiaireIdx] || null)
+    : (stagiaires.length === 1 ? stagiaires[0] : null);
   result = applyGender(result, targetStagiaire);
   // Remove all emoji icons and replace with plain text equivalents
   result = stripEmojis(result);
