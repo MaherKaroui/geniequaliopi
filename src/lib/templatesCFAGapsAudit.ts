@@ -484,7 +484,7 @@ export function genGuideAssistanceFOADCFA(o: OrganismeInfo, f?: FormationInfo) {
               <p style="margin:0">Nom : ${o.responsablePedagogique}</p>
               <p style="margin:0">Date : ${signatureDate}</p>
               <p style="margin:8px 0 0 0">Signature :</p>
-              ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />` : ""}
+              ${(o.signatureUrl || o.tamponUrl) ? `<img src="${(o.signatureUrl || o.tamponUrl)}" alt="Signature" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />` : ""}
             </td>
             <td style="width:50%;vertical-align:top;padding:10px;border:1px solid #ddd">
               <p style="margin:0 0 6px 0"><strong>Le Dirigeant</strong></p>

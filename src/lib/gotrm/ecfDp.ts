@@ -836,7 +836,7 @@ export function genECFUnifie(
 
   /** Bloc « Formateur(s) évaluateur(s) » : une ligne par évaluateur renseigné. */
   const evaluateurs = [
-    { nom: evaluateur1, visa: org.signatureUrl },
+    { nom: evaluateur1, visa: (org.signatureUrl || org.tamponUrl) },
     { nom: evaluateur2, visa: undefined as string | undefined },
   ].filter((e) => e.nom);
   /**
@@ -954,7 +954,7 @@ export function genECFUnifie(
       ? `<h3 style="margin-top:14px">Représentant de l'organisme de formation</h3>
   <table style="width:100%;border-collapse:collapse;font-size:10pt">
     <tr><th style="width:42%">Nom</th><th style="width:20%">Date</th><th>Visa</th></tr>
-    <tr><td>${org.dirigeant}</td><td>${dateVisa}</td><td>${visaCell(org.dirigeant, dateVisa, org.signatureUrl)}</td></tr>
+    <tr><td>${org.dirigeant}</td><td>${dateVisa}</td><td>${visaCell(org.dirigeant, dateVisa, (org.signatureUrl || org.tamponUrl))}</td></tr>
   </table>`
       : ""}
   <p style="margin-top:12px">Un exemplaire du livret a été remis ${g(s, "au candidat", "à la candidate")} pour information par l'organisme de formation contre signature le ${dateVisa}.</p>

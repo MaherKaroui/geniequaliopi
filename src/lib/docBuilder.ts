@@ -772,6 +772,7 @@ export function htmlWrap(content: string, landscape = false): string {
 }
 
 export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
+  setReferentQualiteTampon(org);
   const s = _currentStyle;
   const hs = s.headerStyle || 'classic';
   const logoAlign = s.logoPosition === 'left' ? 'text-align:left' : s.logoPosition === 'right' ? 'text-align:right' : 'text-align:center';
@@ -960,7 +961,8 @@ export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[
  * - "organisme" / "cachet" → tampon only, no signature
  * - "stagiaire" / "apprenant" / "apprenti" / "candidat" / "bénéficiaire" → stagiaire signature
  * - "formateur" → formateur signature
- * - "dirigeant" / "responsable" (without "entreprise") / "directeur" → dirigeant signature + tampon
+ * - "dirigeant" / "responsable" (without "entreprise") / "directeur" → tampon seul s'il existe, sinon signature
+ * - "référent qualité" FD CERTIF EXPERT → tampon FD CERTIF EXPERT
  * - "entreprise" / "employeur" / "maître" → responsable entreprise signature
  */
 interface SignatureUrls {
@@ -981,14 +983,29 @@ function tamponImg(url: string | undefined): string {
   return `<img src="${url}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
 }
 
+/** Tampon du référent qualité externe (FD CERTIF EXPERT), déterminé par l'en-tête du document. */
+let tamponReferentQualite: string | undefined;
+export function setReferentQualiteTampon(org: Pick<OrganismeInfo, "referentQualite"> | undefined) {
+  tamponReferentQualite = /fd\s*certif/i.test(org?.referentQualite || "") ? "/images/FD_CERTIF_TAMPON.png" : undefined;
+}
+
+/** Dirigeant : tampon seul s'il existe, sinon signature — jamais les deux. */
+function tamponOuSignature(urls: SignatureUrls): string {
+  return urls.tamponUrl ? tamponImg(urls.tamponUrl) : sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
+}
+
 function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
   const l = label.toLowerCase();
+  // Référent qualité externe FD CERTIF EXPERT : son tampon (sauf libellé combiné avec le dirigeant).
+  if (/qualit/.test(l) && !/dirigeant|directeur/.test(l) && (tamponReferentQualite || /fd\s*certif/i.test(nom))) {
+    return tamponImg(tamponReferentQualite || "/images/FD_CERTIF_TAMPON.png");
+  }
   // Specific CFA Conseil de Perfectionnement overrides
   if (l.includes('directeur du cfa')) {
     return tamponImg(urls.tamponUrl);
   }
   if (l.includes('secrétaire de séance')) {
-    return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
+    return tamponOuSignature(urls);
   }
   // Organisme / Cachet → tampon only
   if ((/organisme|cachet/i.test(l) && !/responsable/i.test(l)) || l === 'cachet') {
@@ -1013,7 +1030,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   // Dirigeant / Directeur (priority over "référent" so a combined label
   // like "Dirigeant / Référent handicap" still gets the dirigeant signature + tampon)
   if (/dirigeant|directeur/i.test(l)) {
-    return tamponImg(urls.tamponUrl) + sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
+    return tamponOuSignature(urls);
   }
   // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
   if (/pédagogique|qualité|handicap|référent/i.test(l)) {

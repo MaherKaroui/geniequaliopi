@@ -6160,7 +6160,7 @@ function genFeuilleEmargementGestionAbandon(o: OrganismeInfo, f: FormationInfo, 
     extra += `<p><strong>Objet :</strong> ${s.objet}</p>`;
     let rows = '';
     rows += `<tr><th>Prénom et Nom</th><th>Rôle</th><th>Signature</th></tr>`;
-    const refSig = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="sig" style="max-height:38px;max-width:100px;object-fit:contain" />` : (past ? `<span style="font-style:italic;color:#666">Signé ${o.responsablePedagogique}</span>` : `<span style="color:#bbb;font-style:italic">— en attente —</span>`);
+    const refSig = (o.signatureUrl || o.tamponUrl) ? `<img src="${(o.signatureUrl || o.tamponUrl)}" alt="sig" style="max-height:38px;max-width:100px;object-fit:contain" />` : (past ? `<span style="font-style:italic;color:#666">Signé ${o.responsablePedagogique}</span>` : `<span style="color:#bbb;font-style:italic">— en attente —</span>`);
     rows += `<tr style="background:#eaf2fb"><td>${o.responsablePedagogique}</td><td>Référent pédagogique</td><td>${past ? refSig : '<span style="color:#bbb;font-style:italic">— en attente —</span>'}</td></tr>`;
     stagiaires.slice(0, 12).forEach((st, i) => {
       const name = `${st.prenom} ${st.nom.toUpperCase()}`;
@@ -14250,7 +14250,7 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
 
   const sigApprenti = sigImg(s.signatureUrl, "Signature apprenti");
   const sigMaitre = sigImg(s.signatureResponsableUrl, "Signature maître d'apprentissage");
-  const sigReferent = sigImg(o.signatureUrl, "Signature référent pédagogique");
+  const sigReferent = sigImg((o.signatureUrl || o.tamponUrl), "Signature référent pédagogique");
   const tampon = o.tamponUrl
     ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:80px;max-width:140px;object-fit:contain;margin-left:12px;vertical-align:middle" />`
     : "";

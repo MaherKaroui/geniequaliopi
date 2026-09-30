@@ -1232,6 +1232,8 @@ export function mergeOrganisme(userOrg: OrganismeInfo): OrganismeInfo {
   const roles: (keyof OrganismeInfo)[] = ["responsablePedagogique", "referentHandicap", "referentQualite", "poleAdministratif", "relationEntreprises", "referentMobilite"];
   for (const r of roles) if (!txt(merged[r])) (merged as any)[r] = dirigeant;
   if (!txt(merged.outilsUtilises)) merged.outilsUtilises = "Google Meet, Zoom, messagerie électronique";
+  // Dirigeant : le tampon seul s'il existe, sinon la signature — jamais les deux ensemble.
+  if (txt(merged.tamponUrl)) merged.signatureUrl = "";
   return merged;
 }
 

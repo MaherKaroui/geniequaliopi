@@ -302,7 +302,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>En cas de litige relatif à l'interprétation ou à l'exécution du présent contrat, les Parties s'engagent à rechercher une solution amiable. À défaut d'accord dans un délai de 30 jours, le litige sera soumis aux tribunaux compétents de <strong>${o.ville || "MONTPELLIER"}</strong>.</p>
     ` },
   ], extraHtml: (() => {
-    const sigHtml = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+    const sigHtml = (o.signatureUrl || o.tamponUrl) ? `<img src="${(o.signatureUrl || o.tamponUrl)}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
     const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
     return `<p style="margin-top:30px;text-align:center;font-weight:600">Fait en deux exemplaires originaux, à <strong>${o.ville || "……………"}</strong>, le <strong>${dateMaj}</strong></p>
     <div class="signature-block-2" style="margin-top:30px">

@@ -306,7 +306,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       <tr><th>Adresse :</th><td>${o.adresse || ""}<br>${o.codePostal || ""} ${o.ville || ""} — FRANCE</td></tr>
       <tr><th>Date de début de la session :</th><td>${dateDebutSession}</td></tr>
       <tr><th>Date de fin de la session :</th><td>${dateFinSession}</td></tr>
-      <tr><th>Responsable de session :</th><td>Nom : <strong>${responsable.split(" ").slice(-1)[0] || responsable}</strong><br>Prénom : ${responsable.split(" ").slice(0, -1).join(" ") || ""}<br>Signature : ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:110px;object-fit:contain;vertical-align:middle" />` : `<em>(signature manuscrite)</em>`}</td></tr>
+      <tr><th>Responsable de session :</th><td>Nom : <strong>${responsable.split(" ").slice(-1)[0] || responsable}</strong><br>Prénom : ${responsable.split(" ").slice(0, -1).join(" ") || ""}<br>Signature : ${(o.signatureUrl || o.tamponUrl) ? `<img src="${(o.signatureUrl || o.tamponUrl)}" alt="Signature" style="max-height:40px;max-width:110px;object-fit:contain;vertical-align:middle" />` : `<em>(signature manuscrite)</em>`}</td></tr>
     </table>
 
     <h2 class="section-title">Observations du jury sur le déroulement de la session d'examen</h2>
@@ -317,7 +317,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       <tr><th>Nom</th><th>Prénom</th><th>Qualité</th><th>Signature</th></tr>
       ${juryMembers.map(m => {
         const isFormateur = m.role === "Formateur évaluateur";
-        const sigUrl = isFormateur ? f.formateurSignatureUrl : o.signatureUrl;
+        const sigUrl = isFormateur ? f.formateurSignatureUrl : (o.signatureUrl || o.tamponUrl);
         return `<tr>
         <td>${m.nom}</td>
         <td>${m.prenom}</td>
@@ -375,7 +375,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <p style="margin:0"><strong>Le Responsable de session (Direction)</strong></p>
         <p style="margin:4px 0 0;font-size:10pt">${responsable}</p>
         <div style="height:70px;border:1px dashed #999;margin-top:6px;display:flex;align-items:center;justify-content:center;background:#fff">
-          ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:60px;max-width:160px;object-fit:contain" />` : ""}
+          ${(o.signatureUrl || o.tamponUrl) ? `<img src="${(o.signatureUrl || o.tamponUrl)}" alt="Signature dirigeant" style="max-height:60px;max-width:160px;object-fit:contain" />` : ""}
         </div>
       </div>
     </div>

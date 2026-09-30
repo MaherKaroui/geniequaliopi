@@ -116,7 +116,7 @@ export function partiesPour(ctx: BdcContext, regle: RegleSignature, b?: Benefici
     if (role === "C") {
       return { role, libelle: mentionRole(role, regle), nom: p.consultant.nom, qualite: p.consultant.qualification, image: p.consultant.signatureUrl, date };
     }
-    return { role, libelle: mentionRole(role, regle), nom: o.representantLegal.nom, qualite: o.representantLegal.qualite, image: o.signatureUrl, date };
+    return { role, libelle: mentionRole(role, regle), nom: o.representantLegal.nom, qualite: o.representantLegal.qualite, image: (o.signatureUrl || o.tamponUrl), date };
   });
 }
 
