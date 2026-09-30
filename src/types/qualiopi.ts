@@ -58,6 +58,8 @@ export interface OrganismeInfo {
   logoUrl?: string;
   signatureUrl?: string;
   tamponUrl?: string;
+  /** Régime de TVA : exonéré (art. 261-4-4° a du CGI, défaut) ou assujetti. */
+  regimeTva?: "exonere" | "assujetti";
   numeroCertificatQualiopi?: string;
   organismeCertificateur?: string;
   dateObtentionQualiopi?: string;
