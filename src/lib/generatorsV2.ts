@@ -15,11 +15,9 @@ const HORAIRES_LIGNE = "Lun-Ven 09h00–12h30 / 13h30–17h00 (7 h/jour)";
 const HORAIRES_TEXTE_PSH = "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (aménagement personne en situation de handicap)";
 const HORAIRES_LIGNE_PSH = "Lun-Ven 09h00–12h30 / 13h30–17h00 (aménagement PSH)";
 
-/** Détecte si le stagiaire bénéficie d'aménagements horaires PSH (Nouira Bilel ou RQTH=oui). */
+/** Stagiaire bénéficiant d'aménagements PSH : uniquement sur la donnée saisie (RQTH = oui). */
 export function isPSHStagiaire(s: StagiaireInfo | undefined | null): boolean {
-  if (!s) return false;
-  if (((s as any).rqth || "").toLowerCase() === "oui") return true;
-  return `${s.prenom || ""} ${s.nom || ""}`.toLowerCase().includes("nouira");
+  return !!s && ((s as any).rqth || "").toLowerCase() === "oui";
 }
 function horairesTexteFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIRES_TEXTE_PSH : HORAIRES_TEXTE; }
 function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIRES_LIGNE_PSH : HORAIRES_LIGNE; }

@@ -9966,11 +9966,9 @@ function genProcedureEvalBesoins(o: OrganismeInfo) {
 }
 
 function genFicheEvalBesoinsPSH(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[]) {
-  // Identifier le stagiaire en situation de handicap : rqth=oui en priorité, sinon Nouira Bilel
+  // Stagiaire en situation de handicap : uniquement sur la donnée saisie (RQTH = oui)
   const list = stagiaires || [];
-  const psh = list.find(s => (s.rqth || "").toLowerCase() === "oui")
-    || list.find(s => `${s.prenom} ${s.nom}`.toLowerCase().includes("nouira")
-      || `${s.prenom} ${s.nom}`.toLowerCase().includes("bilel"));
+  const psh = list.find(s => (s.rqth || "").toLowerCase() === "oui");
 
   // Si aucun stagiaire PSH identifié → trame vierge classique
   if (!psh || !f) {
@@ -10151,7 +10149,7 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
     });
   }
 
-  const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
+  const tuteurNom = (s as any).tuteur?.trim() || s.responsableEntreprise?.trim() || (s.entreprise?.trim() ? `Représentant(e) de ${s.entreprise.trim()}` : "Représentant(e) de l'entreprise");
 
 
   const headerBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -10207,6 +10205,32 @@ function parsePrerequisItems(prerequis: string | undefined): string[] {
   return parts.length > 0 ? parts : [raw];
 }
 
+/**
+ * Volet alternance de l'évaluation des besoins (apprentissage) : rythme, maître
+ * d'apprentissage et anticipation des missions en entreprise rattachées aux blocs
+ * de la certification (IND 4 et 13).
+ */
+function blocAlternanceBesoins(f: FormationInfo, s: StagiaireInfo, tuteurNom: string): string {
+  const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+  const blocs = (fiche?.blocsCompetences || []).slice(0, 4);
+  const poste = s.poste?.trim() || "apprenti(e)";
+  const lignes = blocs.length
+    ? blocs.map((b, i) => `<tr><td>${b.titre}</td><td>${(b.competences || []).slice(0, 2).join(" ; ")}</td><td>${i === 0 ? "Dès l'entrée (0-3 mois)" : i === 1 ? "3 à 6 mois" : "6 mois et plus"}</td></tr>`).join("")
+    : `<tr><td>Compétences visées par « ${f.intitule} »</td><td>Missions confiées au poste de ${poste}</td><td>Progressives sur la durée du contrat</td></tr>`;
+  return `
+<h3 style="margin-top:18px;color:#1e3a7b">VOLET ALTERNANCE</h3>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+<tr><td><strong>Rythme d'alternance :</strong> ${f.rythmeAlternance?.trim() || "défini dans le calendrier d'alternance"}</td></tr>
+<tr><td><strong>Maître d'apprentissage :</strong> ${tuteurNom}${s.emailResponsable ? ` — ${s.emailResponsable}` : ""}</td></tr>
+<tr><td><strong>Poste occupé par l'apprenti(e) :</strong> ${poste}</td></tr>
+</table>
+<p style="margin-top:10px"><strong>Missions confiées en entreprise, rattachées aux blocs de la certification${f.codeRNCP ? ` (${f.codeRNCP})` : ""} :</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+<tr style="background:#f1f5f9"><th>Bloc / compétences</th><th>Missions en entreprise</th><th>Échéance</th></tr>
+${lignes}
+</table>`;
+}
+
 function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
@@ -10217,7 +10241,7 @@ function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiair
   const questionFinancement = isAlternanceOPCO
     ? QUESTION_FINANCEMENT_ALTERNANCE
     : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
-  const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
+  const tuteurNom = (s as any).tuteur?.trim() || s.responsableEntreprise?.trim() || (s.entreprise?.trim() ? `Représentant(e) de ${s.entreprise.trim()}` : "Représentant(e) de l'entreprise");
   const dateAnalyse = formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)));
 
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -10285,6 +10309,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p><strong>4. En quoi cette formation contribue-t-elle au développement ou aux objectifs stratégiques de votre entreprise ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.contribution}</td></tr></table>
 
+${isAlternanceOPCO ? blocAlternanceBesoins(f, s, tuteurNom) : ""}
 <p style="margin-top:16px"><strong>Signature du tuteur / représentant entreprise :</strong> ${tuteurNom}</p>`;
 
   const footer = `
@@ -10314,11 +10339,9 @@ ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;m
 
 
 
-/** Détecte si le stagiaire est en situation de handicap (Nouira Bilel ou RQTH=oui). */
+/** Stagiaire en situation de handicap : uniquement sur la donnée saisie (RQTH = oui). */
 function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
-  if (!s) return false;
-  if (((s as any).rqth || "").toLowerCase() === "oui") return true;
-  return `${s.prenom || ""} ${s.nom || ""}`.toLowerCase().includes("nouira");
+  return !!s && ((s as any).rqth || "").toLowerCase() === "oui";
 }
 
 /** Réponse "disponibilités / aménagement horaire" : journée standard 09h-17h. */
@@ -10360,37 +10383,46 @@ export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o:
 // Reste stable au sein d'une même vague de génération (tous les stagiaires du batch partagent
 // le même nonce → cohérence entre documents). Automatiquement rafraîchi toutes les 20 secondes,
 // ou explicitement via bumpEvalBesoinsNonce() depuis le pipeline de génération.
-let __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
-let __GEN_NONCE_TS__ = Date.now();
-export function bumpEvalBesoinsNonce() {
-  __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
-  __GEN_NONCE_TS__ = Date.now();
-}
-function _refreshNonceIfStale() {
-  if (Date.now() - __GEN_NONCE_TS__ > 20_000) bumpEvalBesoinsNonce();
+// Graine DÉTERMINISTE : un même stagiaire obtient toujours les mêmes réponses, quel que soit le
+// document (IND 4, contrat, synthèses) ou le moment de la génération. L'ancien nonce aléatoire
+// rafraîchi toutes les 20 s faisait diverger deux exemplaires de la même trame.
+const __GEN_NONCE__ = 0;
+/** Conservé pour compatibilité des appels existants : la graine ne change plus. */
+export function bumpEvalBesoinsNonce() { /* graine déterministe */ }
+function _refreshNonceIfStale() { /* graine déterministe */ }
+
+/** Financement déclaré à partir du champ « financeur » saisi pour le stagiaire. */
+function financementDeclare(s: StagiaireInfo): string | null {
+  const fin = (s.financeur || "").trim().toLowerCase();
+  if (!fin) return null;
+  if (fin.includes("cpf")) return "Je mobilise mon Compte Personnel de Formation (CPF) via Mon Compte Formation.";
+  if (fin.includes("opco")) return `Formation prise en charge par l'OPCO de ${s.entreprise?.trim() || "mon employeur"} au titre du plan de développement des compétences.`;
+  if (fin.includes("entreprise") || fin.includes("employeur")) return `Formation financée directement par ${s.entreprise?.trim() || "mon employeur"} (plan de développement des compétences).`;
+  if (fin.includes("france travail") || fin.includes("pôle emploi") || fin.includes("pole emploi")) return "Financement France Travail (aide individuelle à la formation), validé avec mon conseiller.";
+  if (fin.includes("région") || fin.includes("region")) return "Financement de la Région dans le cadre de son programme de formation.";
+  if (fin.includes("perso")) return "Je finance la formation personnellement.";
+  return `Financement : ${s.financeur}.`;
 }
 
 function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
   _refreshNonceIfStale();
   const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
-  const isDreamers = /dreamers/i.test(o.nom || "");
-  const isFatima = /fatima/i.test(s.prenom || "") && /oliveira/i.test(s.nom || "");
   const isCFAAlternance = (Array.isArray(o.typesActions) && o.typesActions.includes('apprentissage')) || !!f.rythmeAlternance?.trim();
-  if (isDreamers && isFatima) {
-    result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
-  }
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
-  // CQP vitrage : réponses humanisées propres à chaque stagiaire (pas d'écrasement global)
-  if (isVitrageFormation(f.intitule, f.codeRNCP)) return result;
-  if (isOngulaireFormation(f.intitule, f.codeRNCP)) return result;
-  // Override global : diplôme = Baccalauréat, financement adapté au contexte
-  result.diplome = "Baccalauréat";
+  // Données saisies prioritaires, pour TOUTES les formations (y compris presets vitrage / ongulaire).
+  if ((s.diplome || "").trim()) result.diplome = s.diplome!.trim();
+  const declare = financementDeclare(s);
   if (isCFAAlternance) {
     result.budget = ALTERNANCE_OPCO_FINANCEMENT;
-  } else if (hasEntreprise) {
-    result.budget = "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences.";
-  } else {
-    result.budget = "Financement personnel";
+  } else if (declare) {
+    result.budget = declare;
+  } else if (!isVitrageFormation(f.intitule, f.codeRNCP) && !isOngulaireFormation(f.intitule, f.codeRNCP)) {
+    result.budget = hasEntreprise
+      ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
+      : "Financement personnel";
+  }
+  if (isStagiairePSH(s)) {
+    result.handicap = `Oui, je bénéficie d'une reconnaissance de la qualité de travailleur handicapé (RQTH). Je souhaite échanger avec le référent handicap (${o.referentHandicap || o.dirigeant}) pour définir les aménagements utiles : rythme, pauses, supports adaptés.`;
   }
   return result;
 }
@@ -11480,8 +11512,8 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     "Non, pas de situation de handicap déclarée. Je n'ai pas de besoin spécifique.",
     "Non. Je suis en bonne santé et je peux suivre la formation dans les conditions standard proposées.",
     "Non, je ne suis pas en situation de handicap. Je n'ai besoin d'aucun aménagement spécifique.",
-    "Non. Toutefois, je porte des lunettes de correction et apprécierais un écran de taille suffisante pour le confort visuel.",
-    "Non, je n'ai pas de reconnaissance de handicap. Cependant, je signale un léger problème d'audition qui ne nécessite pas d'aménagement particulier.",
+    "Non, je n'ai pas de reconnaissance de handicap et aucun besoin d'adaptation à signaler.",
+    "Non. Je sais que je peux solliciter le référent handicap si un besoin apparaît en cours de formation.",
     "Non, aucune situation de handicap. Je suis disponible aux horaires proposés sans contrainte spécifique.",
     "Non. J'ai pris connaissance de la possibilité de contacter le référent handicap de l'organisme en cas de besoin.",
     "Non, pas de handicap. Je n'ai aucune contrainte particulière pour suivre cette formation.",
