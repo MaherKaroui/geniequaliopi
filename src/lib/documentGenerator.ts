@@ -2,6 +2,7 @@ import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genC
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
+import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14MissionsCFA, genPlanAnnuel14MissionsCFA, genProcedureAccompagnementSocialCFA, genProcedureEvaluationCompetencesCFA } from "./missionsCFA2026";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
@@ -1062,6 +1063,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       if (reunion.getTime() > today.getTime()) reunion.setTime(today.getTime());
       return genSyntheseEvaluationEnseignements(o, f, finis, blocs[bi]?.titre || f.intitule, reunion.toLocaleDateString("fr-FR"), finis.length > 0);
     }
+    case "fiche_mission_cfa": return genFicheMissionCFA(o, f, stagiaires, typeof params?.missionNumero === "number" ? params.missionNumero : 1);
+    case "emargement_atelier_mission_cfa": return genEmargementAtelierMissionCFA(o, f, stagiaires, typeof params?.missionNumero === "number" ? params.missionNumero : 1);
+    case "tableau_bord_14_missions_cfa": return genTableauBord14MissionsCFA(o, f, stagiaires);
+    case "plan_annuel_14_missions_cfa": return genPlanAnnuel14MissionsCFA(o, f, stagiaires);
+    case "procedure_accompagnement_social_cfa": return genProcedureAccompagnementSocialCFA(o);
+    case "procedure_evaluation_competences_cfa": return genProcedureEvaluationCompetencesCFA(o, f);
     case "qcm_mission_cfa": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;

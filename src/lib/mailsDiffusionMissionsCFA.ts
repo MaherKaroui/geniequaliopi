@@ -10,7 +10,7 @@ const MISSIONS_DIFFUSION: { num: number; titre: string; supports: string }[] = [
   { num: 3,  titre: "Cohérence CFA / Entreprise",                     supports: "Affiche A3 Mission 3 + Procédure coopération CFA / Entreprise" },
   { num: 4,  titre: "Droits, devoirs & Santé-Sécurité au travail",    supports: "Affiche A3 Mission 4 + Note d'information SST" },
   { num: 5,  titre: "Rupture de contrat",                             supports: "Affiche A3 Mission 5 + Procédure maintien 6 mois" },
-  { num: 6,  titre: "Accompagnement social & matériel",               supports: "Affiche A3 Mission 6 + Cartes aides régionales (ARA, Imagine R, Santé Psy)" },
+  { num: 6,  titre: "Accompagnement social & matériel",               supports: "Affiche A3 Mission 6 + Procédure d'accompagnement social + aides de la Région du CFA" },
   { num: 7,  titre: "Mixité Femmes – Hommes",                         supports: "Affiche A3 Mission 7 + Plan d'actions mixité F/H" },
   { num: 8,  titre: "Égalité professionnelle & mixité des métiers",   supports: "Affiche A3 Mission 8 + Plan mixité des métiers" },
   { num: 9,  titre: "Diversité & lutte contre les discriminations",   supports: "Affiche A3 Mission 9 + Plan diversité" },

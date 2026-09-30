@@ -692,6 +692,11 @@ export function buildFullCatalog(
 
     // Chapeau — Procédure de communication & mise en œuvre des 14 missions
     add("cfa_14missions_procedure_communication", "CT3 - IND 10 📁 14 MISSIONS / 00 – Procédure Communication & Mise en œuvre des 14 missions", 3, 10, "procedure_communication_14_missions_cfa", { folder: "14_MISSIONS_CFA" });
+    add("cfa_14missions_tableau_bord", "CT3 - IND 14 📁 14 MISSIONS / 00 – Tableau de bord des 14 missions", 3, 14, "tableau_bord_14_missions_cfa", { folder: "14_MISSIONS_CFA" });
+    add("cfa_14missions_plan_annuel", "CT3 - IND 14 📁 14 MISSIONS / 00 – Plan annuel des 14 missions", 3, 14, "plan_annuel_14_missions_cfa", { folder: "14_MISSIONS_CFA" });
+    // Mission 6 — procédure d'accompagnement social et matériel ; Mission 12 — procédure d'évaluation
+    add("cfa_mission6_procedure_accompagnement_social", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Procédure d'accompagnement social et matériel", 3, 10, "procedure_accompagnement_social_cfa", { folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    add("cfa_mission12_procedure_evaluation", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Procédure d'évaluation des compétences acquises", 3, 10, "procedure_evaluation_competences_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences" });
 
     // Mission 2 — Appui à la recherche d'un employeur
     add("cfa_mission2_procedure_aide_employeur", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Procédure d'aide à la recherche d'employeur", 3, 10, "procedure_aide_recherche_employeur_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" });
@@ -750,6 +755,11 @@ export function buildFullCatalog(
       { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation",     titre: "Mission 13 – Accompagnement post-formation",               critere: 3, ind: 10 },
       { num: 14, folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides",                       titre: "Mission 14 – Accès aux aides des apprentis",               critere: 3, ind: 10 },
     ];
+    // Fiche mission (qui / quoi / quand / comment / preuves / indicateur) et émargement de l'atelier
+    MISSIONS_FOLDERS.forEach((m) => {
+      add(`cfa_fiche_mission${m.num}`, `CT${m.critere} - IND ${m.ind} 📁 14 MISSIONS / ${m.titre} – Fiche mission`, m.critere, m.ind, "fiche_mission_cfa", { folder: m.folder, missionNumero: m.num });
+      add(`cfa_emargement_atelier_mission${m.num}`, `CT${m.critere} - IND ${m.ind} 📁 14 MISSIONS / ${m.titre} – Émargement de l'atelier`, m.critere, m.ind, "emargement_atelier_mission_cfa", { folder: m.folder, missionNumero: m.num });
+    });
     MISSIONS_FOLDERS.forEach((m) => {
       stagiaires.forEach((s, si) => {
         add(
