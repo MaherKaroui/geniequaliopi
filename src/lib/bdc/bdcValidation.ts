@@ -112,7 +112,8 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
       : `Une prestation de ${p.dureeTotaleH} h ne peut pas tenir en ${joursReels} jour(s) ouvré(s) : ${joursNecessaires} jours ouvrés au minimum.`));
 
   // V03 — convention signée avant démarrage
-  const dateConvention = new Date(p.dateDebut.getTime() - 14 * DAY);
+  // Signature 14 jours ouvrés avant le démarrage (même règle que les pièces du dossier)
+  const dateConvention = (() => { const d = new Date(p.dateDebut); let n = 0; while (n < 14) { d.setDate(d.getDate() - 1); const w = d.getDay(); if (w !== 0 && w !== 6) n++; } return d; })();
   B.push(r("V03", "Convention signée avant le démarrage", dateConvention <= p.dateDebut, "Convention signée après le démarrage"));
 
   // V04 — la date ÉCRITE dans le fichier « Suivi à 6 mois »
@@ -557,34 +558,33 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
 /* BLOC 8 — Couverture des indicateurs                                 */
 /* ================================================================== */
 
-export const INDICATEURS_NON_APPLICABLES_BC = [3, 7, 13, 14, 15, 20, 29];
+/** Indicateurs non applicables au bilan de compétences (guide de lecture V9, décret n° 2026-728). */
+export const INDICATEURS_NON_APPLICABLES_BC = [3, 7, 8, 13, 14, 15, 16, 20, 28, 29, 33];
 
+/** Pièces attendues par indicateur applicable — libellés alignés sur les pièces réellement générées. */
 export const PIECES_ATTENDUES_BC: Record<number, string[]> = {
-  1: ["Process de diffusion de l'information", "Plaquette de présentation du bilan", "Programme des 3 phases"],
-  2: ["Tableau de bord des indicateurs de résultats", "Justificatifs chiffrés"],
-  4: ["Fiche d'analyse du besoin (renseignée par le bénéficiaire)", "Fiche préalable au bilan"],
-  5: ["Objectifs de la prestation formalisés", "Outil préparatoire"],
-  6: ["Livret d'accueil", "Informations pratiques distanciel", "Planning prévisionnel signé"],
-  8: ["Positionnement d'entrée renseigné par le bénéficiaire"],
-  9: ["Contrat / convention", "CGV", "Règlement intérieur", "Accord de conservation", "Autorisation de transmission", "Clauses BC"],
-  10: ["Programme des 3 phases", "Planning prévisionnel signé", "Fiche pédagogique"],
-  11: ["Document de synthèse", "Feuilles d'émargement", "Suivi de l'atteinte des objectifs"],
-  12: ["Suivi de l'adaptation de l'accompagnement"],
-  16: ["Suivi à 6 mois formalisé", "Questionnaire à froid"],
-  17: ["Moyens matériels et outils d'investigation"],
-  18: ["Ressources documentaires mises à disposition"],
-  19: ["Coordination des intervenants"],
-  21: ["Fiches de poste des fonctions exercées", "CV du consultant"],
-  22: ["Entretien annuel / plan de développement du consultant"],
-  23: ["Veille légale et réglementaire du secteur d'intervention"],
-  24: ["Veille sur les compétences, métiers et emplois du secteur"],
-  25: ["Veille sur les innovations pédagogiques et technologiques"],
+  1: ["Présentation du bilan", "Cadre légal et réglementaire", "Process général"],
+  2: ["Indicateurs de résultats", "Justificatifs chiffrés calculés"],
+  4: ["Fiche d'analyse du besoin", "Fiche préalable au bilan", "Auto-diagnostic préliminaire"],
+  5: ["Objectifs opérationnels et évaluables", "Outil préparatoire"],
+  6: ["Contenus et modalités adaptés", "Programme des 3 phases"],
+  9: ["Contrat / convention", "CGV", "Règlement intérieur", "Livret d'accueil", "Accord de conservation", "Autorisation de transmission", "Clauses BC"],
+  10: ["Convention de prestation", "Planning prévisionnel signé", "Fiche pédagogique", "Entretien intermédiaire"],
+  11: ["Document de synthèse", "Attestation de remise", "Feuilles d'émargement"],
+  12: ["Process abandons", "Guide d'entretien des abandons"],
+  17: ["Moyens, confidentialité et informations pratiques"],
+  18: ["Organigramme", "Annuaire des contacts"],
+  19: ["Ressources mises à disposition"],
+  21: ["Fiches de poste des fonctions exercées", "Process recrutement"],
+  22: ["Entretien annuel", "Plan de développement des compétences"],
+  23: ["Registre de veille légale et réglementaire", "Process veilles"],
+  24: ["Registre de veille emplois, métiers et compétences"],
+  25: ["Registre de veille innovations pédagogiques et technologiques"],
   26: ["Process handicap", "Partenaires handicap"],
-  27: ["Sous-traitance / partenariats"],
-  28: ["Contribution à l'insertion et aux acteurs socio-économiques"],
-  30: ["Questionnaires de satisfaction bénéficiaire (à chaud / à froid)", "Mentions non applicable / sollicité sans réponse"],
-  31: ["Procédure de réclamation et de médiation", "Registre des réclamations"],
-  32: ["Tableau d'amélioration continue"],
+  27: ["Registre de sous-traitance et de portage salarial", "Clauses qualité des contrats"],
+  30: ["Questionnaires de satisfaction (à chaud / à froid)", "Mentions entreprise / financeur"],
+  31: ["Procédure de réclamation et de médiation"],
+  32: ["Tableau d'amélioration continue", "Analyse des risques sur la qualité"],
 };
 
 export interface CouvertureIndicateur {
@@ -607,7 +607,7 @@ function critereDe(ind: number): number {
 
 export function calculerCouverture(nomsDocuments: string[]): CouvertureIndicateur[] {
   const res: CouvertureIndicateur[] = [];
-  for (let ind = 1; ind <= 32; ind++) {
+  for (let ind = 1; ind <= 33; ind++) {
     if (INDICATEURS_NON_APPLICABLES_BC.includes(ind)) {
       res.push({ indicateur: ind, critere: critereDe(ind), statut: "non_applicable", piecesAttendues: [], piecesPresentes: [] });
       continue;
