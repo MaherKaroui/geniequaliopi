@@ -28,19 +28,22 @@ function ligneExperience(f?: FormationInfo): string {
 }
 
 function genFichePosteRefQualiteExterne(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Référent Qualité Externe – Nadine DENDANI", sections: [
+  const brut = (o.referentQualite || o.dirigeant || "").trim();
+  const externe = /externe/i.test(brut);
+  const nomRQ = brut.replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() || o.dirigeant;
+  return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: `Référent qualité${externe ? " externe" : ""} – ${nomRQ}`, sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Identité du référent qualité externe", content: `<p><strong>Madame Nadine DENDANI</strong></p><p>Consultante indépendante – Référente Qualité externe mandatée par l'organisme de formation pour le pilotage et le suivi de la démarche qualité Qualiopi.</p>` },
+    { heading: "Identité du référent qualité", content: `<p><strong>${nomRQ}</strong></p><p>${externe ? "Prestataire externe mandaté par l'organisme de formation pour le pilotage et le suivi de la démarche qualité Qualiopi (voir registre de sous-traitance, IND 27)." : `Fonction assurée en interne au sein de ${o.nom}.`}</p>` },
     { heading: "Lieu d'intervention", content: `<p>La mission est réalisée principalement à distance, avec des interventions ponctuelles en présentiel au sein des locaux de l'organisme situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges réguliers (visioconférence, téléphone, messagerie) sont organisés avec la direction et l'équipe pédagogique.</p>` },
-    { heading: "Type de contrat", content: `<p>Prestataire externe spécialisée, dans le cadre d'un contrat de prestation de services pour l'accompagnement et le pilotage de la démarche qualité Qualiopi.</p><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
-    { heading: "Finalité du poste", content: `<p>La Référente Qualité externe est garante de la conformité de l'organisme aux exigences du Référentiel National Qualité (Qualiopi) et au Décret Qualité du 30 juin 2015.</p><p>Elle accompagne la direction dans la mise en œuvre, le suivi et l'amélioration continue du système de management de la qualité, et prépare l'organisme aux audits initiaux, de surveillance et de renouvellement.</p>` },
+    { heading: "Type de contrat", content: `<p>${externe ? "Prestataire externe, dans le cadre d'un contrat de prestation de services pour l'accompagnement et le pilotage de la démarche qualité Qualiopi." : "Fonction interne exercée par le dirigeant ou un salarié de l'organisme."}</p><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
+    { heading: "Finalité du poste", content: `<p>Le référent qualité est garant de la conformité de l'organisme au référentiel national qualité (article L.6316-3 du Code du travail), dans sa version issue du décret n° 2026-728 du 1er août 2026 (33 indicateurs, en vigueur le 1er novembre 2026).</p><p>Elle accompagne la direction dans la mise en œuvre, le suivi et l'amélioration continue du système de management de la qualité, et prépare l'organisme aux audits initiaux, de surveillance et de renouvellement.</p>` },
     { heading: "Missions principales", content: `<ul><li>Concevoir, déployer et faire vivre le système qualité de l'organisme</li><li>Garantir la conformité aux 7 critères et 33 indicateurs du Référentiel National Qualité</li><li>Réaliser des audits internes réguliers et formaliser des plans d'actions correctives</li><li>Préparer et accompagner les audits Qualiopi (initial, surveillance, renouvellement)</li><li>Accompagner la direction lors des audits externes et lever les non-conformités</li><li>Mettre à jour les procédures, processus, modes opératoires et documents qualité</li><li>Former et sensibiliser l'équipe pédagogique et administrative aux exigences Qualiopi</li><li>Analyser les indicateurs qualité (satisfaction, abandons, réclamations, résultats)</li><li>Piloter la veille légale, réglementaire et qualité de la formation professionnelle</li><li>Suivre et exploiter les enquêtes de satisfaction à chaud et à froid</li><li>Gérer le traitement des réclamations et des actions correctives</li><li>Animer la revue de direction annuelle et formaliser le plan d'amélioration continue</li><li>Conseiller la direction sur les évolutions réglementaires et leurs impacts</li></ul>` },
     { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Maîtrise approfondie du Référentiel National Qualité (Qualiopi) et de ses 33 indicateurs</li><li>Connaissance complète du cadre réglementaire de la formation professionnelle continue</li><li>Conduite d'audits internes et préparation aux audits externes</li><li>Rédaction de procédures, processus et documents qualité</li><li>Analyse de données qualité et construction d'indicateurs de pilotage</li><li>Animation de revues de direction et de revues de processus</li><li>Maîtrise des outils bureautiques et de gestion documentaire</li><li>Pédagogie et transmission auprès des équipes</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Rigueur, méthode et sens du détail</li><li>Sens de l'écoute et capacité d'analyse</li><li>Diplomatie et capacité à fédérer autour de la démarche qualité</li><li>Autonomie et sens de l'initiative</li><li>Confidentialité et discrétion professionnelle</li><li>Capacité à travailler à distance et en mode projet</li><li>Esprit pédagogique et bienveillant</li><li>Force de proposition dans l'amélioration continue</li></ul>` },
     { heading: "Profil requis", content: `<ul><li>Expérience confirmée dans le pilotage de la démarche qualité en organisme de formation</li><li>Maîtrise approfondie du Référentiel National Qualité (Qualiopi)</li><li>Expérience de plusieurs audits Qualiopi (initial, surveillance, renouvellement)</li><li>Bonne connaissance du secteur de la formation professionnelle continue, de l'apprentissage et des financeurs (OPCO, CPF, France Travail)</li><li>Expérience en accompagnement et conseil auprès d'organismes de formation</li></ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux procédures internes, documents qualité et outils de pilotage</li><li>Accès aux plateformes utilisées par l'organisme (LMS, EDOF, dossiers stagiaires)</li><li>Appui de la direction et de l'équipe pédagogique</li><li>Documentation réglementaire et veille qualité</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Conformité aux 33 indicateurs Qualiopi</li><li>Résultats des audits internes et externes (nombre de non-conformités levées)</li><li>Délai de mise en œuvre des actions correctives</li><li>Taux de satisfaction des bénéficiaires</li><li>Mise à jour effective de la veille légale et réglementaire</li><li>Tenue de la revue de direction annuelle</li></ul>` },
-    { heading: "Positionnement", content: `<p>Madame Nadine DENDANI intervient en qualité de prestataire externe sous l'autorité fonctionnelle de la direction de ${o.nom}. Elle travaille en lien étroit avec le dirigeant, le responsable pédagogique, le référent administratif et le référent handicap.</p>` },
+    { heading: "Positionnement", content: `<p>${nomRQ} intervient ${externe ? "en qualité de prestataire externe " : ""}sous l'autorité de la direction de ${o.nom}, en lien étroit avec le responsable pédagogique, le référent administratif et le référent handicap.</p>` },
   ] });
 }
 
@@ -423,39 +426,31 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     );
   }
 
-  // ===== Entrée systématique : accompagnement Qualiopi FD CERTIF EXPERT =====
-  // (sous-traitance / accompagnement dirigeant assuré par FD CERTIF EXPERT — ex IZIBUSINESS / Nadine Dendani)
-  futureTrainings.unshift({
-    origine: "Automatisation gestion administrative",
-    nom: "Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative",
-    objectif: "Mise en place de la stratégie d'automatisation (workflows Make, base Airtable, CRM, suivi qualité Qualiopi)",
-    type: "Externe",
-    formateur: "NADINE DENDANI",
-    nb: "1",
-    noms: o.dirigeant || formateurName,
-    duree: "6 mois",
-  });
-
-  // Ne conserver que l'entrée FD CERTIF EXPERT (Automatisation gestion administrative)
-  const fdOnly = futureTrainings.filter(t => /nadine\s*dendani/i.test(t.formateur));
-
-  fdOnly.forEach(t => {
-    // Pour FD CERTIF : la formation se déroule AVANT la formation principale (date début = date d'inscription),
-    // sur 6 mois, afin de rester cohérent avec l'attestation de fin de formation.
-    const rowDateDebut = dateInscriptionStr;
-    const rowDuree = "6 mois";
+  // Plan PRÉVISIONNEL établi à la date de MAJ : les actions sont « prévues » ; une action
+  // n'est notée réalisée qu'avec l'attestation correspondante jointe au dossier (IND 22).
+  const intervenants = Array.from(new Set([f.formateur, ...(stagiaires || []).map(s => s.formateur), o.dirigeant]
+    .map(n => String(n || "").trim()).filter(Boolean)));
+  const nomsIntervenants = intervenants.join(", ") || formateurName;
+  const majIso = (o.dateMaj || "").trim();
+  const dateEtab = majIso ? fmtDate(new Date(majIso + "T00:00:00")) : dateInscriptionStr;
+  const anneePlan = majIso ? Number(majIso.slice(0, 4)) : year;
+  html = html.replace(`${prevYear} – ${year}`, `${anneePlan} – ${anneePlan + 1} (établi le ${dateEtab})`);
+  html = html.replace("<th>Année</th>", "<th>Année</th><th>Statut</th>");
+  futureTrainings.forEach((t, i) => {
+    const trimestre = ["T1", "T2", "T3", "T4"][i % 4];
     html += `<tr>
-      <td>${dateInscriptionStr}</td>
+      <td>${dateEtab}</td>
       <td>${t.origine}</td>
       <td>${t.nom}</td>
       <td>${t.objectif}</td>
       <td>${t.type}</td>
       <td>${t.formateur}</td>
-      <td>${t.nb}</td>
-      <td>${t.noms}</td>
-      <td>${rowDuree}</td>
-      <td>${rowDateDebut}</td>
-      <td>${prevYear}</td>
+      <td>${intervenants.length || 1}</td>
+      <td>${nomsIntervenants}</td>
+      <td>${t.duree}</td>
+      <td>${trimestre} ${anneePlan + (i >= 4 ? 1 : 0)}</td>
+      <td>${anneePlan}</td>
+      <td>Prévue — attestation à joindre après réalisation</td>
     </tr>`;
   });
 

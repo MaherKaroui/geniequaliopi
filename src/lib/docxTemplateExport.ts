@@ -221,11 +221,6 @@ function buildSplitRegex(key: string): RegExp | null {
 
 /** Template file mapping — factures IND 17 */
 export const DOCX_TEMPLATE_FILES: Record<string, string> = {
-  facture_pack_office_docx: "/templates/factures/Facture_pack_office.docx",
-  facture_google_workspace_docx: "/templates/factures/Facture_google.docx",
-  facture_make_docx: "/templates/factures/FACTURE_MAKE.docx",
-  facture_genspark_docx: "/templates/factures/FACTURE_GENSPARK.docx",
-  diplome_referent_handicap_docx: "/templates/diplomes/DIPLOME_REFERENT_HANDICAP.docx",
 };
 
 /** Template file mapping — mails (per-stagiaire) */

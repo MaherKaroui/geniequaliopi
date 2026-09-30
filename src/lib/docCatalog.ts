@@ -48,7 +48,8 @@ export function buildFullCatalog(
   stagiaires: StagiaireInfo[],
   formateurs: FormateurInfo[],
   typesActions?: ActionType[],
-  dirigeantNom?: string
+  dirigeantNom?: string,
+  referentQualiteNom?: string
 ): DocEntry[] {
   const d: DocEntry[] = [];
   const add = (id: string, nom: string, c: number, i: number, template: string, params?: Record<string, any>) =>
@@ -88,7 +89,7 @@ export function buildFullCatalog(
 
     // IND 3 — Taux d'obtention des certifications (uniquement si code RNCP renseigné)
     formations.forEach((f, fi) => {
-      if (f.codeRNCP && f.codeRNCP.trim()) {
+      if (isCodeRsrncp(f.codeRNCP)) {
         add(`af_c1i3_taux_obtention_${fi}`, `CT1 - IND 3 TAUX D'OBTENTION DE LA CERTIFICATION`, 1, 3, "taux_obtention_certification", { fi });
       }
     });
@@ -127,12 +128,10 @@ export function buildFullCatalog(
     // Trames vides (modèles)
     formations.forEach((f, fi) => {
       add(`af_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION`, 2, 8, "test_positionnement_debut_trame", { fi });
-      add(`af_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION`, 2, 8, "test_positionnement_fin_trame", { fi });
     });
     // Procédures d'évaluation
     formations.forEach((f, fi) => {
       add(`af_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION`, 2, 8, "procedure_eval_debut", { fi });
-      add(`af_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 2, 8, "procedure_eval_fin", { fi });
     });
     // Grille de niveaux
     formations.forEach((f, fi) => {
@@ -142,7 +141,6 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
         add(`af_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 
@@ -175,12 +173,8 @@ export function buildFullCatalog(
 
     // IND 10 — Adaptation de la prestation et accompagnement
     add("af_c3i10_procedure_adaptation", "CT3 - IND 10 PROCÉDURE D'ADAPTATION PÉDAGOGIQUE", 3, 10, "procedure_adaptation");
-    // Évaluation des besoins — un fichier par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`af_c3i10_eval_besoins_${si}`, `CT3 - IND 10 ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_combine", { stagiaireIdx: si });
-    });
+    // (trame des besoins et déroulé restent en IND 4 et IND 5/6 : pas de doublon)
     formations.forEach((f, fi) => {
-      add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 3, 10, "deroule_pedagogique_detaille", { fi });
       add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES`, 3, 10, "tableau_suivi_parcours_excel", { fi });
     });
 
@@ -213,6 +207,11 @@ export function buildFullCatalog(
         }
       }
     });
+    // Évaluation de fin de formation (IND 11 — relevait à tort de l'IND 8)
+    formations.forEach((f, fi) => {
+      add(`af_c3i11_procedure_fin_${fi}`, `CT3 - IND 11 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 3, 11, "procedure_eval_fin", { fi });
+      add(`af_c3i11_trame_fin_${fi}`, `CT3 - IND 11 TEST DE FIN DE FORMATION (TRAME)`, 3, 11, "test_positionnement_fin_trame", { fi });
+    });
     // Documents individuels per-stagiaire IND 11
     formations.forEach((f, fi) => {
       const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
@@ -220,7 +219,6 @@ export function buildFullCatalog(
       const nbJoursFormation = getFormationDays(f).length;
 
       stagiaires.forEach((s, si) => {
-        add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
 
         // 1 fichier = 1 jour de formation (1 exercice par jour).
@@ -317,27 +315,28 @@ export function buildFullCatalog(
         stagiaires.forEach((s, si) => {
           add(`af_c3i16_attestation_presentation_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "attestation_presentation_certification", { fi, stagiaireIdx: si });
         });
-        stagiaires.forEach((s, si) => {
-          add(`af_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
-        });
       }
     });
 
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
 
-    // IND 17 — Moyens humains, techniques et environnement
+    // IND 17 — Moyens humains, techniques et environnement, décrits d'après les données saisies ;
+    // les justificatifs de tiers (bail, factures d'outils) sont listés, jamais fabriqués.
+    formations.forEach((f, fi) => {
+      add(`af_c4i17_moyens_${fi}`, "CT4 - IND 17 DESCRIPTIF DES MOYENS ET DE L'ENVIRONNEMENT", 4, 17, "moyens_environnement_af", { fi });
+    });
+    add("af_c4i17_justificatifs_outils", "CT4 - IND 17 JUSTIFICATIFS DES OUTILS ET LICENCES (à joindre)", 4, 17, "facture_pack_office");
     const afModaLower = (formations[0]?.modalites || '').toLowerCase();
-    const afIsPureDistanciel = afModaLower.includes('distanciel') && !afModaLower.includes('mixte') && !afModaLower.includes('présentiel') && !afModaLower.includes('presentiel');
+    const afIsPureDistanciel = afModaLower.includes('distanciel') && !afModaLower.includes('mixte') && !/pr[ée]sentiel/.test(afModaLower);
     if (!afIsPureDistanciel) {
-      add("af_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+      add("af_c4i17_justificatif_locaux", "CT4 - IND 17 JUSTIFICATIF DES LOCAUX (à joindre)", 4, 17, "bail_sous_location");
     }
-    add("af_c4i17_facture_pack_office", "CT4 - IND 17 FACTURE PACK OFFICE", 4, 17, "facture_pack_office_docx");
-    add("af_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
-    add("af_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
-    add("af_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
-    add("af_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
     // IND 18 — Coordination des intervenants
     add("af_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
+    formations.forEach((f, fi) => {
+      add(`af_c4i18_cr_reunion_${fi}`, "CT4 - IND 18 RÉUNION PÉDAGOGIQUE DE PRÉPARATION", 4, 18, "cr_reunion_pedagogique_af", { fi });
+      add(`af_c4i18_planning_intervenants_${fi}`, "CT4 - IND 18 PLANNING DES INTERVENANTS", 4, 18, "planning_intervenants_af", { fi });
+    });
 
     // IND 19 — Ressources pédagogiques mises à disposition
     formations.forEach((f, fi) => {
@@ -347,40 +346,34 @@ export function buildFullCatalog(
 
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL =====
 
-    // --- Per-formateur docs: extract unique formateur names from stagiaires ---
-    const uniqueFormateurs = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+    // Intervenants réels : formateur de la formation, formateurs affectés aux stagiaires, sinon dirigeant.
+    const intervenantsAF = Array.from(new Map(
+      [formations[0]?.formateur, ...stagiaires.map(s => s.formateur)]
+        .map(n => String(n || "").trim()).filter(Boolean)
+        .map(n => [normalizeName(n), n] as [string, string])
+    ).values());
+    if (intervenantsAF.length === 0 && (dirigeantNom || "").trim()) intervenantsAF.push(String(dirigeantNom).trim());
+    const slugNom = (n: string) => n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]+/g, "_").toUpperCase();
 
     // IND 21 — Compétences des intervenants
     add("af_c5i21_fiche_poste_dirigeant", "CT5 - IND 21 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 5, 21, "fiche_poste_formateur", { role: "dirigeant" });
-    // Fiche de poste formateur générique (si aucun formateur assigné)
-    if (uniqueFormateurs.length === 0) {
-      add("af_c5i21_fiche_poste_formateur", "CT5 - IND 21 FICHE DE POSTE – FORMATEUR", 5, 21, "fiche_poste_formateur", { role: "formateur" });
-    }
     add("af_c5i21_fiche_poste_ref_admin", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 5, 21, "fiche_poste_formateur", { role: "referent_administratif" });
     add("af_c5i21_fiche_poste_ref_handicap", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT HANDICAP", 5, 21, "fiche_poste_formateur", { role: "referent_handicap" });
-    add("af_c5i21_fiche_poste_ref_qualite_externe", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT QUALITÉ EXTERNE (Nadine DENDANI)", 5, 21, "fiche_poste_formateur", { role: "referent_qualite_externe" });
-    // Une seule auto-évaluation pour le formateur de la formation
-    add("af_c5i21_autoevaluation_0", `CT5 - IND 21 AUTO-ÉVALUATION FORMATEUR`, 5, 21, "autoevaluation_formateur", { formateurIdx: 0 });
+    add("af_c5i21_fiche_poste_ref_qualite_externe", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT QUALITÉ", 5, 21, "fiche_poste_formateur", { role: "referent_qualite_externe" });
     add("af_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
+    intervenantsAF.forEach((fname) => {
+      const slug = slugNom(fname);
+      add(`af_c5i21_competences_${slug}`, `CT5 - IND 21 FICHE DE COMPÉTENCES – ${fname}`, 5, 21, "fiche_competences_intervenant", { formateurNom: fname });
+      if (normalizeName(fname) !== dirigeantKey) {
+        add(`af_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
+      }
+    });
 
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
-    
-    add("af_c5i22_attestation_fin_formation", "CT5 - IND 22 ATTESTATION DE FIN DE FORMATION\u00a0", 5, 22, "attestation_fin_formation");
-    add("af_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
-
-
-    uniqueFormateurs.forEach((fName) => {
-      const fname = String(fName).trim();
-      const slug = fname.replace(/\s+/g, '_').toUpperCase();
-      // Fiche d'entretien annuel per formateur
-      add(`af_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
-      // Fiche de poste per formateur
-      add(`af_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
-      // Auto-évaluation per formateur
-      add(`af_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
-      // Contrat de sous-traitance per formateur
-      add(`af_c6i27_contrat_soustraitance_${slug}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
+    add("af_c5i22_attestations_formation", "CT5 - IND 22 ATTESTATIONS DE FORMATION CONTINUE (à joindre)", 5, 22, "attestation_fin_formation");
+    intervenantsAF.forEach((fname) => {
+      add(`af_c5i22_fiche_entretien_${slugNom(fname)}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
     });
 
     // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
@@ -388,9 +381,7 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("af_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("af_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("af_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
-    add("af_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
-    add("af_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
+    add("af_c6i23_veille_sourcee", "CT6 - IND 23 SOURCES DE VEILLE ET TEXTES SUIVIS (dont décret n° 2026-728)", 6, 23, "veille_sourcee", { theme: "reglementaire" });
     add("af_c6i23_preuves_veille", "CT6 - IND 23 PREUVES DE VEILLE RÉGLEMENTAIRE", 6, 23, "preuves_veille_reglementaire");
 
     // IND 24 — Veille métiers et emplois
@@ -398,29 +389,41 @@ export function buildFullCatalog(
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    if (formations.some(f => /excel|word|powerpoint/i.test(f.intitule || ''))) {
-      add("af_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
-    }
-    add("af_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
+    add("af_c6i25_veille_sourcee", "CT6 - IND 25 SOURCES DE VEILLE PÉDAGOGIQUE ET TECHNOLOGIQUE", 6, 25, "veille_sourcee", { theme: "technologique" });
 
     // IND 26 — Accueil et accompagnement handicap
     add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
-    add("af_c6i26_screenshot_agefiph", "CT6 - IND 26 INSCRIPTION NEWSLETTER AGEFIPH", 6, 26, "screenshot_agefiph");
+    add("af_c6i26_veille_sourcee", "CT6 - IND 26 SOURCES ET RÉSEAUX HANDICAP SUIVIS", 6, 26, "veille_sourcee", { theme: "handicap" });
     // PDFs statiques IND 26
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("af_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
-    add("af_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "diplome_referent_handicap_docx");
+    add("af_c6i26_formation_referent_handicap", "CT6 - IND 26 FORMATION DU RÉFÉRENT HANDICAP (à joindre)", 6, 26, "diplome_referent_handicap_docx");
     add("af_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("af_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
-    add("af_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
+    add("af_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES (diaporama)", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
 
     // IND 27 — Sous-traitance et partenariats
+    // IND 27 — Sous-traitance et portage salarial (décret n° 2026-728 : traçabilité contractuelle)
+    add("af_c6i27_registre_sous_traitance", "CT6 - IND 27 REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL", 6, 27, "registre_sous_traitance_portage", { type: "AF" });
     add("af_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
-    if (hasExternalFormateur) add("af_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
-    add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
-    add("af_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
-    add("af_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
+    if (hasExternalFormateur) {
+      add("af_c6i27_clauses_qualite", "CT6 - IND 27 ANNEXE CLAUSES QUALITÉ DES CONTRATS DE SOUS-TRAITANCE / PORTAGE", 6, 27, "clauses_qualite_contrat", { type: "AF" });
+      intervenantsAF.filter(n => normalizeName(n) !== dirigeantKey).forEach((fname) => {
+        add(`af_c6i27_contrat_soustraitance_${slugNom(fname)}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
+      });
+      add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
+    }
+    if (/externe/i.test(referentQualiteNom || "")) {
+      add("af_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", 6, 27, "mandat_qualiopi");
+    }
+
+    // IND 28 — Formation en situation de travail (seulement si la formation comporte de l'alternance)
+    formations.forEach((f, fi) => {
+      if ((f.rythmeAlternance || "").trim()) {
+        add(`af_c6i28_cooperation_${fi}`, "CT6 - IND 28 MOBILISATION DU RÉSEAU SOCIO-ÉCONOMIQUE", 6, 28, "cooperation_socio_eco_af", { fi });
+      }
+    });
     // Checklist formateur — un fichier par session (groupé par dates)
     {
       const f0 = formations[0];
@@ -479,7 +482,7 @@ export function buildFullCatalog(
     });
     add("af_c7i30_compte_rendu_formateur", "CT7 - IND 30 COMPTE-RENDU DE FORMATION", 7, 30, "compte_rendu_formateur");
     // Bilan de fin de formation formateur — per formateur
-    uniqueFormateurs.forEach((fName) => {
+    intervenantsAF.forEach((fName) => {
       const fname = String(fName).trim();
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
       add(`af_c7i30_bilan_fin_formateur_${slug}`, `CT7 - IND 30 BILAN DE FIN DE FORMATION – ${fname}`, 7, 30, "bilan_fin_formation_formateur", { formateurNom: fname });
@@ -498,6 +501,7 @@ export function buildFullCatalog(
     add("af_c7i31_suivi_dysfonctionnements_excel", "CT7 - IND 31 SUIVI DES DYSFONCTIONNEMENTS INTERNES ET EXTERNES", 7, 31, "suivi_dysfonctionnements_excel");
 
     // IND 32 — Amélioration continue
+    add("af_c7i32_analyse_risques", "CT7 - IND 32 ANALYSE DES RISQUES SUR LA QUALITÉ (décret n° 2026-728)", 7, 32, "analyse_risques_qualite", { type: "AF" });
     add("af_c7i32_tableau_amelioration_excel", "CT7 - IND 32 TABLEAU D'AMÉLIORATION CONTINUE", 7, 32, "tableau_amelioration_continue_excel");
     add("af_c7i32_procedure_amelioration", "CT7 - IND 32 PROCÉDURE AMÉLIORATION CONTINUE", 7, 32, "procedure_amelioration_continue");
   }

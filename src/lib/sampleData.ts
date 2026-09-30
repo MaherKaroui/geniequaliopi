@@ -1187,8 +1187,14 @@ export function formationIncludesSaturday(f: FormationInfo): boolean {
 
 export function getFormationDays(f: FormationInfo): string[] {
   if (!f.dateDebut || !f.dateFin) return ["Jour 1", "Jour 2", "Jour 3"];
-  const start = new Date(f.dateDebut);
-  const end = new Date(f.dateFin);
+  const lire = (v: string): Date => {
+    const m = v.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+    const iso = v.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return iso ? new Date(+iso[1], +iso[2] - 1, +iso[3]) : new Date(v);
+  };
+  const start = lire(f.dateDebut);
+  const end = lire(f.dateFin);
   const days: string[] = [];
   const current = new Date(start);
   const includeSat = formationIncludesSaturday(f);

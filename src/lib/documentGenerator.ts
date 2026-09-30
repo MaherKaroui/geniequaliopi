@@ -1,4 +1,6 @@
 import { resolveFormation } from "./formationResolue";
+import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
+import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "./qualite2026";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel, generateBdcNTSuiviAdaptation, generateBdcNTContactsHandicap, generateBdcNTTableauDysfonctionnements } from "@/lib/bdc/bdcNTXlsx";
@@ -21,7 +23,6 @@ import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutemen
 import { genChiffreAffairesSession } from "./templatesCA";
 import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne, genChecklistFormateur } from "./templatesCritere6";
-import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
 import { genDeroulePedagogique, genFactureOPCO, genTauxObtentionCertification, genCertificatRealisationStagiaire } from "./templatesAF";
 import { genECFGotrm, genDPGotrm } from "./gotrm/ecfDp";
@@ -136,7 +137,7 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   // Aucun héritage d'une formation d'exemple : champs vides déduits de la formation,
   // de sa fiche RNCP/RS et de l'organisme (code vide = non certifiant, IND 3/7/16 masqués).
   const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
-  return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant);
+  return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.referentQualite);
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
@@ -221,7 +222,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     stagiaires = [blank];
   }
   const realStagiairesCount = userStagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
-  const formateurs = SAMPLE_FORMATEURS;
+  const formateurs = formateursReels(o, selectedFormation, stagiaires);
   const fi = params?.fi ?? 0;
   let f = formations[fi] || formations[0];
   const fmt = formateurs[params?.formateurIdx ?? 0];
@@ -483,14 +484,41 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "cr_veille": return genCRVeille(o, params?.mois ?? "", params?.type ?? "");
     case "newsletter_veille": return genNewsletter(o, params?.mois ?? "");
-    case "newsletter_screenshots": return genNewsletterScreenshots(o, f, params?.category ?? "all");
-    case "screenshot_france_competences": return genScreenshotFranceCompetences(o, f);
-    case "screenshot_drieets": return genScreenshotDRIEETS(o, f);
-    case "screenshot_centre_inffo": return genScreenshotCentreInfoo(o, f);
-    case "screenshot_microsoft": return genScreenshotMicrosoft(o, f);
-    case "screenshot_openai": return genScreenshotOpenAI(o, f);
-    case "screenshot_agefiph": return genScreenshotAgefiph(o, f);
-    case "certificat_coursera": return genCertificatCoursera(o, f);
+    case "newsletter_screenshots": return genVeilleSourcee(o, f, params?.category === "handicap" ? "handicap" : params?.category === "technologique" ? "technologique" : "reglementaire");
+    // Les anciennes « captures » d'inscription imitant des sites officiels sont remplacées
+    // par des tableaux de veille sourcés (liens réels, dates de consultation ≤ MAJ).
+    case "screenshot_france_competences":
+    case "screenshot_drieets":
+    case "screenshot_centre_inffo": return genVeilleSourcee(o, f, "reglementaire");
+    case "screenshot_microsoft":
+    case "screenshot_openai": return genVeilleSourcee(o, f, "technologique");
+    case "screenshot_agefiph": return genVeilleSourcee(o, f, "handicap");
+    case "veille_sourcee": return genVeilleSourcee(o, f, params?.theme ?? "reglementaire");
+    // Pièces de tiers : jamais fabriquées, remplacées par la liste des justificatifs à joindre.
+    case "certificat_coursera":
+    case "attestation_fin_formation":
+      return genPieceAFournir(o, "ATTESTATIONS DE FORMATION CONTINUE DES INTERVENANTS", ["Attestations de fin de formation ou certificats délivrés par les organismes où les intervenants se sont formés", "Certificats de réalisation, relevés CPF des formations suivies", "Attestations de participation à des conférences, webinaires ou groupes d'analyse de pratiques"], "Ces pièces alimentent le plan de développement des compétences (IND 22).");
+    case "bail_sous_location":
+      return genPieceAFournir(o, "JUSTIFICATIF DES LOCAUX", ["Bail commercial ou professionnel, convention de mise à disposition, contrat de location de salle", "Attestation de domiciliation (siège uniquement, si les formations se déroulent à distance)", "Registre public d'accessibilité / attestation d'accessibilité des locaux accueillant du public"]);
+    case "facture_pack_office":
+    case "facture_google_workspace":
+    case "facture_make":
+    case "facture_genspark":
+    case "facture_pack_office_docx":
+    case "facture_google_workspace_docx":
+    case "facture_make_docx":
+    case "facture_genspark_docx":
+      return genPieceAFournir(o, "JUSTIFICATIFS DES OUTILS ET LICENCES", ["Factures ou abonnements des outils réellement utilisés (visioconférence, suite bureautique, plateforme de formation)", "Captures datées de l'espace d'administration des comptes", "Inventaire du matériel pédagogique"]);
+    case "diplome_referent_handicap_docx":
+      return genPieceAFournir(o, "FORMATION DU RÉFÉRENT HANDICAP", ["Attestation de formation ou de sensibilisation du référent handicap (Agefiph, Ressource Handicap Formation, organisme de formation)", "À défaut : programme de sensibilisation suivi et date prévue"]);
+    case "moyens_environnement_af": return genMoyensEnvironnement(o, f, stagiaires);
+    case "fiche_competences_intervenant": return genFicheCompetencesIntervenant(o, f, params?.formateurNom || f.formateur || o.dirigeant);
+    case "cr_reunion_pedagogique_af": return genCRReunionPedagogique(o, f, stagiaires);
+    case "planning_intervenants_af": return genPlanningIntervenantsAF(o, f, stagiaires);
+    case "cooperation_socio_eco_af": return genCooperationSocioEconomique(o, f, stagiaires);
+    case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f);
+    case "registre_sous_traitance_portage": return genRegistreSousTraitancePortage(o, params?.type ?? "AF", f, stagiaires);
+    case "clauses_qualite_contrat": return genClausesQualiteContrat(o, params?.type ?? "AF");
     case "preuves_veille_reglementaire": return genPreuvesVeilleReglementaire(o, f);
     case "fiche_innovation": return genFicheInnovation(o, params?.sujet ?? "");
     case "benchmark_outils": return genBenchmark(o);
@@ -768,12 +796,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "support_cours_ref": return genSupportCoursRef(o, f);
     case "ressources_pedagogiques": return genRessourcesPedagogiques(o, f);
     case "moyens_materiels": return genMoyensMateriels(o);
-    case "bail_sous_location": return genBailSousLocation(o);
     case "facture_materiel": return genFactureMateriel(o, params);
-    case "facture_pack_office": return genFacturePackOffice(o);
-    case "facture_google_workspace": return genFactureGoogleWorkspace(o);
-    case "facture_make": return genFactureMake(o);
-    case "facture_genspark": return genFactureGenspark(o);
     case "autoevaluation_formateur": {
       let formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       let stagiaireForDoc: StagiaireInfo[] = stagiaires;
@@ -866,7 +889,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
-    case "attestation_fin_formation": return genAttestationFinFormationFDCertif(o, f);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
       // If a specific formateur name is passed, create a mock FormateurInfo
@@ -4384,7 +4406,7 @@ function genEvalFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
 }
 
 function genPlanDev(o: OrganismeInfo, formateurs: FormateurInfo[]) {
-  const rows = formateurs.map(f => ["NADINE DENDANI", f.specialite, "Formation IA en pédagogie", "2024", "✅ Réalisée"]);
+  const rows = formateurs.map(f => [`${f.prenom} ${f.nom}`.trim(), f.specialite, "Actualisation des compétences pédagogiques et métier", o.dateMaj ? o.dateMaj.slice(0, 4) : String(new Date().getFullYear()), "Prévue — attestation à joindre après réalisation"]);
   return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES DES FORMATEURS", table: { headers: ["Formateur / Organisme", "Domaine", "Formation prévue", "Échéance", "Statut"], rows } });
 }
 
@@ -9890,8 +9912,16 @@ function genLienSiteInternet(o: OrganismeInfo) {
   const description = isFb
     ? `La page Facebook diffuse l'ensemble des informations relatives aux formations : intitulés, objectifs, durées, modalités, tarifs, contacts, indicateurs de résultats et accessibilité handicap.`
     : `Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.`;
+  if (!(o.siteWeb && o.siteWeb.trim())) {
+    // Sans site internet : l'information reste accessible au public par d'autres supports (IND 1-2).
+    return buildDocument({ org: o, title: "SUPPORTS DE DIFFUSION DE L'INFORMATION AU PUBLIC", sections: [
+      { heading: "Situation", content: `<p>${o.nom} ne dispose pas de site internet à la date du ${dateMaj}. L'information sur les prestations et les indicateurs de résultats est diffusée par les supports ci-dessous, remis avant toute contractualisation.</p>` },
+      { heading: "Supports utilisés", content: `<ul><li>Programme de formation détaillé (prérequis, objectifs, durée, modalités et délais d'accès, tarifs, contacts, méthodes, modalités d'évaluation, accessibilité)</li><li>Envoi par courriel sur simple demande à ${o.email || "l'adresse de contact de l'organisme"}${o.telephone?.trim() ? ` ou au ${o.telephone}` : ""}</li><li>Fiche des indicateurs de résultats, jointe au programme et mise à jour après chaque session</li>${/cpf|mon compte formation/i.test(o.certifications || "") ? "<li>Fiche de l'action publiée sur Mon Compte Formation</li>" : ""}</ul>` },
+      { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
+    ] });
+  }
   return buildDocument({ org: o, title: label, sections: [
-    ...(o.siteWeb && o.siteWeb.trim() ? [{ heading: headingLabel, content: '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' }] : []),
+    { heading: headingLabel, content: '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' },
     { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
   ] });
 }
@@ -9899,12 +9929,16 @@ function genLienSiteInternet(o: OrganismeInfo) {
 function genProcedureIndicateursPerformance(o: OrganismeInfo, stagiaires: StagiaireInfo[] = []) {
   const nbStagiaires = stagiaires.length || 1;
   return buildDocument({ org: o, title: "PROCÉDURE DE SUIVI DES INDICATEURS DE PERFORMANCE", sections: [
-    { heading: "Objectif", content: `<p>Assurer le suivi mensuel du taux de satisfaction des stagiaires et du nombre d'apprenants formés, afin d'améliorer la qualité des prestations.</p>` },
+    { heading: "Objectif", content: `<p>Calculer, publier et exploiter des indicateurs de résultats chiffrés adaptés aux prestations (IND 2) — satisfaction, assiduité, atteinte des objectifs, abandons et, pour les formations certifiantes, taux d'obtention (IND 3). Les valeurs publiées sont calculées sur les données réelles de la période ; tant qu'aucune session n'est terminée, la mention « nouvel entrant — indicateurs en cours de constitution » est affichée.</p>` },
     { heading: "Fréquence", content: `<p><strong>Collecte des données :</strong> à la fin de chaque formation.</p><p><strong>Mise à jour du tableau de bord :</strong> une fois par mois.</p>` },
     { heading: "Indicateurs suivis", content: `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
       <tr style="background:#1e3a7b;color:#fff"><th>Indicateur</th><th>Méthode de calcul</th><th>Objectif</th></tr>
-      <tr><td>Taux de satisfaction</td><td>(Nb de stagiaires satisfaits ÷ Nb total de réponses) × 100</td><td>100 %</td></tr>
-      <tr><td>Nombre d'apprenants mensuel</td><td>Total des stagiaires formés sur le mois</td><td>${nbStagiaires}</td></tr>
+      <tr><td>Taux de satisfaction</td><td>(Nb de stagiaires satisfaits ÷ Nb total de réponses) × 100</td><td>≥ 90 %</td></tr>
+      <tr><td>Nombre d'apprenants formés</td><td>Total des stagiaires ayant terminé leur parcours sur la période</td><td>Suivi (pas de cible)</td></tr>
+      <tr><td>Taux d'assiduité</td><td>Heures réalisées ÷ heures prévues × 100 (émargements / connexions)</td><td>≥ 95 %</td></tr>
+      <tr><td>Taux d'atteinte des objectifs</td><td>Stagiaires ayant validé l'évaluation finale ÷ stagiaires évalués × 100</td><td>≥ 85 %</td></tr>
+      <tr><td>Taux d'obtention de la certification (formations RS/RNCP)</td><td>Admis ÷ présentés × 100, sur les résultats transmis par le certificateur</td><td>Publié dès le premier résultat</td></tr>
+      <tr><td>Taux d'abandon</td><td>Abandons ÷ entrées × 100</td><td>≤ 5 %</td></tr>
     </table>` },
     { heading: "Responsabilités", content: `<p><strong>${o.dirigeant || "Le Dirigeant"} :</strong> collecte, saisie et analyse mensuelle.</p><p><strong>Formateurs :</strong> transmission des questionnaires de satisfaction et des feuilles d'émargement.</p>` },
     { heading: "Suivi et amélioration", content: `<p>En cas de baisse du taux de satisfaction ou du nombre d'apprenants, une analyse rapide est réalisée pour identifier la cause et mettre en place une action corrective (ajustement pédagogique, accompagnement, communication, etc.).</p>` },
@@ -12579,70 +12613,6 @@ function genMoyensMateriels(o: OrganismeInfo) {
   ] });
 }
 
-function genBailSousLocation(o: OrganismeInfo) {
-  // Date du bail = dateMaj - 15 jours calendaires
-  const refDate = o.dateMaj || new Date().toISOString().slice(0, 10);
-  const bailDateStr = subtractBusinessDays(refDate, 15);
-  const dateSignature = formatDate(bailDateStr);
-  const dateDebut = dateSignature; // le bail commence à la signature
-  const dateFin = (() => {
-    const d = new Date(bailDateStr);
-    d.setFullYear(d.getFullYear() + 2);
-    return formatDate(d.toISOString());
-  })();
-
-  return buildDocument({ org: o, title: "BAIL DE SOUS-LOCATION", subtitle: "À USAGE DE SALLES DE FORMATION", sections: [
-    { heading: "ENTRE LES SOUSSIGNÉS", content: `
-      <h3>LE BAILLEUR</h3>
-      <p>Madame/Monsieur [Nom du Bailleur],<br>
-      Entrepreneur(e) individuel(le),<br>
-      Immatriculé(e) sous le SIREN [SIREN Bailleur],<br>
-      Demeurant à : [Adresse du Bailleur]</p>
-      <p>Ci-après dénommé(e) « le Bailleur »,</p>
-      <h3>ET</h3>
-      <h3>LE PRENEUR</h3>
-      <p><strong>${o.nom}</strong>,<br>
-      Organisme de formation professionnelle,<br>
-      SIRET : ${o.siret},<br>
-      ${o.nda ? `Titulaire du NDA : ${o.nda},<br>` : ''}
-      Ayant son siège social situé au : ${o.adresse}, ${o.codePostal} ${o.ville},<br>
-      Représenté par ${o.dirigeant},<br>
-      Ci-après dénommé « le Preneur ».</p>` },
-    { heading: "ARTICLE 1 – OBJET DU BAIL", content: `<p>Le présent contrat constitue un bail de sous-location, régi par les articles 1713 et suivants du Code civil.</p><p>Le Bailleur consent au Preneur, qui accepte, la sous-location de locaux destinés exclusivement à l'exercice d'activités de formation professionnelle.</p>` },
-    { heading: "ARTICLE 2 – DÉSIGNATION DES LOCAUX", content: `<p>Les locaux sont situés à l'adresse suivante :</p><p><strong>${o.adresse}, ${o.codePostal} ${o.ville}</strong></p><p>Ils se composent de :</p><ul><li>Deux (2) salles / bureaux</li><li>Superficie totale : 30 m², répartie comme suit :<ul><li>Salle 1 : 15 m²</li><li>Salle 2 : 15 m²</li></ul></li></ul><p>Les locaux sont mis à disposition avec le mobilier suivant : tables, chaises, bureaux, tableaux, écrans.</p><p>Le Preneur reconnaît avoir visité les locaux et les accepter en l'état.</p>` },
-    { heading: "ARTICLE 3 – DESTINATION DES LOCAUX", content: `<p>Les locaux sont destinés exclusivement :</p><ul><li>à l'organisation,</li><li>à l'animation,</li><li>et à la gestion d'actions de formation professionnelle.</li></ul><p>Toute autre activité est interdite sans autorisation écrite préalable du Bailleur.</p>` },
-    { heading: "ARTICLE 4 – DURÉE", content: `<p>Le présent bail est consenti pour une durée de <strong>vingt-quatre (24) mois</strong>,</p><p>à compter du <strong>${dateDebut}</strong>,</p><p>et prendra fin le <strong>${dateFin}</strong>,</p><p>sans tacite reconduction.</p>` },
-    { heading: "ARTICLE 5 – LOYER", content: `<p>Le présent bail est consenti moyennant :</p><ul><li>Loyer annuel hors charges : 850 €</li><li>Paiement mensuel</li><li>Exigible le 5 de chaque mois</li><li>Règlement par virement bancaire</li></ul>` },
-    { heading: "ARTICLE 6 – DÉPÔT DE GARANTIE", content: `<p>Le Preneur verse à la signature du présent bail un dépôt de garantie de <strong>1 200 €</strong>, correspondant à trois (3) mois de loyer hors charges.</p><p>Ce dépôt sera restitué à l'expiration du bail, déduction faite des sommes éventuellement dues.</p>` },
-    { heading: "ARTICLE 7 – CHARGES ET SERVICES INCLUS", content: `<p>Sont inclus dans la sous-location :</p><ul><li>Électricité</li><li>Chauffage</li><li>Eau</li><li>Connexion Internet</li><li>Nettoyage des parties communes</li><li>Assurance des locaux</li><li>Tables et chaises</li><li>Ordinateur</li><li>Télévision / écran</li><li>Tableau</li></ul><p>Les charges exceptionnelles résultant de l'activité du Preneur restent à sa charge.</p>` },
-    { heading: "ARTICLE 8 – ÉTAT DES LIEUX", content: `<p>Un état des lieux contradictoire sera établi lors de l'entrée et de la sortie du Preneur.</p><p>Il sera annexé au présent bail.</p>` },
-    { heading: "ARTICLE 9 – ENTRETIEN ET RÉPARATIONS", content: `<p>Le Preneur s'engage à :</p><ul><li>maintenir les locaux en bon état d'entretien,</li><li>utiliser les équipements conformément à leur destination,</li><li>signaler immédiatement toute dégradation.</li></ul><p>Les grosses réparations relevant de l'article 606 du Code civil restent à la charge du Bailleur.</p>` },
-    { heading: "ARTICLE 10 – ASSURANCES", content: `<p>Le Preneur s'engage à souscrire une assurance responsabilité civile professionnelle, couvrant l'ensemble de ses activités exercées dans les locaux.</p>` },
-    { heading: "ARTICLE 11 – CESSION ET SOUS-LOCATION", content: `<p>Toute cession ou sous-location, totale ou partielle, est strictement interdite, sauf accord écrit préalable du Bailleur.</p>` },
-    { heading: "ARTICLE 12 – RÉSILIATION", content: `<p>En cas de manquement grave aux obligations contractuelles, le présent bail pourra être résilié de plein droit après mise en demeure restée sans effet pendant trente (30) jours.</p>` },
-    { heading: "ARTICLE 13 – DROIT APPLICABLE ET LITIGES", content: `<p>Le présent contrat est soumis au droit français.</p><p>Tout litige sera porté devant les juridictions compétentes après tentative de règlement amiable.</p>` },
-    { heading: "ARTICLE 14 – ÉLECTION DE DOMICILE", content: `<p>Pour l'exécution des présentes :</p><ul><li>le Bailleur élit domicile à son adresse déclarée,</li><li>le Preneur élit domicile à son siège social.</li></ul>` },
-  ], extraHtml: `
-    <p style="margin-top:30px"><strong>Fait à ${o.ville}</strong></p>
-    <p><strong>Le ${dateSignature}</strong></p>
-    <p>En deux exemplaires originaux</p>
-    <div class="signature-block-2">
-      <div class="sig-box">
-        <p class="sig-label">LE BAILLEUR</p>
-        <p>Nom : [Nom du Bailleur]</p>
-        <p>Signature :</p>
-        <p style="font-style:italic;color:#999;margin-top:30px">[Signature du Bailleur]</p>
-      </div>
-      <div class="sig-box">
-        <p class="sig-label">LE PRENEUR</p>
-        <p>Pour ${o.nom}</p>
-        <p>Nom et qualité : ${o.dirigeant}</p>
-        <p>Signature :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:10px;opacity:0.85" />` : (o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:10px" />` : `<p style="font-style:italic;color:#999;margin-top:30px">Signé par ${o.dirigeant}</p>`)}
-      </div>
-    </div>
-  ` });
-}
 
 function genFactureMateriel(o: OrganismeInfo, params: Record<string, any>) {
   const type = params?.type || 'pc';
@@ -12704,110 +12674,9 @@ function genFactureMateriel(o: OrganismeInfo, params: Record<string, any>) {
   ] });
 }
 
-function genFacturePackOffice(o: OrganismeInfo) {
-  const dateFacture = formatDate(subtractBusinessDays(new Date().toISOString(), 45));
-  const factureNum = `00${Math.floor(700000 + Math.random() * 99999)}`;
-  const commandeNum = `#${Math.floor(700000000 + Math.random() * 99999999)}`;
 
-  return buildDocument({ org: o, title: `FACTURE n°${factureNum}`, subtitle: `Commande ${commandeNum} via RAKUTEN`, sections: [
-    { heading: "Acheteur", content: `<p>${o.nom}<br>${o.email}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France</p><p><strong>Date de la commande</strong><br>${dateFacture}</p><p>Via Rakuten</p>` },
-    { heading: "Client (fournisseur)", content: `<p><strong>DA-LICENCES</strong><br>13 rue du verger<br>60590 Sérifontaine<br>France<br><br>SIRET 98197071800012 TVA<br>FR56980367213</p>` },
-    { heading: "Details", content: `
-      <table style="width:100%;border-collapse:collapse">
-        <tr style="background:#f5f5f5"><th style="padding:10px;border:1px solid #ddd;text-align:left">Produit</th><th style="padding:10px;border:1px solid #ddd;text-align:right;width:100px">Prix</th></tr>
-        <tr><td style="padding:10px;border:1px solid #ddd">Pack Office 2025 Pour Pc – Livraison 2h Max – Facture Fournie</td><td style="padding:10px;border:1px solid #ddd;text-align:right">0,90 €</td></tr>
-      </table>
-      <table style="width:40%;margin-left:auto;margin-top:20px;border-collapse:collapse">
-        <tr><td style="padding:8px">Montant HT</td><td style="padding:8px;text-align:right">0,75 €</td></tr>
-        <tr><td style="padding:8px">TVA 20%</td><td style="padding:8px;text-align:right">0,15 €</td></tr>
-        <tr style="font-weight:bold"><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">0,90 €</td></tr>
-      </table>` },
-  ], extraHtml: `<p style="text-align:center;margin-top:40px;font-size:11px;color:#888">© ${new Date().getFullYear()} – DA-LICENCES<br>(v1.22.4)</p>` });
-}
 
-function genFactureGoogleWorkspace(o: OrganismeInfo) {
-  const refDate = o.dateMaj || new Date().toISOString().slice(0, 10);
-  const datePaiement = formatDate(subtractBusinessDays(refDate, 30));
-  const d = new Date(subtractBusinessDays(refDate, 60));
-  const moisFin = new Date(d.getFullYear(), d.getMonth() + 1, 0).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  const dateDebutFacture = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  const siren = o.siret ? o.siret.replace(/\s/g, '').slice(0, 9) : '';
 
-  const d1Start = new Date(d); d1Start.setDate(1);
-  const d1End = new Date(d); d1End.setDate(15);
-  const d2Start = new Date(d); d2Start.setDate(16);
-  const d2End = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-
-  const interval1 = `${d1Start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${d1End.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-  const interval2 = `${d2Start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${d2End.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-
-  return buildDocument({ org: o, title: "INVOICE – Google Workspace", subtitle: "Google Cloud France SARL", sections: [
-    { heading: "Invoice Details", content: `<p><strong>Invoice number:</strong> GCFRD00${Math.floor(10000000 + Math.random() * 9999999)}</p><p><strong>Google Cloud France SARL</strong><br>8 Rue de Londres<br>75009 Paris<br>France<br>VAT number: FR78881721583<br>SIREN: 981970718<br>RCS: 981970718</p>` },
-    { heading: "Bill to", content: `<p><strong>${o.dirigeant}</strong><br><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France<br>VAT number: FR 87922670815<br>SIREN: ${siren}<br>SIRET: ${o.siret}</p>` },
-    { heading: "Summary", content: `<p>You will be automatically charged for any amount due.</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:10px">
-        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Subscription</th><th style="padding:8px;border:1px solid #ddd">Description</th><th style="padding:8px;border:1px solid #ddd">Interval</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:50px">Qty</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Amount (€)</th></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Google Workspace Business Standard</td><td style="padding:8px;border:1px solid #ddd">Usage</td><td style="padding:8px;border:1px solid #ddd">${interval1}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">9</td><td style="padding:8px;border:1px solid #ddd;text-align:right">23,51</td></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Google Workspace Business Standard</td><td style="padding:8px;border:1px solid #ddd">Usage</td><td style="padding:8px;border:1px solid #ddd">${interval2}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">9</td><td style="padding:8px;border:1px solid #ddd;text-align:right">117,58</td></tr>
-      </table>
-      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
-        <tr><td style="padding:8px">Subtotal in EUR</td><td style="padding:8px;text-align:right">€141,09</td></tr>
-        <tr><td style="padding:8px">VAT (20%)</td><td style="padding:8px;text-align:right">€28,22</td></tr>
-        <tr style="font-weight:bold"><td style="padding:8px">Total in EUR</td><td style="padding:8px;text-align:right">€169,31</td></tr>
-      </table>` },
-  ], extraHtml: `<p style="margin-top:15px;font-size:10px;color:#888">9629-3125-3201<br>${o.email}<br>VAT on debits.</p>` });
-}
-
-function genFactureMake(o: OrganismeInfo) {
-  const datePaiement = formatDate(subtractBusinessDays(o.dateMaj || new Date().toISOString().slice(0, 10), 25));
-  const invoiceNum = `E6563CDC-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
-
-  return buildDocument({ org: o, title: "Receipt – Make", subtitle: `Invoice number ${invoiceNum}`, sections: [
-    { heading: "Fournisseur", content: `<p><strong>Celonis Inc.</strong><br>One World Trade Center 70th Floor<br>New York, New York 10007 United States<br>billing@make.com<br>US EIN 61-1797223</p>` },
-    { heading: "Bill to", content: `<p><strong>${o.nom}</strong><br>France<br>${o.email}</p>` },
-    { heading: "Details", content: `<p style="font-size:16px;font-weight:bold">$34.12 paid on ${datePaiement}</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:10px">
-        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Description</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:40px">Qty</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Unit price</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Amount</th></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Make Teams plan (10000 operations / month) – monthly subscription (organization ID: 2025028)</td><td style="padding:8px;border:1px solid #ddd;text-align:center">1</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td></tr>
-      </table>
-      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
-        <tr><td style="padding:8px">Subtotal</td><td style="padding:8px;text-align:right">$34.12</td></tr>
-        <tr><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">$34.12</td></tr>
-        <tr style="font-weight:bold"><td style="padding:8px">Amount paid</td><td style="padding:8px;text-align:right">$34.12</td></tr>
-      </table>` },
-    { heading: "Payment history", content: `
-      <table style="width:100%;border-collapse:collapse">
-        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Payment method</th><th style="padding:8px;border:1px solid #ddd">Date</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Amount paid</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Receipt number</th></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Mastercard – 1675</td><td style="padding:8px;border:1px solid #ddd">${datePaiement}</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td><td style="padding:8px;border:1px solid #ddd;text-align:right">2986-5025</td></tr>
-      </table>` },
-  ] });
-}
-
-function genFactureGenspark(o: OrganismeInfo) {
-  const datePaiement = formatDate(subtractBusinessDays(o.dateMaj || new Date().toISOString().slice(0, 10), 20));
-  const invoiceNum = `NF61TY1F-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
-
-  return buildDocument({ org: o, title: "Reçu – Genspark", subtitle: `Numéro de facture ${invoiceNum}`, sections: [
-    { heading: "Fournisseur", content: `<p><strong>MainFunc PTE. LTD.</strong><br>987 SERANGOON ROAD<br>SINGAPORE 328147<br>Singapour<br>support@genspark.ai</p>` },
-    { heading: "Facturer à", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France<br>${o.email}<br>FR VAT FR85750237471</p>` },
-    { heading: "Details", content: `<p style="font-size:16px;font-weight:bold">40,00 $US payés le ${datePaiement}</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:10px">
-        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Description</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:40px">Qté</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Prix unitaire</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:50px">Taxe</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Montant</th></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Genspark Credits Mega Pack</td><td style="padding:8px;border:1px solid #ddd;text-align:center">1</td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td><td style="padding:8px;border:1px solid #ddd;text-align:right;font-size:10px">0 %<sup>[1]</sup></td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td></tr>
-      </table>
-      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
-        <tr><td style="padding:8px">Sous-total</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
-        <tr><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
-        <tr style="font-weight:bold"><td style="padding:8px">Montant payé</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
-      </table>` },
-    { heading: "Historique des paiements", content: `
-      <table style="width:100%;border-collapse:collapse">
-        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Moyen de paiement</th><th style="padding:8px;border:1px solid #ddd">Date</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Montant payé</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Numéro de reçu</th></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd">Link</td><td style="padding:8px;border:1px solid #ddd">${datePaiement}</td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td><td style="padding:8px;border:1px solid #ddd;text-align:right">2515-0324</td></tr>
-      </table>
-      <p style="margin-top:15px;font-size:10px;color:#888">[1] TVA soumise à autoliquidation</p>` },
-  ] });
-}
 
 function genAutoEvaluationFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
   return buildDocument({ org: o, title: "AUTO-ÉVALUATION FORMATEUR", subtitle: `${fmt.prenom} ${fmt.nom}`, sections: [
@@ -12835,169 +12704,33 @@ function genListePartenaires(o: OrganismeInfo) {
 }
 
 function genMandatQualiopi(o: OrganismeInfo) {
-  // Date = dateMaj - 1 month (business days: ~22 business days)
-  const rawDateMaj = (o as any).dateMaj || new Date().toISOString().split("T")[0];
-  const mandatDate = subtractBusinessDays(rawDateMaj, 22);
-  const mandatDateFormatted = formatDate(mandatDate);
-  
+  // Mandat du référent qualité externe, daté de la date de MAJ du dossier (jamais avant la
+  // création de l'organisme). Coordonnées complètes seulement pour FD CERTIF EXPERT, référent
+  // habituel des dossiers ; sinon la raison sociale saisie dans « Référent qualité ».
+  const brut = (o.referentQualite || "").trim();
+  const nomMandataire = brut.replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() || "le référent qualité externe";
+  const isFD = /fd\s*certif/i.test(brut);
+  const mandatDateFormatted = formatDate((o as any).dateMaj || new Date().toISOString().split("T")[0]);
   const tamponMandant = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:60px;max-width:180px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
-  
-  return buildDocument({ org: o, title: "MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", sections: [
-    { heading: "Entre les soussignés", content: `<p>La société <strong>FD CERTIF EXPERT</strong>,<br>Société par Actions Simplifiée (SAS),<br>Dont le siège social est situé au 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>SIREN : 988018479,<br>SIRET : 98801847900010,<br>Numéro de TVA : FR65988018479,<br>Capital social : 100,00 €,<br>Inscrite au RCS Nanterre sous le numéro 988018479 (le 18/06/2025),<br>Représentée par Madame Nadine Dendani, Présidente,<br>Ci-après dénommée « le Prestataire »,</p><p><strong>ET</strong></p><p><strong>${o.nom}</strong>,<br>Organisme de formation professionnelle,<br>Dont le siège social est situé au ${o.adresse}, ${o.codePostal} ${o.ville},<br>SIRET : ${o.siret}${o.nda ? `,<br>Numéro de déclaration d'activité : ${o.nda}` : ""},<br>Ci-après dénommée « le Mandant »,</p><p>Il a été convenu et arrêté ce qui suit :</p>` },
-    { heading: "Article 1 – Objet du mandat", content: `<p>Le Mandant confie au Mandataire, qui accepte, une mission d'accompagnement, de gestion et de suivi de la Certification Qualiopi du Mandant, conformément aux exigences du Référentiel National Qualité (RNQ).</p><p>Le mandat inclut notamment :</p><ul><li>La mise en place, l'adaptation ou l'optimisation du système Qualiopi du Mandant.</li><li>La rédaction ou la mise à jour des procédures, documents, preuves et indicateurs RNQ.</li><li>La préparation des audits (initial, surveillance, renouvellement).</li><li>L'accompagnement lors des audits.</li><li>Le suivi des non-conformités éventuelles.</li><li>La veille réglementaire liée à Qualiopi.</li><li>L'appui à la structuration administrative, pédagogique et qualité du Mandant.</li></ul>` },
-    { heading: "Article 2 – Pouvoirs accordés au Mandataire", content: `<p>Dans le cadre de ce mandat, le Mandataire est autorisé à :</p><ul><li>Accéder aux documents internes relatifs à la formation, à la qualité, aux procédures et aux indicateurs.</li><li>Proposer des modifications organisationnelles et documentaires.</li><li>Communiquer avec les organismes certificateurs ou institutions si nécessaire (avec accord préalable du Mandant).</li><li>Représenter le Mandant lors des audits Qualiopi, en présence ou accord du Mandant.</li></ul><p>Le Mandataire n'a pas autorité financière ou juridique sur le Mandant, sauf accord écrit spécifique.</p>` },
-    { heading: "Article 3 – Obligations du Mandataire", content: `<p>Le Mandataire s'engage à :</p><ul><li>Respecter la confidentialité des informations du Mandant.</li><li>Mettre en œuvre tous les moyens nécessaires pour garantir la conformité Qualiopi.</li><li>Agir avec diligence, loyauté et professionnalisme.</li><li>Informer régulièrement le Mandant de l'avancement des actions.</li></ul>` },
-    { heading: "Article 4 – Obligations du Mandant", content: `<p>Le Mandant s'engage à :</p><ul><li>Fournir au Mandataire l'ensemble des informations et documents nécessaires à la mission.</li><li>Faciliter l'accès aux équipes, process, supports et preuves.</li><li>Appliquer les recommandations du Mandataire dans la mesure du possible.</li><li>Prévenir le Mandataire de toute évolution pouvant impacter la certification.</li></ul>` },
-    { heading: "Article 5 – Durée du mandat", content: `<p>Le présent mandat prend effet à compter du ${mandatDateFormatted}.</p><p>Il est conclu pour une durée indéterminée, ou jusqu'à la réalisation complète de la mission Qualiopi, sauf résiliation selon l'article 8.</p>` },
-    { heading: "Article 6 – Rémunération", content: `<p>La rémunération du Mandataire fera l'objet d'un acte séparé, précisant :</p><ul><li>Les honoraires</li><li>Les modalités de paiement</li><li>Les éventuels frais supplémentaires (déplacements, audits, etc.)</li></ul>` },
-    { heading: "Article 7 – Confidentialité", content: `<p>Le Mandataire s'engage à conserver strictement confidentielles toutes les informations, documents, données et échanges relatifs au Mandant et à ses stagiaires, clients, partenaires ou formateurs.</p><p>Cette obligation survivra à la fin du mandat.</p>` },
-    { heading: "Article 8 – Résiliation", content: `<p>Chaque partie pourra résilier le présent mandat à tout moment, par lettre recommandée avec accusé de réception, sous réserve d'un préavis de 30 jours.</p><p>En cas de manquement grave d'une des parties à ses obligations, la résiliation pourra être immédiate, sans préavis.</p>` },
-    { heading: "Article 9 – Litiges", content: `<p>En cas de litige non résolu à l'amiable, compétence expresse est attribuée au tribunal du ressort du siège social du Mandant (${o.nom}).</p>` },
-    { heading: "Article 10 – Dispositions finales", content: `<p>Le présent mandat annule et remplace tout accord antérieur ayant le même objet.</p><p>Il est établi en deux exemplaires originaux, signés par les deux parties, chacune reconnaissant en avoir reçu un.</p>` },
-  ], extraHtml: (() => {
-    return `<div class="signature-block-2">
+  const fdCertifTampon = isFD ? `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:60px;max-width:180px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+  const identiteMandataire = isFD
+    ? `<p>La société <strong>FD CERTIF EXPERT</strong>,<br>Société par Actions Simplifiée (SAS),<br>Dont le siège social est situé au 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>SIREN : 988018479,<br>Inscrite au RCS Nanterre,<br>Ci-après dénommée « le Mandataire »,</p>`
+    : `<p><strong>${nomMandataire}</strong>,<br>Ci-après dénommé(e) « le Mandataire »,</p>`;
+  return buildDocument({ org: o, title: "MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", subtitle: "Indicateurs 18, 21 et 27", sections: [
+    { heading: "Entre les soussignés", content: `${identiteMandataire}<p><strong>ET</strong></p><p><strong>${o.nom}</strong>,<br>Organisme de formation professionnelle,<br>Dont le siège social est situé au ${o.adresse}, ${o.codePostal} ${o.ville},<br>SIRET : ${o.siret}${o.nda ? `,<br>Numéro de déclaration d'activité : ${o.nda}` : ""},<br>Représenté par ${o.dirigeant},<br>Ci-après dénommé « le Mandant »,</p><p>Il a été convenu et arrêté ce qui suit :</p>` },
+    { heading: "Article 1 – Objet du mandat", content: `<p>Le Mandant confie au Mandataire une mission d'accompagnement et de suivi de sa démarche qualité, conformément au référentiel national qualité (décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026).</p><ul><li>Mise en place et actualisation du système qualité.</li><li>Rédaction et mise à jour des procédures et des indicateurs.</li><li>Préparation des audits (initial, surveillance, renouvellement) et suivi des non-conformités.</li><li>Veille réglementaire liée à Qualiopi.</li></ul><p>La réalisation des prestations de formation reste de la seule responsabilité du Mandant : le Mandataire n'intervient pas auprès des stagiaires. Cette mission est inscrite au registre de sous-traitance (IND 27).</p>` },
+    { heading: "Article 2 – Pouvoirs du Mandataire", content: `<p>Accès aux documents internes relatifs à la formation et à la qualité ; propositions d'évolutions documentaires ; échanges avec l'organisme certificateur avec l'accord préalable du Mandant. Le Mandataire n'a aucune autorité financière ou juridique sur le Mandant.</p>` },
+    { heading: "Article 3 – Obligations des parties", content: `<p>Le Mandataire agit avec diligence et confidentialité et informe régulièrement le Mandant. Le Mandant fournit les informations nécessaires et signale toute évolution pouvant affecter la certification.</p>` },
+    { heading: "Article 4 – Durée", content: `<p>Le présent mandat prend effet le ${mandatDateFormatted}, pour une durée indéterminée, résiliable par chaque partie avec un préavis de 30 jours.</p>` },
+    { heading: "Article 5 – Rémunération", content: `<p>La rémunération du Mandataire fait l'objet d'un acte séparé.</p>` },
+    { heading: "Article 6 – Confidentialité et données personnelles", content: `<p>Le Mandataire conserve strictement confidentielles les informations relatives au Mandant, à ses stagiaires et à ses partenaires, y compris après la fin du mandat, dans le respect du RGPD.</p>` },
+    { heading: "Article 7 – Litiges", content: `<p>À défaut d'accord amiable, compétence est attribuée au tribunal du ressort du siège social du Mandant.</p>` },
+  ], extraHtml: `<div class="signature-block-2">
       <div class="sig-box"><p class="sig-label">Pour le Mandant – ${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Date : ${mandatDateFormatted}</p><p style="margin-top:20px">Signature :</p>${tamponMandant}</div>
-      <div class="sig-box"><p class="sig-label">Pour le Mandataire – FD CERTIF EXPERT</p><p>Nom : Mme Nadine DENDANI</p><p>Date : ${mandatDateFormatted}</p><p style="margin-top:20px">Signature :</p>${fdCertifTampon}</div>
-    </div>`;
-  })() });
+      <div class="sig-box"><p class="sig-label">Pour le Mandataire – ${isFD ? "FD CERTIF EXPERT" : nomMandataire}</p><p>Date : ${mandatDateFormatted}</p><p style="margin-top:20px">Signature :</p>${fdCertifTampon}</div>
+    </div>` });
 }
 
-function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo) {
-  // Date de début de l'accompagnement FD CERTIF = 1 an avant la date de début de la formation principale
-  // (cohérent avec le PDC IND 22). Fallback : 1 an avant la date de mise à jour du dossier.
-  const rawDateRef = f?.dateDebut || (o as any).dateMaj || new Date().toISOString().split("T")[0];
-  const dDebut = new Date(rawDateRef);
-  dDebut.setFullYear(dDebut.getFullYear() - 1);
-  const dFin = new Date(dDebut);
-  dFin.setMonth(dFin.getMonth() + 6);
-  const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
-
-  // === Design figé IZIBUSINESS (indépendant du thème de l'organisme) ===
-  // Toute modification de thème côté organisme ne doit JAMAIS impacter cette attestation.
-  const PRIMARY = "#1e3a7b";
-  const ACCENT = "#c9a227";
-  const beneficiaireNom = o.dirigeant || "Le dirigeant";
-  const orgNom = o.nom || "";
-  const orgSiret = o.siret ? ` (SIRET : ${o.siret})` : "";
-  const orgNda = o.nda ? ` — NDA : ${o.nda}` : "";
-
-  return `<!DOCTYPE html><html lang="fr"><head>
-<meta charset="utf-8">
-<title>Attestation de fin de formation – IZIBUSINESS</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box}
-  body{margin:0;padding:40px;background:#f4f1ea;font-family:'Inter',Arial,sans-serif;color:#1a1a1a;font-size:13px;line-height:1.6}
-  .page{max-width:820px;margin:0 auto;background:#fff;border:1px solid #e6e1d4;box-shadow:0 6px 24px rgba(30,58,123,.08);position:relative;overflow:hidden}
-  .page::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,${PRIMARY} 0%,${PRIMARY} 70%,${ACCENT} 70%,${ACCENT} 100%)}
-  .header{padding:42px 56px 24px;border-bottom:1px solid #ece7dc;display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
-  .brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:700;letter-spacing:.5px;color:${PRIMARY};line-height:1.1}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;letter-spacing:2px;color:${ACCENT};text-transform:uppercase;margin-top:6px}
-  .header-meta{text-align:right;font-size:10.5px;color:#555;line-height:1.5}
-  .header-meta strong{color:#222}
-  .title-wrap{padding:34px 56px 6px;text-align:center}
-  .eyebrow{display:inline-block;font-size:10px;letter-spacing:4px;color:${ACCENT};font-weight:600;text-transform:uppercase;border:1px solid ${ACCENT};padding:4px 14px;border-radius:2px}
-  h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;color:${PRIMARY};margin:14px 0 4px;letter-spacing:.5px}
-  .subtitle{font-size:12px;color:#666;font-style:italic;margin:0 0 6px}
-  .divider{width:60px;height:2px;background:${ACCENT};margin:18px auto 0}
-  .content{padding:28px 56px 16px}
-  .block{margin-bottom:22px}
-  h2{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${PRIMARY};margin:0 0 10px;padding-bottom:6px;border-bottom:1px dotted #cfc6b0}
-  p{margin:0 0 8px}
-  ul{margin:6px 0 8px 0;padding-left:20px}
-  li{margin-bottom:4px}
-  .formation-card{background:#fbf8f0;border-left:3px solid ${ACCENT};padding:18px 22px;margin:4px 0}
-  .formation-card p{margin:0 0 6px}
-  .signature{padding:18px 56px 30px;display:flex;justify-content:flex-end}
-  .sig-card{border:1px solid #e6e1d4;background:#ffffff;padding:18px 24px;min-width:280px;text-align:left}
-  .sig-card .label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:${ACCENT};font-weight:600;margin-bottom:6px}
-  .sig-card .name{font-weight:600;color:#222;margin-bottom:2px}
-  .sig-card .place{font-size:11px;color:#555;margin-bottom:10px}
-  .sig-card img{display:block;max-height:80px;max-width:200px;object-fit:contain}
-  .footer{padding:14px 56px 24px;border-top:1px solid #ece7dc;background:#fbf8f0;font-size:9.5px;color:#666;text-align:center;line-height:1.5}
-  .footer strong{color:${PRIMARY}}
-  @media print{body{background:#fff;padding:0}.page{box-shadow:none;border:none}}
-</style>
-</head><body>
-<div class="page">
-  <div class="header">
-    <div class="brand">IZIBUSINESS</div>
-    <div class="header-meta">
-      <strong>SASU IZIBUSINESS</strong><br>
-      1 place des Alliés — 94600 Choisy-le-Roi<br>
-      SIREN 892 035 320 — SIRET 892 035 320 00019<br>
-      TVA FR35 892035320
-    </div>
-  </div>
-
-  <div class="title-wrap">
-    <span class="eyebrow">Attestation officielle</span>
-    <h1>Attestation de fin de formation</h1>
-    <p class="subtitle">Délivrée par IZIBUSINESS</p>
-    <div class="divider"></div>
-  </div>
-
-  <div class="content">
-    <div class="block">
-      <h2>Le prestataire</h2>
-      <p>La société <strong>IZIBUSINESS</strong>, SASU au capital de 100,00 €, RCS Créteil 892 035 320,<br>
-      Siège social : 1 PLACE DES ALLIÉS, 94600 CHOISY-LE-ROI,<br>
-      SIREN : 892 035 320 — SIRET : 892 035 320 00019 — TVA : FR35 892035320,<br>
-      Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
-      <p><strong>atteste que :</strong></p>
-    </div>
-
-    <div class="block">
-      <h2>Bénéficiaire</h2>
-      <p><strong>${beneficiaireNom}</strong>, en sa qualité de représentant légal de l'organisme de formation <strong>${orgNom}</strong>${orgSiret}${orgNda},</p>
-      <p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par IZIBUSINESS.</p>
-    </div>
-
-    <div class="block">
-      <h2>Action de formation</h2>
-      <div class="formation-card">
-        <p><strong>Intitulé :</strong> Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative</p>
-        <p><strong>Domaine :</strong> Automatisation de la gestion administrative</p>
-        <p><strong>Objectifs pédagogiques :</strong></p>
-        <ul>
-          <li>Concevoir et déployer une base Airtable structurée pour piloter l'activité d'un organisme de formation.</li>
-          <li>Construire des scénarios Make (Integromat) automatisant la gestion administrative (devis, conventions, relances, suivi qualité Qualiopi).</li>
-          <li>Mettre en place un CRM opérationnel reliant prospects, stagiaires, formations et indicateurs de performance.</li>
-          <li>Déployer la stratégie d'automatisation au quotidien (process, tableaux de bord, alertes).</li>
-        </ul>
-        <p><strong>Modalités :</strong> Accompagnement individuel à distance (visioconférence) + supports écrits + travaux pratiques sur les outils du bénéficiaire.</p>
-        <p><strong>Période :</strong> du <strong>${fmt(dDebut)}</strong> au <strong>${fmt(dFin)}</strong></p>
-        <p><strong>Durée totale :</strong> 6 mois</p>
-        <p><strong>Nature de l'action</strong> (article L.6313-1 du Code du travail) : ☒ Action de formation</p>
-      </div>
-    </div>
-
-    <div class="block">
-      <h2>Résultats</h2>
-      <p>Les objectifs pédagogiques de la formation ont été <strong>atteints</strong>. Le bénéficiaire a suivi l'intégralité du parcours et mis en œuvre, sur ses propres outils, les automatisations Make + Airtable conçues pendant l'accompagnement.</p>
-      <p>La présente attestation est délivrée pour servir et valoir ce que de droit, notamment au titre du <strong>plan de développement des compétences</strong> de ${orgNom}.</p>
-    </div>
-  </div>
-
-  <div class="signature">
-    <div class="sig-card">
-      <div class="label">Pour IZIBUSINESS</div>
-      <div class="name">Mme Nadine DENDANI, Présidente</div>
-      <div class="place">Fait à Choisy-le-Roi, le ${fmt(dFin)}</div>
-      <img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="max-height:100px;max-width:220px;object-fit:contain;margin-top:8px">
-
-      
-    </div>
-  </div>
-
-  <div class="footer">
-    <strong>IZIBUSINESS</strong> — SASU au capital de 100,00 € — SIRET 892 035 320 00019 — 1 place des Alliés, 94600 Choisy-le-Roi<br>
-    Document officiel — Attestation de fin de formation
-  </div>
-</div>
-</body></html>`;
-}
 
 
 function genReferentielHandicap(o: OrganismeInfo) {
