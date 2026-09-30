@@ -75,11 +75,13 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
 
-  // Déterminer si le formateur est lié à VICTOR ACADEMY ou est une personne physique
-  const isVictorAcademy = formateurNom.toUpperCase().includes("RENUKA");
+  // Sous-traitant personne physique (formateur indépendant). L'ancienne détection d'un autre
+  // organisme par le prénom du formateur (données figées d'un ancien client) est supprimée :
+  // un sous-traitant société est identifié par ses propres pièces (Kbis, NDA) dans le registre IND 27.
+  const isVictorAcademy = false;
 
   // Infos sous-traitant selon le cas
-  const sousTraitantNom = isVictorAcademy ? "VICTOR ACADEMY" : formateurNom || "Le Sous-traitant";
+  const sousTraitantNom = formateurNom || "Le Sous-traitant";
   const sousTraitantType = isVictorAcademy ? "société" : "personne physique";
 
   // Bloc d'identification du sous-traitant
@@ -88,9 +90,8 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     sousTraitantBlock = `
       <p><strong>${sousTraitantNom}</strong></p>
       <p>Forme juridique : SASU – Société par Actions Simplifiée Unipersonnelle</p>
-      <p>SIRET : 910 645 563 00016 | SIREN : 910 645 563</p>
-      <p>Siège social : 5 Allée Watteau, 95200 SARCELLES</p>
-      <p>Représenté par : <strong>Monsieur Jeganathan SOFIANE</strong>, en qualité de Dirigeant</p>
+      <p>SIRET : …………………………</p>
+      <p>Représenté par : …………………………</p>
       <p>Ci-après dénommé <strong>« le Sous-traitant »</strong></p>
       <br/><p><strong>Formateur désigné :</strong> ${formateurNom}</p>
     `;
@@ -103,13 +104,13 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   }
 
   // Bloc signature sous-traitant
-  const sousTraitantSignLabel = isVictorAcademy ? `Pour le Sous-traitant – VICTOR ACADEMY` : `Pour le Sous-traitant – ${formateurNom}`;
-  const sousTraitantSignRepresentant = isVictorAcademy ? `Monsieur Jeganathan SOFIANE` : formateurNom;
+  const sousTraitantSignLabel = isVictorAcademy ? `Pour le Sous-traitant – ${sousTraitantNom}` : `Pour le Sous-traitant – ${formateurNom}`;
+  const sousTraitantSignRepresentant = formateurNom;
   const sousTraitantSignQualite = isVictorAcademy ? "Dirigeant" : "Formateur indépendant";
 
   // Préambule adapté
   const preambuleSousTraitant = isVictorAcademy
-    ? `Le Sous-traitant, <strong>VICTOR ACADEMY</strong>, est un organisme de formation professionnelle disposant de formateurs salariés qualifiés dans le domaine de l'enseignement du Français Langue Étrangère (FLE).`
+    ? `Le Sous-traitant est un organisme de formation professionnelle.`
     : `Le Sous-traitant, <strong>${formateurNom}</strong>, est un formateur indépendant (personne physique) qualifié dans le domaine de la formation professionnelle.`;
 
   const preambuleFormateur = isVictorAcademy
@@ -122,7 +123,8 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     : `<strong>${formateurNom}</strong>, en qualité de formateur indépendant`;
   const art1Statut = isVictorAcademy
     ? `<p><strong>Il est expressément convenu que le formateur ${formateurNom} intervenant dans le cadre du présent contrat est un salarié du Sous-traitant et non du Donneur d'ordre.</strong></p>`
-    : `<p><strong>Il est expressément convenu que ${formateurNom} intervient en qualité de prestataire indépendant et qu'aucun lien de subordination n'existe entre le Donneur d'ordre et le Sous-traitant.</strong></p>`;
+    : `<p><strong>Il est expressément convenu que ${formateurNom} intervient en qualité de prestataire indépendant et qu'aucun lien de subordination n'existe entre le Donneur d'ordre et le Sous-traitant.</strong></p>`
+    + `<p>Les exigences du référentiel national qualité (article L.6316-3 du Code du travail, décret n° 2026-728 du 1er août 2026) sont transmises au Sous-traitant par l'annexe « Clauses qualité Qualiopi », qui fait partie intégrante du présent contrat et en assure la traçabilité (indicateur 27). Ces clauses s'appliquent également en cas d'intervention en portage salarial.</p>`;
 
   return buildDocument({ org: o, title: "CONTRAT DE SOUS-TRAITANCE EN FORMATION PROFESSIONNELLE", subtitle: "Conformément aux articles L.6351-1 et suivants du Code du travail et au Référentiel National Qualité (Qualiopi)", sections: [
     { heading: "ENTRE LES SOUSSIGNÉS", content: `
@@ -242,7 +244,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     ` },
     { heading: "ARTICLE 6 – MODALITÉS FINANCIÈRES", content: `
       <p><strong>6.1 – Rémunération :</strong></p>
-      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la somme de : <strong>50 € HT</strong> par heure de formation dispensée.</p>
+      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la rémunération horaire convenue entre les Parties et précisée dans le bon de commande de chaque session (montant HT par heure de formation dispensée).</p>
       <p><strong>6.2 – Facturation et paiement :</strong></p>
       <ul>
         <li>Le Sous-traitant adressera une facture à l'issue de chaque session de formation</li>
@@ -302,7 +304,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   ], extraHtml: (() => {
     const sigHtml = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
     const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-    return `<p style="margin-top:30px;text-align:center;font-weight:600">Fait en deux exemplaires originaux, à <strong>${o.ville || "MONTPELLIER"}</strong>, le <strong>${dateMaj}</strong></p>
+    return `<p style="margin-top:30px;text-align:center;font-weight:600">Fait en deux exemplaires originaux, à <strong>${o.ville || "……………"}</strong>, le <strong>${dateMaj}</strong></p>
     <div class="signature-block-2" style="margin-top:30px">
       <div class="sig-box">
         <p class="sig-label">Pour le Donneur d'ordre – ${o.nom}</p>

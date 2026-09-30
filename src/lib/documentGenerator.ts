@@ -14087,8 +14087,9 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
     ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:60px;margin-top:4px;" />`
     : "";
 
-  const tauxReussite = Math.min(100, Math.round(80 + (nbStagiairesFormateur * 3)));
-  const tauxPresence = Math.min(100, Math.round(90 + (nbStagiairesFormateur * 2)));
+  // Indicateurs issus des données saisies (plus de taux calculés « 80 + 3n % »).
+  const tauxPresence = (f.tauxAssiduite || "").trim() ? `${String(f.tauxAssiduite).replace(/\s*%$/, "")} %` : "Selon les émargements joints (IND 11)";
+  const tauxReussite = "Selon les examens finaux et grilles d'acquisition joints (IND 11)";
 
   let extra = `
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -14108,7 +14109,9 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 <thead><tr style="background:#1e3a7b;color:#fff"><th>Objectif</th><th>Atteint</th><th>Partiellement</th><th>Non atteint</th></tr></thead>
 <tbody>`;
 
-  const objectifs = [
+  const objectifsSaisis = (f.objectifs || "").split(/\n/).map(l => l.replace(/^\s*[-•]\s*/, "").trim().replace(/\.$/, ""))
+    .filter(l => l && !/capable de\s*:?$/i.test(l) && !/^à l'issue/i.test(l));
+  const objectifs = objectifsSaisis.length ? objectifsSaisis.slice(0, 6) : [
     "Maîtriser les fondamentaux de la thématique",
     "Appliquer les méthodes et outils présentés",
     "Acquérir une autonomie dans la pratique",
@@ -14122,8 +14125,8 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 
 <h3>3. Indicateurs quantitatifs</h3>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
-<tr><td><strong>Taux de présence</strong></td><td>${tauxPresence}%</td></tr>
-<tr><td><strong>Taux de réussite aux évaluations</strong></td><td>${tauxReussite}%</td></tr>
+<tr><td><strong>Taux de présence</strong></td><td>${tauxPresence}</td></tr>
+<tr><td><strong>Taux de réussite aux évaluations</strong></td><td>${tauxReussite}</td></tr>
 <tr><td><strong>Nombre d'abandons</strong></td><td>0</td></tr>
 <tr><td><strong>Nombre d'incidents</strong></td><td>0</td></tr>
 </table>
