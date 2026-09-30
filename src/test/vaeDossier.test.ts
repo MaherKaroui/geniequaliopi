@@ -15,7 +15,9 @@ function dossier(formation = FORMATIONS_TEST.vae, stagiaires: StagiaireInfo[] = 
 
 describe("dossier VAE", () => {
   it("couvre les indicateurs applicables à la VAE et aucun indicateur non applicable", () => {
-    const inds = new Set(getFullCatalog(org, FORMATIONS_TEST.vae, STAGIAIRES_TEST).filter((d) => d.template !== "indicateur_non_applicable").map((d) => d.indicateur));
+    const catalogue = getFullCatalog(org, FORMATIONS_TEST.vae, STAGIAIRES_TEST);
+    expect(catalogue.some((d) => d.template === "indicateur_non_applicable")).toBe(false);
+    const inds = new Set(catalogue.map((d) => d.indicateur));
     for (const i of [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32]) expect(inds.has(i), `IND ${i}`).toBe(true);
     for (const i of [7, 8, 13, 14, 15, 20, 28, 29, 33]) expect(inds.has(i), `IND ${i}`).toBe(false);
   });

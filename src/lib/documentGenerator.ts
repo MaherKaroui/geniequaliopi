@@ -6,7 +6,6 @@ import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14Mis
 import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2026, genInformationDroitsDevoirsSST2026, genTableauCandidatsSansContrat2026 } from "./missionsCFA2026Plans";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
-import { entreesNonApplicables, motifNonApplicable, genDeclarationNonApplicabilite } from "./nonApplicabilite";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
@@ -166,12 +165,10 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   }
   const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation", "mail_rdv_evaluation_besoins", "mail_envoi_contrat_convocation_ri"]);
   const base = mails.length ? catalogue.filter((d) => !REMPLACES.has(d.template)) : catalogue;
-  // Chaque indicateur 1 à 33 a une pièce : déclaration motivée s'il est sans objet.
   // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement).
   const audit = entreesCatalogueTypeAudit(mergeOrganisme(org)) as DocEntry[];
   const complet = [...base, ...fcEntrees, ...audit];
-  const typeDossierNA = (types[0] || "actions-formation") as OrganismeInfo["typesActions"][number];
-  return [...complet, ...entreesNonApplicables(complet, typeDossierNA, selectedFormation), ...mails];
+  return [...complet, ...mails];
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
@@ -257,14 +254,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
         if (s) return genEvaluationBlocsStagiaire(o, fFC, s);
       }
     }
-  }
-  if (template === "indicateur_non_applicable") {
-    const ind = Number(params?.ind) || 0;
-    const fNA = resolveFormation(userFormation, org, userStagiaires);
-    const typeNA = ((org.typesActions || [])[0] || "actions-formation") as OrganismeInfo["typesActions"][number];
-    const motif = motifNonApplicable(ind, typeNA, fNA);
-    if (!motif) return ""; // rien à mettre : l'indicateur est retiré du dossier
-    return genDeclarationNonApplicabilite(o, fNA, ind, motif);
   }
   if (template.startsWith("audit_")) {
     const html = renderTypeAuditTemplate(template, o, resolveFormation(userFormation, org, userStagiaires), mergeStagiaires(userStagiaires));
