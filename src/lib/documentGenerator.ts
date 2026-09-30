@@ -13856,13 +13856,14 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
 
 function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, phase: string) {
   const s = stagiaires[si] || stagiaires[0];
-  const termine = isFormationTerminee(f, stagiaires);
+  // Dates et statut propres à l'apprenti (entrées décalées possibles en CFA)
+  const termine = isStagiaireFormationTerminee(s, f);
   const isDebut = phase === "debut";
   const evalData = getEvalContent(f.intitule);
   const rncp = getRNCPByCode(f.codeRNCP || '');
 
-  const titre = isDebut ? "TEST DE POSITIONNEMENT DÉBUT DE FORMATION" : "TEST DE POSITIONNEMENT FIN DE FORMATION";
-  const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
+  const titre = isDebut ? "TEST DE POSITIONNEMENT DÉBUT DE FORMATION" : "TEST DE FIN DE FORMATION";
+  const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
   // Le test de début est TOUJOURS rempli (preuve d'évaluation initiale).
   // Le test de fin reste vide si la formation n'est pas terminée.
@@ -13923,6 +13924,10 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   if (rempli && score) {
     extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total} (${Math.round(score.score / score.total * 100)}%)</p>`;
   }
+  // Corrigé et barème, distincts des réponses de l'apprenti
+  extra += `<h3>Corrigé et barème du QCM (réservé au formateur)</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><tr><th style="border:1px solid #ccc;padding:4px">Question</th><th style="border:1px solid #ccc;padding:4px">Bonne réponse</th><th style="border:1px solid #ccc;padding:4px">Barème</th>${rempli ? '<th style="border:1px solid #ccc;padding:4px">Obtenu</th>' : ""}</tr>${questions.map((q, qi) => `<tr><td style="border:1px solid #ccc;padding:4px">${qi + 1}</td><td style="border:1px solid #ccc;padding:4px">${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}</td><td style="border:1px solid #ccc;padding:4px;text-align:center">1 pt</td>${rempli ? `<td style="border:1px solid #ccc;padding:4px;text-align:center">${answers[qi] === q.correctIndex ? 1 : 0}</td>` : ""}</tr>`).join("")}</table>
+    <p style="font-size:12px">Questions ouvertes : appréciation qualitative (acquis / en cours / non acquis), sans incidence sur la note du QCM.</p>`;
 
   const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
@@ -13940,19 +13945,22 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
   if (rempli) {
     if (isDebut) {
-      // Note ramenée sur 20
-      const note20 = score ? Math.round((score.score / score.total) * 20) : 8;
+      // Note ramenée sur 20 et conclusion de positionnement tirée du score réel
+      const pctD = score ? score.score / score.total : 0;
+      const note20 = Math.round(pctD * 20);
+      const niveau = pctD < 0.4 ? "prérequis partiellement acquis" : pctD < 0.7 ? "prérequis acquis, notions métier à construire" : "bon niveau d'entrée";
+      const adaptation = pctD < 0.4
+        ? "Parcours complet, avec renforcement des fondamentaux pendant les premières semaines au CFA (séances de remise à niveau intégrées au planning) ; durée du contrat maintenue."
+        : pctD < 0.7
+          ? "Parcours complet sans adaptation de durée ; accompagnement ciblé sur les notions non acquises relevées au corrigé."
+          : "Parcours complet ; les modules déjà maîtrisés sont traités en approfondissement. Une réduction de la durée du contrat peut être étudiée avec l'employeur (art. L.6222-7-1 du Code du travail) si le niveau est confirmé à l'issue du premier bloc.";
       extra += `<h3>Note globale</h3>
-        <p><strong>Note : <span style="color:#c0212d">${note20} / 20</span></strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
-
-        <h3>Commentaire du formateur</h3>
-        <p style="border:1px solid #ccc;padding:10px;background:#f9f9f9">
-          ${s.prenom} démontre une motivation réelle mais les connaissances de base restent fragiles : les notions techniques clés du référentiel ne sont pas encore maîtrisées.<br/>
-          Un plan d'accompagnement personnalisé sera mis en place dès la première semaine CFA afin de consolider les fondamentaux et sécuriser la progression vers les blocs de compétences.
-        </p>`;
+        <p><strong>Note : ${note20} / 20</strong> — Niveau initial : ${niveau}.</p>
+        <h3>Conclusion du positionnement — adaptation du parcours et de la durée</h3>
+        <p style="border:1px solid #ccc;padding:10px;background:#f9f9f9">${adaptation}<br/>Conclusion partagée avec ${s.prenom} et le maître d'apprentissage, reportée dans le livret d'apprentissage.</p>`;
     } else {
       const note20 = score ? Math.round((score.score / score.total) * 20) : 0;
-      extra += `<h3>Appréciation globale</h3><p>Progression constatée en fin de formation — Note : ${note20} / 20 (${score ? Math.round(score.score / score.total * 100) : 0}%)</p>`;
+      extra += `<h3>Appréciation globale</h3><p>Note de fin de formation : ${note20} / 20 (${score ? Math.round(score.score / score.total * 100) : 0} %), à comparer au test de positionnement d'entrée pour mesurer la progression.</p>`;
     }
   }
 
@@ -14019,9 +14027,41 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   return result;
 }
 
+/**
+ * Corrigé type et barème critérié d'un exercice CFA (distinct de la production
+ * de l'apprenti). Si l'exercice est noté, les points par critère totalisent la note.
+ */
+function corrigeExerciceCFA(matiere: string, contenu: string, competences: string[], note: number | null): string {
+  const notions = (contenu || "").split(/[,;]| et /).map((x) => x.trim()).filter((x) => x.length > 2).slice(0, 5);
+  const attendus = [
+    ...notions.map((n) => `Mobilise la notion « ${n} » de façon juste et l'applique à la situation`),
+    ...competences.slice(0, 2).map((c) => `Démontre la compétence : ${c.charAt(0).toLowerCase() + c.slice(1)}`),
+  ];
+  if (attendus.length === 0) attendus.push(`Applique les méthodes du module « ${matiere || "en cours"} » à un cas concret`, "Justifie chaque choix par un argument professionnel");
+  const criteres: [string, number][] = [
+    ["Compréhension de la consigne et du contexte", 1],
+    [`Maîtrise des notions du module${matiere ? ` « ${matiere} »` : ""}`, 1.5],
+    ["Démarche structurée (diagnostic, solutions, mise en œuvre, suivi)", 1],
+    ["Lien avec les missions en entreprise et pertinence des solutions", 1],
+    ["Qualité de l'expression écrite", 0.5],
+  ];
+  // Répartition des points perdus en partant des derniers critères
+  let perte = note === null ? 0 : Math.max(0, 5 - note);
+  const pts = criteres.map(([, max]) => max);
+  for (let i = pts.length - 1; i >= 0 && perte > 0; i--) {
+    const d = Math.min(pts[i], perte, 0.5);
+    pts[i] -= d; perte -= d;
+    if (i === 0 && perte > 0) i = pts.length;
+  }
+  const rows = criteres.map(([lib, max], i) => `<tr><td style="border:1px solid #ccc;padding:4px 6px">${lib}</td><td style="border:1px solid #ccc;padding:4px 6px;text-align:center">${String(max).replace(".", ",")}</td><td style="border:1px solid #ccc;padding:4px 6px;text-align:center">${note === null ? "" : String(pts[i]).replace(".", ",")}</td></tr>`).join("");
+  return `<h3>Corrigé type et barème (réservé au formateur)</h3>
+    <p><strong>Éléments de réponse attendus :</strong></p><ul>${attendus.map((a) => `<li>${a}.</li>`).join("")}</ul>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><tr><th style="border:1px solid #ccc;padding:4px 6px;text-align:left">Critère</th><th style="border:1px solid #ccc;padding:4px 6px">Barème</th><th style="border:1px solid #ccc;padding:4px 6px">Points obtenus</th></tr>${rows}<tr><td style="border:1px solid #ccc;padding:4px 6px"><strong>Total</strong></td><td style="border:1px solid #ccc;padding:4px 6px;text-align:center"><strong>5</strong></td><td style="border:1px solid #ccc;padding:4px 6px;text-align:center"><strong>${note === null ? "" : String(note).replace(".", ",")}</strong></td></tr></table>`;
+}
+
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
   const formationTerminee = isFormationTerminee(f, stagiaires);
-  const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || { nom: '', prenom: '', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
@@ -14324,7 +14364,8 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     <br/>
     <p><strong>Note :</strong> ${termine ? String(note).replace('.', ',') : '_____'} / 5</p>
     <p><strong>Observations du formateur :</strong></p>
-    ${observationBlock}`;
+    ${observationBlock}
+    ${corrigeExerciceCFA(matiereTitle, matiereContenu, blocCompetences, termine ? note : null)}`;
 
   return buildDocument({ org: o, title: `EXERCICE PRATIQUE – ${exLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
