@@ -20,121 +20,23 @@ export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
 ]);
 
 export const BDC_NT_SOURCE: Record<string, string> = {
-  "Indicateur 1/1. Process g\u00e9n\u00e9ral": `# 1. Diffusion de l'information
+  "Indicateur 1/1. Process g\u00e9n\u00e9ral": `# Process général du bilan de compétences — {ORG_NOM}
 
-Lorsqu\\'une demande concernant la prestation arrive, ABDULHALIK
-ANTTOISSE envoie systématiquement le PDF de présentation du bilan de
-compétences intitulé « Présentation du bilan ». Cette première
-communication permet au bénéficiaire de prendre connaissance de l'offre
-proposée.
+_Version du {DATE_MAJ}. Ce process décrit le parcours d'un bénéficiaire, de la première demande au suivi à six mois ; chaque étape renvoie à la pièce du dossier qualité qui en garde la trace._
 
-Si aucun retour n'est reçu sous trois jours, ABDULHALIK ANTTOISSE
-effectue une relance téléphonique afin de s\\'assurer que le mail a bien
-été reçu et répondre aux éventuelles questions du bénéficiaire.
+| Étape | Qui | Quand | Pièce du dossier (indicateur) |
+|---|---|---|---|
+| 1. Information du public : présentation du bilan, cadre légal, tarifs, délais, accessibilité | {ORG_DIRIGEANT} | Avant toute inscription | Présentation du bilan, cadre légal, calendrier annuel (IND 1) ; indicateurs de résultats (IND 2) |
+| 2. Entretien préalable gratuit : analyse de la demande, vérification que le bilan est la réponse adaptée | Consultant | Avant la contractualisation | Fiche préalable, fiche d'analyse du besoin, auto-diagnostic préliminaire, outil préparatoire (IND 4) |
+| 3. Définition des objectifs et du déroulé adaptés au bénéficiaire | Consultant | Phase préliminaire | Objectifs opérationnels (IND 5), contenus et modalités, programme des 3 phases (IND 6) |
+| 4. Contractualisation : contrat (bénéficiaire) ou convention tripartite (employeur), planning prévisionnel, CGV, règlement intérieur | {ORG_DIRIGEANT} | Avant la première séance ; rétractation ou délai de 10 jours respectés | Convention, planning signé (IND 10) ; CGV, règlement intérieur, livret d'accueil (IND 9) |
+| 5. Réalisation des trois phases, émargement de chaque séance, adaptation du rythme | Consultant | Du premier au dernier entretien | Fiche pédagogique, entretien intermédiaire, suivi de l'adaptation (IND 10) ; émargements (IND 11) |
+| 6. Prévention des abandons : relance après toute absence, entretien en cas d'arrêt | Consultant | En continu | Process et guide d'entretien des abandons (IND 12) |
+| 7. Phase de conclusion : remise du document de synthèse au seul bénéficiaire | Consultant | Dernière séance | Document de synthèse, attestation de remise (IND 11) ; accord de conservation (IND 9) |
+| 8. Recueil des appréciations et traitement des réclamations | {REF_QUALITE} | Fin de bilan, puis à six mois | Questionnaires à chaud et à froid (IND 30) ; procédure de réclamation (IND 31) |
+| 9. Amélioration continue et analyse des risques qualité | {REF_QUALITE} | En continu, revue annuelle | Tableau d'amélioration continue, analyse des risques (IND 32) |
 
-# 2. Analyse du besoin
-
-Lorsque le bénéficiaire manifeste un intérêt pour le bilan de
-compétences, ABDULHALIK ANTTOISSE procède à une analyse approfondie de
-son besoin ou de celui de l'entreprise. Ce travail se fait à l'aide du
-document « Analyse des besoins ».
-
-Si le bénéficiaire se trouve en situation de handicap, une analyse
-spécifique est menée afin d'identifier les besoins particuliers et, si
-nécessaire, définir avec lui les aménagements et adaptations appropriés.
-Ces échanges s'appuient sur les documents « Accueil des bénéficiaires en
-situation de handicap -- entretien » et « Accueil des bénéficiaires en
-situation de handicap -- bilan ».
-
-Dans le cas où les adaptations ne sont pas envisageables, ABDULHALIK
-ANTTOISSE oriente le bénéficiaire vers un organisme compétent, en
-s'appuyant sur « Partenaires nationaux handicap » et « Contacts et suivi
-handicap ».
-
-# 3. Contractualisation de la prestation
-
-Après réalisation de l'analyse des besoins, ABDULHALIK ANTTOISSE
-contractualise la prestation à venir avec le bénéficiaire. Cette étape
-se formalise par la signature de documents tels que le « Contrat de
-formation », la « Convention de formation » et le « Programme de
-formation ».
-
-# 4. Information des publics bénéficiaires
-
-Une fois le délai de rétractation de dix jours écoulé, ABDULHALIK
-ANTTOISSE informe les publics bénéficiaires sur les conditions de
-déroulement de la prestation. Il leur transmet notamment le « Livret
-d'accueil », les « Informations périphériques à la prestation », le
-« Mail type début de prestation », le « Règlement intérieur » ainsi que
-le document relatif au « Droit à l'image ».
-
-# 5. Mise à disposition des moyens
-
-Avant le début de la prestation, ABDULHALIK ANTTOISSE veille à la mise à
-disposition des moyens techniques adaptés et à l'existence d'un
-environnement approprié pour le bon déroulement de la formation. Il
-s'assure de tout cela grâce à la « Liste de vérification », le document
-« Moyens techniques et environnement » et le « Mail type aide à la
-connexion ».
-
-Si la prestation implique des sous-traitants, il contractualise
-également avec eux via le « Contrat de sous-traitance ».
-
-# 6. Réalisation du test de positionnement
-
-Lors de la première heure de la prestation, ABDULHALIK ANTTOISSE réalise
-un test de positionnement. Ce test permet d'évaluer le niveau initial du
-bénéficiaire, en s'appuyant sur le document « Test de positionnement ».
-
-# 7. Réalisation de la formation
-
-La prestation se déroule selon un séquençage précis, documenté dans
-« Séquençage de la prestation ». Pendant la formation, ABDULHALIK
-ANTTOISSE assure le suivi de l'accompagnement mis en place si besoin, en
-utilisant des outils tels que la « Fiche pédagogique » et le « Suivi de
-l'adaptation à l'accompagnement et à l'apprentissage ».
-
-En cas d'abandon, il contacte le bénéficiaire pour en comprendre les
-raisons et assure le suivi grâce au « Guide d'entretien des abandons ».
-Si des difficultés ou réclamations surviennent, il les traite
-directement et assure leur suivi à l'aide du « Tableau des
-dysfonctionnements ».
-
-# 8. Réalisation de l'évaluation finale
-
-Lors de la dernière heure de la prestation, ABDULHALIK ANTTOISSE procède
-à l'évaluation finale et corrige les réponses en les argumentant, en
-s'appuyant sur le document « Évaluation finale ».
-
-# 9. Mise à disposition du bénéficiaire des ressources pédagogiques
-
-À la fin de la prestation, les apprenants reçoivent une fiche
-récapitulative et les ressources pédagogiques nécessaires, conformément
-au document « Ressources pédagogiques ».
-
-# 10. Évaluation de la satisfaction des parties prenantes
-
-Après la prestation, ABDULHALIK ANTTOISSE envoie un questionnaire de
-satisfaction à l'ensemble des parties prenantes : apprenants,
-entreprises, financeurs et équipes pédagogiques. Les questionnaires
-utilisés sont « Questionnaire satisfaction apprenant », « Questionnaire
-satisfaction entreprise », « Questionnaire satisfaction financeur » et
-« Questionnaire satisfaction équipe pédagogique ».
-
-Il profite de cet envoi pour joindre le « Certificat de réalisation ».
-Si aucun retour n'est reçu après sept jours, il effectue une relance.
-
-# 11. Analyse de la satisfaction des parties prenantes
-
-Dès réception des questionnaires de satisfaction, ABDULHALIK ANTTOISSE
-analyse les réponses en équipe, en se référant aux documents « Mesures
-d'amélioration apprenant », « Mesures d'amélioration entreprise »,
-« Mesures d'amélioration financeur », « Mesures d'amélioration équipe
-pédagogique » et « Template réunion ».
-
-Si cela s'avère nécessaire, il met en œuvre de nouvelles mesures pour
-assurer l'amélioration continue des formations et de l'organisme, en
-utilisant le « Tableau d'amélioration continue ».
+**Destruction des documents** : dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi (trois ans au plus, art. R6313-7 du Code du travail).
 `,
   "Indicateur 1/Indicateur 1 - Cadre l\u00e9gal et r\u00e9glementaire": `# {ORG_NOM}
 
@@ -193,7 +95,7 @@ SIRET : {ORG_SIRET}
 
 **Construction et sécurisation du projet professionnel**
 
-**Durée totale : {DUREE_FORMATION} sur 1 mois maximum**
+**Durée totale : {DUREE_FORMATION} d'entretiens individuels, répartis sur la période du bilan**
 **Tarif : {BDC_TARIF_RAW}**
 
 # 1. PRÉSENTATION
@@ -280,11 +182,11 @@ Le bilan de compétences permet au bénéficiaire :
 
 Tarif total du bilan de compétences : {BDC_TARIF_RAW}
 
-Ce tarif comprend l'intégralité de la prestation de bilan de compétences d'une durée de {DUREE_FORMATION} réparties sur 1 mois maximum, comprenant notamment :
+Ce tarif comprend l'intégralité de la prestation de bilan de compétences d'une durée de {DUREE_FORMATION} d'entretiens individuels, comprenant notamment :
 
-- Les 18 heures d'entretiens individuels avec le consultant ;
+- Les {DUREE_FORMATION} d'entretiens individuels avec le consultant ({REPARTITION_HEURES}) ;
 
-- Les 6 heures de travail personnel guidé ;
+- L'accompagnement du travail personnel entre les séances (non décompté de la durée facturée) ;
 
 - Les outils et supports d'investigation effectivement utilisés selon les besoins du bénéficiaire ;
 
@@ -314,7 +216,7 @@ Les conditions de financement et les éventuels restes à charge sont communiqu�
 
 # 6. DURÉE ET ORGANISATION
 
-Durée totale : {DUREE_FORMATION} réparties sur 1 mois maximum.
+Durée totale : {DUREE_FORMATION} d'entretiens individuels ({REPARTITION_HEURES}).
 
 Un entretien préalable à l'inscription, gratuit et sans engagement, peut être réalisé afin d'analyser la demande, de présenter la prestation et de vérifier son adéquation avec les attentes du bénéficiaire.
 
@@ -322,9 +224,9 @@ Cet entretien préalable n'est pas comptabilisé dans les {DUREE_FORMATION} du b
 
 ## Répartition des {DUREE_FORMATION}
 
-- 18 heures d'entretiens individuels avec le consultant ;
+- {DUREE_FORMATION} d'entretiens individuels avec le consultant ;
 
-- 6 heures de travail personnel guidé.
+- du travail personnel guidé entre les séances, non décompté de la durée facturée.
 
 Le calendrier est individualisé et défini avec le bénéficiaire.
 
@@ -332,7 +234,7 @@ Pour les inscriptions réalisées via EDOF, un délai minimum de 14 jours est ap
 
 # 7. PHASE 1 – PHASE PRÉLIMINAIRE
 
-## Durée : 2 heures
+## Durée : {H_P1} heures
 
 Cette première phase permet d'analyser la demande du bénéficiaire et de définir les modalités de déroulement du bilan.
 
@@ -364,19 +266,19 @@ Cette première phase permet d'analyser la demande du bénéficiaire et de défi
 
 Formalisation des besoins et des objectifs individualisés du bénéficiaire.
 
-Durée : 2 heures d'entretien individuel.
+Durée : {H_P1} heures d'entretien individuel.
 
 # 8. PHASE 2 – PHASE D'INVESTIGATION
 
-## Durée totale : 18 heures
+## Durée totale : {H_P2} heures d'entretiens individuels
 
 La phase d'investigation constitue la partie principale du bilan.
 
-Elle comprend : 12 heures d'entretiens individuels + 6 heures de travail personnel guidé.
+Elle comprend {H_P2} heures d'entretiens individuels, complétées par du travail personnel guidé entre les séances (non décompté).
 
 ## Séance 1 – Analyse du parcours personnel et professionnel
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -402,7 +304,7 @@ Première cartographie du parcours, des expériences et des acquis du bénéfici
 
 ## Séance 2 – Motivations, intérêts et valeurs professionnelles
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -440,7 +342,7 @@ Les outils réellement utilisés sont adaptés au bénéficiaire et tracés dans
 
 ## Séance 3 – Identification et analyse des compétences
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -468,7 +370,7 @@ Les outils réellement utilisés sont adaptés au bénéficiaire et tracés dans
 
 ## Séance 4 – Exploration des pistes professionnelles
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 Les pistes étudiées sont déterminées en fonction des éléments identifiés au cours des étapes précédentes et ne sont pas imposées à l'avance.
 
@@ -498,7 +400,7 @@ Sélection argumentée de pistes professionnelles à approfondir.
 
 ## Séance 5 – Enquête et confrontation des projets à la réalité
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -542,7 +444,7 @@ Sélection argumentée de pistes professionnelles à approfondir.
 
 ## Séance 6 – Construction et validation du projet professionnel
 
-### Durée : 2 heures
+### Durée indicative : environ 2 heures
 
 ### Contenu
 
@@ -570,9 +472,9 @@ Formalisation d'un projet professionnel principal et, lorsque cela est pertinent
 
 # 9. TRAVAIL PERSONNEL GUIDÉ
 
-## Durée : 6 heures
+## Travail personnel guidé
 
-Le bénéficiaire réalise 6 heures de travail personnel guidé, réparties sur la durée du bilan.
+Le bénéficiaire réalise un travail personnel guidé entre les séances (recherches, enquêtes métier) ; ce temps n'est pas décompté de la durée facturée.
 
 Selon les besoins identifiés, ce travail peut comprendre :
 
@@ -608,7 +510,7 @@ Le consultant donne les consignes et ressources nécessaires. Les travaux réali
 
 # 10. PHASE 3 – PHASE DE CONCLUSION
 
-## Durée : 4 heures
+## Durée : {H_P3} heures
 
 La phase de conclusion permet au bénéficiaire de s'approprier les résultats détaillés de la phase d'investigation et de formaliser son projet.
 
@@ -642,18 +544,18 @@ La phase de conclusion permet au bénéficiaire de s'approprier les résultats d
 
 - Organisation du suivi post-bilan.
 
-Durée : 4 heures d'entretien individuel.
+Durée : {H_P3} heures d'entretien individuel.
 
 # 11. RÉPARTITION DES 24 HEURES
 
 | Phase | Entretiens individuels | Travail personnel | Total |
 |---|---|---|---|
-| Phase préliminaire | 2 h | – | 2 h |
-| Phase d'investigation | 12 h | 6 h | 18 h |
-| Phase de conclusion | 4 h | – | 4 h |
-| TOTAL | 18 h | 6 h | 24 h |
+| Phase préliminaire | {H_P1} h | – | {H_P1} h |
+| Phase d'investigation | {H_P2} h | non décompté | {H_P2} h |
+| Phase de conclusion | {H_P3} h | – | {H_P3} h |
+| TOTAL | {H_TOTAL} h | – | {H_TOTAL} h |
 
-Durée totale : 24 heures sur 1 mois maximum.
+Durée totale : {DUREE_FORMATION}.
 
 # 12. MÉTHODES ET MOYENS D'ACCOMPAGNEMENT
 

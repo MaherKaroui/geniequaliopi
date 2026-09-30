@@ -129,19 +129,9 @@ export interface BdcTemplateMapping {
 }
 
 export const BDC_TEMPLATES: Record<string, BdcTemplateMapping> = {
-  // Indicateur 1
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": {
-    templateUrl: "/templates/bdc/ind1/presentation_bilan.docx",
-    type: "docx",
-  },
-  "Indicateur 1/Indicateur 1 - Cadre l\u00e9gal et r\u00e9glementaire": {
-    templateUrl: "/templates/bdc/ind1/cadre_legal.docx",
-    type: "docx",
-  },
-  "Indicateur 1/1. Process g\u00e9n\u00e9ral": {
-    templateUrl: "/templates/bdc/ind1/1_process_general.docx",
-    type: "docx",
-  },
+  // Indicateur 1 — la présentation, le cadre légal et le process général sont rendus depuis la
+  // source nettoyée (même contenu que le catalogue) : les anciens DOCX bruts portaient les données
+  // d'autres organismes (anglais VTest, CIF/FONGECIF, process d'action de formation).
   "Indicateur 1/1. Calendrier annuel": {
     templateUrl: "/templates/bdc/ind1/1_calendrier_annuel.xlsx",
     type: "xlsx",
