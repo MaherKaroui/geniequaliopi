@@ -7,7 +7,6 @@ import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { getFicheFC } from "./franceCompetences";
 import { entreesNonApplicables, motifNonApplicable, genDeclarationNonApplicabilite } from "./nonApplicabilite";
-import { INDICATEURS_REFERENCE as REF_RNQ } from "./qualiopiReference";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
@@ -264,13 +263,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     const fNA = resolveFormation(userFormation, org, userStagiaires);
     const typeNA = ((org.typesActions || [])[0] || "actions-formation") as OrganismeInfo["typesActions"][number];
     const motif = motifNonApplicable(ind, typeNA, fNA);
-    if (motif) return genDeclarationNonApplicabilite(o, fNA, ind, motif);
-    const ref = REF_RNQ.find((r) => r.numero === ind);
-    return buildDocument({ org: o, title: `INDICATEUR ${ind} — PIÈCES À PRODUIRE`, sections: [
-      { heading: "Libellé", content: `<p>${ref?.intitule || ""}</p>` },
-      { heading: "Niveau attendu", content: `<p>${ref?.niveauAttendu || ""}</p>` },
-      { heading: "Preuves attendues", content: `<ul>${(ref?.questionsPreuves || []).map((q) => `<li>${q}</li>`).join("")}</ul>` },
-    ] });
+    if (!motif) return ""; // rien à mettre : l'indicateur est retiré du dossier
+    return genDeclarationNonApplicabilite(o, fNA, ind, motif);
   }
   if (template.startsWith("audit_")) {
     const html = renderTypeAuditTemplate(template, o, resolveFormation(userFormation, org, userStagiaires), mergeStagiaires(userStagiaires));
