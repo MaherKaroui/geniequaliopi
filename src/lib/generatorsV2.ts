@@ -373,6 +373,9 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
 
 export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const isBenef = f.typeAction === "bilans-competences" || f.typeAction === "vae";
+  const benef = isBenef ? "bénéficiaire" : "stagiaire";
+  const Benef = isBenef ? "Bénéficiaire" : "Stagiaire";
   const titreContrat = f.typeAction === "bilans-competences" ? "CONTRAT DE BILAN DE COMPÉTENCES"
     : f.typeAction === "vae" ? "CONTRAT D'ACCOMPAGNEMENT VAE"
     : f.typeAction === "apprentissage" ? "CONTRAT DE FORMATION PAR APPRENTISSAGE"
