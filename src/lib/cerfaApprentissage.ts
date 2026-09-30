@@ -132,6 +132,12 @@ function clean(s: string | undefined | null): string {
     .replace(/\u00A0/g, " ");
 }
 
+/**
+ * SMIC mensuel brut (35 h) utilisé pour la rémunération minimale de l'apprenti.
+ * Valeur en vigueur au 1er novembre 2024 : à actualiser à chaque revalorisation.
+ */
+export const SMIC_BRUT_MENSUEL_REFERENCE = { montant: 1801.80, enVigueurDepuis: "2024-11-01" };
+
 export async function genCerfaApprentissagePdf(
   o: OrganismeInfo,
   f: FormationInfo,
@@ -153,12 +159,13 @@ export async function genCerfaApprentissagePdf(
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
-  const telEnt = clean(o.telephone); // téléphone organisme
-  const courrielEnt = clean(o.email); // courriel employeur = mail du formulaire organisme
+  // Coordonnées de l'EMPLOYEUR (jamais celles du CFA) : courriel du responsable si saisi.
+  const telEnt = "";
+  const courrielEnt = clean(s.emailResponsable);
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
-  setText(form, "Zone de texte 8_3", "SARL/Entreprise privée"); // Type employeur
+  setText(form, "Zone de texte 8_3", ""); // Type d'employeur : code de la nomenclature CERFA, à renseigner par l'employeur
   setText(form, "Zone de texte 8_14", adrEnt.numero); // N° adresse
   setText(form, "Zone de texte 8_13", adrEnt.voie); // Voie
   setText(form, "Zone de texte 8_4", ""); // Employeur spécifique
@@ -167,8 +174,8 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_9", cpvEnt.cp); // Code postal entreprise
   setText(form, "Zone de texte 8_10", cpvEnt.ville); // Commune entreprise
   setText(form, "Zone de texte 8_5", ""); // Effectif total
-  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise (fallback)
-  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise (fallback)
+  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise
+  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise
   setText(form, "Zone de texte 8_6", ""); // Code IDCC
 
   // ---------- PAGE 1 — APPRENTI ----------
@@ -203,13 +210,15 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_24", clean(s.telephone)); // Téléphone apprenti
   setText(form, "Zone de texte 8_25", clean(s.email)); // Courriel apprenti
 
-  // Sportif haut niveau / RQTH = Non par défaut
+  // Sportif haut niveau = Non ; RQTH = valeur saisie pour l'apprenti
+  const rqth = (s.rqth || "").toLowerCase() === "oui";
   setCheck(form, "Case #C3#A0 cocher 5_3", false); // sportif Oui
   setCheck(form, "Case #C3#A0 cocher 5_4", true); // sportif Non
-  setCheck(form, "Case #C3#A0 cocher 5_5", false); // RQTH Oui
-  setCheck(form, "Case #C3#A0 cocher 5_6", true); // RQTH Non
+  setCheck(form, "Case #C3#A0 cocher 5_5", rqth); // RQTH Oui
+  setCheck(form, "Case #C3#A0 cocher 5_6", !rqth); // RQTH Non
 
-  // Représentant légal (vide si majeur)
+  // Représentant légal : obligatoire pour un apprenti mineur, laissé vide si majeur
+  // (aucune donnée du représentant n'est saisie dans le dossier : à compléter à la main).
   setText(form, "Zone de texte 8_35", ""); // Nom prénom rep légal
   setText(form, "Zone de texte 8_37", ""); // N° rep
   setText(form, "Zone de texte 8_36", ""); // Voie rep
@@ -238,7 +247,7 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_5", mnM);
   setText(form, "Zone de texte 21_6", mnA);
   setText(form, "Zone de texte 8_44", clean(s.emailResponsable)); // Courriel maître 1
-  setText(form, "Zone de texte 8_45", clean(s.poste) || "Tuteur"); // Emploi occupé maître 1
+  setText(form, "Zone de texte 8_45", ""); // Emploi occupé par le maître d'apprentissage (distinct du poste de l'apprenti)
 
   // Maître n°2 — vide
   setText(form, "Zone de texte 8_46", "");
@@ -253,9 +262,9 @@ export async function genCerfaApprentissagePdf(
   // Type de contrat (11 = contrat d'apprentissage initial par défaut)
   setText(form, "Zone de texte 8_71", "11");
 
-  // Date de conclusion = 1 jour avant date début formation
-  const dateDebut = f.dateDebut;
-  const dateFin = f.dateFin;
+  // Date de conclusion = 7 jours avant le début d'exécution du contrat de l'apprenti
+  const dateDebut = s.dateDebutFormation || f.dateDebut;
+  const dateFin = s.dateFinFormation || f.dateFin;
   const dateConclusion = dateDebut ? (() => {
     const d = new Date(dateDebut);
     d.setDate(d.getDate() - 7);
@@ -348,7 +357,7 @@ export async function genCerfaApprentissagePdf(
   // On remplit la 1ère année (côté gauche : période unique du début→fin contrat).
   const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
   const tarif = tarifApprenti(age);
-  const SMIC_BRUT_MENSUEL = 1801.80;
+  const SMIC_BRUT_MENSUEL = SMIC_BRUT_MENSUEL_REFERENCE.montant;
   const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
   const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
   // Salaire brut mensuel à l'embauche (euros , centimes)
@@ -394,9 +403,9 @@ export async function genCerfaApprentissagePdf(
     const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
       embedImage(pdf, o.tamponUrl),
       embedImage(pdf, s.signatureUrl),
-      embedImage(pdf, s.signatureResponsableUrl || o.signatureUrl),
+      embedImage(pdf, s.signatureResponsableUrl), // jamais la signature du CFA à la place de l'employeur
     ]);
-    // Signature employeur (gauche, sous "Signature de l'employeur") — fallback signature dirigeant CFA si manquante
+    // Signature employeur (gauche, sous "Signature de l'employeur") — uniquement la signature de l'employeur
     if (sigRespImg) drawFitted(page2, sigRespImg, 30, 110, 150, 55);
     // Signature apprenti (centre, sous "Signature de l'apprenti(e)")
     if (sigStagImg) drawFitted(page2, sigStagImg, 220, 110, 150, 55);
