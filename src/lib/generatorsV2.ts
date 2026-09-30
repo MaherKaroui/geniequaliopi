@@ -257,6 +257,16 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
   return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", extraHtml: extra });
 }
 
+/** Nature juridique de l'action selon le type choisi (contrats / conventions). */
+export function natureActionLabel(f: FormationInfo): string {
+  switch (f.typeAction) {
+    case "bilans-competences": return "Bilan de compétences (articles L.6313-4 et R.6322-35 et suivants du Code du travail)";
+    case "vae": return "Validation des acquis de l'expérience — VAE (article L.6313-1 et titre III du livre III du Code du travail)";
+    case "apprentissage": return "Action de formation par apprentissage (articles L.6211-1 et suivants du Code du travail)";
+    default: return "Action de formation (article L.6313-1 du Code du travail)";
+  }
+}
+
 export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = '';
   stagiaires.forEach((s, i) => {
@@ -273,7 +283,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>Ci-après dénommé « le Stagiaire »,</p>
       <h3>Article 1 – Objet du contrat</h3>
       <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
-      <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+      <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
       <h3>Article 2 – Objectifs de la formation</h3>
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${listeObjectifs(f)}</p>
@@ -363,21 +373,28 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
 
 export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const isBenef = f.typeAction === "bilans-competences" || f.typeAction === "vae";
+  const benef = isBenef ? "bénéficiaire" : "stagiaire";
+  const Benef = isBenef ? "Bénéficiaire" : "Stagiaire";
+  const titreContrat = f.typeAction === "bilans-competences" ? "CONTRAT DE BILAN DE COMPÉTENCES"
+    : f.typeAction === "vae" ? "CONTRAT D'ACCOMPAGNEMENT VAE"
+    : f.typeAction === "apprentissage" ? "CONTRAT DE FORMATION PAR APPRENTISSAGE"
+    : "CONTRAT DE FORMATION PROFESSIONNELLE";
   let extra = `
-    <h2>CONTRAT DE FORMATION PROFESSIONNELLE</h2>
+    <h2>${titreContrat}</h2>
     <p style="font-style:italic">(Conformément aux articles L.6353-3 à L.6353-7 et R.6353-1 à R.6353-8 du Code du travail)</p>
     <h3>Entre les soussignés</h3>
     <h4>L'Organisme de formation</h4>
     <p>${o.nom}<br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Email : ${o.email}<br>Représenté par : ${o.dirigeant}</p>
     <p>Ci-après dénommé « l'Organisme de formation »,</p>
-    <h4>Et le stagiaire</h4>
+    <h4>Et le ${Benef.toLowerCase()}</h4>
     <p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}` : ''}</p>
-    <p>Ci-après dénommé « le Stagiaire »,</p>
+    <p>Ci-après dénommé « le ${Benef} »,</p>
     <h3>Article 1 – Objet du contrat</h3>
-    <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+    <p>Le présent contrat a pour objet la participation du ${benef} à l'action suivante :</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
     <h3>Article 2 – Objectifs de la formation</h3>
-    <p>À l'issue de la formation, le stagiaire sera capable de :</p>
+    <p>À l'issue de la formation, le ${benef} sera capable de :</p>
     <p>${listeObjectifs(f)}</p>
     <h3>Article 3 – Organisation de la formation</h3>
     <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
@@ -389,7 +406,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p><strong>Moyens mobilisés :</strong></p>
     <p>${f.moyensPedagogiques}</p>
     <h3>Article 6 – Modalités d'évaluation</h3>
-    <p>Les acquis du stagiaire sont évalués par :</p>
+    <p>Les acquis du ${benef} sont évalués par :</p>
     <ul><li>Un test de positionnement en début de formation</li><li>Des exercices pratiques en cours de formation</li><li>Une évaluation finale en fin de formation</li><li>Une grille d'acquisition des compétences</li></ul>
     <h3>Article 7 – Accessibilité – Situation de handicap</h3>
     <div class="section section-green">
@@ -402,7 +419,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>${mentionTVA(o)}</p>
     <p><strong>Modalités de paiement :</strong> aucune somme n'est exigible avant l'expiration du délai de rétractation de 10 jours. À son terme, un acompte de 30 % au plus du prix peut être demandé ; le solde est réglé au fur et à mesure du déroulement de la formation (art. L.6353-6 du Code du travail).${estCertifiante(f) ? " En cas de financement CPF, aucun paiement n'est demandé au stagiaire hors reste à charge éventuel affiché sur Mon Compte Formation." : ""}</p>
     <h3>Article 9 – Délai de rétractation</h3>
-    <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
+    <p>Conformément à l'article L.6353-5 du Code du travail, le ${benef} dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
     <p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>
     <p>Aucune somme ne peut être exigée avant l'expiration de ce délai.</p>
     <h3>Article 10 – Annulation et abandon</h3>
@@ -420,7 +437,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
   const sigDate3 = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   extra += sigBlock(
     `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
-    `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
+    `Le ${Benef}`, `${s.prenom} ${s.nom}`, stagSig(s),
     'Précédée de la mention « Lu et approuvé »', sigDate3, sigDate3
   );
   return buildDocument({ org: o, title: `CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, extraHtml: extra });
@@ -450,7 +467,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p>Ci-après dénommé(e) « le/la Stagiaire »,</p>
     <h3>Article 1 – Objet de la convention</h3>
     <p>La présente convention définit les conditions de l'action de formation au bénéfice du/de la Stagiaire, salarié(e) de l'Entreprise :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> ${natureActionLabel(f)}</p>
     <h3>Article 2 – Objectifs de la formation</h3>
     <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
     <p>${listeObjectifs(f)}</p>

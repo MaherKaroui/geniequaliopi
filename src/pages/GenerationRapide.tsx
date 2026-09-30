@@ -54,7 +54,7 @@ const emptyFormation: FormationInfo = {
   intitule: "", objectifs: "", prerequis: "", duree: "", modalites: "", tarif: "",
   programme: "", methodesEvaluation: "", moyensPedagogiques: "", publicVise: "",
   delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: "",
-  rythmeAlternance: "",
+  rythmeAlternance: "", typeAction: "actions-formation",
 };
 
 const emptyStagiaire: StagiaireInfo = {
@@ -890,6 +890,18 @@ const GenerationRapide = () => {
                   <SelectItem value="Présentiel">Présentiel</SelectItem>
                   <SelectItem value="Distanciel">Distanciel</SelectItem>
                   <SelectItem value="Mixte (présentiel et distanciel)">Mixte</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Type d'action<span className="text-destructive"> *</span></Label>
+              <Select value={formation.typeAction || "actions-formation"} onValueChange={(v) => setForm({ typeAction: v as FormationInfo["typeAction"] })}>
+                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="actions-formation">Action de formation</SelectItem>
+                  <SelectItem value="bilans-competences">Bilan de compétences</SelectItem>
+                  <SelectItem value="vae">VAE</SelectItem>
+                  <SelectItem value="apprentissage">CFA / Apprentissage</SelectItem>
                 </SelectContent>
               </Select>
             </div>
