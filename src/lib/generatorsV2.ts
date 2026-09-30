@@ -385,7 +385,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>Ci-après dénommé « le Stagiaire »,</p>
     <h3>Article 1 – Objet du contrat</h3>
     <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
     <h3>Article 2 – Objectifs de la formation</h3>
     <p>À l'issue de la formation, le stagiaire sera capable de :</p>
     <p>${listeObjectifs(f)}</p>
@@ -460,7 +460,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p>Ci-après dénommé(e) « le/la Stagiaire »,</p>
     <h3>Article 1 – Objet de la convention</h3>
     <p>La présente convention définit les conditions de l'action de formation au bénéfice du/de la Stagiaire, salarié(e) de l'Entreprise :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> ${natureActionLabel(f)}</p>
     <h3>Article 2 – Objectifs de la formation</h3>
     <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
     <p>${listeObjectifs(f)}</p>
