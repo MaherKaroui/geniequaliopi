@@ -187,6 +187,13 @@ function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, 
 // ------------------------------------------------------------------
 
 // 1) Évaluation des besoins
+/** Ville extraite de l'adresse de l'organisme (« … 69003 Lyon » → « Lyon »), pour « Fait à … ». */
+function villeDepuisAdresse(adresse?: string): string {
+  const m = (adresse || "").match(/\d{5}\s+([^,
+]+)\s*$/);
+  return m ? m[1].trim() : "……………………";
+}
+
 export function getBesoinsHTML(d: VAEData): string {
   const { organisme: o, candidat: c, certification: cert, session: s, contents } = d;
   const b = contents.besoins;
@@ -201,8 +208,8 @@ export function getBesoinsHTML(d: VAEData): string {
     </table>
 
     <h2>Objet du document</h2>
-    <p>Ce document a pour objet d'identifier, avant l'entrée en accompagnement, les besoins du candidat afin de personnaliser le parcours VAE : niveau de maîtrise des outils numériques, disponibilité, attentes pédagogiques, contraintes éventuelles et besoins d'aménagement liés à une situation de handicap. Il complète le Livret 1 de recevabilité et sert de base à la construction du planning d'accompagnement.</p>
-    <p>Les rubriques pré-renseignées le sont à partir du CV et du Livret 1. Elles doivent être vérifiées et complétées par le candidat lors de l'entretien. Les champs en pointillés (……) sont à compléter manuellement.</p>
+    <p>Ce document a pour objet d'identifier, avant l'entrée en accompagnement, les besoins du candidat afin de personnaliser le parcours VAE : niveau de maîtrise des outils numériques, disponibilité, attentes pédagogiques, contraintes éventuelles et besoins d'aménagement liés à une situation de handicap. Il complète le dossier de faisabilité de recevabilité et sert de base à la construction du planning d'accompagnement.</p>
+    <p>Les rubriques pré-renseignées le sont à partir du CV et du dossier de faisabilité. Elles doivent être vérifiées et complétées par le candidat lors de l'entretien. Les champs en pointillés (……) sont à compléter manuellement.</p>
 
     <h2>1. Profil et projet du candidat</h2>
     <table class="kv">
@@ -253,7 +260,7 @@ export function getBesoinsHTML(d: VAEData): string {
   return wrap(o, "Évaluation des besoins", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — Entretien de positionnement");
 }
 
-// 2) Livret 1 – Recevabilité
+// 2) dossier de faisabilité – Recevabilité
 export function getLivret1HTML(d: VAEData): string {
   const { organisme: o, candidat: c, certification: cert, session: s } = d;
   const dip = c.diplomes.length
@@ -277,7 +284,7 @@ export function getLivret1HTML(d: VAEData): string {
     </table>
 
     <h2>Notice explicative</h2>
-    <p>Le présent livret de recevabilité constitue la première étape de la démarche de Validation des Acquis de l'Expérience. Il permet au certificateur de vérifier que le candidat remplit les conditions légales d'accès à la VAE, notamment la nature et le rapport direct de l'expérience avec la certification visée.</p>
+    <p>Le présent dossier de faisabilité constitue la première étape de la démarche de Validation des Acquis de l'Expérience. Il permet au certificateur de vérifier que le candidat remplit les conditions légales d'accès à la VAE, notamment la nature et le rapport direct de l'expérience avec la certification visée.</p>
     <p>Conformément à l'article <strong>L. 6412-1 du Code du travail</strong>, toute personne justifiant d'une activité en rapport direct avec le contenu de la certification visée peut demander la validation des acquis de son expérience. Aucune durée minimale d'expérience n'est désormais exigée par la loi ; toutefois, la pertinence et le rapport direct de l'expérience avec le référentiel restent appréciés par l'autorité certificatrice.</p>
     <p>Les rubriques pré-renseignées dans ce livret le sont à partir du curriculum vitæ communiqué par le candidat. Elles doivent être vérifiées, complétées et, le cas échéant, corrigées par le candidat avant signature. Les champs comportant des pointillés (……) sont à compléter manuellement.</p>
 
@@ -344,15 +351,15 @@ export function getLivret1HTML(d: VAEData): string {
     </p>
 
     <h2>6. Attestation sur l'honneur</h2>
-    <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
+    <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent dossier et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateDemandeRecevabilite || s.dateSignature)}.</p>
 
     ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
   `;
-  return wrap(o, "Livret 1 — Demande de recevabilité", body, "Validation des Acquis de l'Expérience (VAE)");
+  return wrap(o, "Dossier de faisabilité — demande de recevabilité", body, "Validation des Acquis de l'Expérience (VAE)");
 }
 
-// 3) Livret 2 – Dossier de validation
+// 3) dossier de validation – Dossier de validation
 export function getLivret2HTML(d: VAEData): string {
   const { organisme: o, candidat: c, certification: cert, session: s, contents } = d;
 
@@ -451,7 +458,7 @@ export function getLivret2HTML(d: VAEData): string {
 
     ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
   `;
-  return wrap(o, "Livret 2 — Dossier de validation", body, "Description et analyse de l'expérience");
+  return wrap(o, "Dossier de validation", body, "Description et analyse de l'expérience");
 }
 
 // 4) Convention d'accompagnement VAE
@@ -478,7 +485,7 @@ export function getConventionHTML(d: VAEData): string {
     <p>Conformément aux CGV, le Prestataire est tenu à une obligation de moyens et ne garantit pas l'obtention de la certification, la décision relevant du seul jury du certificateur. Le Candidat reconnaît avoir été informé de ce caractère aléatoire du résultat.</p>
 
     <div class="art">Article 3 — Contenu et modalités de l'accompagnement</div>
-    <p>L'accompagnement, réalisé à 100 % à distance, comprend notamment : l'analyse du parcours et de la faisabilité, l'aide à la constitution du dossier de recevabilité (Livret 1), l'accompagnement à la rédaction du dossier de validation (Livret 2), la préparation à l'entretien avec le jury, ainsi que la relecture et la finalisation du dossier.</p>
+    <p>L'accompagnement, réalisé en ${esc((s.modalite || "distanciel").toLowerCase())}, comprend notamment : l'analyse du parcours et de la faisabilité, l'aide à la préparation du dossier de faisabilité déposé sur vae.gouv.fr, l'accompagnement à la rédaction du dossier de validation, la préparation à l'entretien avec le jury, ainsi que la relecture et la finalisation du dossier.</p>
     <table class="kv">
       <tr><td>Durée totale</td><td>${esc(o.duree)}</td></tr>
       <tr><td>Modalité</td><td>${esc(s.modalite)} (visioconférence, courriel, téléphone)</td></tr>
@@ -500,7 +507,7 @@ export function getConventionHTML(d: VAEData): string {
     <div class="art">Article 6 — Rétractation, annulation et abandon</div>
     <p>Le Candidat dispose d'un délai de rétractation conformément aux dispositions du Code du travail et du Code de la consommation. Les conditions détaillées d'annulation et d'abandon figurent aux CGV annexées.</p>
 
-    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}, en deux exemplaires originaux.</p>
+    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature || villeDepuisAdresse(o.adresse))}, le ${shortDate(s.dateSignature)}, en deux exemplaires originaux.</p>
 
     ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
   `;
@@ -516,7 +523,7 @@ export function getConvocationHTML(d: VAEData): string {
     ${esc(candidatAddressLine(c))}<br/>
     Courriel : ${esc(c.email)}${phone}</p>
 
-    <p>À ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}</p>
+    <p>À ${esc(s.lieuSignature || villeDepuisAdresse(o.adresse))}, le ${shortDate(s.dateSignature)}</p>
 
     <p>Madame, Monsieur,</p>
     <p>Nous avons le plaisir de vous confirmer votre inscription à l'accompagnement à la Validation des Acquis de l'Expérience (VAE) organisé par ${esc(o.nom)}. Vous trouverez ci-dessous les informations relatives à votre session.</p>
@@ -600,7 +607,7 @@ export function getAutorisationRGPDHTML(d: VAEData): string {
     <p><span class="cbx">☐</span> J'autorise la transmission de mes données à l'organisme certificateur et au financeur, lorsque cela est nécessaire à ma démarche.</p>
     <p><span class="cbx">☐</span> J'autorise l'enregistrement éventuel des séances de visioconférence à des fins pédagogiques et de traçabilité de l'accompagnement (facultatif).</p>
 
-    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}.</p>
+    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature || villeDepuisAdresse(o.adresse))}, le ${shortDate(s.dateSignature)}.</p>
 
     ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
   `;
@@ -646,7 +653,11 @@ export function getProgrammeHTML(d: VAEData): string {
   const titreCourt = esc(cert.intitule || "la certification visée");
   const rncp = esc(cert.rncp || "—");
   const modalite = (s.modalite || "100 % Présentiel").trim();
-  const duree = (o.duree || "40 heures").trim();
+  const duree = (o.duree || "24 heures").trim();
+  const totalH = (() => { const m = duree.replace(",", ".").match(/(\d+(?:\.\d+)?)/); const h = m ? Math.round(parseFloat(m[1])) : 24; return h >= 7 && h <= 200 ? h : 24; })();
+  const poids = [3, 5, 4, 6, 10, 6, 6];
+  const mh = poids.map((p) => Math.max(1, Math.round((p * totalH) / 40)));
+  mh[4] += totalH - mh.reduce((a, b) => a + b, 0);
   // Durée du parcours estimée en mois (à partir de dates si dispo, sinon 2,5 mois)
   let dureeParcours = "2,5 mois";
   if (s.dateDebut && s.dateFin) {
@@ -674,9 +685,9 @@ export function getProgrammeHTML(d: VAEData): string {
 
     <h2>Objectifs de l'accompagnement</h2>
     <ul>
-      <li>Constituer et déposer son Livret 1 de recevabilité.</li>
+      <li>Préparer et déposer son dossier de faisabilité sur vae.gouv.fr.</li>
       <li>Identifier les compétences acquises au regard du référentiel du titre.</li>
-      <li>Constituer et rédiger son Livret 2.</li>
+      <li>Rédiger son dossier de validation.</li>
       <li>Valoriser ses expériences professionnelles.</li>
       <li>Sélectionner et présenter les preuves pertinentes.</li>
       <li>Préparer et réussir son entretien devant le jury.</li>
@@ -697,7 +708,7 @@ export function getProgrammeHTML(d: VAEData): string {
 
     <h2>Programme détaillé – ${esc(duree)}</h2>
 
-    <p><strong>MODULE 1 : Information et diagnostic du projet VAE (3 h)</strong></p>
+    <p><strong>MODULE 1 : Information et diagnostic du projet VAE (${mh[0]} h)</strong></p>
     <ul>
       <li>Présentation de la démarche VAE.</li>
       <li>Analyse du parcours professionnel.</li>
@@ -705,38 +716,38 @@ export function getProgrammeHTML(d: VAEData): string {
       <li>Élaboration du planning d'accompagnement.</li>
     </ul>
 
-    <p><strong>MODULE 2 : Constitution du Livret 1 – Recevabilité (5 h)</strong></p>
+    <p><strong>MODULE 2 : Dossier de faisabilité et recevabilité (${mh[1]} h)</strong></p>
     <ul>
       <li>Analyse des conditions d'accès à la VAE.</li>
       <li>Collecte des justificatifs.</li>
-      <li>Constitution et finalisation du Livret 1.</li>
-      <li>Dépôt du dossier de recevabilité.</li>
+      <li>Constitution et finalisation du dossier de faisabilité.</li>
+      <li>Dépôt du dossier de faisabilité sur vae.gouv.fr (décision de recevabilité par le certificateur).</li>
     </ul>
 
-    <p><strong>MODULE 3 : Analyse du référentiel et repérage des compétences (4 h)</strong></p>
+    <p><strong>MODULE 3 : Analyse du référentiel et repérage des compétences (${mh[2]} h)</strong></p>
     <ul>
       <li>Étude des blocs de compétences.</li>
       <li>Mise en correspondance expérience/référentiel.</li>
       <li>Identification des situations professionnelles à valoriser.</li>
     </ul>
 
-    <p><strong>MODULE 4 : Construction du Livret 2 (6 h)</strong></p>
+    <p><strong>MODULE 4 : Construction du dossier de validation (${mh[3]} h)</strong></p>
     <ul>
-      <li>Présentation du Livret 2.</li>
+      <li>Présentation du dossier de validation.</li>
       <li>Choix des activités significatives.</li>
       <li>Structuration du dossier.</li>
       <li>Identification des preuves.</li>
     </ul>
 
-    <p><strong>MODULE 5 : Rédaction accompagnée du Livret 2 (10 h)</strong></p>
+    <p><strong>MODULE 5 : Rédaction accompagnée du dossier de validation (${mh[4]} h)</strong></p>
     <ul>
       <li>Description des situations professionnelles.</li>
       <li>Valorisation des activités liées au métier visé.</li>
-      <li>Rédaction des différentes parties du Livret 2.</li>
+      <li>Rédaction des différentes parties du dossier de validation.</li>
       <li>Accompagnement individualisé.</li>
     </ul>
 
-    <p><strong>MODULE 6 : Finalisation du Livret 2 et préparation du dépôt (6 h)</strong></p>
+    <p><strong>MODULE 6 : Finalisation du dossier de validation et préparation du dépôt (${mh[5]} h)</strong></p>
     <ul>
       <li>Relecture complète.</li>
       <li>Corrections et améliorations.</li>
@@ -744,7 +755,7 @@ export function getProgrammeHTML(d: VAEData): string {
       <li>Préparation du dossier final.</li>
     </ul>
 
-    <p><strong>MODULE 7 : Préparation à l'entretien avec le jury (6 h)</strong></p>
+    <p><strong>MODULE 7 : Préparation à l'entretien avec le jury (${mh[6]} h)</strong></p>
     <ul>
       <li>Préparation de la présentation orale.</li>
       <li>Simulations d'entretien.</li>
@@ -756,21 +767,21 @@ export function getProgrammeHTML(d: VAEData): string {
 
     <h2>Modalités pédagogiques</h2>
     <ul>
-      <li>Accompagnement individuel en ${esc(modalite.toLowerCase())} alternant entretiens, analyse d'expériences, aide à la rédaction des Livrets 1 et 2 et simulations d'entretien jury.</li>
+      <li>Accompagnement individuel en ${esc(modalite.toLowerCase())} alternant entretiens, analyse d'expériences, aide à la préparation du dossier de faisabilité et à la rédaction du dossier de validation et simulations d'entretien jury.</li>
     </ul>
 
     <h2>Modalités d'évaluation</h2>
     <ul>
       <li>Diagnostic initial.</li>
-      <li>Validation du Livret 1.</li>
-      <li>Évaluation continue du Livret 2.</li>
+      <li>Recevabilité prononcée par le certificateur.</li>
+      <li>Évaluation continue du dossier de validation.</li>
       <li>Simulation d'entretien jury.</li>
     </ul>
 
     <h2>Résultats attendus</h2>
     <ul>
-      <li>Livret 1 complété et déposé.</li>
-      <li>Livret 2 finalisé et conforme.</li>
+      <li>Dossier de faisabilité complété et déposé.</li>
+      <li>Dossier de validation finalisé et conforme.</li>
       <li>Dossier de preuves constitué.</li>
       <li>Préparation complète au jury.</li>
       <li>Validation totale ou partielle du titre.</li>
@@ -785,7 +796,7 @@ export function getProgrammeHTML(d: VAEData): string {
     <h2>Points forts</h2>
     <ul>
       <li>Accompagnement individuel et personnalisé.</li>
-      <li>Aide complète au Livret 1 et au Livret 2.</li>
+      <li>Aide au dossier de faisabilité et au dossier de validation.</li>
       <li>Préparation approfondie à l'entretien jury.</li>
       <li>Méthodologie conforme aux exigences France VAE et Qualiopi.</li>
     </ul>
@@ -914,13 +925,13 @@ export function getLivretAccueilHTML(d: VAEData): string {
     <h2>Qu'est-ce que la VAE ?</h2>
     <p>La Validation des Acquis de l'Expérience (VAE) est un droit qui vous permet d'obtenir tout ou partie d'une certification professionnelle (diplôme, titre, certificat) grâce à l'expérience que vous avez acquise, qu'elle soit salariée, non salariée, bénévole ou volontaire.</p>
     <ol>
-      <li><strong>La recevabilité (Livret 1)</strong> : vous vérifiez que votre expérience correspond à la certification visée et déposez votre demande auprès du certificateur.</li>
-      <li><strong>Le dossier de validation (Livret 2)</strong> : vous décrivez et analysez votre expérience au regard du référentiel. C'est le cœur de la démarche.</li>
+      <li><strong>Le dossier de faisabilité (recevabilité)</strong> : vous vérifiez que votre expérience correspond à la certification visée et déposez votre demande auprès du certificateur.</li>
+      <li><strong>Le dossier de validation</strong> : vous décrivez et analysez votre expérience au regard du référentiel. C'est le cœur de la démarche.</li>
       <li><strong>L'entretien avec le jury</strong> : vous présentez et défendez votre dossier devant un jury, qui décide d'une validation totale, partielle ou d'un refus.</li>
     </ol>
 
     <h2>Le déroulement de votre accompagnement</h2>
-    <p>Votre accompagnement est réalisé à 100 % à distance, en visioconférence, avec un référent dédié. Il s'organise autour des modules suivants : analyse du parcours, constitution du Livret 1, rédaction du Livret 2, préparation à l'entretien jury, finalisation.</p>
+    <p>Votre accompagnement est réalisé avec un référent dédié, en séances individuelles, selon la modalité prévue à votre contrat. Il s'organise autour des modules suivants : analyse du parcours, dossier de faisabilité, rédaction du dossier de validation, préparation à l'entretien jury, finalisation.</p>
 
     <h2>Interlocuteurs et assistances</h2>
     <p><strong>Référent unique :</strong> ${esc(o.dirigeant)} — ${esc(o.email)}</p>
@@ -995,8 +1006,8 @@ export function getChecklistHTML(d: VAEData): string {
   const rows = [
     ["Documents générés par l'organisme", ""],
     ["Évaluation des besoins VAE", "☐"],
-    ["Livret 1 — Demande de recevabilité", "☐"],
-    ["Livret 2 — Dossier de validation", "☐"],
+    ["Dossier de faisabilité — demande de recevabilité", "☐"],
+    ["Dossier de validation", "☐"],
     ["Convention d'accompagnement VAE", "☐"],
     ["Convocation à l'accompagnement", "☐"],
     ["Autorisation RGPD", "☐"],

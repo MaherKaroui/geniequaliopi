@@ -9,7 +9,7 @@ export interface VAEOrganisme {
   lienVisio: string;
   referentHandicap: string;
   prixTTC: string; // "4 000 €"
-  duree: string; // "40 heures à distance"
+  duree: string; // ex. "24 heures"
   logo?: string;
   signature?: string;
   tampon?: string;
@@ -156,7 +156,7 @@ export const EMPTY_SESSION: VAESession = {
   dateDemandeRecevabilite: "",
   modalite: "100 % à distance",
   financement: "CPF",
-  lieuSignature: "Luxeuil-les-Bains",
+  lieuSignature: "",
   dateSignature: new Date().toISOString().slice(0, 10),
 };
 

@@ -145,7 +145,7 @@ export function analyseBpf(b: BpfData, all: BpfData[], ent?: EntrepriseInfo | nu
   if (v(f3.bilans.nombre) > 0) { types.add("bilans-competences"); motifs.push(`Bilans de compétences (${int(v(f3.bilans.nombre))} en F-3)`); }
 
   if (types.has("apprentissage")) add("info", "Périmètre apprentissage", "Qualiopi « actions de formation par apprentissage » : indicateurs 13 à 15 (alternance, accompagnement, droits et devoirs) + 14 missions du CFA.");
-  if (types.has("vae")) add("info", "Périmètre VAE", "Qualiopi « VAE » : preuves d'accompagnement du candidat (livret 2, entretiens, préparation au jury).");
+  if (types.has("vae")) add("info", "Périmètre VAE", "Qualiopi « VAE » : preuves d'accompagnement du candidat (entretien de faisabilité, accompagnement au dossier de validation, préparation au jury).");
   if (types.has("bilans-competences")) add("info", "Périmètre bilans de compétences", "Qualiopi « bilans de compétences » : trois phases, synthèse remise au bénéficiaire, confidentialité.");
   if (v(b.cadreC.cpf) > 0) add("info", "CPF", "Financements CPF : la certification Qualiopi est obligatoire pour EDOF ; prévoir les preuves Mon Compte Formation (EDOF, conditions générales).");
 
@@ -168,7 +168,7 @@ export function analyseBpf(b: BpfData, all: BpfData[], ent?: EntrepriseInfo | nu
   checks.filter(c => c.level === "error").forEach(c => todo.push(`Corriger dans le BPF : ${c.label} — ${c.detail}`));
   if (types.has("actions-formation")) todo.push("Catalogue / programmes de formation à jour, conventions, émargements, évaluations (IND 1 à 11).");
   if (types.has("apprentissage")) todo.push("Contrats d'apprentissage (CERFA 10103), calendriers d'alternance, livrets d'apprentissage, preuves des 14 missions CFA.");
-  if (types.has("vae")) todo.push("Dossiers VAE : recevabilité (livret 1), accompagnement (livret 2), comptes rendus d'entretiens.");
+  if (types.has("vae")) todo.push("Dossiers VAE : entretien et dossier de faisabilité (décision de recevabilité du certificateur), accompagnement au dossier de validation, émargements, comptes rendus d'entretiens.");
   if (types.has("bilans-competences")) todo.push("Conventions de bilan, documents de synthèse signés, engagement de confidentialité.");
   if (g > 0 || dST > 0) todo.push("Contrats de sous-traitance et preuves de contrôle qualité des sous-traitants (IND 27).");
   if (f2 > 0) todo.push("Conventions de sous-traitance reçues des OF donneurs d'ordre.");
