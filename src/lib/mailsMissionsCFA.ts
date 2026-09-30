@@ -86,7 +86,7 @@ export function genMailMissionCFA(
   const toName = `${s.prenom || ""} ${s.nom || ""}`.trim();
   const civilite = s.civilite === "Mme" ? "Madame" : "Monsieur";
 
-  const sujet = `[Semaine ${missionNumero}/14 — CFA] QCM Mission ${missionNumero} : ${mission.titre.replace(/^Mission \d+ — /, "")}`;
+  const sujet = `[Mission ${missionNumero}/14 — CFA] QCM Mission ${missionNumero} : ${mission.titre.replace(/^Mission \d+ — /, "")}`;
 
   const pjHtml = renderPieceJointe(missionNumero, mission.titre);
 
@@ -121,8 +121,8 @@ export function genMailMissionCFA(
     <p style="margin:0 0 14px;">Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
 
     <p style="margin:0 0 14px;">
-      J'espère que vous allez bien. Cette semaine, nous vous accueillons en centre pour la
-      <strong>semaine école n°${missionNumero}</strong> de votre formation
+      J'espère que vous allez bien. Nous vous accueillons au CFA pour la
+      <strong>période au CFA consacrée à la mission n°${missionNumero}/14</strong> de votre formation
       <strong>${escapeHtml(f.intitule || "")}</strong>.
     </p>
 
@@ -132,15 +132,15 @@ export function genMailMissionCFA(
     </p>
 
     <div style="margin:14px 0;padding:12px 14px;background:#f1f3f4;border-left:3px solid #1a73e8;border-radius:4px;font-size:13px;line-height:1.6;">
-      <strong>Semaine du ${escapeHtml(dateCourte)} au ${escapeHtml(fmtShort(finSemaine))}</strong><br>
+      <strong>${fmtShort(finSemaine) === dateCourte ? `Journée CFA du ${escapeHtml(dateCourte)}` : `Semaine du ${escapeHtml(dateCourte)} au ${escapeHtml(fmtShort(finSemaine))}`}</strong><br>
       Horaires : 09h00 – 12h30 / 13h30 – 17h00 (7h / jour)<br>
       Lieu : centre de formation
     </div>
 
     <p style="margin:14px 0;">
       Vous trouverez en pièce jointe le <strong>QCM de la semaine</strong> (10 questions, durée ≈ 15 min).
-      Merci de le compléter et de me le retourner avant le <strong>vendredi ${escapeHtml(fmtShort(finSemaine))} à 17h00</strong>.
-      Nous reviendrons ensemble sur la correction lors du bilan du vendredi après-midi.
+      Merci de le compléter et de me le retourner avant le <strong>${escapeHtml(fmtLong(finSemaine))} à 17h00</strong>.
+      Nous reviendrons ensemble sur la correction lors du bilan de fin de période au CFA.
     </p>
 
     ${pjHtml}

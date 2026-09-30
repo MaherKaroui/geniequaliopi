@@ -1604,7 +1604,7 @@ export function buildFullCatalog(
         if (dEnvoi.getTime() > now.getTime()) return;
         add(
           `mail_mission${m.num}_${si}`,
-          `MAIL - ✉️ Envoi QCM Semaine ${String(m.num).padStart(2, "0")} – Mission ${m.num} ${m.titre} – ${s.prenom} ${s.nom}`,
+          `MAIL - ✉️ Envoi QCM – Mission ${String(m.num).padStart(2, "0")} ${m.titre} – ${s.prenom} ${s.nom}`,
           0,
           0,
           "mail_mission_cfa",

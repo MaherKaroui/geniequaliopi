@@ -1,7 +1,7 @@
 // Mails d'envoi / d'annonce de DIFFUSION d'une mission CFA
 // Envoyé la veille (J-1) de la semaine école dédiée à la mission.
 // Style Gmail-like, cohérent avec mailsMissionsCFA.ts
-import { lundiMission } from "@/lib/calendrierMissionsCFA";
+import { lundiMission, dateQCMMission } from "@/lib/calendrierMissionsCFA";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
 const MISSIONS_DIFFUSION: { num: number; titre: string; supports: string }[] = [
@@ -94,7 +94,7 @@ export function genMailDiffusionMissionCFA(
 
   const dEnvoi = dateMailDiffusionMission(f, missionNumero, s);
   const dDiffusion = dateDiffusionMission(f, missionNumero, s);
-  const finSemaine = addDays(dDiffusion, 4);
+  const finSemaine = dateQCMMission(f, missionNumero, s);
 
   const dateCourt = dEnvoi.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const heure = fmtTime(dEnvoi);
@@ -151,7 +151,7 @@ export function genMailDiffusionMissionCFA(
 
     <p>Je vous informe que le CFA <strong>${escapeHtml(o.nom || "")}</strong> lancera dès demain, ${escapeHtml(fmtLong(dDiffusion))}, la diffusion officielle de la <strong>Mission ${missionNumero} – ${escapeHtml(mission.titre)}</strong>, dans le cadre des 14 missions du CFA (article L.6231-2 du Code du Travail).</p>
 
-    <p>Cette diffusion s'inscrit dans la <strong>semaine école n°${missionNumero}/14</strong> de votre formation <strong>${escapeHtml(f.intitule || "")}</strong> et se tiendra du ${escapeHtml(fmtShort(dDiffusion))} au ${escapeHtml(fmtShort(finSemaine))}.</p>
+    <p>Cette diffusion s'inscrit dans la <strong>période au CFA consacrée à la mission n°${missionNumero}/14</strong> de votre formation <strong>${escapeHtml(f.intitule || "")}</strong> et se tiendra du ${escapeHtml(fmtShort(dDiffusion))} au ${escapeHtml(fmtShort(finSemaine))}.</p>
 
     <p>Les supports diffusés seront : ${escapeHtml(mission.supports)}. Ils seront mis à disposition par affichage en salle commune, dépôt sur l'ENT / LMS et envoi par mail. Vous trouverez ci-joint le visuel A3 qui sera affiché dès demain matin dans le centre.</p>
 
