@@ -257,6 +257,16 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
   return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", extraHtml: extra });
 }
 
+/** Nature juridique de l'action selon le type choisi (contrats / conventions). */
+export function natureActionLabel(f: FormationInfo): string {
+  switch (f.typeAction) {
+    case "bilans-competences": return "Bilan de compétences (articles L.6313-4 et R.6322-35 et suivants du Code du travail)";
+    case "vae": return "Validation des acquis de l'expérience — VAE (article L.6313-1 et titre III du livre III du Code du travail)";
+    case "apprentissage": return "Action de formation par apprentissage (articles L.6211-1 et suivants du Code du travail)";
+    default: return "Action de formation (article L.6313-1 du Code du travail)";
+  }
+}
+
 export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = '';
   stagiaires.forEach((s, i) => {
@@ -273,7 +283,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>Ci-après dénommé « le Stagiaire »,</p>
       <h3>Article 1 – Objet du contrat</h3>
       <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
-      <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+      <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
       <h3>Article 2 – Objectifs de la formation</h3>
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${listeObjectifs(f)}</p>
