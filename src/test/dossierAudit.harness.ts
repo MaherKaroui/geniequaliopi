@@ -5,6 +5,23 @@
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
+import { setFranceCompetencesReader, preloadFranceCompetences } from "@/lib/franceCompetences";
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
+
+/** Lecture disque de la base France Compétences (public/france-competences) pour les tests. */
+export function useFranceCompetencesFromDisk() {
+  setFranceCompetencesReader(async (p) => {
+    const file = join(process.cwd(), "public", "france-competences", p);
+    return existsSync(file) ? new Uint8Array(readFileSync(file)) : null;
+  });
+}
+
+/** Précharge les fiches de toutes les formations de test. */
+export async function preloadFormationsTest() {
+  useFranceCompetencesFromDisk();
+  for (const f of Object.values(FORMATIONS_TEST)) await preloadFranceCompetences(f.codeRNCP);
+}
 
 export type TypeAction = OrganismeInfo["typesActions"][number];
 

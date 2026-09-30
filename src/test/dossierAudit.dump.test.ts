@@ -1,13 +1,14 @@
 import { describe, it } from "vitest";
 import { writeFileSync, mkdirSync } from "fs";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
-import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST, type TypeAction } from "./dossierAudit.harness";
+import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST, preloadFormationsTest, type TypeAction } from "./dossierAudit.harness";
 
 // Export HTML de documents choisis : DUMP_OUT=<dossier> DUMP_TYPE=vae DUMP_IDS=regex npx vitest run src/test/dossierAudit.dump.test.ts
 const OUT = process.env.DUMP_OUT;
 
 describe.skipIf(!OUT)("export HTML", () => {
-  it("dump", () => {
+  it("dump", async () => {
+    await preloadFormationsTest();
     const type = (process.env.DUMP_TYPE || "actions-formation") as TypeAction;
     const re = new RegExp(process.env.DUMP_IDS || ".");
     const org = { ...ORG_TEST, typesActions: [type] };

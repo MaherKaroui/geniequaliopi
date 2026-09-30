@@ -1,3 +1,4 @@
+import { getFicheFC, unitesFC, type FicheFC } from "./franceCompetences";
 export interface RNCPFiche {
   code: string;
   intitule: string;
@@ -1935,8 +1936,47 @@ export const RNCP_FICHES: RNCPFiche[] = [
   },
 ];
 
+const isoToFr = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split("-").reverse().join("/") : d);
+
+/**
+ * Fusionne une fiche locale (contenus pédagogiques rédigés : matières, volumes)
+ * avec la fiche officielle synchronisée France Compétences, qui fait foi pour
+ * l'intitulé, le niveau, le certificateur, les dates, le statut, les codes et les blocs.
+ */
+function fusionFC(local: RNCPFiche | undefined, fc: FicheFC): RNCPFiche {
+  const unites = unitesFC(fc);
+  const blocsOfficiels = unites.map((u, i) => ({
+    titre: `Bloc ${i + 1} – ${u.titre}`,
+    competences: u.competences,
+    matieres: u.competences.map((c) => ({ competence: c, contenu: c, volume: "" })),
+    modalitesEval: u.modalites || fc.modalitesEvaluation || "",
+  }));
+  return {
+    code: fc.c,
+    intitule: fc.a ? `${fc.a} - ${fc.i}` : fc.i,
+    niveau: fc.n ? `Niveau ${fc.n}` : local?.niveau || "Sans niveau (répertoire spécifique)",
+    certificateur: fc.cert.join(", ") || local?.certificateur || "",
+    dateEnregistrement: isoToFr(fc.dateDecision) || local?.dateEnregistrement || "",
+    dateEcheance: isoToFr(fc.fin) || local?.dateEcheance || "",
+    codeNSF: fc.nsf.map((n) => `${n.code} – ${n.libelle}`).join(" / ") || local?.codeNSF || "",
+    formacodes: fc.formacodes.map((n) => `${n.code} – ${n.libelle}`).join(" / ") || local?.formacodes || "",
+    resume: local?.resume || fc.objectifs || fc.activites.join(" ; "),
+    activitesVisees: local?.activitesVisees || fc.activites.join(" ; "),
+    // Les blocs rédigés localement sont conservés quand ils correspondent aux blocs officiels.
+    blocsCompetences: local && local.blocsCompetences.length === blocsOfficiels.length ? local.blocsCompetences : blocsOfficiels,
+    secteursActivite: fc.secteurs || local?.secteursActivite || "",
+    typesEmplois: local?.typesEmplois?.length ? local.typesEmplois : fc.typesEmplois.split(/[,;]\s*/).filter((x) => x.length > 2).slice(0, 10),
+    codesROME: fc.rome.length ? fc.rome.map((r) => `${r.code} – ${r.libelle}`) : local?.codesROME || [],
+    voiesAcces: fc.voies.length ? fc.voies : local?.voiesAcces || [],
+    dureeIndicative: local?.dureeIndicative || "",
+    inactif: !fc.on,
+  };
+}
+
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
-  return RNCP_FICHES.find(f => f.code.toLowerCase() === code.toLowerCase());
+  const local = RNCP_FICHES.find(f => f.code.toLowerCase() === (code || "").toLowerCase());
+  const fc = getFicheFC(code);
+  return fc ? fusionFC(local, fc) : local;
 }
 
 /** Échéance d'une fiche (jj/mm/aaaa ou aaaa-mm-jj) en Date, null si illisible. */
