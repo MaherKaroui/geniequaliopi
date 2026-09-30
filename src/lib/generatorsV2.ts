@@ -748,7 +748,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const _tIA = (f.intitule || "").toLowerCase();
   const _isIAGen = _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
   const evalPackIA = _isIAGen ? IA_GENERATIVE_EVAL_PACK : null;
-  const termine = isFormationTerminee(f) || !!evalPackIA;
+  const termine = isStagiaireFormationTerminee(s, f) || !!evalPackIA;
   if (!termine) {
     return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX – FORMATION ${f.intitule.toUpperCase()}`, subtitle: `${s.prenom} ${s.nom}`,
       extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
@@ -950,8 +950,12 @@ D) Drive faster to finish the ride.`,
 
   // QCM title (1 QCM per file, 10 sub-questions inside)
   const qcmTitleLabel = selectedExercices[0]?.titre || `QCM`;
+  // Libellé exact : un exercice pratique n'est pas présenté comme un « QCM ».
+  const estQcm = /^\s*QCM\b/i.test(qcmTitleLabel) || !!evalPackIA;
+  const libelleEval = estQcm ? "QCM" : "EXERCICE PRATIQUE";
+  const libelleEvalMin = estQcm ? "ce QCM" : "cet exercice";
   let extra = `
-    <h2>QCM – ${qcmTitleLabel.toUpperCase()} – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <h2>${libelleEval} – ${qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase()} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
   `;
@@ -1143,7 +1147,18 @@ D) Drive faster to finish the ride.`,
     const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickOngulaireExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
-    extra += `<p>${creaRep || repClean}</p>`;
+    if (creaRep) {
+      extra += `<p>${creaRep}</p>`;
+    } else {
+      // Production du stagiaire construite à partir du corrigé : éléments réalisés, avec un élément
+      // non traité quand la note est inférieure au maximum (cohérence note / production / correction).
+      const elements = repClean.replace(/\.$/, "").split(/\s*[,;]\s*/).map(e => e.trim()).filter(Boolean);
+      const manque = noteRound < 5 && elements.length > 2 ? elements[elements.length - 1 - (stagiaireIdx % 2)] : "";
+      const realises = manque ? elements.filter(e => e !== manque) : elements;
+      const contexte = s.entreprise?.trim() ? ` à partir d'une situation de ${s.entreprise.trim()}` : "";
+      extra += `<p>J'ai réalisé l'exercice${contexte}. Ma production comporte : ${realises.join(" ; ")}.${manque ? ` Je n'ai pas finalisé : ${manque}.` : ""}</p>`;
+    }
+    extra += `<h4>Corrigé et barème</h4><p style="background:#f1f5f9;padding:8px;border-left:3px solid #64748b">${ex.reponseAttendue}</p>`;
 
     // Formateur correction
     const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
@@ -1213,12 +1228,15 @@ D) Drive faster to finish the ride.`,
     ],
   ];
 
-  const appIdx = avgPct >= 80 ? 0 : avgPct >= 60 ? 1 : 2;
+  // Seuils alignés sur la notation par exercice (4,5/5 = acquis, 3,5 à 4/5 = en voie d'acquisition)
+  const appIdx = avgPct >= 90 ? 0 : avgPct >= 60 ? 1 : 2;
   extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
-  extra += `<p>${appreciationsFR[appIdx][appSeed]}</p>`;
+  extra += `<p>__APPRECIATION_FINALE__</p>`;
   extra += `<p><strong>Score final attribué : ${moyenneFinale}/10 — ${totalNote}/${totalMax} points</strong></p>`;
 
-  return buildDocument({ org: o, title: `QCM – ${qcmTitleLabel.toUpperCase()} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  const appreciationFinale = appreciationsFR[appIdx][appSeed].replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`);
+  extra = extra.replace("__APPRECIATION_FINALE__", appreciationFinale);
+  return buildDocument({ org: o, title: `${libelleEval} – ${qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase()} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 
