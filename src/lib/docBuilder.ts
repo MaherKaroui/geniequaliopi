@@ -1,3 +1,4 @@
+import { joursFeriesDeLAnnee } from "./joursFeries";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
 import { estJourFormation } from "./joursFeries";
@@ -577,46 +578,29 @@ export function formatDate(dateStr: string): string {
       }
     }
   }
+  const t = dateStr.trim();
+  // jj/mm/aaaa déjà au format français (new Date() le lirait à l'américaine)
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(t)) {
+    const [j, m, a] = t.split("/");
+    return `${j.padStart(2, "0")}/${m.padStart(2, "0")}/${a}`;
+  }
+  const iso = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString("fr-FR");
 }
 
-// French public holidays (approximate, common ones)
+// Jours fériés : source unique joursFeries.ts (l'ancien calcul passait par toISOString()
+// sur une date locale et décalait Pâques, l'Ascension et la Pentecôte d'un jour).
 function getFrenchHolidays(year: number): Set<string> {
-  const holidays = new Set<string>();
-  const add = (m: number, d: number) => holidays.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
-  add(1, 1);   // Jour de l'An
-  add(5, 1);   // Fête du Travail
-  add(5, 8);   // Victoire 1945
-  add(7, 14);  // Fête Nationale
-  add(8, 15);  // Assomption
-  add(11, 1);  // Toussaint
-  add(11, 11); // Armistice
-  add(12, 25); // Noël
-  // Easter Monday (approximate: using Butcher's algorithm)
-  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
-  const d2 = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
-  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d2 - g + 15) % 30;
-  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31);
-  const day = ((h + l - 7 * m + 114) % 31) + 1;
-  const easter = new Date(year, month - 1, day);
-  // Easter Monday
-  const easterMon = new Date(easter); easterMon.setDate(easterMon.getDate() + 1);
-  holidays.add(easterMon.toISOString().slice(0, 10));
-  // Ascension (Easter + 39)
-  const ascension = new Date(easter); ascension.setDate(ascension.getDate() + 39);
-  holidays.add(ascension.toISOString().slice(0, 10));
-  // Whit Monday (Easter + 50)
-  const whitMon = new Date(easter); whitMon.setDate(whitMon.getDate() + 50);
-  holidays.add(whitMon.toISOString().slice(0, 10));
-  return holidays;
+  return joursFeriesDeLAnnee(year);
 }
 
 /** Convert possible Excel serial date to ISO string */
 function normalizeDate(dateStr: string): string {
+  const fr = dateStr.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (fr) return `${fr[3]}-${fr[2].padStart(2, "0")}-${fr[1].padStart(2, "0")}`;
   if (/^\d{4,5}$/.test(dateStr.trim())) {
     const serial = parseInt(dateStr.trim(), 10);
     if (serial > 1000 && serial < 100000) {
@@ -708,7 +692,41 @@ export function subtractBusinessDays(dateStr: string, businessDays: number): str
  * 14 jours ouvrés avant le démarrage, avec respect de la date de MAJ.
  */
 export function getDateSignatureDossier(dateRef: string): string {
-  return subtractBusinessDays(dateRef, 14);
+  const res = subtractBusinessDays(dateRef, 14);
+  // Délai de rétractation (10 jours, art. L.6353-5) : la signature précède
+  // toujours le démarrage d'au moins 11 jours calendaires, même après recalage MAJ.
+  const start = new Date(normalizeDate(dateRef));
+  const sig = new Date(normalizeDate(res));
+  if (isNaN(start.getTime()) || isNaN(sig.getTime())) return res;
+  const limite = new Date(start);
+  limite.setDate(limite.getDate() - 11);
+  if (sig > limite) {
+    while (limite.getDay() === 0 || limite.getDay() === 6) limite.setDate(limite.getDate() - 1);
+    const lim = toISO(limite);
+    return docRefDateISO && lim < docRefDateISO ? docRefDateISO : lim;
+  }
+  return res;
+}
+
+/**
+ * Date d'envoi de la convocation : 5 jours ouvrés avant le démarrage, jamais
+ * pendant le délai de rétractation (au moins 10 jours après la signature).
+ */
+export function getDateConvocation(dateRef: string): string {
+  if (!dateRef) return dateRef;
+  const conv = subtractBusinessDays(dateRef, 5);
+  const sig = new Date(normalizeDate(getDateSignatureDossier(dateRef)));
+  const start = new Date(normalizeDate(dateRef));
+  if (isNaN(sig.getTime()) || isNaN(start.getTime())) return conv;
+  const apresRetractation = new Date(sig);
+  apresRetractation.setDate(apresRetractation.getDate() + 10);
+  const c = new Date(normalizeDate(conv));
+  if (c < apresRetractation) {
+    const veille = new Date(start);
+    veille.setDate(veille.getDate() - 1);
+    return toISO(apresRetractation < veille ? apresRetractation : veille);
+  }
+  return conv;
 }
 
 /**
@@ -732,7 +750,12 @@ export function getDateAnalyseBesoins(dateRef: string): string {
     if (dow !== 0 && dow !== 6 && !allHolidays.has(toISO(d))) remaining--;
   }
   let result = toISO(d);
-  if (docRefDateISO && result < docRefDateISO) result = docRefDateISO;
+  // Plancher MAJ conditionnel : jamais avant la création du dossier, jamais après
+  // la signature des pièces contractuelles (l'analyse précède toujours le contrat).
+  if (docRefDateISO && result < docRefDateISO) {
+    const sigIso = toISO(new Date(normalizeDate(signature)));
+    result = docRefDateISO < sigIso ? docRefDateISO : sigIso;
+  }
   return result;
 }
 
@@ -1320,13 +1343,14 @@ function parseAnyDate(dateStr?: string): Date | null {
 
 /**
  * Le bilan à froid n'est renseigné que si la fin de formation remonte à
- * au moins 5 mois. Sinon le document doit rester vide.
+ * au moins 3 mois (le document annonce un recueil « 3 à 6 mois après »).
+ * Sinon le document reste vierge.
  */
 export function isBilanFroidDisponible(dateFin?: string): boolean {
   const fin = parseAnyDate(dateFin);
   if (!fin) return false;
   const seuil = new Date(fin);
-  seuil.setMonth(seuil.getMonth() + 5);
+  seuil.setMonth(seuil.getMonth() + 3);
   return new Date() >= seuil;
 }
 
@@ -1356,20 +1380,31 @@ export function getFormationProgress(f: FormationInfo): number {
   return (now.getTime() - debut.getTime()) / (fin.getTime() - debut.getTime());
 }
 
+const MOIS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+/** Lit « lundi 9 mars 2026 », « 09/03/2026 » ou « 2026-03-09 ». */
+export function parseJourFormation(dayStr: string): Date | null {
+  const t = (dayStr || "").trim().toLowerCase();
+  const fr = t.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (fr) return new Date(+fr[3], +fr[2] - 1, +fr[1]);
+  const iso = t.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+  const lg = t.match(/(\d{1,2})(?:er)?\s+([a-zéû]+)\s+(\d{4})/);
+  if (lg) {
+    const m = MOIS_FR.indexOf(lg[2]);
+    if (m >= 0) return new Date(+lg[3], m, +lg[1]);
+  }
+  return null;
+}
+
 /** Get formation days that have already passed (up to today) */
 export function getPassedFormationDays(f: FormationInfo): string[] {
   const allDays = getFormationDays(f);
   const now = new Date();
   now.setHours(23, 59, 59, 999);
-  return allDays.filter(dayStr => {
-    try {
-      const parts = dayStr.split('/');
-      if (parts.length === 3) {
-        const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-        return d <= now;
-      }
-      return false;
-    } catch { return false; }
+  return allDays.filter((dayStr) => {
+    const d = parseJourFormation(dayStr);
+    return !!d && d <= now;
   });
 }
 

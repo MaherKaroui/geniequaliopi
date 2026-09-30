@@ -1,6 +1,7 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation } from "./docBuilder";
+import { mentionTVA } from "./mentionsLegales";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 import { getUnitesExercices } from "./parcoursStagiaire";
 
@@ -131,11 +132,11 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} TTC par stagiaire</p>` : ''}` },
-    { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} par stagiaire</p>` : ''}` },
+    { heading: "Article 6 – Modalités de paiement", content: `<p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation de 10 jours (art. L.6353-5 du Code du travail).</p><ul><li>À l'issue de ce délai, un acompte de <strong>30 % au plus</strong> du prix peut être demandé (art. L.6353-6)</li><li>Le solde est échelonné au fur et à mesure du déroulement de la formation</li><li>Formation financée par l'employeur ou un OPCO : facturation après réalisation, règlement à 30 jours</li><li>Formation financée par le CPF : règlement par la Caisse des Dépôts selon les conditions générales de la plateforme Mon Compte Formation</li></ul>` },
 
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
-    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation tardive ou d'abandon injustifié, ${o.nom} se réserve le droit de facturer tout ou partie de la formation engagée.</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
+    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation moins de 7 jours ouvrés avant le début, une indemnité de 30 % du prix peut être facturée ; en cas d'abandon en cours de formation sans motif de force majeure, seules les heures réellement suivies sont dues, majorées de la même indemnité de 30 % sur le reliquat (art. L.6354-1 du Code du travail : les sommes dues au titre du dédit ne peuvent être imputées sur les fonds de la formation professionnelle).</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
     { heading: "Article 9 – Assiduité et obligations du stagiaire", content: `<p>Le stagiaire s'engage à :</p><ul><li>Respecter les horaires et le règlement intérieur</li><li>Suivre la formation avec assiduité</li><li>Informer ${o.nom} de toute absence ou retard</li></ul><p>Les absences injustifiées peuvent entraîner l'interruption de la formation.</p>` },
     { heading: "Article 10 – Règlement intérieur", content: `<p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>` },
     { heading: "Article 11 – Accessibilité et handicap", content: `<p>${o.nom} s'engage à étudier toute demande d'aménagement pour les personnes en situation de handicap.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>` },
@@ -150,7 +151,7 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   let sigPages = '';
   stagiaires.forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    const sigDate = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
     sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
@@ -198,7 +199,7 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let sigPages = '';
   stagiaires.forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    const sigDate = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
     sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
@@ -214,7 +215,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
   let extra = '';
   stagiaires.forEach((s, i) => {
     if (i > 0) extra += '<div class="page-break"></div>';
-    const civilite = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'Madame' : 'Monsieur';
+    const civilite = (s.civilite === 'Mme' ? 'Madame' : s.civilite === 'M.' ? 'Monsieur' : 'Madame, Monsieur');
     extra += `
       <h2>CONVOCATION À LA FORMATION</h2>
       <p><strong>Organisme de formation :</strong> ${o.nom}</p>
@@ -240,7 +241,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
       <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
       <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
-       <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
+       <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
       <p><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
       <div style="margin-top:14px">${bigOrgStamp(o)}</div>
@@ -289,8 +290,8 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       </div>
       <h3>Article 8 – Dispositions financières</h3>
        <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
-      <p>TVA non applicable, article 261-4-4° du CGI.</p>
-      <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
+      <p>${mentionTVA(o)}</p>
+      <p><strong>Modalités de paiement :</strong> aucune somme n'est exigible avant l'expiration du délai de rétractation de 10 jours. À son terme, un acompte de 30 % au plus du prix peut être demandé ; le solde est réglé au fur et à mesure du déroulement de la formation (art. L.6353-6 du Code du travail). En cas de financement CPF, aucun paiement n'est demandé au stagiaire hors reste à charge éventuel affiché sur Mon Compte Formation.</p>
       <h3>Article 9 – Délai de rétractation</h3>
       <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
       <p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>
@@ -305,9 +306,9 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les juridictions compétentes.</p>
       <h3>Article 14 – Entrée en vigueur</h3>
       <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
-      <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
+      <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
     `;
-    const sigDate2 = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    const sigDate2 = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
     extra += sigBlock(
       `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
@@ -319,7 +320,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
 
 export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const civilite = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'Madame' : 'Monsieur';
+  const civilite = (s.civilite === 'Mme' ? 'Madame' : s.civilite === 'M.' ? 'Monsieur' : 'Madame, Monsieur');
   let extra = `
     <h2>CONVOCATION À LA FORMATION</h2>
     <p><strong>Organisme de formation :</strong> ${o.nom}</p>
@@ -345,7 +346,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
     <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateConvocation(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
     <p><strong>Pour ${o.nom}</strong></p>
     <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
     <div style="margin-top:14px">${bigOrgStamp(o)}</div>
@@ -391,8 +392,8 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     </div>
     <h3>Article 8 – Dispositions financières</h3>
     <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
-    <p>TVA non applicable, article 261-4-4° du CGI.</p>
-    <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
+    <p>${mentionTVA(o)}</p>
+    <p><strong>Modalités de paiement :</strong> aucune somme n'est exigible avant l'expiration du délai de rétractation de 10 jours. À son terme, un acompte de 30 % au plus du prix peut être demandé ; le solde est réglé au fur et à mesure du déroulement de la formation (art. L.6353-6 du Code du travail). En cas de financement CPF, aucun paiement n'est demandé au stagiaire hors reste à charge éventuel affiché sur Mon Compte Formation.</p>
     <h3>Article 9 – Délai de rétractation</h3>
     <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
     <p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>
@@ -407,9 +408,9 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les juridictions compétentes.</p>
     <h3>Article 14 – Entrée en vigueur</h3>
     <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
   `;
-  const sigDate3 = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  const sigDate3 = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   extra += sigBlock(
     `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
@@ -423,7 +424,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
   const respEntreprise = s.responsableEntreprise || "Le Responsable";
   const entrepriseNom = s.entreprise || "_______________";
   const poste = s.poste || "_______________";
-  const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  const sigDate = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   const respSigHtml = s.signatureResponsableUrl
     ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
     : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${respEntreprise}</p>`;
@@ -461,11 +462,11 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <ul><li>Libérer le/la salarié(e) pendant toute la durée de la formation</li><li>Maintenir la rémunération du/de la salarié(e)</li><li>Informer l'Organisme de tout changement</li></ul>
     <h3>Article 8 – Dispositions financières</h3>
     <p><strong>Coût total :</strong> ${getStagiaireTarif(s, f)}</p>
-    <p>TVA non applicable (article 261-4-4° du CGI). Facturation adressée à l'Entreprise, règlement à 30 jours.</p>
+    <p>${mentionTVA(o)} Facturation adressée à l'Entreprise, règlement à 30 jours à réception de facture, après réalisation de la formation.</p>
     <h3>Article 9 – Accessibilité</h3>
     <div class="section section-green"><p>Formation accessible aux personnes en situation de handicap.<br><strong>Référent handicap :</strong> ${o.referentHandicap} – ${o.email}</p></div>
     <h3>Article 10 – Annulation</h3>
-    <p>Annulation moins de 7 jours ouvrés avant le début : indemnité de 30%. Abandon : facturation au prorata.</p>
+    <p>Annulation moins de 7 jours ouvrés avant le début : indemnité de 30 % du prix. Abandon en cours de formation : facturation des heures réalisées au prorata, majorée de 30 % du reliquat à titre de dédit, non imputable sur les fonds de la formation professionnelle (art. L.6354-1).</p>
     <h3>Article 11 – Règlement intérieur</h3>
     <p>Le/La stagiaire s'engage à respecter le règlement intérieur de l'Organisme.</p>
     <h3>Article 12 – RGPD</h3>
@@ -1711,10 +1712,10 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. TVA non applicable, article 261-4-4° du CGI.</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${getStagiaireTarif(s, f)} par stagiaire — TVA non applicable, article 261-4-4° du CGI.</p>` : ''}` },
-    { heading: "Article 6 – Modalités de paiement", content: `<p>Les modalités de paiement sont précisées dans le contrat de formation.</p><p>Sauf disposition contraire :</p><ul><li>Un acompte peut être demandé à l'inscription</li><li>Le solde est à régler selon les échéances convenues</li></ul><p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation.</p>` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${getStagiaireTarif(s, f)} par stagiaire — ${mentionTVA(o)}</p>` : ''}` },
+    { heading: "Article 6 – Modalités de paiement", content: `<p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation de 10 jours (art. L.6353-5 du Code du travail).</p><ul><li>À l'issue de ce délai, un acompte de <strong>30 % au plus</strong> du prix peut être demandé (art. L.6353-6)</li><li>Le solde est échelonné au fur et à mesure du déroulement de la formation</li><li>Formation financée par l'employeur ou un OPCO : facturation après réalisation, règlement à 30 jours</li><li>Formation financée par le CPF : règlement par la Caisse des Dépôts selon les conditions générales de la plateforme Mon Compte Formation</li></ul>` },
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
-    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation tardive ou d'abandon injustifié, ${o.nom} se réserve le droit de facturer tout ou partie de la formation engagée.</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
+    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation moins de 7 jours ouvrés avant le début, une indemnité de 30 % du prix peut être facturée ; en cas d'abandon en cours de formation sans motif de force majeure, seules les heures réellement suivies sont dues, majorées de la même indemnité de 30 % sur le reliquat (art. L.6354-1 du Code du travail : les sommes dues au titre du dédit ne peuvent être imputées sur les fonds de la formation professionnelle).</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
     { heading: "Article 9 – Assiduité et obligations du stagiaire", content: `<p>Le stagiaire s'engage à :</p><ul><li>Respecter les horaires et le règlement intérieur</li><li>Suivre la formation avec assiduité</li><li>Informer ${o.nom} de toute absence ou retard</li></ul><p>Les absences injustifiées peuvent entraîner l'interruption de la formation.</p>` },
     { heading: "Article 10 – Règlement intérieur", content: `<p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>` },
     { heading: "Article 11 – Accessibilité et handicap", content: `<p>${o.nom} s'engage à étudier toute demande d'aménagement pour les personnes en situation de handicap.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>` },
@@ -1725,7 +1726,7 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 16 – Acceptation des CGV", content: `<p>L'inscription à la formation vaut acceptation sans réserve des présentes Conditions Générales de Vente.</p>` },
   ];
 
-  const sigDateCGV = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  const sigDateCGV = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateCGV}</p>`;
   sigPages += sigBlock(
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
@@ -1770,7 +1771,7 @@ export function genReglementStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
   );
 
-  const sigDateReg = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  const sigDateReg = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));
   let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateReg}</p>`;
   sigPages += sigBlock(
     `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
