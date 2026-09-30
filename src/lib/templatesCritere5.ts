@@ -1,4 +1,5 @@
 // Critère 5 — IND 21 & IND 22 generators (based on real SELECT FORMATION documents)
+import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
@@ -313,7 +314,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const isCommercial = !isNTC && (t.includes("commercial") || t.includes("vente") || t.includes("prospection") || t.includes("relation client"));
   const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux") || t.includes("marketing digital");
-  const isFLE = t.includes("français") || t.includes("fle");
+  const isFLE = t.includes("français") || mot(t, "fle");
   const isManagement = t.includes("management") || t.includes("encadrement") || t.includes("leadership") || t.includes("manager");
   const isWord = t.includes("word");
 

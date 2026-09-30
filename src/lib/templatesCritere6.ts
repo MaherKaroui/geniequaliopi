@@ -1,4 +1,5 @@
 // Critère 6 — IND 23-27 generators (based on real SELECT FORMATION documents)
+import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays } from "./docBuilder";
 import { getCachedVeillePack, veilleRowsToTable } from "./aiVeillePack";
@@ -37,7 +38,7 @@ function detectFormationType(f: FormationInfo): FormationType {
   if (title.includes("création d'entreprise") || title.includes("creation d'entreprise") || title.includes("création entreprise") || title.includes("creation entreprise") || title.includes("créer son entreprise") || title.includes("creer son entreprise") || title.includes("porteur de projet") || title.includes("créateur d'entreprise") || title.includes("createur d'entreprise")) return "creation";
   if (title.includes("vtc") || title.includes("voiture de transport avec chauffeur") || title.includes("chauffeur vtc") || code.includes("5637") || code.includes("rs5637")) return "vtc";
   if (title.includes("conduite") || title.includes("ecsr") || title.includes("enseignant de la conduite") || code.includes("35329")) return "ecsr";
-  if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
+  if (title.includes("français") || mot(title, "fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
   if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être") || title.includes("postpartum") || title.includes("post-partum") || title.includes("post partum")) return "massage";
   if (title.includes("esthéti") || title.includes("cosmétique") || title.includes("parfumerie") || title.includes("beauté")) return "esthetique";
   if (title.includes("secrétaire") || title.includes("assistant") || title.includes("médico-admin")) return "secretaire";

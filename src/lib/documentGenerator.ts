@@ -1,3 +1,4 @@
+import { mot } from "./resolveurFormation";
 import { resolveFormation } from "./formationResolue";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "./qualite2026";
@@ -112,10 +113,10 @@ export function isECSRFormation(f: FormationInfo): boolean {
     || t.includes("moniteur auto-école")
     || t.includes("moniteur auto-ecole")
     || t.includes("vtc")
-    || t.includes("conducteur")
+    || t.includes("conducteur vtc")
     || t.includes("transport de personnes")
     || t.includes("t3p")
-    || t.includes("chauffeur");
+    || t.includes("chauffeur vtc");
 }
 
 
@@ -1553,7 +1554,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
 function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const lower = f.intitule.toLowerCase();
-  const isFLE = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+  const isFLE = lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français");
 
   // Domain-specific besoins based on formation title
   function getDomainBesoins(): { besoins: string[]; synthese: string; adaptations: string } {
@@ -1856,7 +1857,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Plan d'action commercial individuel post-formation`,
       };
     }
-    if (lower.includes("vtc") || lower.includes("conducteur") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur")) {
+    if (lower.includes("vtc") || lower.includes("conducteur vtc") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur vtc")) {
       return {
         besoins: [
           "Maîtriser la réglementation T3P (transport public particulier de personnes) et les obligations du conducteur VTC",
@@ -2254,7 +2255,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
   // Detect FLE / certification by competence blocks
   const lower = f.intitule.toLowerCase();
-  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+  const isFLEOrCertif = lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français");
   const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
   const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isBlocFormation = isFLEOrCertif || isIACertif;
@@ -2688,7 +2689,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       ${(() => {
         const tProg = (f.intitule || "").toLowerCase();
-        const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur");
+        const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur vtc") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur vtc");
         if (isVTCProg || !isCFA) {
           return `<p><strong>Étapes d'inscription :</strong></p>
       <ol>
@@ -2824,7 +2825,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     ${(() => {
       const tProg = (f.intitule || "").toLowerCase();
-      const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur");
+      const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur vtc") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur vtc");
       if (!isVTCProg) return "";
       return `
     <h2>13 bis. Modalités d'examen – Certification RS5637</h2>
@@ -10310,7 +10311,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const civilite = s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : (s.civilite || "Madame");
   
   // Detect formation type for coherent answers
-  const isFLE = t.includes("français") || t.includes("médico-social") || t.includes("fle") || t.includes("communiquer en");
+  const isFLE = t.includes("français") || t.includes("médico-social") || mot(t, "fle") || t.includes("communiquer en");
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
@@ -10322,7 +10323,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isInfo = t.includes("informatique") || t.includes("systèmes") || t.includes("réseaux");
   const isBureautique = t.includes("bureautique") || t.includes("pack office");
   const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
-  const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
+  const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur vtc") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur vtc"));
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
@@ -12435,7 +12436,7 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     supportsContent = `<p>• Support de cours PDF : prospection, négociation, closing, gestion de portefeuille<br>• Fiches méthodes : SONCAS, SPIN, CAB, SIMAC<br>• Scripts de prospection téléphonique et email<br>• Modèles de propositions commerciales<br>• Exercices de traitement des objections<br>• Grilles de suivi de pipeline commercial</p>`;
     outilsContent = `<p>• CRM de démonstration pour le suivi des prospects<br>• Outils de prospection LinkedIn (Sales Navigator)<br>• Supports vidéo de mises en situation commerciales<br>• Salle équipée pour les jeux de rôle<br>• QCM et quiz de positionnement commercial</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://www.actionco.fr/" style="color:hsl(220,60%,50%)">actionco.fr</a> – Magazine de la performance commerciale<br>• <strong>Site :</strong> <a href="https://www.linkedin.com/sales/" style="color:hsl(220,60%,50%)">linkedin.com/sales</a> – LinkedIn Sales Navigator<br>• <strong>Livre :</strong> "Vendre aux acheteurs professionnels" (Dunod)<br>• Templates de propositions commerciales<br>• Glossaire des termes commerciaux et de négociation</p>`;
-  } else if (lower.includes('français') || lower.includes('fle')) {
+  } else if (lower.includes('français') || mot(lower, 'fle')) {
     supportsContent = `<p>• Support de cours PDF : communication orale et écrite en milieu médico-social<br>• Fiches vocabulaire par situation professionnelle (accueil, transmissions, réunions)<br>• Documents professionnels authentiques (protocoles, cahiers de liaison)<br>• Exercices de rédaction de transmissions écrites<br>• Jeux de rôle en contexte médico-social<br>• QCM de positionnement et d'évaluation finale</p>`;
     outilsContent = `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme d'exercices interactifs FLE (TV5Monde, RFI Savoirs)<br>• Supports audio et vidéo authentiques<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://apprendre.tv5monde.com/" style="color:hsl(220,60%,50%)">apprendre.tv5monde.com</a> – Apprendre le français<br>• <strong>Site :</strong> <a href="https://www.fle.fr/" style="color:hsl(220,60%,50%)">fle.fr</a> – Portail du FLE<br>• <strong>Site :</strong> <a href="https://savoirs.rfi.fr/" style="color:hsl(220,60%,50%)">savoirs.rfi.fr</a> – RFI Savoirs<br>• Glossaire des termes médico-sociaux<br>• Fiches phonétiques téléchargeables</p>`;
@@ -12665,7 +12666,7 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
   const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
   const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
-  const isFLE = t.includes("français") || t.includes("fle");
+  const isFLE = t.includes("français") || mot(t, "fle");
   const isWord = t.includes("word");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
@@ -12809,7 +12810,7 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
   const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
-  const isFLE = t.includes("français") || t.includes("fle");
+  const isFLE = t.includes("français") || mot(t, "fle");
   const isWord = t.includes("word");
   const formName = f.intitule || "la formation";
 

@@ -1,5 +1,7 @@
 // Formation-specific QCM questions, exercises, and evaluation content
 import { getCachedContentPack } from "./aiContentPack";
+import { mot } from "./resolveurFormation";
+import { EVAL_COMPLEMENTS } from "./evalContentComplements";
 import { GOTRM_EVAL_PACK } from "./gotrmPreset";
 import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
 import { isVitrageFormation, getVitrageAutoAnswers } from "./vitrageHumanized";
@@ -26,7 +28,7 @@ export interface ExercicePratique {
   reponseAttendue: string;
 }
 
-interface FormationEvalContent {
+export interface FormationEvalContent {
   qcmPositionnement: QCMQuestion[];
   qcmFinal: QCMQuestion[];
   exercices: ExercicePratique[];
@@ -1341,39 +1343,40 @@ EVAL_CONTENT["Restauration"] = {
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
-  if (lower.includes("ongulaire") || lower.includes("rs7302")) return "Ongulaire";
-  if (lower.includes("vitrage") || lower.includes("rncp36223") || lower.includes("pare-brise") || lower.includes("pare brise")) return "Vitrage";
-  if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
-  if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
-  if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
+  if (mot(lower, "ongulaire") || mot(lower, "rs7302")) return "Ongulaire";
+  if (mot(lower, "vitrage") || mot(lower, "rncp36223") || mot(lower, "pare-brise") || mot(lower, "pare brise")) return "Vitrage";
+  if (mot(lower, "vtc") || mot(lower, "voiture de transport avec chauffeur") || mot(lower, "rs5637") || mot(lower, "chauffeur vtc")) return "VTC";
+  if (mot(lower, "ecsr") || mot(lower, "enseignant de la conduite") || mot(lower, "sécurité routière")) return "ECSR";
+  if (mot(lower, "vtest") || mot(lower, "v-test") || mot(lower, "rs6905")) return "VTest";
   // CIP must be checked before generic "social"
-  if (lower.includes("conseiller en insertion") || lower.includes("insertion professionnelle") || lower.includes("cip") || lower.includes("rncp37274")) return "CIP";
+  if (mot(lower, "conseiller en insertion") || mot(lower, "insertion professionnelle") || mot(lower, "cip") || mot(lower, "rncp37274")) return "CIP";
   // NTC must be checked before generic "commercial"
-  if (lower.includes("ntc") || lower.includes("rncp39063") || lower.includes("négociateur technico-commercial") || lower.includes("negociateur technico-commercial")) return "NTC";
+  if (mot(lower, "ntc") || mot(lower, "rncp39063") || mot(lower, "négociateur technico-commercial") || mot(lower, "negociateur technico-commercial")) return "NTC";
   // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
-  if (lower.includes("sama") || lower.includes("rncp40800") || lower.includes("secrétaire assistant médico-administratif") || lower.includes("secretaire assistant medico-administratif")) return "SAMA";
-  if (lower.includes("sams") || lower.includes("rncp36805") || lower.includes("secrétaire assistant médico-social") || lower.includes("secretaire assistant medico-social")) return "SAMS";
+  if (mot(lower, "sama") || mot(lower, "rncp40800") || mot(lower, "secrétaire assistant médico-administratif") || mot(lower, "secretaire assistant medico-administratif")) return "SAMA";
+  if (mot(lower, "sams") || mot(lower, "rncp36805") || mot(lower, "secrétaire assistant médico-social") || mot(lower, "secretaire assistant medico-social")) return "SAMS";
   // New formations
-  if (lower.includes("responsable de petite") || lower.includes("rpms") || lower.includes("petite et moyenne structure")) return "RPMS";
-  if (lower.includes("assistant") && lower.includes("direction")) return "Assistant de Direction";
-  if (lower.includes("infographiste") || lower.includes("infographie") || lower.includes("metteur en page")) return "Infographiste";
-  if (lower.includes("restauration") || lower.includes("employé polyvalent en restauration")) return "Restauration";
-  if (lower.includes("excel")) return "Excel Professionnel";
-  if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
-  if (lower.includes("anglais")) return "Anglais Professionnel";
-  if (lower.includes("informatique") || lower.includes("admin") || lower.includes("réseau") || lower.includes("système")) return "Informatique";
-  if (lower.includes("management") || lower.includes("leadership")) return "Management";
-  if (lower.includes("digital") || lower.includes("marketing") || lower.includes("seo")) return "Digital Marketing";
-  if (lower.includes("initiation word")) return "Initiation Word";
-  if (lower.includes("bureautique") || lower.includes("word") || lower.includes("pack office")) return "Bureautique";
-  if (lower.includes("esthétique") || lower.includes("cosmétique") || lower.includes("cap")) return "CAP Esthétique";
-  if (lower.includes("français") || lower.includes("médico-social") || lower.includes("social")) return "FLE Médico-Social";
-  if (lower.includes("intelligence artificielle") || lower.includes("ia générative") || lower.includes("contenus rédactionnels")) return "IA Générative";
-  if (lower.includes("massage") || lower.includes("prénatal") || lower.includes("prenatal") || lower.includes("relaxation prénatals")) return "Massage Prénatal";
-  if (lower.includes("création d'entreprise") || lower.includes("creation d'entreprise") || lower.includes("création entreprise") || lower.includes("creation entreprise") || lower.includes("créateur d'entreprise") || (lower.includes("business plan") && lower.includes("entrepre"))) return "Création Entreprise";
-  if (lower.includes("gestionnaire de paie") || lower.includes("gestionnaire paie") || (lower.includes("paie") && (lower.includes("bulletin") || lower.includes("dsn") || lower.includes("gestion")))) return "Paie";
-  if (lower.includes("secrétariat") || lower.includes("secretariat") || lower.includes("secrétaire") || lower.includes("secretaire") || lower.includes("office manager") || lower.includes("assistanat")) return "Secretariat";
-  if (lower.includes("gotrm") || lower.includes("gestionnaire des opérations de transport") || lower.includes("exploitant transport") || lower.includes("tp-01329") || lower.includes("rncp40990")) return "GOTRM";
+  if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
+  if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
+  if (mot(lower, "infographiste") || mot(lower, "infographie") || mot(lower, "metteur en page")) return "Infographiste";
+  if (mot(lower, "restauration") || mot(lower, "employé polyvalent en restauration")) return "Restauration";
+  if (mot(lower, "excel")) return "Excel Professionnel";
+  if ((mot(lower, "anglais") || mot(lower, "english")) && (mot(lower, "a1") || mot(lower, "débutant"))) return "Anglais A1";
+  if (mot(lower, "anglais")) return "Anglais Professionnel";
+  if (mot(lower, "informatique") || mot(lower, "admin") || mot(lower, "réseau") || mot(lower, "système")) return "Informatique";
+  if (mot(lower, "management") || mot(lower, "leadership")) return "Management";
+  if (mot(lower, "digital") || mot(lower, "marketing") || mot(lower, "seo")) return "Digital Marketing";
+  if (mot(lower, "initiation word")) return "Initiation Word";
+  if (mot(lower, "bureautique") || mot(lower, "word") || mot(lower, "pack office")) return "Bureautique";
+  if (mot(lower, "esthétique") || mot(lower, "cosmétique") || mot(lower, "cap")) return "CAP Esthétique";
+  if (mot(lower, "français") || mot(lower, "médico-social") || mot(lower, "social")) return "FLE Médico-Social";
+  if (mot(lower, "intelligence artificielle") || mot(lower, "ia générative") || mot(lower, "contenus rédactionnels")) return "IA Générative";
+  if (mot(lower, "postpartum") || mot(lower, "post-partum") || mot(lower, "post partum")) return "Massage Postpartum";
+  if (mot(lower, "massage") || mot(lower, "prénatal") || mot(lower, "prenatal") || mot(lower, "relaxation prénatals")) return "Massage Prénatal";
+  if (mot(lower, "création d'entreprise") || mot(lower, "creation d'entreprise") || mot(lower, "création entreprise") || mot(lower, "creation entreprise") || mot(lower, "créateur d'entreprise") || (mot(lower, "business plan") && mot(lower, "entrepre"))) return "Création Entreprise";
+  if (mot(lower, "gestionnaire de paie") || mot(lower, "gestionnaire paie") || (mot(lower, "paie") && (mot(lower, "bulletin") || mot(lower, "dsn") || mot(lower, "gestion")))) return "Paie";
+  if (mot(lower, "secrétariat") || mot(lower, "secretariat") || mot(lower, "secrétaire") || mot(lower, "secretaire") || mot(lower, "office manager") || mot(lower, "assistanat")) return "Secretariat";
+  if (mot(lower, "gotrm") || mot(lower, "gestionnaire des opérations de transport") || mot(lower, "exploitant transport") || mot(lower, "tp-01329") || mot(lower, "rncp40990")) return "GOTRM";
   return "";
 }
 
@@ -1509,6 +1512,17 @@ EVAL_CONTENT["Vitrage"] = {
   ],
 };
 
+
+// Contenus complets (QCM + exercices corrigés) des familles qui retombaient sur le contenu générique.
+for (const [cle, contenu] of Object.entries(EVAL_COMPLEMENTS)) {
+  if (!EVAL_CONTENT[cle]) EVAL_CONTENT[cle] = contenu;
+}
+
+/** Vrai si la formation dispose d'un contenu d'évaluation dédié (et pas du contenu générique). */
+export function hasEvalContentDedie(formationIntitule: string): boolean {
+  const key = getContentKey(formationIntitule);
+  return !!key && !!EVAL_CONTENT[key];
+}
 
 export function getEvalContent(formationIntitule: string): FormationEvalContent {
   const key = getContentKey(formationIntitule);

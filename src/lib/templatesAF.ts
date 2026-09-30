@@ -1,4 +1,5 @@
 // Additional AF (Action de Formation) template generators
+import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
@@ -217,7 +218,7 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
 export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
   const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
-  const isVTC = t.includes("vtc") || t.includes("t3p") || t.includes("transport de personnes") || t.includes("chauffeur");
+  const isVTC = t.includes("vtc") || t.includes("t3p") || t.includes("transport de personnes") || t.includes("chauffeur vtc");
 
   if (isMassage) {
     return genDerouleMassagePrenatal(o, f);

@@ -1,4 +1,5 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
+import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation, isStagiaireFormationTerminee } from "./docBuilder";
 import { mentionTVA } from "./mentionsLegales";
@@ -776,8 +777,8 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
   // VTC : on ajoutera 2 QCM anglais supplémentaires (épreuve langue étrangère RS5637)
   const _tIntitVTC = (f.intitule || "").toLowerCase();
-  const _isVTC = _tIntitVTC.includes("vtc") || _tIntitVTC.includes("conducteur") ||
-    _tIntitVTC.includes("transport de personnes") || _tIntitVTC.includes("t3p") || _tIntitVTC.includes("chauffeur");
+  const _isVTC = _tIntitVTC.includes("vtc") || _tIntitVTC.includes("conducteur vtc") ||
+    _tIntitVTC.includes("transport de personnes") || _tIntitVTC.includes("t3p") || _tIntitVTC.includes("chauffeur vtc");
   if (_isVTC) {
     nbBlocks += 2;
     blocLabels = [...blocLabels, "QCM English – Welcoming passengers", "QCM English – Safety & regulation"];
