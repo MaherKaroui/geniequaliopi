@@ -1481,7 +1481,7 @@ Le sous-traitant s'engage à :
   d'ordre ;
 
 - Communiquer au donneur d'ordre ses besoins en matériel (projecteur,
-  tableau, photocopies de supports...) au moins XXX jours avant le début
+  tableau, photocopies de supports...) au moins 7 jours avant le début
   de la prestation ;
 
 - Assurer l'évaluation des bénéficiaires à l'issue de l'action de
@@ -1509,12 +1509,12 @@ Le donneur d'ordre s'engage à :
 - Transmettre au sous-traitant une copie des questionnaires de
   satisfaction remplis par les bénéficiaires à l'issue de la formation
 
-- Prévenir le sous-traitant au moins XXX jours à l'avance en cas
+- Prévenir le sous-traitant au moins 7 jours à l'avance en cas
   d'annulation ou de report de la prestation ;
 
 **Article 6 : Modalités financières**
 
-Le sous-traitant percevra une rémunération de XXX euros HT par journée /
+Le sous-traitant percevra une rémunération de ________ euros HT par journée /
 par session / par bénéficiaire.
 
 Le paiement sera effectué à réception de la facture.
@@ -1526,7 +1526,7 @@ Le paiement sera effectué à réception de la facture.
   contenu de la prestation ;
 
 - Le sous-traitant déclare avoir souscrit une police d'assurance
-  responsabilité civile professionnelle (RCP) auprès de la compagnie XXX
+  responsabilité civile professionnelle (RCP) auprès de la compagnie ______________________
 
 - Le sous-traitant dispose d'une propriété intellectuelle et/ou
   artistique sur le contenu de sa prestation. Le donneur d'ordre

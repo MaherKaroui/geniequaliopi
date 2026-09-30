@@ -626,7 +626,10 @@ export function buildBdcContext(
   const dejaPosees: Seance[] = [];
   beneficiaires.forEach((b, i) => {
     const base = baseFor(stagiaires[i], b);
-    const res = genererPlanning({ ...base, seances: [] }, b, { rang: i, seancesConsultant: dejaPosees });
+    // Même répartition des heures que toutes les pièces (repartitionHeures).
+    const rh = repartitionHeures(base.dureeEntretiensH);
+    const repartition = { preliminaire: rh.p1 / base.dureeEntretiensH, investigation: rh.p2 / base.dureeEntretiensH, conclusion: rh.p3 / base.dureeEntretiensH };
+    const res = genererPlanning({ ...base, seances: [] }, b, { rang: i, seancesConsultant: dejaPosees, repartition });
     const seances = res.ok && res.seances.length ? res.seances : buildSeances(base, b, i, dejaPosees);
     dejaPosees.push(...seances);
     seancesParBeneficiaire[b.id] = seances;
