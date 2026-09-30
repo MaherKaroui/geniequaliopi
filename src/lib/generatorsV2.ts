@@ -32,6 +32,13 @@ import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
 
 // ========== HELPERS ==========
 
+/** Objectifs en liste à puces, sans répéter la phrase d'introduction « À l'issue de la formation… ». */
+function listeObjectifs(f: FormationInfo): string {
+  return (f.objectifs || "").split("\n").map(l => l.trim().replace(/^[-•]\s*/, ""))
+    .filter(l => l && !/^à l'issue de/i.test(l) && !/capable de\s*:?$/i.test(l))
+    .map(l => `• ${l}`).join("<br>");
+}
+
 function stagSig(s: StagiaireInfo): string {
   return s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
@@ -268,7 +275,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
       <h3>Article 2 – Objectifs de la formation</h3>
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
-      <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
+      <p>${listeObjectifs(f)}</p>
       <h3>Article 3 – Organisation de la formation</h3>
       <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
       <h3>Article 4 – Prérequis</h3>
@@ -370,7 +377,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature de l'action :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
     <h3>Article 2 – Objectifs de la formation</h3>
     <p>À l'issue de la formation, le stagiaire sera capable de :</p>
-    <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
+    <p>${listeObjectifs(f)}</p>
     <h3>Article 3 – Organisation de la formation</h3>
     <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
     <h3>Article 4 – Prérequis</h3>
@@ -445,7 +452,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
     <h3>Article 2 – Objectifs de la formation</h3>
     <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
-    <p>${f.objectifs.split('\n').map(obj => '• ' + obj).join('<br>')}</p>
+    <p>${listeObjectifs(f)}</p>
     <h3>Article 3 – Organisation de la formation</h3>
     <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
     <h3>Article 4 – Programme</h3>
