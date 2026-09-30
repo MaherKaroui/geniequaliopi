@@ -14096,13 +14096,14 @@ function corrigeExerciceCFA(matiere: string, contenu: string, competences: strin
 }
 
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
-  const formationTerminee = isFormationTerminee(f, stagiaires);
   const s = stagiaires[si] || stagiaires[0] || { nom: '', prenom: '', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
+  const formationTerminee = isStagiaireFormationTerminee(s, f);
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
-  const cfaWeekDates = getCFAWeekDates(f);
+  // Semaines CFA calculées à partir de la date d'entrée de l'apprenti (entrées décalées)
+  const cfaWeekDates = getCFAWeekDates({ ...f, dateDebut: getStagiaireDateDebut(s, f) || f.dateDebut });
   const totalCFAWeeks = cfaWeekDates.length || 1;
 
   // Determine bloc/matière/exercise from params or fallback
@@ -14408,7 +14409,12 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const termine = isFormationTerminee(f, stagiaires);
+  // Examen blanc : un mois avant la fin du contrat de l'apprenti (jour ouvré), rempli seulement une fois passé.
+  const finApp = new Date(getStagiaireDateFin(s, f) + "T00:00:00");
+  const dExam = isNaN(finApp.getTime()) ? null : new Date(finApp.getTime() - 30 * 86400000);
+  if (dExam) while (dExam.getDay() === 0 || dExam.getDay() === 6) dExam.setDate(dExam.getDate() - 1);
+  const dExamIso = dExam ? `${dExam.getFullYear()}-${String(dExam.getMonth() + 1).padStart(2, "0")}-${String(dExam.getDate()).padStart(2, "0")}` : "";
+  const termine = !!dExam && dExam.getTime() <= Date.now();
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const evalData = getEvalContent(f.intitule);
   const { totalHours } = parseDuree(f.duree);
@@ -14416,7 +14422,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
 
   let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
     <p><strong>L'apprenti(e) :</strong> ${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</p>
-    <p><strong>Date :</strong> ${termine ? formatDate(f.dateFin) : '___/___/______'}</p>
+    <p><strong>Date ${termine ? "" : "prévue "}:</strong> ${dExamIso ? formatDate(dExamIso) : '___/___/______'}</p>
     <p><strong>Durée de l'épreuve :</strong> ${dureeExamen} heures</p>`;
 
   if (rncp) {
@@ -14445,6 +14451,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
       const score = computeQCMScore(questions, answers);
       extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total}</p>`;
     }
+    extra += `<p><strong>Corrigé du QCM (réservé au formateur) :</strong> ${questions.map((q, qi) => `${qi + 1}-${String.fromCharCode(65 + q.correctIndex)}`).join(" · ")} — 1 point par bonne réponse.</p>`;
 
     extra += `<h3>PARTIE 2 — MISE EN SITUATION PROFESSIONNELLE</h3>`;
     rncp.blocsCompetences.forEach((bloc, bi) => {
@@ -14514,7 +14521,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const termine = isFormationTerminee(f, stagiaires);
+  const termine = isStagiaireFormationTerminee(stagiaires[si] || stagiaires[0], f);
   if (termine) {
     return genGrilleAcquisitionStagiaire(o, f, stagiaires, si);
   }
@@ -14551,7 +14558,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
 }
 
 function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const termine = isFormationTerminee(f, stagiaires);
+  const termine = isStagiaireFormationTerminee(stagiaires[si] || stagiaires[0], f);
   if (termine) {
     return genAttestationReussiteStagiaire(o, f, stagiaires, si);
   }
