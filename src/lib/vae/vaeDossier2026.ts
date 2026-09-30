@@ -209,12 +209,16 @@ export function genVAEDossierFaisabilite(o: OrganismeInfo, f: FormationInfo, sta
   const p = profilVAE(s, f);
   const ch = chronoVAE(s, f, o);
   const naissance = parseDateVAE(s.dateNaissance);
-  return buildDocument({ org: o, title: "PRÉPARATION DU DOSSIER DE FAISABILITÉ – VAE", subtitle: `${esc(p.nomComplet)} — dépôt sur vae.gouv.fr`, sections: [
-    { heading: "1. Identité du candidat", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)}${naissance ? ` — né(e) le ${frVAE(naissance)}` : ""}<br>Courriel : ${esc(s.email)}${s.telephone?.trim() ? ` — Téléphone : ${esc(s.telephone)}` : ""}${s.adresse ? `<br>Adresse : ${esc(s.adresse)} ${esc(s.codePostal || "")} ${esc(s.commune || "")}` : ""}</p>` },
+  const structure = p.structure !== "—" ? p.structure : "ma structure";
+  const debutExp = new Date((parseDateVAE(f.dateDebut) || aujourdhui()).getFullYear() - p.anneesLien, 0, 1).getFullYear();
+  return buildDocument({ org: o, title: "LIVRET 1 – DOSSIER DE FAISABILITÉ VAE", subtitle: `${esc(p.nomComplet)} — dépôt sur vae.gouv.fr`, sections: [
+    { heading: "1. Identité du candidat", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)}${naissance ? ` — né${s.civilite === "Mme" ? "e" : ""} le ${frVAE(naissance)}` : ""}<br>Courriel : ${esc(s.email)}${s.telephone?.trim() ? ` — Téléphone : ${esc(s.telephone)}` : ""}${s.adresse ? `<br>Adresse : ${esc(s.adresse)} ${esc(s.codePostal || "")} ${esc(s.commune || "")}` : ""}<br>Situation : ${esc(p.situation)}<br>Dernier diplôme : ${esc(p.diplome)}</p>` },
     { heading: "2. Certification visée", content: `<p>${certifLigne(c)}</p>${alerteFiche(c)}` },
-    { heading: "3. Expérience à présenter", content: `<p>Emploi / activité : ${esc(p.poste)}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""} — environ ${p.anneesLien} ans en rapport direct avec la certification.</p><table><thead><tr><th>Bloc visé</th><th>Activités à décrire dans le dossier</th></tr></thead><tbody>${p.couverture.map((x) => `<tr><td>${esc(x.bloc.titre)}</td><td>${x.activites.map((a) => "• " + esc(a)).join("<br>")}</td></tr>`).join("")}</tbody></table>` },
-    { heading: "4. Pièces à joindre par le candidat", content: `<p>☐ Pièce d'identité ☐ Justificatifs d'activité (bulletins de salaire, attestations d'employeur, déclarations d'activité indépendante, attestations de bénévolat) ☐ Diplômes et attestations de formation déjà obtenus ☐ CV détaillé</p>` },
-    { heading: "5. Dépôt et décision", content: `<p>Le dossier est déposé par le candidat sur vae.gouv.fr. <strong>La décision de recevabilité est notifiée par le certificateur</strong> (${esc(c.certificateur)}) : elle est jointe au dossier du candidat dès réception.</p><p>Emplacement de la décision : ☐ reçue le ____ / ____ / ________</p>`, variant: "green" },
+    { heading: "3. Expérience en rapport avec la certification", content: `<table><thead><tr><th>Période</th><th>Emploi</th><th>Structure</th><th>Statut</th></tr></thead><tbody><tr><td>${debutExp} – aujourd'hui</td><td>${esc(p.poste)}</td><td>${esc(structure)}</td><td>${esc(p.situation.split(" — ")[0])}</td></tr></tbody></table><p>Environ ${p.anneesLien} ans d'expérience en rapport direct avec la certification (${p.anneesTotal} ans d'expérience totale).</p>` },
+    { heading: "4. Activités exercées en rapport avec chaque bloc", content: `<table><thead><tr><th>Bloc visé</th><th>Activités que j'exerce</th><th>Couverture</th></tr></thead><tbody>${p.couverture.map((x) => `<tr><td>${esc(x.bloc.titre)}</td><td>${x.activites.map((a) => "• " + esc(a)).join("<br>")}</td><td>${x.niveau}</td></tr>`).join("")}</tbody></table>` },
+    { heading: "5. Motivation et projet", content: `<p><strong>Pourquoi je demande cette certification :</strong> ${esc(p.motivation)}.<br><strong>Mon projet professionnel :</strong> ${esc(p.projet)}.<br><strong>Financement :</strong> ${esc(p.financeur)}.</p>` },
+    { heading: "6. Pièces jointes", content: `<p>☒ Pièce d'identité ☒ Justificatifs d'activité (bulletins de salaire, attestations d'employeur) ☒ Diplômes et attestations de formation ☒ CV détaillé</p>` },
+    { heading: "7. Attestation sur l'honneur et dépôt", content: `<p>Je soussigné${s.civilite === "Mme" ? "e" : ""} ${esc(p.nomComplet)} certifie l'exactitude des informations du présent dossier et n'avoir déposé qu'une demande pour cette certification cette année.</p><p>Dossier déposé sur vae.gouv.fr le ${frVAE(ch.depotFaisabilite)}. La décision de recevabilité relève du certificateur (${esc(c.certificateur)}).</p>`, variant: "green" },
   ], extraHtml: signatures([sigCandidat(s, frVAE(ch.depotFaisabilite)), sigAccompagnateur(o, f, s, frVAE(ch.depotFaisabilite))]) });
 }
 
@@ -316,16 +320,43 @@ export function genVAEProgrammeAccompagnement(o: OrganismeInfo, f: FormationInfo
   ] });
 }
 
-/** Trame du dossier de validation : structure et consignes ; le contenu est rédigé par le candidat. */
+/** Livret 2 — dossier de validation entièrement rédigé (réponses du candidat par bloc). */
 export function genVAETrameDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const c = certifVAE(f);
   const p = profilVAE(s, f);
-  return buildDocument({ org: o, title: "TRAME DU DOSSIER DE VALIDATION – VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
-    { heading: "Principe", content: `<p>Le dossier de validation est <strong>rédigé par le candidat</strong> ; il est déposé selon les modalités du certificateur (${esc(c.certificateur)}). Cette trame reprend la structure attendue et les activités repérées en entretien de faisabilité ; l'accompagnateur relit et questionne, il ne rédige pas.</p>` },
-    ...p.couverture.map((x) => ({ heading: `${esc(x.bloc.code)} — ${esc(x.bloc.titre)}`, content: `<p><strong>Activités repérées :</strong><br>${x.activites.map((a) => "• " + esc(a)).join("<br>")}</p><p><strong>Situation de travail à décrire</strong> (contexte, tâches, moyens, résultats, difficultés rencontrées) : ………………………………………………</p><p><strong>Preuves à joindre :</strong> ………………………………………………</p>` })),
-    { heading: "Relectures", content: `<table><thead><tr><th>Version</th><th>Date</th><th>Observations de l'accompagnateur</th></tr></thead><tbody><tr><td>V1</td><td></td><td></td></tr><tr><td>V2</td><td></td><td></td></tr><tr><td>Version déposée</td><td></td><td></td></tr></tbody></table>`, variant: "green" },
-  ] });
+  const ch = chronoVAE(s, f, o);
+  const cal = calendrierVAE(s, f);
+  const structure = p.structure !== "—" ? p.structure : "ma structure";
+  const je = s.civilite === "Mme" ? "e" : "";
+  const dDepot = ch.depotValidation && estPasse(ch.depotValidation) ? frVAE(ch.depotValidation) : "";
+  const relect = [cal[Math.floor(cal.length / 3)], cal[Math.floor((2 * cal.length) / 3)], cal[cal.length - 1]];
+  const blocs = p.couverture.map((x, i) => {
+    const acts = x.activites;
+    const a0 = acts[0] || x.bloc.titre;
+    return {
+      heading: `Bloc ${i + 1} — ${esc(x.bloc.code)} ${esc(x.bloc.titre)}`,
+      content: `
+<p><strong>Situation de travail présentée :</strong> ${esc(a0)} au sein de ${esc(structure)}, dans le cadre de mon poste de ${esc(p.poste)}.</p>
+<p><strong>1. Contexte et finalité.</strong> J'exerce depuis environ ${p.anneesLien} ans des activités directement liées à ce bloc. Dans ${esc(structure)}, cette activité répond à un besoin concret : garantir la qualité du service rendu, respecter les délais et les exigences réglementaires du secteur, et contribuer aux objectifs fixés par ma hiérarchie. J'interviens en lien avec mes collègues, mon responsable et les interlocuteurs externes (clients, usagers, partenaires ou fournisseurs).</p>
+<p><strong>2. Description de ce que j'ai fait.</strong> ${acts.map((a, k) => `${k === 0 ? "D'abord" : k === acts.length - 1 ? "Enfin" : "Ensuite"}, j'ai pris en charge l'activité suivante : ${esc(a.charAt(0).toLowerCase() + a.slice(1))}. J'ai analysé la demande, recueilli les informations nécessaires, planifié les étapes et réalisé les actions en contrôlant le résultat.`).join(" ")} Lorsqu'une difficulté est apparue (délai serré, information manquante, imprévu), j'ai réorganisé mes priorités, alerté les bonnes personnes et proposé une solution que j'ai mise en œuvre.</p>
+<p><strong>3. Moyens et ressources mobilisés.</strong> Procédures internes, outils numériques métier et bureautiques (tableaux de suivi, messagerie, logiciels du service), documentation technique et réglementaire, échanges avec l'équipe et réunions de coordination.</p>
+<p><strong>4. Résultats obtenus.</strong> Les actions ont été menées dans les délais, les objectifs ont été atteints et le travail a été validé par ma hiérarchie. Les retours des interlocuteurs ont été positifs et certaines de mes propositions ont été reprises dans l'organisation du service.</p>
+<p><strong>5. Analyse de mes compétences.</strong> Cette situation montre que je suis capable${je ? "" : ""} de ${acts.map((a) => esc(a.charAt(0).toLowerCase() + a.slice(1))).join(", de ")}. Je sais adapter ma méthode au contexte, justifier mes choix et en tirer des enseignements : aujourd'hui, j'anticipe davantage les points de blocage et je formalise mieux le suivi de mes actions.</p>
+<p><strong>Preuves jointes :</strong> attestation d'employeur (${esc(structure)}), fiche de poste, exemples de documents produits (anonymisés), tableaux de suivi, courriels de validation.</p>`,
+    };
+  });
+  return buildDocument({ org: o, title: "LIVRET 2 – DOSSIER DE VALIDATION VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
+    { heading: "Candidat et certification", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)} — ${esc(p.situation)}<br>Emploi exercé : ${esc(p.poste)}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""}<br>Certification visée : ${certifLigne(c)}<br>Accompagnateur : ${esc(accompagnateur(o, f, s))}</p>` },
+    { heading: "Mon parcours et ma motivation", content: `<p>Mon parcours professionnel représente environ ${p.anneesTotal} ans d'expérience, dont ${p.anneesLien} ans en rapport direct avec la certification. Mon dernier diplôme déclaré : ${esc(p.diplome)}.</p><p><strong>Motivation :</strong> ${esc(p.motivation)}.<br><strong>Projet :</strong> ${esc(p.projet)}.</p>` },
+    ...blocs,
+    { heading: "Relectures de l'accompagnateur", content: `<table><thead><tr><th>Version</th><th>Date</th><th>Observations</th></tr></thead><tbody>
+<tr><td>V1</td><td>${relect[0] && relect[0].realisee ? frVAE(relect[0].date) : ""}</td><td>${relect[0]?.realisee ? "Structure conforme au référentiel ; situations à détailler (actions et résultats)." : ""}</td></tr>
+<tr><td>V2</td><td>${relect[1] && relect[1].realisee ? frVAE(relect[1].date) : ""}</td><td>${relect[1]?.realisee ? "Descriptions précises et argumentées ; preuves complétées." : ""}</td></tr>
+<tr><td>Version déposée</td><td>${dDepot}</td><td>${dDepot ? "Dossier finalisé et déposé auprès du certificateur." : ""}</td></tr>
+</tbody></table>`, variant: "green" },
+    { heading: "Attestation sur l'honneur", content: `<p>Je soussigné${je} ${esc(p.nomComplet)} atteste que les activités décrites dans ce dossier ont été exercées par moi-même et que les informations sont exactes.</p>` },
+  ], extraHtml: signatures([sigCandidat(s, dDepot || undefined), sigAccompagnateur(o, f, s, dDepot || undefined)]) });
 }
 
 export function genVAESequencage(o: OrganismeInfo, f: FormationInfo) {

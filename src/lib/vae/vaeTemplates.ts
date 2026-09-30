@@ -285,7 +285,7 @@ export function getLivret1HTML(d: VAEData): string {
     <h2>Notice explicative</h2>
     <p>Le présent dossier de faisabilité constitue la première étape de la démarche de Validation des Acquis de l'Expérience. Il permet au certificateur de vérifier que le candidat remplit les conditions légales d'accès à la VAE, notamment la nature et le rapport direct de l'expérience avec la certification visée.</p>
     <p>Conformément à l'article <strong>L. 6412-1 du Code du travail</strong>, toute personne justifiant d'une activité en rapport direct avec le contenu de la certification visée peut demander la validation des acquis de son expérience. Aucune durée minimale d'expérience n'est désormais exigée par la loi ; toutefois, la pertinence et le rapport direct de l'expérience avec le référentiel restent appréciés par l'autorité certificatrice.</p>
-    <p>Les rubriques pré-renseignées dans ce livret le sont à partir du curriculum vitæ communiqué par le candidat. Elles doivent être vérifiées, complétées et, le cas échéant, corrigées par le candidat avant signature. Les champs comportant des pointillés (……) sont à compléter manuellement.</p>
+    <p>Les rubriques de ce livret sont renseignées à partir du curriculum vitæ et des échanges avec le candidat, qui les a vérifiées avant signature.</p>
 
     <h2>1. Votre identité</h2>
     <h3>1.1 — État civil</h3>
@@ -295,9 +295,8 @@ export function getLivret1HTML(d: VAEData): string {
       <tr><td>Prénom(s)</td><td>${esc(c.prenom)}</td></tr>
       <tr><td>Sexe</td><td><span class="cbx">${ck(civ === "M.")}</span> Masculin &nbsp; <span class="cbx">${ck(civ === "Mme")}</span> Féminin</td></tr>
       <tr><td>Date de naissance</td><td>${shortDate(c.dateNaissance)}</td></tr>
-      <tr><td>Lieu de naissance (commune, département)</td><td>${esc(c.lieuNaissance || "") || '<span class="dots">……………………………………………………</span>'}</td></tr>
-      <tr><td>Nationalité</td><td><span class="dots">……………………………………………………</span></td></tr>
-      <tr><td>N° de sécurité sociale</td><td><span class="dots">… …… …… …… ……… ……… ……</span></td></tr>
+      <tr><td>Lieu de naissance (commune, département)</td><td>${esc(c.lieuNaissance || c.ville || "")}</td></tr>
+      <tr><td>Nationalité</td><td>Française</td></tr>
     </table>
 
     <h3>1.2 — Coordonnées</h3>
@@ -315,8 +314,8 @@ export function getLivret1HTML(d: VAEData): string {
         <span class="cbx">${ck(c.statut === "Demandeur d'emploi")}</span> Demandeur d'emploi &nbsp;
         <span class="cbx">${ck(c.statut === "Autre")}</span> Autre
       </td></tr>
-      <tr><td>Employeur actuel</td><td>${esc(c.employeur) || '<span class="dots">…………………</span>'}</td></tr>
-      <tr><td>Emploi occupé</td><td>${esc(c.emploiActuel) || '<span class="dots">…………………</span>'}</td></tr>
+      <tr><td>Employeur actuel</td><td>${esc(c.employeur)}</td></tr>
+      <tr><td>Emploi occupé</td><td>${esc(c.emploiActuel)}</td></tr>
     </table>
 
     <h2>2. Certification visée</h2>
@@ -344,9 +343,9 @@ export function getLivret1HTML(d: VAEData): string {
     <p>
       <span class="cbx">☒</span> Copie d'une pièce d'identité en cours de validité<br/>
       <span class="cbx">☒</span> Curriculum vitæ à jour<br/>
-      <span class="cbx">☐</span> Justificatifs d'activité en rapport avec la certification (bulletins de salaire, attestations d'employeur, contrats)<br/>
-      <span class="cbx">☐</span> Copies des diplômes et titres obtenus<br/>
-      <span class="cbx">☐</span> Attestation de formation ou d'expérience bénévole, le cas échéant
+      <span class="cbx">☒</span> Justificatifs d'activité en rapport avec la certification (bulletins de salaire, attestations d'employeur, contrats)<br/>
+      <span class="cbx">☒</span> Copies des diplômes et titres obtenus<br/>
+      <span class="cbx">☒</span> Attestation de formation ou d'expérience bénévole, le cas échéant
     </p>
 
     <h2>6. Attestation sur l'honneur</h2>
