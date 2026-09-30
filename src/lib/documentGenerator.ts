@@ -253,6 +253,22 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
   }
 
+  // Pièces de RÉALISATION : jamais émises avant la fin du parcours du stagiaire concerné
+  // (examen, attestations, certificat, PV). Avant la fin : document d'attente daté, sans résultat.
+  const PIECES_APRES_REALISATION: Record<string, string> = {
+    examen_final_stagiaire: "EXAMEN FINAL",
+    attestation_reussite_stagiaire: "ATTESTATION DE RÉUSSITE",
+    certificat_realisation_stagiaire: "CERTIFICAT DE RÉALISATION",
+    pv_examen_certification: "PROCÈS-VERBAL D'EXAMEN",
+    attestation_presentation_certification: "ATTESTATION DE PRÉSENTATION À LA CERTIFICATION",
+  };
+  if (PIECES_APRES_REALISATION[template] && targetStagiaire && typeof params?.stagiaireIdx === "number"
+      && !isStagiaireFormationTerminee(targetStagiaire, f)) {
+    return buildDocument({ org: o, title: PIECES_APRES_REALISATION[template], subtitle: `${targetStagiaire.prenom} ${targetStagiaire.nom} – ${f.intitule}`, sections: [
+      { heading: "Statut", content: `<p>Le parcours de ${targetStagiaire.prenom} ${targetStagiaire.nom} se termine le ${formatDate(getStagiaireDateFin(targetStagiaire, f))}. Ce document est établi à l'issue de la formation, au vu des émargements et des évaluations : il n'est pas émis avant la réalisation.</p>` },
+    ] });
+  }
+
   switch (template) {
     case "bdc_nt_doc":
     case "bdc_nt_doc_per_ben": {
@@ -835,7 +851,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genAppreciationsBeneficiairesStagiaire(o, f, stagiaires, si);
     }
     case "appreciations_entreprises": return genAppreciationsEntreprises(o, f, stagiaires);
-    case "appreciations_financeurs": return genAppreciationsFinanceurs(o, f);
+    case "appreciations_financeurs": return genAppreciationsFinanceurs(o, f, stagiaires);
     case "bilan_froid": return genBilanFroid(o, f, stagiaires);
     case "bilan_froid_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -5792,7 +5808,7 @@ function genFicheCertificationRS(o: OrganismeInfo, f: FormationInfo) {
       ${tableHTML(["Indicateur", "Détail"], [
         ["Volume horaire", f.duree || rncp.dureeIndicative || "À déterminer"],
         ["Nombre de blocs couverts", `${rncp.blocsCompetences.length} / ${rncp.blocsCompetences.length}`],
-        ["Taux de couverture", "100%"],
+        ["Couverture des blocs", "Correspondance bloc par bloc détaillée dans le tableau croisé compétences / modules (IND 7)"],
       ])}` },
     { heading: "5. Conditions de certification", content: `
       <p>La certification est obtenue par la validation de l'ensemble des blocs de compétences selon les modalités définies par le certificateur <strong>${rncp.certificateur}</strong>.</p>
@@ -5920,183 +5936,31 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  // Le procès-verbal d'examen est émis par le CERTIFICATEUR, jamais par l'organisme : l'ancien
+  // PV « ADMIS » systématique, signé par un jury composé du dirigeant et du formateur, est remplacé
+  // par la fiche de suivi de présentation (IND 16) qui renvoie au PV officiel à joindre.
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || "");
-  const certifCode = rncp?.code || f.codeRNCP || "___";
+  const certifCode = rncp?.code || f.codeRNCP || "";
   const certifIntitule = rncp?.intitule || f.intitule;
-  const certifNom = rncp?.certificateur || "___";
-  const dateFin = f.dateFin ? new Date(f.dateFin) : new Date();
-  const dateEpreuves = new Date(dateFin);
-  dateEpreuves.setDate(dateEpreuves.getDate() + 7);
-  const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
-
-  // Épreuves du jury avec notes = moyennes exercices + test fin
-  const evalContent = getEvalContent(f.intitule);
-  const questions = evalContent.qcmFinal;
-  const answers = generateStagiaireAnswers(questions, stagiaireIdx);
-  const qcmResult = computeQCMScore(questions, answers);
-  const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
-
-  // Formateur info — use formation's formateur field, not sample data
-  const formateurNom = f.formateur || SAMPLE_FORMATEURS[0]?.nom || "___";
-
-  // Observations personnalisées par stagiaire
-  const observationsPool = [
-    `${g(s, "Le candidat", "La candidate")} a fait preuve d'une excellente maîtrise des compétences évaluées. Les réponses sont claires, structurées et démontrent une compréhension approfondie du domaine.`,
-    `Très bonne prestation globale. ${g(s, "Le candidat", "La candidate")} a su mobiliser ses connaissances avec pertinence et a démontré une capacité d'analyse remarquable.`,
-    `${g(s, "Le candidat", "La candidate")} a répondu avec aisance aux différentes épreuves. Les compétences transversales sont particulièrement bien maîtrisées.`,
-    `Excellente performance. ${g(s, "Le candidat", "La candidate")} a démontré une solide capacité à appliquer les connaissances théoriques à des situations concrètes.`,
-    `${g(s, "Le candidat", "La candidate")} a su démontrer une très bonne compréhension des enjeux professionnels liés à la certification. Prestation convaincante et bien argumentée.`,
-    `Performance très satisfaisante. ${g(s, "Le candidat", "La candidate")} maîtrise l'ensemble des blocs de compétences avec une rigueur et une clarté appréciables.`,
-    `${g(s, "Le candidat", "La candidate")} a présenté un travail de qualité, reflétant un investissement sérieux dans la formation. Les acquis sont solides et bien restitués.`,
-    `Très bon niveau de compétences observé. ${g(s, "Le candidat", "La candidate")} a su répondre aux exigences du référentiel avec professionnalisme.`,
-    `${g(s, "Le candidat", "La candidate")} a brillamment démontré sa capacité à intégrer les savoirs et savoir-faire. Les épreuves pratiques ont été particulièrement réussies.`,
-    `Prestation globale de haut niveau. ${g(s, "Le candidat", "La candidate")} possède les compétences nécessaires à l'exercice professionnel dans ce domaine.`,
-  ];
-  const observation = observationsPool[stagiaireIdx % observationsPool.length];
-
-  // Mentions personnalisées
-  const mentionsPool = [
-    "Félicitations du jury pour l'excellence des résultats",
-    "Mention Très Bien — Dossier exemplaire",
-    "Le jury souligne la qualité exceptionnelle du travail présenté",
-    "Félicitations pour la rigueur et le professionnalisme démontrés",
-    "Mention Bien — Résultats très satisfaisants",
-    "Le jury salue l'investissement remarquable du candidat",
-    "Félicitations — Prestation de très haute qualité",
-    "Mention Très Bien — Compétences pleinement validées",
-    "Le jury félicite le candidat pour sa maîtrise du sujet",
-    "Mention Bien — Parcours de formation exemplaire",
-  ];
-  const mention = mentionsPool[stagiaireIdx % mentionsPool.length];
-
-  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
-    const baseNote = Math.max(15, Math.min(19, qcmNote));
-    const variations = [0, 1, -1, 2, 0.5, -0.5, 1.5, 0, 1, -1];
-    const variation = variations[(stagiaireIdx * 3 + i) % variations.length];
-    const note = Math.min(20, Math.max(15, Math.round((baseNote + variation) * 10) / 10));
-    return {
-      nom: `Épreuve ${i + 1} – ${b.titre}`,
-      modalite: b.modalitesEval || "Selon référentiel",
-      note
-    };
-  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: Math.max(15, Math.min(19, qcmNote)) }];
-
-  const moyenneGenerale = Math.round((epreuves.reduce((sum, ep) => sum + ep.note, 0) / epreuves.length) * 10) / 10;
-
-  const juryRows = epreuves.map(ep =>
-    `<tr>
-      <td style="font-weight:600">${ep.nom}</td>
-      <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
-      <td style="text-align:center;min-width:60px;font-weight:bold">${ep.note}/20</td>
-      <td style="text-align:center;color:#16a34a;font-weight:600">✅ Acquis</td>
-      <td>${ep.note >= 18 ? "Excellent" : ep.note >= 16 ? "Très bien" : "Bien"}</td>
-    </tr>`
-  ).join("");
-
-  const moyenneRow = `<tr style="background:#f0fdf4;font-weight:bold">
-    <td colspan="2" style="text-align:right">Moyenne générale</td>
-    <td style="text-align:center;font-size:1.1em">${moyenneGenerale}/20</td>
-    <td style="text-align:center;color:#16a34a">✅ Acquis</td>
-    <td>${moyenneGenerale >= 18 ? "Excellent" : moyenneGenerale >= 16 ? "Très bien" : "Bien"}</td>
-  </tr>`;
-
-  const blocsValides = epreuves.map((_ep, i) => `Bloc ${i + 1}`).join(", ");
-
-  return buildDocument({ org: o, title: "PROCÈS-VERBAL INDIVIDUEL D'EXAMEN", subtitle: `${certifIntitule} (${certifCode})`, sections: [
-    // — Section 1 : Informations candidat
-    { heading: "Informations du candidat", content: `
-      ${tableHTML(["Élément", "Détail"], [
-        ["Civilité", s.civilite || "___"],
-        ["Nom", s.nom],
-        ["Prénom", s.prenom],
-        ...(s.dateNaissance ? [["Date de naissance", formatDate(s.dateNaissance)]] : []),
-        ["Email", s.email || "___"],
-        ...(s.telephone?.trim() ? [["Téléphone", s.telephone]] : []),
-      ])}` },
-    // — Section 2 : Informations formation & certification
-    { heading: "Formation et certification", content: `
-      ${tableHTML(["Élément", "Détail"], [
-        ["Formation suivie", f.intitule],
-        ["Organisme de formation", o.nom],
-        ["Période de formation", `Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}`],
-        ["Durée", getStagiaireDuree(s, f)],
-        ["Certification visée", `${certifIntitule} (${certifCode})`],
-        ["Certificateur (Nom légal)", certifNom],
-        ["Date des épreuves", dateEpreuvesStr],
-        ["Lieu des épreuves", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
-      ])}` },
-    // — Section 3 : Composition du jury
-    { heading: "Composition du jury", content: `
-      <table>
-        <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
-        <tbody>
-          <tr><td>Dirigeant</td><td>${o.dirigeant}</td><td>Responsable de l'organisme</td><td>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
-          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td>${(s.formateurSignatureUrl || f.formateurSignatureUrl) ? `<img src="${s.formateurSignatureUrl || f.formateurSignatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
-        </tbody>
-      </table>`, variant: "green" },
-    // — Section 4 : Résultats par épreuve
-    { heading: "Résultats par épreuve", content: `
-      <table>
-        <thead><tr><th>Épreuve</th><th>Modalité d'évaluation</th><th>Note</th><th>Résultat</th><th>Observations</th></tr></thead>
-        <tbody>${juryRows}${moyenneRow}</tbody>
-      </table>` },
-    // — Section 5 : Décision finale
-    { heading: "Décision finale du jury", content: `
-      <table style="width:100%">
-        <tbody>
-          <tr>
-            <td style="padding:15px;font-size:1.1em">
-              <strong>☑ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:15px;font-size:1.1em;color:#999">
-              <strong>☐ ${g(s, "AJOURNÉ", "AJOURNÉE")}</strong> — ${g(s, "Le candidat", "La candidate")} n'a pas satisfait aux exigences
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:15px;font-size:1.1em;color:#999">
-              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : —
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="margin-top:10px"><em>Mention particulière : ${mention}</em></p>
-      <p><em>Blocs de compétences validés : ${blocsValides}</em></p>
-      <p><strong>Moyenne générale obtenue : ${moyenneGenerale}/20</strong></p>` },
-    // — Section 6 : Observations du jury
-    { heading: "Observations du jury", content: `
-      <div style="min-height:80px;border:1px solid #ccc;padding:12px;border-radius:4px">
-        <p>${observation}</p>
-      </div>` },
-    // — Section 7 : Certification sur l'honneur
-    { heading: "Certification sur l'honneur", content: `
-      <p>Les membres du jury certifient sur l'honneur que les épreuves se sont déroulées conformément aux modalités d'évaluation définies par le certificateur <strong>${certifNom}</strong> et que les résultats consignés ci-dessus sont exacts et sincères.</p>` },
-  ], extraHtml: `<div style="margin-top:40px;display:flex;gap:20px;flex-wrap:wrap">
-      <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">${g(s, "Le Candidat", "La Candidate")}</p>
-        <p>Nom : ${s.civilite || "M."} ${s.prenom} ${s.nom}</p>
-        <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Signature :</p>
-        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
-      </div>
-      <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">Le Dirigeant</p>
-        <p>Nom : ${o.dirigeant}</p>
-        <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Signature :</p>
-        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
-      </div>
-      <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">Le Formateur</p>
-        <p>Nom : ${formateurNom}</p>
-        <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Signature :</p>
-        ${(s.formateurSignatureUrl || f.formateurSignatureUrl) ? `<img src="${s.formateurSignatureUrl || f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
-      </div>
-    </div>` });
+  const certifNom = rncp?.certificateur || "certificateur indiqué sur la fiche France Compétences";
+  const fin = getStagiaireDateFin(s, f);
+  return buildDocument({ org: o, title: "FICHE DE SUIVI DE LA PRÉSENTATION À LA CERTIFICATION", subtitle: `${s.prenom} ${s.nom} – ${certifIntitule}${certifCode ? ` (${certifCode})` : ""}`, sections: [
+    { heading: "Candidat et parcours", content: tableHTML(["Élément", "Détail"], [
+      ["Candidat", `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}`],
+      ["Formation suivie", f.intitule],
+      ["Période", `Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(fin)}`],
+      ["Certification visée", `${certifIntitule}${certifCode ? ` (${certifCode})` : ""}`],
+      ["Certificateur", certifNom],
+    ]) },
+    { heading: "Étapes de présentation (exigences formelles du certificateur)", content: tableHTML(["Étape", "Responsable", "Preuve"], [
+      ["Vérification des conditions d'accès et du dossier d'inscription", o.responsablePedagogique || o.dirigeant, "Dossier d'inscription transmis au certificateur"],
+      ["Information du candidat sur les modalités d'évaluation et le règlement", o.responsablePedagogique || o.dirigeant, "Convocation aux épreuves"],
+      ["Aménagement d'épreuves si situation de handicap", o.referentHandicap || o.dirigeant, s.rqth === "oui" ? "Demande d'aménagement transmise au certificateur" : "Sans objet (aucun besoin déclaré)"],
+      ["Passage des épreuves", certifNom, "Relevé / PV officiel du certificateur"],
+    ]) },
+    { heading: "Résultat", content: `<p>Résultat reporté à réception du procès-verbal officiel émis par le certificateur, qui est joint à ce dossier.</p><p>☐ Admis(e) &nbsp;&nbsp; ☐ Admis(e) partiellement (blocs : ……………) &nbsp;&nbsp; ☐ Non admis(e) &nbsp;&nbsp; ☐ En attente des résultats</p>`, variant: "orange" },
+  ] });
 }
 
 function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
@@ -13245,10 +13109,29 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
 }
 
-function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
+function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   let extra = `<p><em>En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone pendant un mois.</em></p>`;
-  const financeurs = ["OPCO Atlas", "OPCO EP", "France Travail"];
+  // Financeurs réels, déduits du champ « financeur » des stagiaires (plus de financeurs inventés).
+  const nomFinanceur = (st: StagiaireInfo): string | null => {
+    const x = (st.financeur || "").toLowerCase();
+    if (x.includes("cpf")) return "Caisse des Dépôts et Consignations (Mon Compte Formation)";
+    if (x.includes("opco")) return st.entreprise?.trim() ? `OPCO de ${st.entreprise.trim()}` : "OPCO de l'employeur";
+    if (x.includes("france travail") || x.includes("pôle emploi") || x.includes("pole emploi")) return "France Travail";
+    if (x.includes("région") || x.includes("region")) return "Conseil régional";
+    if (x.includes("entreprise") || x.includes("employeur")) return st.entreprise?.trim() || "Employeur";
+    return null;
+  };
+  const financeurs = Array.from(new Set(stagiaires.map(nomFinanceur).filter((x): x is string => !!x)));
+  const remplie = isFormationTerminee(f, stagiaires);
+  if (financeurs.length === 0) {
+    extra += `<p>Aucun financeur tiers identifié pour cette session (financement personnel ou non renseigné). Le questionnaire ci-dessous est adressé à tout financeur dès qu'une prise en charge est accordée, au moins une fois par an.</p>`;
+    financeurs.push("");
+  }
   financeurs.forEach((fin, i) => {
+    if (!remplie || !fin) {
+      extra += `<h3>Financeur : ${fin || "……………………………………"}</h3><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>Non concerné</th><th>Insuffisant</th><th>Correct</th><th>Très bien</th></tr>${["Informations figurant sur nos conventions", "Qualité des factures", "Respect des délais de traitement", "Tarifs proposés", "Documents remis en fin de formation", "Qualité globale des formations", "Cohérence avec les attentes"].map(c => `<tr><td>${c}</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>`).join("")}</table><p><strong>Commentaires :</strong></p><div style="height:50px;border:1px dashed #999"></div><hr/>`;
+      return;
+    }
     extra += `<h3>Financeur : ${fin}</h3>`;
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Nom du financeur :</strong></td><td>${fin}</td></tr><tr><td><strong>Références des dossiers financés :</strong></td><td>Dossier ${new Date().getFullYear()}-${String(i + 1).padStart(3, '0')}</td></tr></table>`;
     const criteres = [

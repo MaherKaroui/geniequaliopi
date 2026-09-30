@@ -1,6 +1,6 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation, isStagiaireFormationTerminee } from "./docBuilder";
 import { mentionTVA } from "./mentionsLegales";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 import { getUnitesExercices } from "./parcoursStagiaire";
@@ -1385,13 +1385,13 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
   let extra = `
     <h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>
     <p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>
-    <p><strong>L'APPRENTI(E) :</strong> ${[s.civilite, s.prenom, s.nom].filter(Boolean).join(" ")}</p>
+    <p><strong>${(f.rythmeAlternance || "").trim() ? "L'APPRENTI(E)" : "LE/LA STAGIAIRE"} :</strong> ${[s.civilite, s.prenom, s.nom].filter(Boolean).join(" ")}</p>
     <p><strong>FORMATION :</strong> ${f.intitule}</p>
   `;
 
   const headers = ["", "NIVEAU", "", ""];
   const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
-  const termine = isFormationTerminee(f);
+  const termine = isStagiaireFormationTerminee(s, f);
 
   // Pour les formations Paie / Secrétariat : compétences = titres des modules du support de cours.
   const tGrille = (f.intitule || "").toLowerCase();
@@ -1412,10 +1412,18 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
     "Module 4 — Accueil, téléphone et anglais pro",
     "Module 5 — Organisation, archivage et employabilité",
   ];
-  const competencesGrille = isPaieGrille ? PAIE_MODULES : isSecretariatGrille ? SECRETARIAT_MODULES : evalData.competences;
+  // Formation sans contenu dédié : compétences tirées des objectifs saisis (plus de « Compétence technique 1/2 »).
+  const depuisObjectifs = (f.objectifs || "").split("\n").map(l => l.replace(/^\s*[-•]\s*/, "").trim().replace(/\.$/, ""))
+    .filter(l => l && !/capable de\s*:?$/i.test(l) && !/^à l'issue/i.test(l));
+  const generiques = (evalData.competences || []).every(c => /comp[ée]tence (technique|transversale)\s*\d/i.test(c));
+  const competencesGrille = isPaieGrille ? PAIE_MODULES : isSecretariatGrille ? SECRETARIAT_MODULES
+    : (generiques || !(evalData.competences || []).length) && depuisObjectifs.length ? depuisObjectifs : evalData.competences;
 
-  const rows = competencesGrille.map((comp) => {
-    return termine ? [comp, 'X', '', ''] : [comp, '', '', ''];
+  // Niveau calculé depuis la note obtenue par compétence (≥ 8 acquis, 5-7 en cours, ≤ 4 non acquis).
+  const rows = competencesGrille.map((comp, ci) => {
+    if (!termine) return [comp, '', '', ''];
+    const note = sc[ci % sc.length] ?? 7;
+    return note >= 8 ? [comp, 'X', '', ''] : note >= 5 ? [comp, '', '', 'X'] : [comp, '', 'X', ''];
   });
 
 

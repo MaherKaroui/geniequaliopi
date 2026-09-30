@@ -310,7 +310,7 @@ export function buildFullCatalog(
           add(`af_c3i16_convocation_certification_${fi}_${si}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
         });
         stagiaires.forEach((s, si) => {
-          add(`af_c3i16_pv_examen_${fi}_${si}`, `CT3 - IND 16 PROCÈS-VERBAL D'EXAMEN – ${s.prenom} ${s.nom}`, 3, 16, "pv_examen_certification", { fi, stagiaireIdx: si });
+          add(`af_c3i16_pv_examen_${fi}_${si}`, `CT3 - IND 16 SUIVI DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "pv_examen_certification", { fi, stagiaireIdx: si });
         });
         stagiaires.forEach((s, si) => {
           add(`af_c3i16_attestation_presentation_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "attestation_presentation_certification", { fi, stagiaireIdx: si });
