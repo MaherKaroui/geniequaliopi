@@ -982,7 +982,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
-    // === CFA — Gaps Qualiopi audit (Dreamers Team) ===
+    // === CFA — pièces complémentaires audit Qualiopi ===
     case "grille_competences_alternance_cfa": return genGrilleCompetencesAlternanceCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "qcm_14_missions_cfa": return genQCM14MissionsCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "attestation_remise_livret_sst_cfa": return genAttestationLivretSSTCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -4760,38 +4760,63 @@ function genRapportAmelioration(o: OrganismeInfo) {
 
 // ============== CFA / APPRENTISSAGE ==============
 
+/**
+ * Date du conseil de perfectionnement : 5 mois après le démarrage de la session.
+ * Jamais inventée pour un organisme donné ; `tenu` = la date est passée.
+ */
+function dateConseilPerfectionnement(f: FormationInfo): { iso: string; tenu: boolean } {
+  const base = f.dateDebut ? new Date(f.dateDebut + "T00:00:00") : null;
+  const d = base && !isNaN(base.getTime()) ? base : new Date();
+  const r = new Date(d);
+  if (base) r.setMonth(r.getMonth() + 5);
+  // Jamais un samedi / dimanche
+  while (r.getDay() === 0 || r.getDay() === 6) r.setDate(r.getDate() + 1);
+  const iso = `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, "0")}-${String(r.getDate()).padStart(2, "0")}`;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return { iso, tenu: r.getTime() <= today.getTime() };
+}
+
+function compositionConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const rows: string[][] = [
+    [o.dirigeant || "Direction", "Directeur du CFA — président", "Direction"],
+    [o.responsablePedagogique || o.dirigeant || "", "Responsable pédagogique", "Équipe pédagogique"],
+    [f.formateur || o.responsablePedagogique || "", "Formateur", "Équipe pédagogique"],
+    [o.referentHandicap || o.dirigeant || "", "Référent handicap", "Personnel dédié (IND 20)"],
+    [o.referentMobilite || o.dirigeant || "", "Référent mobilité nationale et internationale", "Personnel dédié (IND 20)"],
+    ...stagiaires.filter((s) => s.nom).slice(0, 2).map((s) => [`${s.prenom || ""} ${s.nom}`.trim(), "Représentant des apprentis", "Apprentis"]),
+    ...Array.from(new Set(stagiaires.map((s) => (s.entreprise || "").trim()).filter(Boolean))).slice(0, 2).map((e) => [e, "Représentant d'une entreprise d'accueil", "Entreprises"]),
+  ];
+  return tableHTML(["Membre", "Qualité", "Collège"], rows);
+}
+
 function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const now = new Date();
-  const isDreamers = /dreamers/i.test(o.nom || "");
-  const dateReunion = isDreamers ? formatDate("2026-07-01") : (f.dateDebut ? (() => {
-    const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 5);
-    return formatDate(d.toISOString().slice(0, 10));
-  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10)));
-
-
-  return buildDocument({ org: o, title: "PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
-    { heading: "1. Objet", content: `<p>Le présent document constate la <strong>programmation du Conseil de Perfectionnement</strong> du CFA ${o.nom}, fixé au <strong>${dateReunion}</strong>.</p>` },
-    { heading: "2. Participants pressentis", content: `<ul><li>${o.dirigeant || "M. le Directeur"} – Directeur du CFA</li>${o.responsablePedagogique ? `<li>${o.responsablePedagogique} – Responsable pédagogique</li>` : ""}${o.referentHandicap ? `<li>${o.referentHandicap} – Référent Handicap</li>` : ""}${o.referentQualite ? `<li>${o.referentQualite} – Référent Qualité</li>` : ""}${stagiaires.filter(s => s.nom).slice(0, 2).map(s => `<li>${s.prenom || ""} ${s.nom} – Représentant des apprenants</li>`).join("")}</ul>` },
-    { heading: "3. Ordre du jour prévisionnel", content: `<ol><li>Bilan de rentrée ${now.getFullYear()} (effectifs, intégration des apprentis).</li><li>Analyse du suivi pédagogique et administratif.</li><li>Taux d'assiduité et suivi qualité.</li><li>Prévention des abandons et accompagnement.</li><li>Suivi des apprentis en situation de handicap.</li><li>Relations CFA – entreprises d'accueil.</li><li>Préparation des examens et certification.</li><li>Questions diverses.</li></ol>` },
-    { heading: "4. Conclusion", content: `<p>Le Conseil de Perfectionnement est <strong>prévu à la date du ${dateReunion}</strong>.<br>Un <strong>procès-verbal détaillé des échanges et décisions</strong> sera rédigé et validé à l'issue de la réunion.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Secrétaire de séance"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""], dates: (() => { const d = new Date(isDreamers ? "2026-07-01" : (f.dateDebut || new Date().toISOString().slice(0,10))); if (!isDreamers) d.setMonth(d.getMonth() + 5); d.setMonth(d.getMonth() - 1); const s = formatDate(d.toISOString().slice(0,10)); return [s, s]; })() } });
+  const { iso, tenu } = dateConseilPerfectionnement(f);
+  const dateReunion = formatDate(iso);
+  const today = new Date().toISOString().slice(0, 10);
+  // Programmation signée un mois avant la réunion, jamais dans le futur.
+  const prog = new Date(iso + "T00:00:00"); prog.setMonth(prog.getMonth() - 1);
+  const progIso = prog.toISOString().slice(0, 10);
+  const dateSignature = formatDate(tenu ? iso : (progIso < today ? progIso : today));
+  const composition = compositionConseilPerfectionnement(o, f, stagiaires);
+  if (!tenu) {
+    return buildDocument({ org: o, title: "PROGRAMMATION DU CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
+      { heading: "1. Objet", content: `<p>Le présent document constate la <strong>programmation</strong> du conseil de perfectionnement du CFA ${o.nom}, fixé au <strong>${dateReunion}</strong>. Le procès-verbal des échanges et décisions sera établi à l'issue de la réunion.</p>` },
+      { heading: "2. Composition", content: composition },
+      { heading: "3. Ordre du jour prévisionnel", content: `<ol><li>Effectifs et intégration des apprentis.</li><li>Suivi pédagogique, assiduité, prévention des ruptures.</li><li>Résultats de l'évaluation des contenus et des enseignements par les apprentis (IND 33).</li><li>Analyse des risques qualité et tableau d'amélioration continue (IND 32).</li><li>Apprentis en situation de handicap, mobilité.</li><li>Relations CFA – entreprises d'accueil.</li><li>Préparation de la certification.</li><li>Questions diverses.</li></ol>` },
+    ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Responsable pédagogique"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""], dates: [dateSignature, dateSignature] } });
+  }
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", subtitle: `${o.nom} — séance du ${dateReunion}`, sections: [
+    { heading: "1. Composition et présents", content: composition },
+    { heading: "2. Points examinés", content: `<ol><li>Effectifs de la promotion ${f.intitule} : ${stagiaires.filter((s) => s.nom).length} apprenti(s).</li><li>Suivi pédagogique, assiduité et prévention des ruptures.</li><li>Évaluation des contenus et des enseignements par les apprentis (IND 33) : synthèse présentée par le responsable pédagogique.</li><li>Analyse des risques qualité (IND 32) : revue de la cartographie.</li><li>Accueil des apprentis en situation de handicap et mobilité.</li><li>Relations avec les entreprises d'accueil et préparation de la certification.</li></ol>` },
+    { heading: "3. Décisions", content: `<ul><li>Les actions issues de l'évaluation des enseignements sont inscrites au tableau d'amélioration continue, avec pilote et échéance.</li><li>La cartographie des risques qualité est validée ; les risques « élevés » font l'objet d'un suivi trimestriel.</li><li>Prochaine réunion : dans un délai maximal de 12 mois.</li></ul>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Secrétaire de séance"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""], dates: [dateSignature, dateSignature] } });
 }
 
 function genConvocationConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const now = new Date();
-  const isDreamers = /dreamers/i.test(o.nom || "");
-  const dateReunion = isDreamers ? formatDate("2026-07-01") : (f.dateDebut ? (() => {
-    const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 5);
-    return formatDate(d.toISOString().slice(0, 10));
-  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10)));
-  const dateLimite = isDreamers ? formatDate("2026-06-15") : (f.dateDebut ? (() => {
-    const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 4);
-    d.setDate(d.getDate() + 15);
-    return formatDate(d.toISOString().slice(0, 10));
-  })() : "");
+  const { iso } = dateConseilPerfectionnement(f);
+  const dateReunion = formatDate(iso);
+  const lim = new Date(iso + "T00:00:00"); lim.setDate(lim.getDate() - 15);
+  const dateLimite = formatDate(lim.toISOString().slice(0, 10));
 
   const lieu = `${o.adresse || ""}${o.codePostal ? `, ${o.codePostal}` : ""}${o.ville ? ` ${o.ville}` : ""}`.trim() || o.nom;
 
@@ -5120,28 +5145,27 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const lowerF = (f.intitule || "").toLowerCase();
   const isNTC = lowerF.includes("négociateur") || lowerF.includes("technico-commercial") || lowerF.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
 
-  const termineRes = isFormationTerminee(f, validStagiaires);
-  const baseRows: string[][] = termineRes ? [
-    ["Taux de réussite à la certification", "100%", "100%", `${nbStagiaires} ${nbStagiaires > 1 ? "apprentis certifiés" : "apprenti certifié"} sur ${nbStagiaires}`],
-    ["Taux de satisfaction global des apprentis", "100%", "≥ 95%", "Enquête de fin de formation – note moyenne 10/10"],
-    ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation à 6 mois"],
-    ["Taux de rupture de contrat d'apprentissage", "0%", "< 5%", "Aucune rupture sur la promotion"],
-    ["Taux de poursuite d'études", "32%", "35%", "Orientation post-diplôme"],
-    ["Nombre d'apprentis formés", String(nbStagiaires), String(nbStagiaires + 1), `Effectif réel de la promotion ${annee}`],
-    ["Taux de présence moyen", "100%", "100%", "Suivi assiduité – émargements complets"],
-    ["Taux de retour enquêtes", "100%", "≥ 90%", "Tous les apprentis ont répondu"],
-    ["Taux d'abandon", "0%", "< 3%", "Aucun abandon constaté"],
-  ] : [
-    ["Taux de réussite à la certification", "En cours", "100%", "Disponible à l'issue des examens"],
-    ["Taux de satisfaction global des apprentis", "En cours", "≥ 95%", "Enquête de fin de formation à administrer"],
-    ["Taux d'insertion professionnelle à 6 mois", "En cours", "88%", "Mesuré 6 mois après la sortie de formation"],
-    ["Taux de rupture de contrat d'apprentissage", "0% (à date)", "< 5%", "Aucune rupture à ce jour"],
-    ["Taux de poursuite d'études", "En cours", "35%", "Mesuré post-diplôme"],
-    ["Nombre d'apprentis inscrits", String(nbStagiaires), String(nbStagiaires + 1), `Promotion ${annee} en cours`],
-    ["Taux de présence moyen", "En cours", "100%", "Suivi assiduité en cours – émargements en cours de remplissage"],
-    ["Taux de retour enquêtes", "En cours", "≥ 90%", "Enquête à administrer en fin de formation"],
-    ["Taux d'abandon", "0% (à date)", "< 3%", "Aucun abandon constaté à ce jour"],
+  // Indicateurs calculés UNIQUEMENT à partir des données saisies (étape Formation) :
+  // aucune valeur n'est inventée. À défaut : « Non disponible — première cohorte ».
+  const num = (v?: string) => { const n = parseFloat(String(v ?? "").replace(",", ".").replace(/[^\d.]/g, "")); return isNaN(n) ? null : n; };
+  const pct = (v?: string) => { const n = num(v); return n === null ? null : `${Math.round(n)} %`; };
+  const ND = "Non disponible — première cohorte";
+  const nbPres = num(f.nbPresentesCertification);
+  const nbAdmis = num(f.nbAdmisCertification);
+  const tauxReussite = nbPres && nbAdmis !== null ? `${Math.round((nbAdmis / nbPres) * 100)} %` : null;
+  const anneeInd = (f.anneeIndicateurs || "").trim() || String(annee);
+  const effectif = num(f.nombreStagiairesFormes);
+  const baseRows: string[][] = [
+    ["Taux d'obtention de la certification (art. L.6111-8)", tauxReussite || ND, "≥ 80 %", tauxReussite ? `${nbAdmis} admis sur ${nbPres} présentés (${anneeInd})` : "Aucun apprenti présenté à la certification à ce jour"],
+    ["Taux de poursuite d'études (art. L.6111-8)", ND, "Suivi", "Mesuré après la sortie de formation — publié via InserJeunes"],
+    ["Taux d'interruption en cours de formation (art. L.6111-8)", ND, "< 15 %", "Registre des ruptures ; publié via InserJeunes"],
+    ["Taux d'insertion professionnelle des sortants (art. L.6111-8)", ND, "Suivi", "Enquête à 6 mois après la sortie — publié via InserJeunes"],
+    ["Valeur ajoutée de l'établissement (art. L.6111-8)", ND, "—", "Calculée par l'État à partir des données InserJeunes"],
+    ["Taux de satisfaction des apprentis", pct(f.tauxSatisfaction) || ND, "≥ 90 %", f.tauxSatisfaction ? `${f.nombreAvisSatisfaction ? f.nombreAvisSatisfaction + " avis — " : ""}questionnaires de fin de formation (${anneeInd})` : "Questionnaire administré en fin de formation"],
+    ["Taux d'assiduité", pct(f.tauxAssiduite) || ND, "≥ 95 %", f.tauxAssiduite ? `Émargements (${anneeInd})` : "Calculé à partir des émargements"],
+    [effectif !== null ? "Nombre d'apprentis formés" : "Nombre d'apprentis inscrits dans ce dossier", String(effectif ?? nbStagiaires), "—", effectif !== null ? `Année ${anneeInd}` : `Promotion ${annee}${isFormationTerminee(f, validStagiaires) ? "" : " en cours"}`],
   ];
+  if ((f.commentaireIndicateurs || "").trim()) baseRows.push(["Commentaire", "—", "—", f.commentaireIndicateurs!.trim()]);
 
   const nationalRows: string[][] = isNTC ? [
     ["Taux national d'insertion professionnelle à 6 mois (InserJeunes)", "50%", "—", "Donnée nationale Ministère de l'Éducation nationale / France Compétences (TH5 T)"],
@@ -5160,7 +5184,7 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
     { heading: "1. Objet", content: `<p>Ce document présente les indicateurs de résultats du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>, conformément aux exigences du Référentiel National Qualité (indicateur 2). Effectif de la promotion : <strong>${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"}</strong>.</p>` },
     indicateursSection,
     { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs${isNTC ? "<br>• <strong>Comparaison nationale</strong> : taux nationaux publiés par InserJeunes (Ministère de l'Éducation nationale / France Compétences)" : ""}</p>` },
-    { heading: "4. Actions d'amélioration engagées", content: `<p>• Renforcement de l'accompagnement individuel pour réduire les ruptures<br>• Mise en place d'examens blancs supplémentaires pour améliorer le taux de réussite<br>• Développement du réseau d'entreprises partenaires pour favoriser l'insertion<br>• Amélioration de la plateforme pédagogique en ligne</p>`, variant: "green" },
+    { heading: "4. Exploitation des résultats", content: `<p>Les résultats sont analysés chaque année en conseil de perfectionnement ; tout indicateur sous son objectif donne lieu à une action inscrite au tableau d'amélioration continue (IND 32). Les indicateurs réglementaires de l'article L.6111-8 du Code du travail sont publiés par l'État sur le portail InserJeunes (<a href="https://www.inserjeunes.education.gouv.fr" target="_blank">inserjeunes.education.gouv.fr</a>) dès la première cohorte sortie.</p>`, variant: "green" },
     { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• ${isFacebookPage(o.siteWeb) ? 'La page Facebook' : 'Le site internet'} du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
     ...(sourceSection ? [sourceSection] : []),
   ] });
@@ -8588,7 +8612,7 @@ ${mc.isDist ? `<h4>Comportement en classe virtuelle</h4><p>Les apprenants adopte
   ],
     ...((s.nom || s.prenom)
       ? { signatures: { type: "2" as const, labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } }
-      : { extraHtml: `<div style="margin-top:40px;text-align:center;width:50%"><p><strong>Le Directeur du CFA</strong></p><p>${o.dirigeant || '___'}</p><p>Date : ${dateSignature}</p><div style="min-height:80px;position:relative">${/dreamers/i.test(o.nom || "") && o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:90px" />` : ""}</div></div>` })
+      : { extraHtml: `<div style="margin-top:40px;text-align:center;width:50%"><p><strong>Le Directeur du CFA</strong></p><p>${o.dirigeant || '___'}</p><p>Date : ${dateSignature}</p><div style="min-height:80px;position:relative">${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:90px" />` : ""}</div></div>` })
   });
 }
 
