@@ -1041,7 +1041,7 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
     formateurSignatureUrl,
     responsableEntrepriseSignatureUrl,
   };
-  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const fallbackDate = docRefDateISO ? formatDate(docRefDateISO) : new Date().toLocaleDateString("fr-FR");
   const d1 = dates?.[0] || fallbackDate;
   const d2 = dates?.[1] || d1;
   const d3 = dates?.[2] || d1;
@@ -1065,7 +1065,7 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   };
   const sig1Html = resolveSignature(label1, nom1, urls);
   const sig2Html = resolveSignature(label2, nom2, urls);
-  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const fallbackDate = docRefDateISO ? formatDate(docRefDateISO) : new Date().toLocaleDateString("fr-FR");
   // If dates is explicitly provided with empty strings, omit the Date line
   const hideDate1 = dates !== undefined && (dates[0] === "" || dates[0] === null);
   const hideDate2 = dates !== undefined && (dates[1] === "" || dates[1] === null);
@@ -1150,7 +1150,9 @@ export function buildDocument(config: DocBuildConfig): string {
     let sigDates = config.signatures.dates;
     if (!sigDates || sigDates.length === 0) {
       const refDate = firstStagiaire?.dateDebutFormation || config.formation?.dateDebut || "";
-      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : new Date().toLocaleDateString("fr-FR");
+      // Document de système qualité (sans session) : daté de la date de MAJ du dossier (V1), jamais du jour.
+      const dateSysteme = (config.org?.dateMaj || "").trim() || docRefDateISO || "";
+      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : (dateSysteme ? formatDate(dateSysteme) : new Date().toLocaleDateString("fr-FR"));
       sigDates = [computedDate, computedDate];
     }
     if (config.signatures.type === "3") {

@@ -209,8 +209,10 @@ function stripEmojis(html: string): string {
   html = html.replace(/[\u{1F300}-\u{1F5FF}]/gu, '');
   html = html.replace(/[\u{1F680}-\u{1F6FF}]/gu, '');
   html = html.replace(/[\u{1F900}-\u{1F9FF}]/gu, '');
-  html = html.replace(/[\u{2600}-\u{26FF}]/gu, '');
-  html = html.replace(/[\u{2700}-\u{27BF}]/gu, '');
+  // Symboles divers : on conserve les cases à cocher (☐ ☑ ☒), les étoiles des tampons (★ ☆)
+  // et les coches (✓ ✔ ✗ ✘), qui portent du sens dans les documents (cases cochées, cachets).
+  const GARDER = new Set(["☐", "☑", "☒", "★", "☆", "✓", "✔", "✕", "✖", "✗", "✘"]);
+  html = html.replace(/[\u{2600}-\u{27BF}]/gu, (c) => (GARDER.has(c) ? c : ""));
   return html;
 }
 
@@ -3645,7 +3647,11 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
 
     extra += `<p><strong>Réponse du stagiaire :</strong> ${ans.reponse}</p>`;
-    if ((q as any).reponseAttendue) extra += `<p style="color:#475569"><strong>Corrigé / éléments attendus :</strong> ${(q as any).reponseAttendue}</p>`;
+    // Corrigé affiché seulement pour une question de connaissances : une réponse modèle écrite
+    // à la 1re personne (vécu, attentes) n'est pas un corrigé et ferait doublon avec la réponse.
+    const attendu = String((q as any).reponseAttendue || "").trim();
+    if (attendu && !/^(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/.test(attendu)) extra += `<p style="color:#475569"><strong>Corrigé / éléments attendus :</strong> ${attendu}</p>`;
+    else if (attendu) extra += `<p style="color:#475569"><strong>Éléments d'appréciation :</strong> question de positionnement sans réponse type ; le formateur apprécie la précision, les exemples donnés et le lien avec le projet du stagiaire.</p>`;
     extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
   });

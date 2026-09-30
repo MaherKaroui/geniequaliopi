@@ -43,7 +43,6 @@ export function construireMatrice(): Cas[] {
       for (const [im, modalite] of modalites.entries()) {
         for (const [ic, cal] of cals.entries()) {
           // Échantillonnage déterministe : on garde environ la moitié des combinaisons, en couvrant chaque valeur.
-          if ((im + ic + n) % 2 === 1 && !(im === 0 && ic === 0)) { n++; continue; }
           n++;
           const d = dates(cal, type);
           const f: FormationInfo = {
@@ -97,6 +96,7 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
   const presentiel = /pr[ée]sentiel/i.test(c.f.modalites) && !/mixte|distanciel/i.test(c.f.modalites);
   const distanciel = /distanciel/i.test(c.f.modalites);
   const evalBesoins: Record<number, string> = {};
+  const chrono: Record<number, { analyse?: Date | null; contrat?: Date | null; convoc?: Date | null }> = {};
   const add = (regle: string, d: DocEntry, ex: string) => v.push({ cas: c.id, regle, doc: d.nom, template: d.template, extrait: ex });
 
   for (const d of cat) {
@@ -111,7 +111,7 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
     const t = texte(html);
     for (const re of TROUS) if (re.test(t)) add("trou", d, extrait(t, re));
     // Un organisme sans certificat ne peut pas se dire « certifié Qualiopi ».
-    if (!(c.org.numeroCertificatQualiopi || "").trim() && /(organisme|est|sommes|CERTIFIÉ)\s+(de formation\s+)?certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i.test(t)) add("qualiopi-non-certifie", d, extrait(t, /certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i));
+    if (!/quiz/i.test(d.id) && !(c.org.numeroCertificatQualiopi || "").trim() && /(organisme|est|sommes|CERTIFIÉ)\s+(de formation\s+)?certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i.test(t)) add("qualiopi-non-certifie", d, extrait(t, /certifié\s+Qualiopi|CERTIFIÉ QUALIOPI/i));
     for (const f of FUITES) if (t.includes(f)) {
       // Les noms de certification officiels (fiche RS5637 VTC) ne sont pas des fuites quand la formation est VTC.
       if (/VTC|RS5637/.test(f) && /RS5637/.test(c.f.codeRNCP || "")) continue;
@@ -119,6 +119,13 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
     }
     const si = typeof d.params?.stagiaireIdx === "number" ? (d.params!.stagiaireIdx as number) : -1;
     const s = si >= 0 ? effectifs[si] : undefined;
+    if (s && c.type === "actions-formation") {
+      const dt = (re: RegExp) => { const m = t.match(re); if (!m) return null; const [j, mo, a] = m[1].split("/").map(Number); return new Date(a, mo - 1, j); };
+      const ch = (chrono[si] = chrono[si] || {});
+      if (/trame_eval_besoins/.test(d.template)) ch.analyse = dt(/Date d'analyse : (\d{2}\/\d{2}\/\d{4})/) || ch.analyse;
+      if (/contrat_formation|convention_formation/.test(d.template)) ch.contrat = dt(/Fait à [^,]+, le : (\d{2}\/\d{2}\/\d{4})/) || ch.contrat;
+      if (/convocation_stagiaire/.test(d.template)) ch.convoc = dt(/Fait à [^,]+, le : (\d{2}\/\d{2}\/\d{4})/) || ch.convoc;
+    }
     if (s) {
       // Financement : rien de CPF pour une formation non certifiante.
       if (c.type === "actions-formation" && !certifiante && /\bCPF\b|Mon Compte Formation/i.test(t) && !/non (éligible|eligible)|pas (éligible|eligible)|hors CPF|n'est pas éligible/i.test(t)) add("cpf-non-certifiant", d, extrait(t, /\bCPF\b|Mon Compte Formation/i));
@@ -133,13 +140,21 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
       if (s.rqth !== "oui" && /RQTH\s*:\s*Oui/i.test(t)) add("rqth-contradiction", d, extrait(t, /RQTH\s*:\s*Oui/i));
       if (/eval_besoins|evaluation_besoins|analyse_besoin/i.test(d.template)) evalBesoins[si] = (evalBesoins[si] || "") + t.replace(new RegExp(`${s.nom}|${s.prenom}|Madame|Monsieur|Mme|M\\.`, "g"), "");
       // Mineur (CFA).
-      if (c.type === "apprentissage" && /cerfa|contrat_apprentissage|convention/i.test(d.template) && /2009/.test(s.dateNaissance || "") && !/représentant légal|representant legal|responsable légal/i.test(t)) add("mineur-sans-representant", d, d.nom);
+      if (c.type === "apprentissage" && /contrat_apprentissage|convention/i.test(d.template) && /2009/.test(s.dateNaissance || "") && !/représentant légal|representant legal|responsable légal/i.test(t)) add("mineur-sans-representant", d, d.nom);
     }
     // Modalité.
     if (presentiel && /convocation|programme/i.test(d.template) && /classe virtuelle|Google Meet|Zoom/i.test(t) && !/ou à distance|mixte/i.test(t)) add("modalite-presentiel", d, extrait(t, /classe virtuelle|Google Meet|Zoom/i));
     if (distanciel && !/mixte/i.test(c.f.modalites) && /convocation/i.test(d.template) && /salle de formation|se présenter à l'accueil/i.test(t)) add("modalite-distanciel", d, extrait(t, /salle de formation|se présenter à l'accueil/i));
     // Pièces d'exécution d'une session future : aucune date passée de réalisation ni résultat.
     if (c.tags.includes("future") && PIECE_EXECUTION.test(d.template) && /\b(ADMIS|Acquis|Présent|Signé le)\b/.test(t) && !/à venir|n'est pas émis|sera (établi|complété|renseigné)|à compléter|avant la réalisation/i.test(t)) add("execution-future-remplie", d, extrait(t, /\b(ADMIS|Acquis|Présent|Signé le)\b/));
+  }
+  // Chronologie AF : analyse des besoins ≤ contrat/convention ≤ convocation ≤ début.
+  for (const [si, ch] of Object.entries(chrono)) {
+    const fmt = (d?: Date | null) => (d ? d.toLocaleDateString("fr-FR") : "?");
+    if (ch.analyse && ch.contrat && ch.analyse > ch.contrat) v.push({ cas: c.id, regle: "chronologie", doc: `stagiaire ${si}`, template: "analyse>contrat", extrait: `analyse ${fmt(ch.analyse)} > contrat ${fmt(ch.contrat)}` });
+    if (ch.contrat && ch.convoc && ch.contrat > ch.convoc) v.push({ cas: c.id, regle: "chronologie", doc: `stagiaire ${si}`, template: "contrat>convocation", extrait: `contrat ${fmt(ch.contrat)} > convocation ${fmt(ch.convoc)}` });
+    const debut = new Date(`${(c.stagiaires[+si].dateDebutFormation || c.f.dateDebut)}T00:00:00`);
+    if (ch.convoc && ch.convoc > debut) v.push({ cas: c.id, regle: "chronologie", doc: `stagiaire ${si}`, template: "convocation>debut", extrait: `convocation ${fmt(ch.convoc)} > début ${fmt(debut)}` });
   }
   // Réponses différentes d'un stagiaire à l'autre.
   const vals = Object.entries(evalBesoins);
