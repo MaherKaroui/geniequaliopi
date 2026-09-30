@@ -4843,7 +4843,7 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
 function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "", signatureUrl: "" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
-  const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
+  const respEntreprise = (s as any).responsableEntreprise || "son représentant légal";
   const dateDebut = formatDate(getStagiaireDateDebut(s as StagiaireInfo, f));
   const dateFin = formatDate(getStagiaireDateFin(s as StagiaireInfo, f));
   const duree = getStagiaireDuree(s as StagiaireInfo, f);
@@ -7054,12 +7054,12 @@ function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 <li><strong>Dates de la formation :</strong> ${dateDebut} au ${dateFin}</li>
 <li><strong>Durée totale :</strong> ${dureeTotal}</li>
 <li><strong>Rythme d'alternance :</strong> ${(f as any).rythmeAlternance || '1 semaine à l\'école / 3 semaines en entreprise'}</li>
-<li><strong>Horaires :</strong> 9h à 12h et 13h à 17h</li>
+<li><strong>Horaires (jours au CFA) :</strong> 09h00 – 12h30 et 13h30 – 17h00</li>
 </ul>` },
 
     { heading: "DOCUMENTS À APPORTER", content: `<p>Le jour de votre entrée en formation, merci de vous munir des documents suivants :</p><ul><li>Une pièce d'identité en cours de validité</li><li>Un carnet et de quoi prendre des notes</li><li>Votre contrat d'apprentissage ou de professionnalisation (si disponible)</li></ul><p>Nous vous remercions de vous présenter le premier jour de formation à l'heure précise indiquée et de respecter l'ensemble des consignes transmises par le CFA.</p>` },
 
-    { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Référente administrative :</strong> ${o.dirigeant || '___'}</li></ul><p>${o.email || '___'} | ${o.telephone || '___'}</p>` },
+    { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Pôle administratif :</strong> ${o.poleAdministratif || o.dirigeant || '___'}</li></ul><p>${o.email || ''}${o.telephone?.trim() ? ` | ${o.telephone}` : ''}</p>` },
 
     { heading: "INFORMATIONS SUR L'ORGANISME", content: `<p><strong>Nom :</strong> ${o.nom}<br><strong>Adresse :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}<br><strong>SIRET :</strong> ${o.siret || '___'}<br><strong>Email :</strong> ${o.email || '___'}${o.telephone?.trim() ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}${o.nda ? `<br><strong>N° déclaration d'activité :</strong> ${o.nda}` : ""}</p>` },
   ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
@@ -7176,10 +7176,19 @@ function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 }
 
 
+/** Apprenti mineur à la date de début de son contrat. */
+function estMineurAuDebut(s: StagiaireInfo, f: FormationInfo): boolean {
+  const n = new Date(`${(s.dateNaissance || "").slice(0, 10)}T00:00:00`);
+  const d = new Date(`${(getStagiaireDateDebut(s, f) || "").slice(0, 10)}T00:00:00`);
+  if (isNaN(n.getTime()) || isNaN(d.getTime())) return false;
+  const age = d.getFullYear() - n.getFullYear() - (d < new Date(d.getFullYear(), n.getMonth(), n.getDate()) ? 1 : 0);
+  return age < 18;
+}
+
 function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
-  const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
+  const respEntreprise = (s as any).responsableEntreprise || "son représentant légal";
   const mc = getModaliteContent(f, o);
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
@@ -7187,9 +7196,9 @@ function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaire
   const montant = getStagiaireTarif(s, f) || f.tarif || "8 000";
   const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
   return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", formation: f, showFormationInfo: false, sections: [
-    { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? `<br>Numéro de déclaration à la Préfecture : ${o.nda}` : ""}<br></p><p><strong>${entreprise}</strong><br>Adresse : ${s.adresseEntreprise || "________________________"}<br>SIRET : ${s.siretEntreprise || "________________________"}<br>représenté(e) par <strong>${respEntreprise}</strong>,</p><p><strong>${s.prenom} ${s.nom}</strong><br>Adresse : ${(s as any).adresse || "________________________"}<br>Code postal : ${(s as any).codePostal || "________________________"}<br>Commune : ${(s as any).commune || "________________________"}<br></p><p>CI-APRÈS DÉNOMMÉ(E) LE BÉNÉFICIAIRE,</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
-    { heading: "Article 1er : Objet de la convention", content: `<p>Le ${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Lieu de formation :</strong> ${mc.lieuFormation}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}<br><strong>Adresse stagiaire :</strong> ${(s as any).adresse || "________________________"}${(s as any).codePostal || (s as any).commune ? `, ${(s as any).codePostal || ""} ${(s as any).commune || ""}`.trim() : ""}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
-    { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${mc.modaliteLabel}</p><p><strong>Modalités de suivi :</strong></p><ul>${mc.isDist ? '<li>Suivi des temps de connexion sur la plateforme e-learning</li><li>Progression pédagogique et participation aux classes virtuelles</li>' : '<li>Feuille d\'émargement</li>'}${mc.isMixte ? '<li>Suivi des temps de connexion pour les sessions à distance</li>' : ''}<li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention du titre :</strong></p><p>Présentation à l'examen en vue de l'obtention d'un titre professionnel</p>` },
+    { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? `<br>Numéro de déclaration à la Préfecture : ${o.nda}` : ""}<br></p><p><strong>${entreprise}</strong><br>Adresse : ${s.adresseEntreprise || "________________________"}<br>SIRET : ${s.siretEntreprise || "________________________"}<br>représentée par <strong>${respEntreprise}</strong>,</p><p>CI-APRÈS DÉNOMMÉE L'EMPLOYEUR,</p><p>au bénéfice de l'apprenti(e) <strong>${s.prenom} ${s.nom}</strong><br>Adresse : ${(s as any).adresse || "________________________"}<br>Code postal : ${(s as any).codePostal || "________________________"}<br>Commune : ${(s as any).commune || "________________________"}${estMineurAuDebut(s, f) ? `<br><strong>Apprenti(e) mineur(e)</strong> – représenté(e) par son représentant légal : ________________________ (nom, adresse, qualité), qui signe également la présente convention.` : ""}</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
+    { heading: "Article 1er : Objet de la convention", content: `<p>${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Lieu de formation :</strong> ${mc.lieuFormation}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}<br><strong>Adresse stagiaire :</strong> ${(s as any).adresse || "________________________"}${(s as any).codePostal || (s as any).commune ? `, ${(s as any).codePostal || ""} ${(s as any).commune || ""}`.trim() : ""}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
+    { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${mc.modaliteLabel}</p><p><strong>Modalités de suivi :</strong></p><ul>${mc.isDist ? '<li>Suivi des temps de connexion sur la plateforme e-learning</li><li>Progression pédagogique et participation aux classes virtuelles</li>' : '<li>Feuille d\'émargement</li>'}${mc.isMixte ? '<li>Suivi des temps de connexion pour les sessions à distance</li>' : ''}<li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention de la certification :</strong></p><p>${/^TP|titre professionnel/i.test(f.intitule) ? "Présentation à la session de validation en vue de l'obtention du titre professionnel" : "Présentation aux épreuves de la certification"}${f.codeRNCP ? ` ${f.codeRNCP}` : ""}, selon le règlement du certificateur.</p>` },
     { heading: "Article 3 : Dispositions financières", content: `<p><strong>Rappel :</strong> gratuité de la formation pour l'apprenti et son représentant légal, le cas échéant, aucune somme ne peut être demandée.</p>
 ${tableHTML(["", "Quantité", "Unité", "Prix unitaire en €", "Montant net en €"], [
   ["Intitulé de l'action de formation", "", "Montant global", "", montant + " €"],
@@ -7207,7 +7216,7 @@ ${tableHTML(["Frais", "Prise en charge"], [
 ])}
 <p style="font-size:11px;color:#666">(Informations à destination de l'OPCO de l'entreprise)</p>` },
     { heading: "Article 5 : Modalités de règlement", content: `<p>En cas de reste à charge de l'entreprise : par chèque ou virement à réception de facture.</p>` },
-    { heading: "Article 6 : Clause suspensive", content: `<p>L'exécution de la présente convention est soumise à l'enregistrement du contrat par la chambre consulaire ou la Direccte (L 6224-1 du Code du travail). Le contrat d'apprentissage enregistré sera transmis par le CFA à l'OPCO dont relève l'entreprise, pour prise en charge financière.</p>` },
+    { heading: "Article 6 : Clause suspensive", content: `<p>L'exécution de la présente convention est subordonnée au dépôt du contrat d'apprentissage auprès de l'opérateur de compétences (OPCO) dont relève l'employeur (art. L.6224-1 du Code du travail). Le contrat d'apprentissage enregistré sera transmis par le CFA à l'OPCO dont relève l'entreprise, pour prise en charge financière.</p>` },
     { heading: "Article 7 : Engagements des contractants", content: `<p><strong>Engagements de l'organisme de formation :</strong></p><p>${o.nom} s'engage à mettre en œuvre les moyens pédagogiques, matériels et humains nécessaires à la formation, tels qu'ils sont décrits dans le programme de formation joint en annexe. Il se charge d'inscrire le salarié à l'examen, il établit les attestations de présence, sur la base des feuilles de présence émargées par le salarié.</p><p><strong>Engagements de l'entreprise :</strong></p><p>Conformément au principe d'alternance, l'entreprise permet au salarié d'exercer des activités professionnelles en relation avec la qualification préparée. Le salarié en contrat d'apprentissage sera suivi par le maître d'apprentissage désigné. L'entreprise organise le temps de travail du salarié de façon que le programme et le calendrier de formation soient respectés.</p><p><strong>Autorité :</strong> Les stagiaires sont placés sous l'autorité du responsable de l'organisme et sont tenus de respecter le règlement intérieur en vigueur.</p><p><strong>Justificatifs :</strong> Il sera remis une attestation de stage nominative à l'issue de l'action de formation.</p>` },
     { heading: "Article 8 : Résiliation", content: `<p>En cas de dédit par le Bénéficiaire à moins de 15 jours francs avant le début d'une action de formation, ou d'abandon en cours de formation par le stagiaire, ${o.nom} retiendra sur le coût total, les sommes qu'il aura réellement dépensées ou engagées pour la réalisation de ladite action, conformément aux dispositions de l'article L920-9 du Code du Travail.</p>` },
     { heading: "Article 9 : Différends éventuels", content: `<p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le Tribunal compétent réglera le litige.</p>` },
@@ -8287,7 +8296,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>4. En quoi cette formation contribue-t-elle au développement ou aux objectifs stratégiques de votre entreprise ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.contribution}</td></tr></table>
 
-<h3 style="margin-top:20px;color:#1e3a7b">PARTIE EXPÉRIENCE ET SCOLAIRE :</h3>
+<h3 style="margin-top:20px;color:#1e3a7b">PARCOURS ET PROJET :</h3>
 
 <p><strong>1. Quel est le dernier diplôme ou titre que vous avez obtenu ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.diplome}</td></tr></table>
@@ -8316,7 +8325,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 ` });
 }
 
-const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
+const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge des frais pédagogiques par <strong>l'OPCO dont relève l'employeur</strong>, au niveau de prise en charge (NPEC) fixé par la branche, au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
 const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
 /** Formation non certifiante : pas d'éligibilité au CPF, la question ne le propose pas. */
 const QUESTION_FINANCEMENT_NON_CERTIFIANTE = "Quel budget avez-vous prévu pour cette formation et comment la financez-vous (financement personnel, employeur, France Travail) ?";
@@ -8358,7 +8367,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
   return buildDocument({ org: o, title: "Évaluation des besoins – Apprenant", extraHtml: civiliteBlock + `
 <p style="margin-top:14px;font-style:italic;color:#555">Trame d'évaluation des besoins – <strong>Partie Apprenant</strong> (parcours, expérience, projet, financement, accessibilité).</p>
 
-<h3 style="margin-top:20px;color:#1e3a7b">PARTIE EXPÉRIENCE ET SCOLAIRE :</h3>
+<h3 style="margin-top:20px;color:#1e3a7b">PARCOURS ET PROJET :</h3>
 
 <p><strong>1. Quel est le dernier diplôme ou titre que vous avez obtenu ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.diplome}</td></tr></table>
@@ -8599,6 +8608,17 @@ function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
 
 /** Réponse "disponibilités / aménagement horaire" : journée standard 09h-17h. */
 function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
+  // Alternance : la disponibilité découle du rythme d'alternance, pas d'un choix de créneaux.
+  const rythme = (f?.rythmeAlternance || "").trim();
+  if (rythme) {
+    const h = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    const psh = isStagiairePSH(s) ? " Au titre de ma RQTH, je souhaite convenir avec le référent handicap de pauses et de supports adaptés, au CFA comme en entreprise." : "";
+    return [
+      `Je suivrai la formation selon le rythme d'alternance prévu au contrat (${rythme}) : les journées au CFA de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, le reste du temps en entreprise.${psh}`,
+      `Mon planning est celui du calendrier d'alternance (${rythme}), validé avec mon employeur ; je n'ai pas de contrainte horaire particulière les jours de formation.${psh}`,
+      `Le rythme ${rythme} me convient : il me permet d'appliquer rapidement en entreprise ce qui est vu au CFA.${psh}`,
+    ][h % 3];
+  }
   if (f && isVitrageFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getVitrageEvalBesoins(s, false).disponibilites;
   }
@@ -9013,7 +9033,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       diplome: vtcDiplomes[h(2) % vtcDiplomes.length],
       objectif: vtcObjectif[h(7) % vtcObjectif.length],
       budget: hasEntreprise
-        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences."
+        ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
         : "Financement personnel via le CPF (compte personnel de formation) – environ 1 800 € TTC, complété si besoin par un abondement Pôle Emploi/France Travail.",
       projetPro: vtcProjetPro[h(8) % vtcProjetPro.length],
       handicap: vtcHandicap[h(9) % vtcHandicap.length],
@@ -9085,7 +9105,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       diplome: ecsrDiplomes[h(2) % ecsrDiplomes.length],
       objectif: ecsrObjectif[h(7) % ecsrObjectif.length],
       budget: hasEntreprise
-        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences de l'entreprise."
+        ? "Formation prise en charge par l'OPCO au titre du plan de développement des compétences de l'entreprise."
         : "Financement personnel via le CPF (Compte Personnel de Formation) – environ 4 500 € TTC, complété si besoin par un abondement France Travail dans le cadre d'un projet de reconversion professionnelle (PTP / AIF).",
       projetPro: ecsrProjetPro[h(8) % ecsrProjetPro.length],
       handicap: ecsrHandicap[h(9) % ecsrHandicap.length],
@@ -9129,7 +9149,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     ];
     const ntcObjectif = [
       `Obtenir le Titre Professionnel Négociateur Technico-Commercial (RNCP 39063, niveau 5) afin de pouvoir exercer comme commercial BtoB en CDI dans une PME du secteur industriel ou des services.`,
-      `Valider les 2 blocs de compétences du titre (BC1 – Élaborer une stratégie commerciale omnicanale / BC2 – Mettre en œuvre l'action commerciale) pour décrocher un poste d'attaché commercial avec un salaire fixe + variable supérieur à 30 K€ brut/an.`,
+      `Valider les 2 blocs de compétences du titre (BC01 – Élaborer une stratégie de prospection et la mettre en œuvre / BC02 – Négocier une solution technique et commerciale et consolider l'expérience client) pour décrocher un poste d'attaché commercial avec un salaire fixe + variable supérieur à 30 K€ brut/an.`,
       `Me reconvertir vers le métier de commercial terrain : passer d'une fonction sédentaire (téléconseil, accueil) à une activité de prospection et de négociation à forte rémunération variable.`,
       `Sécuriser mon évolution interne : du poste actuel d'assistant commercial vers un poste de négociateur technico-commercial confirmé, avec gestion d'un portefeuille en propre et perspectives de management d'équipe à 3 ans.`,
       `Devenir commercial indépendant (agent commercial inscrit au RSAC) après obtention de la certification, pour représenter plusieurs marques sur un secteur géographique dédié en BtoB.`,

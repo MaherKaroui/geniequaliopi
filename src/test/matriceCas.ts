@@ -137,6 +137,9 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
       // Civilité.
       if (s.civilite === "Mme" && new RegExp(`Monsieur\\s+(${s.nom}|${s.prenom})`, "i").test(t)) add("civilite", d, extrait(t, /Monsieur/));
       if (s.civilite === "M." && new RegExp(`Madame\\s+(${s.nom}|${s.prenom})`, "i").test(t)) add("civilite", d, extrait(t, /Madame/));
+      // Accords au genre du stagiaire concerné.
+      if (s.civilite === "M." && /(apprentie|convoquée|inscrite|l'apprenante|la candidate|la stagiaire)/i.test(t)) add("accord-genre", d, extrait(t, /(apprentie|convoquée|inscrite|l'apprenante|la candidate|la stagiaire)/i));
+      if (s.civilite === "Mme" && /(convoqué|inscrit)(?!e)|l'apprenti|le stagiaire concerné/.test(t) && !/l'apprenti\(e\)/.test(t)) add("accord-genre", d, extrait(t, /(convoqué|inscrit)(?!e)|l'apprenti|le stagiaire concerné/));
       // RQTH.
       if (s.rqth === "oui" && /pas de reconnaissance de handicap|je ne suis pas en situation de handicap|RQTH\s*:\s*Non/i.test(t)) add("rqth-contradiction", d, extrait(t, /pas de reconnaissance de handicap|je ne suis pas en situation de handicap|RQTH\s*:\s*Non/i));
       if (s.rqth !== "oui" && /RQTH\s*:\s*Oui/i.test(t)) add("rqth-contradiction", d, extrait(t, /RQTH\s*:\s*Oui/i));

@@ -1176,7 +1176,8 @@ export function buildDocument(config: DocBuildConfig): string {
   let result = htmlWrap(body);
   // Sans stagiaire désigné, les formes neutres (« le/la », « (e) ») sont laissées à la passe
   // finale de generateDocumentById, qui connaît le stagiaire concerné par le document.
-  if (config.stagiaires && config.stagiaires.length > 0) {
+  // Un seul stagiaire : son genre. Plusieurs : la passe finale choisit le stagiaire concerné.
+  if (config.stagiaires && config.stagiaires.length === 1) {
     result = applyGender(result, config.stagiaires[0]);
   }
   return result;
@@ -1449,7 +1450,10 @@ export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
     ? "Formation à distance – Plateforme e-learning"
     : mixte
     ? `Mixte : ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'} + Plateforme e-learning`
-    : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
+    : (f.lieu && /\d{5}/.test(f.lieu)
+      // Le lieu saisi contient déjà un code postal : on ne répète pas celui de l'organisme.
+      ? f.lieu
+      : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`);
 
   const horaires = dist
     ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : Lun-Ven 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"
