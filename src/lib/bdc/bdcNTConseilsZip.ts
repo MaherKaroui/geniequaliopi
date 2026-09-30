@@ -305,8 +305,8 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
       .replace(/\{CONVENTION_EMPLOYEUR\}/g, tripartite ? `- **${entreprise || "L'employeur"}**, employeur du bénéficiaire${s?.responsableEntreprise ? `, représenté par ${s.responsableEntreprise}` : ""}${s?.siretEntreprise ? ` — SIRET ${s.siretEntreprise}` : ""}\n\nci-après « l'employeur »,\n\n` : "")
       .replace(/\{CONVENTION_ACCORD\}/g, "")
       .replace(/\{CONVENTION_BASE\}/g, tripartite
-        ? "l'article R6313-8 du Code du travail (bilan réalisé dans le cadre du plan de développement des compétences)"
-        : pf?.financeur === "CPF" || pf?.financeur === "France Travail"
+        ? "de l'article R6313-8 du Code du travail (bilan réalisé dans le cadre du plan de développement des compétences)"
+        : pf?.financeur === "CPF"
           ? "des articles L6353-3 à L6353-7 du Code du travail et des conditions générales d'utilisation de Mon Compte Formation"
           : "des articles L6353-3 à L6353-7 du Code du travail")
       .replace(/\{CONVENTION_FINANCEMENT\}/g, financement[pf?.financeur || "CPF"] || financement.CPF)
@@ -704,7 +704,10 @@ function buildFicheAnalyseBesoinMd(
   const objectifsB = pf.resultatAttendu;
   const contraintesH = `Disponible le ${pf.jours.join(", ")}, ${pf.creneaux.map((c) => (c === "apres-midi" ? "après-midi" : c)).join(" et ")}`;
   const contraintesG = pick(["Aucune contrainte particulière", `Déplacements limités à ${org.ville || "la région"}`, "Privilégier le distanciel"], seed, 7);
-  const contraintesP = pick(["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"], seed, 8);
+  // Contraintes cohérentes avec la situation déclarée (pas de « charge professionnelle » sans emploi).
+  const contraintesP = pick(pf.situation === "salarie"
+    ? ["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"]
+    : ["Aucune contrainte particulière", "Organisation familiale à anticiper", "Démarches de recherche d'emploi à concilier"], seed, 8);
   const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);

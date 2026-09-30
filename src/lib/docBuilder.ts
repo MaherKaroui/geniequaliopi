@@ -439,7 +439,7 @@ tr:nth-child(odd){background:#fff}
     simplepro: `
 body{background:#fff;color:#1a1a1a;padding:60px 70px;max-width:880px}
 .header{text-align:center;margin-bottom:48px;padding-bottom:28px;position:relative}
-.header::before{content:"Organisme de formation certifié Qualiopi";display:block;font-size:${s.fontSize - 3}px;color:${s.secondaryColor};letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.header::before{content:"Organisme de formation professionnelle";display:block;font-size:${s.fontSize - 3}px;color:${s.secondaryColor};letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
 .header::after{content:"";display:block;width:64px;height:1px;background:${s.secondaryColor};margin:22px auto 0}
 .header h1{border:none;background:none;padding:0;color:#111;font-family:${s.headingFont};font-weight:600;text-transform:uppercase;letter-spacing:6px;font-size:${s.fontSize + 18}px;line-height:1.15}
 .org-name{font-family:${s.headingFont};font-size:${s.fontSize + 18}px;font-weight:600;letter-spacing:6px;text-transform:uppercase;color:#111;line-height:1.15}
@@ -1058,7 +1058,7 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
     formateurSignatureUrl,
     responsableEntrepriseSignatureUrl,
   };
-  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const fallbackDate = docRefDateISO ? formatDate(docRefDateISO) : new Date().toLocaleDateString("fr-FR");
   const d1 = dates?.[0] || fallbackDate;
   const d2 = dates?.[1] || d1;
   const d3 = dates?.[2] || d1;
@@ -1082,7 +1082,7 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   };
   const sig1Html = resolveSignature(label1, nom1, urls);
   const sig2Html = resolveSignature(label2, nom2, urls);
-  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const fallbackDate = docRefDateISO ? formatDate(docRefDateISO) : new Date().toLocaleDateString("fr-FR");
   // If dates is explicitly provided with empty strings, omit the Date line
   const hideDate1 = dates !== undefined && (dates[0] === "" || dates[0] === null);
   const hideDate2 = dates !== undefined && (dates[1] === "" || dates[1] === null);
@@ -1167,7 +1167,9 @@ export function buildDocument(config: DocBuildConfig): string {
     let sigDates = config.signatures.dates;
     if (!sigDates || sigDates.length === 0) {
       const refDate = firstStagiaire?.dateDebutFormation || config.formation?.dateDebut || "";
-      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : new Date().toLocaleDateString("fr-FR");
+      // Document de système qualité (sans session) : daté de la date de MAJ du dossier (V1), jamais du jour.
+      const dateSysteme = (config.org?.dateMaj || "").trim() || docRefDateISO || "";
+      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : (dateSysteme ? formatDate(dateSysteme) : new Date().toLocaleDateString("fr-FR"));
       sigDates = [computedDate, computedDate];
     }
     if (config.signatures.type === "3") {
@@ -1189,10 +1191,11 @@ export function buildDocument(config: DocBuildConfig): string {
   }
   body += footer(config.org);
   let result = htmlWrap(body);
-  if (config.stagiaires && config.stagiaires.length > 0) {
+  // Sans stagiaire désigné, les formes neutres (« le/la », « (e) ») sont laissées à la passe
+  // finale de generateDocumentById, qui connaît le stagiaire concerné par le document.
+  // Un seul stagiaire : son genre. Plusieurs : la passe finale choisit le stagiaire concerné.
+  if (config.stagiaires && config.stagiaires.length === 1) {
     result = applyGender(result, config.stagiaires[0]);
-  } else {
-    result = applyGender(result, null);
   }
   return result;
 }
@@ -1290,12 +1293,20 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
   ];
   // Generic catch-all for any remaining (e) on past participles: word ending in é(e), i(e), u(e)
   let result = html;
+  // Conserve la majuscule du texte d'origine (« Le/La Stagiaire » → « La stagiaire »).
+  const casse = (orig: string, rempl: string) => (orig && orig[0] === orig[0].toUpperCase() && orig[0] !== orig[0].toLowerCase() ? rempl.charAt(0).toUpperCase() + rempl.slice(1) : rempl);
   for (const [regex, masc, fem] of replacements) {
-    result = result.replace(regex, isFem ? fem : masc);
+    result = result.replace(regex, (m) => casse(m, isFem ? fem : masc));
   }
   // Catch remaining patterns like "xxxé(e)" not in our list
   result = result.replace(/([éi])\(e\)/g, isFem ? "$1e" : "$1");
   result = result.replace(/([u])\(e\)/g, isFem ? "$1e" : "$1");
+  // Formes génériques restantes : présent(e), apprenant(e), candidat(e), seul(e), collaborateur(trice)…
+  result = result.replace(/([A-Za-zÀ-ÿ]+)teur\(trice\)/g, isFem ? "$1trice" : "$1teur");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)eur\(euse\)/g, isFem ? "$1euse" : "$1eur");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)er\(ère\)/g, isFem ? "$1ère" : "$1er");
+  result = result.replace(/([A-Za-zÀ-ÿ]+)(ien|en|on)\(ne\)/g, isFem ? "$1$2ne" : "$1$2");
+  result = result.replace(/([A-Za-zÀ-ÿ]+[a-zà-ÿ])\(e\)/g, isFem ? "$1e" : "$1");
   // Catch M./Mme patterns
   result = result.replace(/M\.\/Mme/g, isFem ? "Mme" : "M.");
   // Catch "il/elle" variants with capitals
@@ -1456,7 +1467,10 @@ export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
     ? "Formation à distance – Plateforme e-learning"
     : mixte
     ? `Mixte : ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'} + Plateforme e-learning`
-    : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
+    : (f.lieu && /\d{5}/.test(f.lieu)
+      // Le lieu saisi contient déjà un code postal : on ne répète pas celui de l'organisme.
+      ? f.lieu
+      : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`);
 
   const horaires = dist
     ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : Lun-Ven 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"

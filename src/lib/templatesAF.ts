@@ -199,7 +199,8 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le représentant légal du dispensateur", "Cachet"], names: [o.dirigeant, ""] } })
+    // Signé à la fin de la formation (date du « Fait à »), jamais à la date du jour.
+    signatures: { type: "2", labels: ["Le représentant légal du dispensateur", "Cachet de l'organisme"], names: [o.dirigeant, o.nom], dates: stagiaires.length === 1 ? [formatDate(getStagiaireDateFin(stagiaires[0], f)), formatDate(getStagiaireDateFin(stagiaires[0], f))] : undefined } })
     .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 

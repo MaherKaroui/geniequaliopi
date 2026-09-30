@@ -96,19 +96,20 @@ export const BDC_VOCABULAIRE_INTERDIT: Array<[RegExp, string]> = [
   [/\bélèves?\b/gi, "bénéficiaire"],
   [/\bstagiaires?\b/gi, "bénéficiaire"],
   [/\bsessions? de formation\b/gi, "séance"],
-  [/\bstages?\b/gi, "prestation"],
+  [/\bstage(s?)\b/gi, "prestation$1"],
   [/\bformateur(s|rice|rices)?\b/gi, "consultant"],
   [/\bcentres? de formation\b/gi, "cabinet"],
   [/\bécoles?\b/gi, "cabinet"],
   [/\bévaluations? finales?\b/gi, "entretien de conclusion"],
   [/\bcorrections? des réponses\b/gi, "remise du document de synthèse"],
   [/\bQCM\b/g, "investigation"],
-  [/\bexercices?\b/gi, "exploration"],
+  [/\bexercice(s?)\b/gi, "exploration$1"],
   [/\bcompétences acquises\b/gi, "compétences identifiées"],
   [/\bacquis\b/gi, "restitution"],
-  [/\bmodules?\b/gi, "séance"],
+  [/\bmodule(s?)\b/gi, "séance$1"],
   [/\bcours\b/gi, "phase"],
-  [/\bformations?\b/gi, "prestation"],
+  // Le pluriel est conservé (« les formations » → « les prestations »).
+  [/\bformation(s?)\b/gi, "prestation$1"],
 ];
 
 /**

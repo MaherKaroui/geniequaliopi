@@ -889,7 +889,7 @@ ci-après « le bénéficiaire »,
 
 ci-après « l'organisme »,
 
-est conclu{CONVENTION_ACCORD} le présent document en application de {CONVENTION_BASE} et de l'article L6313-4 du Code du travail.
+est conclu{CONVENTION_ACCORD} le présent document en application {CONVENTION_BASE} et de l'article L6313-4 du Code du travail.
 
 **1. Objet**
 

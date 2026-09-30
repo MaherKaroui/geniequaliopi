@@ -2727,10 +2727,15 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
     mainContent = words.slice(0, cutoff).join(' ');
   }
   
-  return mainContent + '.';
+  return mainContent.replace(/[\s.!?…]+$/, '') + '.';
 }
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, isEnglish?: boolean): string {
+  // Question sur le vécu ou les attentes du stagiaire (réponse modèle à la 1re personne) :
+  // il n'y a pas de « mauvaise » réponse, seulement une réponse moins développée.
+  if (/^\s*(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/.test(expected)) {
+    return generatePartialAnswer(expected, seed, stagiaireIndex, questionIndex);
+  }
   const vaguePool = isEnglish
     ? [
         "I think it is something important but I am not sure about the details.",
@@ -2743,14 +2748,14 @@ function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: num
         "I remember hearing about this but I forgot the details.",
       ]
     : [
-        "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
-        "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
-        "Il faut en parler à un responsable, c'est la première chose à faire.",
-        "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
-        "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
-        "Il faut documenter la situation et suivre le protocole en place.",
-        "La procédure demande de vérifier plusieurs points avant d'agir.",
-        "Il faut se référer aux fiches de procédure et appliquer les consignes.",
+        "Je connais le principe mais je ne saurais pas expliquer précisément comment faire.",
+        "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler.",
+        "Je l'ai déjà vu faire mais je ne l'ai jamais pratiqué moi-même.",
+        "Je crois que cela fait partie des bases, mais je ne me souviens plus de la méthode exacte.",
+        "Je ne suis pas sûr(e) de la réponse ; j'aurais besoin d'un exemple concret.",
+        "Je sais que c'est important mais je confonds encore certaines notions.",
+        "Je pense que cela dépend de la situation, sans pouvoir donner la démarche.",
+        "Je n'ai pas encore abordé ce point.",
       ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
