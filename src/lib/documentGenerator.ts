@@ -1,6 +1,7 @@
 import { mot } from "./resolveurFormation";
 import { resolveFormation } from "./formationResolue";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
+import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille } from "./veilleExploitee";
 import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "./qualite2026";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
@@ -511,6 +512,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "screenshot_openai": return genVeilleSourcee(o, f, "technologique");
     case "screenshot_agefiph": return genVeilleSourcee(o, f, "handicap");
     case "veille_sourcee": return genVeilleSourcee(o, f, params?.theme ?? "reglementaire");
+    case "procedure_veille_exploitee": return genProcedureVeilleExploitee(o);
+    case "cr_exploitation_veille": return genCompteRenduExploitationVeille(o, f, stagiaires, params?.type ?? "AF");
     // Pièces de tiers : jamais fabriquées, remplacées par la liste des justificatifs à joindre.
     case "certificat_coursera":
     case "attestation_fin_formation":

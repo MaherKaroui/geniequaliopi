@@ -381,7 +381,8 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("af_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("af_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("af_c6i23_veille_sourcee", "CT6 - IND 23 SOURCES DE VEILLE ET TEXTES SUIVIS (dont décret n° 2026-728)", 6, 23, "veille_sourcee", { theme: "reglementaire" });
+    add("af_c6i23_procedure_veille", "CT6 - IND 23 PROCÉDURE DE VEILLE ET D'EXPLOITATION", 6, 23, "procedure_veille_exploitee");
+    add("af_c6i23_cr_exploitation_veille", "CT6 - IND 23 COMPTE RENDU D'EXPLOITATION DE LA VEILLE (IND 23-24-25)", 6, 23, "cr_exploitation_veille", { type: "AF" });
     add("af_c6i23_preuves_veille", "CT6 - IND 23 PREUVES DE VEILLE RÉGLEMENTAIRE", 6, 23, "preuves_veille_reglementaire");
 
     // IND 24 — Veille métiers et emplois
@@ -389,7 +390,6 @@ export function buildFullCatalog(
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    add("af_c6i25_veille_sourcee", "CT6 - IND 25 SOURCES DE VEILLE PÉDAGOGIQUE ET TECHNOLOGIQUE", 6, 25, "veille_sourcee", { theme: "technologique" });
 
     // IND 26 — Accueil et accompagnement handicap
     add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
