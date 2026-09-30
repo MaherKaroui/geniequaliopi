@@ -49,12 +49,13 @@ const INDICATEUR_LABELS: Record<number, string> = {
   24: "Veille métiers",
   25: "Veille innovations pédagogiques",
   26: "Accueil handicap",
-  27: "Sous-traitance",
+  27: "Sous-traitance et portage salarial",
   28: "Formation situation travail",
   29: "Insertion professionnelle",
   30: "Recueil appréciations",
   31: "Traitement réclamations",
-  32: "Mesures amélioration",
+  32: "Amélioration continue et analyse des risques",
+  33: "Évaluation des enseignements (CFA)",
 };
 
 function getDocType(template: string): MappingEntry["type"] {
@@ -98,19 +99,20 @@ function getPreuveAssociee(indicateur: number): string {
     17: "Liste moyens, inventaire",
     18: "CR réunions, planning formateurs",
     19: "Supports cours, guide LMS",
-    20: "Fiche maître apprentissage",
+    20: "Référents mobilité et handicap, conseil de perfectionnement",
     21: "CV, diplômes, compétences formateur",
     22: "Plan développement, formations continues",
     23: "Tableaux veille réglementaire",
     24: "Veille métiers, analyses sectorielles",
     25: "Fiches innovation, benchmark",
-    26: "Rapport veille, exploitation, plan action",
-    27: "Contrats sous-traitance",
+    26: "Procédure handicap, réseau de partenaires, aménagements",
+    27: "Registre et contrats de sous-traitance / portage (clause qualité)",
     28: "Convention partenariat",
     29: "Taux insertion",
     30: "Questionnaires satisfaction, synthèses",
     31: "Registre réclamations, fiches traitement",
-    32: "Plan amélioration, fiches action, audits",
+    32: "Tableau d'amélioration, analyse des risques qualité",
+    33: "Grilles d'évaluation des enseignements, synthèse partagée, plan d'action",
   };
   return map[indicateur] || "";
 }
