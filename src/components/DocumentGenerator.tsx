@@ -903,9 +903,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const handleDownloadAll = () => {
     // Un bilan de compétences peut être exporté pendant son déroulement.
+    // Organisme BC + autres types (AF, CFA, VAE) : les deux dossiers sont exportés.
     if (isBDCOrg) {
       runBdcExport();
-      return;
+      const autresTypes = (mergedOrganisme.typesActions || []).some((t) => t !== "bilans-competences");
+      if (!autresTypes) return;
     }
 
     const erreurs = controlerStagiairesAF();
