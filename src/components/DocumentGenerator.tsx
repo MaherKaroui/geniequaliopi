@@ -10,7 +10,9 @@ import { generateGuideAuditCFA } from "@/lib/guideAuditCFA";
 import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type TypeActionAudit } from "@/lib/guideAuditUniversal";
 import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
-import { resolveFormation } from "@/lib/formationResolue";
+import { resolveFormation, financeursEffectifs } from "@/lib/formationResolue";
+import { clientMailOrganisme, retrouverMail, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
+import { captureMail } from "@/lib/mails/captureMail";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronRight, X, Loader2, FolderOpen, RefreshCw, Archive, AlertTriangle, Cloud } from "lucide-react";
@@ -89,6 +91,7 @@ const NATIVE_XLSX_TEMPLATES = new Set<string>([
 ]);
 
 const HTML_MAIL_TEMPLATES = new Set<string>([
+  "mail_capture",
   "mail_mission_cfa",
   "mail_diffusion_mission_cfa",
 ]);
@@ -191,7 +194,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const selectedFormation = useMemo(() => (
     resolveFormation(formation, organisme, stagiaires)
   ), [formation, organisme, stagiaires]);
-  const allStagiaires = useMemo(() => mergeStagiaires(stagiaires), [stagiaires]);
+  const allStagiaires = useMemo(() => financeursEffectifs(mergeStagiaires(stagiaires), formation, organisme), [stagiaires, formation, organisme]);
   const catalog = useMemo(() => getFullCatalog(organisme, formation, stagiaires), [organisme, formation, stagiaires]);
   const progress = catalog.length ? Math.round((generated.size / catalog.length) * 100) : 0;
   // Index critère → indicateur → documents (évite de re-filtrer le catalogue à chaque rendu)
@@ -297,6 +300,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     return generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, stagiaires);
   }, [organisme, formation, stagiaires, allStagiaires, editedContents]);
 
+  /** Capture PNG (Gmail ou Outlook selon la messagerie de l'organisme) d'un mail automatique. */
+  const captureMailDoc = async (doc: DocEntry): Promise<{ blob: Blob; fileName: string; stagiaire: StagiaireInfo } | null> => {
+    const s = allStagiaires[doc.params?.stagiaireIdx as number];
+    if (!s) return null;
+    const r = retrouverMail(mergedOrganisme, selectedFormation, s, String(doc.params?.mailKey || ""));
+    if (!r) return null;
+    const blob = await captureMail(r.mail, clientMailOrganisme(mergedOrganisme), r.precedents);
+    return { blob, fileName: nomFichierCapture(r.mail), stagiaire: s };
+  };
+
   const buildImportReport = useCallback((audit: ImportAuditResult) => {
     const lines = [
       "RAPPORT DE PRE-CONTROLE IMPORT",
@@ -354,6 +367,19 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewInner = async (doc: DocEntry) => {
+
+    // Mail automatique → capture Gmail / Outlook (image)
+    if (doc.template === "mail_capture") {
+      const cap = await captureMailDoc(doc);
+      if (!cap) throw new Error("Mail introuvable pour ce stagiaire.");
+      setPreviewContent(null);
+      setPreviewBlobUrl(URL.createObjectURL(cap.blob));
+      setPreviewTitle(docTitle(doc.nom, cap.stagiaire));
+      setCurrentDocId(doc.id);
+      setEditing(false);
+      setGenerated((prev) => new Set(prev).add(doc.id));
+      return;
+    }
 
     // CERFA Apprentissage rempli → PDF dans iframe
     if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
@@ -463,6 +489,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownload = async (doc: DocEntry) => {
+    if (doc.template === "mail_capture") {
+      const cap = await captureMailDoc(doc);
+      if (cap) saveAs(cap.blob, cap.fileName);
+      return;
+    }
     // CERFA Apprentissage rempli (PDF par stagiaire)
     if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
       const s = allStagiaires[doc.params.stagiaireIdx];
@@ -997,7 +1028,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         const basePath = isBDCOrg && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
-        if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+        if (doc.template === "mail_capture") {
+          await safeRun(`${doc.nom} (capture)`, async () => {
+            const cap = await captureMailDoc(doc);
+            if (cap) addFileToZip(`${basePath}/${buildStagiaireFolderName(cap.stagiaire)}/${cap.fileName}`, cap.blob);
+          });
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
           const mailFolder = s ? `${basePath}/${buildStagiaireFolderName(s)}` : basePath;
           await safeRun(`${doc.nom} (mail)`, async () => {
@@ -1934,7 +1970,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   try {
                     const zip = new JSZip();
                     for (const doc of mailDocs) {
-                      if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+                      if (doc.template === "mail_capture") {
+                        const cap = await captureMailDoc(doc);
+                        if (cap) zip.file(`${buildStagiaireFolderName(cap.stagiaire)}/${cap.fileName}`, cap.blob);
+                      } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
                         const s = allStagiaires[doc.params.stagiaireIdx];
                         if (s) {
                           const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);

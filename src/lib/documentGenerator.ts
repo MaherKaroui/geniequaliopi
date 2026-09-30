@@ -1,7 +1,8 @@
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
-import { resolveFormation } from "./formationResolue";
+import { resolveFormation, financeursEffectifs } from "./formationResolue";
+import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements } from "./qualite2026";
@@ -135,15 +136,23 @@ export function getEmargementBlocs(_f: FormationInfo, _dow?: number): { label: s
     { label: "Après-midi", horaire: "13h30 – 17h00" },
   ];
 }
-export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
+export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): DocEntry[] {
+  const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
   // Use only the single selected formation (merged with sample defaults if needed)
   // Aucun héritage d'une formation d'exemple : champs vides déduits de la formation,
   // de sa fiche RNCP/RS et de l'organisme (code vide = non certifiant, IND 3/7/16 masqués).
   const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
-  return buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.codePostal, org.referentQualite);
+  const catalogue = buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.codePostal, org.referentQualite);
+  // Mails automatiques : captures Gmail / Outlook datées (remplacent les 5 mails génériques .docx).
+  const mails = entreesCatalogueMails(mergeOrganisme(org), selectedFormation, mergeStagiaires(userStagiaires));
+  if (mails.length === 0) return catalogue;
+  const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation"]);
+  return [...catalogue.filter((d) => !REMPLACES.has(d.template)), ...mails];
 }
 
-export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
+export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
+  // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
+  const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
   let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
   // Apply gender adaptation based on the relevant stagiaire
   const stagiaires = mergeStagiaires(userStagiaires);
@@ -207,6 +216,11 @@ function stripEmojis(html: string): string {
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
+  if (template === "mail_capture") {
+    const s = mergeStagiaires(userStagiaires)[params?.stagiaireIdx ?? 0];
+    const r = s ? retrouverMail(o, resolveFormation(userFormation, org, userStagiaires), s, String(params?.mailKey || "")) : null;
+    return r ? mailHtmlSimple(r.mail) : "";
+  }
   const selectedFormation = resolveFormation(userFormation, org, userStagiaires);
   const formations = [selectedFormation];
   let stagiaires = mergeStagiaires(userStagiaires);

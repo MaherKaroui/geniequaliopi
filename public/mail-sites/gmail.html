@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=4bedb489-9953-49ea-b874-3a10bb281e1e
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gmail — Éditeur d'e-mail</title>
+<style>
+  :root{
+    --bg:#f6f8fc; --card:#fff; --line:#e0e3e7; --txt:#202124; --muted:#5e5e5e;
+    --blue:#0b57d0; --chip:#e9eef6; --search:#eaf1fb;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:"Google Sans","Roboto",Arial,Helvetica,sans-serif;
+    font-size:14px; -webkit-font-smoothing:antialiased; padding-bottom:70px;
+  }
+  /* ---------- Barre du haut ---------- */
+  .topbar{display:flex;align-items:center;gap:8px;height:64px;padding:8px 16px;background:var(--bg);position:sticky;top:0;z-index:20}
+  .icobtn{width:40px;height:40px;border:0;background:transparent;border-radius:50%;cursor:pointer;display:grid;place-items:center;color:#444746}
+  .icobtn:hover{background:#e8eaed}
+  .icobtn svg{width:20px;height:20px;fill:currentColor}
+  .brand{display:flex;align-items:center;gap:8px;min-width:190px;font-size:22px;color:#5f6368;letter-spacing:.5px}
+  .brand .m{width:32px;height:24px;flex:none}
+  .search{flex:1;max-width:720px;display:flex;align-items:center;gap:10px;background:var(--search);border-radius:8px;height:48px;padding:0 16px}
+  .search:focus-within{background:#fff;box-shadow:0 1px 3px rgba(60,64,67,.3)}
+  .search svg{width:20px;height:20px;fill:#444746;flex:none}
+  .search .q{flex:1;outline:0;color:#202124}
+  .topright{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .me{width:32px;height:32px;border-radius:50%;background:#0b8043;color:#fff;display:grid;place-items:center;font-weight:600;font-size:15px;background-size:cover;background-position:center}
+  .me.img{color:transparent}
+  /* ---------- Corps ---------- */
+  .app{display:flex;padding:0 16px 24px}
+  .sidebar{width:256px;flex:none;padding-right:8px}
+  .compose{display:flex;align-items:center;gap:12px;height:56px;padding:0 24px 0 16px;background:#c2e7ff;border:0;border-radius:16px;color:#001d35;font-size:14px;font-weight:500;cursor:pointer;margin:0 0 12px;font-family:inherit}
+  .compose:hover{box-shadow:0 1px 3px rgba(60,64,67,.3)}
+  .compose svg{width:24px;height:24px}
+  .nav{list-style:none;margin:0;padding:0}
+  .nav li{display:flex;align-items:center;gap:16px;height:32px;padding:0 12px 0 12px;border-radius:0 16px 16px 0;color:#1f1f1f;cursor:pointer;font-size:14px}
+  .nav li:hover{background:#e8eaed}
+  .nav li.active{background:#d3e3fd;font-weight:700;color:#001d35}
+  .nav li svg{width:20px;height:20px;fill:#444746;flex:none}
+  .nav li.active svg{fill:#001d35}
+  .nav .count{margin-left:auto;font-size:12px;font-weight:700}
+  .labels-row{display:flex;align-items:center;gap:16px;height:40px;padding:0 12px;margin-top:8px;color:#1f1f1f;font-size:14px}
+  .labels-row .plus{margin-left:auto;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;cursor:pointer}
+  .labels-row .plus:hover{background:#e8eaed}
+  .labels-row svg{width:20px;height:20px;fill:#444746}
+  /* ---------- Carte conversation ---------- */
+  .content{flex:1;min-width:0;background:var(--card);border-radius:16px;padding:0 0 24px;min-height:calc(100vh - 130px)}
+  .toolbar-mail{display:flex;align-items:center;gap:2px;padding:8px 12px}
+  .toolbar-mail .grow{flex:1}
+  .toolbar-mail .pager{font-size:12px;color:var(--muted);margin-right:4px}
+  .subject-row{display:flex;align-items:flex-start;gap:12px;padding:8px 32px 20px 24px}
+  h1.subject{font-size:22px;font-weight:400;line-height:1.4;margin:0;flex:1;color:#202124;outline:0}
+  .chip{display:inline-flex;align-items:center;height:20px;padding:0 8px;background:var(--chip);border-radius:4px;font-size:11px;color:#3c4043;margin-top:6px;white-space:nowrap}
+  /* ---------- Message ---------- */
+  .msg{padding:0 32px 0 24px;position:relative}
+  .msg + .msg{border-top:1px solid #f1f3f4;padding-top:16px;margin-top:8px}
+  .msg-head{display:flex;gap:16px;align-items:flex-start}
+  .avatar{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-size:18px;font-weight:500;background:#1a73e8;cursor:pointer;user-select:none}
+  .avatar.img{color:transparent}
+  .msg-meta{flex:1;min-width:0}
+  .line1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+  .from-name{font-weight:700;color:#202124}
+  .from-mail{font-size:12px;color:var(--muted)}
+  .line1 .right{margin-left:auto;display:flex;align-items:center;gap:4px}
+  .date{font-size:12px;color:var(--muted);white-space:nowrap}
+  .ago{font-size:12px;color:var(--muted);white-space:nowrap;outline:0}
+  body.edit .ago:empty::before{content:"(date relative)";opacity:.45}
+  .to-line{display:flex;align-items:center;gap:4px;margin-top:2px;font-size:12px;color:var(--muted)}
+  .star,.mini{width:28px;height:28px;border:0;background:transparent;border-radius:50%;cursor:pointer;color:#5e5e5e;display:grid;place-items:center;padding:0}
+  .star:hover,.mini:hover{background:#e8eaed}
+  .star svg,.mini svg{width:18px;height:18px;fill:currentColor}
+  .star.on{color:#f4b400}
+  .msg-body{margin:16px 0 8px 56px;line-height:1.6;color:#202124;font-size:14px;outline:0}
+  .msg-body p{margin:0 0 12px}
+  .msg-body a{color:var(--blue)}
+  .msg-body .btn-cta{display:inline-block;background:#0b57d0;color:#fff;text-decoration:none;padding:12px 22px;border-radius:24px;font-weight:600;margin:6px 0}
+  .msg-body blockquote{border-left:2px solid #ccc;margin:8px 0;padding-left:12px;color:#5f6368}
+  /* ---------- Pièces jointes ---------- */
+  .attachments{margin:18px 0 4px 56px;display:none}
+  .attachments.show{display:block}
+  .att-head{display:flex;align-items:center;gap:7px;font-size:13px;color:#5f6368;padding:0 0 12px}
+  .att-head .att-count{color:#222;font-weight:700}
+  .att-head .info{width:14px;height:14px;fill:#9aa0a6;flex:none}
+  .att-head .link{display:inline-flex;align-items:center;gap:6px;color:#444746;cursor:pointer;margin-left:12px}
+  .att-head .link:hover{text-decoration:underline}
+  .att-head .link[hidden]{display:none}
+  .att-head .link svg{width:18px;height:18px;fill:#5f6368;flex:none}
+  .att-list{display:flex;flex-wrap:wrap;gap:12px}
+  /* vignette Gmail 180 x 120 */
+  .att{position:relative;width:180px;height:120px;border:1px solid #e5e5e5;background:#fff;overflow:hidden}
+  .att:hover{border-color:#d2d2d2;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .att-thumb{height:86px;display:grid;place-items:center;background:#fff;background-size:cover;background-position:center;overflow:hidden}
+  .att-ph{width:56px;height:56px;border-radius:8px;background:#e5e5e5;display:grid;place-items:center;color:#fff;font:700 15px/1 Arial,Helvetica,sans-serif;letter-spacing:.5px;cursor:pointer;user-select:none}
+  .att-cap{position:relative;height:33px;border-top:1px solid #f1f1f1;display:flex;align-items:center;gap:8px;padding:0 8px;background:#fff}
+  .att-badge{width:16px;height:16px;border-radius:2px;flex:none;display:grid;place-items:center;color:#fff;font:700 6px/1 Arial,Helvetica,sans-serif;background:#ea4335;cursor:pointer;user-select:none}
+  .att-name{font-size:13px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:104px;outline:0}
+  .att-name:focus{position:absolute;left:30px;right:4px;bottom:5px;z-index:3;max-width:none;white-space:normal;overflow:visible;background:#fff;border-radius:3px;padding:2px 4px}
+  /* coin plié (couleur du type de fichier) */
+  .fold-g{position:absolute;right:19px;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 12px 18px;border-color:transparent transparent #c4c4c4 transparent}
+  .fold-c{position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:19px 19px 0 0;border-color:#fb4c2f transparent transparent transparent}
+  /* survol : actions par-dessus la vignette */
+  .att-over{position:absolute;left:0;right:0;top:0;height:86px;background:rgba(32,33,36,.55);display:none;align-items:center;justify-content:center;gap:6px}
+  .att:hover .att-over{display:flex}
+  .att-over button{width:32px;height:32px;border:0;border-radius:50%;background:rgba(255,255,255,.92);cursor:pointer;color:#3c4043;display:grid;place-items:center;padding:0}
+  .att-over button:hover{background:#fff}
+  .att-over svg{width:17px;height:17px;fill:currentColor}
+  .att-size{position:absolute;left:6px;bottom:4px;font-size:11px;color:#fff;outline:0;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  /* menu pièces jointes */
+  .menu{position:absolute;z-index:60;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.28);padding:8px 0;width:280px;display:none}
+  .menu.wide{width:340px}
+  .menu .sub{display:block;font-size:11px;color:#5f6368;margin-top:2px}
+  .menu .stack{display:block;text-align:left}
+  .menu.show{display:block}
+  .menu .mtitle{font-size:11px;color:#5f6368;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:4px 16px 8px}
+  .menu button,.menu label{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;text-align:left;padding:8px 16px;font-size:13px;font-family:inherit;color:#202124;cursor:pointer}
+  .menu button:hover,.menu label:hover{background:#f1f3f4}
+  .menu .tag{width:26px;height:26px;border-radius:4px;flex:none;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:700}
+  .menu hr{border:0;border-top:1px solid #e8eaed;margin:6px 0}
+  .msg-tools{display:none;position:absolute;top:2px;right:8px;gap:2px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:2px;z-index:5}
+  .msg:hover .msg-tools{display:flex}
+  .thread-actions{display:flex;gap:12px;margin:20px 0 0 80px}
+  .pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 24px;border:1px solid #747775;border-radius:18px;background:#fff;color:#0b57d0;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+  .pill:hover{background:#f2f6fc}
+  .pill.round{width:36px;padding:0;justify-content:center;border-radius:50%;color:#444746}
+  .pill svg{width:18px;height:18px;fill:currentColor}
+  /* ---------- Mode édition ---------- */
+  body.edit [contenteditable="true"]:hover{outline:1px dashed #b0c4de;outline-offset:2px;border-radius:3px}
+  body.edit [contenteditable="true"]:focus{outline:2px solid #a8c7fa;outline-offset:2px;background:#f8fbff;border-radius:3px}
+  /* ---------- Barre d'outils bas ---------- */
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+       padding:8px 12px;background:#202124;color:#e8eaed;font-size:12px;box-shadow:0 -1px 6px rgba(0,0,0,.25);transition:transform .18s ease}
+  .bar button{background:#3c4043;color:#e8eaed;border:0;border-radius:16px;padding:7px 14px;cursor:pointer;font-size:12px;font-family:inherit}
+  .bar button:hover{background:#4d5156}
+  .bar button.on{background:#8ab4f8;color:#202124;font-weight:600}
+  .bar .sep{width:1px;height:22px;background:#5f6368;margin:0 4px}
+  .bar .hint{opacity:.65;margin-left:auto;padding-right:4px}
+  .bar.hidden{transform:translateY(110%)}
+  /* popover avatar */
+  .pop{position:absolute;z-index:60;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);padding:12px;width:252px;display:none}
+  .pop.show{display:block}
+  .pop h4{margin:0 0 8px;font-size:11px;color:#5f6368;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .swatches{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .sw{width:26px;height:26px;border-radius:50%;border:0;cursor:pointer;padding:0}
+  .pop input[type=text]{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;margin-bottom:10px}
+  .pop .row{display:flex;gap:6px}
+  .pop .row button,.pop .row label{flex:1;text-align:center;background:#f1f3f4;border:0;border-radius:6px;padding:7px;cursor:pointer;font-size:12px;font-family:inherit;line-height:1.4}
+  @media print{
+    .bar,.sidebar,.topbar,.msg-tools,.thread-actions,.toolbar-mail{display:none!important}
+    body{background:#fff;padding:0}
+    .app{padding:0}.content{border-radius:0;min-height:0}
+  }
+  @media (max-width:900px){ .sidebar{display:none} .msg{padding:0 16px} .msg-body{margin-left:0} .thread-actions{margin-left:0} }
+</style>
+</head>
+<body class="edit">
+
+<div id="page">
+
+  <!-- ================= HEADER ================= -->
+  <header class="topbar">
+    <button class="icobtn" title="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <div class="brand">
+      <svg class="m" viewBox="0 0 52 40"><path fill="#4285f4" d="M3 37h8V19L0 11v23a3 3 0 0 0 3 3z"/><path fill="#34a853" d="M41 37h8a3 3 0 0 0 3-3V11l-11 8z"/><path fill="#fbbc04" d="M41 6v13l11-8V7.5C52 4 48 2 45.2 4.1z"/><path fill="#ea4335" d="M11 19V6l15 11L41 6v13L26 30z"/><path fill="#c5221f" d="M0 7.5V11l11 8V6L6.8 4.1C4 2 0 4 0 7.5z"/></svg>
+      <span contenteditable="true" data-k="brand">Gmail</span>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7 14 5 12 5 9.5S7 5 9.5 5 14 7 14 9.5 12 14 9.5 14z"/></svg>
+      <div class="q" contenteditable="true" data-k="search">Rechercher dans les messages</div>
+    </div>
+    <div class="topright">
+      <button class="icobtn" title="Aide"><svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a4 4 0 0 0-4 4h2a2 2 0 1 1 3.4 1.4l-1.2 1.3A3 3 0 0 0 11 15h2a2 2 0 0 1 .6-1.4l.9-.9A4 4 0 0 0 12 6z"/></svg></button>
+      <button class="icobtn" title="Paramètres"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.6-2-3.4-2.5 1a7.6 7.6 0 0 0-1.7-1L14.8 3H11l-.4 2.9a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.4L6.6 11a7.8 7.8 0 0 0 0 2l-2 1.6 2 3.4 2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.9h3.8l.4-2.9a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.4zM12.9 15a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/></svg></button>
+      <button class="icobtn" title="Applications Google"><svg viewBox="0 0 24 24"><path d="M6 8a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2zM6 14a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2zM6 20a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm6 0a2 2 0 1 0-2-2 2 2 0 0 0 2 2z"/></svg></button>
+      <div class="me" title="Synchronisé avec l'avatar de l'expéditeur du 1er message">D</div>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <button class="compose"><svg viewBox="0 0 24 24"><path fill="#001d35" d="M3 17.2V21h3.8L17.8 10 14 6.2 3 17.2zM20.7 7.1a1 1 0 0 0 0-1.4l-2.4-2.4a1 1 0 0 0-1.4 0l-1.8 1.8L18.9 8.9z"/></svg>Nouveau message</button>
+      <ul class="nav" data-k="nav">
+        <li class="active"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 12h-4a3 3 0 0 1-6 0H5V5h14z"/></svg><span contenteditable="true">Boîte de réception</span> <span class="count" contenteditable="true">157</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="m12 17.3 6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7 2 9.3l5.4 4.7-1.6 7z"/></svg><span contenteditable="true">Messages suivis</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"/></svg><span contenteditable="true">En attente</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg><span contenteditable="true">Messages envoyés</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5z"/></svg><span contenteditable="true">Brouillons</span> <span class="count" contenteditable="true">25</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M21.4 11.6 12.4 2.6A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .6 1.4l9 9a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z"/></svg><span contenteditable="true">Catégories</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg><span contenteditable="true">Plus</span></li>
+      </ul>
+      <div class="labels-row">
+        <span contenteditable="true">Libellés</span>
+        <span class="plus" title="Créer un libellé"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg></span>
+      </div>
+    </aside>
+
+    <!-- ================= CONVERSATION ================= -->
+    <main class="content">
+      <div class="toolbar-mail">
+        <button class="icobtn" title="Retour"><svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg></button>
+        <button class="icobtn" title="Archiver"><svg viewBox="0 0 24 24"><path d="M20.5 5.2 19.7 4H4.3l-.8 1.2A2 2 0 0 0 3 6.5V19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.5a2 2 0 0 0-.5-1.3zM12 17.5 6.5 12H10v-2h4v2h3.5zM5.1 5l.8-1h12.2l.9 1z"/></svg></button>
+        <button class="icobtn" title="Supprimer"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>
+        <button class="icobtn" title="Marquer comme non lu"><svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg></button>
+        <button class="icobtn" title="Reporter"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"/></svg></button>
+        <button class="icobtn" title="Ajouter à Tasks"><svg viewBox="0 0 24 24"><path d="M19 3h-4.2a3 3 0 0 0-5.6 0H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1-1 1 1 1 0 0 1 1-1zm-1.5 14L7 13.5l1.4-1.4 2.1 2.1 5.1-5.1L17 10.5z"/></svg></button>
+        <button class="icobtn" title="Déplacer vers"><svg viewBox="0 0 24 24"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z"/></svg></button>
+        <button class="icobtn" title="Libellés"><svg viewBox="0 0 24 24"><path d="M21.4 11.6 12.4 2.6A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .6 1.4l9 9a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z"/></svg></button>
+        <button class="icobtn" title="Plus"><svg viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm0 2a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm0 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"/></svg></button>
+        <span class="grow"></span>
+        <span class="pager" contenteditable="true" data-k="pager">6 sur 401</span>
+        <button class="icobtn" title="Précédent"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></button>
+        <button class="icobtn" title="Suivant"><svg viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg></button>
+      </div>
+
+      <div class="subject-row">
+        <h1 class="subject" id="subject" contenteditable="true">Votre inscription — documents à retourner signés</h1>
+        <span class="chip" contenteditable="true" data-k="chip">Boîte de réception</span>
+        <button class="icobtn" title="Imprimer"><svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8zm3-7a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm-1-9H6v4h12z"/></svg></button>
+        <button class="icobtn" title="Ouvrir dans une nouvelle fenêtre"><svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3z"/></svg></button>
+      </div>
+
+      <div id="messages"></div>
+
+      <div class="thread-actions">
+        <button class="pill" id="btnReply"><svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>Répondre</button>
+        <button class="pill" id="btnForward"><svg viewBox="0 0 24 24"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>Transférer</button>
+        <button class="pill round" title="Ajouter une réaction"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM8.5 11a1.5 1.5 0 1 0-1.5-1.5A1.5 1.5 0 0 0 8.5 11zm7 0A1.5 1.5 0 1 0 14 9.5 1.5 1.5 0 0 0 15.5 11zM12 17.5a5.5 5.5 0 0 0 5-3.2H7a5.5 5.5 0 0 0 5 3.2z"/></svg></button>
+      </div>
+    </main>
+  </div>
+</div><!-- /#page -->
+
+<!-- popover avatar -->
+<div class="pop" id="pop">
+  <h4>Couleur de l'avatar</h4>
+  <div class="swatches" id="swatches"></div>
+  <h4>Lettre affichée</h4>
+  <input type="text" id="popLetter" maxlength="2" placeholder="Auto (1re lettre du nom)">
+  <div class="row">
+    <button id="popPhoto">Photo…</button><input type="file" id="popFile" accept="image/*" hidden>
+    <button id="popAuto">Auto</button>
+    <button id="popClose">OK</button>
+  </div>
+</div>
+
+<!-- menu pièces jointes (base documentaire) -->
+<div class="menu" id="attMenu">
+  <div class="mtitle">Base documentaire</div>
+  <div id="presetList"></div>
+  <hr>
+  <button data-preset="custom"><span class="tag" style="background:#5f6368">…</span>Pièce jointe personnalisée</button>
+  <button id="attFileBtn"><span class="tag" style="background:#0b57d0">↑</span>Fichier de mon ordinateur…</button><input type="file" id="attFile" hidden>
+</div>
+
+<!-- menu des modèles de mails -->
+<div class="menu wide" id="tplMenu">
+  <div class="mtitle">Modèles de mails</div>
+  <div id="tplList"></div>
+</div>
+
+<!-- ================= BARRE D'OUTILS ================= -->
+<div class="bar" id="bar">
+  <button id="tEdit" class="on">Édition : ON</button>
+  <button id="btnTpl">Modèles</button>
+  <span class="sep"></span>
+  <button data-cmd="bold"><b>G</b></button>
+  <button data-cmd="italic"><i>I</i></button>
+  <button data-cmd="underline"><u>S</u></button>
+  <button data-cmd="insertUnorderedList">Liste</button>
+  <button id="tLink">Lien</button>
+  <button id="tBtn">Bouton bleu</button>
+  <button data-cmd="removeFormat">Effacer format</button>
+  <span class="sep"></span>
+  <button id="addIn">+ Message reçu</button>
+  <button id="addOut">+ Réponse (moi)</button>
+  <button id="addAtt">+ Pièce jointe</button>
+  <span class="sep"></span>
+  <button id="tSave">Exporter HTML</button>
+  <button id="tPrint">Imprimer / PDF</button>
+  <button id="tReset">Réinitialiser</button>
+  <span class="hint">Ctrl+E : masquer cette barre · sauvegarde auto</span>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var PALETTE = ["#1a73e8","#d93025","#188038","#e37400","#8430ce","#00897b","#c5221f","#3949ab","#a142f4","#f09300","#0b8043","#795548"];
+  var KEY = "mail-editable-v2";
+  /* Mode capture (générateur Qualiopi) : aucune lecture/écriture du stockage local. */
+  var CAPTURE = /[?&]capture=1/.test(location.search);
+  if(CAPTURE) document.documentElement.setAttribute("data-export", "1");
+  var msgs = document.getElementById("messages");
+  var editOn = true;
+
+  /* ---------- helpers ---------- */
+  function initialOf(t){
+    t = (t||"").trim().replace(/^[<("'\[\{\s]+/,"");
+    return t ? t.charAt(0).toUpperCase() : "?";
+  }
+  function colorFor(t){
+    var h=0,i; t=t||"";
+    for(i=0;i<t.length;i++){ h=(h*31+t.charCodeAt(i))>>>0; }
+    return PALETTE[h%PALETTE.length];
+  }
+  function refreshAvatar(msg){
+    if(!msg) return;
+    var av = msg.querySelector(".avatar");
+    var nm = msg.querySelector(".from-name");
+    if(!av || !nm || av.dataset.lock === "1") return;
+    av.textContent = initialOf(nm.textContent);
+    av.style.background = colorFor(nm.textContent.trim());
+  }
+  function refreshAll(){
+    Array.prototype.forEach.call(msgs.querySelectorAll(".msg"), refreshAvatar);
+    syncAccount();
+  }
+  /* l'icône du compte (en haut à droite) recopie l'avatar de l'expéditeur du 1er message */
+  function syncAccount(){
+    var me = document.querySelector(".me"), av = msgs.querySelector(".msg .avatar");
+    if(!me || !av) return;
+    me.textContent = av.classList.contains("img") ? "" : av.textContent;
+    me.style.background = av.style.background || "";
+    me.classList.toggle("img", av.classList.contains("img"));
+  }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function nowFr(){
+    return new Date().toLocaleString("fr-FR",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  }
+
+  /* ---------- gabarit d'un message ---------- */
+  function tpl(o){
+    o = o || {};
+    var d = document.createElement("article");
+    d.className = "msg";
+    d.innerHTML =
+      '<div class="msg-tools">' +
+        '<button class="mini" data-act="att" title="Ajouter une pièce jointe"><svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4.5 4.5 0 0 1-9 0V5a3 3 0 0 1 6 0v10.5a1.5 1.5 0 0 1-3 0V6H9v9.5a3 3 0 0 0 6 0V5a4.5 4.5 0 0 0-9 0v12.5a6 6 0 0 0 12 0V6z"/></svg></button>' +
+        '<button class="mini" data-act="up" title="Monter"><svg viewBox="0 0 24 24"><path d="M7.4 15.4 12 10.8l4.6 4.6L18 14l-6-6-6 6z"/></svg></button>' +
+        '<button class="mini" data-act="down" title="Descendre"><svg viewBox="0 0 24 24"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg></button>' +
+        '<button class="mini" data-act="dup" title="Dupliquer"><svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11z"/></svg></button>' +
+        '<button class="mini" data-act="del" title="Supprimer ce message"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg></button>' +
+      '</div>' +
+      '<div class="msg-head">' +
+        '<div class="avatar" title="Cliquer : couleur / lettre / photo">A</div>' +
+        '<div class="msg-meta">' +
+          '<div class="line1">' +
+            '<span class="from-name" contenteditable="true">' + esc(o.name || "Expéditeur") + '</span>' +
+            '<span class="from-mail">&lt;<span contenteditable="true">' + esc(o.mail || "contact@exemple.com") + '</span>&gt;</span>' +
+            '<span class="right">' +
+              '<span class="date" contenteditable="true">' + esc(o.date || nowFr()) + '</span>' +
+              '<span class="ago" contenteditable="true">' + esc(o.ago != null ? o.ago : "(à l’instant)") + '</span>' +
+              '<button class="star" title="Suivi"><svg viewBox="0 0 24 24"><path d="m12 17.3 6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7 2 9.3l5.4 4.7-1.6 7z"/></svg></button>' +
+              '<button class="mini react" title="Ajouter une réaction"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM8.5 11a1.5 1.5 0 1 0-1.5-1.5A1.5 1.5 0 0 0 8.5 11zm7 0A1.5 1.5 0 1 0 14 9.5 1.5 1.5 0 0 0 15.5 11zM12 17.5a5.5 5.5 0 0 0 5-3.2H7a5.5 5.5 0 0 0 5 3.2z"/></svg></button>' +
+              '<button class="mini" title="Répondre"><svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg></button>' +
+              '<button class="mini" title="Plus"><svg viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0-2-2 2 2 0 0 0 2 2zm0 2a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm0 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"/></svg></button>' +
+            '</span>' +
+          '</div>' +
+          '<div class="to-line">à <span contenteditable="true">' + esc(o.to || "moi") + '</span>' +
+            '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#5e5e5e"><path d="M7 10l5 5 5-5z"/></svg></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="msg-body" contenteditable="true">' + (o.body || "<p>Écrivez ici le contenu du message…</p>") + '</div>' +
+      attBlock();
+    if(o.atts) o.atts.forEach(function(p){ addAtt(d, p); });
+    return d;
+  }
+
+  /* ---------- pièces jointes ---------- */
+  function attBlock(){
+    return '<div class="attachments">' +
+      '<div class="att-head">' +
+        '<span class="att-count">Une pièce jointe</span>' +
+        '<span>·</span><span>Analysé par Gmail</span>' +
+        '<svg class="info" viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>' +
+        '<span class="link dl-all" hidden><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"/></svg>Tout télécharger</span>' +
+        '<span class="link drive"><svg viewBox="0 0 24 24"><path d="M7.7 3 1.2 14.2 4.5 20l6.5-11.2zM22.8 14.2 16.3 3H9.7l6.5 11.2zM5.9 21h12.2l3.3-5.7H9.2z"/></svg><span class="drive-lbl">Ajouter à Drive</span></span>' +
+      '</div><div class="att-list"></div></div>';
+  }
+  var TYPES = {
+    pdf:{lbl:"PDF", c:"#ea4335", fold:"#fb4c2f"},
+    doc:{lbl:"DOC", c:"#4285f4", fold:"#4285f4"},
+    xls:{lbl:"XLS", c:"#0f9d58", fold:"#0f9d58"},
+    ppt:{lbl:"PPT", c:"#f4b400", fold:"#f4b400"},
+    img:{lbl:"IMG", c:"#8430ce", fold:"#8430ce"},
+    zip:{lbl:"ZIP", c:"#5f6368", fold:"#5f6368"}
+  };
+  var TYPE_ORDER = ["pdf","doc","xls","ppt","img","zip"];
+  function typeFromName(n){
+    var e = (String(n).split(".").pop() || "").toLowerCase();
+    if(e === "pdf") return "pdf";
+    if(e === "doc" || e === "docx" || e === "odt" || e === "rtf" || e === "txt") return "doc";
+    if(e === "xls" || e === "xlsx" || e === "csv" || e === "ods") return "xls";
+    if(e === "ppt" || e === "pptx") return "ppt";
+    if(e === "png" || e === "jpg" || e === "jpeg" || e === "gif" || e === "webp" || e === "bmp") return "img";
+    if(e === "zip" || e === "rar" || e === "7z") return "zip";
+    return "doc";
+  }
+  function humanSize(b){
+    if(b < 1024) return b + " o";
+    if(b < 1024*1024) return Math.round(b/1024) + " Ko";
+    return (b/1048576).toFixed(1).replace(".", ",") + " Mo";
+  }
+  /* base documentaire — modifiable ici */
+  var PRESETS = [
+    { key:"contrat",    label:"Contrat de formation",    name:"Contrat_de_formation.pdf",           size:"245 Ko" },
+    { key:"ri",         label:"Règlement intérieur",     name:"Reglement_interieur.pdf",            size:"132 Ko" },
+    { key:"convention", label:"Convention de formation", name:"Convention_de_formation.pdf",        size:"198 Ko" },
+    { key:"cgv",        label:"CGV",                     name:"CGV.pdf",                            size:"121 Ko" },
+    { key:"besoins",    label:"Évaluation des besoins",  name:"Evaluation_des_besoins.docx",        size:"88 Ko"  },
+    { key:"test",       label:"Test de début",           name:"Test_de_positionnement_debut.pdf",   size:"156 Ko" }
+  ];
+  function addAtt(msg, o){
+    o = o || {};
+    var box = msg.querySelector(".attachments");
+    if(!box){ msg.insertAdjacentHTML("beforeend", attBlock()); box = msg.querySelector(".attachments"); }
+    var name = o.name || "Document.pdf";
+    var type = o.type || typeFromName(name);
+    var a = document.createElement("div");
+    a.className = "att";
+    a.setAttribute("data-type", type);
+    a.innerHTML =
+      '<div class="att-thumb">' +
+        '<div class="att-ph" title="Cliquer : changer le type de fichier">' + TYPES[type].lbl + '</div>' +
+        '<div class="att-over">' +
+          '<button data-att="dl" title="Télécharger"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"/></svg></button>' +
+          '<button data-att="drive" title="Enregistrer dans Drive"><svg viewBox="0 0 24 24"><path d="M7.7 3 1.2 14.2 4.5 20l6.5-11.2zM22.8 14.2 16.3 3H9.7l6.5 11.2zM5.9 21h12.2l3.3-5.7H9.2z"/></svg></button>' +
+          '<button data-att="del" title="Supprimer la pièce jointe"><svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>' +
+          '<span class="att-size" contenteditable="true">' + esc(o.size || "120 Ko") + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="att-cap">' +
+        '<span class="att-badge" title="Cliquer : changer le type de fichier" style="background:' + TYPES[type].c + '">' + TYPES[type].lbl + '</span>' +
+        '<span class="att-name" contenteditable="true">' + esc(name) + '</span>' +
+        '<span class="fold-g"></span><span class="fold-c" style="border-top-color:' + TYPES[type].fold + '"></span>' +
+      '</div>';
+    if(o.thumb) a.querySelector(".att-thumb").style.background = "url(" + o.thumb + ") center/cover no-repeat";
+    if(o.href) a.setAttribute("data-href", o.href);
+    box.querySelector(".att-list").appendChild(a);
+    refreshAtt(msg);
+    return a;
+  }
+  function setAttType(card, t){
+    card.setAttribute("data-type", t);
+    var ph = card.querySelector(".att-ph"), bd = card.querySelector(".att-badge"), fc = card.querySelector(".fold-c");
+    if(ph) ph.textContent = TYPES[t].lbl;
+    if(bd){ bd.textContent = TYPES[t].lbl; bd.style.background = TYPES[t].c; }
+    if(fc) fc.style.borderTopColor = TYPES[t].fold;
+  }
+  function refreshAtt(msg){
+    var box = msg.querySelector(".attachments");
+    if(!box) return;
+    var n = box.querySelectorAll(".att").length;
+    box.classList.toggle("show", n > 0);
+    var c = box.querySelector(".att-count");
+    if(c) c.textContent = (n === 1) ? "Une pièce jointe" : n + " pièces jointes";
+    var d = box.querySelector(".drive-lbl");
+    if(d) d.textContent = (n === 1) ? "Ajouter à Drive" : "Tout enregistrer dans Drive";
+    var dl = box.querySelector(".dl-all");
+    if(dl) dl.hidden = (n < 2);
+  }
+
+  /* ---------- contenu de démonstration ---------- */
+  function demo(){
+    msgs.innerHTML = "";
+    msgs.appendChild(tpl({
+      name:"Expéditeur", mail:"expediteur@exemple.com", to:"moi", date:"26 août 2026, 09:12", ago:"(il y a 8 jours)",
+      body:'<p>Bonjour,</p>' +
+           '<p>Votre inscription est bien enregistrée.</p>' +
+           '<p>Vous trouverez ci-joint les documents à lire et à retourner signés.</p>' +
+           '<p><a class="btn-cta" href="#">Ouvrir mon dossier</a></p>' +
+           '<p>Cordialement,<br>Expéditeur</p>',
+      atts:[ PRESETS[0], PRESETS[2], PRESETS[1], PRESETS[3] ]
+    }));
+    msgs.appendChild(tpl({
+      name:"Moi", mail:"moi@exemple.com", to:"Expéditeur", date:"26 août 2026, 10:04", ago:"(il y a 8 jours)",
+      body:'<p>Bonjour,</p><p>Bien reçu, merci. Vous trouverez ci-joint le document complété.</p><p>Cordialement,</p>',
+      atts:[ PRESETS[4] ]
+    }));
+    refreshAll();
+  }
+
+  /* ---------- modèles de mails (structure des 5 mails récurrents) ----------
+     Les valeurs entre crochets sont des variables à remplacer : cliquez dessus et tapez. */
+  var OF = "[ORGANISME DE FORMATION]", OFMAIL = "[contact@organisme.fr]";
+  var STG = "[NOM Prénom du stagiaire]", STGMAIL = "[stagiaire@exemple.com]";
+  var FORM = "[Intitulé de la formation]", D1 = "[date de début]", D2 = "[date de fin]";
+  var SIGN = '<p>Cordialement,</p><p>L’équipe pédagogique<br>' + OF + '<br>' + OFMAIL + '</p>';
+
+  var TEMPLATES = [
+    {
+      label: "1 · Pré-inscription",
+      hint: "Programme + test de positionnement + évaluation des besoins (avec réponse du stagiaire)",
+      subject: "Pré-inscription",
+      msgs: [
+        { name:OF, mail:OFMAIL, to:STGMAIL, date:"21 juil. 2026 à 14:05", ago:"",
+          body:'<p>Bonjour,</p>' +
+               '<p>Merci pour l’intérêt que vous portez à notre formation :<br><b>' + FORM + '</b></p>' +
+               '<p>Vous trouverez en pièces jointes :</p>' +
+               '<ul><li>L’évaluation de vos besoins (à compléter et à nous retourner),</li>' +
+               '<li>Le test de positionnement (à compléter et à nous retourner),</li>' +
+               '<li>Le programme de formation correspondant à votre projet.</li></ul>' +
+               '<p>Nous vous invitons à lire attentivement le programme afin de valider qu’il correspond bien à vos attentes et objectifs. Une fois cette lecture effectuée, nous vous remercions de bien vouloir nous retourner l’évaluation des besoins dûment complétée. Ce document est essentiel pour mieux cerner vos besoins et préparer au mieux votre accueil en formation.</p>' +
+               '<p>Si vous êtes en situation de handicap ou si vous avez besoin d’un aménagement particulier, merci de nous en informer afin que nous puissions adapter la formation en conséquence.</p>' + SIGN,
+          atts:[ {name:"PROGRAMME.pdf", size:"3,1 Mo"},
+                 {name:"TEST DE POSITIONNEMENT.pdf", size:"392 Ko"},
+                 {name:"TRAME EVALUATION DES BESOINS.pdf", size:"414 Ko"} ] },
+        { name:STG, mail:STGMAIL, to:OF, date:"23 juil. 2026 à 16:20", ago:"",
+          body:'<p>Bonjour,</p><p>Je vous prie de trouver ci-joint les documents demandés.</p>' +
+               '<p>Bien cordialement,<br>' + STG + '</p>',
+          atts:[ {name:"TRAME EVALUATION DES BESOINS.pdf", size:"428 Ko"},
+                 {name:"TEST DE POSITIONNEMENT.pdf", size:"486 Ko"} ] }
+      ]
+    },
+    {
+      label: "2 · Confirmation d’inscription",
+      hint: "Convention, CGV, règlement intérieur, convocation",
+      subject: "Confirmation de votre inscription et envoi des documents de formation",
+      msgs: [
+        { name:OF, mail:OFMAIL, to:STGMAIL, date:"29 juil. 2026 à 09:05", ago:"",
+          body:'<p>Bonjour ' + STG + ',</p>' +
+               '<p>Nous avons le plaisir de vous confirmer votre inscription à la formation <b>' + FORM + '</b>, organisée par ' + OF + '.</p>' +
+               '<p>Vous trouverez ci-joints les documents relatifs à votre entrée en formation :</p>' +
+               '<ul><li>La convention de formation à lire, signer et nous retourner,</li>' +
+               '<li>Les conditions générales de vente (CGV),</li>' +
+               '<li>Le règlement intérieur,</li>' +
+               '<li>La convocation, précisant les dates et horaires de formation.</li></ul>' +
+               '<p>Nous vous remercions de bien vouloir prendre connaissance de l’ensemble des pièces jointes et de nous retourner le contrat signé dans les meilleurs délais, soit par voie électronique, soit en main propre lors de votre venue.</p>' +
+               '<p>N’hésitez pas à revenir vers nous si vous souhaitez y apporter des modifications ou si vous avez la moindre question. Restant à votre disposition,</p>' + SIGN,
+          atts:[ {name:"Convention_de_formation.pdf", size:"198 Ko"},
+                 {name:"CGV.pdf", size:"121 Ko"},
+                 {name:"Reglement_interieur.pdf", size:"132 Ko"},
+                 {name:"Convocation.pdf", size:"164 Ko"} ] }
+      ]
+    },
+    {
+      label: "3 · Convocation",
+      hint: "Dates, horaires, modalités d’accès + programme en pièce jointe",
+      subject: "Convocation à la formation " + FORM,
+      msgs: [
+        { name:OF, mail:OFMAIL, to:STGMAIL, date:"7 août 2026 à 16:22", ago:"",
+          body:'<p>Bonjour ' + STG + ',</p>' +
+               '<p>Nous vous confirmons votre inscription à la formation <b>' + FORM + '</b>.</p>' +
+               '<p>La session se tiendra du ' + D1 + ' au ' + D2 + '.</p>' +
+               '<p>Veuillez trouver en pièce jointe votre convocation détaillée (programme, horaires, modalités d’accès en présentiel ou en ligne, coordonnées utiles). Merci de la lire attentivement et de conserver ces informations.</p>' +
+               '<p>Si vous ne la voyez pas, pensez à vérifier votre dossier « Courriers indésirables ».</p>' +
+               '<p>Pour toute question, vous pouvez nous joindre à ' + OFMAIL + '.</p>' + SIGN,
+          atts:[ {name:"PROGRAMME " + FORM + ".docx", size:"181 Ko"},
+                 {name:"Convocation.pdf", size:"164 Ko"} ] }
+      ]
+    },
+    {
+      label: "4 · Envoi du support de cours",
+      hint: "Support de cours + ressources pédagogiques",
+      subject: "Transmission du support de cours et des ressources pédagogiques",
+      msgs: [
+        { name:OF, mail:OFMAIL, to:STGMAIL, date:"18 août 2026 à 10:35", ago:"",
+          body:'<p>Bonjour ' + STG + ',</p>' +
+               '<p>Je vous prie de bien vouloir trouver en pièce jointe le support de cours relatif à la formation <b>' + FORM + '</b>.</p>' +
+               '<p>Vous trouverez également ci-joint les ressources complémentaires.</p>' +
+               '<p>Ces éléments ont pour objectif de faciliter votre compréhension et de vous accompagner dans la mise en pratique des compétences acquises.</p>' +
+               '<p>Je reste à votre disposition pour toute question ou besoin d’accompagnement complémentaire, et vous souhaite une excellente continuation dans votre parcours de formation.</p>' + SIGN,
+          atts:[ {name:"Support de cours.pdf", size:"928 Ko"},
+                 {name:"RESSOURCES_PEDAGOGIQUES.pdf", size:"186 Ko"} ] }
+      ]
+    },
+    {
+      label: "5 · Bilan à chaud",
+      hint: "Évaluation de fin de session à compléter et renvoyer",
+      subject: "Bilan à chaud",
+      msgs: [
+        { name:OF, mail:OFMAIL, to:STGMAIL, date:"19 août 2026 à 09:31", ago:"",
+          body:'<p>Bonjour ' + STG + ',</p>' +
+               '<p>Merci pour votre participation à la formation <b>' + FORM + '</b> du ' + D1 + ' au ' + D2 + '.</p>' +
+               '<p>Afin d’évaluer la qualité de la session et d’améliorer nos actions, merci de compléter votre bilan à chaud.</p>' +
+               '<p>Veuillez remplir le document et nous le renvoyer par retour d’e-mail à ' + OFMAIL + '.</p>' +
+               '<p>Nous restons à votre disposition en cas de besoin.</p>' + SIGN,
+          atts:[ {name:"BILAN_A_CHAUD.pdf", size:"152 Ko"} ] }
+      ]
+    }
+  ];
+
+  function applyTemplate(t){
+    document.getElementById("subject").textContent = t.subject;
+    msgs.innerHTML = "";
+    t.msgs.forEach(function(m){ msgs.appendChild(tpl(m)); });
+    refreshAll();
+    syncTitle();
+    save();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  /* ---------- sauvegarde locale ---------- */
+  /* On ne sauvegarde que le CONTENU (objet, messages, textes modifiables de l'habillage),
+     jamais la structure : une page déjà enregistrée profite ainsi des évolutions du gabarit. */
+  var timer = null;
+  function save(){
+    syncAccount();
+    if(document.documentElement.getAttribute("data-export") === "1") return;
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      try{
+        var kv = {};
+        Array.prototype.forEach.call(document.querySelectorAll("#page [data-k]"), function(el){
+          kv[el.getAttribute("data-k")] = el.innerHTML;
+        });
+        localStorage.setItem(KEY, JSON.stringify({
+          v: 3,
+          subject: document.getElementById("subject").innerHTML,
+          msgs: document.getElementById("messages").innerHTML,
+          kv: kv
+        }));
+      }catch(e){}
+    }, 400);
+  }
+  function applyContent(subject, msgsHtml, kv){
+    if(subject != null) document.getElementById("subject").innerHTML = subject;
+    if(msgsHtml != null) document.getElementById("messages").innerHTML = msgsHtml;
+    if(kv) Object.keys(kv).forEach(function(k){
+      var el = document.querySelector('#page [data-k="' + k + '"]');
+      if(el) el.innerHTML = kv[k];
+    });
+  }
+  function restore(){
+    if(document.documentElement.getAttribute("data-export") === "1") return false;
+    var v;
+    try{ v = localStorage.getItem(KEY); }catch(e){ return false; }
+    if(!v) return false;
+    if(v.charAt(0) === "{"){                        /* format actuel */
+      try{
+        var o = JSON.parse(v);
+        applyContent(o.subject, o.msgs, o.kv);
+        return true;
+      }catch(e){ return false; }
+    }
+    try{                                            /* ancien format : page entière */
+      var tmp = document.createElement("div");
+      tmp.innerHTML = v;
+      var sub = tmp.querySelector("#subject"), ms = tmp.querySelector("#messages"), kv2 = {};
+      Array.prototype.forEach.call(tmp.querySelectorAll("[data-k]"), function(el){
+        kv2[el.getAttribute("data-k")] = el.innerHTML;
+      });
+      applyContent(sub ? sub.innerHTML : null, ms ? ms.innerHTML : null, kv2);
+      return !!ms;
+    }catch(e){}
+    return false;
+  }
+
+  /* ---------- init ---------- */
+  var restored = restore();
+  msgs = document.getElementById("messages");
+  if(!msgs.children.length) demo();
+  upgradeAll();
+  syncAccount();
+  syncTitle();
+
+  /* met à niveau une page sauvegardée par une version précédente */
+  function upgradeAll(){
+    Array.prototype.forEach.call(msgs.querySelectorAll(".msg"), function(m){
+      if(!m.querySelector('[data-act="att"]')){
+        var tools = m.querySelector(".msg-tools");
+        if(tools) tools.insertAdjacentHTML("afterbegin",
+          '<button class="mini" data-act="att" title="Ajouter une pièce jointe"><svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4.5 4.5 0 0 1-9 0V5a3 3 0 0 1 6 0v10.5a1.5 1.5 0 0 1-3 0V6H9v9.5a3 3 0 0 0 6 0V5a4.5 4.5 0 0 0-9 0v12.5a6 6 0 0 0 12 0V6z"/></svg></button>');
+      }
+      if(!m.querySelector(".ago")){
+        var dt = m.querySelector(".date");
+        if(dt) dt.insertAdjacentHTML("afterend", '<span class="ago" contenteditable="true">(à l’instant)</span>');
+      }
+      if(!m.querySelector(".react")){
+        var stEl = m.querySelector(".star");
+        if(stEl) stEl.insertAdjacentHTML("afterend",
+          '<button class="mini react" title="Ajouter une réaction"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM8.5 11a1.5 1.5 0 1 0-1.5-1.5A1.5 1.5 0 0 0 8.5 11zm7 0A1.5 1.5 0 1 0 14 9.5 1.5 1.5 0 0 0 15.5 11zM12 17.5a5.5 5.5 0 0 0 5-3.2H7a5.5 5.5 0 0 0 5 3.2z"/></svg></button>');
+      }
+      var box = m.querySelector(".attachments");
+      if(box && (box.querySelector(".att-ico") || box.querySelector(".att-head .gap"))){
+        /* ancien format (cartes compactes) : on récupère les données et on redessine en vignettes */
+        var data = [];
+        Array.prototype.forEach.call(box.querySelectorAll(".att"), function(old){
+          var nm = old.querySelector(".att-name"), sz = old.querySelector(".att-size");
+          data.push({
+            name: nm ? nm.textContent.trim() : "Document.pdf",
+            size: sz ? sz.textContent.trim() : "120 Ko",
+            type: old.getAttribute("data-type") || null,
+            href: old.getAttribute("data-href") || null
+          });
+        });
+        box.remove(); box = null;
+        m.insertAdjacentHTML("beforeend", attBlock());
+        data.forEach(function(d){ addAtt(m, d); });
+      }
+      if(!m.querySelector(".attachments")) m.insertAdjacentHTML("beforeend", attBlock());
+      refreshAtt(m);
+      refreshAvatar(m);
+    });
+  }
+
+  function syncTitle(){
+    var s = document.getElementById("subject");
+    if(s) document.title = (s.textContent.trim() || "Mail") + " — Gmail";
+  }
+
+  /* ---------- saisie ---------- */
+  document.addEventListener("input", function(e){
+    var t = e.target;
+    if(t.classList && t.classList.contains("from-name")) refreshAvatar(t.closest(".msg"));
+    if(t.id === "subject") syncTitle();
+    if(t.id === "popLetter") return;
+    save();
+  });
+
+  /* ---------- clics ---------- */
+  document.addEventListener("click", function(e){
+    if(e.target.closest("#pop") || e.target.closest("#attMenu") || e.target.closest("#tplMenu")) return;
+
+    var av = e.target.closest(".avatar");
+    if(av){ openPop(av); return; }
+
+    /* pièces jointes : icône = type de fichier */
+    var ic = e.target.closest(".att-ph") || e.target.closest(".att-badge");
+    if(ic){
+      var card = ic.closest(".att");
+      var cur = card.getAttribute("data-type") || "pdf";
+      var nxt = TYPE_ORDER[(TYPE_ORDER.indexOf(cur) + 1) % TYPE_ORDER.length];
+      setAttType(card, nxt);
+      save(); return;
+    }
+    var ab = e.target.closest("[data-att]");
+    if(ab){
+      var c2 = ab.closest(".att"), m2 = ab.closest(".msg"), what = ab.getAttribute("data-att");
+      if(what === "del"){ c2.remove(); refreshAtt(m2); }
+      else if(what === "dl"){
+        var href = c2.getAttribute("data-href");
+        if(href){
+          var dl = document.createElement("a");
+          dl.href = href; dl.download = c2.querySelector(".att-name").textContent.trim();
+          document.body.appendChild(dl); dl.click(); dl.remove();
+        } else {
+          alert("Pièce jointe fictive : aucun fichier réel n'est associé.\nUtilisez « Fichier de mon ordinateur… » pour joindre un vrai document.");
+        }
+      }
+      save(); return;
+    }
+
+    var st = e.target.closest(".star");
+    if(st){ st.classList.toggle("on"); save(); return; }
+
+    var b = e.target.closest("[data-act]");
+    if(b){
+      var m = b.closest(".msg"), act = b.getAttribute("data-act");
+      if(act === "att"){ openAttMenu(m, b); return; }
+      if(act === "del"){ if(msgs.children.length > 1) m.remove(); }
+      else if(act === "dup"){ m.parentNode.insertBefore(m.cloneNode(true), m.nextSibling); }
+      else if(act === "up" && m.previousElementSibling){ m.parentNode.insertBefore(m, m.previousElementSibling); }
+      else if(act === "down" && m.nextElementSibling){ m.parentNode.insertBefore(m.nextElementSibling, m); }
+      save(); return;
+    }
+
+    var a = e.target.closest(".msg-body a");
+    if(a && editOn) e.preventDefault();
+  });
+
+  /* ---------- popover avatar ---------- */
+  var pop = document.getElementById("pop"), popTarget = null;
+  var swBox = document.getElementById("swatches");
+  PALETTE.forEach(function(c){
+    var b = document.createElement("button");
+    b.className = "sw"; b.style.background = c; b.type = "button";
+    b.onclick = function(){
+      if(!popTarget) return;
+      popTarget.classList.remove("img");
+      popTarget.style.background = c;
+      popTarget.dataset.lock = "1";
+      save();
+    };
+    swBox.appendChild(b);
+  });
+  function openPop(av){
+    popTarget = av;
+    var r = av.getBoundingClientRect();
+    pop.style.top = (window.scrollY + r.bottom + 8) + "px";
+    pop.style.left = (window.scrollX + r.left) + "px";
+    document.getElementById("popLetter").value = (av.dataset.lock === "1" && !av.classList.contains("img")) ? av.textContent.trim() : "";
+    pop.classList.add("show");
+  }
+  document.getElementById("popLetter").addEventListener("input", function(){
+    if(!popTarget) return;
+    var v = this.value.trim();
+    if(v){ popTarget.classList.remove("img"); popTarget.textContent = v; popTarget.dataset.lock = "1"; }
+    else { popTarget.dataset.lock = ""; refreshAvatar(popTarget.closest(".msg")); }
+    save();
+  });
+  document.getElementById("popFile").addEventListener("change", function(){
+    var f = this.files[0]; if(!f || !popTarget) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      popTarget.classList.add("img");
+      popTarget.style.background = "url(" + rd.result + ") center/cover no-repeat";
+      popTarget.dataset.lock = "1";
+      save();
+    };
+    rd.readAsDataURL(f);
+    this.value = "";
+  });
+  document.getElementById("popPhoto").onclick = function(){ document.getElementById("popFile").click(); };
+  document.getElementById("popAuto").onclick = function(){
+    if(!popTarget) return;
+    popTarget.classList.remove("img");
+    popTarget.dataset.lock = "";
+    refreshAvatar(popTarget.closest(".msg"));
+    document.getElementById("popLetter").value = "";
+    save();
+  };
+  document.getElementById("popClose").onclick = function(){ pop.classList.remove("show"); };
+  document.addEventListener("mousedown", function(e){
+    if(pop.classList.contains("show") && !e.target.closest("#pop") && !e.target.closest(".avatar")) pop.classList.remove("show");
+  });
+
+  /* ---------- menu pièces jointes ---------- */
+  var attMenu = document.getElementById("attMenu"), attTarget = null;
+  var pl = document.getElementById("presetList");
+  PRESETS.forEach(function(p){
+    var t = typeFromName(p.name);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = '<span class="tag" style="background:' + TYPES[t].c + '">' + TYPES[t].lbl + '</span>' + esc(p.label);
+    b.onclick = function(){
+      if(attTarget){ addAtt(attTarget, p); save(); }
+      attMenu.classList.remove("show");
+    };
+    pl.appendChild(b);
+  });
+  attMenu.querySelector('[data-preset="custom"]').onclick = function(){
+    if(!attTarget) return;
+    var n = prompt("Nom du fichier (avec son extension) :", "Document.pdf");
+    if(!n) return;
+    var s = prompt("Taille affichée :", "120 Ko") || "120 Ko";
+    addAtt(attTarget, {name:n, size:s});
+    attMenu.classList.remove("show");
+    save();
+  };
+  document.getElementById("attFile").addEventListener("change", function(){
+    var f = this.files[0]; if(!f || !attTarget) return;
+    var msgEl = attTarget, isImg = /^image\//.test(f.type);
+    if(f.size <= 2 * 1024 * 1024){
+      var rd = new FileReader();
+      rd.onload = function(){
+        addAtt(msgEl, {name:f.name, size:humanSize(f.size), href:rd.result, thumb:isImg ? rd.result : null});
+        save();
+      };
+      rd.readAsDataURL(f);
+    } else {
+      addAtt(msgEl, {name:f.name, size:humanSize(f.size)});
+      save();
+    }
+    attMenu.classList.remove("show");
+    this.value = "";
+  });
+  document.getElementById("attFileBtn").onclick = function(){ document.getElementById("attFile").click(); };
+  function openAttMenu(msg, anchor){
+    attTarget = msg;
+    attMenu.classList.add("show");           /* affiché d'abord pour être mesuré */
+    var r = anchor.getBoundingClientRect();
+    var h = attMenu.offsetHeight, w = attMenu.offsetWidth;
+    var vh = document.documentElement.clientHeight, vw = document.documentElement.clientWidth;
+    var top = r.bottom + 6;
+    if(top + h > vh - 8) top = Math.max(8, r.top - h - 6);   /* pas de place dessous : on ouvre vers le haut */
+    var left = Math.min(Math.max(8, r.right - w), vw - w - 8);
+    attMenu.style.top = (window.scrollY + top) + "px";
+    attMenu.style.left = (window.scrollX + left) + "px";
+    pop.classList.remove("show");
+  }
+  document.addEventListener("mousedown", function(e){
+    if(attMenu.classList.contains("show") && !e.target.closest("#attMenu") && !e.target.closest('[data-act="att"]') && !e.target.closest("#addAtt"))
+      attMenu.classList.remove("show");
+  });
+
+  /* ---------- menu des modèles ---------- */
+  var tplMenu = document.getElementById("tplMenu"), tplList = document.getElementById("tplList");
+  TEMPLATES.forEach(function(t){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = '<span class="stack"><span>' + esc(t.label) + '</span><span class="sub">' + esc(t.hint) + '</span></span>';
+    b.onclick = function(){
+      tplMenu.classList.remove("show");
+      if(msgs.children.length && !confirm("Remplacer le contenu actuel par le modèle « " + t.label + " » ?")) return;
+      applyTemplate(t);
+    };
+    tplList.appendChild(b);
+  });
+  document.getElementById("btnTpl").onclick = function(){
+    tplMenu.classList.add("show");
+    var r = this.getBoundingClientRect();
+    var h = tplMenu.offsetHeight, w = tplMenu.offsetWidth;
+    var vh = document.documentElement.clientHeight, vw = document.documentElement.clientWidth;
+    var top = r.bottom + 6;
+    if(top + h > vh - 8) top = Math.max(8, r.top - h - 6);
+    var left = Math.min(Math.max(8, r.left), vw - w - 8);
+    tplMenu.style.top = (window.scrollY + top) + "px";
+    tplMenu.style.left = (window.scrollX + left) + "px";
+    attMenu.classList.remove("show"); pop.classList.remove("show");
+  };
+  document.addEventListener("mousedown", function(e){
+    if(tplMenu.classList.contains("show") && !e.target.closest("#tplMenu") && !e.target.closest("#btnTpl"))
+      tplMenu.classList.remove("show");
+  });
+
+  /* ---------- barre d'outils ---------- */
+  var bar = document.getElementById("bar");
+  Array.prototype.forEach.call(bar.querySelectorAll("[data-cmd]"), function(b){
+    b.onmousedown = function(e){ e.preventDefault(); };
+    b.onclick = function(){ document.execCommand(b.getAttribute("data-cmd"), false, null); save(); };
+  });
+  var lnk = document.getElementById("tLink");
+  lnk.onmousedown = function(e){ e.preventDefault(); };
+  lnk.onclick = function(){
+    var u = prompt("URL du lien :", "https://");
+    if(u){ document.execCommand("createLink", false, u); save(); }
+  };
+  var btnB = document.getElementById("tBtn");
+  btnB.onmousedown = function(e){ e.preventDefault(); };
+  btnB.onclick = function(){
+    var txt = prompt("Texte du bouton :", "Accéder à ma formation");
+    if(!txt) return;
+    var u = prompt("URL :", "https://") || "#";
+    document.execCommand("insertHTML", false, '<a class="btn-cta" href="' + u + '">' + esc(txt) + '</a>');
+    save();
+  };
+
+  function addMsg(kind){
+    var m;
+    if(kind === "in"){
+      m = tpl({ name:"Nouvel expéditeur", mail:"expediteur@exemple.com", to:"moi", date:nowFr() });
+    } else {
+      var last = msgs.querySelector(".msg:last-child");
+      var to = last ? last.querySelector(".from-name").textContent : "destinataire";
+      m = tpl({
+        name:"Moi", mail:"moi@exemple.com", to:to, date:nowFr(),
+        body:"<p>Bonjour,</p><p>Votre réponse ici…</p><p>Cordialement,</p>"
+      });
+    }
+    msgs.appendChild(m);
+    refreshAvatar(m);
+    m.scrollIntoView({behavior:"smooth", block:"center"});
+    save();
+  }
+  document.getElementById("addAtt").onclick = function(){
+    var m = null, sel = window.getSelection();
+    if(sel && sel.anchorNode){
+      var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode;
+      if(n && n.closest) m = n.closest(".msg");
+    }
+    if(!m) m = msgs.querySelector(".msg:last-child");
+    if(m) openAttMenu(m, this);
+  };
+  document.getElementById("addIn").onclick = function(){ addMsg("in"); };
+  document.getElementById("addOut").onclick = function(){ addMsg("out"); };
+  document.getElementById("btnReply").onclick = function(){ addMsg("out"); };
+  document.getElementById("btnForward").onclick = function(){ addMsg("out"); };
+
+  function setEdit(v){
+    editOn = v;
+    document.body.classList.toggle("edit", v);
+    Array.prototype.forEach.call(document.querySelectorAll("#page [contenteditable]"), function(el){
+      el.setAttribute("contenteditable", v ? "true" : "false");
+    });
+    var t = document.getElementById("tEdit");
+    t.textContent = v ? "Édition : ON" : "Édition : OFF";
+    t.classList.toggle("on", v);
+  }
+  document.getElementById("tEdit").onclick = function(){ setEdit(!editOn); };
+
+  document.getElementById("tPrint").onclick = function(){ window.print(); };
+
+  document.getElementById("tReset").onclick = function(){
+    if(!confirm("Effacer vos modifications et revenir à l'exemple ?")) return;
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    location.reload();
+  };
+
+  document.getElementById("tSave").onclick = function(){
+    document.documentElement.setAttribute("data-export", "1");
+    var html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    document.documentElement.removeAttribute("data-export");
+    var subj = (document.getElementById("subject").textContent || "mail").trim().replace(/[\\/:*?"<>|]/g, "").slice(0, 60);
+    var blob = new Blob([html], {type:"text/html;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = (subj || "mail") + ".html";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  };
+
+  document.addEventListener("keydown", function(e){
+    if(e.ctrlKey && String(e.key).toLowerCase() === "e"){ e.preventDefault(); bar.classList.toggle("hidden"); }
+  });
+
+  /* ---------- pré-remplissage automatique (générateur Qualiopi) ----------
+     d = { subject, messages:[{name, mail, to, date, ago, body, atts:[{name,size}]}] } */
+  window.__prefill = function(d){
+    document.getElementById("subject").textContent = d.subject || "";
+    msgs.innerHTML = "";
+    (d.messages || []).forEach(function(m){ msgs.appendChild(tpl(m)); });
+    refreshAll(); syncAccount(); syncTitle();
+    setEdit(false);
+    var b = document.getElementById("bar"); if(b) b.classList.add("hidden");
+    Array.prototype.forEach.call(document.querySelectorAll(".msg-tools,.pop,#attMenu,#tplMenu"), function(el){ el.style.display = "none"; });
+    return true;
+  };
+  window.__mailReady = true;
+})();
+</script>
+</body>
+</html>
