@@ -1,6 +1,7 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { SAMPLE_FORMATIONS } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
+import { getFicheFC, ficheToReferentiel } from "./franceCompetences";
 
 /** Nombre d'heures déduit des dates (7 h par jour ouvré), 0 si incalculable. */
 function heuresDepuisDates(deb?: string, fin?: string): number {
@@ -109,6 +110,9 @@ export function resolveFormation(
   }
   if (!v(f.formateur)) f.formateur = v(org?.responsablePedagogique) || v(org?.dirigeant);
   if (!v(f.nombreParticipants)) f.nombreParticipants = String((stagiaires || []).filter((s) => v(s?.nom)).length || 1);
+  // Référentiel officiel (base synchronisée France Compétences) si aucune analyse n'a été enregistrée.
+  const fc = code ? getFicheFC(code) : null;
+  if (fc && !f.referentiel?.code) f.referentiel = ficheToReferentiel(fc);
   // Le code certification n'est jamais hérité : vide = formation non RS/RNCP (IND 3, 7 et 16 masqués).
   f.codeRNCP = code;
   return f;

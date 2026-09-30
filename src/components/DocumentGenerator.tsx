@@ -13,6 +13,7 @@ import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sample
 import { resolveFormation, financeursEffectifs } from "@/lib/formationResolue";
 import { clientMailOrganisme, retrouverMail, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
 import { captureMail } from "@/lib/mails/captureMail";
+import { preloadFranceCompetences } from "@/lib/franceCompetences";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronRight, X, Loader2, FolderOpen, RefreshCw, Archive, AlertTriangle, Cloud } from "lucide-react";
@@ -195,7 +196,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     resolveFormation(formation, organisme, stagiaires)
   ), [formation, organisme, stagiaires]);
   const allStagiaires = useMemo(() => financeursEffectifs(mergeStagiaires(stagiaires), formation, organisme), [stagiaires, formation, organisme]);
-  const catalog = useMemo(() => getFullCatalog(organisme, formation, stagiaires), [organisme, formation, stagiaires]);
+  // Fiche RNCP/RS officielle (base synchronisée France Compétences) chargée dès que le code est saisi.
+  const [fcVersion, setFcVersion] = useState(0);
+  useEffect(() => {
+    let actif = true;
+    preloadFranceCompetences(formation.codeRNCP).then(() => { if (actif) setFcVersion((v) => v + 1); });
+    return () => { actif = false; };
+  }, [formation.codeRNCP]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const catalog = useMemo(() => getFullCatalog(organisme, formation, stagiaires), [organisme, formation, stagiaires, fcVersion]);
   const progress = catalog.length ? Math.round((generated.size / catalog.length) * 100) : 0;
   // Index critère → indicateur → documents (évite de re-filtrer le catalogue à chaque rendu)
   const docsIndex = useMemo(() => {

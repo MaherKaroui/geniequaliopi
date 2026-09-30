@@ -3,6 +3,8 @@ import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
+import { getFicheFC } from "./franceCompetences";
+import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements } from "./qualite2026";
@@ -145,9 +147,20 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   const catalogue = buildFullCatalog([selectedFormation], mergeStagiaires(userStagiaires), SAMPLE_FORMATEURS, org.typesActions, org.dirigeant, org.codePostal, org.referentQualite);
   // Mails automatiques : captures Gmail / Outlook datées (remplacent les 5 mails génériques .docx).
   const mails = entreesCatalogueMails(mergeOrganisme(org), selectedFormation, mergeStagiaires(userStagiaires));
-  if (mails.length === 0) return catalogue;
+  // Référentiel officiel synchronisé France Compétences (AF / CFA certifiants) :
+  // banque d'exercices corrigés + évaluation par bloc propre à chaque stagiaire.
+  const types = org.typesActions || [];
+  const fcEntrees: DocEntry[] = [];
+  if (getFicheFC(selectedFormation.codeRNCP) && (types.length === 0 || types.includes("actions-formation") || types.includes("apprentissage"))) {
+    const p = types.includes("apprentissage") ? "cfa" : "af";
+    fcEntrees.push({ id: `${p}_c3i11_banque_exercices_referentiel`, nom: "CT3 - IND 11 BANQUE D'EXERCICES CORRIGÉS (RÉFÉRENTIEL FRANCE COMPÉTENCES)", critere: 3, indicateur: 11, template: "fc_banque_exercices" });
+    mergeStagiaires(userStagiaires).forEach((s, si) => {
+      if ((s.nom || "").trim()) fcEntrees.push({ id: `${p}_c3i11_evaluation_blocs_${si}`, nom: `CT3 - IND 11 ÉVALUATION DES ACQUIS PAR BLOC DE COMPÉTENCES – ${s.prenom} ${s.nom}`, critere: 3, indicateur: 11, template: "fc_evaluation_blocs", params: { stagiaireIdx: si } });
+    });
+  }
   const REMPLACES = new Set(["mail_pre_inscription", "mail_inscription", "mail_convocation", "mail_envoie_sc_ressources", "mail_fin_formation"]);
-  return [...catalogue.filter((d) => !REMPLACES.has(d.template)), ...mails];
+  const base = mails.length ? catalogue.filter((d) => !REMPLACES.has(d.template)) : catalogue;
+  return [...base, ...fcEntrees, ...mails];
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
@@ -216,6 +229,19 @@ function stripEmojis(html: string): string {
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
+  // Fiche officielle et tableau croisé : données France Compétences quand la fiche est chargée.
+  if (template === "fiche_certification_rs" || template === "tableau_croise_cfa" || template.startsWith("fc_")) {
+    const fFC = resolveFormation(userFormation, org, userStagiaires);
+    if (getFicheFC(fFC.codeRNCP)) {
+      if (template === "fiche_certification_rs") return genFicheCertificationFC(o, fFC);
+      if (template === "tableau_croise_cfa") return genTableauCroiseFC(o, fFC);
+      if (template === "fc_banque_exercices") return genBanqueExercicesFC(o, fFC);
+      if (template === "fc_evaluation_blocs") {
+        const s = mergeStagiaires(userStagiaires)[params?.stagiaireIdx ?? 0];
+        if (s) return genEvaluationBlocsStagiaire(o, fFC, s);
+      }
+    }
+  }
   if (template === "mail_capture") {
     const s = mergeStagiaires(userStagiaires)[params?.stagiaireIdx ?? 0];
     const r = s ? retrouverMail(o, resolveFormation(userFormation, org, userStagiaires), s, String(params?.mailKey || "")) : null;
