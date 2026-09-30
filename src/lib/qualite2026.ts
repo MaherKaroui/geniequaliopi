@@ -239,7 +239,7 @@ export function genGrilleEvaluationEnseignements(o: OrganismeInfo, f: FormationI
     ],
     table: { headers: ["Critère", "1", "2", "3", "4", "5"], rows },
     extraHtml: realisee
-      ? `<p><strong>Moyenne :</strong> ${moyenne}/5</p><p><strong>Ce qui m'a le plus aidé :</strong> les mises en situation reliées à mes missions en entreprise.</p><p><strong>Ce qui pourrait être amélioré :</strong> ${faible.charAt(0).toLowerCase() + faible.slice(1)}.</p>`
+      ? `<p><strong>Moyenne :</strong> ${moyenne}/5</p><p><strong>Ce qui m'a le plus aidé :</strong> les mises en situation reliées à mes missions en entreprise.</p><p><strong>Critère à améliorer en priorité :</strong> « ${faible} » (note la plus basse de ma grille).</p>`
       : `<p><strong>Ce qui m'a le plus aidé :</strong> ………………………………………………</p><p><strong>Ce qui pourrait être amélioré :</strong> ………………………………………………</p>`,
     stagiaires: [s],
   });
