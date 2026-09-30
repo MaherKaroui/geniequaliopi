@@ -170,7 +170,7 @@ export function profilDeclaratif(s: StagiaireInfo, f?: FormationInfo, domaine?: 
   ], 4);
   const resultatAttendu = pk([
     "Un projet professionnel formalisé et un plan d'action sur 6 à 12 mois.",
-    "Une décision éclairée sur la suite de mon parcours et les formations à engager.",
+    "Une décision éclairée sur la suite de mon parcours et les démarches à engager.",
     "Une feuille de route claire, avec des étapes concrètes et des contacts identifiés.",
   ], 5);
   return { seed, motif, motifLibelle: MOTIFS[motif], niveauEtudes, source, financeur, origine, situation, jours, creneaux, projet, cible, attente, resultatAttendu };

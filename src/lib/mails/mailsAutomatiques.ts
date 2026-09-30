@@ -7,6 +7,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { joursFeriesDeLAnnee, cleDate } from "../joursFeries";
 import { getDateAnalyseBesoins, getDateSignatureDossier } from "../docBuilder";
+import { chronoVAE } from "../vae/vaeProfil";
 
 export type ClientMail = "gmail" | "outlook";
 export type TypeAction = OrganismeInfo["typesActions"][number];
@@ -265,27 +266,37 @@ function scenarioCFA(c: Ctx): MailAuto[] {
 function scenarioVAE(c: Ctx): MailAuto[] {
   const { f, s } = c;
   const k = `${s.nom}|${s.prenom}`;
+  // Même chronologie que les pièces VAE (entretien → faisabilité → contrat → séances → jury).
+  const ch = chronoVAE(s, f, c.o);
+  const entretien = ch.entretienFaisabilite || jo(c.debut, -25);
+  const contrat = ch.contrat || jo(c.debut, -14);
+  const premiere = ch.premiereSeance || c.debut;
+  const derniere = ch.derniereSeance || c.fin;
+  const cpf = /cpf|compte formation/i.test(s.financeur || "");
+  const retractation = cpf
+    ? "La commande passée sur Mon Compte Formation vaut acceptation des conditions générales de la plateforme, dont le délai de 11 jours ouvrés avant l'entrée en accompagnement."
+    : "Vous disposez d'un délai de rétractation de 10 jours à compter de la signature (art. L.6353-5 du Code du travail) ; l'accompagnement débutera ensuite.";
   return [
     mail("vae_demande", "Réponse à la demande d'information VAE", `Votre projet de VAE – ${f.intitule}`, [
-      deStagiaire(c, aHeure(jo(c.debut, -18), k + "d0", [1000, 1250]), `<p>Bonjour,</p><p>Je souhaite obtenir le ${esc(f.intitule)} par la VAE. Pouvez-vous m'accompagner ?</p>`),
-      deOF(c, aHeure(jo(c.debut, -17), k + "d1"), `<p>${c.appel},</p><p>Merci pour votre message. La démarche se fait sur la plateforme France VAE (vae.gouv.fr). Nous vous proposons un entretien gratuit pour vérifier l'adéquation de votre expérience avec la certification ${esc(f.codeRNCP || "")} ; vous trouverez ci-joint la présentation de notre accompagnement.</p>`, [pj(c, "Presentation accompagnement VAE", false)]),
+      deStagiaire(c, aHeure(jo(entretien, -4), k + "d0", [1000, 1250]), `<p>Bonjour,</p><p>Je souhaite obtenir le ${esc(f.intitule)} par la VAE. Pouvez-vous m'accompagner ?</p>`),
+      deOF(c, aHeure(jo(entretien, -3), k + "d1"), `<p>${c.appel},</p><p>Merci pour votre message. La démarche se fait sur la plateforme France VAE (vae.gouv.fr). Nous vous proposons un entretien gratuit pour vérifier l'adéquation de votre expérience avec la certification ${esc(f.codeRNCP || "")} ; vous trouverez ci-joint la présentation de notre accompagnement.</p>`, [pj(c, "Presentation accompagnement VAE", false)]),
     ]),
     mail("vae_faisabilite", "Entretien de faisabilité", `Entretien de faisabilité VAE`, [
-      deOF(c, aHeure(jo(c.debut, -14), k + "f1"), `<p>${c.appel},</p><p>Je vous confirme notre entretien de faisabilité. Merci de préparer votre CV et la liste de vos expériences en lien avec le référentiel : nous les comparerons bloc par bloc.</p>`),
+      deOF(c, aHeure(jo(entretien, -1), k + "f1"), `<p>${c.appel},</p><p>Je vous confirme notre entretien de faisabilité. Merci de préparer votre CV et la liste de vos expériences en lien avec le référentiel : nous les comparerons bloc par bloc.</p>`),
     ]),
     mail("vae_contrat", "Envoi du contrat d'accompagnement", `Contrat d'accompagnement VAE`, [
-      deOF(c, aHeure(jo(c.debut, -11), k + "c1"), v(c, "vae_contrat", [`<p>${c.appel},</p><p>Suite à la décision de recevabilité, vous trouverez ci-joint votre contrat d'accompagnement VAE, le règlement intérieur et les conditions générales. Vous disposez d'un délai de rétractation de 10 jours à compter de la signature.</p>`, `<p>${c.appel},</p><p>Votre dossier de faisabilité ayant été déclaré recevable, je vous adresse votre contrat d'accompagnement VAE ainsi que le règlement intérieur. Le délai de rétractation est de 10 jours à compter de la signature ; l'accompagnement débutera ensuite.</p>`]), [pj(c, "Contrat d accompagnement VAE"), pj(c, "Reglement interieur", false)]),
-      deStagiaire(c, aHeure(jo(c.debut, -10), k + "c2"), `<p>Bonjour,</p><p>Ci-joint le contrat signé.</p>`, [pj(c, "Contrat signe")]),
+      deOF(c, aHeure(jo(contrat, -1), k + "c1"), v(c, "vae_contrat", [`<p>${c.appel},</p><p>Suite à la décision de recevabilité, vous trouverez ci-joint votre contrat d'accompagnement VAE, le règlement intérieur et les conditions générales. ${retractation}</p>`, `<p>${c.appel},</p><p>Votre dossier de faisabilité ayant été déclaré recevable, je vous adresse votre contrat d'accompagnement VAE ainsi que le règlement intérieur. ${retractation}</p>`]), [pj(c, "Contrat d accompagnement VAE"), pj(c, "Reglement interieur", false)]),
+      deStagiaire(c, aHeure(contrat, k + "c2"), `<p>Bonjour,</p><p>Ci-joint le contrat signé.</p>`, [pj(c, "Contrat signe")]),
     ]),
     mail("vae_planning", "Planning des séances d'accompagnement", `Planning de vos séances d'accompagnement`, [
-      deOF(c, aHeure(jo(c.debut, -2), k + "p1"), v(c, "vae_planning", [`<p>${c.appel},</p><p>Vous trouverez ci-joint le planning de vos séances d'accompagnement du ${fr(c.debut)} au ${fr(c.fin)}, ${modalite(c)}.</p>`, `<p>${c.appel},</p><p>Voici le calendrier de nos séances d'accompagnement (${fr(c.debut)} → ${fr(c.fin)}), ${modalite(c)}. Entre les séances, vous pouvez m'envoyer vos écrits pour relecture.</p>`]), [pj(c, "Planning des seances")]),
+      deOF(c, aHeure(jo(premiere, -2), k + "p1"), v(c, "vae_planning", [`<p>${c.appel},</p><p>Vous trouverez ci-joint le planning de vos séances d'accompagnement du ${fr(c.debut)} au ${fr(c.fin)}, ${modalite(c)}.</p>`, `<p>${c.appel},</p><p>Voici le calendrier de nos séances d'accompagnement (${fr(c.debut)} → ${fr(c.fin)}), ${modalite(c)}. Entre les séances, vous pouvez m'envoyer vos écrits pour relecture.</p>`]), [pj(c, "Planning des seances")]),
     ]),
     mail("vae_relecture", "Retour de relecture du dossier de validation", `Relecture de votre dossier de validation`, [
       deStagiaire(c, aHeure(milieu(c.debut, c.fin), k + "r0", [1000, 1260]), `<p>Bonjour,</p><p>Voici la première version de ma description d'activités pour le premier bloc.</p>`, [pj(c, "Dossier de validation V1")]),
       deOF(c, aHeure(jo(milieu(c.debut, c.fin), 2), k + "r1"), `<p>${c.appel},</p><p>Merci pour votre envoi. Mes remarques sont en commentaire : détaillez davantage les situations concrètes (contexte, actions, résultats) pour chaque activité du référentiel.</p>`),
     ]),
     mail("vae_jury", "Préparation à l'entretien avec le jury", `Préparation à l'entretien avec le jury`, [
-      deOF(c, aHeure(jo(c.fin, -3), k + "j1"), `<p>${c.appel},</p><p>Pour préparer votre passage devant le jury, nous ferons une mise en situation d'entretien lors de la prochaine séance. La date du jury vous sera communiquée par le certificateur.</p>`),
+      deOF(c, aHeure(jo(derniere, -2), k + "j1"), `<p>${c.appel},</p><p>Pour préparer votre passage devant le jury, nous ferons une mise en situation d'entretien lors de la prochaine séance. La date du jury vous sera communiquée par le certificateur.</p>`),
     ]),
     mail("vae_suivi", "Suivi après le jury", `Suivi de votre VAE`, [
       deOF(c, aHeure(jo(c.fin, 25), k + "s1"), `<p>${c.appel},</p><p>Avez-vous reçu la décision du jury ? En cas de validation partielle, nous pouvons étudier ensemble les solutions pour les blocs restants, qui vous sont acquis définitivement pour les blocs validés.</p>`),
@@ -298,11 +309,12 @@ function scenarioBC(c: Ctx): MailAuto[] {
   const k = `${s.nom}|${s.prenom}`;
   return [
     mail("bc_prealable", "Entretien préalable gratuit", `Votre bilan de compétences – entretien préalable`, [
-      deOF(c, aHeure(jo(c.debut, -12), k + "a1"), `<p>${c.appel},</p><p>Suite à votre demande, je vous propose un entretien préalable gratuit afin de présenter le déroulement du bilan (trois phases, 24 heures au plus) et de vérifier qu'il répond à votre besoin.</p>`, [pj(c, "Presentation du bilan de competences", false)]),
-      deStagiaire(c, aHeure(jo(c.debut, -11), k + "a2", [1000, 1260]), `<p>Bonjour,</p><p>Merci, je suis disponible mardi à 10 h.</p>`),
+      deOF(c, aHeure(jo(c.debut, -18), k + "a1"), `<p>${c.appel},</p><p>Suite à votre demande, je vous propose un entretien préalable gratuit afin de présenter le déroulement du bilan (trois phases, 24 heures au plus) et de vérifier qu'il répond à votre besoin.</p>`, [pj(c, "Presentation du bilan de competences", false)]),
+      deStagiaire(c, aHeure(jo(c.debut, -17), k + "a2", [1000, 1260]), `<p>Bonjour,</p><p>Merci, je suis disponible mardi à 10 h.</p>`),
     ]),
     mail("bc_contrat", "Envoi du contrat ou de la convention et du programme", `Documents de votre bilan de compétences`, [
-      deOF(c, aHeure(jo(c.debut, -8), k + "c1"), v(c, "bc_contrat", [`<p>${c.appel},</p><p>Vous trouverez ci-joint votre ${/entreprise|opco|employeur/i.test(s.financeur || "") ? "convention tripartite" : "contrat"}, le programme des trois phases et les conditions générales. Les résultats du bilan vous appartiennent : ils ne seront communiqués à personne sans votre accord écrit.</p>`, `<p>${c.appel},</p><p>Suite à notre entretien préalable, je vous transmets les documents de votre bilan de compétences : ${/entreprise|opco|employeur/i.test(s.financeur || "") ? "la convention tripartite" : "le contrat"}, le programme détaillé des trois phases et les conditions générales. Je vous rappelle que le document de synthèse vous sera remis à vous ${s.civilite === "Mme" ? "seule" : "seul"}.</p>`]), [pj(c, "Contrat bilan de competences"), pj(c, "Programme des trois phases", false)]),
+      deOF(c, aHeure(jo(c.debut, -15), k + "c1"), v(c, "bc_contrat", [`<p>${c.appel},</p><p>Vous trouverez ci-joint votre ${/entreprise|opco|employeur/i.test(s.financeur || "") ? "convention tripartite" : "contrat"}, le programme des trois phases et les conditions générales. Les résultats du bilan vous appartiennent : ils ne seront communiqués à personne sans votre accord écrit.</p>`, `<p>${c.appel},</p><p>Suite à notre entretien préalable, je vous transmets les documents de votre bilan de compétences : ${/entreprise|opco|employeur/i.test(s.financeur || "") ? "la convention tripartite" : "le contrat"}, le programme détaillé des trois phases et les conditions générales. Je vous rappelle que le document de synthèse vous sera remis à vous ${s.civilite === "Mme" ? "seule" : "seul"}.</p>`]), [pj(c, "Contrat bilan de competences"), pj(c, "Programme des trois phases", false)]),
+      deStagiaire(c, aHeure(jo(c.debut, -14), k + "c2"), `<p>Bonjour,</p><p>Je vous retourne le document signé. Merci pour ces explications.</p>`, [pj(c, "Contrat signe")]),
     ]),
     mail("bc_planning", "Confirmation du planning des entretiens", `Planning de vos entretiens`, [
       deOF(c, aHeure(jo(c.debut, -2), k + "p1"), `<p>${c.appel},</p><p>Je vous confirme le planning de vos entretiens, du ${fr(c.debut)} au ${fr(c.fin)}, ${modalite(c)}.</p>`, [pj(c, "Planning des entretiens")]),
