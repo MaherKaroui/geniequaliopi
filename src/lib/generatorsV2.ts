@@ -373,8 +373,12 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
 
 export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const titreContrat = f.typeAction === "bilans-competences" ? "CONTRAT DE BILAN DE COMPÉTENCES"
+    : f.typeAction === "vae" ? "CONTRAT D'ACCOMPAGNEMENT VAE"
+    : f.typeAction === "apprentissage" ? "CONTRAT DE FORMATION PAR APPRENTISSAGE"
+    : "CONTRAT DE FORMATION PROFESSIONNELLE";
   let extra = `
-    <h2>CONTRAT DE FORMATION PROFESSIONNELLE</h2>
+    <h2>${titreContrat}</h2>
     <p style="font-style:italic">(Conformément aux articles L.6353-3 à L.6353-7 et R.6353-1 à R.6353-8 du Code du travail)</p>
     <h3>Entre les soussignés</h3>
     <h4>L'Organisme de formation</h4>
