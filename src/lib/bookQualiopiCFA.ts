@@ -1,5 +1,5 @@
 // Book Qualiopi CFA — version spécialisée du Book pour les CFA (audit initial nouvel entrant).
-// Réplique l'esprit de la FICHE MÉMO + GUIDE Dreamers Team : 33 indicateurs, 7 critères,
+// Fiche mémo + guide de préparation : 33 indicateurs, 7 critères (décret n° 2026-728),
 // avec pour chacun le niveau attendu V9, le script "ce qu'il faut dire", les preuves
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
@@ -93,8 +93,8 @@ li{margin:3px 0;font-size:12.5px}
 
   // Mode d'emploi
   html += `<div class="page"><h1 class="sec-title">Comment utiliser ce Book</h1><p style="margin:10px 0">Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec les documents générés par l'application), et (4) les points de vigilance.</p>
-  ${isNE ? `<div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>` : `<div class="box warn"><strong>${getTypeAuditLabel(typeAudit)}.</strong> Tous les indicateurs font l'objet d'une vérification de la <strong>mise en œuvre effective</strong> avec preuves de résultats (taux, satisfaction, insertion, amélioration continue).</div>`}
-  <div class="box"><strong>Pondération.</strong> Les indicateurs <strong>1, 2, 3, 8, 9, 12, 13, 17, 18, 19, 23, 24, 25, 28 et 30</strong> peuvent donner lieu à une NC mineure. Les autres entraînent une NC majeure en cas de non-respect.</div>
+  ${isNE ? `<div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>` : `<div class="box warn"><strong>${getTypeAuditLabel(typeAudit)}.</strong> Tous les indicateurs font l'objet d'une vérification de la <strong>mise en œuvre effective</strong> avec preuves de résultats (taux, satisfaction, insertion, amélioration continue).</div>`}
+  <div class="box"><strong>Pondération.</strong> Les indicateurs <strong>${INDICATEURS_CFA.filter(i => i.ponderable).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}</strong> peuvent donner lieu à une NC mineure. Les autres entraînent une NC majeure en cas de non-respect.</div>
   <div class="box script"><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez d'abord de votre processus, puis montrez la preuve.</div>
   </div><div class="page-break"></div>`;
 

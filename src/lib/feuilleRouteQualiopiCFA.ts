@@ -31,7 +31,7 @@ export function generateFeuilleRouteQualiopiCFA(
   const rows: (string | number)[][] = [];
   rows.push([`PRÉPARATION AUDIT QUALIOPI — CFA ${org.nom} — ${getTypeAuditLabel(typeAudit)} — ${frDate()}`]);
   rows.push([isNE
-    ? `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. Nouvel entrant : indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26, 32 et 33 — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
+    ? `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. Nouvel entrant : indicateurs ${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")} — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
     : `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. ${getTypeAuditLabel(typeAudit)} : vérification de la MISE EN ŒUVRE effective sur tous les indicateurs.`]);
   rows.push([]);
   const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Pondération"];

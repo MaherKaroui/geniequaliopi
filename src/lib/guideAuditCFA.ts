@@ -59,7 +59,7 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
   <div class="intro">
     <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec ceux générés par l'application), et (4) les points de vigilance.
     ${isNE
-      ? `<br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.`
+      ? `<br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs ${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.`
       : `<br><br><strong>${getTypeAuditLabel(typeAudit)}.</strong> L'auditeur vérifie la <strong>mise en œuvre effective</strong> sur l'ensemble des indicateurs (résultats, taux, satisfaction, amélioration continue).`}
     <br><br><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez de votre processus, puis montrez la preuve.
   </div>`;
