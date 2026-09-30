@@ -211,7 +211,7 @@ export function genTableauBord14MissionsCFA(o: OrganismeInfo, f: FormationInfo, 
     title: "TABLEAU DE BORD DES 14 MISSIONS DU CFA",
     subtitle: `Article L.6231-2 du Code du travail — situation au ${fr(today0())}`,
     formation: f,
-    sections: [{ heading: "Synthèse", content: `<p>${faites} mission(s) sur 14 déjà mises en œuvre auprès des apprentis de la session ; les autres sont programmées dans leurs semaines école. Le tableau est revu en réunion pédagogique et présenté au conseil de perfectionnement.</p>` }],
+    sections: [{ heading: "Synthèse", content: `<p>${faites === 14 ? "Les 14 missions ont été mises en œuvre auprès des apprentis de la session." : `${faites} mission(s) sur 14 déjà mises en œuvre auprès des apprentis de la session ; les ${14 - faites} autre(s) sont programmées dans leurs semaines école.`} Le tableau est revu en réunion pédagogique et présenté au conseil de perfectionnement.</p>` }],
     table: { headers: ["Mission", "Responsable", "Actions menées", "Preuves", "Indicateurs", "Dernière action", "IND Qualiopi"], rows },
   });
 }
@@ -222,7 +222,7 @@ export function genPlanAnnuel14MissionsCFA(o: OrganismeInfo, f: FormationInfo, s
   const rows = MISSIONS_REF.map((m) => {
     const dates = datesApprentis(f, stagiaires, m.n).map((x) => x.date);
     const d = dates.length ? dates.sort((a, b) => a.getTime() - b.getTime())[0] : lundiMission(f, m.n);
-    return [`${m.n}° — ${m.titre}`, `Semaine école du ${fr(lundiMission(f, m.n, valides(stagiaires)[0]))}`, m.actions[0], m.responsable(o), d.getTime() <= t.getTime() ? "Réalisée" : "Planifiée"];
+    return [`${m.n}° — ${m.titre}`, `Semaine école du ${fr(lundiMission(f, m.n, valides(stagiaires)[0]))}`, `Atelier et QCM Mission ${m.n}. Tout au long de la session : ${m.actions.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join(" ; ")}`, m.responsable(o), d.getTime() <= t.getTime() ? "Atelier réalisé" : "Planifié"];
   });
   return buildDocument({
     org: o,
@@ -230,6 +230,6 @@ export function genPlanAnnuel14MissionsCFA(o: OrganismeInfo, f: FormationInfo, s
     subtitle: "Une mission par semaine école, réparties sur toute la durée de la session",
     formation: f,
     sections: [{ heading: "Principe", content: `<p>Chaque mission est diffusée pendant une semaine école réelle de l'apprenti (rythme d'alternance : ${f.rythmeAlternance || "non précisé"}) : annonce la veille, newsletter, atelier émargé, QCM individuel corrigé. Le plan est arrêté le ${dateSysteme(o)} et ajusté si le calendrier d'un apprenti change.</p>` }],
-    table: { headers: ["Mission", "Période", "Action principale", "Responsable", "Statut"], rows },
+    table: { headers: ["Mission", "Semaine de l'atelier", "Actions", "Responsable", "Statut"], rows },
   });
 }

@@ -729,7 +729,7 @@ export function buildFullCatalog(
     add("cfa_mission11_suivi_distance", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure de suivi & accompagnement à distance", 3, 10, "accompagnement_distanciel_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" });
 
     // Mission 12 — Évaluation des compétences acquises (contrôle continu)
-    add("cfa_mission12_attestation_formation_ma", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Attestation de formation du Maître d'Apprentissage (évaluation)", 3, 10, "attestation_formation_maitre_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences" });
+    // Mission 12 : procédure d'évaluation des compétences (ajoutée avec les pièces 2026) — plus d'attestation de formation pré-validée.
 
     // Mission 13 — Accompagnement post-formation (interruption / non-diplômés)
     add("cfa_mission13_accompagnement_post_formation", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Procédure d'accompagnement post-formation", 3, 10, "procedure_accompagnement_post_formation_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" });

@@ -830,7 +830,7 @@ export function genConventionMobiliteInterCFA(o: OrganismeInfo, f: FormationInfo
       },
       {
         heading: "Article 6 — Modalités financières",
-        content: `<p>☐ Mise à disposition à <strong>titre gratuit</strong> (réciprocité entre CFA partenaires)<br>☐ Refacturation au CFA d'origine sur la base de [montant] € / heure stagiaire<br>☐ Prise en charge des frais de transport / hébergement par : ☐ Apprenti  ☐ Employeur  ☐ CFA d'origine  ☐ Aide régionale (Carte mobilité, ARA, etc.)</p>`,
+        content: `<p>☐ Mise à disposition à <strong>titre gratuit</strong> (réciprocité entre CFA partenaires)<br>☐ Refacturation au CFA d'origine sur la base de [montant] € / heure stagiaire<br>☐ Prise en charge des frais de transport / hébergement par : ☐ Apprenti  ☐ Employeur  ☐ CFA d'origine  ☐ Aide de la Région (selon la Région du CFA)</p>`,
       },
       {
         heading: "Article 7 — Engagements du CFA d'accueil",
@@ -892,7 +892,7 @@ export function genFicheDemandeMobiliteNationale(o: OrganismeInfo, f: FormationI
       },
       {
         heading: "Aides mobilisables (à cocher)",
-        content: `<p>☐ <strong>Aide mobilité Région</strong> (transport / hébergement) — formulaire région<br>☐ <strong>Carte de réduction transport</strong> (Imagine R, OùRA!, Pass Pays de la Loire…)<br>☐ <strong>Aide au logement temporaire</strong> (FJT, CROUS hors étudiant, Action Logement Mobili-Jeune)<br>☐ <strong>Aide exceptionnelle CFA</strong> (fonds social interne)<br>☐ <strong>Aide employeur</strong> (prise en charge transport/repas)</p>`,
+        content: `<p>☐ <strong>Aide mobilité Région</strong> (transport / hébergement) — formulaire région<br>☐ <strong>Carte de réduction transport</strong> (dispositif de la Région du CFA)<br>☐ <strong>Aide au logement temporaire</strong> (FJT, CROUS hors étudiant, Action Logement Mobili-Jeune)<br>☐ <strong>Aide exceptionnelle CFA</strong> (fonds social interne)<br>☐ <strong>Aide employeur</strong> (prise en charge transport/repas)</p>`,
       },
       {
         heading: "Décision finale",
@@ -960,7 +960,7 @@ export function genFichePosteReferentMobiliteNationale(o: OrganismeInfo, f: Form
       },
       {
         heading: "Missions principales",
-        content: `<p>Dans le cadre du projet d'établissement et de la certification Qualiopi de <strong>${o.nom}</strong>, le Référent Mobilité assure les missions suivantes :</p><p>• <strong>Accompagnement individuel</strong> des apprentis dans la définition et la mise en œuvre de leur projet de mobilité (nationale ou Erasmus+).<br>• <strong>Vérification</strong> des documents administratifs et contractuels liés aux bourses de mobilité (Erasmus+, aides régionales, ARA, Mobili-Jeune…).<br>• <strong>Saisie et suivi</strong> sur les bases de données institutionnelles (Mobility Tool+, Beneficiary Module, plateformes régionales).<br>• <strong>Relance, classement et archivage</strong> des dossiers de mobilité dans l'espace partagé du CFA.<br>• <strong>Organisation des réunions</strong> du réseau Référents Mobilité, suivi et comptes-rendus.<br>• <strong>Animation</strong> du réseau de CFA partenaires (France) et d'établissements d'accueil (Europe).<br>• <strong>Suivi des projets individuels</strong> de mobilité (préparation, départ, suivi à distance, retour, Europass Mobilité).<br>• <strong>Écoute et dialogue</strong> avec les apprenants pour préciser, mettre en œuvre et sécuriser leur projet de mobilité.<br>• <strong>Participation</strong> au groupe de travail interne qualité dans une démarche d'amélioration continue de la mobilité.<br>• <strong>Représentation</strong> de ${o.nom} lors d'événements liés à la mobilité européenne et nationale.</p>`,
+        content: `<p>Dans le cadre du projet d'établissement et de la certification Qualiopi de <strong>${o.nom}</strong>, le Référent Mobilité assure les missions suivantes :</p><p>• <strong>Accompagnement individuel</strong> des apprentis dans la définition et la mise en œuvre de leur projet de mobilité (nationale ou Erasmus+).<br>• <strong>Vérification</strong> des documents administratifs et contractuels liés aux bourses de mobilité (Erasmus+, aides de la Région, Mobili-Jeune…).<br>• <strong>Saisie et suivi</strong> sur les bases de données institutionnelles (Mobility Tool+, Beneficiary Module, plateformes régionales).<br>• <strong>Relance, classement et archivage</strong> des dossiers de mobilité dans l'espace partagé du CFA.<br>• <strong>Organisation des réunions</strong> du réseau Référents Mobilité, suivi et comptes-rendus.<br>• <strong>Animation</strong> du réseau de CFA partenaires (France) et d'établissements d'accueil (Europe).<br>• <strong>Suivi des projets individuels</strong> de mobilité (préparation, départ, suivi à distance, retour, Europass Mobilité).<br>• <strong>Écoute et dialogue</strong> avec les apprenants pour préciser, mettre en œuvre et sécuriser leur projet de mobilité.<br>• <strong>Participation</strong> au groupe de travail interne qualité dans une démarche d'amélioration continue de la mobilité.<br>• <strong>Représentation</strong> de ${o.nom} lors d'événements liés à la mobilité européenne et nationale.</p>`,
       },
       {
         heading: "Spécificités du poste / contraintes",
