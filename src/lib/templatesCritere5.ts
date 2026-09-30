@@ -237,71 +237,28 @@ export interface PlanDevTraining {
   dateDebut?: string;
 }
 
-/** Returns the contextual training list used in the IND 22 PDC, filtered by formation type. */
-export function getPlanDevTrainings(f: FormationInfo, formateurs: FormateurInfo[]): PlanDevTraining[] {
-  const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
-  // Re-use the same generator to keep a single source of truth, then parse out the planned training rows.
-  const html = genPlanDevCompetencesExcel({ nom: "" } as OrganismeInfo, f, formateurs, []);
-  // Columns: dateInsc, origine, nom, objectif, type, formateur, nb, noms, duree, dateDebut, annee
-  const rowRegex = /<tr>\s*<td>([^<]*)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]*)<\/td>\s*<td>[^<]*<\/td>\s*<\/tr>/g;
-  const trainings: PlanDevTraining[] = [];
-  let match: RegExpExecArray | null;
-  while ((match = rowRegex.exec(html)) !== null) {
-    trainings.push({
-      dateInscription: match[1].trim(),
-      origine: match[2].trim(),
-      nom: match[3].trim(),
-      objectif: match[4].trim(),
-      type: match[5].trim(),
-      formateur: match[6].trim(),
-      nb: match[7].trim(),
-      noms: match[8].trim() || formateurName,
-      duree: match[9].trim(),
-      dateDebut: match[10].trim(),
-    });
-  }
-  return trainings;
+/** Action du plan : un besoin identifié → une action → un critère d'efficacité. */
+export interface PlanDevAction {
+  ref: string;
+  famille: "metier" | "pedagogie" | "qualite" | "reglementaire" | "handicap" | "numerique" | "specifique";
+  besoin: string;         // besoin identifié et sa source
+  indicateurs: string;    // indicateurs Qualiopi concernés
+  nom: string;
+  objectif: string;
+  beneficiaires: string;
+  modalite: string;       // interne / externe, présentiel / distanciel
+  prestataire: string;
+  duree: string;
+  periode: string;
+  financement: string;
+  priorite: "Haute" | "Moyenne" | "Normale";
+  efficacite: string;     // critère d'évaluation de l'efficacité
 }
 
-export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, formateurs: FormateurInfo[], stagiaires?: StagiaireInfo[]): string {
-  // Use formation date year, fallback to current year
-  const rawDate = f.dateDebut || f.dateFin || "";
-  const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
-  const dateDebutFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
-  const year = dateDebutFormation.getFullYear();
-  const prevYear = year - 1;
-  // Date d'inscription par défaut = 1 an avant le début de la formation
-  const dateInscriptionDefault = new Date(dateDebutFormation);
-  dateInscriptionDefault.setFullYear(dateInscriptionDefault.getFullYear() - 1);
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  const fmtDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
-  const dateInscriptionStr = fmtDate(dateInscriptionDefault);
-  const dateDebutStr = fmtDate(dateDebutFormation);
-  const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
-  const stagiaireNames = stagiaires && stagiaires.length > 0
-    ? stagiaires.filter(s => s.nom || s.prenom).map(s => `${s.prenom} ${s.nom}`.trim()).join(", ")
-    : formateurName;
-  const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
+type Metier = { origine: string; nom: string; objectif: string; type: string; formateur: string; duree: string };
 
-  let html = `<tr><th colspan="11">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${prevYear} – ${year}</td></tr>`;
-  html += `<tr><td></td></tr>`;
-  html += `<tr>
-    <th>Date d'inscription</th>
-    <th>Origine</th>
-    <th>Nom de la formation</th>
-    <th>Objectifs attendus</th>
-    <th>Interne / Externe</th>
-    <th>Formateur / Organisme</th>
-    <th>Nb stagiaires</th>
-    <th>Noms des stagiaires</th>
-    <th>Durée</th>
-    <th>Date de début</th>
-    <th>Année</th>
-  </tr>`;
-
-  // ========== FORMATIONS PRÉVUES (année suivante) ==========
-
+/** Formations « métier » adaptées au domaine de la formation dispensée. */
+function formationsMetier(f: FormationInfo): Metier[] {
   const t = (f.intitule || "").toLowerCase();
   const code = (f.codeRNCP || "").toLowerCase();
   const isECSR = t.includes("conduite") || t.includes("ecsr") || t.includes("enseignant de la conduite") || code.includes("35329");
@@ -309,159 +266,224 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const isEsth = !isECSR && (t.includes("esthétique") || t.includes("cosmétique") || t.includes("beauté") || t.includes("parfumerie"));
   const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
   const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic") || t.includes("vtest") || t.includes("v-test") || t.includes("rs6905"));
-  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ") || t.includes("chatgpt") || t.includes("prompt");
-  const isCRM = t.includes("crm") || t.includes("hubspot") || t.includes("automation");
+  const isIA = t.includes("intelligence artificielle") || mot(t, "ia") || t.includes("chatgpt") || t.includes("prompt");
+  const isCRM = mot(t, "crm") || t.includes("hubspot") || t.includes("automation");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
   const isCommercial = !isNTC && (t.includes("commercial") || t.includes("vente") || t.includes("prospection") || t.includes("relation client"));
   const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux") || t.includes("marketing digital");
   const isFLE = t.includes("français") || mot(t, "fle");
   const isManagement = t.includes("management") || t.includes("encadrement") || t.includes("leadership") || t.includes("manager");
-  const isWord = t.includes("word");
+  const isWord = mot(t, "word") || t.includes("bureautique");
+  const E = "Externe";
+  if (isECSR) return [
+    { origine: "Montée en compétences pédagogiques conduite", nom: "Perfectionnement à la pédagogie de la conduite et de la sécurité routière", objectif: "Approfondir la conduite commentée, la gestion du stress de l'élève et l'éco-conduite", type: E, formateur: "Organisme de formation continue des enseignants de la conduite", duree: "3 jours" },
+    { origine: "Veille réglementaire sécurité routière", nom: "Évolutions du Code de la route et de l'examen du permis de conduire", objectif: "Intégrer les dernières évolutions réglementaires dans les contenus de formation", type: E, formateur: "Délégation à la sécurité routière / organisme agréé", duree: "1 jour" },
+    { origine: "Innovation pédagogique conduite", nom: "Simulateurs de conduite et outils numériques de suivi pédagogique", objectif: "Utiliser simulateurs, e-learning code et livret numérique d'apprentissage", type: E, formateur: "Éditeur de solutions pédagogiques conduite", duree: "2 jours" },
+  ];
+  if (isAnglaisA1) return [
+    { origine: "Pédagogie des grands débutants", nom: "Enseigner l'anglais niveau A1 – approches ludiques et CECRL", objectif: "Maîtriser les techniques de mise en confiance, supports visuels et répétition espacée", type: E, formateur: "Organisme de formation de formateurs en langues", duree: "2 jours" },
+    { origine: "Veille pédagogique langues", nom: "Outils numériques pour l'apprentissage des langues (niveau débutant)", objectif: "Intégrer applications et plateformes d'exercices interactifs adaptées au A1", type: E, formateur: "Organisme de formation au numérique éducatif", duree: "1 jour" },
+    { origine: "Phonétique", nom: "Phonétique anglaise et prononciation pour francophones", objectif: "Utiliser l'alphabet phonétique et la discrimination auditive au niveau A1", type: E, formateur: "Organisme de formation de formateurs en langues", duree: "2 jours" },
+  ];
+  if (isAnglais) return [
+    { origine: "Préparation aux certifications", nom: "Anglais professionnel : méthodologie de préparation aux certifications", objectif: "Maîtriser les formats d'épreuves et l'évaluation des 4 compétences", type: E, formateur: "Organisme de formation de formateurs en langues", duree: "3 jours" },
+    { origine: "Veille pédagogique langues", nom: "Outils numériques et IA pour l'enseignement des langues", objectif: "Intégrer plateformes adaptatives et outils de reconnaissance vocale", type: E, formateur: "Organisme de formation au numérique éducatif", duree: "2 jours" },
+    { origine: "Innovation pédagogique", nom: "Simulations professionnelles et apprentissage immersif en anglais", objectif: "Concevoir jeux de rôle, simulations de réunion et de négociation", type: E, formateur: "Organisme de formation de formateurs en langues", duree: "2 jours" },
+  ];
+  if (isMassage) return [
+    { origine: "Montée en compétences bien-être", nom: "Aromathérapie : précautions pendant la grossesse et le post-partum", objectif: "Connaître les huiles compatibles, les protocoles et les contre-indications", type: E, formateur: "École ou fédération de massage bien-être", duree: "2 jours" },
+    { origine: "Veille métier", nom: "Accompagnement périnatal et pratiques de relaxation", objectif: "Actualiser ses connaissances sur les pratiques de bien-être maternel", type: E, formateur: "Organisme de formation en périnatalité", duree: "2 jours" },
+    { origine: "Approfondissement technique", nom: "Anatomie palpatoire et physiologie de la grossesse", objectif: "Approfondir l'anatomie du bassin et les adaptations corporelles", type: E, formateur: "École de massage", duree: "3 jours" },
+  ];
+  if (isEsth) return [
+    { origine: "Montée en compétences esthétique", nom: "Techniques actuelles de soins du visage et cosmétologie", objectif: "Actualiser les protocoles de soins et la connaissance des actifs cosmétiques", type: E, formateur: "École d'esthétique / marque professionnelle", duree: "3 jours" },
+    { origine: "Veille réglementaire cosmétiques", nom: "Règlement (CE) n° 1223/2009 et hygiène en institut", objectif: "Maîtriser étiquetage, traçabilité des produits et protocoles d'hygiène", type: E, formateur: "Organisme professionnel de la filière beauté", duree: "1 jour" },
+    { origine: "Numérique métier", nom: "Outils numériques de l'institut : prise de rendez-vous et réseaux sociaux", objectif: "Intégrer les outils de gestion et de communication dans les contenus", type: E, formateur: "Organisme de formation au numérique", duree: "2 jours" },
+  ];
+  if (isManagement) return [
+    { origine: "Montée en compétences managériales", nom: "Management d'équipe : approches actuelles et management hybride", objectif: "Actualiser les contenus : management situationnel, feedback, conflits", type: E, formateur: "Organisme de formation au management", duree: "3 jours" },
+    { origine: "Veille RH", nom: "Qualité de vie et des conditions de travail (QVCT) et prévention des RPS", objectif: "Intégrer les obligations et outils QVCT dans les contenus managériaux", type: E, formateur: "Réseau ANACT-ARACT / organisme spécialisé", duree: "2 jours" },
+    { origine: "Posture d'accompagnement", nom: "Coaching et co-développement : outils et postures", objectif: "Acquérir l'écoute active, le questionnement et l'animation de co-développement", type: E, formateur: "Organisme de formation au coaching", duree: "2 jours" },
+  ];
+  if (isCommercial || isNTC) return [
+    { origine: "Montée en compétences commerciales", nom: isNTC ? "Négociation complexe et vente grands comptes" : "Techniques de vente et négociation commerciale avancée", objectif: "Actualiser vente consultative, traitement des objections et closing", type: E, formateur: "Organisme de formation commerciale", duree: "3 jours" },
+    { origine: "Veille commerciale et digitale", nom: "Prospection digitale B2B et social selling", objectif: "Intégrer réseaux professionnels, CRM et séquences de prospection", type: E, formateur: "Organisme de formation commerciale", duree: "2 jours" },
+    { origine: "Pratiques du secteur", nom: "Relation client omnicanale et expérience client", objectif: "Intégrer les attentes clients actuelles dans les mises en situation", type: E, formateur: "Organisme de formation commerciale", duree: "2 jours" },
+  ];
+  if (isIA) return [
+    { origine: "Montée en compétences IA", nom: "IA générative avancée : conception de requêtes et usages professionnels", objectif: "Actualiser les techniques de requêtes, les limites et les usages métier", type: E, formateur: "Organisme de formation au numérique", duree: "3 jours" },
+    { origine: "Veille réglementaire IA", nom: "Règlement européen sur l'IA (AI Act) et protection des données", objectif: "Intégrer les obligations et bonnes pratiques dans les contenus", type: E, formateur: "Organisme de formation juridique / CNIL", duree: "1 jour" },
+    { origine: "Innovation pédagogique", nom: "Concevoir des formations avec l'IA", objectif: "Utiliser l'IA pour concevoir des supports et personnaliser les parcours", type: E, formateur: "Organisme de formation au numérique éducatif", duree: "2 jours" },
+  ];
+  if (isSAMA) return [
+    { origine: "Montée en compétences secrétariat médical", nom: "Terminologie médicale et codification des actes", objectif: "Actualiser la terminologie par spécialité et la codification", type: E, formateur: "École de secrétariat médical", duree: "3 jours" },
+    { origine: "Veille réglementaire santé", nom: "RGPD et dossier patient informatisé", objectif: "Maîtriser les obligations de confidentialité en santé", type: E, formateur: "Organisme de formation juridique / CNIL", duree: "1 jour" },
+    { origine: "Numérique métier", nom: "Logiciels de gestion de cabinet et télétransmission", objectif: "Intégrer les outils utilisés en cabinet dans les exercices", type: E, formateur: "Organisme de formation au numérique", duree: "2 jours" },
+  ];
+  if (isWebmark) return [
+    { origine: "Montée en compétences marketing digital", nom: "Stratégie de contenu et référencement naturel", objectif: "Actualiser SEO, stratégie éditoriale et mesure de performance", type: E, formateur: "Organisme de formation au marketing digital", duree: "3 jours" },
+    { origine: "Veille réseaux sociaux", nom: "Vidéo courte et algorithmes des réseaux sociaux", objectif: "Intégrer les formats et pratiques actuels dans les contenus", type: E, formateur: "Organisme de formation au marketing digital", duree: "2 jours" },
+    { origine: "Innovation", nom: "IA appliquée au marketing", objectif: "Utiliser l'IA pour la création de contenu et l'analyse de données", type: E, formateur: "Organisme de formation au numérique", duree: "2 jours" },
+  ];
+  if (isFLE) return [
+    { origine: "Montée en compétences FLE", nom: "Didactique du FLE : approche actionnelle et CECRL", objectif: "Concevoir des tâches communicatives et évaluer selon le CECRL", type: E, formateur: "Organisme de formation de formateurs FLE", duree: "3 jours" },
+    { origine: "Publics allophones", nom: "Interculturalité et accompagnement des publics migrants", objectif: "Adapter la pédagogie à l'hétérogénéité des publics", type: E, formateur: "Organisme de formation de formateurs FLE", duree: "2 jours" },
+    { origine: "Numérique", nom: "Outils numériques pour l'enseignement du FLE", objectif: "Intégrer plateformes et ressources numériques", type: E, formateur: "Organisme de formation au numérique éducatif", duree: "2 jours" },
+  ];
+  if (isCRM) return [
+    { origine: "Montée en compétences CRM", nom: "CRM avancé : automatisation et tableaux de bord", objectif: "Actualiser workflows, lead scoring et reporting", type: E, formateur: "Éditeur de CRM / organisme partenaire", duree: "2 jours" },
+    { origine: "Veille technologique CRM", nom: "CRM et intelligence artificielle", objectif: "Comprendre scoring prédictif et assistants conversationnels", type: E, formateur: "Organisme de formation au numérique", duree: "2 jours" },
+  ];
+  if (isWord) return [
+    { origine: "Montée en compétences bureautique", nom: "Suite bureautique : fonctions avancées et nouveautés (dont assistants IA)", objectif: "Actualiser la maîtrise des fonctions avancées et des nouveautés de la suite", type: E, formateur: "Organisme de formation bureautique", duree: "3 jours" },
+    { origine: "Veille technologique", nom: "Assistants IA intégrés aux logiciels bureautiques", objectif: "Comprendre et enseigner leur usage responsable", type: E, formateur: "Organisme de formation au numérique", duree: "1 jour" },
+  ];
+  return [
+    { origine: "Montée en compétences dans le secteur de la formation", nom: "Réglementation de la formation professionnelle", objectif: "Maîtriser le cadre juridique, les obligations déclaratives (BPF, NDA) et les droits des stagiaires", type: E, formateur: "Centre Inffo ou organisme spécialisé", duree: "2 jours" },
+    { origine: `Actualisation des compétences techniques « ${f.intitule || "domaine de formation"} »`, nom: `Actualisation technique dans le domaine « ${f.intitule || "enseigné"} »`, objectif: "Maintenir une expertise technique à jour dans le domaine enseigné", type: E, formateur: "Organisme professionnel du secteur", duree: "2 jours" },
+    { origine: "Innovation pédagogique", nom: "Intelligence artificielle appliquée à la formation", objectif: "Intégrer les outils d'IA dans l'ingénierie pédagogique et l'évaluation", type: E, formateur: "Organisme de formation au numérique éducatif", duree: "2 jours" },
+  ];
+}
 
-  const futureTrainings: Array<{ origine: string; nom: string; objectif: string; type: string; formateur: string; nb: string; noms: string; duree: string }> = [];
+function intervenantsDe(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string[] {
+  return Array.from(new Set([f.formateur, ...(stagiaires || []).map((s) => s.formateur), o.responsablePedagogique, o.dirigeant]
+    .map((n) => String(n || "").trim()).filter((n) => n && !/externe/i.test(n))));
+}
 
-  if (isECSR) {
-    futureTrainings.push(
-      { origine: "Montée en compétences pédagogiques conduite", nom: "Perfectionnement à la pédagogie de la conduite et de la sécurité routière", objectif: "Approfondir les techniques pédagogiques d'enseignement de la conduite : gestion du stress, conduite commentée, éco-conduite et conduite en conditions difficiles", type: "Externe", formateur: "INSERR – Institut National de Sécurité Routière", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille réglementaire sécurité routière", nom: "Évolutions réglementaires du Code de la route et du permis de conduire", objectif: "Maîtriser les dernières modifications du Code de la route, les nouvelles sanctions et les évolutions du permis (permis numérique, réforme 2024)", type: "Externe", formateur: "Sécurité Routière – Formation continue", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique conduite", nom: "Simulateurs de conduite et outils numériques pour la formation ECSR", objectif: "Maîtriser l'utilisation des simulateurs de conduite, des applications e-learning et des outils de suivi pédagogique numérique", type: "Externe", formateur: "Codes Rousseau – Formation continue", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isAnglaisA1) {
-    futureTrainings.push(
-      { origine: "Montée en compétences du formateur en anglais débutant", nom: "Enseigner l'anglais aux grands débutants – Approches ludiques et CECRL A1", objectif: "Maîtriser les techniques d'enseignement pour un public débutant : supports visuels, répétition espacée, phonétique de base et mise en confiance", type: "Externe", formateur: "British Council – Teacher Development", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Veille pédagogique langues étrangères", nom: "Nouveaux outils numériques pour l'apprentissage des langues – Niveau débutant", objectif: "Découvrir et intégrer les applications adaptées au niveau A1 (Duolingo, Busuu, Memrise) et les plateformes d'exercices interactifs", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique inclusive", nom: "Phonétique anglaise et prononciation pour francophones débutants", objectif: "Maîtriser l'alphabet phonétique international (IPA) appliqué à l'anglais, les paires minimales et les exercices de discrimination auditive pour le niveau A1", type: "Externe", formateur: "Alliance Française – Formation de formateurs en langues", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isAnglais) {
-    futureTrainings.push(
-      { origine: "Montée en compétences du formateur en anglais professionnel", nom: "Business English avancé – Préparation aux certifications (TOEIC, VTest, Linguaskill)", objectif: "Maîtriser les méthodologies de préparation aux certifications d'anglais professionnel et les techniques d'évaluation des 4 compétences (listening, reading, writing, speaking)", type: "Externe", formateur: "British Council – Teacher Development", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille pédagogique langues étrangères", nom: "Outils numériques et IA pour l'enseignement des langues", objectif: "Intégrer les plateformes adaptatives (Babbel, Busuu), les chatbots conversationnels et les outils de speech-to-text dans l'enseignement de l'anglais", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Gamification et apprentissage immersif de l'anglais", objectif: "Créer des scénarios d'apprentissage immersifs : jeux de rôle professionnels, simulations de réunions, négociations en anglais", type: "Externe", formateur: "Cambridge English – Formation de formateurs", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isMassage) {
-    futureTrainings.push(
-      { origine: "Montée en compétences massage et bien-être", nom: "Aromathérapie et huiles essentielles pour la grossesse et le post-partum", objectif: "Maîtriser les huiles essentielles compatibles avec la grossesse, les protocoles d'application et les contre-indications spécifiques", type: "Externe", formateur: "FFMBE – Fédération Française de Massage Bien-Être", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Veille métier bien-être prénatal", nom: "Accompagnement périnatal et nouvelles pratiques de relaxation", objectif: "Découvrir les évolutions des pratiques de bien-être maternel : sophrologie prénatale, hypnose, réflexologie plantaire adaptée", type: "Externe", formateur: "Institut de Formation en Périnatalité", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Anatomie palpatoire et physiologie de la grossesse – Approfondissement", objectif: "Approfondir les connaissances en anatomie du bassin, physiologie des fascias et adaptations corporelles pendant la grossesse", type: "Externe", formateur: "École de massage reconnue", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
-  } else if (isEsth) {
-    futureTrainings.push(
-      { origine: "Montée en compétences esthétique", nom: "Techniques avancées en soins du visage et cosmétologie", objectif: "Maîtriser les dernières techniques de soins esthétiques : micro-needling, LED-thérapie, cosmétiques bio et personnalisés", type: "Externe", formateur: "École Internationale d'Esthétique", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille réglementaire cosmétiques", nom: "Réglementation cosmétique européenne et normes d'hygiène en institut", objectif: "Maîtriser le règlement CE 1223/2009, les obligations d'étiquetage, la traçabilité des produits et les protocoles d'hygiène", type: "Externe", formateur: "FEBEA – Fédération des Entreprises de la Beauté", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation numérique beauté", nom: "Digitalisation du secteur beauté et réseaux sociaux pour esthéticiennes", objectif: "Maîtriser Instagram, TikTok et les outils de prise de rendez-vous en ligne pour développer son activité", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isManagement) {
-    futureTrainings.push(
-      { origine: "Montée en compétences managériales", nom: "Leadership et management d'équipe – Approches contemporaines", objectif: "Maîtriser le management situationnel, la gestion des conflits, le feedback constructif et le management hybride (présentiel/distanciel)", type: "Externe", formateur: "Groupe Cegos – Parcours Management", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille RH et management", nom: "Qualité de Vie et Conditions de Travail (QVCT) – Enjeux managériaux", objectif: "Comprendre les obligations légales QVCT, les outils de prévention des RPS et le rôle du manager dans le bien-être au travail", type: "Externe", formateur: "ANACT – Agence nationale pour l'amélioration des conditions de travail", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Coaching et accompagnement managérial – Outils et postures", objectif: "Acquérir les techniques de coaching pour accompagner les collaborateurs : écoute active, questionnement puissant, co-développement", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isCommercial) {
-    futureTrainings.push(
-      { origine: "Montée en compétences commerciales", nom: "Techniques de vente et négociation commerciale avancée", objectif: "Maîtriser les techniques de vente consultative, la gestion des objections, le closing et la fidélisation client", type: "Externe", formateur: "Halifax Consulting", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille commerciale et digitale", nom: "Social Selling et prospection digitale B2B", objectif: "Maîtriser LinkedIn Sales Navigator, l'inbound marketing et les outils de prospection automatisée (CRM, séquences email)", type: "Externe", formateur: "Groupe Cegos", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
-  } else if (isIA) {
-    futureTrainings.push(
-      { origine: "Montée en compétences IA avancée", nom: "IA Générative avancée – Prompt engineering et fine-tuning", objectif: "Maîtriser les techniques avancées de prompt engineering, le fine-tuning de modèles et les RAG (Retrieval-Augmented Generation)", type: "Externe", formateur: "OpenClassrooms – Parcours IA", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille réglementaire IA", nom: "AI Act européen et éthique de l'IA – Cadre juridique", objectif: "Comprendre les obligations du règlement européen sur l'IA, les niveaux de risque et les bonnes pratiques éthiques", type: "Externe", formateur: "CNIL Formations", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Concevoir des formations avec l'IA (ChatGPT, Gemini, Midjourney)", objectif: "Utiliser l'IA pour créer des supports, évaluer les acquis et personnaliser les parcours de formation", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isNTC) {
-    futureTrainings.push(
-      { origine: "Montée en compétences commerciales", nom: "Négociation complexe et vente stratégique grands comptes", objectif: "Maîtriser la vente consultative, la négociation multi-interlocuteurs et les techniques de closing avancées", type: "Externe", formateur: "Halifax Consulting", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille commerciale et digitale", nom: "Social Selling et prospection digitale B2B", objectif: "Maîtriser LinkedIn Sales Navigator, l'inbound marketing et les outils de prospection automatisée", type: "Externe", formateur: "Groupe Cegos", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
-  } else if (isSAMA) {
-    futureTrainings.push(
-      { origine: "Montée en compétences secrétariat médical", nom: "Terminologie médicale avancée et codification CCAM/NGAP", objectif: "Approfondir la terminologie par spécialité, maîtriser la codification des actes et la facturation T2A", type: "Externe", formateur: "Sup Santé – École de secrétariat médical", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille réglementaire santé", nom: "RGPD et gestion du dossier patient informatisé (DPI)", objectif: "Maîtriser les obligations RGPD en établissement de santé et les bonnes pratiques du DPI", type: "Externe", formateur: "CNIL Formations", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique numérique", nom: "Logiciels médicaux et outils de gestion de cabinet", objectif: "Maîtriser Doctolib Pro, les logiciels de facturation et la télétransmission", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isWebmark) {
-    futureTrainings.push(
-      { origine: "Montée en compétences marketing digital", nom: "Stratégie de contenu avancée et SEO technique", objectif: "Maîtriser le référencement technique, la stratégie de content marketing et les algorithmes des réseaux sociaux", type: "Externe", formateur: "Groupe Cegos – Parcours Marketing Digital", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille technologique réseaux sociaux", nom: "TikTok, Instagram Reels et vidéo courte pour les marques", objectif: "Maîtriser la création de contenu vidéo court, les algorithmes de recommandation et les stratégies d'engagement", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Intelligence Artificielle appliquée au marketing (ChatGPT, Canva IA)", objectif: "Utiliser l'IA pour automatiser la création de contenu, l'analyse de données et la personnalisation des campagnes", type: "Externe", formateur: "OpenClassrooms", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isFLE) {
-    futureTrainings.push(
-      { origine: "Montée en compétences FLE", nom: "Didactique du FLE – Approche actionnelle et CECRL", objectif: "Maîtriser l'approche actionnelle, la conception de tâches communicatives et l'évaluation selon le CECRL", type: "Externe", formateur: "Alliance Française – Formation de formateurs", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille pédagogique FLE", nom: "FLE et interculturalité – Accompagner les publics migrants", objectif: "Adapter la pédagogie aux publics allophones, gérer l'hétérogénéité et favoriser l'intégration", type: "Externe", formateur: "CIEP – Centre International d'Études Pédagogiques", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation numérique", nom: "Outils numériques pour l'enseignement du FLE (LMS, IA)", objectif: "Intégrer les plateformes de e-learning et les outils IA dans l'enseignement du français", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isWord) {
-    futureTrainings.push(
-      { origine: "Montée en compétences bureautique", nom: "Microsoft 365 avancé – Word, Excel, PowerPoint et Copilot", objectif: "Maîtriser les fonctions avancées de la suite Office 365, y compris l'assistant IA Copilot", type: "Externe", formateur: "ENI – École Nationale d'Informatique", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille technologique", nom: "Copilot et IA dans Microsoft Office – Intégration pédagogique", objectif: "Comprendre et enseigner l'utilisation de Copilot dans Word, Excel et PowerPoint", type: "Externe", formateur: "Microsoft Learning Partners", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
-  } else if (isCRM) {
-    futureTrainings.push(
-      { origine: "Montée en compétences CRM", nom: "HubSpot CRM avancé – Automatisation et reporting", objectif: "Maîtriser les workflows avancés, le lead scoring, le reporting personnalisé et les intégrations API", type: "Externe", formateur: "HubSpot Academy – Certification avancée", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Veille technologique CRM", nom: "CRM et Intelligence Artificielle – Scoring prédictif et chatbots", objectif: "Comprendre l'intégration de l'IA dans les CRM (scoring, chatbots, recommandations)", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
-  } else {
-    futureTrainings.push(
-      { origine: "Montée en compétences du dirigeant dans le secteur de la formation", nom: "Maîtriser la réglementation de la formation professionnelle", objectif: "Comprendre le cadre juridique (Code du travail, loi Avenir, décrets Qualiopi), les obligations déclaratives (BPF, NDA) et les droits des stagiaires", type: "Externe", formateur: "Centre Inffo – Centre de ressources de la formation", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, Canva IA, etc.) dans l'ingénierie pédagogique, l'évaluation et la gestion administrative", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ (décret n° 2026-728, 33 indicateurs)", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Montée en compétences pédagogiques", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe, d'évaluation des acquis et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-    );
+/** Actions du plan (données communes au tableau Excel et aux autres pièces IND 22). */
+export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: FormateurInfo[], stagiaires?: StagiaireInfo[]): PlanDevAction[] {
+  const types = o.typesActions || [];
+  const isCFA = types.includes("apprentissage");
+  const isVAE = types.includes("vae");
+  const isBC = types.includes("bilans-competences");
+  const intervenants = intervenantsDe(o, f, stagiaires);
+  const formateursNoms = Array.from(new Set([f.formateur, ...(stagiaires || []).map((s) => s.formateur)].map((n) => String(n || "").trim()).filter(Boolean)));
+  const tous = intervenants.join(", ") || o.dirigeant || "";
+  const peda = (formateursNoms.join(", ") || tous);
+  const distanciel = /distanciel|distance|visio|meet|zoom|mixte/i.test(`${f.modalites} ${f.lieu}`);
+  const certifiante = /^(RS|RNCP)\d+$/i.test(String(f.codeRNCP || "").replace(/\s+/g, ""));
+  const financement = "OPCO / fonds d'assurance formation selon le statut";
+  const out: PlanDevAction[] = [];
+  const add = (a: Omit<PlanDevAction, "ref">) => out.push({ ref: "", ...a });
+
+  // 1. Compétences métier (IND 21-22 : expertise à jour dans le domaine enseigné)
+  if (!isVAE && !isBC) {
+    formationsMetier(f).forEach((m) => add({
+      famille: "metier", besoin: `${m.origine} — issu de l'entretien professionnel et de la veille métier (IND 24)`, indicateurs: "21, 22, 24",
+      nom: m.nom, objectif: m.objectif, beneficiaires: peda, modalite: `${m.type} — distanciel ou présentiel`, prestataire: m.formateur,
+      duree: m.duree, periode: "", financement, priorite: "Moyenne", efficacite: "Mise à jour des supports et exercices ; évolution de la satisfaction sur les contenus (IND 30)",
+    }));
   }
+  // 2. Spécifique au type de prestation
+  if (isVAE) {
+    add({ famille: "specifique", besoin: "Réforme de la VAE (loi n° 2022-1598, décret n° 2023-1275) — veille réglementaire (IND 23)", indicateurs: "10, 21, 22, 23", nom: "Accompagner un parcours VAE depuis la réforme : France VAE, dossier de faisabilité et dossier de validation", objectif: "Maîtriser le nouveau parcours, la plateforme vae.gouv.fr et le rôle d'accompagnateur", beneficiaires: tous, modalite: "Externe — distanciel", prestataire: "Organisme de professionnalisation des acteurs de la VAE", duree: "2 jours", periode: "", financement, priorite: "Haute", efficacite: "Procédures VAE mises à jour ; taux de dossiers de faisabilité recevables" });
+    add({ famille: "specifique", besoin: "Accompagnement à l'écrit réflexif — retours des candidats (IND 30)", indicateurs: "10, 11, 22", nom: "Méthodes d'accompagnement à l'écriture du dossier de validation et à l'entretien avec le jury", objectif: "Aider le candidat à décrire ses activités (contexte, actions, résultats) sans rédiger à sa place", beneficiaires: tous, modalite: "Externe — distanciel", prestataire: "Organisme de formation des accompagnateurs VAE", duree: "2 jours", periode: "", financement, priorite: "Moyenne", efficacite: "Taux de validation totale ; satisfaction des candidats sur l'accompagnement" });
+  }
+  if (isBC) {
+    add({ famille: "specifique", besoin: "Qualité de l'accompagnement — obligation de supervision de la pratique", indicateurs: "21, 22", nom: "Analyse de pratiques / supervision des consultants en bilan de compétences", objectif: "Prendre du recul sur les situations d'accompagnement et sécuriser la posture déontologique", beneficiaires: tous, modalite: "Externe — séances trimestrielles", prestataire: "Superviseur ou psychologue du travail", duree: "4 × 2 heures", periode: "", financement, priorite: "Haute", efficacite: "Comptes rendus de supervision ; satisfaction des bénéficiaires" });
+    add({ famille: "specifique", besoin: "Outils d'investigation utilisés en phase 2 (R.6313-4)", indicateurs: "17, 21, 22", nom: "Habilitation / actualisation aux outils d'évaluation des intérêts, de la personnalité et des compétences", objectif: "Utiliser et restituer les outils d'investigation dans le respect de leurs conditions d'usage", beneficiaires: tous, modalite: "Externe", prestataire: "Éditeur de tests / organisme habilité", duree: "2 jours", periode: "", financement, priorite: "Moyenne", efficacite: "Attestation d'habilitation ; qualité des synthèses" });
+    add({ famille: "specifique", besoin: "Veille emploi et métiers pour les projets des bénéficiaires (IND 24)", indicateurs: "22, 24", nom: "Marché du travail, métiers en tension et dispositifs de reconversion", objectif: "Actualiser la connaissance des métiers et des dispositifs (CPF, PTP, VAE)", beneficiaires: tous, modalite: "Autoformation — webinaires de sources officielles", prestataire: "France Travail, ONISEP, Carif-Oref", duree: "1 jour", periode: "", financement: "Sans coût (ressources publiques)", priorite: "Normale", efficacite: "Fiches de veille exploitées dans les bilans" });
+  }
+  if (isCFA) {
+    add({ famille: "specifique", besoin: "Missions des CFA (art. L.6231-2) et coordination centre / entreprise (IND 13)", indicateurs: "13, 20, 22", nom: "Pédagogie de l'alternance et coordination avec les maîtres d'apprentissage", objectif: "Articuler missions en entreprise et blocs de compétences, conduire les visites de suivi", beneficiaires: tous, modalite: "Externe", prestataire: "Réseau des CFA / organisme spécialisé", duree: "2 jours", periode: "", financement, priorite: "Haute", efficacite: "Visites réalisées / prévues ; grille de coordination renseignée" });
+    add({ famille: "specifique", besoin: "Décret n° 2026-728 : traitement sans délai des ruptures, violences et discriminations (IND 14, 15)", indicateurs: "14, 15, 22", nom: "Prévenir et traiter les violences, le harcèlement et les discriminations envers les apprentis", objectif: "Repérer, recueillir un signalement, orienter vers les interlocuteurs et le médiateur de l'apprentissage", beneficiaires: tous, modalite: "Externe — distanciel", prestataire: "Organisme spécialisé en prévention des violences", duree: "1 jour", periode: "", financement, priorite: "Haute", efficacite: "Procédure appliquée ; délai de prise en charge des situations signalées" });
+    add({ famille: "specifique", besoin: "Mobilité nationale et internationale des apprentis (IND 20)", indicateurs: "20, 22", nom: "Monter un projet de mobilité Erasmus+ pour des apprentis", objectif: "Connaître les financements, conventions et accompagnements possibles", beneficiaires: o.referentMobilite || tous, modalite: "Externe — webinaire", prestataire: "Agence Erasmus+ France Éducation Formation", duree: "0,5 jour", periode: "", financement: "Sans coût (webinaire institutionnel)", priorite: "Normale", efficacite: "Nombre de projets de mobilité étudiés / engagés" });
+  }
+  // 3. Pédagogie
+  if (!isBC) add({ famille: "pedagogie", besoin: "Évaluations des stagiaires et observation des séances (IND 11, 30)", indicateurs: "6, 10, 11, 22", nom: isVAE ? "Techniques d'entretien d'explicitation" : "Concevoir et animer des formations pour adultes ; construire des évaluations", objectif: isVAE ? "Faire expliciter l'expérience du candidat avec précision" : "Varier les méthodes actives, individualiser, construire des évaluations critériées avec corrigés", beneficiaires: peda, modalite: "Externe", prestataire: "Organisme de formation de formateurs", duree: "3 jours", periode: "", financement, priorite: "Moyenne", efficacite: "Grille d'observation de séance ; progression positionnement entrée / sortie" });
+  if (distanciel) add({ famille: "numerique", besoin: "Prestations à distance (art. D.6313-3-1) — assistance technique et pédagogique (IND 17, 19)", indicateurs: "17, 19, 22, 25", nom: "Animer une classe virtuelle et rendre les supports accessibles (RGAA)", objectif: "Maîtriser l'animation à distance, l'engagement des participants et l'accessibilité numérique", beneficiaires: peda, modalite: "Externe — distanciel", prestataire: "Organisme de formation au numérique éducatif", duree: "1 jour", periode: "", financement, priorite: "Moyenne", efficacite: "Taux d'assiduité en distanciel ; incidents techniques par session" });
+  // 4. Certification (IND 7 et 16)
+  if (certifiante && !isBC) add({ famille: "specifique", besoin: `Exigences de la certification ${f.codeRNCP} — référentiel d'évaluation du certificateur (IND 7, 16)`, indicateurs: "7, 16, 22", nom: `Référentiel d'évaluation et modalités d'épreuves de la certification ${f.codeRNCP}`, objectif: "Aligner les évaluations formatives sur les épreuves et respecter les exigences formelles du certificateur", beneficiaires: peda, modalite: "Externe ou réunion d'information du certificateur", prestataire: "Certificateur de la fiche (voir fiche France Compétences)", duree: "0,5 jour", periode: "", financement: "Selon le certificateur", priorite: "Haute", efficacite: "Tableau croisé à jour ; taux de réussite à la certification" });
+  // 5. Handicap (IND 26)
+  add({ famille: "handicap", besoin: "Accueil des personnes en situation de handicap — référent handicap (IND 26)", indicateurs: "26, 22", nom: "Référent handicap : accueil, compensation et mobilisation du réseau", objectif: "Identifier les besoins de compensation, mobiliser les partenaires (Agefiph, Cap emploi, MDPH) et adapter la prestation", beneficiaires: o.referentHandicap || o.dirigeant || tous, modalite: "Externe — distanciel", prestataire: "Ressource Handicap Formation (RHF) de la région / Agefiph", duree: "1 jour", periode: "", financement: "Sans coût ou OPCO selon l'offre régionale", priorite: "Haute", efficacite: "Demandes d'aménagement traitées sous 8 jours" });
+  // 6. Qualité et réglementation (IND 23, 27, 32)
+  add({ famille: "reglementaire", besoin: "Veille réglementaire : décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026 (IND 23)", indicateurs: "23, 27, 32, 33", nom: "Référentiel national qualité 2026 : indicateurs 27, 32 et 33", objectif: "Intégrer la traçabilité sous-traitance / portage, l'analyse des risques qualité et, pour un CFA, l'évaluation des enseignements", beneficiaires: tous, modalite: "Autoformation (texte du décret, guide de lecture) + réunion interne", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour", periode: "", financement: "Sans coût", priorite: "Haute", efficacite: "Registre IND 27 et analyse des risques IND 32 à jour" });
+  add({ famille: "qualite", besoin: "Démarche d'amélioration continue et préparation de l'audit (IND 30 à 32)", indicateurs: "30, 31, 32", nom: "Piloter la démarche qualité : appréciations, réclamations, analyse des risques", objectif: "Exploiter les appréciations et réclamations et suivre le plan d'amélioration", beneficiaires: tous, modalite: "Interne — revue qualité", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour par semestre", periode: "", financement: "Sans coût", priorite: "Moyenne", efficacite: "Actions d'amélioration closes dans les délais" });
 
-  // Plan PRÉVISIONNEL établi à la date de MAJ : les actions sont « prévues » ; une action
-  // n'est notée réalisée qu'avec l'attestation correspondante jointe au dossier (IND 22).
-  const intervenants = Array.from(new Set([f.formateur, ...(stagiaires || []).map(s => s.formateur), o.dirigeant]
-    .map(n => String(n || "").trim()).filter(Boolean)));
-  const nomsIntervenants = intervenants.join(", ") || formateurName;
-  const majIso = (o.dateMaj || "").trim();
-  const dateEtab = majIso ? fmtDate(new Date(majIso + "T00:00:00")) : dateInscriptionStr;
-  const anneePlan = majIso ? Number(majIso.slice(0, 4)) : year;
-  html = html.replace(`${prevYear} – ${year}`, `${anneePlan} – ${anneePlan + 1} (établi le ${dateEtab})`);
-  html = html.replace("<th>Année</th>", "<th>Année</th><th>Statut</th>");
-  // Nouvel entrant : plan prévisionnel. Surveillance / renouvellement : les actions échues
-  // renvoient au bilan de réalisation (IND 22), qui les confirme par attestation ou les reporte.
-  const statutPlan = typeAuditEffectif(o) === "initial"
+  // Références et périodes : répartition sur l'année du plan, priorités en premier.
+  const ordre = { Haute: 0, Moyenne: 1, Normale: 2 } as const;
+  out.sort((a, b) => ordre[a.priorite] - ordre[b.priorite]);
+  const maj = (o.dateMaj || "").trim();
+  const an = maj ? Number(maj.slice(0, 4)) : new Date().getFullYear();
+  const moisDebut = maj ? Number(maj.slice(5, 7)) : 1;
+  out.forEach((a, i) => {
+    a.ref = `PDC-${String(i + 1).padStart(2, "0")}`;
+    const trimIdx = Math.floor((moisDebut - 1) / 3) + Math.floor(i / 2);
+    a.periode = `T${(trimIdx % 4) + 1} ${an + Math.floor(trimIdx / 4)}`;
+  });
+  void formateurs;
+  return out;
+}
+
+/** Liste simplifiée (compatibilité avec les pièces qui lisent le plan). */
+export function getPlanDevTrainings(f: FormationInfo, formateurs: FormateurInfo[]): PlanDevTraining[] {
+  return planDevActions({ nom: "", dirigeant: f.formateur || "" } as OrganismeInfo, f, formateurs, []).map((a) => ({
+    origine: a.besoin, nom: a.nom, objectif: a.objectif, type: a.modalite.split(" — ")[0], formateur: a.prestataire,
+    nb: String(a.beneficiaires.split(",").filter(Boolean).length || 1), noms: a.beneficiaires, duree: a.duree, dateDebut: a.periode,
+  }));
+}
+
+export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, formateurs: FormateurInfo[], stagiaires?: StagiaireInfo[]): string {
+  const actions = planDevActions(o, f, formateurs, stagiaires);
+  const intervenants = intervenantsDe(o, f, stagiaires);
+  const maj = (o.dateMaj || "").trim();
+  const dateEtab = maj ? formatDate(maj) : formatDate(new Date().toISOString().slice(0, 10));
+  const an = maj ? Number(maj.slice(0, 4)) : new Date().getFullYear();
+  const initial = typeAuditEffectif(o) === "initial";
+  const statut = initial
     ? "Prévue — attestation à joindre après réalisation"
-    : "Voir bilan de réalisation du plan (IND 22) : réalisée avec attestation ou reportée avec motif";
-  futureTrainings.forEach((t, i) => {
-    const trimestre = ["T1", "T2", "T3", "T4"][i % 4];
-    html += `<tr>
-      <td>${dateEtab}</td>
-      <td>${t.origine}</td>
-      <td>${t.nom}</td>
-      <td>${t.objectif}</td>
-      <td>${t.type}</td>
-      <td>${t.formateur}</td>
-      <td>${intervenants.length || 1}</td>
-      <td>${nomsIntervenants}</td>
-      <td>${t.duree}</td>
-      <td>${trimestre} ${anneePlan + (i >= 4 ? 1 : 0)}</td>
-      <td>${anneePlan}</td>
-      <td>${statutPlan}</td>
-    </tr>`;
+    : "Voir bilan de réalisation (IND 22) : réalisée avec attestation ou reportée avec motif";
+  const C = 12;
+  const sec = (t: string) => `<tr><th colspan="${C}" style="background:#2d5aa0">${t}</th></tr>`;
+  const ligne = (label: string, val: string) => `<tr><td><strong>${label}</strong></td><td colspan="${C - 1}">${val}</td></tr>`;
+  let h = `<tr><th colspan="${C}">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES ${an} – ${an + 1}</th></tr>`;
+  h += ligne("Établi le", `${dateEtab} (V${o.version || "1"}) par ${o.responsablePedagogique || o.dirigeant} — validé par ${o.dirigeant}`);
+  h += ligne("Périmètre", `Ensemble des personnes intervenant dans les prestations : ${intervenants.join(", ") || o.dirigeant}${/externe/i.test(o.referentQualite || "") ? ` ; accompagnement qualité externe : ${o.referentQualite}` : ""}. Les intervenants sous-traitants ou en portage salarial transmettent leurs attestations de formation (IND 27).`);
+  h += ligne("Référence", "Indicateur 22 du référentiel national qualité (décret n° 2026-728) : « Le prestataire entretient et développe les compétences de ses salariés, adaptées aux prestations qu'il délivre. » Un indépendant démontre sa propre démarche de formation continue.");
+  h += ligne("Financement", "OPCO de branche pour les salariés ; fonds d'assurance formation selon le statut pour le dirigeant non salarié (à confirmer à la demande de prise en charge) ; ressources gratuites institutionnelles lorsque c'est indiqué.");
+  h += ligne("Situation d'audit", initial ? "Nouvel entrant : plan prévisionnel ; sa mise en œuvre sera vérifiée à l'audit de surveillance." : "Surveillance / renouvellement : la réalisation de chaque action est tracée dans le bilan de réalisation du plan (IND 22).");
+
+  h += sec("1. RECENSEMENT DES BESOINS DE COMPÉTENCES");
+  h += `<tr><th>Source</th><th colspan="5">Ce qui est analysé</th><th colspan="6">Besoins identifiés</th></tr>`;
+  const sources: [string, string, string][] = [
+    ["Entretien professionnel annuel", "Parcours, compétences, souhaits d'évolution de chaque intervenant", "Actualisation technique dans le domaine enseigné ; développement pédagogique"],
+    ["Appréciations des bénéficiaires (IND 30)", "Commentaires sur les contenus, l'animation et les supports", "Méthodes actives, individualisation, qualité des supports"],
+    ["Veilles légale, métiers et innovations (IND 23 à 25)", "Évolutions réglementaires, du métier et des outils", "Référentiel 2026, évolutions du métier, outils numériques"],
+    ["Analyse des risques qualité (IND 32)", "Risques « compétence insuffisante ou non actualisée d'un intervenant »", "Plan de formation continue annuel pour chaque intervenant"],
+    ["Handicap (IND 26)", "Demandes d'aménagement reçues et réseau mobilisé", "Formation du référent handicap"],
+  ];
+  if (/^(RS|RNCP)\d+$/i.test(String(f.codeRNCP || "").replace(/\s+/g, ""))) sources.push(["Certification visée (IND 7, 16)", `Évolutions de la fiche ${f.codeRNCP} et exigences du certificateur`, "Maîtrise du référentiel d'évaluation"]);
+  sources.forEach(([a, b, c]) => { h += `<tr><td>${a}</td><td colspan="5">${b}</td><td colspan="6">${c}</td></tr>`; });
+
+  h += sec("2. ACTIONS DE DÉVELOPPEMENT DES COMPÉTENCES");
+  h += `<tr><th>Réf.</th><th>Besoin identifié (source)</th><th>Action</th><th>Objectifs attendus</th><th>Bénéficiaire(s)</th><th>Modalité</th><th>Prestataire / animateur</th><th>Durée</th><th>Période</th><th>Financement</th><th>Critère d'efficacité</th><th>Statut</th></tr>`;
+  actions.forEach((a) => {
+    h += `<tr><td>${a.ref}</td><td>${a.besoin}</td><td>${a.nom}</td><td>${a.objectif}</td><td>${a.beneficiaires}</td><td>${a.modalite}</td><td>${a.prestataire}</td><td>${a.duree}</td><td>${a.periode}</td><td>${a.financement}</td><td>${a.efficacite}</td><td>${a.priorite === "Haute" ? "Prioritaire — " : ""}${statut}</td></tr>`;
   });
 
-  // Excel wrapper
+  h += sec("3. AUTRES LEVIERS DE PROFESSIONNALISATION");
+  h += `<tr><th>Levier</th><th colspan="5">Modalités</th><th colspan="3">Fréquence</th><th colspan="3">Trace conservée</th></tr>`;
+  const leviers: [string, string, string, string][] = [
+    ["Réunions pédagogiques", "Retour sur les sessions, partage des difficultés, mise à jour des supports", "Mensuelle ou après chaque session", "Compte rendu (IND 18)"],
+    ["Analyse de pratiques", "Étude de situations vécues avec les stagiaires, recherche de solutions", "Trimestrielle", "Fiche de synthèse"],
+    ["Autoformation et veille", "Lecture des sources de veille, webinaires institutionnels (Centre Inffo, France Compétences, Carif-Oref)", "Continue", "Registre de veille (IND 23 à 25)"],
+    ["Réseaux professionnels", "Participation aux réseaux régionaux de la formation et de la branche", "Au moins 2 fois par an", "Invitations, comptes rendus"],
+    ["Entretien professionnel", "Bilan des compétences, besoins et projet de chaque intervenant", "Annuel (et bilan à 6 ans pour les salariés)", "Fiche d'entretien signée"],
+  ];
+  leviers.forEach(([a, b, c, d]) => { h += `<tr><td>${a}</td><td colspan="5">${b}</td><td colspan="3">${c}</td><td colspan="3">${d}</td></tr>`; });
+
+  h += sec("4. ÉVALUATION DE L'EFFICACITÉ DU PLAN");
+  h += `<tr><th>Niveau</th><th colspan="5">Méthode</th><th colspan="3">Moment</th><th colspan="3">Responsable</th></tr>`;
+  const eff: [string, string, string, string][] = [
+    ["Satisfaction", "Évaluation à chaud de chaque action suivie par l'intervenant", "Fin de l'action", o.responsablePedagogique || o.dirigeant],
+    ["Acquis", "Attestation de fin de formation / certificat de réalisation joint au dossier", "Fin de l'action", o.responsablePedagogique || o.dirigeant],
+    ["Transfert", "Mise à jour constatée des supports, exercices et procédures", "Dans les 3 mois", o.responsablePedagogique || o.dirigeant],
+    ["Impact", "Évolution des appréciations des stagiaires sur les contenus et l'animation (IND 30) et des taux de réussite (IND 2, 3)", "Revue annuelle", o.dirigeant],
+  ];
+  eff.forEach(([a, b, c, d]) => { h += `<tr><td>${a}</td><td colspan="5">${b}</td><td colspan="3">${c}</td><td colspan="3">${d}</td></tr>`; });
+  h += ligne("Révision", `Plan revu chaque année après les entretiens professionnels et la revue qualité, et à chaque arrivée d'un nouvel intervenant. Prochaine révision : au plus tard le ${formatDate(`${an + 1}${maj ? maj.slice(4) : "-01-01"}`)}.`);
+
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8">
 <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Plan Dev Compétences</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
@@ -471,5 +493,5 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   td { padding: 6px 10px; border: 1px solid #d0d0d0; vertical-align: top; }
   tr:nth-child(even) { background-color: #f2f6fc; }
 </style>
-</head><body><table>${html}</table></body></html>`;
+</head><body><table>${h}</table></body></html>`;
 }

@@ -7,6 +7,7 @@
  * Aucun chiffre n'est inventé : valeur saisie, sinon calculée depuis les stagiaires du
  * dossier dont la session est terminée, sinon « non disponible ».
  */
+import { planDevActions } from "./templatesCritere5";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, isStagiaireFormationTerminee } from "./docBuilder";
 import { getSatisfactionLabel, getAssiduiteLabel, getTauxObtention, getRepartitionParAnnee } from "./indicateursResultats";
@@ -147,21 +148,21 @@ export function genRevueDirection(o: OrganismeInfo, f: FormationInfo, stagiaires
 /** IND 22 : bilan de réalisation du plan de développement des compétences (hors nouvel entrant). */
 export function genBilanPlanDeveloppement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], today: Date = new Date()): string {
   const type = typeAuditEffectif(o, today);
-  const intervenants = [...new Set([f.formateur, ...stagiaires.map((s) => s.formateur), o.dirigeant].map(v).filter(Boolean))];
   const date = formatDate(iso(dateRevueDirection(o, today)));
-  const actions = [
-    ["Actualisation réglementaire (référentiel national qualité, décret n° 2026-728)", "Veille IND 23"],
-    [`Actualisation des compétences techniques liées à « ${f.intitule} »`, "Veille IND 24"],
-    ["Outils et méthodes pédagogiques (classe virtuelle, évaluation, accessibilité)", "Veille IND 25"],
-    ["Accueil des personnes en situation de handicap", "IND 26"],
-  ];
-  const rows = intervenants.flatMap((n) => actions.map(([a, o2]) => [n, a, o2, "Réalisée — attestation jointe ☐    Reportée — motif : ……… ☐"]));
+  const dRevue = dateRevueDirection(o, today);
+  // Mêmes actions et références (PDC-nn) que le plan de développement des compétences.
+  const rows = planDevActions(o, f, [], stagiaires).map((a) => {
+    const m = a.periode.match(/^T(\d) (\d{4})$/);
+    const finTrim = m ? new Date(+m[2], +m[1] * 3, 0) : null;
+    const echue = !finTrim || finTrim <= dRevue;
+    return [a.ref, a.nom, a.beneficiaires, a.besoin, a.periode, echue ? "Réalisée — attestation jointe ☐    Reportée — motif : ……… ☐" : "Échéance non atteinte — maintenue au plan"];
+  });
   return buildDocument({
     org: o, title: "BILAN DE RÉALISATION DU PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", subtitle: `Indicateur 22 — ${LIBELLES_AUDIT[type]}`,
     sections: [
       { heading: "Objet", content: `<p>Bilan établi le ${date} pour l'audit de ${type === "renouvellement" ? "renouvellement" : "surveillance"} : chaque action du plan de développement dont l'échéance est passée est confirmée par une attestation (réalisée) ou reportée avec son motif. Seules les actions justifiées par une attestation sont présentées comme réalisées.</p>` },
     ],
-    table: { headers: ["Intervenant", "Action du plan", "Origine", "Statut au " + date], rows },
+    table: { headers: ["Réf.", "Action du plan", "Bénéficiaire(s)", "Besoin (source)", "Période prévue", "Statut au " + date], rows },
     signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite || o.dirigeant], dates: [date, date] },
   });
 }

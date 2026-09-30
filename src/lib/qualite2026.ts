@@ -150,6 +150,20 @@ const RISQUES_SPECIFIQUES: Record<TypePrestation, Risque[]> = {
   ],
 };
 
+/**
+ * Risques de la cartographie (même source que l'analyse des risques IND 32),
+ * avec leur criticité : sert au tableau d'amélioration continue pour que les deux
+ * pièces citent exactement les mêmes risques, mesures et pilotes.
+ */
+export function risquesQualite(o: OrganismeInfo, type: TypePrestation): { processus: string; risque: string; mesure: string; indicateur: string; pilote: string; ind: string; criticite: number }[] {
+  const L = LIBELLE[type];
+  return [...RISQUES_COMMUNS, ...RISQUES_SPECIFIQUES[type]].map((r) => ({
+    processus: r.processus,
+    risque: type === "BC" || type === "VAE" ? r.risque.replace("bénéficiaires", L.publicPl) : r.risque,
+    mesure: r.mesure, indicateur: r.indicateur, pilote: r.pilote(o), ind: r.ind, criticite: r.p * r.g,
+  }));
+}
+
 function criticite(p: number, g: number): string {
   const c = p * g;
   return c >= 6 ? `${c} — élevé` : c >= 3 ? `${c} — modéré` : `${c} — faible`;

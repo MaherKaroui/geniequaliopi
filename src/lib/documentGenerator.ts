@@ -11,7 +11,8 @@ import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection 
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
-import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements } from "./qualite2026";
+import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
+import { planDevActions } from "./templatesCritere5";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel } from "@/lib/bdc/bdcNTXlsx";
@@ -11182,6 +11183,28 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
   }, signatures: { type: "2", labels: ["Le Référent Qualité", "Le Dirigeant"], names: [o.referentQualite, o.dirigeant] } });
 }
 
+/**
+ * Aléa de session (IND 31) : un seul enregistrement, partagé par le suivi des
+ * dysfonctionnements et le tableau d'amélioration continue (même référence AC-D01).
+ * Daté du premier jour de session, clôturé 2 jours ouvrés plus tard ; absent tant
+ * que la session n'a pas commencé (aucune trace datée dans le futur).
+ */
+function aleaSession(f: FormationInfo): { ref: string; date: string; cloture: string; partie: string; canal: string; desc: string; causes: string; action: string } | null {
+  const debut = new Date(`${(f.dateDebut || "").slice(0, 10)}T00:00:00`);
+  if (isNaN(debut.getTime())) return null;
+  const now = new Date();
+  if (debut > now) return null;
+  const plus2 = new Date(debut);
+  let k = 2;
+  while (k > 0) { plus2.setDate(plus2.getDate() + 1); if (plus2.getDay() !== 0 && plus2.getDay() !== 6) k--; }
+  const fmt = (d: Date) => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  const distanciel = /distanciel|distance|ligne|visio|meet|zoom/i.test(`${f.modalites} ${f.lieu}`);
+  const cloture = fmt(plus2 > now ? now : plus2);
+  return distanciel
+    ? { ref: "AC-D01", date: fmt(debut), cloture, partie: "Stagiaire", canal: "Email", desc: "Coupures de connexion d'un participant pendant la classe virtuelle", causes: "Connexion internet instable du participant ; lien de secours non communiqué", action: "Envoi systématique d'un second lien et du support avant chaque séance ; test de connexion la veille" }
+    : { ref: "AC-D01", date: fmt(debut), cloture, partie: "Stagiaire", canal: "Oral en formation", desc: "Nuisances sonores dans la salle de formation", causes: "Travaux imprévus à proximité de la salle", action: "Changement de salle et vérification des conditions d'accueil la veille de chaque session" };
+}
+
 function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo, formations: FormationInfo[], stagiaires: StagiaireInfo[]) {
   // Use formation START date as base, then generate dates BEFORE it
   // Improvements must be planned and closed BEFORE the training starts
@@ -11229,12 +11252,8 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const todayIso = new Date().toISOString().slice(0, 10);
   const veilles = (["reglementaire", "metier", "technologique"] as const).flatMap((th) =>
     entreesVeille(o, f, th, typeAct).map((e) => ({ e, ind: th === "reglementaire" ? 23 : th === "metier" ? 24 : 25 })));
-  const risquesAction: Array<[string, string, string]> = [
-    ["Décrochage ou abandon en cours de parcours", "Relance sous 48 h après une absence, entretien d'étape, procédure d'abandon", o.responsablePedagogique || o.dirigeant],
-    ["Information du public incomplète ou non datée", "Contrôle des 10 items du programme et de la date de mise à jour avant chaque session", o.responsablePedagogique || o.dirigeant],
-    ["Besoin de compensation du handicap non identifié", "Question systématique dans l'évaluation des besoins et entretien avec le référent handicap", o.referentHandicap || o.dirigeant],
-    ["Évolution réglementaire non prise en compte", "Veille mensuelle tracée et compte rendu d'exploitation (IND 23)", o.referentQualite || o.dirigeant],
-  ];
+  // Mêmes risques, mesures et pilotes que la cartographie de l'analyse des risques (IND 32).
+  const risquesAction = risquesQualite(o, typeAct).filter((r) => r.criticite >= 6);
   const lignes: string[][] = [];
   veilles.forEach(({ e, ind }, i) => {
     const clos = e.statut === "Réalisé";
@@ -11243,9 +11262,26 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const dateRisques = formatDate((o.dateMaj || todayIso) <= todayIso ? (o.dateMaj || todayIso) : todayIso);
   const typeAud = typeAuditEffectif(o);
   const dateRD = formatDate((() => { const d = dateRevueDirection(o); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })());
-  risquesAction.forEach(([risque, action, qui], i) => {
-    lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `Risque coté « élevé » dans la cartographie des risques de ${o.nom}`, risque, action, qui, "Permanent — revue annuelle", "",
-      typeAud === "initial" ? "Mesure de maîtrise en place ; efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`]);
+  risquesAction.forEach((r, i) => {
+    lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `${r.processus} — risque coté « élevé » (criticité ${r.criticite}) dans la cartographie des risques de ${o.nom}`, r.risque, r.mesure, r.pilote, "Permanent — revue annuelle", "",
+      `Indicateur de suivi : ${r.indicateur}. ${typeAud === "initial" ? "Efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`}`]);
+  });
+  // Aléa de session (IND 31) — même enregistrement que le suivi des dysfonctionnements.
+  const alea = aleaSession(f);
+  if (alea) {
+    lignes.push([alea.ref, alea.date, "Aléa / difficulté signalé (IND 31)", `${alea.desc} — cause : ${alea.causes}`, "Défaillance technique ou matérielle", alea.action, o.responsablePedagogique || o.dirigeant, "Session suivante", alea.cloture, "Clôturé — action corrective appliquée ; voir le suivi des dysfonctionnements (IND 31)"]);
+  }
+  // Appréciations de la session (IND 30) : analysées une fois la session terminée.
+  const finSession = new Date(`${(f.dateFin || "").slice(0, 10)}T00:00:00`);
+  if (termine && !isNaN(finSession.getTime())) {
+    const analyse = new Date(finSession);
+    let n = 10;
+    while (n > 0) { analyse.setDate(analyse.getDate() + 1); if (analyse.getDay() !== 0 && analyse.getDay() !== 6) n--; }
+    lignes.push(["AC-S01", fmtDate(finSession), "Appréciations des parties prenantes (IND 30)", `Synthèse des questionnaires à chaud de la session du ${formatDate((f.dateDebut || "").slice(0, 10))} au ${formatDate((f.dateFin || "").slice(0, 10))}`, "Contenus ou animation inadaptés non détectés", "Analyse de la synthèse en réunion pédagogique ; mise à jour des supports sur les points les moins bien notés", o.responsablePedagogique || o.dirigeant, "10 jours ouvrés après la session", fmtDate(analyse > today ? today : analyse), "Clôturé — synthèse des appréciations et compte rendu de réunion pédagogique"]);
+  }
+  // Plan de développement des compétences (IND 22) : actions prioritaires.
+  planDevActions(o, f, SAMPLE_FORMATEURS, stagiaires).filter((a) => a.priorite === "Haute").slice(0, 3).forEach((a, i) => {
+    lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, dateRisques, "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, a.periode, "", typeAud === "initial" ? "Prévue — attestation à joindre" : "Voir le bilan de réalisation du plan (IND 22)"]);
   });
   if (typeAud !== "initial") {
     lignes.push(["AC-RD01", dateRD, `Revue de direction (${LIBELLES_AUDIT[typeAud]})`, "Revue annuelle des résultats, appréciations, réclamations, veille et risques", "Tous risques de la cartographie", typeAud === "renouvellement" ? "Bilan du cycle de certification et mise à jour de l'analyse des risques" : "Mise à jour des indicateurs publiés et de l'analyse des risques", o.dirigeant, dateRD, dateRD, "Clôturé — compte rendu de revue de direction (IND 32)"]);
@@ -11288,11 +11324,12 @@ function genSuiviDysfonctionnementsExcel(o: OrganismeInfo, f: FormationInfo, sta
   <th>Date de clôture</th>
 </tr>`;
 
-  const isDistanciel = (f.modalites || "").toLowerCase().includes("distance") || (f.modalites || "").toLowerCase().includes("distanciel") || (f.modalites || "").toLowerCase().includes("ligne");
-  const dysfonctionnement = isDistanciel
-    ? { date: fmtDate(addDays(baseDate, -5)), partie: "Stagiaire", type: "Externe", canal: "Email", desc: "Problème de connexion internet, certains moments la connexion internet avait un dysfonctionnement", causes: "Box internet saturée lors de sessions en groupe", action: "Oui – souscription box supplémentaire", cloture: fmtDate(addDays(baseDate, 3)) }
-    : { date: fmtDate(addDays(baseDate, -5)), partie: "Stagiaire", type: "Externe", canal: "Oral en formation", desc: "Salle de formation bruyante, des travaux à proximité perturbaient le bon déroulement de la session", causes: "Travaux imprévus dans le bâtiment voisin", action: "Oui – changement de salle et signalement au gestionnaire du site", cloture: fmtDate(addDays(baseDate, 3)) };
-  const dysfonctionnements = [dysfonctionnement];
+  // Même enregistrement que la ligne AC-D01 du tableau d'amélioration continue.
+  const alea = aleaSession(f);
+  const dysfonctionnements = alea
+    ? [{ date: alea.date, partie: alea.partie, type: "Externe", canal: alea.canal, desc: alea.desc, causes: alea.causes, action: `Oui – ${alea.ref} : ${alea.action}`, cloture: alea.cloture }]
+    : [];
+  void baseDate; void fmtDate; void addDays;
 
   dysfonctionnements.forEach(d => {
     xlsHtml += `<tr>
