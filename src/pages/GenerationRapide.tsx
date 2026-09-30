@@ -893,6 +893,18 @@ const GenerationRapide = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Type d'action<span className="text-destructive"> *</span></Label>
+              <Select value={formation.typeAction || "actions-formation"} onValueChange={(v) => setForm({ typeAction: v as FormationInfo["typeAction"] })}>
+                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="actions-formation">Action de formation</SelectItem>
+                  <SelectItem value="bilans-competences">Bilan de compétences</SelectItem>
+                  <SelectItem value="vae">VAE</SelectItem>
+                  <SelectItem value="apprentissage">CFA / Apprentissage</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Field label="Lieu" value={formation.lieu} onChange={(e) => setForm({ lieu: e.target.value })} />
             <Field label="Tarif" required value={formation.tarif} onChange={(e) => setForm({ tarif: e.target.value })} placeholder="2 100 € TTC" />
             <Field label="Formateur" value={formation.formateur} onChange={(e) => setForm({ formateur: e.target.value })} />
