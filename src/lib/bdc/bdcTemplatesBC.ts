@@ -1148,6 +1148,7 @@ const compteRenduVeille: BdcDocDef = {
 };
 
 import { supportCoursPatisserie } from "./bdcSupportCoursPatisserie";
+import { supportCoursManager } from "./bdcSupportCoursManager";
 
 const ressourcesBeneficiaire: BdcDocDef = {
   nom: "Indicateur 19 - Ressources mises à disposition du bénéficiaire",
@@ -1183,6 +1184,12 @@ const supportCoursPatisserieConditionnel: BdcDocDef = {
   applicable: (f) => getBdcDomainProfile(f).label === "Pâtisserie & Cake Design",
 };
 
+/** Support de cours du profil Manager : compétences managériales, exercices corrigés, veille. */
+const supportCoursManagerConditionnel: BdcDocDef = {
+  ...supportCoursManager,
+  applicable: (f) => getBdcDomainProfile(f).label === "Manager — compétences managériales",
+};
+
 export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   documentSynthese,
   attestationRemiseSynthese,
@@ -1210,6 +1217,7 @@ export const BDC_TEMPLATES_MANQUANTS: BdcDocDef[] = [
   compteRenduVeille,
   ressourcesBeneficiaire,
   supportCoursPatisserieConditionnel,
+  supportCoursManagerConditionnel,
 ];
 
 /** Pièces BC applicables à une formation donnée (même filtre pour le catalogue et le ZIP). */

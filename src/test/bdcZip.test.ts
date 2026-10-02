@@ -65,4 +65,14 @@ describe("ZIP d'audit bilan de compétences", () => {
     const noms = Object.keys(await textesZip(blob));
     expect(noms.some((n) => /Support de cours/i.test(n))).toBe(true);
   }, 600_000);
+
+  it("produit le support de cours Manager (exercices corrigés, veille) pour le profil Manager", async () => {
+    const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
+    const blob = await buildBDCNTConseilsZip(org, { ...FORMATIONS_TEST["bilans-competences"], intitule: "Bilan de compétences – Manager : évaluer et développer ses compétences managériales" }, STAGIAIRES_TEST.slice(0, 1));
+    const textes = await textesZip(blob);
+    const support = Object.keys(textes).find((n) => /Support de cours Manager/i.test(n));
+    expect(support).toBeTruthy();
+    expect(textes[support!]).toMatch(/Corrigé 13/);
+    expect(Object.keys(textes).some((n) => /Pâtisserie/i.test(n))).toBe(false);
+  }, 600_000);
 });

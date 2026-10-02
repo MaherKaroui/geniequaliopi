@@ -194,7 +194,7 @@ export const MENTIONS_ABROGEES: Array<[RegExp, string]> = [
   [/articles?\s*R\.?\s*6322-\d+(\s*(à|et)\s*R\.?\s*6322-\d+)?/gi, "articles L6313-4 et R6313-4 à R6313-8"],
   [/décret n[°o]\s*92-478 du 29[\/ ]0?5[\/ ]1992/gi, "décret n° 2006-1386 (interdiction de fumer et de vapoter)"],
   [/correspondant à la protection des données/gi, "délégué à la protection des données"],
-  [/(cinq|5)\s*ans? (d')?ancienneté[^.]*\./gi, ""],
+  [/\b(cinq|5)\s*ans? (d')?ancienneté[^.]*\./gi, ""],
   [/(vingt-quatre|24)\s*mois[^.]*(CDD)[^.]*\./gi, ""],
   [/délai de franchise[^.]*\./gi, ""],
 ];
@@ -426,7 +426,12 @@ export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
 
   // BLOC 6 — vocabulaire BC + clauses inadaptées (mot entier uniquement)
   if (!opts.categorieAction || opts.categorieAction === "BC") {
-    for (const [re, rep] of BDC_VOCABULAIRE_INTERDIT) out = out.replace(re, rep);
+    // Un support de cours garde ses « exercices », ses « cours » et les « formations » qu'il
+    // recommande ; seuls les termes désignant les personnes sont ramenés au vocabulaire BC.
+    const regles = /support de cours/i.test(opts.titre)
+      ? BDC_VOCABULAIRE_INTERDIT.filter(([re]) => /apprenant|élève|stagiaire|formateur/.test(re.source))
+      : BDC_VOCABULAIRE_INTERDIT;
+    for (const [re, rep] of regles) out = out.replace(re, rep);
     out = out
       .split("\n")
       .filter((line) => !CLAUSES_A_RETIRER.some((re) => re.test(line)))

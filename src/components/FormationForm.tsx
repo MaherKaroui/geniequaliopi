@@ -247,6 +247,12 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
       }
+      // Bilan de compétences « Manager » : profil, support de cours, exercices corrigés et veilles
+      // générés par le module BC ; le consultant déjà saisi dans le dossier est conservé.
+      if (selected.intitule.startsWith("Bilan de compétences – Manager")) {
+        onChange({ ...selected, formateur: data.formateur || selected.formateur, formateurSignatureUrl: data.formateurSignatureUrl });
+        toast.success("Bilan de compétences Manager : référentiel des 10 compétences, évaluation des besoins, test de positionnement, 13 exercices corrigés, veilles et support de cours inclus");
+      }
       // Techniques de prothésie ongulaire (RS7302) : contenus 100 % pré-remplis, AUCUN stagiaire importé
       const lowerOngulaire = selected.intitule.toLowerCase();
       if (lowerOngulaire.includes("ongulaire") || lowerOngulaire.includes("rs7302")) {
