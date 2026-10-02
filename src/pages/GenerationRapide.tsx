@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { htmlToWordBlob } from "@/lib/wordExport";
+import { adaptHtmlToTypeAction } from "@/lib/adaptTypeAction";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { buildDocumentFileName, buildGenericFileName, buildStagiaireFolderName } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
@@ -598,7 +599,7 @@ const GenerationRapide = () => {
         setPreviewBlobUrl(URL.createObjectURL(blob));
       } else {
         const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-        const content = generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires);
+        const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires), safeFormation.typeAction);
         if (exportFormat === "pdf") {
           const blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options);
           setPreviewBlobUrl(URL.createObjectURL(blob));
@@ -637,7 +638,7 @@ const GenerationRapide = () => {
           ext = ".pdf";
         } else {
           const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-          const content = generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires);
+          const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires), safeFormation.typeAction);
           if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options); ext = ".pdf"; }
           else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
         }
@@ -701,7 +702,7 @@ const GenerationRapide = () => {
               ext = ".pdf";
             } else {
               const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-              const content = generateDocumentById(doc.key, doc.template, params, snapOrg, snapForm, snapStag);
+              const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, snapOrg, snapForm, snapStag), snapForm.typeAction);
               if (snapFormat === "pdf") { blob = await htmlToPdfBlob(content, pdfOptions); ext = ".pdf"; }
               else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
             }
