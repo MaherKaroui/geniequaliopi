@@ -74,10 +74,12 @@ export const PHRASES_PROTEGEES: string[] = [
 const TOKEN = (i: number) => `\u0001PROT${i}\u0001`;
 
 /** Remplace les chaînes protégées par des jetons avant toute substitution. */
-function protegerPhrases(texte: string): { texte: string; jetons: string[] } {
+function protegerPhrases(texte: string, extra: string[] = []): { texte: string; jetons: string[] } {
   const jetons: string[] = [];
   let out = texte;
-  PHRASES_PROTEGEES.forEach((phrase) => {
+  // Les noms propres (raison sociale de l'organisme…) passent avant les libellés génériques.
+  const phrases = [...extra.filter((p) => p && p.trim()), ...PHRASES_PROTEGEES];
+  phrases.forEach((phrase) => {
     const re = new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
     out = out.replace(re, (m) => {
       jetons.push(m);
@@ -411,6 +413,16 @@ export interface SanitizeOptions {
   titre: string;
   categorieAction?: "BC" | "AF" | "VAE" | "APP";
   antiFabrication?: boolean;
+  /** Raison sociale de l'organisme : jamais réécrite (« NEXUS FORMATION » ≠ « NEXUS prestation »). */
+  raisonSociale?: string;
+}
+
+/** « FORMATION » écrit en capitales = nom propre ou titre : laissé tel quel. */
+function remplacerHorsCapitales(texte: string, re: RegExp, rep: string): string {
+  return texte.replace(re, (m: string, ...args: unknown[]) => {
+    if (/^formations?$/i.test(m) && m === m.toUpperCase()) return m;
+    return m.replace(new RegExp(re.source, re.flags.replace("g", "")), rep);
+  });
 }
 
 /** Applique l'ensemble des corrections à un markdown de document BDC. */
@@ -418,7 +430,8 @@ export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
   let out = md;
 
   // MESSAGE 17 — protection des libellés réglementaires et noms de dispositifs
-  const { texte: protege, jetons } = protegerPhrases(out);
+  const nom = (opts.raisonSociale || "").trim();
+  const { texte: protege, jetons } = protegerPhrases(out, nom ? [nom, nom.toUpperCase()] : []);
   out = protege;
 
   // BLOC 5 — droit abrogé
@@ -431,7 +444,7 @@ export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
     const regles = /support de cours/i.test(opts.titre)
       ? BDC_VOCABULAIRE_INTERDIT.filter(([re]) => /apprenant|élève|stagiaire|formateur/.test(re.source))
       : BDC_VOCABULAIRE_INTERDIT;
-    for (const [re, rep] of regles) out = out.replace(re, rep);
+    for (const [re, rep] of regles) out = remplacerHorsCapitales(out, re, rep);
     out = out
       .split("\n")
       .filter((line) => !CLAUSES_A_RETIRER.some((re) => re.test(line)))

@@ -1931,7 +1931,7 @@ export function renderBdcNTDocHtml(
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation, nbBeneficiaires);
   // BLOCS 3/5/6/9 — vocabulaire BC, droit à jour, anti-fabrication, corrections de rendu
-  md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title) });
+  md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title), raisonSociale: org.nom });
 
 
 
@@ -2019,6 +2019,7 @@ export function renderBdcTemplateBCHtml(
     titre: def.nom,
     categorieAction: "BC",
     antiFabrication: antiFabricationPour(def.nom),
+    raisonSociale: org.nom,
   });
   const body = mdToHtmlBody(md);
   const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&and]+\s*\d+)*\s*-\s*/i, "");
@@ -2117,7 +2118,7 @@ export async function buildBDCNTConseilsZip(
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
-    md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title) });
+    md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title), raisonSociale: org.nom });
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
       md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
     }
@@ -2240,7 +2241,7 @@ export async function buildBDCNTConseilsZip(
         const b = bdcCtx.beneficiaires[i] ?? null;
         advance(`${def.nom} — ${s.prenom} ${s.nom}`);
         try {
-          let md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+          let md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom), raisonSociale: org.nom });
           collect(def.nom, md, s);
           // Confidentialité (L6313-4) : la synthèse et les résultats de tests ne sont versés
           // au dossier d'audit qu'anonymisés ; l'attestation de remise reste nominative.
@@ -2256,7 +2257,7 @@ export async function buildBDCNTConseilsZip(
     } else {
       advance(def.nom);
       try {
-        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, null), bdcCtx, null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom) });
+        const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, null), bdcCtx, null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom), raisonSociale: org.nom });
         collect(def.nom, md, null);
         const dates = computeDates(undefined, org, formation);
         const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
