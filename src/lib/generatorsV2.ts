@@ -30,6 +30,7 @@ import { IA_GENERATIVE_EVAL_PACK } from "./iaGenerativePreset";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
+import { pickRPMSExerciceAnswer } from "./rpmsHumanized";
 
 // ========== HELPERS ==========
 
@@ -1171,6 +1172,7 @@ D) Drive faster to finish the ride.`,
     // Output the student response as a single flowing block — no extra filler paragraphs
     const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickOngulaireExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
+      || pickRPMSExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;

@@ -7,6 +7,8 @@ import { VITRAGE_EVAL_PACK, getVitrageManualAnswers } from "./vitragePreset";
 import { isVitrageFormation, getVitrageAutoAnswers } from "./vitrageHumanized";
 import { ONGULAIRE_EVAL_PACK } from "./ongulairePreset";
 import { isOngulaireFormation, getOngulaireAutoAnswers } from "./ongulaireHumanized";
+import { RPMS_EXERCICES_COMPLETS, RPMS_QCM_DEBUT, RPMS_QCM_FIN } from "./rpmsPreset";
+import { isRPMSFormation, getRPMSAutoAnswers } from "./rpmsHumanized";
 
 
 
@@ -1140,6 +1142,33 @@ EVAL_CONTENT["RPMS"] = {
 };
 
 // ===== MANAGEMENT (Initiation, Leadership, Management situationnel) =====
+// ===== TP RPMS — RNCP38575 (3 blocs, 9 compétences professionnelles) =====
+// Mises en situation corrigées (socle + CP1 à CP9) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["RPMS38575"] = {
+  qcmPositionnement: RPMS_QCM_DEBUT,
+  qcmFinal: RPMS_QCM_FIN,
+  exercices: RPMS_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "CP1 – Développer une vision systémique de la structure dans son environnement",
+    "CP2 – Inscrire la structure dans son territoire",
+    "CP3 – Manager et animer une équipe",
+    "CP4 – Adapter l'offre de la structure à la demande",
+    "CP5 – Organiser et développer la diffusion de l'offre",
+    "CP6 – Organiser la production",
+    "CP7 – Analyser le bilan de la structure",
+    "CP8 – Analyser le compte de résultat de la structure",
+    "CP9 – Rédiger le rapport d'activité de la structure",
+  ],
+  appreciations: [
+    "Diagnostic stratégique rigoureux et analyse financière exacte. Projets de bloc solides, prêts pour le jury.",
+    "Très bonne maîtrise du management et du plan d'actions commerciales. L'analyse du bilan reste à consolider.",
+    "Bonne progression sur les SIG et le seuil de rentabilité. Rapport d'activité clair et bien présenté.",
+    "Implication constante. Le volet RSE et les obligations du dirigeant sont bien maîtrisés ; la segmentation doit être approfondie.",
+    "Travail sérieux, Dossier Professionnel bien avancé. Doit gagner en précision sur le bilan fonctionnel.",
+    "Excellente prise de recul sur l'entreprise d'accueil. Organisation de la production et indicateurs bien construits.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1355,6 +1384,8 @@ function getContentKey(intitule: string): string {
   // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
   if (mot(lower, "sama") || mot(lower, "rncp40800") || mot(lower, "secrétaire assistant médico-administratif") || mot(lower, "secretaire assistant medico-administratif")) return "SAMA";
   if (mot(lower, "sams") || mot(lower, "rncp36805") || mot(lower, "secrétaire assistant médico-social") || mot(lower, "secretaire assistant medico-social")) return "SAMS";
+  // TP RPMS RNCP38575 (intitulé officiel « petite ou moyenne structure ») — avant l'ancien contenu RPMS
+  if (isRPMSFormation(lower)) return "RPMS38575";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2051,6 +2082,35 @@ QUESTIONS_OUVERTES["RPMS"] = {
   ],
 };
 
+// TP RPMS RNCP38575 — 10 questions début / fin dans l'ordre du livret (socle puis CP1 à CP9),
+// le même ordre que les réponses humanisées de rpmsHumanized.ts.
+QUESTIONS_OUVERTES["RPMS38575"] = {
+  debut: [
+    { question: "Quelles obligations légales connaissez-vous pour un dirigeant de PME (CSE, DUERP, facturation électronique, index égalité, emploi des travailleurs handicapés) ?", reponseAttendue: "CSE dès 11 salariés pendant 12 mois consécutifs ; DUERP dès le premier salarié ; index égalité dès 50 salariés ; obligation d'emploi de 6 % de travailleurs handicapés dès 20 salariés ; facturation électronique : réception obligatoire au 1er septembre 2026, émission pour les PME au 1er septembre 2027." },
+    { question: "Comment réaliseriez-vous le diagnostic stratégique d'une structure et sa veille ?", reponseAttendue: "PESTEL pour le macro-environnement, SWOT croisant interne et externe, 5 forces de Porter, chaîne de valeur ; veille organisée (périmètre, sources fiables, outils, fréquence, diffusion, exploitation)." },
+    { question: "Quels acteurs du territoire et quels moyens de visibilité mobiliseriez-vous pour une PME ?", reponseAttendue: "Préfecture, DREETS/DDETS, Région, EPCI, CCI, CMA, Bpifrance, réseaux d'entreprises, France Travail ; Google Business Profile, SEO local avec NAP identique, LinkedIn, réseaux sociaux, annuaires, événements et partenariats." },
+    { question: "Comment recrutez-vous, intégrez-vous et animez-vous une équipe ?", reponseAttendue: "Fiche de poste, sourcing multicanal, entretien structuré STAR, DPAE dans les 8 jours avant l'embauche, onboarding 90 jours ; management situationnel, réunions, entretiens annuel et professionnel, gestion des conflits (DESC), GEPP, QVCT." },
+    { question: "Comment adapteriez-vous l'offre d'une structure à la demande de ses clients ?", reponseAttendue: "Étude de marché quantitative et qualitative, segmentation, ciblage (matrice attractivité × accessibilité), positionnement, personas, mix 4P/7P, méthodes de fixation du prix." },
+    { question: "Comment organiseriez-vous le développement commercial d'une PME ?", reponseAttendue: "Plan d'actions commerciales sur 12 mois avec objectifs SMART, prospection multicanale (BEBEDC, emailing conforme au RGPD, social selling), CRM et entonnoir de conversion, fidélisation (NPS, CSAT), tableau de bord." },
+    { question: "Comment organiseriez-vous la production ou la prestation pour garantir qualité et délais ?", reponseAttendue: "Planification (PERT, Gantt, Kanban), gestion des stocks (ABC, Wilson), achats responsables, qualité (PDCA, Ishikawa, 5 Pourquoi, 5S), TRS, sécurité (DUERP, EPI), environnement." },
+    { question: "Que savez-vous de l'analyse d'un bilan (fonds de roulement, BFR, trésorerie) ?", reponseAttendue: "FR = ressources stables − emplois stables ; BFR = stocks + créances − dettes d'exploitation ; trésorerie nette = FR − BFR ; ratios d'autonomie, d'indépendance, d'endettement et délais de paiement." },
+    { question: "Que savez-vous de l'analyse d'un compte de résultat (SIG, CAF, seuil de rentabilité) ?", reponseAttendue: "SIG de la marge commerciale au résultat net, CAF additive et soustractive, charges fixes et variables, marge sur coût variable, seuil de rentabilité = CF / taux de MCV, point mort." },
+    { question: "Comment rédigeriez-vous le rapport d'activité d'une structure ?", reponseAttendue: "Plan type (mot du dirigeant, présentation, activité, performance financière, RSE, perspectives, annexes), indicateurs N/N-1, volet RSE selon les seuils applicables, présentation orale claire à la gouvernance." },
+  ],
+  fin: [
+    { question: "Quelles obligations légales du dirigeant avez-vous recensées pour votre structure, avec leurs seuils et échéances ?", reponseAttendue: "CSE dès 11 salariés pendant 12 mois consécutifs ; DUERP dès le premier salarié, mise à jour annuelle à partir de 11 salariés ; index égalité dès 50 salariés ; 6 % de travailleurs handicapés dès 20 salariés ; facturation électronique : réception au 1er septembre 2026, émission des PME au 1er septembre 2027 ; CSRD réservée aux grandes entreprises depuis la directive Omnibus." },
+    { question: "Expliquez la démarche de diagnostic stratégique et le dispositif de veille que vous avez mis en place.", reponseAttendue: "PESTEL, SWOT sans confusion interne/externe, Porter, chaîne de valeur ; veille avec sources fiables (INSEE, CCI, BODACC, INPI, fédération), outils (Google Alerts, Feedly), pilote, fréquence, diffusion et exploitation dans le plan stratégique." },
+    { question: "Comment avez-vous inscrit la structure dans son territoire et mesuré sa visibilité ?", reponseAttendue: "Cartographie des acteurs avec leur apport, plan numérique chiffré (fiche Google, NAP, mots-clés locaux, LinkedIn), actions physiques datées, partenariats à bénéfice réciproque, KPI mensuels (vues, appels, itinéraires, leads)." },
+    { question: "Décrivez votre démarche de recrutement, d'intégration et d'animation d'équipe.", reponseAttendue: "Fiche de poste, sourcing multicanal budgété, grille STAR identique pour tous, DPAE, onboarding J1/S1/M1/M3, management situationnel, rituels, entretiens annuels et professionnels, gestion des conflits (DESC, médiation), baromètre QVCT, GEPP." },
+    { question: "Comment avez-vous adapté l'offre de la structure à sa demande ?", reponseAttendue: "Étude de marché mixte, 3 segments, cible prioritaire justifiée, personas, formule de positionnement complète, mix 7P avec actions, estimation du CA additionnel (cible × pénétration × panier)." },
+    { question: "Présentez le plan d'actions commerciales construit et ses indicateurs de suivi.", reponseAttendue: "Objectifs SMART cohérents avec l'objectif global, PAC 12 mois (cibles, actions, moyens, calendrier), prospection multicanale conforme au RGPD, CRM, entonnoir avec taux réalistes, fidélisation (NPS, CSAT, CRAC), tableau de bord de 10 KPI." },
+    { question: "Comment avez-vous organisé la production et traité un problème qualité ?", reponseAttendue: "VSM, TRS = disponibilité × performance × qualité, 5S, ABC et Wilson, Ishikawa 5M et 5 Pourquoi jusqu'à la cause racine, plan PDCA chiffré, sécurité et environnement intégrés." },
+    { question: "Analysez l'équilibre financier d'une structure à partir de son bilan.", reponseAttendue: "Bilan fonctionnel, FR, BFR, trésorerie nette (FR − BFR), ratios comparés aux normes, délais clients et fournisseurs (plafond légal de 60 jours), faiblesses et préconisations chiffrées, risque de cessation de paiement." },
+    { question: "Analysez la rentabilité d'une structure à partir de son compte de résultat.", reponseAttendue: "SIG, CAF par les deux méthodes, taux de VA, taux de marge d'EBE, partage de la VA, marge nette, MCV, seuil de rentabilité et point mort, analyse des écarts N/N-1, mesures correctives." },
+    { question: "Comment avez-vous rédigé et présenté le rapport d'activité de la structure ?", reponseAttendue: "Plan type en 7 chapitres, mot du dirigeant, 8 KPI sur 3 exercices et graphiques, volet RSE (environnement, social, sociétal) selon les seuils applicables (DPEF et CSRD non applicables à une PME), perspectives chiffrées, diaporama 6×6 et questions sensibles anticipées." },
+  ],
+};
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2447,6 +2507,18 @@ export function generateStagiaireOpenAnswers(
 
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  // TP RPMS RNCP38575 : moteur humanisé (une copie différente par stagiaire).
+  if (isRPMSFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoRpms = getRPMSAutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoRpms.reponses, autoRpms.scores);
+  }
+
   if (isOngulaireFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoOng = getOngulaireAutoAnswers(
       stagiaireInfo?.nom,

@@ -31,6 +31,7 @@ import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
 import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./vitrageHumanized";
 import { isOngulaireFormation, getOngulaireBesoin, getOngulaireEvalBesoins } from "./ongulaireHumanized";
+import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins } from "./rpmsHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
@@ -1971,6 +1972,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
         ? getOngulaireBesoin(s.nom, s.prenom, s.civilite)
+        : isRPMSFormation(f.intitule, f.codeRNCP)
+        ? getRPMSBesoin(s.nom, s.prenom, s.civilite)
         : domain.besoins[i % domain.besoins.length];
       return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
@@ -8680,6 +8683,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   if (f && isOngulaireFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getOngulaireEvalBesoins(s, false).disponibilites;
   }
+  if (f && isRPMSFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getRPMSEvalBesoins(s, false).disponibilites;
+  }
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
@@ -8800,6 +8806,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Techniques de prothésie ongulaire (RS7302) ===
   if (isOngulaireFormation(f.intitule, f.codeRNCP)) {
     return getOngulaireEvalBesoins(s, hasEntreprise, idx);
+  }
+
+  // === Early return : TP Responsable de petite ou moyenne structure (RNCP38575) ===
+  if (isRPMSFormation(f.intitule, f.codeRNCP)) {
+    return getRPMSEvalBesoins(s, hasEntreprise, idx);
   }
 
   // === Early return : Création d'entreprise (porteurs de projet) ===

@@ -187,6 +187,8 @@ import { FORMATION_VITRAGE } from "./vitragePreset";
 export { VITRAGE_ORG, STAGIAIRES_VITRAGE, FORMATION_VITRAGE, seedVitrageAICaches } from "./vitragePreset";
 import { FORMATION_ONGULAIRE } from "./ongulairePreset";
 export { FORMATION_ONGULAIRE, seedOngulaireAICaches } from "./ongulairePreset";
+import { FORMATION_RPMS } from "./rpmsPreset";
+export { FORMATION_RPMS, seedRPMSAICaches } from "./rpmsPreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -661,6 +663,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Jean-Pierre Blanc",
     codeRNCP: "RNCP38575",
   },
+  // TP RPMS RNCP38575 à 9 compétences : contenus pré-remplis (rpmsPreset), aucun stagiaire importé
+  FORMATION_RPMS,
   {
     intitule: "TP Employé Polyvalent en Restauration",
     objectifs: "Préparer et dresser des entrées et des desserts. Préparer et dresser des plats chauds et des produits snacking. Accueillir, conseiller et servir la clientèle dans un contexte de restauration commerciale, collective ou snacking. Réaliser la plonge et le nettoyage des locaux et des matériels en respectant le PMS, l'HACCP et la réglementation INCO sur les 14 allergènes.",
