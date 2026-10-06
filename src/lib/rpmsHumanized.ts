@@ -394,15 +394,73 @@ export function getRPMSAutoAnswers(
   const fem = isFeminin(civilite, prenom);
   const bank = isDebut ? DEBUT : FIN;
 
+  // Au début, chaque question a son propre décalage de permutation (SEL_DEBUT) : les réponses
+  // restent toutes différentes à la même question, et la note varie d'un stagiaire à l'autre
+  // (8 stagiaires consécutifs : 8 notes différentes, de 1 à 4,5 / 10, jamais au-dessus de 6 / 10).
+  const choix: number[] = [];
+  for (let q = 0; q < nbQuestions; q++) {
+    const pool = bank[q % bank.length];
+    const sel = isDebut ? SEL_DEBUT[q % SEL_DEBUT.length] : q + 5;
+    choix.push(rang(base, sel, pool.length));
+  }
   const reponses: string[] = [];
   const scores: number[] = [];
   for (let q = 0; q < nbQuestions; q++) {
-    const pool = bank[q % bank.length];
-    const [txt, score] = pool[rang(base, q + (isDebut ? 0 : 5), pool.length)];
+    const [txt, score] = bank[q % bank.length][choix[q]];
     reponses.push(accorder(txt, fem));
     scores.push(score);
   }
   return { reponses, scores };
+}
+
+/** Décalages de permutation des 10 questions ouvertes de début (choisis pour étaler les notes). */
+const SEL_DEBUT = [33, 20, 13, 17, 2, 19, 32, 58, 55, 36];
+
+/**
+ * Note du QCM de positionnement de DÉBUT, sur 20 : jamais au-dessus de 12, et différente pour
+ * 8 stagiaires consécutifs (rang dans la session, sinon empreinte du nom).
+ */
+const NOTES_DEBUT_SUR_20 = [10, 7, 12, 8, 5, 11, 6, 9];
+export function rpmsNoteDebutSur20(idx?: number, nom?: string, prenom?: string): number {
+  return NOTES_DEBUT_SUR_20[rang(baseIndex(idx, nom, prenom), 23, NOTES_DEBUT_SUR_20.length)];
+}
+
+/** Bonnes réponses au QCM de positionnement de début (10 questions → 2 à 6, soit 4 à 12/20). */
+export function rpmsBonnesQcmDebut(nbQuestions: number, idx?: number, nom?: string, prenom?: string): number {
+  return Math.floor((rpmsNoteDebutSur20(idx, nom, prenom) / 20) * nbQuestions);
+}
+
+/**
+ * Réponses au QCM de positionnement de début pour le TP RPMS : exactement le nombre de bonnes
+ * réponses de `rpmsBonnesQcmDebut`, les autres sur une option fausse (déterministe).
+ */
+export function rpmsReponsesQcmDebut(
+  questions: { options: string[]; correctIndex: number }[],
+  idx: number,
+  nom?: string,
+  prenom?: string,
+): number[] {
+  const n = questions.length;
+  const bonnes = rpmsBonnesQcmDebut(n, idx, nom, prenom);
+  const base = baseIndex(idx, nom, prenom);
+  const justes = new Set<number>();
+  for (let k = 0; justes.size < bonnes && k < n * 4; k++) justes.add(rang(base + k, 47, n));
+  return questions.map((q, qi) => {
+    if (justes.has(qi)) return q.correctIndex;
+    const fausses = q.options.map((_, i) => i).filter(i => i !== q.correctIndex);
+    return fausses[rang(base, qi + 3, fausses.length)];
+  });
+}
+
+/**
+ * Notes des exercices, différentes d'un stagiaire à l'autre pour un même exercice :
+ * QCM sur 10 (5 à 10), mise en situation sur 5 (2,5 à 5).
+ */
+const NOTES_QCM_SUR_10 = [8, 6, 9, 7, 10, 5];
+const NOTES_EXERCICE_SUR_5 = [4, 3, 4.5, 3.5, 5, 2.5];
+export function rpmsNoteExercice(stagiaireIdx: number, exerciceIdx: number, estQcm: boolean): number {
+  const notes = estQcm ? NOTES_QCM_SUR_10 : NOTES_EXERCICE_SUR_5;
+  return notes[rang(stagiaireIdx, exerciceIdx + 31, notes.length)];
 }
 
 // ---------------------------------------------------------------------------

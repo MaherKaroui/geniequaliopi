@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { FORMATION_RPMS, RPMS_QCM_COMPETENCES, RPMS_EXERCICES_COMPLETS, seedRPMSAICaches } from "@/lib/rpmsPreset";
-import { isRPMSFormation, getRPMSAutoAnswers, getRPMSEvalBesoins, getRPMSBesoin, pickRPMSExerciceAnswer } from "@/lib/rpmsHumanized";
+import { isRPMSFormation, getRPMSAutoAnswers, getRPMSEvalBesoins, getRPMSBesoin, pickRPMSExerciceAnswer, rpmsNoteDebutSur20, rpmsReponsesQcmDebut, rpmsNoteExercice } from "@/lib/rpmsHumanized";
+import { RPMS_QCM_DEBUT } from "@/lib/rpmsPreset";
 import { getEvalContent, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "@/lib/evalContent";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { genExercicesStagiaire } from "@/lib/generatorsV2";
@@ -107,5 +108,30 @@ describe("TP RPMS RNCP38575 — formation exemple", () => {
     expect(html).toContain("QCM CP7");
     expect(html).toContain("Réponse du stagiaire");
     expect(html).toContain("Exercice 8 — CP7");
+  });
+
+  it("positionnement de début : notes différentes, jamais au-dessus de 12/20", () => {
+    const notes = Array.from({ length: 8 }, (_, i) => rpmsNoteDebutSur20(i));
+    expect(new Set(notes).size).toBe(8);
+    expect(Math.max(...notes)).toBeLessThanOrEqual(12);
+    // Questions ouvertes (sur 10) : 8 notes différentes, au plus 6/10
+    const ouv = Array.from({ length: 8 }, (_, i) =>
+      getRPMSAutoAnswers("NOM" + i, "Prenom", "Mme", true, 10, i).scores.reduce((a, b) => a + b, 0));
+    expect(new Set(ouv).size).toBe(8);
+    for (let i = 0; i < 24; i++) {
+      const tot = getRPMSAutoAnswers("NOM" + i, "Prenom", "Mme", true, 10, i).scores.reduce((a, b) => a + b, 0);
+      expect(tot, `stagiaire ${i}`).toBeLessThanOrEqual(6);
+      // QCM (10 questions, 2 points chacune) : au plus 6 bonnes réponses
+      const rep = rpmsReponsesQcmDebut(RPMS_QCM_DEBUT, i, "NOM" + i, "Prenom");
+      const bonnes = rep.filter((r, qi) => r === RPMS_QCM_DEBUT[qi].correctIndex).length;
+      expect(bonnes * 2).toBeLessThanOrEqual(12);
+    }
+  });
+
+  it("exercices : notes différentes d'un stagiaire à l'autre", () => {
+    for (let ex = 0; ex < 19; ex++) {
+      expect(new Set(Array.from({ length: 6 }, (_, i) => rpmsNoteExercice(i, ex, true))).size).toBe(6);
+      expect(new Set(Array.from({ length: 6 }, (_, i) => rpmsNoteExercice(i, ex, false))).size).toBe(6);
+    }
   });
 });

@@ -31,7 +31,7 @@ import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
 import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./vitrageHumanized";
 import { isOngulaireFormation, getOngulaireBesoin, getOngulaireEvalBesoins } from "./ongulaireHumanized";
-import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins } from "./rpmsHumanized";
+import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins, rpmsBonnesQcmDebut, rpmsReponsesQcmDebut } from "./rpmsHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
@@ -1480,7 +1480,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Summary table
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = generateStagiaireAnswers(questions, i);
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
@@ -1491,7 +1491,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
-    const answers = generateStagiaireAnswers(questions, si);
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
@@ -3079,7 +3079,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
   // Summary
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = generateStagiaireAnswers(questions, i);
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const practicalScore = sc[1];
@@ -4033,7 +4033,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // Individual results
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
   stagiaires.forEach((s, si) => {
-    const answers = generateStagiaireAnswers(questions, si);
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
 
@@ -11996,7 +11996,10 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   if (rempli) {
     if (isDebut) {
       // Cible : 40 % de bonnes réponses (déterministe par stagiaire)
-      const targetCorrect = Math.max(1, Math.round(questions.length * 0.4));
+      // TP RPMS RNCP38575 : note propre à chaque apprenti, au plus 12/20.
+      const targetCorrect = isRPMSFormation(f.intitule, f.codeRNCP)
+        ? rpmsBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
+        : Math.max(1, Math.round(questions.length * 0.4));
       const seedBase = (s.prenom + s.nom + si).split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0);
       const correctSet = new Set<number>();
       let k = 0;
@@ -15235,6 +15238,10 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }
 
 
+  // TP RPMS RNCP38575 : note de début propre à chaque stagiaire, au plus 12/20.
+  if (mode === "debut" && isRPMSFormation(f.intitule, f.codeRNCP)) {
+    targetCorrect = rpmsBonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
+  }
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
   const isDebut = mode === "debut";

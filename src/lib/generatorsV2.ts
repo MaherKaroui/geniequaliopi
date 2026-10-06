@@ -30,7 +30,7 @@ import { IA_GENERATIVE_EVAL_PACK } from "./iaGenerativePreset";
 import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
-import { pickRPMSExerciceAnswer } from "./rpmsHumanized";
+import { pickRPMSExerciceAnswer, isRPMSFormation, rpmsNoteExercice } from "./rpmsHumanized";
 
 // ========== HELPERS ==========
 
@@ -1070,7 +1070,9 @@ D) Drive faster to finish the ride.`,
     const qcm = parseQCM(ex.consigne, ex.reponseAttendue);
     if (qcm) {
       // Génère les réponses du stagiaire avec un score réaliste (7-10/10)
-      const targetScore = 7 + (exSeed % 4); // 7,8,9,10 sur 10
+      const targetScore = isRPMSFormation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, rpmsNoteExercice(stagiaireIdx, ei, true))
+        : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
       const nbWrong = qcm.questions.length - targetScore;
@@ -1124,7 +1126,9 @@ D) Drive faster to finish the ride.`,
     let noteBase = profile.baseNote;
     const variation = ((exSeed % 10) - 3) / 10;
     const rawNote = noteBase + variation;
-    const noteRound = Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
+    const noteRound = isRPMSFormation(f.intitule, f.codeRNCP)
+      ? rpmsNoteExercice(stagiaireIdx, ei, false)
+      : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
     notesRecap.push({ titre: ex.titre, note: noteRound, max: noteMax });
