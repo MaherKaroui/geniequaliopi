@@ -2515,6 +2515,7 @@ export function generateStagiaireOpenAnswers(
       stagiaireInfo?.civilite,
       isDebut,
       Math.max(1, questions.length),
+      stagiaireIndex,
     );
     return toAnswers(autoRpms.reponses, autoRpms.scores);
   }

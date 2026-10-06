@@ -1973,7 +1973,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         : isOngulaireFormation(f.intitule, f.codeRNCP)
         ? getOngulaireBesoin(s.nom, s.prenom, s.civilite)
         : isRPMSFormation(f.intitule, f.codeRNCP)
-        ? getRPMSBesoin(s.nom, s.prenom, s.civilite)
+        ? getRPMSBesoin(s.nom, s.prenom, s.civilite, i)
         : domain.besoins[i % domain.besoins.length];
       return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });

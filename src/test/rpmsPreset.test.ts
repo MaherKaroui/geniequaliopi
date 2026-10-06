@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { FORMATION_RPMS, RPMS_QCM_COMPETENCES, RPMS_EXERCICES_COMPLETS, seedRPMSAICaches } from "@/lib/rpmsPreset";
-import { isRPMSFormation, getRPMSAutoAnswers, getRPMSEvalBesoins, pickRPMSExerciceAnswer } from "@/lib/rpmsHumanized";
+import { isRPMSFormation, getRPMSAutoAnswers, getRPMSEvalBesoins, getRPMSBesoin, pickRPMSExerciceAnswer } from "@/lib/rpmsHumanized";
 import { getEvalContent, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "@/lib/evalContent";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { genExercicesStagiaire } from "@/lib/generatorsV2";
@@ -75,6 +75,28 @@ describe("TP RPMS RNCP38575 — formation exemple", () => {
     const autre = pickRPMSExerciceAnswer(FORMATION_RPMS.intitule, "RNCP38575", 8, 1, STAGIAIRES_TEST[1], RPMS_EXERCICES_COMPLETS[7].titre);
     expect(autre).not.toBe(cp7);
     expect(pickRPMSExerciceAnswer(ANCIEN_RPMS.intitule, ANCIEN_RPMS.codeRNCP, 0, 0, s, "CP1")).toBeNull();
+  });
+
+  it("groupe de 12 stagiaires : aucune réponse identique à la même question, aucune copie d'exercice identique sur 8", () => {
+    const noms = Array.from({ length: 12 }, (_, i) => ({ nom: `NOM${i}`, prenom: i % 2 ? "Julie" : "Karim", civilite: i % 2 ? "Mme" : "M." }));
+    for (const debut of [true, false]) {
+      const copies = noms.map((s, i) => getRPMSAutoAnswers(s.nom, s.prenom, s.civilite, debut, 10, i));
+      for (let q = 0; q < 10; q++) {
+        expect(new Set(copies.map(c => c.reponses[q])).size, `${debut ? "début" : "fin"} Q${q + 1}`).toBe(12);
+      }
+      if (debut) expect(copies.every(c => c.scores.some(sc => sc < 1))).toBe(true);
+    }
+    RPMS_EXERCICES_COMPLETS.slice(0, 10).forEach((ex, ei) => {
+      const prods = noms.slice(0, 8).map((s, i) => pickRPMSExerciceAnswer(FORMATION_RPMS.intitule, "RNCP38575", ei, i, s, ex.titre));
+      expect(new Set(prods).size, ex.titre).toBe(8);
+    });
+    const besoins = noms.map((s, i) => getRPMSEvalBesoins(s, true, i));
+    expect(new Set(besoins.map(b => b.objectif)).size).toBe(12);
+    expect(new Set(besoins.map(b => b.attentes)).size).toBe(12);
+    expect(besoins.every(b => !/\{|\}/.test(Object.values(b).join(" ")))).toBe(true);
+    // Le besoin principal de l'analyse des besoins correspond au profil de l'évaluation des besoins
+    const b0 = getRPMSBesoin(noms[3].nom, noms[3].prenom, noms[3].civilite, 3);
+    expect(b0.length).toBeGreaterThan(20);
   });
 
   it("le générateur d'exercices rend les QCM par compétence avec la réponse du stagiaire", () => {
