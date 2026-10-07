@@ -615,6 +615,10 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_reglement_interieur_${si}`, `CT3 - IND 9 RÈGLEMENT INTÉRIEUR DU CFA – ${s.prenom} ${s.nom}`, 3, 9, "reglement_interieur_cfa_v2", { stagiaireIdx: si });
     });
+    // Convention de formation par apprentissage — également classée en IND 9
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_convention_formation_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_cfa", { stagiaireIdx: si });
+    });
     add("cfa_c3i9_pv_election_delegues", "CT3 - IND 9 PROCÈS-VERBAL D'ÉLECTION DES DÉLÉGUÉS", 3, 9, "pv_election_delegues_cfa");
     add("cfa_c3i9_pdf_guide_numerique_psh", "CT3 - IND 9 GUIDE NUMÉRIQUE PSH", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_GUIDE_NUMERIQUE_PSH.pdf" });
     add("cfa_c3i9_pdf_droit_apprentis", "CT3 - IND 9 DROIT DES APPRENTIS", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_DROIT_DES_APPRENTIS.pdf" });
