@@ -1031,7 +1031,7 @@ export const WM14_PARTIE4: CourseChapter[] = [
   {
     title: "Chapitre 8 – Projet final : construire et présenter son plan webmarketing",
     description:
-      "1 h – Évaluation interne de fin de formation : finaliser un dossier projet webmarketing portant sur sa propre entreprise et couvrant les compétences C1 à C6, puis le présenter oralement au formateur et au groupe lors de la dernière classe virtuelle. Plan type, attendus, grilles d'évaluation et d'autoévaluation, exemple commenté, plan des 90 jours, aménagements et attestation de fin de formation.",
+      "1 h – Évaluation interne de fin de formation : finaliser un dossier projet webmarketing portant sur sa propre entreprise et couvrant les compétences C1 à C6, puis le présenter oralement au formateur et au groupe en fin de deuxième journée. Plan type, attendus, grilles d'évaluation et d'autoévaluation, exemple commenté, plan des 90 jours, aménagements et attestation de fin de formation.",
     sections: [
       {
         title: "8.1 – Le projet final : principe, déroulé et calendrier",
@@ -1039,7 +1039,7 @@ export const WM14_PARTIE4: CourseChapter[] = [
 <p>La formation « Développer son activité avec le webmarketing » se conclut par un <strong>projet final</strong> qui sert d'évaluation interne des acquis. Il comporte deux éléments :</p>
 <ol>
 <li>un <strong>dossier projet webmarketing</strong> portant sur <strong>votre propre entreprise</strong> (ou celle qui vous emploie), couvrant les six compétences travaillées : C1 objectifs, C2 stratégie, C3 plan d'action, C4 référencement naturel, C5 réseaux sociaux, C6 dispositif de pilotage ;</li>
-<li>une <strong>présentation orale de 20 minutes</strong> devant le formateur et le groupe, lors de la dernière classe virtuelle, suivie d'échanges. Si le groupe est nombreux, le formateur peut ramener la présentation à <strong>10 minutes</strong> par participant pour que chacun puisse présenter ; il l'annonce dès le début de la formation.</li>
+<li>une <strong>présentation orale de 20 minutes</strong> devant le formateur et le groupe, en fin de deuxième journée, suivie d'échanges. Si le groupe est nombreux, le formateur peut ramener la présentation à <strong>10 minutes</strong> par participant pour que chacun puisse présenter ; il l'annonce dès le début de la formation.</li>
 </ol>
 <p>L'objectif n'est pas de produire un document parfait, mais un <strong>plan réaliste, chiffré et directement applicable</strong> dès la fin de la formation. C'est votre feuille de route des mois à venir.</p>
 <h3>Un dossier construit au fil des deux jours</h3>
@@ -1229,11 +1229,11 @@ export const WM14_PARTIE4: CourseChapter[] = [
 <li>Des chiffres cohérents avec le dossier.</li>
 <li>Une diapositive de secours en annexe pour les questions attendues (détail du budget, calcul du CAC).</li>
 </ul>
-<h3>Réussir en classe virtuelle</h3>
+<h3>Réussir sa présentation en salle</h3>
 <ul>
-<li>Tester la veille le partage d'écran, le micro et la caméra ; fermer les notifications.</li>
-<li>Envoyer le support au formateur avant la séance en cas de problème technique.</li>
-<li>Regarder la caméra, parler un peu plus lentement qu'en présentiel, annoncer les transitions (« Je passe maintenant au pilotage »).</li>
+<li>Tester son support sur le vidéoprojecteur pendant la pause qui précède ; fermer les notifications.</li>
+<li>Envoyer le support au formateur avant la séance et l'avoir aussi sur une clé USB en cas de problème technique.</li>
+<li>Regarder le groupe, parler posément, annoncer les transitions (« Je passe maintenant au pilotage »).</li>
 <li>Prévoir un chronomètre visible.</li>
 <li>Répéter au moins deux fois à voix haute en se chronométrant.</li>
 </ul>
@@ -1355,7 +1355,7 @@ export const WM14_PARTIE4: CourseChapter[] = [
 <tr><th>Besoin</th><th>Adaptations possibles</th></tr>
 <tr><td>Fatigabilité, besoin de temps supplémentaire</td><td>Temps de présentation ou d'échange allongé, pauses, présentation à un autre moment de la journée</td></tr>
 <tr><td>Trouble des apprentissages (dyslexie, dyspraxie…)</td><td>Consignes écrites remises à l'avance, police adaptée, délai supplémentaire pour le dossier, tolérance orthographique, utilisation d'outils de dictée</td></tr>
-<tr><td>Déficience auditive</td><td>Sous-titrage de la classe virtuelle, transcription, interprète en langue des signes si nécessaire, questions également posées par écrit dans la messagerie</td></tr>
+<tr><td>Déficience auditive</td><td>Supports écrits remis à l'avance, placement face au formateur, transcription, interprète en langue des signes si nécessaire, questions également posées par écrit dans la messagerie</td></tr>
 <tr><td>Déficience visuelle</td><td>Supports compatibles avec les lecteurs d'écran, agrandissement, description orale des visuels, présentation sans support projeté</td></tr>
 <tr><td>Anxiété à l'oral, trouble psychique</td><td>Présentation au formateur seul, présentation enregistrée à l'avance suivie d'un échange court, ordre de passage choisi</td></tr>
 <tr><td>Handicap moteur</td><td>Outils de saisie adaptés, temps aménagé, accompagnement technique pour le partage d'écran</td></tr>
@@ -1364,7 +1364,7 @@ export const WM14_PARTIE4: CourseChapter[] = [
 <h3>L'attestation de fin de formation</h3>
 <p>Conformément à l'article L. 6353-1 du Code du travail, l'organisme remet à chaque participant, à l'issue de la formation, une <strong>attestation</strong> mentionnant les objectifs, la nature et la durée de l'action ainsi que les <strong>résultats de l'évaluation des acquis</strong>. Pour cette formation, elle indique :</p>
 <ul>
-<li>l'intitulé « Développer son activité avec le webmarketing », les dates et la durée (14 heures en classe virtuelle) ;</li>
+<li>l'intitulé « Développer son activité avec le webmarketing », les dates et la durée (14 heures en présentiel) ;</li>
 <li>les objectifs et les compétences travaillées (C1 à C6) ;</li>
 <li>le niveau atteint pour chaque compétence selon la grille d'évaluation du formateur (non acquis, en cours d'acquisition, acquis, maîtrisé).</li>
 </ul>

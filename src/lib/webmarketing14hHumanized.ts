@@ -866,13 +866,13 @@ const BESOINS_DIPLOMES = [
 
 const BESOINS_HANDICAP = [
   "Non, je n'ai aucune situation de handicap et je n'ai pas besoin d'adaptation particulière.",
-  "Non. Je souhaite simplement recevoir les supports à l'avance pour les lire avant les classes virtuelles.",
-  "Non, aucune situation de handicap déclarée. Des pauses régulières pendant les classes virtuelles me conviennent.",
+  "Non. Je souhaite simplement recevoir les supports à l'avance pour les lire avant les deux journées.",
+  "Non, aucune situation de handicap déclarée. Des pauses régulières pendant les journées me conviennent.",
   "Non. Je porte des lunettes et j'apprécie des supports en police suffisamment grande pour la lecture à l'écran.",
   "Non, pas de handicap. Je précise que je suis moins à l'aise avec les outils informatiques, le tutoriel de prise en main me sera utile.",
   "Non. Aucun aménagement nécessaire.",
   "Non, je ne suis pas en situation de handicap. Je sais que je peux solliciter le référent handicap à tout moment.",
-  "Non. Je souhaite seulement que les classes virtuelles soient enregistrées pour revoir les manipulations des outils.",
+  "Non. Je souhaite seulement recevoir les tutoriels écrits pour revoir les manipulations des outils.",
   "Non, aucune situation de handicap. J'ai besoin d'un peu de temps pour prendre en main les outils Google, je m'y préparerai.",
   "Non. Je préfère avoir les supports en PDF pour les annoter.",
   "Non, pas de besoin particulier. Le référent handicap m'a été présenté lors de l'entretien.",
@@ -880,15 +880,15 @@ const BESOINS_HANDICAP = [
 ];
 
 const BESOINS_DISPOS = [
-  "Je suis disponible les deux jours de formation, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, en classe virtuelle depuis mon bureau.",
+  "Je suis disponible les deux jours de formation, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, en salle de formation.",
   "Je bloque les deux journées dans mon agenda (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) ; mon associé assure les rendez-vous clients pendant ces deux jours.",
-  "Je suis disponible les deux jours de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>. Je dispose d'un ordinateur avec webcam et d'une connexion stable.",
-  "Je peux suivre l'intégralité des deux journées à distance, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, sans contrainte particulière.",
+  "Je suis disponible les deux jours de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>. J'apporterai mon ordinateur portable pour travailler sur mon site.",
+  "Je peux suivre l'intégralité des deux journées en présentiel, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, sans contrainte particulière.",
   "Je suis disponible les deux jours (<strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>). J'ai fermé l'agenda de rendez-vous ces jours-là.",
   "Disponibilité complète sur les deux journées (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>). Je suivrai la formation depuis une pièce au calme, à l'écart de la boutique.",
   "Les deux jours de formation, je suis disponible de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> ; mon équipe gère les urgences pendant mon absence.",
   "Je suis disponible sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> les deux jours. Je me connecterai depuis mon domicile.",
-  "Je suivrai les deux journées en classe virtuelle (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) et je prévois une heure le soir pour avancer mon projet.",
+  "Je suivrai les deux journées en salle (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) et je prévois une heure le soir pour avancer mon projet.",
   "Aucune contrainte sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> des deux jours. J'ai prévenu mes clients habituels de mon absence.",
 ];
 
