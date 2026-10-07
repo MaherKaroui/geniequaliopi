@@ -8,4 +8,5 @@
 - [x] Déplacer l’analyse France Compétences en haut de l’étape Formation et la rendre persistante.
 - [x] Créer une barre réutilisable de génération de personnes fictives cohérentes.
 - [x] Intégrer cette barre dans tous les formulaires stagiaires, apprenants et candidats concernés.
-- [ ] Vérifier le typage, la compilation et les pages modifiées.
+- [x] Vérifier le typage, la compilation et les pages modifiées.
+- [x] Ajouter aussi la convention de formation CFA à l’indicateur 9.

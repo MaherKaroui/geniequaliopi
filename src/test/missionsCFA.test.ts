@@ -12,6 +12,14 @@ const texte = (h: string) => h.replace(/<style[\s\S]*?<\/style>/g, " ").replace(
 describe("14 missions CFA (art. L.6231-2)", () => {
   beforeAll(async () => { await preloadFormationsTest(); }, 120_000);
 
+  it("classe aussi une convention de formation par apprenti dans l'indicateur 9", () => {
+    const conventions = getFullCatalog(org, f, STAGIAIRES_TEST).filter(
+      (d) => d.indicateur === 9 && d.template === "convention_formation_cfa",
+    );
+    expect(conventions).toHaveLength(STAGIAIRES_TEST.length);
+    expect(conventions.every((d) => d.nom.startsWith("CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE"))).toBe(true);
+  });
+
   it("les 14 missions sont présentes avec fiche, émargement, QCM, newsletter et visuel", () => {
     const cat = getFullCatalog(org, f, STAGIAIRES_TEST);
     expect(MISSIONS_REF.map((m) => m.n)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
