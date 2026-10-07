@@ -20,6 +20,21 @@ describe("14 missions CFA (art. L.6231-2)", () => {
     expect(conventions.every((d) => d.nom.startsWith("CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE"))).toBe(true);
   });
 
+  it("reprend les validations du CFA, de l'entreprise et de l'apprenant dans les conventions IND 5 et IND 9", () => {
+    const o = { ...org, tamponUrl: "https://example.test/cfa-stamp.png", signatureUrl: "https://example.test/unused-director.png" };
+    const apprenant = { ...STAGIAIRES_TEST[0], signatureUrl: "https://example.test/learner-signature.png", signatureResponsableUrl: "https://example.test/company-signature.png" };
+    const conventions = getFullCatalog(o, f, [apprenant]).filter((d) => d.template === "convention_formation_cfa");
+    expect(conventions.map((d) => d.indicateur).sort()).toEqual([5, 9]);
+    for (const d of conventions) {
+      const html = generateDocumentById(d.id, d.template, d.params, o, f, [apprenant]);
+      const images = Array.from(html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g), (match) => match[1]);
+      expect(images).toContain(o.tamponUrl);
+      expect(images).toContain(apprenant.signatureResponsableUrl);
+      expect(images).toContain(apprenant.signatureUrl);
+      expect(images).not.toContain(o.signatureUrl);
+    }
+  });
+
   it("les 14 missions sont présentes avec fiche, émargement, QCM, newsletter et visuel", () => {
     const cat = getFullCatalog(org, f, STAGIAIRES_TEST);
     expect(MISSIONS_REF.map((m) => m.n)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
