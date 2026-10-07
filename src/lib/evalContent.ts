@@ -9,6 +9,8 @@ import { ONGULAIRE_EVAL_PACK } from "./ongulairePreset";
 import { isOngulaireFormation, getOngulaireAutoAnswers } from "./ongulaireHumanized";
 import { RPMS_EXERCICES_COMPLETS, RPMS_QCM_DEBUT, RPMS_QCM_FIN } from "./rpmsPreset";
 import { isRPMSFormation, getRPMSAutoAnswers } from "./rpmsHumanized";
+import { WM14_EXERCICES_COMPLETS, WM14_QCM_DEBUT, WM14_QCM_FIN } from "./webmarketing14hPreset";
+import { isWM14Formation, getWM14AutoAnswers, WM14_QUESTIONS_OUVERTES } from "./webmarketing14hHumanized";
 
 
 
@@ -1169,6 +1171,30 @@ EVAL_CONTENT["RPMS38575"] = {
   ],
 };
 
+// ===== Développer son activité avec le webmarketing – 14 h (non certifiante, C1 à C6) =====
+// Mises en situation corrigées (diagnostic puis C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["WM14"] = {
+  qcmPositionnement: WM14_QCM_DEBUT,
+  qcmFinal: WM14_QCM_FIN,
+  exercices: WM14_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Définir les objectifs webmarketing de l'entreprise",
+    "C2 – Concevoir la stratégie webmarketing de l'entreprise",
+    "C3 – Élaborer le plan d'action webmarketing",
+    "C4 – Mettre en œuvre le référencement naturel du site",
+    "C5 – Mettre en œuvre la communication sur les réseaux sociaux",
+    "C6 – Élaborer un dispositif de pilotage",
+  ],
+  appreciations: [
+    "Objectifs SMART bien construits et plan d'action réaliste. Le suivi des conversions dans GA4 reste à mettre en place.",
+    "Très bon travail sur le référencement local et la fiche Google. La stratégie réseaux sociaux doit être resserrée sur un ou deux réseaux.",
+    "Bonne compréhension des leviers et du budget. L'audit sémantique est solide ; le netlinking reste à engager.",
+    "Implication constante. Plan webmarketing clair et chiffré, tableau de bord opérationnel dès la sortie de formation.",
+    "Travail sérieux sur l'emailing et le RGPD. Doit gagner en régularité dans le calendrier éditorial.",
+    "Excellente appropriation des outils (Search Console, GA4, Looker Studio). Projet final convaincant et bien argumenté.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1386,6 +1412,8 @@ function getContentKey(intitule: string): string {
   if (mot(lower, "sams") || mot(lower, "rncp36805") || mot(lower, "secrétaire assistant médico-social") || mot(lower, "secretaire assistant medico-social")) return "SAMS";
   // TP RPMS RNCP38575 (intitulé officiel « petite ou moyenne structure ») — avant l'ancien contenu RPMS
   if (isRPMSFormation(lower)) return "RPMS38575";
+  // Webmarketing 14 h (non certifiante) — avant les contenus génériques marketing
+  if (isWM14Formation(lower)) return "WM14";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2111,6 +2139,10 @@ QUESTIONS_OUVERTES["RPMS38575"] = {
   ],
 };
 
+// Webmarketing 14 h — 10 questions début / fin dans l'ordre des mises en situation
+// (diagnostic puis C1 à C6), le même ordre que les réponses de webmarketing14hHumanized.ts.
+QUESTIONS_OUVERTES["WM14"] = WM14_QUESTIONS_OUVERTES;
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2507,6 +2539,18 @@ export function generateStagiaireOpenAnswers(
 
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  // Webmarketing 14 h : moteur humanisé (une copie différente par stagiaire).
+  if (isWM14Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoWm = getWM14AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoWm.reponses, autoWm.scores);
+  }
+
   // TP RPMS RNCP38575 : moteur humanisé (une copie différente par stagiaire).
   if (isRPMSFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoRpms = getRPMSAutoAnswers(

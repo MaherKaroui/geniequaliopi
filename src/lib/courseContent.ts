@@ -463,6 +463,7 @@ import { getGenericChapters } from "./courseContentGeneric";
 import { getFLEChapters } from "./courseContentFLE";
 import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
+import { getWebmarketing14hChapters } from "./courseContentWebmarketing14h";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
@@ -548,6 +549,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (mot(t, 'management') || mot(t, 'manager')) return getManagementChapters();
   if (mot(t, 'français') || mot(t, 'médico-social') || mot(t, 'social')) return getFLEChapters();
   if (mot(t, 'intelligence artificielle') || mot(t, 'ia générative') || mot(t, 'contenus rédactionnels')) return getIAChapters();
+  if (mot(t, 'webmarketing') && /\b14\s?h\b/.test(t)) return getWebmarketing14hChapters();
   if (mot(t, 'webmarketing') || mot(t, 'marketing de contenus') || mot(t, 'réseaux sociaux') || mot(t, 'marketing digital')) return getWebmarketingChapters();
   if (mot(t, 'crm') || mot(t, 'automation') || mot(t, 'automatisation')) return getCRMChapters();
   if (mot(t, 'postpartum') || mot(t, 'post-partum') || mot(t, 'post partum')) return getMassagePostpartumChapters();

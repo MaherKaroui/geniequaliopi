@@ -31,6 +31,7 @@ import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
 import { pickRPMSExerciceAnswer, isRPMSFormation, rpmsNoteExercice } from "./rpmsHumanized";
+import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./webmarketing14hHumanized";
 
 // ========== HELPERS ==========
 
@@ -1072,6 +1073,8 @@ D) Drive faster to finish the ride.`,
       // Génère les réponses du stagiaire avec un score réaliste (7-10/10)
       const targetScore = isRPMSFormation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, rpmsNoteExercice(stagiaireIdx, ei, true))
+        : isWM14Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, wm14NoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1128,6 +1131,8 @@ D) Drive faster to finish the ride.`,
     const rawNote = noteBase + variation;
     const noteRound = isRPMSFormation(f.intitule, f.codeRNCP)
       ? rpmsNoteExercice(stagiaireIdx, ei, false)
+      : isWM14Formation(f.intitule, f.codeRNCP)
+      ? wm14NoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1177,6 +1182,7 @@ D) Drive faster to finish the ride.`,
     const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickOngulaireExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickRPMSExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;
