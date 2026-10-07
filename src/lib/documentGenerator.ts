@@ -7256,7 +7256,7 @@ function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaire
   const duree = f.duree || "420 heures";
   const montant = getStagiaireTarif(s, f) || f.tarif || "8 000";
   const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
-  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", formation: f, showFormationInfo: false, sections: [
+  return buildDocument({ org: o, title: "CONVENTION TRIPARTITE DE FORMATION PAR APPRENTISSAGE", subtitle: "CFA — Entreprise — Apprenant", formation: f, showFormationInfo: false, sections: [
     { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? `<br>Numéro de déclaration à la Préfecture : ${o.nda}` : ""}<br></p><p><strong>${entreprise}</strong><br>Adresse : ${s.adresseEntreprise || "________________________"}<br>SIRET : ${s.siretEntreprise || "________________________"}<br>représentée par <strong>${respEntreprise}</strong>,</p><p>CI-APRÈS DÉNOMMÉE L'EMPLOYEUR,</p><p>au bénéfice de l'apprenti(e) <strong>${s.prenom} ${s.nom}</strong><br>Adresse : ${(s as any).adresse || "________________________"}<br>Code postal : ${(s as any).codePostal || "________________________"}<br>Commune : ${(s as any).commune || "________________________"}${estMineurAuDebut(s, f) ? `<br><strong>Apprenti(e) mineur(e)</strong> – représenté(e) par son représentant légal : ________________________ (nom, adresse, qualité), qui signe également la présente convention.` : ""}</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
     { heading: "Article 1er : Objet de la convention", content: `<p>${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Lieu de formation :</strong> ${mc.lieuFormation}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}<br><strong>Adresse stagiaire :</strong> ${(s as any).adresse || "________________________"}${(s as any).codePostal || (s as any).commune ? `, ${(s as any).codePostal || ""} ${(s as any).commune || ""}`.trim() : ""}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
     { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${mc.modaliteLabel}</p><p><strong>Modalités de suivi :</strong></p><ul>${mc.isDist ? '<li>Suivi des temps de connexion sur la plateforme e-learning</li><li>Progression pédagogique et participation aux classes virtuelles</li>' : '<li>Feuille d\'émargement</li>'}${mc.isMixte ? '<li>Suivi des temps de connexion pour les sessions à distance</li>' : ''}<li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention de la certification :</strong></p><p>${/^TP|titre professionnel/i.test(f.intitule) ? "Présentation à la session de validation en vue de l'obtention du titre professionnel" : "Présentation aux épreuves de la certification"}${f.codeRNCP ? ` ${f.codeRNCP}` : ""}, selon le règlement du certificateur.</p>` },
@@ -7282,17 +7282,24 @@ ${tableHTML(["Frais", "Prise en charge"], [
     { heading: "Article 8 : Résiliation", content: `<p>En cas de dédit par le Bénéficiaire à moins de 15 jours francs avant le début d'une action de formation, ou d'abandon en cours de formation par le stagiaire, ${o.nom} retiendra sur le coût total, les sommes qu'il aura réellement dépensées ou engagées pour la réalisation de ladite action, conformément aux dispositions de l'article L920-9 du Code du Travail.</p>` },
     { heading: "Article 9 : Différends éventuels", content: `<p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le Tribunal compétent réglera le litige.</p>` },
   ], extraHtml: `
-    <p style="margin-top:30px">Fait en double exemplaire, à ${o.ville}, le ${dateConvention}</p>
-    <div class="signature-block-2">
+    <p style="margin-top:30px">Fait en trois exemplaires, à ${o.ville}, le ${dateConvention}</p>
+    <div class="signature-block">
       <div class="sig-box">
-        <p class="sig-label">Pour ${o.nom}</p>
-        <p>(Cachet et signature)</p>
+        <p class="sig-label">Pour le CFA : ${o.nom}</p>
+        ${o.dirigeant ? `<p>${o.dirigeant}</p>` : ""}
+        <p>(Cachet du CFA)</p>
         ${o.tamponUrl ? `<div style="margin-top:10px"><img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;opacity:0.85" /></div>` : ""}
       </div>
       <div class="sig-box">
-        <p class="sig-label">« ${entreprise} »</p>
+        <p class="sig-label">Pour l'entreprise : ${entreprise}</p>
+        <p>${respEntreprise}</p>
         <p>(Cachet et signature)</p>
         ${s.signatureResponsableUrl ? `<div style="margin-top:10px"><img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">L'apprenant : ${s.prenom} ${s.nom}</p>
+        <p>(Signature — lu et approuvé)</p>
+        ${s.signatureUrl ? `<div style="margin-top:10px"><img src="${s.signatureUrl}" alt="Signature apprenant" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
       </div>
     </div>`, stagiaires: [s as StagiaireInfo] });
 }
