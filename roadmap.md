@@ -10,3 +10,4 @@
 - [x] Intégrer cette barre dans tous les formulaires stagiaires, apprenants et candidats concernés.
 - [x] Vérifier le typage, la compilation et les pages modifiées.
 - [x] Ajouter aussi la convention de formation CFA à l’indicateur 9.
+- [ ] Corriger la convention CFA tripartite : CFA, entreprise et apprenant, puis vérifier les signatures.
