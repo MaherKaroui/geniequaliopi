@@ -898,6 +898,7 @@ export function getDisplayTarif(f: FormationInfo, stagiaires?: StagiaireInfo[]):
 
 /** Calculate individual stagiaire duration based on their dates (business days × hours/day) */
 export function getStagiaireDuree(s: StagiaireInfo, f: FormationInfo): string {
+  if (f.dureeSaisiePrioritaire) return f.duree || "";
   const dateDebut = s.dateDebutFormation || f.dateDebut || "";
   const dateFin = s.dateFinFormation || f.dateFin || "";
   if (dateDebut && dateFin) {
