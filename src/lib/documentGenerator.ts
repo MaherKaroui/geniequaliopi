@@ -3266,6 +3266,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const blankSigHtml = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
+  if (f.dureeSaisiePrioritaire) extra += `<p><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
   extra += `<p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
