@@ -1495,6 +1495,7 @@ export function buildFullCatalog(
     add("vae_c3i9_mail_preparation_entretien", "CT3 - IND 9 Modèle de courriel – préparation de l'entretien avec le jury", 3, 9, "vae_mail_preparation_entretien");
     add("vae_c3i9_mail_post_validation", "CT3 - IND 9 Modèle de courriel – suivi après le jury", 3, 9, "vae_mail_post_validation");
     add("vae_c3i9_mail_envoi_certificat", "CT3 - IND 9 Modèle de courriel – envoi du certificat de réalisation", 3, 9, "vae_mail_envoi_certificat");
+    per("vae_c3i9_contrat", "CT3 - IND 9 Contrat / convention d'accompagnement", 3, 9, "vae_contrat_accompagnement");
     per("vae_c3i9_certificat_realisation", "CT3 - IND 9 Certificat de réalisation", 3, 9, "vae_certificat_realisation");
     add("vae_c3i10_adaptation_accompagnement", "CT3 - IND 10 Adaptation de l'accompagnement VAE", 3, 10, "vae_adaptation_accompagnement");
     add("vae_c3i10_fiche_pedagogique", "CT3 - IND 10 Fiche pédagogique VAE", 3, 10, "vae_fiche_pedagogique");
