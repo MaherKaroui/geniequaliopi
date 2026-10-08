@@ -464,6 +464,7 @@ import { getFLEChapters } from "./courseContentFLE";
 import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getWebmarketing14hChapters } from "./courseContentWebmarketing14h";
+import { getVentesEnergie35hChapters } from "./courseContentVentesEnergie35h";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
@@ -520,6 +521,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
+  // Techniques de vente – travaux énergétiques 35 h (non certifiante) : avant toutes les règles génériques
+  if (t.includes('techniques de vente') && /[ée]nerg/.test(t)) return getVentesEnergie35hChapters();
   if (mot(t, 'gestionnaire de paie') || mot(t, 'gestionnaire paie') || (mot(t, 'paie') && (mot(t, 'formation') || mot(t, 'bulletin') || mot(t, 'gestion')))) return getPaieChapters();
   if (mot(t, 'secrétariat') || mot(t, 'secretariat') || mot(t, 'secrétaire') || mot(t, 'secretaire') || mot(t, 'office manager') || mot(t, 'assistanat')) return getSecretariatChapters();
   if (mot(t, 'gotrm') || mot(t, 'gestionnaire des op\u00e9rations de transport') || mot(t, 'exploitant transport') || mot(t, 'tp-01329') || mot(t, 'rncp40990')) return getGOTRMChapters();

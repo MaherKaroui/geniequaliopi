@@ -11,6 +11,8 @@ import { RPMS_EXERCICES_COMPLETS, RPMS_QCM_DEBUT, RPMS_QCM_FIN } from "./rpmsPre
 import { isRPMSFormation, getRPMSAutoAnswers } from "./rpmsHumanized";
 import { WM14_EXERCICES_COMPLETS, WM14_QCM_DEBUT, WM14_QCM_FIN } from "./webmarketing14hPreset";
 import { isWM14Formation, getWM14AutoAnswers, WM14_QUESTIONS_OUVERTES } from "./webmarketing14hHumanized";
+import { TVTE_EXERCICES_COMPLETS, TVTE_QCM_DEBUT, TVTE_QCM_FIN } from "./ventesEnergie35hPreset";
+import { isTVTEFormation, getTVTEAutoAnswers, TVTE_QUESTIONS_OUVERTES } from "./ventesEnergie35hHumanized";
 
 
 
@@ -1195,6 +1197,30 @@ EVAL_CONTENT["WM14"] = {
   ],
 };
 
+// ===== Techniques de vente dans le secteur des travaux énergétiques – 35 h (non certifiante, C1 à C6) =====
+// Mises en situation corrigées (diagnostic puis C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["TVTE"] = {
+  qcmPositionnement: TVTE_QCM_DEBUT,
+  qcmFinal: TVTE_QCM_FIN,
+  exercices: TVTE_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Situer l'offre de travaux énergétiques dans son cadre technique et réglementaire",
+    "C2 – Identifier les besoins et attentes des clients particuliers et professionnels",
+    "C3 – Élaborer un argumentaire et une proposition commerciale adaptée",
+    "C4 – Négocier et traiter les objections",
+    "C5 – Prospecter et développer un portefeuille clients dans le respect de la réglementation",
+    "C6 – Conclure la vente et fidéliser",
+  ],
+  appreciations: [
+    "Découverte des besoins nettement mieux structurée. Le calcul du temps de retour doit encore être présenté avec plus de prudence.",
+    "Très bonne maîtrise du DPE et des aides, présentées comme des estimations. Le traitement de l'objection prix reste à travailler.",
+    "Argumentaire clair, relié aux motivations du client. Les règles du contrat hors établissement sont acquises.",
+    "Implication constante dans les jeux de rôle. Plan de prospection conforme et réaliste, prêt à être mis en œuvre.",
+    "Devis et proposition complets. Doit gagner en aisance pour conclure sans attendre que le client le propose.",
+    "Excellente posture de conseil, aucune promesse invérifiable. Démarche B2B et décret tertiaire bien maîtrisés.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1414,6 +1440,8 @@ function getContentKey(intitule: string): string {
   if (isRPMSFormation(lower)) return "RPMS38575";
   // Webmarketing 14 h (non certifiante) — avant les contenus génériques marketing
   if (isWM14Formation(lower)) return "WM14";
+  // Techniques de vente – travaux énergétiques 35 h (non certifiante) — avant les contenus génériques
+  if (isTVTEFormation(lower)) return "TVTE";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2143,6 +2171,10 @@ QUESTIONS_OUVERTES["RPMS38575"] = {
 // (diagnostic puis C1 à C6), le même ordre que les réponses de webmarketing14hHumanized.ts.
 QUESTIONS_OUVERTES["WM14"] = WM14_QUESTIONS_OUVERTES;
 
+// Techniques de vente – travaux énergétiques 35 h — 10 questions début / fin dans l'ordre des mises en
+// situation (diagnostic puis C1 à C6), le même ordre que les réponses de ventesEnergie35hHumanized.ts.
+QUESTIONS_OUVERTES["TVTE"] = TVTE_QUESTIONS_OUVERTES;
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2539,6 +2571,18 @@ export function generateStagiaireOpenAnswers(
 
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  // Techniques de vente – travaux énergétiques 35 h : moteur humanisé (une copie différente par stagiaire).
+  if (isTVTEFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoTv = getTVTEAutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoTv.reponses, autoTv.scores);
+  }
+
   // Webmarketing 14 h : moteur humanisé (une copie différente par stagiaire).
   if (isWM14Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoWm = getWM14AutoAnswers(

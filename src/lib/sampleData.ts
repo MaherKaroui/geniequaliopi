@@ -191,6 +191,8 @@ import { FORMATION_RPMS } from "./rpmsPreset";
 export { FORMATION_RPMS, seedRPMSAICaches } from "./rpmsPreset";
 import { FORMATION_WM14 } from "./webmarketing14hPreset";
 export { FORMATION_WM14, seedWM14AICaches } from "./webmarketing14hPreset";
+import { FORMATION_TVTE } from "./ventesEnergie35hPreset";
+export { FORMATION_TVTE, seedTVTEAICaches } from "./ventesEnergie35hPreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -534,6 +536,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   },
   // Webmarketing 14 h (non certifiante, C1 à C6) : contenus pré-remplis (webmarketing14hPreset), aucun stagiaire importé
   FORMATION_WM14,
+  // Techniques de vente – travaux énergétiques 35 h (non certifiante, C1 à C6) : contenus pré-remplis (ventesEnergie35hPreset), aucun stagiaire importé
+  FORMATION_TVTE,
   {
     intitule: "Anglais Niveau A1 – Débutant",
     objectifs: "Acquérir les bases de la langue anglaise au niveau A1 du CECRL : se présenter, comprendre et utiliser des expressions familières et quotidiennes, poser des questions simples, décrire son environnement immédiat, rédiger des messages courts en anglais.",

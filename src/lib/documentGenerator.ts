@@ -33,6 +33,7 @@ import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./v
 import { isOngulaireFormation, getOngulaireBesoin, getOngulaireEvalBesoins } from "./ongulaireHumanized";
 import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins, rpmsBonnesQcmDebut, rpmsReponsesQcmDebut } from "./rpmsHumanized";
 import { isWM14Formation, getWM14Besoin, getWM14EvalBesoins, wm14BonnesQcmDebut, wm14ReponsesQcmDebut } from "./webmarketing14hHumanized";
+import { isTVTEFormation, getTVTEBesoin, getTVTEEvalBesoins, tvteBonnesQcmDebut, tvteReponsesQcmDebut } from "./ventesEnergie35hHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
@@ -1481,7 +1482,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Summary table
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
@@ -1492,7 +1493,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
@@ -1977,6 +1978,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getRPMSBesoin(s.nom, s.prenom, s.civilite, i)
         : isWM14Formation(f.intitule, f.codeRNCP)
         ? getWM14Besoin(s.nom, s.prenom, s.civilite, i)
+        : isTVTEFormation(f.intitule, f.codeRNCP)
+        ? getTVTEBesoin(s.nom, s.prenom, s.civilite, i)
         : domain.besoins[i % domain.besoins.length];
       return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
@@ -3082,7 +3085,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
   // Summary
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const practicalScore = sc[1];
@@ -4037,7 +4040,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // Individual results
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
   stagiaires.forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
 
@@ -8700,6 +8703,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   if (f && isWM14Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getWM14EvalBesoins(s, false).disponibilites;
   }
+  if (f && isTVTEFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getTVTEEvalBesoins(s, false).disponibilites;
+  }
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
@@ -8830,6 +8836,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Développer son activité avec le webmarketing – 14 h ===
   if (isWM14Formation(f.intitule, f.codeRNCP)) {
     return getWM14EvalBesoins(s, hasEntreprise, idx);
+  }
+
+  // === Early return : Techniques de vente dans le secteur des travaux énergétiques – 35 h ===
+  if (isTVTEFormation(f.intitule, f.codeRNCP)) {
+    return getTVTEEvalBesoins(s, hasEntreprise, idx);
   }
 
   // === Early return : Création d'entreprise (porteurs de projet) ===
@@ -12020,6 +12031,8 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
         ? rpmsBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : isWM14Formation(f.intitule, f.codeRNCP)
         ? wm14BonnesQcmDebut(questions.length, si, s.nom, s.prenom)
+        : isTVTEFormation(f.intitule, f.codeRNCP)
+        ? tvteBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : Math.max(1, Math.round(questions.length * 0.4));
       const seedBase = (s.prenom + s.nom + si).split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0);
       const correctSet = new Set<number>();
@@ -15265,6 +15278,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }
   if (mode === "debut" && isWM14Formation(f.intitule, f.codeRNCP)) {
     targetCorrect = wm14BonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
+  }
+  if (mode === "debut" && isTVTEFormation(f.intitule, f.codeRNCP)) {
+    targetCorrect = tvteBonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
   }
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;

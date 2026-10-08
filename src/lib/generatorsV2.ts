@@ -32,6 +32,7 @@ import { pickVitrageExerciceAnswer } from "./vitrageHumanized";
 import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
 import { pickRPMSExerciceAnswer, isRPMSFormation, rpmsNoteExercice } from "./rpmsHumanized";
 import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./webmarketing14hHumanized";
+import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ventesEnergie35hHumanized";
 
 // ========== HELPERS ==========
 
@@ -1075,6 +1076,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, rpmsNoteExercice(stagiaireIdx, ei, true))
         : isWM14Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, wm14NoteExercice(stagiaireIdx, ei, true))
+        : isTVTEFormation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, tvteNoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1133,6 +1136,8 @@ D) Drive faster to finish the ride.`,
       ? rpmsNoteExercice(stagiaireIdx, ei, false)
       : isWM14Formation(f.intitule, f.codeRNCP)
       ? wm14NoteExercice(stagiaireIdx, ei, false)
+      : isTVTEFormation(f.intitule, f.codeRNCP)
+      ? tvteNoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1183,6 +1188,7 @@ D) Drive faster to finish the ride.`,
       || pickOngulaireExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickRPMSExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickTVTEExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;
