@@ -2036,7 +2036,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   // If no structured programme, auto-generate a déroulé based on duration and formation topic
   const heuresMatch = f.duree.match(/(\d+)\s*h/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
-  const heuresTotal = `${totalHeures} heures`;
+  const heuresTotal = f.dureeSaisiePrioritaire ? f.duree : `${totalHeures} heures`;
   const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
   const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
 
@@ -2446,7 +2446,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   ` : "";
 
   // For bloc-based formations, override duration display
-  const displayDuree = isBlocFormation ? "À définir selon le groupe" : heuresTotal;
+  const displayDuree = f.dureeSaisiePrioritaire ? f.duree : isBlocFormation ? "À définir selon le groupe" : heuresTotal;
   const displayTarif = isBlocFormation ? "Tarif sur demande" : f.tarif;
   // Build bloc-based déroulé for FLE/certification formations
   let blocDerouleHtml = "";
@@ -2536,7 +2536,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>7. Durée et lieu de formation</h2>
     <div class="section">
-      <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
+      <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation && !f.dureeSaisiePrioritaire ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
       <p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
