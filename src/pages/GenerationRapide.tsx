@@ -120,6 +120,7 @@ const buildFormationSafe = (
   stagiairesValides: StagiaireInfo[],
 ): FormationInfo => ({
   ...formation,
+  dureeSaisiePrioritaire: true,
   lieu: formation.lieu?.trim() || `${organisme.adresse}, ${organisme.codePostal} ${organisme.ville}`,
   formateur: formation.formateur?.trim() || organisme.responsablePedagogique?.trim() || organisme.dirigeant?.trim() || "",
   nombreParticipants: String(formation.nombreParticipants ?? "").trim() || String(stagiairesValides.length),

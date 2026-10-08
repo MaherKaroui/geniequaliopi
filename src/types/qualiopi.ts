@@ -128,6 +128,8 @@ export interface FormationInfo {
   objectifs: string;
   prerequis: string;
   duree: string;
+  /** Reprendre la durée saisie telle quelle, sans la déduire des dates. */
+  dureeSaisiePrioritaire?: boolean;
   modalites: string;
   tarif: string;
   programme: string;

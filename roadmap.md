@@ -12,3 +12,4 @@
 - [x] Ajouter aussi la convention de formation CFA à l’indicateur 9.
 - [x] Corriger la convention CFA tripartite : CFA, entreprise et apprenant, puis vérifier les signatures.
 - [x] Ajouter le contrat d’accompagnement de chaque bénéficiaire VAE à l’indicateur 9.
+- [ ] Reprendre la durée saisie dans tous les fichiers concernés du pack rapide sans recalcul depuis les dates.
