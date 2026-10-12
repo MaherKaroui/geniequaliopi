@@ -278,8 +278,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
     // Tous les mails (DOCX ou générés en HTML) sont conservés dans le dossier MAILS.
     const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || isHtmlMailTemplate(doc.template));
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
-    const racine = typeof doc.params?.racine === "string" ? doc.params.racine : null;
-    const root = racine || (isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur)));
+    const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
     const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
     return subFolder ? `${root}/${subFolder}` : root;
   }, []);

@@ -59,63 +59,18 @@ describe("dossier VAE", () => {
     expect(em.t).toMatch(/0 heure\(s\) réalisée\(s\)/);
   });
 
-  it("une seule pièce contractuelle par candidat (indicateur 4, format NEO VOIE), choisie selon le financeur", () => {
+  it("une seule pièce contractuelle, choisie selon le financeur", () => {
     const docs = dossier();
-    const contrats = docs.filter(({ d }) => d.template === "vae_contrat_accompagnement" && typeof d.params?.stagiaireIdx === "number");
-    expect(contrats).toHaveLength(STAGIAIRES_TEST.length);
-    expect(contrats.every(({ d }) => d.indicateur === 4 && d.params?.fichier === "CONTRAT_ACCOMPAGNEMENT_VAE")).toBe(true);
-    expect(contrats[0].t).toMatch(/Mon Compte Formation/); // CPF
-    expect(contrats[1].t).toMatch(/TRIPARTITE/); // OPCO
-    expect(contrats[2].t).toMatch(/rétractation de 10 jours/); // personnel
-    expect(docs.filter(({ d }) => d.template === "vae_contrat_accompagnement" && d.params?.trame)).toHaveLength(1);
+    const contrats = docs.filter(({ d }) => d.template === "vae_contrat_accompagnement");
+    expect(contrats).toHaveLength(STAGIAIRES_TEST.length * 2);
+    for (const indicateur of [4, 9]) {
+      const contratsIndicateur = contrats.filter(({ d }) => d.indicateur === indicateur);
+      expect(contratsIndicateur).toHaveLength(STAGIAIRES_TEST.length);
+      expect(contratsIndicateur[0].t).toMatch(/Mon Compte Formation/); // CPF
+      expect(contratsIndicateur[1].t).toMatch(/TRIPARTITE/); // OPCO
+      expect(contratsIndicateur[2].t).toMatch(/rétractation de 10 jours/); // personnel
+    }
     expect(docs.some(({ d }) => /convention_tripartite|convention_accompagnement/.test(d.template))).toBe(false);
-  });
-
-  it("arborescence NEO VOIE : noms imposés, trames à la racine de l'indicateur, pilotage dans QUALIOPI", () => {
-    const cat = getFullCatalog(org, FORMATIONS_TEST.vae, STAGIAIRES_TEST);
-    const vae = cat.filter((d) => d.id.startsWith("vae_"));
-    expect(vae.every((d) => typeof d.params?.fichier === "string" && /^[A-Z0-9_]+$/.test(d.params.fichier))).toBe(true);
-    for (const d of vae.filter((x) => x.params?.trame)) {
-      expect(d.params?.fichier).toMatch(/^TRAME_/);
-      expect(d.params?.stagiaireIdx).toBeUndefined();
-    }
-    expect(vae.filter((d) => d.params?.racine === "QUALIOPI").map((d) => d.params?.fichier).sort()).toEqual(
-      ["NOTE_POSITION_NOUVEL_ENTRANT_VAE", "NOTICE_UTILISATION_TRAMES_VAE", "SOMMAIRE_DU_DOSSIER", "TABLEAU_APPLICABILITE_INDICATEURS_VAE"]);
-    const f = (n: string) => vae.find((d) => d.params?.fichier === n)!;
-    expect([f("MAIL_TYPE_SUIVI_POST_JURY").indicateur, f("MAIL_TYPE_CONDITIONS_PRESENTATION_CERTIFICATION").indicateur]).toEqual([16, 16]);
-    expect(f("TRAME_ENTRETIEN_FAISABILITE_VAE").indicateur).toBe(4);
-    expect(f("CV_CANDIDAT_ORIENTE_CERTIFICATION").indicateur).toBe(4);
-  });
-
-  it("CV du candidat : rien d'inventé sans expérience déclarée, rapprochement avec les blocs sinon", () => {
-    const cv = (s: StagiaireInfo) => {
-      const ss = [s];
-      const d = getFullCatalog(org, FORMATIONS_TEST.vae, ss).find((x) => x.template === "vae_cv_candidat" && x.params?.stagiaireIdx === 0)!;
-      return texte(generateDocumentById(d.id, d.template, d.params, org, FORMATIONS_TEST.vae, ss) || "");
-    };
-    const vide = cv(STAGIAIRES_TEST[0]);
-    expect(vide).toMatch(/aucune expérience n'a encore été déclarée/);
-    expect(vide).not.toMatch(/\d+ ans? d'expérience|Établie/);
-    const reel = cv({ ...STAGIAIRES_TEST[0], experiences: [
-      { poste: "Esthéticienne", employeur: "Institut Beauté Lumière", debut: "2019-03", fin: "2024-08", activites: "Soins esthétiques du visage et maquillage\nÉpilations sur différentes zones du corps\nConseil et vente de produits cosmétiques" },
-    ] });
-    expect(reel).toMatch(/Institut Beauté Lumière/);
-    expect(reel).toMatch(/5 ans et 6 mois/);
-    expect(reel).toMatch(/Établie/);
-    expect(reel).not.toMatch(/aucune expérience n'a encore été déclarée/);
-    // Métier sans lien avec la certification : le CV le montre au lieu de l'habiller.
-    const sansLien = cv({ ...STAGIAIRES_TEST[0], experiences: [
-      { poste: "Assistante administrative", employeur: "Société Alpha", debut: "2020-01", fin: "2024-12", activites: "Saisie des factures fournisseurs\nClassement et archivage du courrier" },
-    ] });
-    expect(sansLien).toMatch(/Aucune activité déclarée en rapport/);
-    expect(sansLien).not.toMatch(/Établie/);
-  });
-
-  it("aucune réponse ni note n'est rédigée à la place du candidat", () => {
-    for (const { d, t } of dossier()) {
-      if (d.template === "vae_satisfaction") expect(t, d.id).not.toMatch(/☒/);
-      if (/vae_trame_dossier_validation|vae_diagnostic_faisabilite|vae_dossier_faisabilite/.test(d.template)) expect(t, d.id).not.toMatch(/J'exerce depuis|environ \d+ ans/);
-    }
   });
 
   it("certificateur et blocs issus de la fiche RNCP", () => {

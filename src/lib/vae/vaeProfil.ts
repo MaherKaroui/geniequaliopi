@@ -14,7 +14,6 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, isRNCPActif } from "../rncpData";
 import { estJourFerie } from "../joursFeries";
-import { rapprochementVAE, dureeTexte, type RapprochementVAE } from "./vaeCandidat";
 
 // ───────────────────────────── Dates ─────────────────────────────
 
@@ -74,6 +73,7 @@ export function graine(s: string): number {
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
   return Math.abs(h);
 }
+const pick = <T,>(arr: T[], seed: number, salt = 0): T => arr[(seed >>> (salt % 24)) % arr.length];
 
 // ───────────────────────────── Certification ─────────────────────────────
 
@@ -236,45 +236,52 @@ export interface ProfilVAE {
   situation: string;
   financeur: FinanceurVAE;
   contratAvecEmployeur: boolean;
-  /** Emploi déclaré (fiche candidat ou expérience la plus récente) ; vide si rien n'est déclaré. */
   poste: string;
   structure: string;
-  /** Durée cumulée en rapport direct, calculée sur les expériences déclarées (texte). */
-  experienceLien: string;
-  experienceTotale: string;
+  anneesLien: number;
+  anneesTotal: number;
   diplome: string;
-  /** Motivation et projet exprimés par le candidat ; vide si non recueillis. */
+  motivation: string;
   projet: string;
+  disponibilites: string;
   rqth: boolean;
-  couverture: { bloc: BlocVAE; niveau: "Établie" | "À documenter"; activites: string[] }[];
+  couverture: { bloc: BlocVAE; niveau: "Complète" | "Partielle"; activites: string[] }[];
   avis: string;
   blocsVigilance: string[];
-  rapp: RapprochementVAE;
+}
+
+const MOTIVATIONS: [string, string][] = [
+  ["Faire reconnaître officiellement des compétences exercées au quotidien", "Rester dans son emploi avec une qualification reconnue et une évolution de rémunération"],
+  ["Sécuriser son emploi en obtenant la certification correspondant à son poste", "Conserver et consolider son poste actuel"],
+  ["Pouvoir s'installer à son compte avec une certification reconnue", "Créer ou reprendre une activité indépendante dans le métier"],
+  ["Évoluer vers un poste à responsabilités qui exige la certification", "Candidater à des postes qualifiés dans le secteur"],
+  ["Accéder ensuite à une certification de niveau supérieur", "Poursuivre vers une certification de niveau supérieur du même domaine"],
+];
+function motivationProjet(seed: number): { motivation: string; projet: string } {
+  const [motivation, projet] = MOTIVATIONS[(seed >>> 7) % MOTIVATIONS.length];
+  return { motivation, projet };
 }
 
 export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
   const seed = graine(`${s.nom}|${s.prenom}|${s.email}|${f.intitule}`);
   const certif = certifVAE(f);
   const financeur = financeurVAE(s);
-  const ref = parseDateVAE(s.dateDebutFormation || f.dateDebut) || aujourdhui();
-  const rapp = rapprochementVAE(s, certif, ref);
   const salarie = !!s.entreprise?.trim() && financeur !== "France Travail";
   const fem = s.civilite === "Mme";
   const situation = financeur === "France Travail"
     ? `Demandeu${fem ? "se" : "r"} d'emploi inscrit${fem ? "e" : ""} à France Travail`
-    : salarie ? `Salarié${fem ? "e" : ""} — ${s.entreprise}` : "Situation professionnelle à préciser lors de l'entretien de faisabilité";
-  const poste = (s.poste || "").trim() || rapp.experiences[0]?.poste?.trim() || "";
-  const couverture = rapp.liens.map((l) => ({
-    bloc: l.bloc,
-    niveau: (l.etabli ? "Établie" : "À documenter") as "Établie" | "À documenter",
-    activites: Array.from(new Set(l.preuves.map((p) => p.activite))).slice(0, 4),
-  }));
-  const vigilance = rapp.renseigne ? rapp.blocsNonCouverts : [];
-  const avis = rapp.avis === "À ÉTABLIR"
-    ? "À ÉTABLIR — aucune expérience n'a encore été déclarée avec ses justificatifs"
-    : rapp.avis === "FAVORABLE AVEC VIGILANCE" ? `FAVORABLE — avec vigilance sur : ${vigilance.join(" ; ")}`
-    : rapp.avis === "RÉSERVÉ" ? "RÉSERVÉ — aucune activité déclarée n'est en rapport direct avec les blocs professionnels de la certification"
-    : "FAVORABLE";
+    : salarie ? `Salarié${fem ? "e" : ""} — ${s.entreprise}` : "Activité exercée à titre indépendant (structure non renseignée à l'inscription)";
+  const metier = s.poste?.trim() || (certif.metiers.length ? pick(certif.metiers, seed, 3) : `Professionnel(le) du domaine « ${certif.intitule} »`);
+  const anneesLien = 2 + (seed % 7);
+  const pro = certif.blocs.filter((b) => b.professionnel);
+  // Au plus un bloc « partiel » (jamais tous) : le profil reste cohérent avec un avis favorable.
+  const blocPartiel = pro.length > 1 && seed % 3 === 0 ? (seed >>> 4) % pro.length : -1;
+  const couverture = pro.map((b, i) => {
+    const partielle = i === blocPartiel;
+    const acts = (b.competences.length ? b.competences : [`activités relevant du bloc « ${b.titre} »`]).slice(0, 3);
+    return { bloc: b, niveau: (partielle ? "Partielle" : "Complète") as "Complète" | "Partielle", activites: acts };
+  });
+  const vigilance = couverture.filter((c) => c.niveau === "Partielle").map((c) => c.bloc.titre);
   return {
     seed,
     nomComplet: `${s.prenom} ${s.nom}`.trim(),
@@ -282,16 +289,16 @@ export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
     situation,
     financeur,
     contratAvecEmployeur: financeur === "Employeur / OPCO",
-    poste,
-    structure: s.entreprise?.trim() || rapp.experiences[0]?.employeur?.trim() || "—",
-    experienceLien: rapp.renseigne ? dureeTexte(rapp.moisLien) : "",
-    experienceTotale: rapp.renseigne ? dureeTexte(rapp.moisTotal) : "",
-    diplome: s.diplome?.trim() || "",
-    projet: (s.projetVAE || "").trim(),
+    poste: metier,
+    structure: s.entreprise?.trim() || "—",
+    anneesLien,
+    anneesTotal: anneesLien + ((seed >>> 5) % 5),
+    diplome: s.diplome?.trim() || "Non renseigné à l'inscription",
+    ...motivationProjet(seed),
+    disponibilites: pick(["En semaine, en matinée", "En semaine, en début d'après-midi", "En semaine, matin ou après-midi selon le planning de travail"], seed, 11),
     rqth: s.rqth === "oui",
     couverture,
-    avis,
+    avis: vigilance.length ? `FAVORABLE — avec vigilance sur : ${vigilance.join(" ; ")}` : "FAVORABLE",
     blocsVigilance: vigilance,
-    rapp,
   };
 }

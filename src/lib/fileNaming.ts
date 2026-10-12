@@ -211,10 +211,8 @@ export function buildDocumentFileName(
   extension: string,
   stagiaire?: StagiaireInfo | null,
 ): string {
-  // Nom imposé par le catalogue (dossiers VAE au format NEO VOIE : FICHE_SUIVI_INDIVIDUEL…).
-  const imposed = typeof doc.params?.fichier === "string" ? stripDiacritics(doc.params.fichier).toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "") : "";
   const parts = [
-    imposed || toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
+    toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
   ];
 
   if (stagiaire?.prenom) parts.push(toTitleSnakeCase(stagiaire.prenom));

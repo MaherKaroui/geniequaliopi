@@ -103,38 +103,6 @@ export function hashSeed(src: string): number {
   return h >>> 0;
 }
 
-/**
- * L'organisme est-il certifié Qualiopi pour les bilans de compétences à la date donnée ?
- * Sans certificat (numéro + date d'obtention), ou si la liste des catégories certifiées
- * n'inclut pas le bilan de compétences, ou si le bilan démarre avant la date d'obtention :
- * aucun financement public ou mutualisé (CPF, OPCO, France Travail, Région, Transitions Pro)
- * n'est mobilisable (art. L6316-1 du Code du travail).
- */
-export function bcCertifieAu(org: Partial<OrganismeInfo> | undefined, date: Date | null): boolean {
-  if (!org) return false;
-  const num = `${org.numeroCertificatQualiopi || ""}`.trim();
-  const obtention = parseDateAny(org.dateObtentionQualiopi || "");
-  if (!num || !obtention) return false;
-  const cats = `${org.certifications || ""}`.toLowerCase();
-  if (/actions? de formation|apprentissage|vae|validation/.test(cats) && !/bilan/.test(cats)) return false;
-  if (date && date.getTime() < obtention.getTime()) return false;
-  const fin = parseDateAny(org.dateFinValiditeQualiopi || "");
-  if (date && fin && date.getTime() > fin.getTime()) return false;
-  return true;
-}
-
-/** Financeurs qui exigent la certification Qualiopi de l'organisme pour le bilan. */
-const FINANCEURS_SOUS_QUALIOPI = /cpf|compte formation|opco|france travail|p[ôo]le emploi|r[ée]gion|transition/i;
-
-/** Financeur effectif d'un bénéficiaire : le financement public n'est retenu que si l'OF est certifié BC. */
-export function financeurEffectifBC(s: StagiaireInfo, org: Partial<OrganismeInfo> | undefined, f?: FormationInfo): string {
-  const saisi = `${s.financeur || ""}`.trim();
-  const debut = parseDateAny(s.dateDebutFormation) || parseDateAny(f?.dateDebut);
-  if (bcCertifieAu(org, debut)) return saisi;
-  if (!saisi || FINANCEURS_SOUS_QUALIOPI.test(saisi)) return "Personnel";
-  return saisi;
-}
-
 /** Financeur saisi dans la fiche stagiaire (CPF, OPCO, Entreprise, Personnel, France Travail, Région, Autre). */
 export function financeurSaisi(s?: StagiaireInfo, f?: FormationInfo): Financeur {
   const v = `${s?.financeur || ""}`.toLowerCase();
@@ -403,7 +371,7 @@ export function formatDuree(p: Prestation): string {
 
 /** Phrase UNIQUE sur la rétractation : contrat, CGV, livret d'accueil et clauses la reprennent. */
 export const DELAI_RETRACTATION_BC =
-  "Le bénéficiaire qui contracte à titre individuel dispose d'un délai de rétractation de 14 jours calendaires à compter de la signature du contrat (art. L6353-5 du Code du travail et art. L221-18 du Code de la consommation, le délai le plus long étant retenu pour toutes les prestations). Aucune somme ne peut être exigée avant l'expiration de ce délai ; l'acompte est ensuite plafonné à 30 % du prix (art. L6353-6). En cas d'inscription via Mon Compte Formation, les conditions générales d'utilisation de la plateforme s'appliquent et la prestation débute au plus tôt 11 jours ouvrés après la validation de l'inscription.";
+  "Le bénéficiaire qui contracte à titre individuel dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat (art. L6353-5 du Code du travail), porté à 14 jours lorsque le contrat est conclu à distance ou hors établissement (art. L221-18 du Code de la consommation). Aucune somme ne peut être exigée avant l'expiration de ce délai ; l'acompte est ensuite plafonné à 30 % du prix (art. L6353-6). En cas d'inscription via Mon Compte Formation, les conditions générales d'utilisation de la plateforme s'appliquent et la prestation débute au plus tôt 11 jours ouvrés après la validation de l'inscription.";
 
 /** Table UNIQUE des références légales du bilan de compétences. */
 export const ARTICLES_BC = {
@@ -613,9 +581,7 @@ export function buildBdcContext(
   };
 
   const domaine = getBdcDomainProfile(formation);
-  // Un seul financeur cohérent par bénéficiaire, compatible avec le périmètre certifié.
-  stagiaires = (stagiaires || []).map((s) => ({ ...s, financeur: financeurEffectifBC(s, org, formation) }));
-  const beneficiaires = stagiaires.map((s, i) => buildBeneficiaire(s, i, formation, domaine));
+  const beneficiaires = (stagiaires || []).map((s, i) => buildBeneficiaire(s, i, formation, domaine));
   const dureeTotaleH = dureeBilanH(formation);
   // Le planning couvre la totalité des heures vendues (24 h = 24 h de séances).
   const dureeEntretiensH = dureeTotaleH;

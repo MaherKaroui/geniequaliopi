@@ -1,11 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
-
-// html2canvas ne fonctionne pas sous jsdom : le rendu PDF est remplacé par le HTML source,
-// ce qui permet de contrôler le contenu exact de chaque pièce PDF.
-vi.mock("@/lib/pdfExport", () => ({
-  htmlToPdfBlob: async (html: string) => new Blob([html], { type: "application/pdf" }),
-  getActivePdfOptions: () => ({}),
-}));
+import { describe, it, expect } from "vitest";
 import JSZip from "jszip";
 import { buildBDCNTConseilsZip } from "@/lib/bdc/bdcNTConseilsZip";
 import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST } from "./dossierAudit.harness";
@@ -46,7 +39,8 @@ describe("ZIP d'audit bilan de compétences", () => {
     const textes = await textesZip(blob);
     const noms = Object.keys(textes);
     expect(noms.some((n) => /00_CONTROLE/.test(n))).toBe(false);
-    for (const ind of [1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32]) {
+    expect(noms.some((n) => /Indicateur_8\//.test(n))).toBe(false);
+    for (const ind of [1, 2, 4, 5, 6, 9, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32]) {
       expect(noms.some((n) => new RegExp(`/Indicateur_${ind}/`).test(n)), `IND ${ind} couvert`).toBe(true);
     }
     const fuites: string[] = [];
@@ -80,67 +74,5 @@ describe("ZIP d'audit bilan de compétences", () => {
     expect(support).toBeTruthy();
     expect(textes[support!]).toMatch(/Corrigé 13/);
     expect(Object.keys(textes).some((n) => /Pâtisserie/i.test(n))).toBe(false);
-  }, 600_000);
-
-  it("suit l'arborescence « MMF - BDC » : PDF, remap des indicateurs, pied de page unique", async () => {
-    const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
-    const blob = await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST.slice(0, 2));
-    const textes = await textesZip(blob);
-    const noms = Object.keys(textes);
-    // Toutes les pièces documentaires en PDF ; seuls les tableaux restent en .xlsx
-    expect(noms.filter((n) => !/\.(pdf|xlsx)$/i.test(n) && n !== "LISEZMOI.txt")).toEqual([]);
-    expect(noms.some((n) => /\.docx?$/i.test(n))).toBe(false);
-    // Aucun indicateur 16 ni 28 pour le bilan
-    expect(noms.some((n) => /Indicateur_(16|28)\//.test(n))).toBe(false);
-    // Nommage « Indicateur N - Libellé » cohérent avec le dossier
-    for (const n of noms.filter((x) => x.startsWith("Critere_"))) {
-      const m = n.match(/^Critere_(\d)\/Indicateur_(\d+)\/(?:Bénéficiaire - [^/]+\/)?Indicateur (\d+) - [^/]+$/);
-      expect(m, n).toBeTruthy();
-      expect(m![2]).toBe(m![3]);
-    }
-    const attendus = [
-      "Critere_1/Indicateur_1/Indicateur 1 - Process de diffusion de l'information.pdf",
-      "Critere_1/Indicateur_2/Indicateur 2 - Process Suivi à 6 mois.pdf",
-      "Critere_1/Indicateur_2/Bénéficiaire - Claire ALPHA/Indicateur 2 - Compte rendu de suivi à 6 mois.pdf",
-      "Critere_2/Indicateur_6/Indicateur 6 - Programme des 3 phases du bilan de compétences.pdf",
-      "Critere_2/Indicateur_6/Indicateur 6 - Phase 2 - Phase d'investigation.pdf",
-      "Critere_2/Indicateur_8/Bénéficiaire - Claire ALPHA/Indicateur 8 - Test de positionnement.pdf",
-      "Critere_3/Indicateur_9/Indicateur 9 - Process Information des publics.pdf",
-      "Critere_3/Indicateur_9/Indicateur 9 - Conditions générales de vente.pdf",
-      "Critere_3/Indicateur_9/Bénéficiaire - Claire ALPHA/Indicateur 9 - Convention de prestation.pdf",
-      "Critere_3/Indicateur_9/Bénéficiaire - Claire ALPHA/Indicateur 9 - Accusé de réception des informations.pdf",
-      "Critere_3/Indicateur_11/Bénéficiaire - Claire ALPHA/Indicateur 11 - Document de synthèse (copie anonymisée).pdf",
-      "Critere_5/Indicateur_21/Indicateur 21 - Fiche de compétences du consultant.pdf",
-      "Critere_6/Indicateur_24/Indicateur 24 - Réseau d'acteurs socio-économiques.pdf",
-    ];
-    for (const a of attendus) expect(noms, a).toContain(a);
-    // Pièces collectives versées une seule fois, hors dossier bénéficiaire
-    expect(noms.filter((n) => /Conditions générales de vente/.test(n))).toHaveLength(1);
-    // Une seule version et une seule date de mise à jour (celle de la V1) sur chaque PDF
-    for (const n of noms.filter((x) => x.endsWith(".pdf"))) {
-      const t = textes[n];
-      expect(t.split("Version 1 · Mise à jour du 3 février 2025").length - 1, n).toBe(1);
-      expect(/V\d+ \d{1,2} \w+ \d{4}/.test(t), n).toBe(false);
-    }
-    // Rétractation : 14 jours partout ; conservation : trois ans au plus
-    for (const [n, t] of Object.entries(textes)) {
-      expect(/r[ée]tractation de (4|7|10) jours/i.test(t), n).toBe(false);
-      expect(/conserv[^.]{0,80}(un|1) an/i.test(t), n).toBe(false);
-    }
-    // Entretien annuel = trame vierge (pas de faits inventés)
-    const annuel = textes["Critere_5/Indicateur_22/Indicateur 22 - Compte rendu d'entretien annuel.pdf"];
-    expect(annuel).not.toMatch(/salons|audit de surveillance|8\/10/);
-  }, 600_000);
-
-  it("n'emploie le CPF que si l'organisme est certifié Qualiopi « bilans de compétences »", async () => {
-    const claire = STAGIAIRES_TEST.slice(0, 1);
-    const nonCertifie = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
-    const t1 = await textesZip(await buildBDCNTConseilsZip(nonCertifie, FORMATIONS_TEST["bilans-competences"], claire));
-    const conv1 = Object.keys(t1).find((n) => /Claire ALPHA\/.*Convention de prestation/.test(n))!;
-    expect(t1[conv1]).toMatch(/finance personnellement/);
-    const certifie = { ...nonCertifie, numeroCertificatQualiopi: "TEST-001", dateObtentionQualiopi: "2025-06-01", certifications: "Actions de formation, bilans de compétences" };
-    const t2 = await textesZip(await buildBDCNTConseilsZip(certifie, FORMATIONS_TEST["bilans-competences"], claire));
-    const conv2 = Object.keys(t2).find((n) => /Claire ALPHA\/.*Convention de prestation/.test(n))!;
-    expect(t2[conv2]).toMatch(/compte personnel de formation/i);
   }, 600_000);
 });
