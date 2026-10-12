@@ -351,7 +351,8 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
                 value={stagiaire.experiences || []}
                 onChange={(experiences) => { const updated = [...data]; updated[index] = { ...updated[index], experiences }; onChange(updated); }}
                 projet={stagiaire.projetVAE}
-                onProjetChange={estVAE ? (v) => updateStagiaire(index, 'projetVAE', v) : undefined}
+                onProjetChange={(v) => updateStagiaire(index, 'projetVAE', v)}
+                projetLabel={estVAE ? "Motivation et projet exprimés par le candidat" : "Attentes exprimées par le bénéficiaire (fiche préalable)"}
               />
             )}
             <div>

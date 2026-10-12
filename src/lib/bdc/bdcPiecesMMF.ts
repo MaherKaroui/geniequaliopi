@@ -353,6 +353,97 @@ Le consultant ${c}, pour attestation de l'exactitude des informations — le ___
 `;
 }
 
+// ───────────────────────────── IND 5 — Objectifs individualisés (par bénéficiaire) ─────────────────────────────
+
+/**
+ * Objectifs individualisés du bilan : les trois finalités légales servent de cadre ; la
+ * formulation propre au bénéficiaire (« À l'issue du bilan, je serai en capacité de… ») est
+ * écrite avec lui lors de l'entretien préalable — seule son attente déclarée est reprise.
+ */
+export function mdObjectifsIndividualises(ctx: BdcContext, b: Beneficiaire): string {
+  const p = prestationFor(ctx, b);
+  const attente = b.profil.declare ? b.profil.attente : "";
+  const Z = "______________________________________________";
+  return `# OBJECTIFS INDIVIDUALISÉS DU BILAN DE COMPÉTENCES
+
+_Indicateur 5 — Objectifs opérationnels et évaluables, formalisés avec le bénéficiaire avant la contractualisation._
+
+| | |
+|---|---|
+| Bénéficiaire | ${b.prenom} ${b.nom} |
+| Consultant | ${consultantNom(ctx)} |
+| Période prévue | du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)} |
+| Attente exprimée | ${attente || Z} |
+
+**À l'issue du bilan, le bénéficiaire sera en capacité de :**
+
+| N° | Objectif (formulé avec le bénéficiaire) | Finalité légale (art. L6313-4) | Résultat observable | Preuve de l'atteinte |
+|---|---|---|---|---|
+| 1 | | Analyser ses compétences professionnelles et personnelles, ses aptitudes et motivations | | Document de synthèse, § 2 |
+| 2 | | Définir un projet professionnel (et, le cas échéant, un projet de formation) | | Document de synthèse, § 3 |
+| 3 | | Utiliser ses atouts comme instrument de négociation pour un emploi, un parcours qualifiant ou une évolution de carrière | | Plan d'action daté |
+| 4 | | | | |
+
+Objectifs repris à l'identique dans le ${typeContrat(p).type === "bipartite" ? "contrat" : "convention"} de prestation et évalués dans le document de synthèse (§ 4).
+
+Fait le ____ / ____ / ________
+
+| Signature du bénéficiaire | Signature du consultant |
+|---|---|
+| ${b.prenom} ${b.nom} | ${consultantNom(ctx)} |
+`;
+}
+
+// ───────────────────────────── IND 21 — CV du consultant (trame) ─────────────────────────────
+
+/** CV du consultant : rempli par l'intéressé (ou remplacé par son CV signé) — rien n'est préfabriqué. */
+export function mdCVConsultant(ctx: BdcContext): string {
+  const c = consultantNom(ctx);
+  const ligne = "| | | | |";
+  return `# CURRICULUM VITAE DU CONSULTANT — ${c.toUpperCase()}
+
+_Indicateur 21 — À compléter et signer par le consultant, ou à remplacer par son CV daté et signé. Joindre les copies des diplômes et attestations._
+
+| | |
+|---|---|
+| Nom et prénom | ${c} |
+| Fonction exercée pour l'organisme | Consultant en bilan de compétences |
+| Statut | ☐ Dirigeant ☐ Salarié ☐ Sous-traitant (contrat au registre IND 27) |
+
+## Diplômes, titres et certifications
+
+| Année | Intitulé | Organisme délivrant | Copie jointe |
+|---|---|---|---|
+${ligne}
+${ligne}
+${ligne}
+
+## Expérience en accompagnement, orientation ou bilan de compétences
+
+| Période | Fonction | Structure | Publics accompagnés / nombre de bilans |
+|---|---|---|---|
+${ligne}
+${ligne}
+${ligne}
+
+## Autres expériences professionnelles
+
+| Période | Fonction | Structure | Activités |
+|---|---|---|---|
+${ligne}
+${ligne}
+
+## Formations suivies au cours des trois dernières années
+
+| Date | Intitulé | Organisme | Durée |
+|---|---|---|---|
+${ligne}
+${ligne}
+
+Je certifie l'exactitude des informations ci-dessus — ${c}, le ____ / ____ / ________
+`;
+}
+
 // ───────────────────────────── IND 24 — Réseau d'acteurs socio-économiques ─────────────────────────────
 
 export function mdReseauActeurs(ctx: BdcContext): string {

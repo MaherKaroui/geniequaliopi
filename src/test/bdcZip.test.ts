@@ -143,4 +143,29 @@ describe("ZIP d'audit bilan de compétences", () => {
     const conv2 = Object.keys(t2).find((n) => /Claire ALPHA\/.*Convention de prestation/.test(n))!;
     expect(t2[conv2]).toMatch(/compte personnel de formation/i);
   }, 600_000);
+  it("ne rédige ni réponse, ni note, ni résultat à la place du bénéficiaire ou du consultant", async () => {
+    const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
+    const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST));
+    const de = (re: RegExp) => Object.entries(textes).filter(([n]) => re.test(n));
+    const verifier = (re: RegExp, interdit: RegExp) => {
+      const pieces = de(re);
+      expect(pieces.length, String(re)).toBeGreaterThan(0);
+      for (const [n, t] of pieces) expect(t, n).not.toMatch(interdit);
+    };
+    verifier(/Test de positionnement/, /[1-5]\/5|J'ai exercé|Capacité d'adaptation, sens/);
+    verifier(/personnalit|Restitution de l.inventaire/i, /\d+\/10/);
+    verifier(/Questionnaire de satisfaction a chaud|Questionnaire de satisfaction à chaud/, /☒/);
+    verifier(/Document de synth[eè]se/, /☒/);
+    verifier(/Fiche pr[ée]alable/, /Je ressens le besoin|Bénéficiaire motivé/);
+    verifier(/Entretien interm/, /Oui, la prestation répond|Globalement oui/);
+    expect(de(/Objectifs individualis/).length).toBe(STAGIAIRES_TEST.length);
+    expect(de(/CV du consultant/).length).toBe(1);
+  });
+
+  it("ne mentionne pas l'inscription via Mon Compte Formation pour un organisme non certifié BC", async () => {
+    const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const], numeroCertificatQualiopi: "", dateObtentionQualiopi: "" };
+    const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST));
+    const fuites = Object.entries(textes).filter(([, t]) => /via Mon Compte Formation|inscription via Mon Compte/.test(t)).map(([n]) => n);
+    expect(fuites).toEqual([]);
+  });
 });

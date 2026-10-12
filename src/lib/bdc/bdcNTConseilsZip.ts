@@ -20,11 +20,11 @@ import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
-import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, financeurEffectifBC, type BdcContext, type Beneficiaire } from "./bdcModel";
+import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, MENTION_MCF_BC, financeurEffectifBC, bcCertifieAu, type BdcContext, type Beneficiaire } from "./bdcModel";
 import { genAnalyseRisquesQualite, genClausesQualiteContrat } from "@/lib/qualite2026";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
-import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessPositionnement, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdAccuseReception, mdFicheCompetencesConsultant, mdReseauActeurs } from "./bdcPiecesMMF";
+import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessPositionnement, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdAccuseReception, mdFicheCompetencesConsultant, mdReseauActeurs, mdObjectifsIndividualises, mdCVConsultant } from "./bdcPiecesMMF";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
@@ -318,7 +318,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
       .replace(/\{CONVENTION_FINANCEMENT\}/g, financement[pf?.financeur || "CPF"] || financement.CPF)
       .replace(/\{CONVENTION_DELAI\}/g, tripartite
         ? "Le salarié dispose de 10 jours à compter de la transmission de la présente convention pour l'accepter en la signant ; l'absence de réponse vaut refus, lequel ne constitue ni une faute ni un motif de licenciement (art. R6313-8). Le bilan ne débute qu'après signature des trois parties."
-        : DELAI_RETRACTATION_BC)
+        : DELAI_RETRACTATION_BC + (pf?.financeur === "CPF" ? MENTION_MCF_BC : ""))
       .replace(/\{CONVENTION_EXEMPLAIRES\}/g, tripartite ? "trois" : "deux");
   }
 
@@ -508,6 +508,19 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 </table>`;
   txt = txt.replace(/\{SIGNATURES_ORG_STAGIAIRE\}/g, signaturesHtml);
 
+  // Organisme non certifié Qualiopi « bilans de compétences » : CPF et financeurs publics impossibles
+  // (art. L6316-1) — on retire toute mention d'inscription via Mon Compte Formation.
+  if (!bcCertifieAu(org, new Date())) {
+    const nonMob = "le CPF et les financeurs publics ne sont pas mobilisables tant que l'organisme ne détient pas la certification qualité pour la catégorie « bilans de compétences » (art. L6316-1 du Code du travail)";
+    txt = txt
+      .replace(/^\|\s*Actif \(salarié, indépendant, demandeur d'emploi\) à son initiative\s*\|[^\n]*$/m, `| Actif (salarié, indépendant, demandeur d'emploi) à son initiative | Financement personnel — ${nonMob} | Contrat de prestation ; rétractation de 14 jours |`)
+      .replace(/^\|\s*Demandeur d'emploi\s*\|\s*CPF[^\n]*\n/m, "")
+      .replace(/^- Via le Compte Personnel de Formation \(CPF\)[^\n]*\n+/m, `- Le ${nonMob.charAt(0) === "l" ? nonMob.slice(3) : nonMob} ;\n\n`)
+      .replace(/^- Via Mon Compte Formation \/ EDOF[^\n]*\n+/m, "")
+      .replace(/^Lorsque l'inscription est réalisée via Mon Compte Formation[^\n]*\n+/m, "")
+      .replace(/En cas d'inscription via Mon Compte Formation[^.]*\.\s?/g, "");
+  }
+  txt = txt.replace(/rétractation de 10 jours \(art\. L6353-5\), 14 jours à distance \(art\. L221-18 du Code de la consommation\)/g, "rétractation de 14 jours calendaires (art. L6353-5 du Code du travail et L221-18 du Code de la consommation)");
   return txt;
 }
 
@@ -542,95 +555,33 @@ function buildOutilPreparatoireMd(
   formation?: FormationInfo,
 ): string {
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
-  const email = s.email || "";
-  const tel = s.telephone || "";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
   const handicap = s.rqth === "oui" ? "Oui" : "Non";
-  const civ = s.civilite === "Mme" ? "Madame" : "Monsieur";
+  const civ = s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : "";
   const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
-  const seed = pf.seed;
   const rh = repartitionHeures(dureeBilanH(formation));
-  const joursTxt = pf.jours.join(", ");
-  const creneauxTxt = pf.creneaux.map((c) => (c === "apres-midi" ? "après-midi" : c)).join(" et ");
-
-  const motivations = [
-    `Faire le point sur mon parcours${poste ? ` de ${poste}` : ""} et clarifier mes axes d'évolution`,
-    `Préparer une reconversion professionnelle réfléchie après plusieurs années${entreprise ? ` chez ${entreprise}` : " d'expérience"}`,
-    `Valider un projet professionnel cohérent avec mes valeurs et mes compétences`,
-    `Identifier les formations utiles pour sécuriser mon avenir professionnel`,
-    `Reprendre confiance et structurer une démarche de mobilité interne ou externe`,
-  ];
-  const objectifs = [
-    `Identifier mes compétences clés et mes atouts pour construire un projet réaliste`,
-    `Définir un projet professionnel principal et un projet alternatif crédibles`,
-    `Élaborer un plan d'action concret avec étapes, ressources et calendrier`,
-    `Confronter mes hypothèses au marché du travail via des enquêtes métier`,
-    `Mettre en cohérence mes aspirations, mes compétences et les opportunités du marché`,
-  ];
-  const rythmes = [
-    "24 heures réparties en séances de 2 heures hebdomadaires, sur 12 semaines",
-    "24 heures avec 3 séances de 2h par mois, étalées sur 4 mois",
-    "24 heures dont 20h en entretien individuel et 4h de travail personnel encadré",
-    "24 heures en mixte : 16h en présentiel et 8h en distanciel synchrone",
-  ];
-  const modalites = [
-    "Entretiens individuels, tests psychotechniques, travaux intersession personnalisés",
-    "Alternance d'entretiens, d'auto-diagnostic en ligne et de mises en situation",
-    "Supports numériques, questionnaires d'intérêts, grilles d'analyse de compétences",
-    "Entretiens d'exploration, tests de personnalité et restitution argumentée",
-  ];
-  const environnements = [
-    "Bureau dédié, calme et confidentiel, accès Wi-Fi sécurisé, matériel mis à disposition",
-    "Salle d'entretien individuelle équipée, environnement neutre garantissant la confidentialité",
-    "Locaux accessibles PMR, espace d'accueil dédié et créneaux flexibles (soir / samedi possibles)",
-  ];
-  const equipes = [
-    `Consultante référente : ${org.responsablePedagogique || org.dirigeant || "Le consultant désigné"} ; supervision qualité : ${org.referentQualite || org.dirigeant || "Le référent qualité"}`,
-    `Un consultant unique tout au long du bilan, appuyé par le référent handicap (${org.referentHandicap || "à désigner"}) si besoin`,
-    `Binôme consultant principal / consultant ressource, coordination assurée par ${org.dirigeant || "la direction"}`,
-  ];
-  const remarques = [
-    poste ? `Souhaite explorer des passerelles depuis le poste de ${poste}.` : "Souhaite explorer plusieurs pistes sans a priori.",
-    entreprise ? `Démarche initiée à titre personnel, hors de l'employeur actuel (${entreprise}).` : "Démarche personnelle et confidentielle.",
-    `Disponibilités à privilégier : ${pick(["fin de journée", "matinée", "mercredi après-midi", "samedi matin"], seed, 3)}.`,
-  ];
-  const adminNotes = [
-    "Dossier complet, financement CPF mobilisable.",
-    "Pièces administratives reçues, RIB et attestation CPF en cours.",
-    "Convention à émettre après validation du devis par le bénéficiaire.",
-  ];
-
-  void motivations; void objectifs; void rythmes;
-  const motivation = `${pf.motifLibelle}${poste ? ` (poste actuel : ${poste})` : ""}`;
-  const objectif = pf.attente;
-  const rythme = `${rh.p1 + rh.p2 + rh.p3} heures d'entretiens : ${rh.p1} h en phase préliminaire, ${rh.p2} h en investigation, ${rh.p3} h en conclusion ; séances le ${joursTxt}, ${creneauxTxt}`;
-  const modalite = pick(modalites, seed, 3);
-  const env = pick(environnements, seed, 4);
-  const equipe = pick(equipes, seed, 5);
-  void remarques; void adminNotes;
-  const remarque = `Disponibilités déclarées : ${joursTxt}, ${creneauxTxt}.${entreprise && pf.origine !== "employeur" ? " Démarche personnelle, sans information de l'employeur." : ""}`;
   const admin = ({
     CPF: "Financement CPF : inscription à valider sur Mon Compte Formation (démarrage au plus tôt 11 jours ouvrés après validation).",
     employeur: "Financement employeur : convention tripartite à émettre ; délai de 10 jours laissé au salarié.",
     OPCO: "Financement employeur avec participation OPCO : convention tripartite à émettre.",
-    personnel: "Financement personnel : contrat à émettre, délai de rétractation à respecter avant tout paiement.",
+    personnel: "Financement personnel : contrat à émettre, délai de rétractation de 14 jours à respecter avant tout paiement.",
     "France Travail": "Financement CPF avec abondement France Travail : accord du conseiller à joindre.",
   } as Record<string, string>)[pf.financeur] || "Plan de financement à confirmer.";
-
   const initiative = pf.origine === "employeur" ? "Non — à l'initiative de l'employeur (plan de développement des compétences)" : "Oui";
-  const contacts = [email, tel].filter(Boolean).join(" · ") || "[Contacts à compléter]";
+  const contacts = [s.email, s.telephone].filter(Boolean).join(" · ") || ZONE;
   const carac = poste ? `Poste actuel : ${poste}${entreprise ? ` — ${entreprise}` : ""}` : "Situation professionnelle à préciser en entretien";
+  const consultant = formation?.formateur || org.responsablePedagogique || org.dirigeant || "le consultant désigné";
 
   return `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
 
 **Date de l'entretien :** ${dates.dateOutilPrep}
 
-**Bénéficiaire : ${civ} ${nom}**
+**Bénéficiaire : ${`${civ} ${nom}`.trim()}**
 
 **Contacts : ${contacts}**
 
-**Dates du bilan de compétences souhaitées : du ${dates.dateDebut} au ${dates.dateFin}**
+**Dates du bilan de compétences prévues : du ${dates.dateDebut} au ${dates.dateFin}**
 
 1)  **Bénéficiaire**
 
@@ -638,19 +589,19 @@ function buildOutilPreparatoireMd(
 | ${carac} |
 | **Situation de handicap ?** ${handicap}${handicap === "Oui" ? " — voir process handicap" : ""} |
 
-2)  **Désirs / souhaits :**
+2)  **Désirs / souhaits** (exprimés par le bénéficiaire pendant l'entretien)
 
 | **Bilan de compétences à l'initiative du bénéficiaire ?** ${initiative} |
-| **Motivations :** ${motivation} |
-| **Objectifs du bilan de compétences :** ${objectif} |
-| **Remarques autres :** ${remarque} |
+| **Motivations :** ${pf.declare ? pf.attente : ZONE} |
+| **Objectifs du bilan de compétences :** ${ZONE} |
+| **Remarques autres :** ${ZONE} |
 
-3)  **Hypothèses :**
+3)  **Hypothèses** (proposées par l'organisme)
 
-| **Rythmes et temps de prestation :** ${rythme} |
-| **Modalités pédagogiques, contenus, supports et outils :** ${modalite} |
-| **Environnement de la prestation :** ${env} |
-| **Structuration de l'équipe pédagogique :** ${equipe} |
+| **Rythmes et temps de prestation :** ${rh.p1 + rh.p2 + rh.p3} heures d'entretiens : ${rh.p1} h en phase préliminaire, ${rh.p2} h en investigation, ${rh.p3} h en conclusion ; calendrier convenu avec le bénéficiaire (planning prévisionnel) |
+| **Modalités pédagogiques, contenus, supports et outils :** entretiens individuels, questionnaire d'intérêts, test de personnalité, enquêtes métier, travail personnel entre les séances |
+| **Environnement de la prestation :** ${formation?.modalites || "selon la modalité retenue"}${formation?.lieu ? ` — ${formation.lieu}` : ""} |
+| **Structuration de l'équipe pédagogique :** consultant : ${consultant} ; référent handicap : ${org.referentHandicap || org.dirigeant || ""} |
 
 | **Cadre réservé au service administratif :** ${admin} |
 `;
@@ -664,6 +615,19 @@ function chk(b: boolean): string {
   return b ? "**X**" : " ";
 }
 
+/** Zone de réponse vierge : le bénéficiaire ou le consultant la remplit à la date de l'étape. */
+const ZONE = "______________________________________________________________";
+const zone = (n = 2) => Array.from({ length: n }, () => ZONE).join("\n\n");
+const cases = (items: string[]) => items.map((x) => `☐ ${x}`).join(" · ");
+
+/** Expériences déclarées (fiche stagiaire) — jamais complétées par défaut. */
+function experiencesDeclareesMd(s: StagiaireInfo): string {
+  const ex = (s.experiences || []).filter((e) => (e.poste || "").trim());
+  if (!ex.length) return zone(3);
+  const mois = (x: string) => { const m = (x || "").match(/^(\d{4})-(\d{2})/); return m ? `${m[2]}/${m[1]}` : x; };
+  return ex.map((e) => `- ${e.poste}${e.employeur ? ` — ${e.employeur}` : ""}${e.debut ? ` (${mois(e.debut)}${e.fin ? ` à ${mois(e.fin)}` : " à aujourd'hui"})` : ""}${e.activites ? ` : ${e.activites.split(/\r?\n/).filter(Boolean).join(" ; ")}` : ""}`).join("\n");
+}
+
 function buildFicheAnalyseBesoinMd(
   s: StagiaireInfo,
   org: OrganismeInfo,
@@ -671,98 +635,39 @@ function buildFicheAnalyseBesoinMd(
   formation?: FormationInfo,
 ): string {
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
-  const naissance = s.dateNaissance || "—";
   const tel = s.telephone || "";
-  const email = s.email || "—";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const anciennete = poste ? "Expérience professionnelle sur le poste actuel" : "—";
   const consultant = formation?.formateur || org.responsablePedagogique || org.dirigeant || "Le consultant désigné";
   const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
   const isSalarie = pf.situation === "salarie";
   const isDE = pf.situation === "demandeur_emploi";
-  const isIndep = pf.situation === "independant";
-  const isAutreSitu = !isSalarie && !isDE && !isIndep;
   const handicap = s.rqth === "oui";
-  const seed = pf.seed;
   const origine = pf.origine === "employeur" ? (pf.financeur === "OPCO" ? "OPCO" : "Employeur")
     : pf.origine === "prescripteur" ? "France Travail"
     : pf.financeur === "CPF" ? "CPF" : "Initiative personnelle";
-  const objetParMotif: Record<string, string> = {
-    point: "Faire le point sur mes compétences",
-    reconversion: "Préparer une reconversion professionnelle",
-    evolution: "Évoluer dans mon métier",
-    confirmer: "Confirmer un projet professionnel",
-    pistes: "Identifier des pistes d'évolution",
-  };
-  const objet = objetParMotif[pf.motif];
-  const formationInit = `Niveau d'études : ${pf.niveauEtudes}`;
-  const experiences = poste
-    ? `${anciennete} sur le poste de ${poste}${entreprise ? ` au sein de ${entreprise}` : ""}, expériences antérieures en service et coordination`
-    : "Plusieurs postes successifs dans le secteur ciblé, avec montée en responsabilités";
-  const competences = pick([
-    "Gestion de projet, relation client, communication écrite et orale",
-    "Organisation du travail, animation d'équipe, rigueur administrative",
-    "Maîtrise des outils bureautiques, capacités d'analyse et de synthèse",
-    "Sens du service, autonomie, adaptation et résolution de problèmes",
-  ], seed, 3);
-  const attente = pf.attente;
-  const objectifsB = pf.resultatAttendu;
-  const contraintesH = `Disponible le ${pf.jours.join(", ")}, ${pf.creneaux.map((c) => (c === "apres-midi" ? "après-midi" : c)).join(" et ")}`;
-  const contraintesG = pick(["Aucune contrainte particulière", `Déplacements limités à ${org.ville || "la région"}`, "Privilégier le distanciel"], seed, 7);
-  // Contraintes cohérentes avec la situation déclarée (pas de « charge professionnelle » sans emploi).
-  const contraintesP = pick(pf.situation === "salarie"
-    ? ["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"]
-    : ["Aucune contrainte particulière", "Organisation familiale à anticiper", "Démarches de recherche d'emploi à concilier"], seed, 8);
-  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
+  const modaliteRetenue = (formation?.modalites || "").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
-  const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
-  const dureeH = String(dureeBilanH(formation));
-  const nbSeances = benCtx(org, formation, s).ctx.seancesParBeneficiaire;
-  const seancesB = Object.values(nbSeances)[0] || [];
-  const rythme = seancesB.length ? `${seancesB.length} séances individuelles de 2 à 3 heures, du ${fmtShortDate(seancesB[0].date)} au ${fmtShortDate(seancesB[seancesB.length - 1].date)} (planning prévisionnel annexé)` : "Séances de 2 à 3 heures selon le planning prévisionnel";
-  const amenagements = handicap
-    ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
-    : "Aucun aménagement spécifique requis à ce jour";
-  const prenomB = (s.prenom || "Le bénéficiaire").trim();
-  const jai = "j'ai";
-
-  const monProjet = pick([
-    "mon projet professionnel",
-    "ma reconversion",
-    "mon évolution de carrière",
-    "mon orientation professionnelle",
-  ], seed, 12);
-  const commentaireBeneficiaire = pick([
-    `Je viens vers vous parce que ${monProjet} n'est pas encore assez clair. ${jai.charAt(0).toUpperCase() + jai.slice(1)} besoin de poser des mots sur ce que je sais faire et sur ce qui me motive vraiment. Je compte sur cet accompagnement pour m'aider à y voir plus clair et à construire la suite étape par étape.`,
-    `Ce qui m'importe aujourd'hui, c'est de comprendre mon parcours autrement. ${jai.charAt(0).toUpperCase() + jai.slice(1)} acquis de l'expérience, mais je ne sais pas toujours comment la valoriser. Je souhaite identifier mes compétences transférables et trouver des pistes qui me ressemblent.`,
-    `Je ressens le besoin de faire le point. Mon métier actuel ne me satisfait plus complètement et j'aimerais explorer d'autres horizons sans me précipiter. Je veux un projet réaliste, construit avec du recul et de la méthode.`,
-    `J'ai déjà une idée de la direction à prendre, mais il me manque la confiance et les arguments pour avancer sereinement. Je compte sur ce bilan pour objectiver mon projet et vérifier qu'il est bien en phase avec le marché et mes contraintes.`,
-    `Pour moi, ce bilan est une opportunité de prendre du temps pour moi. Entre le travail et les obligations personnelles, je n'ai pas eu le temps de réfléchir vraiment. Je veux repartir avec un plan d'action concret et des décisions éclairées.`,
-    `Je suis prêt(e) à m'investir dans une démarche structurée. Ce que j'attends surtout, c'est un cadre bienveillant qui me permette d'explorer librement, de tester mes idées et d'obtenir un retour honnête sur mes hypothèses.`,
-    `J'ai longtemps repoussé cette démarche par manque de temps. Aujourd'hui, je suis décidé(e) à avancer. Je veux comprendre quels métiers correspondent à mon profil et quels sont les financements ou les formations possibles pour y parvenir.`,
-    `Mon objectif est simple : ne plus avancer à tâtons. Je veux que mon projet soit clair, motivant et réaliste. ${jai.charAt(0).toUpperCase() + jai.slice(1)} hâte de commencer ce travail et de bénéficier de votre regard extérieur pour avancer sereinement.`,
-  ], seed, 11);
-
-  const besoinExplo = /reconvers|pistes|projet/i.test(objet);
-  const besoinValidation = !/pistes d'évolution/i.test(objet);
-
+  const isMix = /mixte|hybride/.test(modaliteRetenue);
+  const seancesB = Object.values(benCtx(org, formation, s).ctx.seancesParBeneficiaire)[0] || [];
+  const rythme = seancesB.length ? `${seancesB.length} séances individuelles, du ${fmtShortDate(seancesB[0].date)} au ${fmtShortDate(seancesB[seancesB.length - 1].date)} (planning prévisionnel annexé)` : "Selon le planning prévisionnel";
 
   return `**FICHE D'ANALYSE DU BESOIN**
 
 **Bilan de compétences**
 
+Les rubriques 3, 5, 6 et 7 sont remplies pendant l'entretien préalable, avec les mots du bénéficiaire.
+
 **1. Identification du bénéficiaire**
 
 | **Nom et prénom** | ${nom} |
-| **Date de naissance** | ${naissance} |${tel ? `
+| **Date de naissance** | ${s.dateNaissance || ""} |${tel ? `
 | **Téléphone** | ${tel} |` : ""}
-| **E-mail** | ${email} |
-| **Situation actuelle** | ${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(isIndep)} Travailleur indépendant · ${chk(isAutreSitu)} Autre |
-| **Poste occupé** | ${poste || "—"} |
-| **Entreprise** | ${entreprise || "—"} |
-| **Ancienneté** | ${anciennete} |
+| **E-mail** | ${s.email || ""} |
+| **Situation actuelle** | ${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(false)} Travailleur indépendant · ${chk(false)} Autre |
+| **Poste occupé** | ${poste || ""} |
+| **Entreprise** | ${entreprise || ""} |
 | **Date de l'entretien préalable** | ${dates.dateOutilPrep} |
 | **Nom du consultant** | ${consultant} |
 
@@ -772,70 +677,49 @@ ${chk(origine === "Initiative personnelle")} Initiative personnelle · ${chk(ori
 
 **3. Objet de la démarche**
 
-${chk(objet === "Faire le point sur mes compétences")} Faire le point sur mes compétences
+${cases(["Faire le point sur mes compétences", "Évoluer dans mon métier", "Préparer une reconversion professionnelle", "Retrouver un emploi", "Créer ou reprendre une entreprise", "Confirmer un projet professionnel", "Identifier des pistes d'évolution"])}
 
-${chk(objet === "Évoluer dans mon métier")} Évoluer dans mon métier
-
-${chk(objet === "Préparer une reconversion professionnelle")} Préparer une reconversion professionnelle
-
-${chk(false)} Retrouver un emploi
-
-${chk(false)} Créer ou reprendre une entreprise
-
-${chk(objet === "Confirmer un projet professionnel")} Confirmer un projet professionnel
-
-${chk(objet === "Identifier des pistes d'évolution")} Identifier des pistes d'évolution
-
-**Précisions :** ${objet}.
+**Précisions :** ${pf.declare ? pf.attente : ZONE}
 
 **4. Situation professionnelle et parcours**
 
-**Formation initiale :** ${formationInit}
+**Formation initiale / diplôme :** ${pf.niveauEtudes || ZONE}
 
-**Principales expériences professionnelles :** ${experiences}
+**Principales expériences professionnelles :**
 
-**Compétences ou savoir-faire identifiés :** ${competences}
+${experiencesDeclareesMd(s)}
+
+**Compétences ou savoir-faire identifiés :** ${ZONE}
 
 **5. Motivations et attentes du bénéficiaire**
 
-**Qu'attendez-vous du bilan de compétences ?** ${attente}
+**Qu'attendez-vous du bilan de compétences ?** ${pf.declare ? pf.attente : ZONE}
 
-**Quels sont vos objectifs à l'issue du bilan ?** ${objectifsB}
+**Quels sont vos objectifs à l'issue du bilan ?** ${ZONE}
 
 **6. Contraintes et points de vigilance**
 
-| **Contraintes horaires** | ${contraintesH} |
-| **Contraintes géographiques** | ${contraintesG} |
-| **Contraintes personnelles ou familiales** | ${contraintesP} |
+| **Contraintes horaires** | ${ZONE} |
+| **Contraintes géographiques** | ${ZONE} |
+| **Contraintes personnelles ou familiales** | ${ZONE} |
 | **Situation de handicap nécessitant un aménagement** | ${chk(handicap)} Oui · ${chk(!handicap)} Non${handicap ? " — voir process handicap" : ""} |
 
-**7. Analyse du besoin exprimée par le bénéficiaire**
+**7. Analyse du besoin**
 
-**Le besoin exprimé est-il cohérent avec la prestation de bilan de compétences ?** ${chk(true)} Oui · ${chk(false)} Non
+**Le besoin exprimé est-il cohérent avec la prestation de bilan de compétences ?** ☐ Oui · ☐ Non
 
-**Besoins identifiés par le bénéficiaire :**
+**Besoins identifiés :** ${cases(["Analyse du parcours professionnel", "Identification des compétences", "Exploration des métiers et secteurs", "Construction d'un projet professionnel", "Validation du projet", "Élaboration d'un plan d'action"])}
 
-${chk(true)} Analyse du parcours professionnel
+**Commentaire du bénéficiaire :**
 
-${chk(true)} Identification des compétences
-
-${chk(besoinExplo)} Exploration des métiers et secteurs
-
-${chk(true)} Construction d'un projet professionnel
-
-${chk(besoinValidation)} Validation du projet
-
-${chk(true)} Élaboration d'un plan d'action
-
-**Commentaire du bénéficiaire :** ${commentaireBeneficiaire}
-
+${zone(3)}
 
 **8. Modalités d'accompagnement retenues**
 
 | **Modalité** | ${chk(isPres)} Présentiel · ${chk(isDist)} Distanciel · ${chk(isMix)} Mixte |
-| **Durée prévisionnelle** | ${dureeH} heures |
+| **Durée prévisionnelle** | ${dureeBilanH(formation)} heures |
 | **Rythme envisagé** | ${rythme} |
-| **Aménagements spécifiques** | ${amenagements} |
+| **Aménagements spécifiques** | ${handicap ? "À étudier avec le référent handicap" : "Aucun besoin signalé à l'inscription"} |
 
 **9. Validation**
 
@@ -853,101 +737,42 @@ function buildFichePrealableMd(
   dates: DatesCtx,
   formation?: FormationInfo,
 ): string {
+  void org;
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
-  const naissance = s.dateNaissance || "—";
   const tel = s.telephone || "";
-  const email = s.email || "—";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const anciennete = poste ? "Expérience professionnelle sur le poste actuel" : "—";
   const handicap = s.rqth === "oui";
   const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
-  const seed = pf.seed;
-
   const isSalarie = pf.situation === "salarie";
   const isDE = pf.situation === "demandeur_emploi";
-  const isIndep = pf.situation === "independant";
-  const isFonc = pf.situation === "fonctionnaire";
-  const isAutreSitu = !isSalarie && !isDE && !isIndep && !isFonc;
-
   const source = pf.source;
-  const fin = ({ CPF: "CPF", employeur: "Employeur", OPCO: "OPCO", "France Travail": "France Travail", personnel: "Financement personnel" } as Record<string, string>)[pf.financeur] || "CPF";
-
-  const motifParCle: Record<string, string> = {
-    point: "Faire le point sur ma carrière",
-    reconversion: "Changer de métier",
-    evolution: "Évoluer professionnellement",
-    pistes: "Identifier mes compétences",
-    confirmer: "Confirmer un projet professionnel",
-  };
-  const motif = motifParCle[pf.motif];
-  const situation = pick([
-    `Engagé(e) depuis ${anciennete}${poste ? ` sur le poste de ${poste}` : ""}${entreprise ? ` chez ${entreprise}` : ""}, je souhaite prendre du recul sur mon parcours et clarifier la suite à donner.`,
-    `Après une période riche en expériences professionnelles, je ressens le besoin de structurer mes choix d'évolution et de valider un projet à moyen terme.`,
-    `Mon parcours m'amène aujourd'hui à m'interroger sur la cohérence entre mes compétences acquises et le métier que je souhaite exercer dans les prochaines années.`,
-  ], seed, 3);
-  const attentes = [
-    "Identifier mes compétences et aptitudes",
-    "Construire un projet professionnel",
-    "Valider un projet existant",
-    "Élaborer un plan d'action",
-    "Mieux me connaître",
-  ];
-  const attente = /compétences transférables/.test(pf.attente) ? "Identifier mes compétences et aptitudes"
-    : /plan d'action/.test(pf.attente) ? "Élaborer un plan d'action"
-    : /recul/.test(pf.attente) ? "Mieux me connaître"
-    : pf.motif === "confirmer" ? "Valider un projet existant" : "Construire un projet professionnel";
-  void attentes;
-  const resultats = pf.resultatAttendu;
-
-  const niveau = pf.niveauEtudes;
-
-  const exps = pick([
-    `Plusieurs postes successifs dans le secteur, avec une montée en responsabilités progressive.`,
-    `Expériences variées dans la relation client, la coordination d'équipe et la gestion de projet.`,
-    `Parcours combinant fonctions opérationnelles et missions transversales en organisation.`,
-  ], seed, 7);
-
-  const contraintes = pick([
-    "Horaires de travail à concilier avec les rendez-vous",
-    "Organisation familiale à anticiper",
-    "Mobilité géographique limitée",
-    "Aucune contrainte particulière",
-  ], seed, 8);
-
-  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
+  const fin = ({ CPF: "CPF", employeur: "Employeur", OPCO: "OPCO", "France Travail": "France Travail", personnel: "Financement personnel" } as Record<string, string>)[pf.financeur] || "";
+  const modaliteRetenue = (formation?.modalites || "").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
-  const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
-
-  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
-  const joursSel = new Set(pf.jours.map((j) => j.charAt(0).toUpperCase() + j.slice(1)));
-  const creneaux = ["Matin", "Après-midi", "Soirée"];
-  const creneauxSel = new Set<string>(pf.creneaux.map((c) => (c === "apres-midi" ? "Après-midi" : c === "soir" ? "Soirée" : "Matin")));
-  const obs = pick([
-    "Bénéficiaire motivé(e), démarche réfléchie et exprimée clairement.",
-    "Bonne capacité d'autonomie attendue dans les phases d'investigation.",
-    "Disponibilités à confirmer après réception du planning prévisionnel.",
-  ], seed, 12);
+  const isMix = /mixte|hybride/.test(modaliteRetenue);
 
   return `**FICHE PRÉALABLE AU BILAN DE COMPÉTENCES**
+
+Fiche remplie par le bénéficiaire avant l'entretien préalable.
 
 **1. Informations générales**
 
 | **Nom et prénom** | ${nom} |
-| **Date de naissance** | ${naissance} |${tel ? `
+| **Date de naissance** | ${s.dateNaissance || ""} |${tel ? `
 | **Téléphone** | ${tel} |` : ""}
-| **E-mail** | ${email} |
+| **E-mail** | ${s.email || ""} |
 
 **Situation actuelle :**
 
-${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(isIndep)} Travailleur indépendant · ${chk(isFonc)} Fonctionnaire · ${chk(isAutreSitu)} Autre
+${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(false)} Travailleur indépendant · ${chk(false)} Fonctionnaire · ${chk(false)} Autre
 
-**Profession actuelle :** ${poste || "—"}
+**Profession actuelle :** ${poste || ZONE}
 
-**Entreprise :** ${entreprise || "—"}
+**Entreprise :** ${entreprise || ZONE}
 
-**Ancienneté dans le poste :** ${anciennete}
+**Ancienneté dans le poste :** ${ZONE}
 
 **2. Votre demande**
 
@@ -963,55 +788,43 @@ ${chk(fin === "CPF")} CPF · ${chk(fin === "Employeur")} Employeur · ${chk(fin 
 
 Pour quelles raisons souhaitez-vous réaliser un bilan de compétences ?
 
-${chk(motif === "Faire le point sur ma carrière")} Faire le point sur ma carrière
+${cases(["Faire le point sur ma carrière", "Changer de métier", "Évoluer professionnellement", "Identifier mes compétences", "Confirmer un projet professionnel"])}
 
-${chk(motif === "Changer de métier")} Changer de métier
+**Situation actuelle et raisons d'envisager un bilan :**
 
-${chk(motif === "Évoluer professionnellement")} Évoluer professionnellement
-
-${chk(motif === "Identifier mes compétences")} Identifier mes compétences
-
-${chk(motif === "Confirmer un projet professionnel")} Confirmer un projet professionnel
-
-**Situation actuelle et raisons d'envisager un bilan :** ${situation}
+${pf.declare ? pf.attente : zone(2)}
 
 **4. Vos attentes**
 
-${chk(attente === "Identifier mes compétences et aptitudes")} Identifier mes compétences et aptitudes
+${cases(["Identifier mes compétences et aptitudes", "Construire un projet professionnel", "Valider un projet existant", "Élaborer un plan d'action", "Mieux me connaître"])}
 
-${chk(attente === "Construire un projet professionnel")} Construire un projet professionnel
-
-${chk(attente === "Valider un projet existant")} Valider un projet existant
-
-${chk(attente === "Élaborer un plan d'action")} Élaborer un plan d'action
-
-${chk(attente === "Mieux me connaître")} Mieux me connaître
-
-**Quels résultats espérez-vous obtenir ?** ${resultats}
+**Quels résultats espérez-vous obtenir ?** ${ZONE}
 
 **5. Votre parcours**
 
-**Niveau d'études :** ${niveau}
+**Niveau d'études / diplôme :** ${pf.niveauEtudes || ZONE}
 
-**Principales expériences professionnelles :** ${exps}
+**Principales expériences professionnelles :**
+
+${experiencesDeclareesMd(s)}
 
 **6. Contraintes et besoins spécifiques**
 
-**Contraintes particulières :** ${contraintes}
+**Contraintes particulières :** ${ZONE}
 
-**Souhaitez-vous un accompagnement :** ${chk(isPres)} Présentiel · ${chk(isDist)} À distance · ${chk(isMix)} Mixte
+**Modalité de l'accompagnement :** ${chk(isPres)} Présentiel · ${chk(isDist)} À distance · ${chk(isMix)} Mixte
 
 **Aménagement spécifique lié à une situation de handicap :** ${chk(handicap)} Oui · ${chk(!handicap)} Non${handicap ? " — voir process handicap" : ""}
 
 **7. Disponibilités**
 
-**Jours disponibles :** ${jours.map((j) => `${chk(joursSel.has(j))} ${j}`).join(" · ")}
+**Jours disponibles :** ${cases(["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"])}
 
-**Créneaux souhaités :** ${creneaux.map((c) => `${chk(creneauxSel.has(c))} ${c}`).join(" · ")}
+**Créneaux souhaités :** ${cases(["Matin", "Après-midi", "Soirée"])}
 
 **8. Observations complémentaires**
 
-${obs}
+${zone(2)}
 
 **9. Validation**
 
@@ -1032,76 +845,9 @@ function buildTestPositionnementMd(
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
   const poste = (s.poste || "").trim();
   const entreprise = (s.entreprise || "").trim();
-  const pfd = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
-  const seed = pfd.seed;
+  const pf = profilDeclaratif(s, formation, domaineMetier(formation) || undefined);
   const orgNom = org.nom || "[Organisme]";
-
-  // Profil métier seulement si l'intitulé désigne un domaine (ex. Pâtisserie & Cake Design)
-  const profile = domaineMetier(formation);
-  const metier = profile?.metier || "le métier visé";
-  const secteur = profile?.secteur || "le secteur visé";
-  void (profile?.missions || []);
-  const techniques = profile?.techniques || [];
-  const transversales = profile?.transversales || [];
-  const formationsProf = profile?.formations || [];
-  const opportunites = profile?.opportunites || [];
-  const axes = profile?.axes || [];
-  const pickP = (arr: string[], off: number) => arr.length ? arr[(seed + off) % arr.length] : "";
-
-  const ancreMetier = profile ? ` et explorer concrètement le métier de ${metier} dans ${secteur}` : "";
-
-  const motivationsArr = [
-    `Faire le point sur mes compétences acquises ${poste ? `dans le poste de ${poste}` : "au fil de mon parcours"}${ancreMetier}. Je souhaite construire un projet aligné avec mes valeurs et mes contraintes personnelles.`,
-    `Sortir d'une routine professionnelle qui ne me correspond plus et valider une reconversion vers ${metier}. Le bilan est pour moi un temps structuré pour prendre du recul et décider de la suite.`,
-    `Sécuriser une reconversion que j'envisage depuis plusieurs mois${entreprise ? `, en parallèle de mon poste chez ${entreprise}` : ""}${profile ? `, autour du métier de ${metier}` : ""}. J'attends du bilan des outils concrets et un regard extérieur professionnel.`,
-    `Confirmer mon intuition de m'orienter vers ${metier} et la confronter à la réalité du marché (${secteur}). Je veux éviter de me lancer sans avoir validé mes hypothèses.`,
-  ];
-
-  const parcoursArr = [
-    `J'ai exercé ${poste ? `comme ${poste}` : "plusieurs fonctions"} pendant environ ${5 + (seed % 8)} ans${entreprise ? `, principalement au sein de ${entreprise}` : ""}. J'ai développé des compétences en organisation, en relation client et en gestion de priorités.`,
-    `Mon parcours est mixte : une première partie technique${poste ? ` autour du métier de ${poste}` : ""}, puis une évolution progressive vers des missions à plus forte dimension relationnelle et d'encadrement d'équipe.`,
-    `Après des études supérieures, j'ai occupé ${2 + (seed % 4)} postes successifs${entreprise ? `, dont le dernier chez ${entreprise}` : ""}. Chaque expérience m'a permis de monter en autonomie et de confronter mes choix initiaux à la réalité du terrain.`,
-  ];
-
-  const transvHint = transversales.length ? ` Je m'appuie notamment sur ${pickP(transversales, 1)} et ${pickP(transversales, 2)}.` : "";
-  const pointsFortsArr = [
-    `Capacité d'adaptation, sens de l'organisation et écoute active. Mes collègues soulignent souvent ma fiabilité et ma rigueur dans le suivi des dossiers.${transvHint}`,
-    `Autonomie, esprit d'analyse et persévérance face aux situations complexes. Je sais prendre du recul avant d'agir et je m'appuie sur des faits.${transvHint}`,
-    `Sens du collectif, pédagogie et capacité à fédérer autour d'un objectif commun. J'aime transmettre et accompagner la montée en compétences des autres.${transvHint}`,
-    `Curiosité, capacité à apprendre vite et à m'approprier de nouveaux outils.${profile ? ` Plusieurs de mes atouts (${pickP(transversales, 0)}) sont transférables vers ${metier}.` : ""}`,
-  ];
-
-  const formationCible = formationsProf.length ? pickP(formationsProf, 0) : "la formation identifiée comme nécessaire";
-  const opportuniteCible = opportunites.length ? pickP(opportunites, 0) : "un poste qui ait du sens";
-  const objectifsArr = [
-    `À court terme : poser un diagnostic clair sur mes compétences et mes motivations${profile ? ` vis-à-vis du métier de ${metier}` : ""}. À moyen terme : identifier 2 ou 3 pistes professionnelles crédibles${profile ? ` (dont ${opportuniteCible})` : ""}. À long terme : engager une transition dans les 12 à 18 mois.`,
-    `À court terme : structurer mon projet et lever mes doutes. À moyen terme : suivre ${formationCible}. À long terme : exercer ${profile ? `comme ${metier}` : "un métier qui ait du sens"} avec un équilibre vie pro / vie perso satisfaisant.`,
-    `À court terme : sécuriser mon poste actuel tout en explorant ${profile ? `le secteur de ${secteur}` : "des alternatives"}. À moyen terme : tester ${profile ? metier : "une nouvelle voie"} via une immersion, une enquête métier ou une mission. À long terme : me stabiliser dans un projet professionnel à 5 ans.`,
-  ];
-
-  const besoinBilanArr = [
-    `Je suis arrivé(e) à un palier dans mon poste actuel et je manque de visibilité sur la suite${profile ? `. L'idée de m'orienter vers ${metier} me motive mais j'ai besoin de la valider` : ""}. Le bilan doit m'aider à clarifier ce qui est possible et à hiérarchiser mes options.`,
-    `Je traverse une période de questionnement et j'ai besoin d'un cadre méthodique, accompagné par un professionnel neutre, pour avancer sans m'éparpiller${profile ? ` sur le projet ${metier}` : ""}.`,
-    `Mon environnement de travail évolue fortement et je veux m'assurer que mon projet${profile ? ` (notamment l'orientation vers ${metier})` : ""} reste cohérent avec ces changements et avec mes aspirations.`,
-  ];
-
-  const techHint = techniques.length ? ` (notamment ${pickP(techniques, 0)} et ${pickP(techniques, 1)})` : "";
-  const axeHint = axes.length ? ` Un focus particulier sur ${pickP(axes, 0)} serait précieux.` : "";
-  const attentesArr = [
-    `Un accompagnement bienveillant et exigeant, des tests fiables, et une synthèse écrite réutilisable pour mes démarches (entretiens, dossiers de formation, CPF).${profile ? ` J'attends également une exploration sérieuse du métier de ${metier}${techHint}.` : ""}`,
-    `Des outils concrets pour mieux me connaître (intérêts, valeurs, personnalité), une exploration réaliste du marché${profile ? ` autour de ${secteur}` : ""}, et un plan d'action chiffré et calendaire.${axeHint}`,
-    `Un travail de fond sur mes compétences transférables${profile ? ` vers ${metier}` : ""}, une validation par des enquêtes métier, et la sécurisation du financement (CPF, autres dispositifs).`,
-  ];
-
-  const motivation = pfd.motif === "reconversion" ? motivationsArr[1] : pfd.motif === "confirmer" ? motivationsArr[3] : pfd.motif === "evolution" ? motivationsArr[2] : motivationsArr[0];
-  const parcours = pick(parcoursArr, seed, 1);
-  const pointsForts = pick(pointsFortsArr, seed, 2);
-  const objectifs = pick(objectifsArr, seed, 3);
-  const besoin = pick(besoinBilanArr, seed, 4);
-  const attentes = pick(attentesArr, seed, 5);
-
-  // --- Grille de notes + appréciation du consultant ---
-  const consultantNom = ((org as any).responsablePedagogique || org.dirigeant || "Le consultant").toString();
+  const consultantNom = (formation?.formateur || org.responsablePedagogique || org.dirigeant || "Le consultant").toString();
   const datePassation = _dates?.dateOutilPrep || _dates?.dateDebut || "";
   const critLib = [
     "Clarté de la demande et du besoin exprimé",
@@ -1111,82 +857,40 @@ function buildTestPositionnementMd(
     "Connaissance du marché de l'emploi et des métiers visés",
     "Implication et disponibilité dans la démarche",
   ];
-  const obsBanque: string[][] = [
-    ["Demande exprimée de façon claire et argumentée.", "Demande formulée, à préciser sur le périmètre visé.", "Demande encore générale, à reformuler en séance."],
-    ["Parcours bien retracé, expériences illustrées par des exemples.", "Parcours retracé, compétences à formaliser davantage.", "Difficulté à nommer les compétences acquises."],
-    ["Bonne capacité de recul, analyse nuancée.", "Recul en construction, s'appuie surtout sur le ressenti.", "Auto-analyse à consolider avec des outils."],
-    ["Projet identifié et cohérent avec le parcours.", "Deux pistes envisagées, à départager.", "Projet à construire : hypothèses non stabilisées."],
-    ["Connaissance correcte du secteur et de ses exigences.", "Représentations partielles à confronter au terrain.", "Méconnaissance du marché : enquêtes métier à prévoir."],
-    ["Très impliqué(e), disponibilités confirmées.", "Impliqué(e), organisation à caler sur les séances.", "Motivation réelle, disponibilité à sécuriser."],
-  ];
-  const criteres = critLib.map((libelle, i) => {
-    const note = 2 + ((seed + i * 7) % 3); // 2 à 4
-    const obs = obsBanque[i][(4 - note) % 3];
-    return { libelle, note, obs };
-  });
-  const totalNote = criteres.reduce((a, c) => a + c.note, 0);
-  const moyenne20 = (Math.round((totalNote / (criteres.length * 5)) * 200) / 10).toFixed(1).replace(".", ",");
-  const niveau = totalNote >= 22 ? "avancé" : totalNote >= 16 ? "intermédiaire" : "à consolider";
-  const apprBanque = [
-    `${nom} aborde le bilan avec une demande construite et une réelle capacité à se projeter. Les échanges montrent une bonne connaissance de son parcours ; le travail portera surtout sur la confrontation du projet au marché${profile ? ` de ${secteur}` : ""} et sur la formalisation des compétences transférables.`,
-    `Le positionnement initial de ${nom} met en évidence une motivation solide mais un projet encore à stabiliser. La phase d'investigation s'attachera à explorer deux à trois pistes, dont ${profile ? `le métier de ${metier}` : "la piste principale évoquée"}, à l'aide de tests et d'enquêtes métier.`,
-    `${nom} présente un profil expérimenté, avec des acquis professionnels solides mais insuffisamment valorisés. L'accompagnement visera à objectiver ces acquis (tests d'intérêts et de personnalité) et à sécuriser un plan d'action réaliste sur 12 à 18 mois.`,
-    `Le test met en lumière une bonne implication et une disponibilité confirmée. Les points de vigilance portent sur la connaissance du marché et sur la faisabilité financière du projet ; ces deux points seront traités dès les premières séances d'investigation.`,
-  ];
-  const appreciation = pick(apprBanque, seed, 6);
-  const axesBanque = [
-    "formalisation des compétences transférables · enquêtes métier · étude de faisabilité (durée, coût, financement)",
-    "tests d'intérêts et de personnalité · exploration de 2 à 3 pistes · confrontation au marché local",
-    "valorisation du parcours · repérage des dispositifs de formation · construction du plan d'action daté",
-  ];
-  const axesTravail = pick(axesBanque, seed, 7);
+  const q = (n: number, texte: string, reponse?: string) => `Question ${n} : ${texte}\n\n${reponse || zone(3)}`;
 
+  return `**[${orgNom}]{.underline}**
 
+**TEST DE POSITIONNEMENT — AUTO-DIAGNOSTIC PRÉLIMINAIRE**
 
-  return accordCivilite(`**[${orgNom}]{.underline}**
-
-**AUTO-DIAGNOSTIC PRÉLIMINAIRE**
-
-_Réalisé lors de l'entretien de la phase préliminaire (art. R6313-4) : il sert à analyser la demande et le besoin, pas à évaluer des acquis._
+_Réalisé lors de l'entretien de la phase préliminaire (art. R6313-4) : il sert à analyser la demande et le besoin, pas à évaluer des acquis. Le bénéficiaire répond avec ses propres mots ; le consultant cote ensuite la grille avec lui._
 
 **Bénéficiaire : ${nom}**${poste ? `\n\n**Poste actuel : ${poste}**` : ""}${entreprise ? `\n\n**Entreprise : ${entreprise}**` : ""}
 
-Question 1 : Quelles sont vos principales motivations pour entreprendre un bilan de compétences ?
+${q(1, "Quelles sont vos principales motivations pour entreprendre un bilan de compétences ?", pf.declare ? pf.attente : undefined)}
 
-${motivation}
+${q(2, "Pouvez-vous décrire brièvement votre parcours professionnel jusqu'à présent ?", (s.experiences || []).some((e) => (e.poste || "").trim()) ? experiencesDeclareesMd(s) : undefined)}
 
-Question 2 : Pouvez-vous décrire brièvement votre parcours professionnel jusqu'à présent ?
+${q(3, "Quels sont selon vous vos points forts sur le plan professionnel ?")}
 
-${parcours}
+${q(4, "Quels sont vos objectifs professionnels à court, moyen et long terme ?")}
 
-Question 3 : Quels sont selon vous vos points forts sur le plan professionnel ?
+${q(5, "Pourquoi pensez-vous avoir besoin d'un bilan de compétences à ce stade de votre carrière ?")}
 
-${pointsForts}
-
-Question 4 : Quels sont vos objectifs professionnels à court, moyen et long terme ?
-
-${objectifs}
-
-Question 5 : Pourquoi pensez-vous avoir besoin d'un bilan de compétences à ce stade de votre carrière ?
-
-${besoin}
-
-Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
-
-${attentes}
+${q(6, "Qu'attendez-vous spécifiquement de ce bilan de compétences ?")}
 
 **GRILLE D'ANALYSE DE LA DEMANDE** _(cotation de 1 à 5 : 1 = très insuffisant, 5 = très satisfaisant)_
 
 | Critère évalué | Note | Observation du consultant |
 |---|---|---|
-${criteres.map((c) => `| ${c.libelle} | **${c.note}/5** | ${c.obs} |`).join("\n")}
-| **TOTAL** | **${totalNote}/${criteres.length * 5}** | Soit ${moyenne20}/20 — maturité du projet : **${niveau}** |
+${critLib.map((c) => `| ${c} | ___ /5 |  |`).join("\n")}
+| **TOTAL** | ___ /30 |  |
 
 **APPRÉCIATION DU CONSULTANT**
 
-${appreciation}
+${zone(3)}
 
-**Axes de travail retenus pour la phase d'investigation :** ${axesTravail}
+**Axes de travail retenus pour la phase d'investigation :** ${ZONE}
 
 **Consultant :** ${consultantNom}
 
@@ -1195,7 +899,7 @@ ${appreciation}
 | Signature du bénéficiaire | Signature du consultant |
 |---|---|
 | ${nom} | ${consultantNom} |
-`, s.civilite);
+`;
 }
 
 
@@ -1488,13 +1192,15 @@ function buildEntretienIntermediaireMd(
   const profile = domaineMetier(formation);
   const metier = profile?.metier || "le métier visé";
   const seed = b?.profil.seed ?? hashStr(`enti|${s.prenom}|${s.nom}|${s.email}`);
-  if (milieu.getTime() > Date.now()) {
+  void seed; void metier;
+  {
+    const passe = milieu.getTime() <= Date.now();
     return `**${orgNom}**
 
 **ENTRETIEN INTERMÉDIAIRE\\
 BÉNÉFICIAIRE**
 
-**Date prévue de l'entretien :** ${fmtShortDate(milieu)} (séance médiane du planning)
+**${passe ? "Date de l'entretien" : "Date prévue de l'entretien"} :** ${fmtShortDate(milieu)} (séance médiane du planning)
 
 **Bénéficiaire :** ${civ} ${nomComplet}
 
@@ -1504,98 +1210,25 @@ BÉNÉFICIAIRE**
 
 **La prestation correspond-elle à vos attentes ?**
 
-_[À compléter lors de l'entretien]_
+${zone(2)}
 
 **Quels éléments appréciez-vous le plus ?**
 
-_[À compléter lors de l'entretien]_
+${zone(2)}
 
 **Quels éléments appréciez-vous le moins ?**
 
-_[À compléter lors de l'entretien]_
+${zone(2)}
 
 **Le consultant communique-t-il d'une façon claire et dynamique ?**
 
-_[À compléter lors de l'entretien]_
+${zone(2)}
 
 **Avez-vous des remarques à nous formuler ?**
 
-_[À compléter lors de l'entretien]_
+${zone(2)}
 `;
   }
-  const pickP = (arr: string[], off: number) => arr.length ? arr[(seed + off) % arr.length] : "";
-  const technique = profile ? pickP(profile.techniques, 0) : "";
-  const transv = profile ? pickP(profile.transversales, 1) : "";
-
-  const attentesArr = [
-    `Oui, la prestation répond pleinement à mes attentes. Les premières séances m'ont permis de clarifier mon parcours et de commencer à structurer mon projet${profile ? ` autour de ${metier}` : ""}. Je me sens accompagné(e) à mon rythme, dans un cadre rassurant et professionnel.`,
-    `Globalement oui. La méthodologie est claire et les outils proposés (tests, exercices, fiches métier) sont concrets. Je découvre des aspects de moi-même que je ne soupçonnais pas et cela alimente ma réflexion${profile ? ` sur l'orientation vers ${metier}` : ""}.`,
-    `Oui, j'apprécie la qualité de l'écoute et la rigueur de l'accompagnement. Les échanges sont riches et je commence à voir plus clair sur les options qui s'offrent à moi${profile ? `, notamment dans ${profile.secteur}` : ""}.`,
-  ];
-
-  const apprecPlusArr = [
-    `La qualité de l'écoute, la bienveillance et la disponibilité du consultant. J'apprécie également les supports de travail entre les séances, qui m'aident à avancer concrètement${profile && technique ? ` (notamment l'approche autour de ${technique})` : ""}.`,
-    `La structure claire des séances et les outils d'auto-évaluation. J'aime aussi le fait de pouvoir prendre du recul sur mes compétences${profile && transv ? ` (en particulier ${transv})` : ""} et de les confronter à la réalité du marché.`,
-    `Les enquêtes métier et la possibilité d'aller à la rencontre de professionnels${profile ? ` du secteur ${profile.secteur}` : ""}. Cela me permet de valider concrètement mes pistes et d'ajuster mon projet.`,
-  ];
-
-  const apprecMoinsArr = [
-    `Le travail personnel entre les séances demande de la rigueur et du temps, ce qui est parfois difficile à articuler avec mes obligations. Mais c'est nécessaire pour avancer.`,
-    `Certains tests sont denses et nécessitent de la concentration. J'aurais aimé un peu plus de temps de restitution sur les résultats, mais le consultant reste disponible pour y revenir.`,
-    `Rien de particulier à signaler. Le rythme et le contenu me conviennent. J'aimerais simplement, dans la suite, approfondir davantage les démarches concrètes (formation, financement).`,
-  ];
-
-  const commArr = [
-    `Oui, ${consultant} communique de façon très claire, structurée et dynamique. Les consignes sont explicites et les échanges fluides.`,
-    `Oui, la communication est professionnelle et adaptée à mon profil. Je me sens en confiance pour poser mes questions, même celles qui me semblent naïves.`,
-    `Tout à fait. Les explications sont précises, les reformulations utiles et le ton toujours respectueux. Le rythme des séances est bien calibré.`,
-  ];
-
-  const remarquesArr = [
-    `Pas de remarque particulière à ce stade. Je souhaite poursuivre dans le même esprit et approfondir la phase d'investigation${profile ? ` autour du métier de ${metier}` : ""}.`,
-    `Je suis satisfait(e) de l'accompagnement. J'aimerais, dans les prochaines séances, travailler plus en profondeur sur le plan d'action et les pistes de financement (CPF, autres dispositifs).`,
-    `Merci pour la qualité de l'accompagnement. Je n'ai pas de point d'amélioration à formuler pour l'instant et je me projette positivement dans la suite du bilan.`,
-  ];
-
-  const attentes = pick(attentesArr, seed, 0);
-  const apprecPlus = pick(apprecPlusArr, seed, 1);
-  const apprecMoins = pick(apprecMoinsArr, seed, 2);
-  const comm = pick(commArr, seed, 3);
-  const remarques = pick(remarquesArr, seed, 4);
-
-  return accordCivilite(`**${orgNom}**
-
-**ENTRETIEN INTERMÉDIAIRE\\
-BÉNÉFICIAIRE**
-
-**Date de l'entretien :** ${fmtShortDate(milieu)}
-
-**Bénéficiaire :** ${civ} ${nomComplet}${email ? `\n\n**Contact :** ${email}` : ""}
-
-**Date de début de prestation :** ${fmtShortDate(debut)}
-
-**Date de fin de prestation :** ${fmtShortDate(fin)}
-
-**La prestation correspond-elle à vos attentes ?**
-
-${attentes}
-
-**Quels éléments appréciez-vous le plus ?**
-
-${apprecPlus}
-
-**Quels éléments appréciez-vous le moins ?**
-
-${apprecMoins}
-
-**Le consultant communique-t-il d'une façon claire et dynamique ?**
-
-${comm}
-
-**Avez-vous des remarques à nous formuler ?**
-
-${remarques}
-`, s.civilite);
 }
 
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo, stagiaires?: StagiaireInfo[]): string | null {
@@ -2338,6 +1971,7 @@ export async function buildBDCNTConseilsZip(
         ? [{ ind: 9, nom: "Informations pratiques - prestation à distance", md: mdInformationsPratiquesDistance(bdcCtx) }]
         : []),
       { ind: 21, nom: "Fiche de compétences du consultant", md: mdFicheCompetencesConsultant(bdcCtx) },
+      { ind: 21, nom: `CV du consultant - ${(formation?.formateur || org.responsablePedagogique || org.dirigeant || "consultant").toString().trim()}`, md: mdCVConsultant(bdcCtx) },
       { ind: 24, nom: "Réseau d'acteurs socio-économiques", md: mdReseauActeurs(bdcCtx) },
     ];
     for (const p of collectives) {
@@ -2355,6 +1989,16 @@ export async function buildBDCNTConseilsZip(
       const md = sanitizeBdcMarkdown(mdAccuseReception(bdcCtx, b), { titre, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
       collect(titre, md, s);
       put(9, titre, s, "pdf", await toPdf(mdToHtml(md, titre, org, s)));
+    }
+    for (let i = 0; i < benList.length; i++) {
+      const s = benList[i];
+      const b = bdcCtx.beneficiaires[i];
+      if (!b) continue;
+      const titre = "Objectifs individualisés du bilan";
+      advance(`${titre} — ${s.prenom} ${s.nom}`);
+      const md = sanitizeBdcMarkdown(mdObjectifsIndividualises(bdcCtx, b), { titre, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
+      collect(titre, md, s);
+      put(5, titre, s, "pdf", await toPdf(mdToHtml(md, titre, org, s)));
     }
   }
 

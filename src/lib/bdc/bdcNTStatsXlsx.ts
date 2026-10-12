@@ -134,6 +134,10 @@ export function buildSatisfactionChaud(o: OrganismeInfo, f: FormationInfo, st: S
       return;
     }
     const notes = notesSatisfaction(b, "Questionnaire satisfaction à chaud", QUESTIONS_SATISFACTION_CHAUD.length);
+    if (!notes.length) {
+      body += row([i + 1, nomB(b), ...QUESTIONS_SATISFACTION_CHAUD.map(() => ""), "À reporter depuis le questionnaire signé"]);
+      return;
+    }
     const m = moyenne(notes);
     moyennes.push(m);
     body += row([i + 1, nomB(b), ...notes, m.toFixed(2).replace(".", ",")]);
@@ -160,11 +164,11 @@ export function buildSuivi6Mois(o: OrganismeInfo, f: FormationInfo, st: Stagiair
     let moy = "—";
     if (suiviEchu) {
       echus++;
-      moy = moyenne(notesSatisfaction(b, "Questionnaire satisfaction à froid", QUESTIONS_SATISFACTION_FROID.length)).toFixed(2).replace(".", ",");
+      moy = "À reporter";
     }
-    body += row([i + 1, nomB(b), fmt(p.dateFin), fmt(p.dateSuivi6Mois), suiviEchu ? "Entretien réalisé" : "À programmer (échéance non atteinte)", moy]);
+    body += row([i + 1, nomB(b), fmt(p.dateFin), fmt(p.dateSuivi6Mois), suiviEchu ? "Échéance atteinte — entretien à tracer" : "À programmer (échéance non atteinte)", moy]);
   });
-  body += row(["", "TOTAL", "", "", `Suivis réalisés : ${taux(echus, echus)}`, ""], false, "total");
+  body += row(["", "TOTAL", "", "", `Échéances atteintes : ${echus}`, ""], false, "total");
   return wrap("SUIVI À 6 MOIS", subtitleOrg(o), "Suivi 6 mois", body, headers.length);
 }
 
@@ -179,16 +183,14 @@ export function buildEnquete6Mois(o: OrganismeInfo, f: FormationInfo, st: Stagia
   ctx.beneficiaires.forEach((b, i) => {
     const p = prestationFor(ctx, b);
     if (!etatBilan(p).suiviEchu) {
-      body += row([i + 1, nomB(b), b.profil.projet, "—", "À recueillir lors de l'entretien de suivi"]);
+      body += row([i + 1, nomB(b), "Selon le document de synthèse", "—", "À recueillir lors de l'entretien de suivi"]);
       return;
     }
     echus++;
-    const note = notesSatisfaction(b, "Questionnaire satisfaction à froid", QUESTIONS_SATISFACTION_FROID.length)[0];
-    const ok = note >= 4;
-    if (ok) confirmes++;
-    body += row([i + 1, nomB(b), b.profil.projet, note, ok ? "Projet confirmé, démarches engagées (déclaratif)" : "Projet à réajuster"]);
+    body += row([i + 1, nomB(b), "Selon le document de synthèse", "", "À reporter depuis le compte rendu de suivi"]);
   });
-  body += row(["", "TOTAL", "", "", `Projets confirmés : ${taux(confirmes, echus)}`], false, "total");
+  void confirmes;
+  body += row(["", "TOTAL", "", "", `Échéances atteintes : ${echus}`], false, "total");
   return wrap("ENQUÊTE À 6 MOIS — MISE EN ŒUVRE DU PROJET PROFESSIONNEL", subtitleOrg(o), "Enquête 6 mois", body, headers.length);
 }
 
@@ -209,27 +211,24 @@ export function buildSuivi6MoisIndividuel(o: OrganismeInfo, f: FormationInfo, s:
   const p = prestationFor(ctx, b);
   const { termine, suiviEchu } = etatBilan(p);
   const nomComplet = b ? nomB(b) : "Bénéficiaire";
-  const noteMiseEnOeuvre = b && suiviEchu ? notesSatisfaction(b, "Questionnaire satisfaction à froid", QUESTIONS_SATISFACTION_FROID.length)[0] : 0;
   const lignes: Array<[string, string]> = [
     ["Bénéficiaire", `${b?.civilite === "Non précisé" ? "" : b?.civilite || ""} ${nomComplet}`.trim()],
     ["Date de début du bilan", fmt(p.dateDebut)],
     ["Date de fin du bilan", fmt(p.dateFin)],
     ["Entretien de suivi proposé à partir du", fmt(p.dateSuivi6Mois)],
     ["Consultant en charge du suivi", p.consultant.nom],
-    ["Statut du suivi", !termine ? "Bilan en cours" : suiviEchu ? "Entretien réalisé" : "À programmer (échéance non atteinte)"],
-    ["Projet retenu en fin de bilan", b?.profil.projet || "—"],
-    ["Mise en œuvre déclarée (note /5)", suiviEchu ? String(noteMiseEnOeuvre) : "—"],
-    ["Situation à 6 mois", suiviEchu ? (noteMiseEnOeuvre >= 4 ? "Projet confirmé, démarches engagées (déclaratif)" : "Projet à réajuster ; pistes complémentaires proposées") : "—"],
+    ["Statut du suivi", !termine ? "Bilan en cours" : suiviEchu ? "Échéance atteinte — entretien à tracer" : "À programmer (échéance non atteinte)"],
+    ["Projet retenu en fin de bilan", "Selon le document de synthèse"],
+    ["Mise en œuvre déclarée (note /5)", ""],
+    ["Situation à 6 mois", ""],
   ];
   const prenom = b?.prenom || "Le bénéficiaire";
   const commentaire = !suiviEchu
     ? `Entretien à proposer à ${prenom} à partir du ${fmt(p.dateSuivi6Mois)} ; un rappel lui sera adressé quinze jours avant.`
-    : noteMiseEnOeuvre >= 4
-      ? `${prenom} indique avoir engagé les étapes du plan d'action défini dans le document de synthèse. Aucun besoin d'accompagnement complémentaire exprimé.`
-      : `${prenom} a fait évoluer son projet après confrontation au terrain ; les compétences identifiées pendant le bilan restent mobilisables et de nouvelles pistes ont été évoquées.`;
+    : `Réponses de ${prenom} à reporter depuis l'entretien de suivi (date, mise en œuvre du projet, besoins éventuels).`;
   let body = row(["Rubrique", "Information"], true);
   lignes.forEach(([k, v]) => { body += row([k, v]); });
   body += row(["Commentaire", commentaire]);
-  body += row(["Date du compte rendu", suiviEchu ? fmt(p.dateSuivi6Mois) : "—"]);
+  body += row(["Date du compte rendu", ""]);
   return wrap(`COMPTE RENDU DE SUIVI À 6 MOIS — ${nomComplet}`, subtitleOrg(o), "CR 6 mois", body, 2);
 }

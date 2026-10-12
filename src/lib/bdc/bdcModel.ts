@@ -76,7 +76,7 @@ export const MOTIFS: Record<MotifCle, string> = {
   pistes: "Identifier des pistes d'évolution",
 };
 export const NIVEAUX_ETUDES = ["CAP/BEP", "Bac", "Bac +2", "Bac +3", "Bac +5 et plus"];
-export type SourceContact = "Internet" | "Réseaux sociaux" | "Recommandation" | "Employeur" | "France Travail";
+export type SourceContact = "Internet" | "Réseaux sociaux" | "Recommandation" | "Employeur" | "France Travail" | "";
 
 export interface ProfilDeclaratif {
   seed: number;
@@ -95,6 +95,8 @@ export interface ProfilDeclaratif {
   cible: string;
   attente: string;
   resultatAttendu: string;
+  /** true si le bénéficiaire a exprimé ses attentes (fiche stagiaire) ; sinon les pièces restent à compléter. */
+  declare: boolean;
 }
 
 export function hashSeed(src: string): number {
@@ -172,8 +174,10 @@ export function profilDeclaratif(s: StagiaireInfo, f?: FormationInfo, domaine?: 
     ? ["evolution", "point", "pistes"]
     : situation === "demandeur_emploi" ? ["reconversion", "pistes", "confirmer"] : ["reconversion", "evolution", "point", "confirmer", "pistes"];
   const motif = pk(motifs, 1);
-  const niveauEtudes = (s.diplome || "").trim() || pk(NIVEAUX_ETUDES, 2);
-  const source: SourceContact = origine === "employeur" ? "Employeur" : origine === "prescripteur" ? "France Travail" : pk(["Internet", "Réseaux sociaux", "Recommandation"] as SourceContact[], 3);
+  // Données déclaratives : uniquement ce que le bénéficiaire a réellement dit (jamais tiré d'une graine).
+  const niveauEtudes = (s.diplome || "").trim();
+  const source: SourceContact = origine === "employeur" ? "Employeur" : origine === "prescripteur" ? "France Travail" : "";
+  const attentesDeclarees = (s.projetVAE || "").trim();
   const semaine: Jour[] = ["lundi", "mardi", "mercredi", "jeudi", "vendredi"];
   const retire = seed % 5;
   const jours = semaine.filter((_, i) => i !== retire && (seed % 3 !== 0 || i !== (retire + 2) % 5));
@@ -194,18 +198,9 @@ export function profilDeclaratif(s: StagiaireInfo, f?: FormationInfo, domaine?: 
     } as Record<MotifCle, string>)[motif];
     cible = "son projet professionnel";
   }
-  const attente = pk([
-    "Clarifier mon projet professionnel et vérifier sa faisabilité",
-    "Identifier mes compétences transférables et les formations à mobiliser",
-    "Construire un plan d'action concret et daté",
-    "Prendre du recul sur mon parcours et structurer mes choix",
-  ], 4);
-  const resultatAttendu = pk([
-    "Un projet professionnel formalisé et un plan d'action sur 6 à 12 mois.",
-    "Une décision éclairée sur la suite de mon parcours et les démarches à engager.",
-    "Une feuille de route claire, avec des étapes concrètes et des contacts identifiés.",
-  ], 5);
-  return { seed, motif, motifLibelle: MOTIFS[motif], niveauEtudes, source, financeur, origine, situation, jours, creneaux, projet, cible, attente, resultatAttendu };
+  const attente = attentesDeclarees;
+  const resultatAttendu = "";
+  return { seed, motif, motifLibelle: attentesDeclarees ? MOTIFS[motif] : "", niveauEtudes, source, financeur, origine, situation, jours, creneaux, projet, cible, attente, resultatAttendu, declare: !!attentesDeclarees };
 }
 
 /** Répartition UNIQUE des heures entre les trois phases (art. R6313-4), reprise par toutes les pièces. */
@@ -403,7 +398,11 @@ export function formatDuree(p: Prestation): string {
 
 /** Phrase UNIQUE sur la rétractation : contrat, CGV, livret d'accueil et clauses la reprennent. */
 export const DELAI_RETRACTATION_BC =
-  "Le bénéficiaire qui contracte à titre individuel dispose d'un délai de rétractation de 14 jours calendaires à compter de la signature du contrat (art. L6353-5 du Code du travail et art. L221-18 du Code de la consommation, le délai le plus long étant retenu pour toutes les prestations). Aucune somme ne peut être exigée avant l'expiration de ce délai ; l'acompte est ensuite plafonné à 30 % du prix (art. L6353-6). En cas d'inscription via Mon Compte Formation, les conditions générales d'utilisation de la plateforme s'appliquent et la prestation débute au plus tôt 11 jours ouvrés après la validation de l'inscription.";
+  "Le bénéficiaire qui contracte à titre individuel dispose d'un délai de rétractation de 14 jours calendaires à compter de la signature du contrat (art. L6353-5 du Code du travail et art. L221-18 du Code de la consommation, le délai le plus long étant retenu pour toutes les prestations). Aucune somme ne peut être exigée avant l'expiration de ce délai ; l'acompte est ensuite plafonné à 30 % du prix (art. L6353-6).";
+
+/** Ajout réservé au bénéficiaire inscrit via Mon Compte Formation (OF certifié BC à la date du bilan). */
+export const MENTION_MCF_BC =
+  " En cas d'inscription via Mon Compte Formation, les conditions générales d'utilisation de la plateforme s'appliquent et la prestation débute au plus tôt 11 jours ouvrés après la validation de l'inscription.";
 
 /** Table UNIQUE des références légales du bilan de compétences. */
 export const ARTICLES_BC = {

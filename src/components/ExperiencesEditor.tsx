@@ -10,6 +10,7 @@ interface ExperiencesEditorProps {
   onChange: (value: ExperienceDeclaree[]) => void;
   projet?: string;
   onProjetChange?: (value: string) => void;
+  projetLabel?: string;
 }
 
 const VIDE: ExperienceDeclaree = { poste: "", employeur: "", debut: "", fin: "", activites: "" };
@@ -19,7 +20,7 @@ const VIDE: ExperienceDeclaree = { poste: "", employeur: "", debut: "", fin: "",
  * certification et le rapprochement avec les blocs de la fiche RNCP : sans saisie, les pièces
  * restent des trames à compléter (rien n'est inventé).
  */
-const ExperiencesEditor = ({ value, onChange, projet, onProjetChange }: ExperiencesEditorProps) => {
+const ExperiencesEditor = ({ value, onChange, projet, onProjetChange, projetLabel }: ExperiencesEditorProps) => {
   const maj = (i: number, champ: keyof ExperienceDeclaree, v: string) => onChange(value.map((e, k) => (k === i ? { ...e, [champ]: v } : e)));
   return (
     <div className="col-span-full space-y-3 rounded-md border border-dashed p-3">
@@ -63,7 +64,7 @@ const ExperiencesEditor = ({ value, onChange, projet, onProjetChange }: Experien
       ))}
       {onProjetChange && (
         <div>
-          <Label className="text-xs">Motivation et projet exprimés par le candidat</Label>
+          <Label className="text-xs">{projetLabel || "Motivation et projet exprimés"}</Label>
           <Textarea rows={2} value={projet || ""} onChange={(ev) => onProjetChange(ev.target.value)} placeholder="Recueilli lors de l'entretien de faisabilité" />
         </div>
       )}

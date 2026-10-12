@@ -102,67 +102,43 @@ const documentSynthese: BdcDocDef = {
       ].join("\n");
     }
 
+    // Le contenu de la synthèse est établi par le consultant avec le bénéficiaire en phase de
+    // conclusion : seuls les faits du dossier sont repris, le reste reste à rédiger.
     const pf = b?.profil;
-    const seed = pf?.seed ?? 0;
-    const pk = <T,>(arr: T[], off: number): T => arr[(seed + off) % arr.length];
-    const generique = !prof || prof.generique;
-    const cible = pf?.cible || (generique ? "son projet professionnel" : `le métier de ${prof!.metier}`);
-    const secteur = generique ? "le secteur visé" : prof!.secteur.split(",")[0];
-    const tech = generique ? [] : prof!.techniques;
-    const transv = prof?.transversales || [];
-    const forms = generique ? [] : prof!.formations;
-    const projetTxt = pf?.projet || "préciser son projet professionnel";
-
-    const dPlus = (mois: number) => {
-      const d = new Date(p.dateFin);
-      d.setMonth(d.getMonth() + mois);
-      return fmtDateFR(d);
-    };
-    const circonstances = `${nomB} a engagé ce bilan pour ${pf ? pf.motifLibelle.charAt(0).toLowerCase() + pf.motifLibelle.slice(1) : "faire le point sur son parcours"}${b?.poste ? `, alors en poste comme ${b.poste}${b.entreprise ? ` (${b.entreprise})` : ""}` : ""}. La demande${pf?.origine === "employeur" ? ", formulée dans le cadre du plan de développement des compétences de l'employeur," : pf?.financeur === "CPF" ? ", financée par son compte personnel de formation," : ""} a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}. Attente exprimée : « ${pf?.attente || "clarifier son projet"} ».`;
-
-    const lignesComp: Array<[string, string, string]> = [
-      ["Compétences issues du parcours", b?.poste ? `Compétences mobilisées sur le poste occupé (${b.poste}) : organisation, relation avec les interlocuteurs, fiabilité d'exécution` : "Compétences issues des expériences professionnelles et extra-professionnelles, formalisées en séance", "Analyse du parcours, entretiens d'explicitation"],
-      ["Compétences transversales", transv.length ? `${transv[seed % transv.length]} ; ${transv[(seed + 2) % transv.length]}` : "Organisation, communication, adaptation", "Questionnaire d'intérêts (RIASEC), entretiens"],
-      [generique ? "Compétences à développer pour le projet" : "Compétences techniques du métier visé", tech.length ? `${tech[seed % tech.length]} ; ${tech[(seed + 1) % tech.length]}` : "Écarts identifiés entre les compétences actuelles et les exigences du projet, traités dans le plan d'action", "Enquêtes métier, recherches documentaires"],
-      ["Aptitudes et motivations", `Motivation confirmée pour ${cible} ; niveau d'études : ${b?.niveauEtudes || "non renseigné"}`, "Test de personnalité, entretiens"],
-    ];
-    const etapes: Array<[string, string, string]> = [
-      [forms.length ? `Constituer le dossier de candidature à ${forms[seed % forms.length]}` : "Identifier et comparer les formations qualifiantes ou postes correspondant au projet", dPlus(1), "Fiches France Compétences, sites des organismes, réseau professionnel"],
-      [`Monter le plan de financement (${pf?.financeur === "employeur" || pf?.financeur === "OPCO" ? "plan de développement des compétences, OPCO" : "CPF, France Travail, aides régionales selon la situation"})`, dPlus(2), "Conseiller en évolution professionnelle, Mon Compte Formation"],
-      [`Confronter le projet au terrain (${generique ? "rencontres de professionnels" : `immersion en ${secteur}`})`, dPlus(3), "PMSMP, réseau, entreprises contactées lors des enquêtes"],
-      ["Engager la mise en œuvre du projet et faire le point sur son avancement", dPlus(6), "Entretien de suivi proposé par le consultant"],
-    ];
-    const partiel = seed % 4 === 0;
+    const circonstances = `${nomB} a engagé ce bilan${b?.poste ? ` alors en poste comme ${b.poste}${b.entreprise ? ` (${b.entreprise})` : ""}` : ""}. La demande${pf?.origine === "employeur" ? ", formulée dans le cadre du plan de développement des compétences de l'employeur," : pf?.financeur === "CPF" ? ", financée par son compte personnel de formation," : pf?.financeur === "personnel" ? ", financée personnellement," : ""} a été instruite lors de l'entretien préliminaire du ${fmtDateFR(p.dateDebut)}.${pf?.declare ? ` Attente exprimée : « ${pf.attente} ».` : ""}`;
+    const Z = "______________________________________________";
     return [
       H("Document de synthèse du bilan de compétences"),
-      `_Remis au seul bénéficiaire (${ARTICLES_BC.definition}) — phase de conclusion (${ARTICLES_BC.phases})._\n`,
+      `_Remis au seul bénéficiaire (${ARTICLES_BC.definition}) — phase de conclusion (${ARTICLES_BC.phases}). Rédigé par le consultant avec le bénéficiaire lors de la dernière séance._\n`,
       entete(o, b, p),
       H2("1. Circonstances du bilan"),
       circonstances,
       H2("2. Compétences et aptitudes identifiées au regard des perspectives d'évolution envisagées"),
       "\n| Domaine | Compétences et aptitudes identifiées | Éléments de preuve mobilisés |",
       "|---|---|---|",
-      ...lignesComp.map(([d, c, pr]) => `| ${d} | ${c} | ${pr} |`),
+      `| Compétences issues du parcours |  | Analyse du parcours, entretiens d'explicitation |`,
+      `| Compétences transversales |  | Questionnaire d'intérêts, entretiens |`,
+      `| Compétences à développer pour le projet |  | Enquêtes métier, recherches documentaires |`,
+      `| Aptitudes et motivations |  | Test de personnalité, entretiens |`,
       H2("3. Éléments constitutifs du projet et principales étapes de sa mise en œuvre"),
-      `**Projet retenu à l'issue du bilan** : ${projetTxt.charAt(0).toUpperCase() + projetTxt.slice(1)}.\n`,
+      `**Projet retenu à l'issue du bilan** : ${Z}\n`,
       "| Étape | Action | Échéance | Ressources / appuis |",
       "|---|---|---|---|",
-      ...etapes.map(([ac, e, r], i) => `| ${i + 1} | ${ac} | ${e} | ${r} |`),
+      ...[1, 2, 3, 4].map((i) => `| ${i} |  |  |  |`),
       H2("4. Atteinte des objectifs de la prestation"),
       "\n| Objectif fixé en phase préliminaire | Atteint | Partiellement atteint | Non atteint |",
       "|---|---|---|---|",
-      `| Analyser ses compétences professionnelles et personnelles | ☒ | ☐ | ☐ |`,
-      `| Identifier ses aptitudes, intérêts et motivations | ☒ | ☐ | ☐ |`,
-      `| Définir un projet professionnel réaliste | ${partiel ? "☐" : "☒"} | ${partiel ? "☒" : "☐"} | ☐ |`,
-      `| Élaborer un plan d'action daté | ☒ | ☐ | ☐ |`,
+      `| Analyser ses compétences professionnelles et personnelles | ☐ | ☐ | ☐ |`,
+      `| Identifier ses aptitudes, intérêts et motivations | ☐ | ☐ | ☐ |`,
+      `| Définir un projet professionnel réaliste | ☐ | ☐ | ☐ |`,
+      `| Élaborer un plan d'action daté | ☐ | ☐ | ☐ |`,
       "",
-      `**Réalisation** : ${seancesFor(ctx, b).length} séances individuelles, ${p.dureeTotaleH} heures, du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)}, trois phases réalisées (${ARTICLES_BC.phases}).`,
-      partiel ? "\n**Point de vigilance** : la faisabilité financière du projet reste à confirmer." : "",
+      `**Réalisation** : ${seancesFor(ctx, b).length} séances individuelles prévues, ${p.dureeTotaleH} heures, du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)}, trois phases (${ARTICLES_BC.phases}) — feuilles d'émargement à l'appui.`,
       `\n**Suivi** : un entretien de suivi est proposé à ${nomB} six mois après la fin du bilan, à partir du ${fmtDateFR(p.dateSuivi6Mois)} (démarche qualité de l'organisme, facultative pour le bénéficiaire).`,
       H2("5. Propriété et confidentialité"),
       `Le document de synthèse et les résultats détaillés sont remis au seul bénéficiaire ; ils ne peuvent être communiqués à un tiers qu'avec son accord (${ARTICLES_BC.definition}). Les personnes chargées du bilan sont tenues au secret professionnel (art. 226-13 et 226-14 du Code pénal).`,
       `Les documents élaborés pour le bilan sont détruits dès le terme de l'action, sauf accord écrit du bénéficiaire fondé sur la nécessité d'un suivi de sa situation (conservation de trois ans au plus, ${ARTICLES_BC.destruction}).`,
-      `\n_Document remis à ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "la personne concernée"} le ${fmtDateFR(p.dateFin)}._`,
+      `\n_Document remis à ${b ? `${b.civilite} ${b.prenom} ${b.nom}` : "la personne concernée"} le ____ / ____ / ________._`,
       SIGN(ctx, "Indicateur 11 - Document de synthèse du bilan de compétences", b),
     ].join("\n");
   },
@@ -352,95 +328,25 @@ const testPersonnalite: BdcDocDef = {
     const generique = !prof || prof.generique;
     const metier = generique ? (b?.profil.cible || "son projet professionnel") : prof!.metier;
     const secteur = generique ? "le secteur visé" : prof!.secteur.split(",")[0];
-    if (!passe(datePassation)) {
-      return [
-        H("Test de personnalité"),
-        "_Outil de la phase d'investigation — passé à mi-parcours._\n",
-        entete(o, b, p),
-        `> **Passation prévue le ${fmtDateFR(datePassation)}** — les résultats seront consignés et restitués en séance.\n`,
-        "| Dimension | Score / 10 | Interprétation |",
-        "|---|---|---|",
-        ...LETTRES_RIASEC.map((l) => `| **${PROFILS_RIASEC[l].label}** (${l}) |  |  |`),
-      ].join("\n");
-    }
-    const nomB = b ? `${b.prenom} ${b.nom}` : "Le bénéficiaire";
-    const civ = b?.civilite === "Mme" ? "Mme" : "M.";
-
-    // Profil déterministe mais distinct par bénéficiaire
-    const ordre = [...LETTRES_RIASEC].sort((a, b) => {
-      const sa = (seed + a.charCodeAt(0) * 31) % 1000;
-      const sb = (seed + b.charCodeAt(0) * 31) % 1000;
-      return sb - sa;
-    });
-    const dominant = ordre[0];
-    const secondaire = ordre[1];
-    const dom = PROFILS_RIASEC[dominant];
-    const sec = PROFILS_RIASEC[secondaire];
-
-    const scores = LETTRES_RIASEC.map((l) => ({
-      lettre: l,
-      label: PROFILS_RIASEC[l].label,
-      score: scoreRiasec(seed, l, dominant, secondaire),
-    })).sort((a, b) => b.score - a.score);
-
-    const interps = [
-      `Le profil dominant **${dom.label}** (${dominant}) de ${nomB} traduit une personnalité ${dom.traits}. Ce profil est un atout pour envisager ${metier}, dans la mesure où ce métier mobilise des compétences concrètes et une approche factuelle de la résolution de problèmes.`,
-      `La dominante **${dom.label}** (${dominant}) indique une préférence pour l'action structurée et l'efficacité opérationnelle. Cette orientation est cohérente avec ${secteur} et les exigences de rigueur liées à ${metier}.`,
-      `Avec un profil **${dom.label}** (${dominant}) en tête, ${nomB} a un fonctionnement privilégiant la clarté, l'objectivité et le résultat concret. Cette base de personnalité soutient une transition vers ${metier} à condition d'intégrer les dimensions relationnelles et créatives du métier.`,
-    ];
-    const interp = interps[seed % interps.length];
-
-    const liens = [
-      `La combinaison ${dominant}${secondaire} suggère une affinité particulière avec ${sec.projets[seed % sec.projets.length]}, ce qui permet d'envisager ${metier} sous l'angle ${dominant === "S" || secondaire === "S" ? "de l'accompagnement et de la relation" : "de la technique et de la méthode"}.`,
-      `Le profil secondaire **${sec.label}** (${secondaire}) renforce la capacité d'${nomB} à s'adapter aux exigences de ${secteur}, notamment sur les aspects ${sec.traits}.`,
-      `Le binôme ${dominant}${secondaire} constitue un profil équilibré pour ${metier} : il associe les forces de ${dom.label.toLowerCase()} à celles de ${sec.label.toLowerCase()}, deux dimensions fréquemment recherchées dans ${secteur}.`,
-    ];
-    const lien = liens[seed % liens.length];
-
-    const conseils = [
-      `Poursuivre l'exploration de ${metier} en valorisant le côté ${dom.label.toLowerCase()} du profil, tout en travaillant les situations où le registre ${sec.label.toLowerCase()} sera attendu.`,
-      `Prévoir des mises en situation concrètes dans ${secteur} pour confirmer que les préférences ${dominant}${secondaire} se traduisent bien dans la pratique quotidienne de ${metier}.`,
-      `Intégrer dans le plan d'action des étapes de rencontre avec des professionnels exerçant ${metier}, afin de valider l'adéquation entre le profil de personnalité et les réalités du terrain.`,
-    ];
-    const conseil = conseils[seed % conseils.length];
-
-    const appreciationBanque = [
-      `${nomB} a complété le test de personnalité de manière cohérente et réflexive. Le profil ${dominant}${secondaire} est stable et aligné avec les éléments recueillis lors de la phase préliminaire. Ce résultat constitue un appui utile pour la suite de la phase d'investigation.`,
-      `Les résultats obtenus par ${nomB} confirment une personnalité structurée autour de la dimension ${dom.label.toLowerCase()}. Le profil secondaire ${sec.label.toLowerCase()} apporte une nuance importante qui sera à prendre en compte dans la définition du projet professionnel.`,
-      `Le test de personnalité révèle un profil équilibré et mobilisable pour ${metier}. Les échanges avec le consultant permettront de confronter ces résultats aux contraintes et aux opportunités du marché de ${secteur}.`,
-    ];
-    const appreciation = appreciationBanque[seed % appreciationBanque.length];
-
+    // Les scores sont ceux de la passation réelle : la pièce est la grille de restitution, jamais pré-remplie.
+    void seed; void metier; void secteur;
     return [
       H("Test de personnalité"),
-      `_Outil d'investigation de la phase d'investigation — passé à mi-parcours._\n`,
+      "_Outil de la phase d'investigation — passé à mi-parcours ; scores reportés depuis la passation et restitués en séance._\n",
       entete(o, b, p),
-      `**Date de passation** : ${fmtDateFR(datePassation)}`,
-      `**Bénéficiaire** : ${civ} ${nomB}`,
+      `**${passe(datePassation) ? "Date de passation" : "Passation prévue le"}** : ${fmtDateFR(datePassation)}`,
       `**Consultant** : ${p.consultant.nom}`,
       "",
-      H2("1. Profil de personnalité dominant"),
-      `**Profil dominant** : ${dom.label} (${dominant})`,
-      `**Profil secondaire** : ${sec.label} (${secondaire})`,
-      "",
-      interp,
-      "",
-      H2("2. Résultats détaillés par dimension"),
       "| Dimension | Score / 10 | Interprétation |",
       "|---|---|---|",
-      ...scores.map((s) => `| **${s.label}** (${s.lettre}) | ${s.score}/10 | ${s.lettre === dominant ? "Dominante forte" : s.lettre === secondaire ? "Dominante secondaire" : "Présente à un niveau modéré"} |`),
+      ...LETTRES_RIASEC.map((l) => `| **${PROFILS_RIASEC[l].label}** (${l}) |  |  |`),
       "",
-      H2("3. Lien avec le projet professionnel"),
-      lien,
-      "",
-      H2("4. Conseils personnalisés"),
-      conseil,
-      "",
-      H2("5. Appréciation du consultant"),
-      appreciation,
-      "",
-      H2("6. Validation"),
-      `Test de personnalité passé le ${fmtDateFR(datePassation)} dans le cadre du bilan de compétences de ${nomB}. Les résultats sont restitués à titre indicatif et intégrés au document de synthèse.`,
+      H2("Profil dominant et secondaire"),
+      "Profil dominant : ________________   Profil secondaire : ________________",
+      H2("Lien avec le projet professionnel"),
+      "______________________________________________",
+      H2("Appréciation du consultant"),
+      "______________________________________________",
     ].join("\n");
   },
 };
@@ -454,11 +360,9 @@ function echelleCochee(note: number): string {
 }
 
 /** Notes 4 ou 5 déterministes (mêmes valeurs dans le questionnaire et les statistiques IND 2). */
-export function notesSatisfaction(b: Beneficiaire | null, nomPiece: string, nbQuestions: number): number[] {
-  const seed = seedBenef(b, nomPiece);
-  // 4 ou 5 selon le bénéficiaire et la question ; la part de 4 varie d'un bénéficiaire à l'autre.
-  const seuil = 2 + (seed % 3); // 2 à 4 chances sur 10
-  return Array.from({ length: nbQuestions }, (_, i) => (((seed >>> (i % 16)) + i * 7) % 10 < seuil ? 4 : 5));
+export function notesSatisfaction(_b: Beneficiaire | null, _nomPiece: string, _nbQuestions: number): number[] {
+  // Les notes viennent des questionnaires remplis par le bénéficiaire : aucune note n'est générée.
+  return [];
 }
 
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
@@ -468,12 +372,12 @@ function questionnaireSatisfaction(titre: string, quand: string, questions: stri
     const froid = /froid/i.test(nomPiece);
     const dateRepD = froid ? p.dateSuivi6Mois : p.dateFin;
     const disponible = passe(dateRepD);
-    if (!disponible) {
+    {
       return [
         H(titre),
         entete(o, b, p),
         `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
-        `> **${froid ? "Suivi à programmer" : "À renseigner en fin de bilan"}** — questionnaire à remettre au bénéficiaire le ${fmtDateFR(dateRepD)}.\n`,
+        `> **${disponible ? "Questionnaire remis au bénéficiaire" : froid ? "Suivi à programmer" : "À renseigner en fin de bilan"}** — ${disponible ? "réponses portées par le bénéficiaire le" : "questionnaire à remettre au bénéficiaire le"} ${fmtDateFR(dateRepD)}.\n`,
         "| Question | 1 → 5 |",
         "|---|---|",
         ...questions.map((q) => `| ${q} | ${ECHELLE_SATISFACTION} |`),
@@ -481,30 +385,6 @@ function questionnaireSatisfaction(titre: string, quand: string, questions: stri
         FILIGRANE_BENEFICIAIRE,
       ].join("\n");
     }
-    const seed = seedBenef(b, nomPiece);
-    const notes = notesSatisfaction(b, nomPiece, questions.length);
-    const cible = b?.profil.cible || "mon projet professionnel";
-    const commentaires = [
-      `Accompagnement à l'écoute et structuré. Les séances m'ont aidé(e) à poser des mots précis sur mes compétences et à avancer sur ${cible.replace(/^son /, "mon ")}.`,
-      "J'ai apprécié la méthode : des outils concrets, un rythme adapté à mes disponibilités et des échanges respectueux. Je repars avec un plan d'action clair.",
-      "Le bilan m'a permis de sortir du flou. Point à améliorer : un peu plus de temps sur le volet financement.",
-      "Très satisfait(e) du suivi. Le consultant m'a aidé(e) à hiérarchiser mes priorités.",
-      "Démarche exigeante mais utile. Le travail entre les séances demande du temps ; en contrepartie, les résultats sont concrets.",
-    ];
-    return [
-      H(titre),
-      entete(o, b, p),
-      `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
-      "| Question | 1 → 5 |",
-      "|---|---|",
-      ...questions.map((q, i) => `| ${q} | ${echelleCochee(notes[i])} |`),
-      H2("Commentaire libre"),
-      commentaires[seed % commentaires.length],
-      "",
-      `**Renseigné le** : ${fmtDateFR(dateRepD)}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}`,
-      p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
-      SIGN(ctx, nomPiece, b, dateRepD),
-    ].join("\n");
   };
 }
 
