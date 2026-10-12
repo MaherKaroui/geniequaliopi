@@ -102,6 +102,8 @@ export interface StagiaireInfo {
   numeroAction?: string;
   /** Financeur de la formation (CPF, OPCO, Entreprise, Personnel, France Travail, Région, Autre) */
   financeur?: string;
+  /** Expériences déclarées par la personne (CV) : seules données utilisées pour son parcours. */
+  experiences?: { poste: string; employeur: string; debut: string; fin: string; activites: string }[];
   /** true si le stagiaire a été produit par un générateur de données fictives */
   fictif?: boolean;
   /**
