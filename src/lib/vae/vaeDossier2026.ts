@@ -19,8 +19,15 @@ import { getRNCPByCode } from "../rncpData";
 import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "../qualite2026";
 import {
   certifVAE, profilVAE, calendrierVAE, chronoVAE, heuresVAE, frVAE, frLongVAE, parseDateVAE, estPasse, aujourdhui, graine,
-  type SeanceVAE, type CertifVAE,
+  type SeanceVAE, type CertifVAE, type ProfilVAE,
 } from "./vaeProfil";
+import { libelleMois, dureeTexte } from "./vaeCandidat";
+import {
+  genVAECVCandidat, genVAEPlanningIndividuel, genVAEFicheSuiviRecevabilite, genVAEAccuseRemiseDocuments, genVAESimulationJury,
+  genVAEAccompagnementConvocation, genVAESuiviPostJury, genVAERegistreDiffusion, genVAEProcedureIndicateurs, genVAEProcedureAccueilHandicap,
+  genVAERegistreAmenagements, genVAEProcedureEvaluationObjectifs, genVAERegistreAleas, genVAEProcedureAssistanceTechnique,
+  genVAEFormulaireReclamation, genVAERevueDirection, genVAETableauApplicabilite, genVAENoteNouvelEntrant, genVAENoticeTrames, genVAESommaire,
+} from "./vaeNeoVoie";
 
 // ───────────────────────────── Aides communes ─────────────────────────────
 
@@ -46,6 +53,23 @@ const sigAccompagnateur = (o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo,
 
 const valides = (stagiaires: StagiaireInfo[]) => stagiaires.filter((s) => (s.nom || "").trim());
 const cand = (stagiaires: StagiaireInfo[], si: number) => stagiaires[si] || stagiaires[0] || ({ civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo);
+
+const LIGNE = "________________________________________";
+const lignes = (n: number) => Array.from({ length: n }, () => LIGNE).join("<br>");
+
+/** Tableau des expériences déclarées (aucune expérience inventée). */
+function tableExperiences(p: ProfilVAE, vide = 3): string {
+  const ex = p.rapp.experiences;
+  if (!ex.length) {
+    return `<table><thead><tr><th>Période (début – fin)</th><th>Emploi / fonction</th><th>Employeur ou structure</th><th>Activités principales</th></tr></thead><tbody>${Array.from({ length: vide }, () => "<tr><td>&nbsp;</td><td></td><td></td><td></td></tr>").join("")}</tbody></table><p><em>Expériences à déclarer par le candidat avec leurs justificatifs (attestations d'employeur, bulletins de salaire, contrats, attestations d'activité bénévole). Aucune donnée n'est préremplie.</em></p>`;
+  }
+  return `<table><thead><tr><th>Période</th><th>Emploi / fonction</th><th>Employeur ou structure</th><th>Durée</th><th>Activités déclarées</th></tr></thead><tbody>${ex.map((e) => `<tr><td>${esc(libelleMois(e.debutDate))} – ${e.finDate ? esc(libelleMois(e.finDate)) : e.debutDate ? "en cours" : ""}</td><td>${esc(e.poste)}</td><td>${esc(e.employeur)}</td><td>${esc(dureeTexte(e.mois))}</td><td>${e.activitesListe.map((a) => "• " + esc(a)).join("<br>")}</td></tr>`).join("")}</tbody></table>`;
+}
+
+/** Rapprochement activités déclarées ↔ blocs de la certification. */
+function tableRapprochement(p: ProfilVAE): string {
+  return `<table><thead><tr><th>Bloc de compétences</th><th>Activités déclarées en rapport</th><th>Lien</th></tr></thead><tbody>${p.couverture.map((x) => `<tr><td>${esc(x.bloc.code)} — ${esc(x.bloc.titre)}</td><td>${x.activites.length ? x.activites.map((a) => "• " + esc(a)).join("<br>") : p.rapp.renseigne ? "<em>Aucune activité déclarée ne correspond encore à ce bloc</em>" : "&nbsp;"}</td><td>${p.rapp.renseigne ? x.niveau : ""}</td></tr>`).join("")}</tbody></table>`;
+}
 
 function blocsTable(c: CertifVAE): string {
   return `<table><thead><tr><th>Code</th><th>Bloc de compétences</th><th>Nature</th></tr></thead><tbody>${c.blocs.map((b) => `<tr><td>${esc(b.code)}</td><td>${esc(b.titre)}</td><td>${b.professionnel ? "Professionnel" : "Enseignement général"}</td></tr>`).join("")}</tbody></table>`;
@@ -186,55 +210,56 @@ export function genVAEEntretienFaisabiliteTrame(o: OrganismeInfo, f: FormationIn
   ] });
 }
 
-/** Compte rendu d'entretien de faisabilité (diagnostic) — rempli à partir du profil du candidat. */
+/** Compte rendu d'entretien de faisabilité — rempli uniquement avec ce que le candidat a déclaré. */
 export function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const c = certifVAE(f);
   const p = profilVAE(s, f);
   const ch = chronoVAE(s, f, o);
   const d = frVAE(ch.entretienFaisabilite);
+  const experience = p.rapp.renseigne
+    ? `<p>Expérience en rapport direct avec la certification, calculée sur les expériences déclarées : <strong>${esc(p.experienceLien)}</strong> (expérience déclarée au total : ${esc(p.experienceTotale)}). La loi n'impose aucune durée minimale : l'analyse porte sur la nature des activités.${p.rapp.metierVise ? ` L'emploi déclaré correspond à un métier visé par la fiche (${esc(p.rapp.metierVise)}).` : ""}</p>`
+    : `<p><strong>Aucune expérience n'a encore été déclarée.</strong> Le rapprochement sera établi pendant l'entretien, à partir du CV du candidat et de ses justificatifs.</p>`;
   return buildDocument({ org: o, title: "COMPTE RENDU D'ENTRETIEN DE FAISABILITÉ – VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
-    { heading: "Candidat", content: `<p><strong>${esc(p.civ)} ${esc(p.nomComplet)}</strong><br>Situation : ${esc(p.situation)}<br>Emploi exercé : ${esc(p.poste)}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""}<br>Dernier diplôme déclaré : ${esc(p.diplome)}<br>Certification visée : ${certifLigne(c)}<br>Date de l'entretien : ${d} — mené par ${esc(accompagnateur(o, f, s))}</p>${alerteFiche(c)}` },
-    { heading: "Expérience en rapport direct avec la certification", content: `<p>Expérience déclarée en rapport avec la certification : environ ${p.anneesLien} ans (expérience professionnelle totale : ${p.anneesTotal} ans). La loi n'impose aucune durée minimale : l'analyse porte sur la nature des activités.</p>` },
-    { heading: "Rapprochement avec le référentiel", content: `<table><thead><tr><th>Bloc</th><th>Activités décrites par le candidat</th><th>Couverture estimée</th></tr></thead><tbody>${p.couverture.map((x) => `<tr><td>${esc(x.bloc.titre)}</td><td>${x.activites.map((a) => "• " + esc(a)).join("<br>")}</td><td>${x.niveau}</td></tr>`).join("")}</tbody></table>${c.blocs.some((b) => !b.professionnel) ? `<p><em>Blocs d'enseignement général : des dispenses peuvent s'appliquer selon les diplômes déjà détenus ; à vérifier auprès du certificateur lors du dépôt du dossier de faisabilité.</em></p>` : ""}`, variant: "green" },
-    { heading: "Projet et besoins", content: `<p><strong>Motivation :</strong> ${esc(p.motivation)}.<br><strong>Projet :</strong> ${esc(p.projet)}.<br><strong>Disponibilités :</strong> ${esc(p.disponibilites)}.<br><strong>Adaptation liée à un handicap :</strong> ${p.rqth ? "oui — orientation vers le référent handicap (" + esc(o.referentHandicap) + ") pour définir les aménagements" : "non signalée"}.<br><strong>Financement envisagé :</strong> ${esc(p.financeur)}.</p>` },
-    { heading: "Avis de faisabilité", content: `<p><strong>${esc(p.avis)}</strong></p><p>Suite : dépôt par le candidat du dossier de faisabilité sur vae.gouv.fr (préparé le ${frVAE(ch.depotFaisabilite)}), puis accompagnement de ${heuresVAE(f)} heures dès la signature du contrat. La recevabilité relève du seul certificateur.</p>` },
+    { heading: "Candidat", content: `<p><strong>${esc(p.civ)} ${esc(p.nomComplet)}</strong><br>Situation : ${esc(p.situation)}<br>Emploi déclaré : ${esc(p.poste) || "non renseigné"}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""}<br>Dernier diplôme déclaré : ${esc(p.diplome) || "non renseigné"}<br>Certification visée : ${certifLigne(c)}<br>Date de l'entretien : ${d} — mené par ${esc(accompagnateur(o, f, s))}</p>${alerteFiche(c)}` },
+    { heading: "Expériences déclarées", content: tableExperiences(p) + experience },
+    { heading: "Rapprochement avec le référentiel", content: `${tableRapprochement(p)}${c.blocs.some((b) => !b.professionnel) ? `<p><em>Blocs d'enseignement général : des dispenses peuvent s'appliquer selon les diplômes déjà détenus ; à vérifier auprès du certificateur lors du dépôt du dossier de faisabilité.</em></p>` : ""}`, variant: "green" },
+    { heading: "Projet et besoins", content: `<p><strong>Motivation et projet exprimés :</strong> ${p.projet ? esc(p.projet) : lignes(2)}<br><strong>Adaptation liée à un handicap :</strong> ${p.rqth ? "oui — orientation vers le référent handicap (" + esc(o.referentHandicap) + ") pour définir les aménagements" : "non signalée"}.<br><strong>Financement envisagé :</strong> ${esc(p.financeur)}.</p>` },
+    { heading: "Avis de faisabilité", content: `<p><strong>${esc(p.avis)}</strong></p><p>Suite : dépôt par le candidat du dossier de faisabilité sur vae.gouv.fr, puis accompagnement de ${heuresVAE(f)} heures dès la signature du contrat. La recevabilité relève du seul certificateur.</p>` },
   ], extraHtml: signatures([sigAccompagnateur(o, f, s, d), sigCandidat(s, d)]) });
 }
 
-/** Fiche de préparation du dossier de faisabilité (remplace l'ancien « Livret 1 – recevabilité »). */
+/** Appui à la demande de recevabilité (dossier de faisabilité déposé par le candidat sur vae.gouv.fr). */
 export function genVAEDossierFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const c = certifVAE(f);
   const p = profilVAE(s, f);
   const ch = chronoVAE(s, f, o);
   const naissance = parseDateVAE(s.dateNaissance);
-  const structure = p.structure !== "—" ? p.structure : "ma structure";
-  const debutExp = new Date((parseDateVAE(f.dateDebut) || aujourdhui()).getFullYear() - p.anneesLien, 0, 1).getFullYear();
-  return buildDocument({ org: o, title: "LIVRET 1 – DOSSIER DE FAISABILITÉ VAE", subtitle: `${esc(p.nomComplet)} — dépôt sur vae.gouv.fr`, sections: [
-    { heading: "1. Identité du candidat", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)}${naissance ? ` — né${s.civilite === "Mme" ? "e" : ""} le ${frVAE(naissance)}` : ""}<br>Courriel : ${esc(s.email)}${s.telephone?.trim() ? ` — Téléphone : ${esc(s.telephone)}` : ""}${s.adresse ? `<br>Adresse : ${esc(s.adresse)} ${esc(s.codePostal || "")} ${esc(s.commune || "")}` : ""}<br>Situation : ${esc(p.situation)}<br>Dernier diplôme : ${esc(p.diplome)}</p>` },
+  return buildDocument({ org: o, title: "APPUI À LA DEMANDE DE RECEVABILITÉ – VAE", subtitle: `${esc(p.nomComplet)} — dossier de faisabilité déposé par le candidat sur vae.gouv.fr`, sections: [
+    { heading: "1. Identité du candidat", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)}${naissance ? ` — né${s.civilite === "Mme" ? "e" : ""} le ${frVAE(naissance)}` : ""}<br>Courriel : ${esc(s.email)}${s.telephone?.trim() ? ` — Téléphone : ${esc(s.telephone)}` : ""}${s.adresse ? `<br>Adresse : ${esc(s.adresse)} ${esc(s.codePostal || "")} ${esc(s.commune || "")}` : ""}<br>Situation : ${esc(p.situation)}<br>Dernier diplôme : ${esc(p.diplome) || "à renseigner"}</p>` },
     { heading: "2. Certification visée", content: `<p>${certifLigne(c)}</p>${alerteFiche(c)}` },
-    { heading: "3. Expérience en rapport avec la certification", content: `<table><thead><tr><th>Période</th><th>Emploi</th><th>Structure</th><th>Statut</th></tr></thead><tbody><tr><td>${debutExp} – aujourd'hui</td><td>${esc(p.poste)}</td><td>${esc(structure)}</td><td>${esc(p.situation.split(" — ")[0])}</td></tr></tbody></table><p>Environ ${p.anneesLien} ans d'expérience en rapport direct avec la certification (${p.anneesTotal} ans d'expérience totale).</p>` },
-    { heading: "4. Activités exercées en rapport avec chaque bloc", content: `<table><thead><tr><th>Bloc visé</th><th>Activités que j'exerce</th><th>Couverture</th></tr></thead><tbody>${p.couverture.map((x) => `<tr><td>${esc(x.bloc.titre)}</td><td>${x.activites.map((a) => "• " + esc(a)).join("<br>")}</td><td>${x.niveau}</td></tr>`).join("")}</tbody></table>` },
-    { heading: "5. Motivation et projet", content: `<p><strong>Pourquoi je demande cette certification :</strong> ${esc(p.motivation)}.<br><strong>Mon projet professionnel :</strong> ${esc(p.projet)}.<br><strong>Financement :</strong> ${esc(p.financeur)}.</p>` },
-    { heading: "6. Pièces jointes", content: `<p>☒ Pièce d'identité ☒ Justificatifs d'activité (bulletins de salaire, attestations d'employeur) ☒ Diplômes et attestations de formation ☒ CV détaillé</p>` },
-    { heading: "7. Attestation sur l'honneur et dépôt", content: `<p>Je soussigné${s.civilite === "Mme" ? "e" : ""} ${esc(p.nomComplet)} certifie l'exactitude des informations du présent dossier et n'avoir déposé qu'une demande pour cette certification cette année.</p><p>Dossier déposé sur vae.gouv.fr le ${frVAE(ch.depotFaisabilite)}. La décision de recevabilité relève du certificateur (${esc(c.certificateur)}).</p>`, variant: "green" },
-  ], extraHtml: signatures([sigCandidat(s, frVAE(ch.depotFaisabilite)), sigAccompagnateur(o, f, s, frVAE(ch.depotFaisabilite))]) });
+    { heading: "3. Expériences en rapport avec la certification", content: tableExperiences(p, 4) + (p.rapp.renseigne ? `<p>Durée cumulée en rapport direct : ${esc(p.experienceLien)}.</p>` : "") },
+    { heading: "4. Activités rapprochées de chaque bloc", content: tableRapprochement(p) },
+    { heading: "5. Pièces à joindre par le candidat", content: `<p>☐ Pièce d'identité ☐ Justificatifs d'activité (attestations d'employeur, bulletins de salaire, contrats) ☐ Diplômes et attestations de formation ☐ CV détaillé</p>` },
+    { heading: "6. Dépôt", content: `<p>Le candidat dépose lui-même son dossier sur vae.gouv.fr et atteste sur l'honneur l'exactitude des informations. ${esc(o.nom)} vérifie la complétude avant dépôt${ch.depotFaisabilite && estPasse(ch.depotFaisabilite) ? ` (vérification du ${frVAE(ch.depotFaisabilite)})` : ""}. La décision de recevabilité relève du certificateur (${esc(c.certificateur)}) : sa notification est classée dans la fiche de suivi de la recevabilité.</p>`, variant: "green" },
+  ], extraHtml: signatures([sigCandidat(s), sigAccompagnateur(o, f, s)]) });
 }
 
-/** Analyse du besoin — remplie à partir des données du candidat. */
+/** Analyse du besoin — remplie à partir des données déclarées par le candidat. */
 export function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const p = profilVAE(s, f);
   const ch = chronoVAE(s, f, o);
   const d = frVAE(ch.entretienFaisabilite);
   const box = (b: boolean) => (b ? "☒" : "☐");
+  const appui = p.couverture.filter((x) => x.niveau === "Établie").map((x) => esc(x.bloc.titre)).join(" ; ");
   return buildDocument({ org: o, title: "ANALYSE DU BESOIN DU CANDIDAT – VAE", subtitle: esc(p.nomComplet), sections: [
-    { heading: "Situation", content: `<p>${esc(p.situation)} — Emploi : ${esc(p.poste)} — Diplôme déclaré : ${esc(p.diplome)}</p>` },
-    { heading: "Attentes", content: `<p><strong>Objectif :</strong> ${esc(p.motivation)}.<br><strong>Projet :</strong> ${esc(p.projet)}.<br><strong>Points d'appui :</strong> ${p.couverture.filter((x) => x.niveau === "Complète").map((x) => esc(x.bloc.titre)).join(" ; ") || "à préciser"}.<br><strong>Points de vigilance :</strong> ${p.blocsVigilance.length ? p.blocsVigilance.map(esc).join(" ; ") : "aucun bloc identifié comme fragile"}.</p>` },
-    { heading: "Financement", content: `<p>${box(p.financeur === "CPF")} CPF ${box(p.financeur === "Employeur / OPCO")} Employeur / OPCO ${box(p.financeur === "France Travail")} France Travail ${box(p.financeur === "Personnel")} Personnel ${box(p.financeur === "Région / autre")} Autre</p>${p.contratAvecEmployeur ? `<p>Attentes de l'employeur (${esc(s.entreprise)}) : reconnaissance des compétences exercées dans le poste de ${esc(p.poste)} ; elles sont reprises dans la convention tripartite.</p>` : ""}` },
+    { heading: "Situation", content: `<p>${esc(p.situation)} — Emploi déclaré : ${esc(p.poste) || "à préciser"} — Diplôme déclaré : ${esc(p.diplome) || "à préciser"}</p>` },
+    { heading: "Attentes", content: `<p><strong>Motivation et projet :</strong> ${p.projet ? esc(p.projet) : lignes(2)}<br><strong>Points d'appui (blocs rapprochés d'activités déclarées) :</strong> ${appui || (p.rapp.renseigne ? "aucun bloc encore étayé" : "à établir à partir du CV et des justificatifs")}.<br><strong>Points de vigilance :</strong> ${p.blocsVigilance.length ? p.blocsVigilance.map(esc).join(" ; ") : p.rapp.renseigne ? "aucun bloc sans activité déclarée" : "à établir"}.</p>` },
+    { heading: "Financement", content: `<p>${box(p.financeur === "CPF")} CPF ${box(p.financeur === "Employeur / OPCO")} Employeur / OPCO ${box(p.financeur === "France Travail")} France Travail ${box(p.financeur === "Personnel")} Personnel ${box(p.financeur === "Région / autre")} Autre</p>${p.contratAvecEmployeur ? `<p>Attentes de l'employeur (${esc(s.entreprise)}) : à recueillir auprès du signataire de la convention tripartite.</p>` : ""}` },
     { heading: "Handicap et adaptations", content: `<p>${box(!p.rqth)} Aucun besoin signalé ${box(p.rqth)} Besoin d'aménagement : entretien avec le référent handicap (${esc(o.referentHandicap)}) avant la première séance.</p>` },
-    { heading: "Organisation retenue", content: `<p>${heuresVAE(f)} heures en séances individuelles de 2 heures, ${esc(f.modalites)} (${esc(lieuVAE(o, f))}), du ${frVAE(ch.debut)} au ${frVAE(ch.fin)} ; disponibilités : ${esc(p.disponibilites.toLowerCase())}.</p>`, variant: "green" },
+    { heading: "Organisation retenue", content: `<p>${heuresVAE(f)} heures en séances individuelles de 2 heures, ${esc(f.modalites)} (${esc(lieuVAE(o, f))}), du ${frVAE(ch.debut)} au ${frVAE(ch.fin)} ; créneaux convenus avec le candidat et repris dans son planning individuel.</p>`, variant: "green" },
   ], extraHtml: signatures([sigCandidat(s, d), sigAccompagnateur(o, f, s, d)]) });
 }
 
@@ -320,43 +345,38 @@ export function genVAEProgrammeAccompagnement(o: OrganismeInfo, f: FormationInfo
   ] });
 }
 
-/** Livret 2 — dossier de validation entièrement rédigé (réponses du candidat par bloc). */
+/**
+ * Appui à la rédaction du dossier de validation (livret 2). Le candidat en est seul auteur :
+ * la pièce reprend ses activités déclarées par bloc et les questions de l'accompagnateur,
+ * avec des zones de rédaction vides — aucun texte n'est écrit à sa place.
+ */
 export function genVAETrameDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const c = certifVAE(f);
   const p = profilVAE(s, f);
-  const ch = chronoVAE(s, f, o);
   const cal = calendrierVAE(s, f);
-  const structure = p.structure !== "—" ? p.structure : "ma structure";
-  const je = s.civilite === "Mme" ? "e" : "";
-  const dDepot = ch.depotValidation && estPasse(ch.depotValidation) ? frVAE(ch.depotValidation) : "";
   const relect = [cal[Math.floor(cal.length / 3)], cal[Math.floor((2 * cal.length) / 3)], cal[cal.length - 1]];
-  const blocs = p.couverture.map((x, i) => {
-    const acts = x.activites;
-    const a0 = acts[0] || x.bloc.titre;
-    return {
-      heading: `Bloc ${i + 1} — ${esc(x.bloc.code)} ${esc(x.bloc.titre)}`,
-      content: `
-<p><strong>Situation de travail présentée :</strong> ${esc(a0)} au sein de ${esc(structure)}, dans le cadre de mon poste de ${esc(p.poste)}.</p>
-<p><strong>1. Contexte et finalité.</strong> J'exerce depuis environ ${p.anneesLien} ans des activités directement liées à ce bloc. Dans ${esc(structure)}, cette activité répond à un besoin concret : garantir la qualité du service rendu, respecter les délais et les exigences réglementaires du secteur, et contribuer aux objectifs fixés par ma hiérarchie. J'interviens en lien avec mes collègues, mon responsable et les interlocuteurs externes (clients, usagers, partenaires ou fournisseurs).</p>
-<p><strong>2. Description de ce que j'ai fait.</strong> ${acts.map((a, k) => `${k === 0 ? "D'abord" : k === acts.length - 1 ? "Enfin" : "Ensuite"}, j'ai pris en charge l'activité suivante : ${esc(a.charAt(0).toLowerCase() + a.slice(1))}. J'ai analysé la demande, recueilli les informations nécessaires, planifié les étapes et réalisé les actions en contrôlant le résultat.`).join(" ")} Lorsqu'une difficulté est apparue (délai serré, information manquante, imprévu), j'ai réorganisé mes priorités, alerté les bonnes personnes et proposé une solution que j'ai mise en œuvre.</p>
-<p><strong>3. Moyens et ressources mobilisés.</strong> Procédures internes, outils numériques métier et bureautiques (tableaux de suivi, messagerie, logiciels du service), documentation technique et réglementaire, échanges avec l'équipe et réunions de coordination.</p>
-<p><strong>4. Résultats obtenus.</strong> Les actions ont été menées dans les délais, les objectifs ont été atteints et le travail a été validé par ma hiérarchie. Les retours des interlocuteurs ont été positifs et certaines de mes propositions ont été reprises dans l'organisation du service.</p>
-<p><strong>5. Analyse de mes compétences.</strong> Cette situation montre que je suis capable${je ? "" : ""} de ${acts.map((a) => esc(a.charAt(0).toLowerCase() + a.slice(1))).join(", de ")}. Je sais adapter ma méthode au contexte, justifier mes choix et en tirer des enseignements : aujourd'hui, j'anticipe davantage les points de blocage et je formalise mieux le suivi de mes actions.</p>
-<p><strong>Preuves jointes :</strong> attestation d'employeur (${esc(structure)}), fiche de poste, exemples de documents produits (anonymisés), tableaux de suivi, courriels de validation.</p>`,
-    };
-  });
-  return buildDocument({ org: o, title: "LIVRET 2 – DOSSIER DE VALIDATION VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
-    { heading: "Candidat et certification", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)} — ${esc(p.situation)}<br>Emploi exercé : ${esc(p.poste)}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""}<br>Certification visée : ${certifLigne(c)}<br>Accompagnateur : ${esc(accompagnateur(o, f, s))}</p>` },
-    { heading: "Mon parcours et ma motivation", content: `<p>Mon parcours professionnel représente environ ${p.anneesTotal} ans d'expérience, dont ${p.anneesLien} ans en rapport direct avec la certification. Mon dernier diplôme déclaré : ${esc(p.diplome)}.</p><p><strong>Motivation :</strong> ${esc(p.motivation)}.<br><strong>Projet :</strong> ${esc(p.projet)}.</p>` },
+  const blocs = p.couverture.map((x, i) => ({
+    heading: `Bloc ${i + 1} — ${esc(x.bloc.code)} ${esc(x.bloc.titre)}`,
+    content: `${x.bloc.competences.length ? `<p><strong>Compétences du référentiel :</strong></p><ul>${x.bloc.competences.map((k) => `<li>${esc(k)}</li>`).join("")}</ul>` : ""}
+<p><strong>Activités déclarées par le candidat pour ce bloc :</strong> ${x.activites.length ? x.activites.map((a) => "• " + esc(a)).join("<br>") : "à identifier avec le candidat"}</p>
+<p><strong>Situation de travail choisie :</strong><br>${lignes(1)}</p>
+<p><strong>1. Contexte</strong> (où, quand, avec qui, pour quel public) :<br>${lignes(3)}</p>
+<p><strong>2. Ce que j'ai fait, étape par étape :</strong><br>${lignes(5)}</p>
+<p><strong>3. Moyens, outils et règles appliqués :</strong><br>${lignes(2)}</p>
+<p><strong>4. Résultats et contrôle :</strong><br>${lignes(2)}</p>
+<p><strong>5. Ce que cette situation montre de mes compétences :</strong><br>${lignes(3)}</p>
+<p><strong>Preuves jointes :</strong><br>${lignes(1)}</p>`,
+  }));
+  return buildDocument({ org: o, title: "APPUI À LA RÉDACTION DU DOSSIER DE VALIDATION – VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
+    { heading: "Candidat et certification", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)} — ${esc(p.situation)}<br>Certification visée : ${certifLigne(c)}<br>Accompagnateur : ${esc(accompagnateur(o, f, s))}</p><p><em>Le dossier de validation est rédigé par le candidat, qui en reste seul auteur (article R.6412-2 du Code du travail). Cette pièce structure son travail ; elle ne remplace pas le dossier déposé auprès du certificateur.</em></p>` },
     ...blocs,
-    { heading: "Relectures de l'accompagnateur", content: `<table><thead><tr><th>Version</th><th>Date</th><th>Observations</th></tr></thead><tbody>
-<tr><td>V1</td><td>${relect[0] && relect[0].realisee ? frVAE(relect[0].date) : ""}</td><td>${relect[0]?.realisee ? "Structure conforme au référentiel ; situations à détailler (actions et résultats)." : ""}</td></tr>
-<tr><td>V2</td><td>${relect[1] && relect[1].realisee ? frVAE(relect[1].date) : ""}</td><td>${relect[1]?.realisee ? "Descriptions précises et argumentées ; preuves complétées." : ""}</td></tr>
-<tr><td>Version déposée</td><td>${dDepot}</td><td>${dDepot ? "Dossier finalisé et déposé auprès du certificateur." : ""}</td></tr>
+    { heading: "Relectures de l'accompagnateur", content: `<table><thead><tr><th>Version</th><th>Séance prévue</th><th>Observations</th></tr></thead><tbody>
+<tr><td>V1</td><td>${relect[0] ? `${frVAE(relect[0].date)} (séance ${relect[0].num})` : ""}</td><td></td></tr>
+<tr><td>V2</td><td>${relect[1] ? `${frVAE(relect[1].date)} (séance ${relect[1].num})` : ""}</td><td></td></tr>
+<tr><td>Version déposée</td><td></td><td></td></tr>
 </tbody></table>`, variant: "green" },
-    { heading: "Attestation sur l'honneur", content: `<p>Je soussigné${je} ${esc(p.nomComplet)} atteste que les activités décrites dans ce dossier ont été exercées par moi-même et que les informations sont exactes.</p>` },
-  ], extraHtml: signatures([sigCandidat(s, dDepot || undefined), sigAccompagnateur(o, f, s, dDepot || undefined)]) });
+  ] });
 }
 
 export function genVAESequencage(o: OrganismeInfo, f: FormationInfo) {
@@ -381,16 +401,16 @@ export function genVAEPositionnement(o: OrganismeInfo, f: FormationInfo, stagiai
   const ref = moment === "debut" ? cal[0] : cal[cal.length - 1];
   const fait = !!ref && ref.realisee;
   const d = fait ? frVAE(ref.date) : "";
-  const niveau = (x: { niveau: string }) => moment === "debut" ? (x.niveau === "Complète" ? "Activités identifiées, description à construire" : "Activités partielles, preuves à rechercher") : (x.niveau === "Complète" ? "Description complète et argumentée" : "Description complète, preuves complétées");
+  const niveau = (x: { niveau: string }) => moment === "debut" ? (x.niveau === "Établie" ? "Activités déclarées, description à construire" : "Activités à identifier, preuves à rechercher") : "";
   return buildDocument({ org: o, title: moment === "debut" ? "POSITIONNEMENT EN DÉBUT D'ACCOMPAGNEMENT – VAE" : "POSITIONNEMENT EN FIN D'ACCOMPAGNEMENT – VAE", subtitle: esc(p.nomComplet), table: {
     headers: ["Bloc", "Niveau", "Observations"],
     rows: [
-      ...p.couverture.map((x) => [esc(x.bloc.titre), fait ? niveau(x) : "", fait ? (x.niveau === "Partielle" ? "Point de vigilance travaillé en priorité" : "") : ""]),
-      ["Rédaction (décrire une situation de travail)", fait ? (moment === "debut" ? "À développer" : "Acquis") : "", ""],
-      ["Présentation orale devant un jury", fait ? (moment === "debut" ? "À développer" : "Préparé (mise en situation réalisée)") : "", ""],
+      ...p.couverture.map((x) => [esc(x.bloc.titre), fait && moment === "debut" && p.rapp.renseigne ? niveau(x) : "", fait && moment === "debut" && x.niveau === "À documenter" && p.rapp.renseigne ? "Point de vigilance travaillé en priorité" : ""]),
+      ["Rédaction (décrire une situation de travail)", "", ""],
+      ["Présentation orale devant un jury", "", ""],
     ],
   }, sections: [
-    { heading: "Statut", content: fait ? `<p>Positionnement réalisé le ${d} lors de la séance ${ref.num}.</p>` : `<p>Positionnement prévu ${ref ? `le ${frVAE(ref.date)} (séance ${ref.num})` : "à la séance concernée"} : grille à compléter à cette date.</p>`, variant: "green" },
+    { heading: "Statut", content: fait ? `<p>Positionnement de la séance ${ref.num} du ${d}. ${moment === "debut" ? "Première colonne issue des activités déclarées par le candidat ; les autres appréciations sont portées en séance avec lui." : "Appréciations portées en séance avec le candidat."}</p>` : `<p>Positionnement prévu ${ref ? `le ${frVAE(ref.date)} (séance ${ref.num})` : "à la séance concernée"} : grille à compléter à cette date.</p>`, variant: "green" },
   ], extraHtml: signatures([sigCandidat(s, d || undefined), sigAccompagnateur(o, f, s, d || undefined)]) });
 }
 
@@ -522,7 +542,7 @@ export function genVAEEntretienIntermediaire(o: OrganismeInfo, f: FormationInfo,
   return buildDocument({ org: o, title: "ENTRETIEN INTERMÉDIAIRE – VAE", subtitle: esc(p.nomComplet), sections: [
     { heading: "Date", content: `<p>${fait ? `Entretien réalisé le ${d} (séance ${mi.num}).` : `Entretien prévu ${mi ? `le ${frVAE(mi.date)} (séance ${mi.num})` : "à mi-parcours"}.`}</p>` },
     { heading: "Point d'étape", content: fait
-      ? `<p><strong>Blocs décrits :</strong> ${p.couverture.slice(0, Math.max(1, Math.ceil(p.couverture.length / 2))).map((x) => esc(x.bloc.titre)).join(" ; ")}.<br><strong>Difficultés :</strong> ${p.blocsVigilance.length ? `preuves à compléter pour ${p.blocsVigilance.map(esc).join(" ; ")}` : "aucune difficulté bloquante"}.<br><strong>Décisions :</strong> poursuite du calendrier ; relecture de la version suivante avant la séance ${Math.min(cal.length, mi.num + 1)}.</p>`
+      ? `<p><strong>Blocs travaillés à cette date :</strong> ${lignes(1)}<br><strong>Difficultés rencontrées :</strong> ${lignes(1)}${p.blocsVigilance.length ? `<br><em>Blocs signalés en faisabilité comme sans activité déclarée : ${p.blocsVigilance.map(esc).join(" ; ")}.</em>` : ""}<br><strong>Décisions :</strong> ${lignes(1)}</p>`
       : `<p>Blocs décrits : ________________<br>Difficultés : ________________<br>Décisions : ________________</p>`, variant: "green" },
   ], extraHtml: signatures([sigCandidat(s, d || undefined), sigAccompagnateur(o, f, s, d || undefined)]) });
 }
@@ -555,12 +575,12 @@ export function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo
   const ch = chronoVAE(s, f, o);
   const fait = estPasse(ch.depotValidation);
   const crit = ["Les activités décrites correspondent au bloc", "Les situations sont précises (contexte, actions, résultats)", "Le vocabulaire professionnel est maîtrisé", "Les preuves sont pertinentes et référencées"];
-  const note = (bi: number, ci: number) => (p.couverture[bi]?.niveau === "Partielle" && ci === 3 ? "À renforcer" : "Satisfaisant");
+
   return buildDocument({ org: o, title: "GRILLE D'ANALYSE DU DOSSIER DE VALIDATION", subtitle: `${esc(p.nomComplet)} — relecture de l'accompagnateur (non décisionnelle)`, table: {
     headers: ["Bloc", ...crit],
-    rows: p.couverture.map((x, bi) => [esc(x.bloc.titre), ...crit.map((_, ci) => (fait ? note(bi, ci) : ""))]),
+    rows: p.couverture.map((x) => [esc(x.bloc.titre), ...crit.map(() => "")]),
   }, sections: [
-    { heading: "Statut", content: fait ? `<p>Relecture de la version finalisée le ${frVAE(ch.depotValidation)}. Cette grille aide le candidat à améliorer son dossier : la décision appartient au seul jury.</p>` : `<p>Relecture prévue le ${frVAE(ch.depotValidation)} : grille à compléter à cette date.</p>`, variant: "green" },
+    { heading: "Statut", content: `<p>Relecture ${fait ? "de la version finalisée, séance du" : "prévue le"} ${frVAE(ch.depotValidation)} : appréciations portées par l'accompagnateur à la lecture du dossier rédigé par le candidat (Satisfaisant / À renforcer). Cette grille aide le candidat à améliorer son dossier : la décision appartient au seul jury.</p>`, variant: "green" },
   ] });
 }
 
@@ -819,9 +839,9 @@ export function genVAEPartenaires(o: OrganismeInfo, f: FormationInfo) {
 
 const CRITERES_SATISFACTION = ["Accueil et information", "Entretien de faisabilité", "Qualité de l'accompagnement", "Ressources remises", "Préparation à l'entretien avec le jury", "Organisation et respect du calendrier"];
 
-export function satisfactionNotes(s: StagiaireInfo, f: FormationInfo): number[] {
-  const g = graine(`sat|${s.nom}|${s.prenom}|${f.intitule}`);
-  return CRITERES_SATISFACTION.map((_, i) => ((g >>> (i * 2)) % 4 === 0 ? 4 : 5));
+/** Les réponses de satisfaction viennent du candidat : aucune note n'est générée. */
+export function satisfactionNotes(_s: StagiaireInfo, _f: FormationInfo): number[] {
+  return [];
 }
 
 export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -833,7 +853,7 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
     headers: ["Critère", "1", "2", "3", "4", "5"],
     rows: CRITERES_SATISFACTION.map((c, i) => [c, ...[1, 2, 3, 4, 5].map((n) => (notes[i] === n ? "☒" : "☐"))]),
   }, sections: [
-    { heading: "Statut", content: fait ? `<p>Questionnaire rempli le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5. Recommanderiez-vous ${esc(o.nom)} ? ☒ Oui ☐ Non</p>` : `<p>Questionnaire à remplir à la fin de l'accompagnement (${frVAE(ch.fin)}).</p>` },
+    { heading: "Statut", content: `<p>Questionnaire ${fait ? "remis au candidat à l'issue de la dernière séance" : "à remettre à la fin de l'accompagnement"} (${frVAE(ch.fin)}) ; réponses portées par le candidat lui-même. Recommanderiez-vous ${esc(o.nom)} ? ☐ Oui ☐ Non</p><p><strong>Commentaires :</strong><br>${lignes(3)}</p>` },
   ] });
 }
 
@@ -844,11 +864,11 @@ export function genVAESyntheseSatisfaction(o: OrganismeInfo, f: FormationInfo, s
       { heading: "Statut", content: `<p>Aucun accompagnement n'est encore achevé au ${frVAE(aujourdhui())} : la synthèse sera établie à partir des premiers questionnaires de fin d'accompagnement.</p>` },
     ] });
   }
-  const moy = CRITERES_SATISFACTION.map((_, i) => acheves.reduce((a, s) => a + satisfactionNotes(s, f)[i], 0) / acheves.length);
-  return buildDocument({ org: o, title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${acheves.length} questionnaire(s) — au ${frVAE(aujourdhui())}`, table: {
-    headers: ["Critère", "Moyenne /5"], rows: CRITERES_SATISFACTION.map((c, i) => [c, moy[i].toFixed(1).replace(".", ",")]),
+  const saisi = (f.tauxSatisfaction || "").trim();
+  return buildDocument({ org: o, title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${acheves.length} accompagnement(s) achevé(s) — au ${frVAE(aujourdhui())}`, table: {
+    headers: ["Critère", "Moyenne /5 (questionnaires reçus)"], rows: CRITERES_SATISFACTION.map((c) => [c, ""]),
   }, sections: [
-    { heading: "Analyse", content: `<p>Critère le moins bien noté : « ${CRITERES_SATISFACTION[moy.indexOf(Math.min(...moy))]} » — action de progrès inscrite au tableau d'amélioration continue.</p>`, variant: "green" },
+    { heading: "Résultat publié", content: saisi ? `<p>Satisfaction déclarée par l'organisme : ${esc(saisi)}${f.nombreAvisSatisfaction ? ` (${esc(f.nombreAvisSatisfaction)} avis)` : ""}, issue des questionnaires remplis par les candidats.</p>` : `<p>Les moyennes sont reportées à partir des questionnaires effectivement remplis par les candidats ; aucune note n'est reconstituée.</p>`, variant: "green" },
   ] });
 }
 
@@ -901,9 +921,35 @@ export const genVAERegistreSousTraitance = (o: OrganismeInfo, f: FormationInfo, 
 export const genVAEClausesQualite = (o: OrganismeInfo) => genClausesQualiteContrat(o, "VAE");
 
 /** Point d'entrée unique du switch de documentGenerator pour les templates « vae_* ». */
-export function renderVAETemplate(template: string, params: Record<string, any> | undefined, o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string | null {
-  const si = params?.stagiaireIdx ?? 0;
+/** Candidat vierge : sert à rendre une pièce nominative sous forme de trame TRAME_ (format NEO VOIE). */
+const CANDIDAT_VIERGE: StagiaireInfo = { civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+
+export function renderVAETemplate(template: string, params: Record<string, any> | undefined, o: OrganismeInfo, f0: FormationInfo, stagiaires0: StagiaireInfo[]): string | null {
+  const trame = !!params?.trame;
+  const f = trame ? { ...f0, dateDebut: "", dateFin: "" } : f0;
+  const stagiaires = trame ? [CANDIDAT_VIERGE] : stagiaires0;
+  const si = trame ? 0 : params?.stagiaireIdx ?? 0;
   switch (template) {
+    case "vae_cv_candidat": return genVAECVCandidat(o, f, stagiaires, si);
+    case "vae_planning_individuel": return genVAEPlanningIndividuel(o, f, stagiaires, si);
+    case "vae_fiche_suivi_recevabilite": return genVAEFicheSuiviRecevabilite(o, f, stagiaires, si);
+    case "vae_accuse_remise_documents": return genVAEAccuseRemiseDocuments(o, f, stagiaires, si);
+    case "vae_simulation_jury": return genVAESimulationJury(o, f, stagiaires, si, trame);
+    case "vae_accompagnement_convocation": return genVAEAccompagnementConvocation(o, f, stagiaires, si);
+    case "vae_suivi_post_jury": return genVAESuiviPostJury(o, f, stagiaires, si);
+    case "vae_registre_diffusion": return genVAERegistreDiffusion(o, f);
+    case "vae_procedure_indicateurs": return genVAEProcedureIndicateurs(o);
+    case "vae_procedure_accueil_handicap": return genVAEProcedureAccueilHandicap(o);
+    case "vae_registre_amenagements": return genVAERegistreAmenagements(o);
+    case "vae_procedure_evaluation_objectifs": return genVAEProcedureEvaluationObjectifs(o);
+    case "vae_registre_aleas": return genVAERegistreAleas(o);
+    case "vae_procedure_assistance_technique": return genVAEProcedureAssistanceTechnique(o, f);
+    case "vae_formulaire_reclamation": return genVAEFormulaireReclamation(o);
+    case "vae_revue_direction": return genVAERevueDirection(o, f, stagiaires);
+    case "vae_tableau_applicabilite": return genVAETableauApplicabilite(o);
+    case "vae_note_nouvel_entrant": return genVAENoteNouvelEntrant(o, f, stagiaires);
+    case "vae_notice_trames": return genVAENoticeTrames(o, params?.trames || []);
+    case "vae_sommaire": return genVAESommaire(o, params?.entrees || []);
     case "vae_plaquette_info": return genVAEPlaquetteInfo(o, f);
     case "vae_diffusion_info": return genVAEDiffusionInfo(o, f);
     case "vae_procedure_info": return genVAEProcedureInfo(o);
