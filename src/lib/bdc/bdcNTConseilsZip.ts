@@ -5,12 +5,12 @@
  *
  * Personnalisation :
  *   - Substitutions org/bénéficiaire/dates intelligentes (jamais "today")
- *   - DOCX via htmlToWordBlob (markdown → HTML → DOCX)
+ *   - Toutes les pièces en PDF (htmlToPdfBlob), arborescence « MMF - BDC » (skill /bdc)
  *   - Assets statiques (xlsx, pdf) téléchargés depuis /pdfs/bdc_nt/
  */
 import JSZip from "jszip";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { htmlToWordBlob } from "@/lib/wordExport";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { htmlWrap, orgHeader, footer as docFooter } from "@/lib/docBuilder";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdcNTSource";
 import { BDC_TEMPLATES, renderBdcTemplateIfMapped } from "./bdcTemplateMap";
@@ -19,10 +19,11 @@ import type { JobReporter } from "@/lib/backgroundJobs";
 import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
-import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, type BdcContext, type Beneficiaire } from "./bdcModel";
+import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, financeurEffectifBC, type BdcContext, type Beneficiaire } from "./bdcModel";
 import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "@/lib/qualite2026";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
+import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessPositionnement, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdAccuseReception, mdFicheCompetencesConsultant, mdReseauActeurs } from "./bdcPiecesMMF";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
@@ -259,6 +260,10 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     if (stagiaireEmail) {
       txt = txt.replace(/Marc\.z103@gmail\.com/gi, stagiaireEmail);
     }
+  } else {
+    // Pièce collective (ex. engagements déontologiques) : le signataire est le consultant.
+    const consultant = (formation?.formateur || org.dirigeant || "Le consultant").trim();
+    txt = txt.replace(/M\.\s*ZOCLY\s+Marc|ZOCLY\s+Marc|\bZOCLY\b/g, consultant);
   }
 
   // --- Automatisation des dates de prestation (formats courts hardcodés DD/MM/YYYY) ---
@@ -1862,17 +1867,6 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
 
 
 
-function buildFooter(org: OrganismeInfo, dates: DatesCtx): string {
-  // Pied de page : pas de date d'édition, uniquement la date de mise à jour de la trame.
-  const parts = [
-    `<strong>${org.nom || ""}</strong>`,
-    org.siret ? `SIRET ${org.siret}` : "",
-    org.nda ? `NDA ${org.nda}` : "",
-    org.version ? `Version ${org.version}` : "",
-    dates.dateVersion ? `Mise à jour du ${dates.dateVersion}` : "",
-  ].filter(Boolean);
-  return `<div class="footer">${parts.join(" · ")}</div>`;
-}
 
 
 function slugBen(s: StagiaireInfo): string {
@@ -2041,35 +2035,6 @@ export function renderBdcTemplateBCHtml(
 
 
 
-/**
- * Convertit un dossier source (ex: "Indicateur 10", "Indicateur 23 & 24 & 25")
- * en chemin "Critere_X/Indicateur_Y" pour le ZIP final.
- */
-function mapFolderToCriterePath(folder: string): string {
-  if (!folder) return "";
-  const m = folder.match(/Indicateur\s*(\d+)/i);
-  if (!m) return folder;
-  const ind = parseInt(m[1], 10);
-  const crit = critereForIndicateur(ind);
-  return `Critere_${crit}/Indicateur_${ind}`;
-}
-
-/** Convertit un zipPath source en chemin avec critère. */
-function mapAssetPathToCriterePath(zipPath: string): string {
-  if (zipPath.includes("/")) {
-    const idx = zipPath.indexOf("/");
-    const folder = zipPath.slice(0, idx);
-    const rest = zipPath.slice(idx + 1);
-    return `${mapFolderToCriterePath(folder)}/${rest}`;
-  }
-  const m = zipPath.match(/^Indicateur\s*(\d+)/i);
-  if (m) {
-    const ind = parseInt(m[1], 10);
-    return `${mapFolderToCriterePath(`Indicateur ${ind}`)}/${zipPath}`;
-  }
-  return zipPath;
-}
-
 /** Anonymise une pièce nominative sensible (synthèse, test) pour le dossier d'audit. */
 function anonymiser(md: string, s: StagiaireInfo): string {
   const initiales = `${(s.prenom || "").charAt(0)}. ${(s.nom || "").charAt(0)}.`.trim();
@@ -2082,6 +2047,91 @@ function anonymiser(md: string, s: StagiaireInfo): string {
 /** Pièces nominatives dont le contenu n'est versé au dossier d'audit qu'anonymisé (art. L6313-4). */
 const PIECES_CONFIDENTIELLES = /document de synth[èe]se du bilan|test de personnalit[ée]/i;
 
+/**
+ * Arborescence et libellés du dossier de référence « MMF - BDC » (skill /bdc, remap.py) :
+ * information des publics en IND 9, programme et phases en IND 6, suivi à 6 mois en IND 2,
+ * test de positionnement en IND 8, aucune pièce en IND 16 ni en IND 28.
+ */
+interface Placement { ind: number; nom: string; beneficiaire?: boolean; collectif?: boolean }
+const REMAP_MMF: Array<{ de: RegExp; vers: Placement | ((ind: number) => Placement) }> = [
+  { de: /^1\. Process général$/i, vers: { ind: 1, nom: "Process de diffusion de l'information" } },
+  { de: /^1\. Calendrier annuel$/i, vers: { ind: 1, nom: "Calendrier annuel" } },
+  { de: /^Présentation du bilan de compétences$/i, vers: { ind: 1, nom: "Fiche de présentation du bilan de compétences" } },
+  { de: /^INDICATEURS DE RÉSULTATS – /i, vers: { ind: 2, nom: "Indicateurs de résultats - situation à la date d'arrêté" } },
+  { de: /^Suivi à 6 mois$/i, vers: { ind: 2, nom: "Suivi à 6 mois et tableau de relance" } },
+  { de: /^Compte rendu de suivi à 6 mois$/i, vers: { ind: 2, nom: "Compte rendu de suivi à 6 mois", beneficiaire: true } },
+  { de: /^Auto-diagnostic préliminaire$/i, vers: { ind: 8, nom: "Test de positionnement", beneficiaire: true } },
+  { de: /^Mail auto-diagnostic préliminaire$/i, vers: { ind: 8, nom: "Mail test de positionnement", beneficiaire: true } },
+  { de: /^Programme des 3 phases du bilan de compétences$/i, vers: { ind: 6, nom: "Programme des 3 phases du bilan de compétences" } },
+  { de: /^Phase (\d) - (.*)$/i, vers: { ind: 6, nom: "" } },
+  { de: /^Convention de prestation$/i, vers: { ind: 9, nom: "Convention de prestation", beneficiaire: true } },
+  { de: /^Adaptation de l.accompagnement$/i, vers: { ind: 10, nom: "Catalogue des adaptations de l'accompagnement" } },
+  { de: /^Entretien intermédiaire bénéficiaire$/i, vers: { ind: 10, nom: "Entretien intermédiaire", beneficiaire: true } },
+  { de: /^Planning prévisionnel signé/i, vers: { ind: 10, nom: "Planning prévisionnel signé", beneficiaire: true } },
+  { de: /^Suivi de l.adaptation à l.accompagnement$/i, vers: (ind) => ({ ind, nom: "Suivi de l'adaptation à l'accompagnement" }) },
+  { de: /^Document de synthèse du bilan de compétences/i, vers: { ind: 11, nom: "Document de synthèse (copie anonymisée)", beneficiaire: true } },
+  { de: /^Test de personnalité/i, vers: { ind: 11, nom: "Restitution de l'inventaire de personnalité (copie anonymisée)", beneficiaire: true } },
+  { de: /^Process Abandons$/i, vers: { ind: 12, nom: "Process Prévention et traitement des abandons" } },
+  { de: /^Guide d.entretien des abandons$/i, vers: { ind: 12, nom: "Guide d'entretien des abandons" } },
+  { de: /^CGV$/i, vers: { ind: 9, nom: "Conditions générales de vente", collectif: true } },
+  { de: /^Droit à l.image$/i, vers: { ind: 9, nom: "Autorisation d'utilisation d'image et de témoignage", beneficiaire: true } },
+  { de: /^Engagements déontologiques$/i, vers: { ind: 9, nom: "Engagements déontologiques du consultant", collectif: true } },
+  { de: /^Règlement intérieur$/i, vers: { ind: 9, nom: "Règlement intérieur", collectif: true } },
+  { de: /^Mail début de prestation$/i, vers: { ind: 9, nom: "Mail de début de prestation", beneficiaire: true } },
+  { de: /^Mail envoi de la convention de prestation$/i, vers: { ind: 9, nom: "Mail envoi de la convention", beneficiaire: true } },
+  { de: /^Accord de conservation/i, vers: { ind: 9, nom: "Accord de conservation et destruction des documents", beneficiaire: true } },
+  { de: /^Autorisation de transmission/i, vers: { ind: 9, nom: "Autorisation de transmission du document de synthèse", beneficiaire: true } },
+  { de: /^Informations périphériques/i, vers: { ind: 9, nom: "Informations périphériques (présentiel)" } },
+  { de: /^Moyens, confidentialité et informations pratiques$/i, vers: { ind: 17, nom: "Moyens humains, techniques et environnement" } },
+  { de: /^Entretien de recrutement$/i, vers: { ind: 21, nom: "Trame d'entretien de recrutement" } },
+  { de: /^Entretien annuel$/i, vers: { ind: 22, nom: "Compte rendu d'entretien annuel" } },
+  { de: /^Formations sur le handicap$/i, vers: { ind: 26, nom: "Ressources de formation sur le handicap" } },
+  { de: /^Charte des formateurs sous-traitants$/i, vers: { ind: 27, nom: "Charte des consultants sous-traitants" } },
+  { de: /^Questionnaire de satisfaction bénéficiaire \(à chaud\)$/i, vers: { ind: 30, nom: "Questionnaire de satisfaction à chaud", beneficiaire: true } },
+  { de: /^Questionnaire de satisfaction bénéficiaire \(à froid/i, vers: { ind: 30, nom: "Questionnaire de satisfaction à froid", beneficiaire: true } },
+  { de: /^Process Satisfaction$/i, vers: { ind: 30, nom: "Process Satisfaction des parties prenantes" } },
+];
+
+/** Place une pièce (indicateur d'origine + libellé) dans l'arborescence MMF. */
+export function placementMMF(ind: number, libelle: string, beneficiaire: boolean): Placement {
+  const nom = libelle.replace(/^\s*Indicateur\s*\d+\s*[-–:]\s*/i, "").replace(/\b([ldj])_/g, "$1'").trim();
+  for (const r of REMAP_MMF) {
+    const m = nom.match(r.de);
+    if (!m) continue;
+    if (/^Phase \d/i.test(nom)) return { ind: 6, nom: `Phase ${m[1]} - ${m[2]}`, beneficiaire: false };
+    const v = typeof r.vers === "function" ? r.vers(ind) : r.vers;
+    return { ind: v.ind, nom: v.nom, beneficiaire: v.collectif ? false : (v.beneficiaire ?? beneficiaire), collectif: v.collectif };
+  }
+  // Aucun indicateur 16 (suivi à 6 mois → IND 2) ni 28 (réseau → IND 24) pour le bilan.
+  if (ind === 16) return { ind: 2, nom, beneficiaire };
+  if (ind === 28) return { ind: 24, nom, beneficiaire };
+  return { ind, nom, beneficiaire };
+}
+
+/** Pied de page unique de toutes les pièces : « Version N · Mise à jour du <date de la V1> ». */
+function piedUnique(org: OrganismeInfo): string {
+  const v = String(org.version || "1").replace(/[^0-9]/g, "") || "1";
+  const d = parseDateFR(org.dateMaj);
+  const parts = [
+    `<strong>${org.nom || ""}</strong>`,
+    org.siret ? `SIRET ${org.siret}` : "",
+    org.nda ? `NDA ${org.nda}` : "",
+    `Version ${v}`,
+    d ? `Mise à jour du ${fmtLongDate(d)}` : "",
+  ].filter(Boolean);
+  return `<div class="footer">${parts.join(" · ")}</div>`;
+}
+
+/** Remplace tout pied de page existant par le pied unique (une seule version, une seule date). */
+export function avecPiedUnique(html: string, org: OrganismeInfo): string {
+  let out = html;
+  // Les pieds de docBuilder ne contiennent que des <p> : la première balise </div> ferme le pied.
+  for (let i = 0; i < 5 && /<div class="footer">/.test(out); i++) {
+    out = out.replace(/<div class="footer">[\s\S]*?<\/div>/, "");
+  }
+  return /<\/body>/i.test(out) ? out.replace(/<\/body>/i, `${piedUnique(org)}</body>`) : out + piedUnique(org);
+}
+
 export async function buildBDCNTConseilsZip(
   org: OrganismeInfo,
   formation: FormationInfo,
@@ -2090,13 +2140,15 @@ export async function buildBDCNTConseilsZip(
 ): Promise<Blob> {
   const zip = new JSZip();
   const keys = Object.keys(BDC_NT_SOURCE).sort();
-  const benList = beneficiaires.length > 0 ? beneficiaires : [{
+  const saisis = beneficiaires.length > 0 ? beneficiaires : [{
     civilite: "", nom: "BÉNÉFICIAIRE", prenom: "Modèle", email: "", telephone: "",
     entreprise: "", poste: "", dateNaissance: "",
   } as StagiaireInfo];
+  // Un seul financeur cohérent par bénéficiaire (CPF / OPCO / France Travail seulement si l'OF est certifié BC).
+  const benList = saisis.map((s) => ({ ...s, financeur: financeurEffectifBC(s, org, formation) }));
 
   let step = 0;
-  const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length + BDC_TEMPLATES_MANQUANTS.length * benList.length + 10;
+  const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length + BDC_TEMPLATES_MANQUANTS.length * benList.length + 20;
   const advance = (msg: string) => {
     step++;
     reporter?.setProgress(Math.min(99, (step / Math.max(1, totalSteps)) * 100));
@@ -2115,63 +2167,74 @@ export async function buildBDCNTConseilsZip(
     if (s) (renduParBeneficiaire[`${s.prenom} ${s.nom}`] ||= []).push(md);
   };
 
-  const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
+  /** Toutes les pièces documentaires sont des PDF, avec le pied de page unique. */
+  const toPdf = async (html: string): Promise<Blob> => await htmlToPdfBlob(avecPiedUnique(html, org));
+
+  /** Dépose une pièce dans l'arborescence MMF ; une pièce collective n'est versée qu'une fois. */
+  const deja = new Set<string>();
+  const put = (ind: number, libelle: string, s: StagiaireInfo | null, ext: string, data: Blob | ArrayBuffer) => {
+    const pl = placementMMF(ind, libelle, !!s);
+    const dossierBen = pl.beneficiaire && s ? `/Bénéficiaire - ${s.prenom} ${s.nom}` : "";
+    const path = `Critere_${critereForIndicateur(pl.ind)}/Indicateur_${pl.ind}${dossierBen}/Indicateur ${pl.ind} - ${pl.nom}.${ext}`;
+    if (deja.has(path)) return;
+    deja.add(path);
+    zip.file(path, data);
+  };
+  /** Une pièce collective issue d'une trame nominative n'est rendue qu'une fois, sans bénéficiaire. */
+  const estCollective = (ind: number, libelle: string) => !!placementMMF(ind, libelle, true).collectif;
+
+  const genPdf = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
     md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title), raisonSociale: org.nom });
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
       md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
     }
+    // Tampon seul pour le dirigeant (il porte déjà sa signature).
     if (/Certificat de réalisation/i.test(title) && org.tamponUrl) {
       const tampon = `\n\n<img src="${org.tamponUrl}" alt="Tampon ${org.nom || ""}" style="max-height:120px;max-width:220px;display:block;margin:8px 0;object-fit:contain;" />\n`;
       md = md.replace(/(^|\n)\s*Signature\s*$/m, `$1Signature${tampon}`);
       if (!/<img[^>]+Tampon/i.test(md)) md += tampon;
     }
     collect(title, md, s);
-    const html = mdToHtml(md, title, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
-    return await htmlToWordBlob(html);
+    return await toPdf(mdToHtml(md, bdcDocTitle(title).replace(/\s+–\s+.*$/, ""), org, s));
   };
-  const dossier = (ind: number) => `Critere_${critereForIndicateur(ind)}/Indicateur_${ind}`;
 
   // === 1. Pièces de la trame (source nettoyée — même rendu que le catalogue) ===
   for (const key of keys) {
-    const folder = key.includes("/") ? key.split("/")[0] : "";
-    const critereFolder = mapFolderToCriterePath(folder) || dossier(indicateurFromKey(key));
+    const ind = indicateurFromKey(key);
     const baseName = fileTitle(key);
     const raw = BDC_NT_SOURCE[key];
-    if (BDC_NT_PER_BENEFICIAIRE.has(key)) {
+    if (BDC_NT_PER_BENEFICIAIRE.has(key) && !estCollective(ind, baseName)) {
       for (const s of benList) {
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
         const dts = computeDates(s, org, formation);
         const personalized = getPersonalizedRaw(key, s, org, dts, formation, benList);
-        const blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
-        zip.file(`${critereFolder}/Bénéficiaire - ${s.prenom} ${s.nom}/${baseName}.docx`, blob);
+        put(ind, baseName, s, "pdf", await genPdf(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s));
       }
     } else {
       advance(baseName);
-      const tplMapping = BDC_TEMPLATES[key];
-      if (tplMapping) {
+      if (BDC_TEMPLATES[key]) {
         const r = await renderBdcTemplateIfMapped(key, org, formation, null);
-        if (r) { zip.file(`${critereFolder}/${baseName}.${r.extension}`, r.blob); continue; }
+        if (r) { put(ind, baseName, null, r.extension, r.blob); continue; }
       }
-      zip.file(`${critereFolder}/${baseName}.docx`, await genDocx(raw, baseName, null));
+      put(ind, baseName, null, "pdf", await genPdf(raw, baseName, null));
     }
   }
 
-  // === 2. Programme des 3 phases (IND 6) et fiches par phase (IND 10) ===
+  // === 2. Programme des 3 phases et fiches par phase (IND 6) ===
   {
     const dates = computeDates(undefined, org, formation);
-    const nomProg = "Indicateur 6 - Programme des 3 phases du bilan de compétences";
-    advance(nomProg);
-    zip.file(`${dossier(6)}/${nomProg}.docx`, await genDocx(buildProgrammePhasesMd(org, dates, formation), nomProg, null));
+    advance("Programme des 3 phases");
+    put(6, "Programme des 3 phases du bilan de compétences", null, "pdf", await genPdf(buildProgrammePhasesMd(org, dates, formation), "Programme des 3 phases du bilan de compétences", null));
     const phases: Array<{ n: 1 | 2 | 3; nom: string }> = [
-      { n: 1, nom: "Indicateur 10 - Phase 1 - Phase préliminaire" },
-      { n: 2, nom: "Indicateur 10 - Phase 2 - Phase d'investigation" },
-      { n: 3, nom: "Indicateur 10 - Phase 3 - Phase de conclusion" },
+      { n: 1, nom: "Phase 1 - Phase préliminaire" },
+      { n: 2, nom: "Phase 2 - Phase d'investigation" },
+      { n: 3, nom: "Phase 3 - Phase de conclusion" },
     ];
     for (const p of phases) {
       advance(p.nom);
-      zip.file(`${dossier(10)}/${p.nom}.docx`, await genDocx(buildPhaseMd(p.n, org, dates, formation), p.nom, null));
+      put(6, p.nom, null, "pdf", await genPdf(buildPhaseMd(p.n, org, dates, formation), p.nom, null));
     }
   }
 
@@ -2180,6 +2243,7 @@ export async function buildBDCNTConseilsZip(
     advance(a.zipPath.split("/").pop() || a.zipPath);
     try {
       const keyNoExt = a.zipPath.replace(/\.(xlsx|docx|pdf)$/i, "");
+      const ext = (a.zipPath.match(/\.(\w+)$/) || ["", "pdf"])[1];
       let buf: ArrayBuffer | null = null;
       if (BDC_TEMPLATES[keyNoExt]) {
         const r = await renderBdcTemplateIfMapped(keyNoExt, org, formation, null);
@@ -2189,7 +2253,7 @@ export async function buildBDCNTConseilsZip(
         const res = await fetch(a.src);
         if (res.ok) buf = await res.arrayBuffer();
       }
-      if (buf) zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
+      if (buf) put(indicateurFromKey(a.zipPath), fileTitle(keyNoExt), null, ext, buf);
     } catch (e) {
       console.warn("[BDC] ressource indisponible", a.src, e);
     }
@@ -2200,7 +2264,7 @@ export async function buildBDCNTConseilsZip(
     advance(c.name);
     try {
       const html = c.build(bdcCtx);
-      zip.file(`${dossier(c.indicateur)}/${c.name}`, htmlToXlsxBlob(html));
+      put(c.indicateur, c.name.replace(/\.xlsx$/i, ""), null, "xlsx", htmlToXlsxBlob(html));
       collect(c.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
       console.warn("[BDC] classeur échoué", c.name, e);
@@ -2212,20 +2276,19 @@ export async function buildBDCNTConseilsZip(
     advance(file.name);
     try {
       const html = file.build(org, formation, benList);
-      zip.file(`${dossier(2)}/${file.name}`, htmlToXlsxBlob(html));
+      put(2, file.name.replace(/\.xlsx$/i, ""), null, "xlsx", htmlToXlsxBlob(html));
       collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
     } catch (e) {
       console.warn("[BDC] indicateurs IND 2 échoués", file.name, e);
     }
   }
 
-  // === 6. Suivi à 6 mois par bénéficiaire (IND 30) ===
+  // === 6. Suivi à 6 mois par bénéficiaire (IND 2) ===
   for (let i = 0; i < benList.length; i++) {
     const s = benList[i];
     advance(`Compte rendu de suivi à 6 mois — ${s.prenom} ${s.nom}`);
     try {
-      const html = buildSuivi6MoisIndividuel(org, formation, s, i);
-      zip.file(`${dossier(30)}/Bénéficiaire - ${s.prenom} ${s.nom}/Indicateur 30 - Compte rendu de suivi à 6 mois.docx`, await htmlToWordBlob(html));
+      put(2, "Compte rendu de suivi à 6 mois", s, "pdf", await toPdf(buildSuivi6MoisIndividuel(org, formation, s, i)));
     } catch (e) {
       console.warn("[BDC] suivi 6 mois échoué", e);
     }
@@ -2234,7 +2297,6 @@ export async function buildBDCNTConseilsZip(
   // === 7. Pièces obligatoires BC (synthèse, émargements, veilles, plan de développement…) ===
   for (const def of BDC_TEMPLATES_MANQUANTS) {
     if (!bdcTemplateApplicable(def, formation)) continue;
-    const dossierDef = dossier(def.indicateur);
     if (def.parBeneficiaire) {
       for (let i = 0; i < benList.length; i++) {
         const s = benList[i];
@@ -2243,13 +2305,11 @@ export async function buildBDCNTConseilsZip(
         try {
           let md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, b), bdcCtx, b), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom), raisonSociale: org.nom });
           collect(def.nom, md, s);
-          // Confidentialité (L6313-4) : la synthèse et les résultats de tests ne sont versés
-          // au dossier d'audit qu'anonymisés ; l'attestation de remise reste nominative.
+          // Confidentialité (L6313-4) : synthèse et résultats de tests versés en copie anonymisée ;
+          // l'attestation de remise reste nominative.
           const confidentiel = PIECES_CONFIDENTIELLES.test(def.nom);
           if (confidentiel) md = `> _Copie anonymisée versée au dossier qualité — l'original nominatif est remis au seul bénéficiaire (art. L6313-4 du Code du travail)._\n\n${anonymiser(md, s)}`;
-          const dates = computeDates(s, org, formation);
-          const html = mdToHtml(md, def.nom, org, confidentiel ? null : s).replace("</body>", buildFooter(org, dates) + "</body>");
-          zip.file(`${dossierDef}/Bénéficiaire - ${s.prenom} ${s.nom}/${def.nom}${confidentiel ? " (anonymisé)" : ""}.docx`, await htmlToWordBlob(html));
+          put(def.indicateur, def.nom, s, "pdf", await toPdf(mdToHtml(md, bdcDocTitle(def.nom), org, confidentiel ? null : s)));
         } catch (e) {
           console.warn("[BDC] pièce échouée", def.nom, e);
         }
@@ -2259,28 +2319,57 @@ export async function buildBDCNTConseilsZip(
       try {
         const md = sanitizeBdcMarkdown(autofillDocument(def.build(bdcCtx, null), bdcCtx, null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom), raisonSociale: org.nom });
         collect(def.nom, md, null);
-        const dates = computeDates(undefined, org, formation);
-        const html = mdToHtml(md, def.nom, org, null).replace("</body>", buildFooter(org, dates) + "</body>");
-        zip.file(`${dossierDef}/${def.nom}.docx`, await htmlToWordBlob(html));
+        put(def.indicateur, def.nom, null, "pdf", await toPdf(mdToHtml(md, bdcDocTitle(def.nom), org, null)));
       } catch (e) {
         console.warn("[BDC] pièce échouée", def.nom, e);
       }
     }
   }
 
-  // === 8. Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32 ===
+  // === 8. Pièces du format MMF (process, accusé de réception, compétences du consultant, réseau) ===
+  {
+    const collectives: Array<{ ind: number; nom: string; md: string }> = [
+      { ind: 2, nom: "Process Suivi à 6 mois", md: mdProcessSuivi6Mois(bdcCtx) },
+      { ind: 5, nom: "Process Définition des objectifs", md: mdProcessObjectifs() },
+      { ind: 8, nom: "Process Positionnement à l'entrée", md: mdProcessPositionnement(bdcCtx) },
+      { ind: 9, nom: "Process Information des publics", md: mdProcessInformationPublics(bdcCtx) },
+      ...(bdcCtx.prestation.modalite !== "presentiel"
+        ? [{ ind: 9, nom: "Informations pratiques - prestation à distance", md: mdInformationsPratiquesDistance(bdcCtx) }]
+        : []),
+      { ind: 21, nom: "Fiche de compétences du consultant", md: mdFicheCompetencesConsultant(bdcCtx) },
+      { ind: 24, nom: "Réseau d'acteurs socio-économiques", md: mdReseauActeurs(bdcCtx) },
+    ];
+    for (const p of collectives) {
+      advance(p.nom);
+      const md = sanitizeBdcMarkdown(p.md, { titre: p.nom, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
+      collect(p.nom, md, null);
+      put(p.ind, p.nom, null, "pdf", await toPdf(mdToHtml(md, p.nom, org, null)));
+    }
+    for (let i = 0; i < benList.length; i++) {
+      const s = benList[i];
+      const b = bdcCtx.beneficiaires[i];
+      if (!b) continue;
+      const titre = "Accusé de réception des informations";
+      advance(`${titre} — ${s.prenom} ${s.nom}`);
+      const md = sanitizeBdcMarkdown(mdAccuseReception(bdcCtx, b), { titre, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
+      collect(titre, md, s);
+      put(9, titre, s, "pdf", await toPdf(mdToHtml(md, titre, org, s)));
+    }
+  }
+
+  // === 9. Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32 ===
   {
     const pieces2026: Array<{ ind: number; nom: string; html: string }> = [
-      { ind: 27, nom: "Indicateur 27 - Registre de sous-traitance et de portage salarial", html: genRegistreSousTraitancePortage(org, "BC", formation, benList) },
-      { ind: 27, nom: "Indicateur 27 - Annexe clauses qualité des contrats de sous-traitance", html: genClausesQualiteContrat(org, "BC") },
-      { ind: 32, nom: "Indicateur 32 - Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
-
+      { ind: 27, nom: "Registre de sous-traitance et de portage salarial", html: genRegistreSousTraitancePortage(org, "BC", formation, benList) },
+      { ind: 27, nom: "Annexe clauses qualité des contrats de sous-traitance", html: genClausesQualiteContrat(org, "BC") },
+      { ind: 32, nom: "Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
       // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement)
-      ...entreesCatalogueTypeAudit(org).map((e) => ({ ind: e.indicateur, nom: `Indicateur ${e.indicateur} - ${e.nom.replace(/^CT\d+ - IND \d+ /, "")}`, html: renderTypeAuditTemplate(e.template, org, formation, benList) || "" })),
+      ...entreesCatalogueTypeAudit(org).map((e) => ({ ind: e.indicateur, nom: e.nom.replace(/^CT\d+ - IND \d+ /, ""), html: renderTypeAuditTemplate(e.template, org, formation, benList) || "" })),
     ];
     for (const p of pieces2026) {
       advance(p.nom);
-      zip.file(`${dossier(p.ind)}/${p.nom}.docx`, await htmlToWordBlob(p.html));
+      if (!p.html) continue;
+      put(p.ind, p.nom, null, "pdf", await toPdf(p.html));
     }
   }
 
@@ -2288,6 +2377,8 @@ export async function buildBDCNTConseilsZip(
   {
     const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((x) => !x.endsWith("/"));
     const nominatifs = fichiers.filter((x) => /Bénéficiaire - /.test(x)).length;
+    const v = String(org.version || "1").replace(/[^0-9]/g, "") || "1";
+    const d = parseDateFR(org.dateMaj);
     const readme = [
       `DOSSIER BILAN DE COMPÉTENCES — ${(org.nom || "").toUpperCase()}`,
       "=".repeat(40),
@@ -2295,12 +2386,14 @@ export async function buildBDCNTConseilsZip(
       `Organisme : ${org.nom}`,
       `SIRET : ${org.siret}    NDA : ${org.nda}`,
       `Bénéficiaires : ${benList.length}`,
-      `Référentiel : référentiel national qualité, décret n° 2026-728 (33 indicateurs) — indicateurs non applicables au bilan de compétences : 3, 7, 8, 13, 14, 15, 16, 20, 28, 29, 33.`,
+      `Version ${v}${d ? ` · Mise à jour du ${fmtLongDate(d)}` : ""} (identique sur toutes les pièces)`,
+      "Référentiel : référentiel national qualité, décret n° 2026-728 — indicateurs non applicables au bilan de compétences : 3, 7, 13, 14, 15, 16, 20, 28, 29.",
       "",
-      "Structure :",
-      "  - Critere_X / Indicateur_Y / documents collectifs",
-      "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
-      "  - Les documents de synthèse et tests sont versés anonymisés (art. L6313-4) ; l'attestation de remise est nominative.",
+      "Structure (format « MMF - BDC ») :",
+      "  - Critere_X / Indicateur_Y / Indicateur Y - Libellé.pdf : pièces collectives",
+      "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / : pièces nominatives",
+      "  - Tableaux de suivi et registres en .xlsx ; toutes les autres pièces en PDF.",
+      "  - Document de synthèse et inventaire de personnalité versés en copie anonymisée (art. L6313-4) ; l'attestation de remise est nominative.",
       "",
       `Fichiers du dossier : ${fichiers.length + 1}`,
       `Dont pièces nominatives : ${nominatifs}`,

@@ -1118,58 +1118,24 @@ export function genTrameSuivi6MoisBDC(o: OrganismeInfo, f: FormationInfo, stagia
 }
 
 // ===== CR – CV du bénéficiaire (annexé au dossier de bilan) =====
+/**
+ * CV construit UNIQUEMENT à partir des données saisies pour le bénéficiaire (poste, entreprise,
+ * diplôme, expériences déclarées). Aucun employeur, aucune date ni aucune mission n'est inventé :
+ * les rubriques sans donnée restent à compléter par le bénéficiaire.
+ */
 export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  void o; void f;
   const s = stagiaires[si] || stagiaires[0];
-  const profile = getBdcDomainProfile(f);
-  const perso = bdcPersonalisation(f, s, si);
-  const yearNow = new Date().getFullYear();
-  const yearMid = yearNow - deterministicIndex(s, si, 4, 21) - 2;
-  const yearStart = yearMid - deterministicIndex(s, si, 5, 22) - 2;
-  const yearEarly = yearStart - deterministicIndex(s, si, 4, 31) - 2;
-  const ville = s.commune || (o.adresse || "").split(",").slice(-1)[0]?.trim() || "France";
-  const entreprise = s.entreprise && s.entreprise.toLowerCase() !== "demandeur d'emploi" ? s.entreprise : "";
-  const poste = s.poste || perso.profile.metier;
   const adresseLine = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const entreprise = s.entreprise && s.entreprise.toLowerCase() !== "demandeur d'emploi" ? s.entreprise.trim() : "";
+  const poste = (s.poste || "").trim();
 
-  // Pick a deterministic CV design + accent + font per beneficiary so each one looks visually distinct
-  const design: CVDesign = CV_DESIGNS[deterministicIndex(s, si, CV_DESIGNS.length, 41)].id;
-  const accentPalette = [
-    "#1e3a7b", "#2563eb", "#0f766e", "#92700C", "#dc2626", "#7c3aed",
-    "#0891b2", "#be185d", "#15803d", "#b45309", "#475569", "#9333ea",
-    "#c2410c", "#0369a1", "#4d7c0f", "#a21caf",
-  ];
-  const fontPalette = [
-    "'Segoe UI',Arial,sans-serif",
-    "Georgia,'Times New Roman',serif",
-    "'Helvetica Neue',Helvetica,Arial,sans-serif",
-    "'Trebuchet MS',sans-serif",
-    "'Verdana',Geneva,sans-serif",
-    "'Calibri','Segoe UI',sans-serif",
-    "'Garamond','Times New Roman',serif",
-    "'Tahoma',Geneva,sans-serif",
-  ];
-  const accent = accentPalette[deterministicIndex(s, si, accentPalette.length, 81)];
-  const fontFamily = fontPalette[deterministicIndex(s, si, fontPalette.length, 82)];
-
-  const profilTexts = [
-    `${perso.profile.metier} avec ${yearNow - yearStart} ans d'expérience dans le secteur ${profile.secteur}. ${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}.`,
-    `Professionnel(le) engagé(e) dans le secteur ${profile.secteur}, je souhaite donner un nouvel élan à mon parcours. ${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}.`,
-    `Fort(e) d'un parcours dans ${profile.secteur}, je m'investis aujourd'hui dans une démarche de bilan de compétences pour clarifier mon projet : ${perso.objectif}.`,
-    `Acteur/actrice de mon évolution professionnelle, je m'appuie sur mon expérience de ${perso.profile.metier} pour construire un projet cohérent : ${perso.objectif}.`,
-  ];
-  const interets = [
-    "Lecture, marche, voyages",
-    "Sport, cuisine, bénévolat associatif",
-    "Photographie, randonnée, activités familiales",
-    "Musique, jardinage, engagement local",
-    "Cinéma, course à pied, cuisine du monde",
-  ];
-
-  const expDescriptions = [
-    profile.missions.slice(0, 3).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(". ") + ".",
-    profile.missions.slice(1, 4).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(". ") + ".",
-    `Polyvalence sur ${pickForBeneficiaire(s, si, profile.missions, 51)}, ${pickForBeneficiaire(s, si, profile.missions, 52)} et ${pickForBeneficiaire(s, si, profile.missions, 53)}.`,
-  ];
+  const declarees = (s.experiences || []).filter((e) => (e.poste || e.employeur || "").trim());
+  const experiences: CVData["experiences"] = declarees.length
+    ? declarees.map((e) => ({ poste: e.poste || "", entreprise: e.employeur || "", dateDebut: e.debut || "", dateFin: e.fin || "", description: e.activites || "" }))
+    : poste || entreprise
+      ? [{ poste: poste || "À compléter par le bénéficiaire", entreprise: entreprise || "À compléter", dateDebut: "", dateFin: "", description: "Missions et période à compléter par le bénéficiaire." }]
+      : [{ poste: "À compléter par le bénéficiaire", entreprise: "", dateDebut: "", dateFin: "", description: "" }];
 
   const data: CVData = {
     prenom: s.prenom || "",
@@ -1179,101 +1145,18 @@ export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     telephone: s.telephone || "",
     adresse: adresseLine,
     photoUrl: "",
-    profil: pickForBeneficiaire(s, si, profilTexts, 42),
-    specialites: profile.techniques.slice(0, 3).join(" • "),
-    experiences: (() => {
-      // Nombre d'expériences variable : 2, 3, 4 ou 5 selon le bénéficiaire
-      const nbExp = 2 + deterministicIndex(s, si, 4, 91);
-      const villes = [ville, "Paris", "Lyon", "Marseille", "Toulouse", "Nantes", "Bordeaux", "Lille"];
-      const v2 = pickForBeneficiaire(s, si, villes, 92);
-      const v3 = pickForBeneficiaire(s, si, villes, 93);
-      const all = [
-        // Exp 1 - Poste actuel/récent
-        {
-          poste,
-          entreprise: entreprise || `Secteur ${profile.secteur} – ${ville}`,
-          dateDebut: `${yearMid}`,
-          dateFin: `${yearNow}`,
-          description: pickForBeneficiaire(s, si, expDescriptions, 43),
-        },
-        // Exp 2 - Précédente
-        {
-          poste: perso.profile.metier,
-          entreprise: pickForBeneficiaire(s, si, [
-            `Entreprise locale – ${ville}`, `PME du secteur ${profile.secteur}`,
-            `Établissement à ${ville}`, `Société de services – ${v2}`,
-            `Cabinet ${profile.secteur} – ${v2}`,
-          ], 44),
-          dateDebut: `${yearStart}`,
-          dateFin: `${yearMid}`,
-          description: pickForBeneficiaire(s, si, [
-            "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
-            "Participation à l'organisation quotidienne et au respect des procédures internes.",
-            "Contribution à la satisfaction client et au bon déroulement de l'activité.",
-            "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
-            "Encadrement ponctuel de stagiaires et formation des nouveaux entrants sur les procédures.",
-          ], 45),
-        },
-        // Exp 3 - Premier poste
-        {
-          poste: pickForBeneficiaire(s, si, ["Premier poste / stage", "Emploi saisonnier", "Mission d'intérim", "Apprentissage", "Contrat aidé"], 46),
-          entreprise: pickForBeneficiaire(s, si, [`Établissement local – ${ville}`, `TPE – ${v3}`, `Association locale`, `Commerce de proximité – ${ville}`], 94),
-          dateDebut: `${yearEarly}`,
-          dateFin: `${yearStart}`,
-          description: pickForBeneficiaire(s, si, [
-            "Découverte du monde professionnel, intégration à une équipe et acquisition des fondamentaux du métier.",
-            "Apprentissage des bases du métier, observation des process et premières prises de responsabilité.",
-            "Mission de remplacement : adaptation rapide, autonomie et fiabilité dans l'exécution des tâches.",
-          ], 95),
-        },
-        // Exp 4 - Mission complémentaire (optionnelle)
-        {
-          poste: pickForBeneficiaire(s, si, ["Mission ponctuelle", "Vacation", "Bénévolat associatif", "Activité indépendante", "Service civique"], 96),
-          entreprise: pickForBeneficiaire(s, si, [`Association ${ville}`, `Indépendant – ${ville}`, `Collectif local`, `Structure d'insertion – ${v2}`], 97),
-          dateDebut: `${yearEarly - 1}`,
-          dateFin: `${yearEarly}`,
-          description: pickForBeneficiaire(s, si, [
-            "Engagement dans une démarche solidaire et développement de compétences transversales (organisation, communication, gestion de projet).",
-            "Accompagnement de publics variés et travail en équipe pluridisciplinaire.",
-            "Participation à l'animation d'événements et à la coordination logistique.",
-          ], 98),
-        },
-        // Exp 5 - Formation/job étudiant (optionnelle)
-        {
-          poste: pickForBeneficiaire(s, si, ["Job étudiant", "Stage de découverte", "Aide familial(e)", "Petits boulots", "Service à la personne"], 99),
-          entreprise: pickForBeneficiaire(s, si, [`Restauration – ${ville}`, `Grande distribution – ${ville}`, `Particulier employeur`, `Commerce indépendant – ${v3}`], 100),
-          dateDebut: `${yearEarly - 3}`,
-          dateFin: `${yearEarly - 1}`,
-          description: pickForBeneficiaire(s, si, [
-            "Première expérience du monde du travail : ponctualité, sens du service, gestion du stress.",
-            "Contact client direct, encaissement, mise en rayon et entretien de l'espace de travail.",
-            "Accompagnement de personnes au quotidien, sens de l'écoute et de la bienveillance.",
-          ], 101),
-        },
-      ];
-      return all.slice(0, nbExp);
-    })(),
-    formations: [
-      ...(s.diplome ? [{ diplome: s.diplome, etablissement: pickForBeneficiaire(s, si, ["Lycée professionnel", "Centre de formation", "CFA régional", "Établissement public"], 47), annee: `${yearStart - 1}` }] : []),
-      { diplome: pickForBeneficiaire(s, si, profile.formations, 48), etablissement: "Formation continue", annee: `${yearMid}` },
-      { diplome: `Bilan de compétences – ${o.nom}`, etablissement: o.nom, annee: `${yearNow}` },
-    ],
-    competences: profile.techniques.slice(0, 6).map((t, idx) => ({
-      nom: t.charAt(0).toUpperCase() + t.slice(1),
-      niveau: 3 + ((deterministicIndex(s, si, 3, 50 + idx)) % 3), // 3, 4 or 5
-    })),
-    langues: [
-      { langue: "Français", niveau: "Langue maternelle" },
-      ...(deterministicIndex(s, si, 2, 60) === 0 ? [{ langue: "Anglais", niveau: pickForBeneficiaire(s, si, ["Notions (A2)", "Intermédiaire (B1)", "Courant (B2)"], 61) }] : []),
-    ],
-    certifications: [
-      ...(deterministicIndex(s, si, 2, 70) === 0 ? [{ nom: pickForBeneficiaire(s, si, ["SST – Sauveteur Secouriste du Travail", "Habilitation électrique BS/BE", "Permis B", "PIX – Compétences numériques"], 71), annee: `${yearMid}` }] : []),
-    ],
+    profil: "",
+    specialites: "",
+    experiences,
+    formations: s.diplome ? [{ diplome: s.diplome, etablissement: "", annee: "" }] : [{ diplome: "À compléter par le bénéficiaire", etablissement: "", annee: "" }],
+    competences: [],
+    langues: [],
+    certifications: [],
     experiencePedagogique: "",
     publications: "",
   };
 
-  return generateCVHTML(data, design, { accent, fontFamily });
+  return generateCVHTML(data, "classique");
 }
 
 // ===== CR – Test de personnalité (typologie MBTI E/I, S/N, T/F, J/P) =====
