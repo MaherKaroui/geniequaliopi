@@ -786,7 +786,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genAppreciationsBeneficiairesStagiaire(o, f, stagiaires, si);
     }
-    case "appreciations_entreprises": return genAppreciationsEntreprises(o, f, stagiaires);
+    case "appreciations_entreprises": return genAppreciationsEntreprises(o, f, params?.entreprise ? stagiaires.filter((s) => (s.entreprise || "").trim() === params.entreprise) : stagiaires);
     case "appreciations_financeurs": return genAppreciationsFinanceurs(o, f, stagiaires);
     case "bilan_froid": return genBilanFroid(o, f, stagiaires);
     case "bilan_froid_stagiaire": {
