@@ -178,7 +178,10 @@ export function buildFullCatalog(
 
     // IND 10 — Adaptation de la prestation et accompagnement
     add("af_c3i10_procedure_adaptation", "CT3 - IND 10 PROCÉDURE D'ADAPTATION PÉDAGOGIQUE", 3, 10, "procedure_adaptation");
-    // (trame des besoins et déroulé restent en IND 4 et IND 5/6 : pas de doublon)
+    // Même évaluation individuelle des besoins qu'en IND 4, également classée en IND 10.
+    stagiaires.forEach((s, si) => {
+      add(`af_c3i10_trame_eval_besoins_${si}`, `CT3 - IND 10 TRAME ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_combine", { stagiaireIdx: si });
+    });
     formations.forEach((f, fi) => {
       add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES`, 3, 10, "tableau_suivi_parcours_excel", { fi });
     });

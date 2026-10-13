@@ -14,3 +14,4 @@
 - [x] Ajouter le contrat d’accompagnement de chaque bénéficiaire VAE à l’indicateur 9.
 - [x] Reprendre la durée saisie dans tous les fichiers concernés du pack rapide sans recalcul depuis les dates.
 - [x] Appliquer la règle IND 4 : stagiaire avec entreprise → OPCO, sans entreprise → Financement personnel.
+- [x] Ajouter dans l’IND 10 AF les mêmes évaluations des besoins individuelles qu’en IND 4 et vérifier leurs réponses.
