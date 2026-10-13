@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { isIAP21Formation } from "@/lib/iaPro21hHumanized";
+import { seedIAP21AICaches } from "@/lib/iaPro21hPreset";
+import { getCachedContentPack } from "@/lib/aiContentPack";
 import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
@@ -137,6 +140,11 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
   };
 
   const handleLoad = (d: SavedDossier) => {
+    // IA 21 h (non certifiante) : un dossier créé hors du formulaire n'a pas les packs du preset en cache
+    // (veille, ressources, évaluations) ; on les recharge sans écraser un pack déjà présent.
+    if (d.formation && isIAP21Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedIAP21AICaches(d.formation);
+    }
     onLoad(d.organisme, d.formation, d.stagiaires);
     setCurrentDossierId(d.id);
     setSaveName(d.name);
