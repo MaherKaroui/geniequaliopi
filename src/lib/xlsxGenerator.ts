@@ -5,7 +5,7 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { formatDate, isFormationTerminee, getStagiaireDateDebut, getStagiaireDateFin, isFacebookPage } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, parseDuree } from "./sampleData";
 import { getEvalContent } from "./evalContent";
-import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance } from "./documentGenerator";
+import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance, getStagiaireDays } from "./documentGenerator";
 import { getRNCPByCode } from "./rncpData";
 import { getSatisfactionLabel, getAssiduiteLabel, getNombreStagiairesFormes, getTauxObtention, getCommentaireIndicateurs, getRepartitionParAnnee, NON_COLLECTE } from "./indicateursResultats";
 
@@ -362,7 +362,8 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
 }
 
 export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const days = getFormationDays(f);
+  const daysBy = stagiaires.map((s) => getStagiaireDays(s, f));
+  const nbJours = Math.min(31, Math.max(1, ...daysBy.map((d) => d.length), stagiaires.length ? 0 : getFormationDays(f).length));
   const isAlternance = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const natureValue = isAlternance ? 'Alternance' : 'Action de formation';
 
@@ -379,7 +380,7 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
   html += `<th>Nom</th><th>Prénom</th><th>Sexe</th><th>Prise en charge</th><th>Nature</th><th>Handicap</th><th>Observations</th>`;
   html += `<th>Date entrée</th><th>Date sortie</th>`;
   html += `<th>Date adaptation</th><th>Adaptations nécessaires</th><th>Difficultés</th><th>Suivi</th>`;
-  days.slice(0, 12).forEach((_, i) => { html += `<th>JS${i + 1}</th>`; });
+  for (let i = 0; i < nbJours; i++) html += `<th>JS${i + 1}</th>`;
   html += `<th>Interruption</th><th>Cause</th>`;
   html += `<th>QCM</th><th>Test réussite</th><th>Satisfaction</th>`;
   html += `</tr>`;
@@ -391,14 +392,16 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
     const civ = (s.civilite || '').toLowerCase().trim();
     const isF = civ.startsWith('mme') || civ.startsWith('mad') || civ.includes('madame');
     const sexe = civ ? (isF ? 'F' : 'M.') : (s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'M.');
-    const presences = days.slice(0, 12).map(() => 'X');
+    const presences = Array.from({ length: nbJours }, (_, i) => (i < daysBy[si].length ? 'X' : ''));
+    const dEntree = getStagiaireDateDebut(s, f);
+    const dSortie = getStagiaireDateFin(s, f);
     const financement = getEvalBesoinsFinancement(s, f, o, si);
     html += tableRow([
       s.nom?.toUpperCase() || '', s.prenom?.toUpperCase() || '', sexe,
       financement,
       natureValue, 'non', '',
-      formatDate(f.dateDebut), formatDate(f.dateFin),
-      formatDate(f.dateDebut), 'aucune', 'aucune', 'aucune',
+      formatDate(dEntree), formatDate(dSortie),
+      formatDate(dEntree), 'aucune', 'aucune', 'aucune',
       ...presences,
       '', '',
       `${avg}/10`, avg >= 6 ? 'oui' : 'non', 'oui'

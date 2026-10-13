@@ -499,7 +499,10 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`af_c7i30_appreciations_beneficiaires_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION – ${s.prenom} ${s.nom}`, 7, 30, "appreciations_beneficiaires_stagiaire", { stagiaireIdx: si });
     });
-    add("af_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
+    // Un questionnaire commanditaire par entreprise (aucun si pas d'entreprise)
+    Array.from(new Set(stagiaires.map((s) => (s.entreprise || "").trim()).filter(Boolean))).forEach((ent, ei) => {
+      add(`af_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
+    });
     add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
     
 
@@ -1254,7 +1257,10 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_appreciations_beneficiaires_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION – ${s.prenom} ${s.nom}`, 7, 30, "appreciations_beneficiaires_stagiaire", { stagiaireIdx: si });
     });
-    add("cfa_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
+    // Un questionnaire commanditaire par entreprise (aucun si pas d'entreprise)
+    Array.from(new Set(stagiaires.map((s) => (s.entreprise || "").trim()).filter(Boolean))).forEach((ent, ei) => {
+      add(`cfa_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
+    });
     add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
     
 
