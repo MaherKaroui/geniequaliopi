@@ -3,6 +3,7 @@
 // Documents à présenter · Vigilance. Les 8 indicateurs CFA spécifiques (13,14,15,16,20,27,28,32)
 // sont marqués en orange. Mention nouvel entrant / pondération incluse.
 
+import { clampCells } from "./xlsxSafe";
 import { isStagiaireFormationTerminee } from "./docBuilder";
 import { typeAuditEffectif } from "./typeAudit";
 import * as XLSX from "xlsx";
@@ -75,7 +76,7 @@ export function generateFeuilleRouteQualiopiCFA(
   });
   rows.push(["TOTAL", INDICATEURS_CFA.length, catalog.length, `${INDICATEURS_CFA.filter(i => (docsByInd.get(i.numero)?.length || 0) > 0).length}/${INDICATEURS_CFA.length} indicateurs couverts`]);
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const ws = XLSX.utils.aoa_to_sheet(clampCells(rows));
   ws["!cols"] = [
     { wch: 18 }, { wch: 6 }, { wch: 38 }, { wch: 55 }, { wch: 55 }, { wch: 55 }, { wch: 30 },
   ];
@@ -170,7 +171,7 @@ export function generateFeuilleRouteQualiopiCFA(
     s.entreprise || "—", frDate(s.dateDebutFormation), frDate(s.dateFinFormation),
     s.rqth === "oui" ? "Oui" : "Non", s.numeroAction || "—"
   ]));
-  const wsCtx = XLSX.utils.aoa_to_sheet(ctx);
+  const wsCtx = XLSX.utils.aoa_to_sheet(clampCells(ctx));
   wsCtx["!cols"] = [{ wch: 24 }, { wch: 22 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 18 }];
   XLSX.utils.book_append_sheet(wb, wsCtx, "Contexte");
 

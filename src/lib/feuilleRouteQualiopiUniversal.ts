@@ -2,6 +2,7 @@
 // 7 colonnes : Critère · N° · Indicateur · Niveau attendu V9 · Ce qu'il faut dire ·
 // Documents à présenter · Vigilance. Indicateurs spécifiques au type d'action marqués en orange.
 
+import { clampCells } from "./xlsxSafe";
 import { isStagiaireFormationTerminee } from "./docBuilder";
 import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import * as XLSX from "xlsx";
@@ -110,7 +111,7 @@ ${attenduSelonAudit(typeAudit, ind.numero)}`,
   const totalCovered = indicateurs.filter((i) => (docsByInd.get(i.numero)?.length || 0) > 0).length;
   rows.push(["TOTAL", indicateurs.length, catalog.length, `${totalCovered}/${indicateurs.length} indicateurs couverts`]);
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const ws = XLSX.utils.aoa_to_sheet(clampCells(rows));
   ws["!cols"] = [
     { wch: 18 }, { wch: 6 }, { wch: 50 }, { wch: 50 }, { wch: 55 }, { wch: 55 }, { wch: 30 },
   ];
@@ -221,7 +222,7 @@ ${attenduSelonAudit(typeAudit, ind.numero)}`,
   ctx.push(["Indicateurs couverts", `${totalCovered}/${indicateurs.length}`]);
   ctx.push(["Taux de couverture", indicateurs.length ? `${Math.round((totalCovered / indicateurs.length) * 100)} %` : "—"]);
 
-  const wsCtx = XLSX.utils.aoa_to_sheet(ctx);
+  const wsCtx = XLSX.utils.aoa_to_sheet(clampCells(ctx));
   wsCtx["!cols"] = [{ wch: 28 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 18 }];
   XLSX.utils.book_append_sheet(wb, wsCtx, "Contexte");
 
