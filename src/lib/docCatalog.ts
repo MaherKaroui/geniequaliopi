@@ -156,12 +156,9 @@ export function buildFullCatalog(
     });
     // Contrat ou Convention de formation — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
-      // Convention si l'entreprise (ou son OPCO, la Région) finance ; contrat de formation
-      // professionnelle (art. L.6353-3) quand la personne finance elle-même (ou via CPF / France Travail).
-      const fin = (s.financeur || "").toLowerCase();
-      const hasEntreprise = fin
-        ? /opco|entreprise|employeur|plan de d[ée]veloppement|r[ée]gion/.test(fin)
-        : !!(s.entreprise && s.entreprise.trim());
+      // Règle : stagiaire avec entreprise → convention tripartite (jamais de contrat) ;
+      // sans entreprise → contrat bilatéral (art. L.6353-3, la personne finance elle-même).
+      const hasEntreprise = !!(s.entreprise && s.entreprise.trim());
       if (hasEntreprise) {
         add(`af_c3i9_convention_formation_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION TRIPARTITE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_tripartite", { stagiaireIdx: si });
       } else {

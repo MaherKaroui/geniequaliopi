@@ -527,10 +527,13 @@ const GenerationRapide = () => {
     for (const doc of PACK_DOCS) {
       if (!selected[doc.key]) continue;
       if (doc.key === "convention" && !stagiaires.some((s) => s.prenom?.trim() && s.nom?.trim() && conventionPossible(s))) continue;
+      if (doc.key === "contrat" && !stagiaires.some((s) => s.prenom?.trim() && s.nom?.trim() && !conventionPossible(s))) continue;
       if (!doc.perStagiaire) { out.push({ doc, stagiaire: null, stagiaireIdx: null }); continue; }
       stagiaires.forEach((s, i) => {
         if (!s.prenom?.trim() || !s.nom?.trim()) return;
+        // Avec entreprise : convention tripartite automatique, jamais de contrat.
         if (doc.key === "convention" && !conventionPossible(s)) return;
+        if (doc.key === "contrat" && conventionPossible(s)) return;
         out.push({ doc, stagiaire: s, stagiaireIdx: i });
       });
     }
@@ -620,9 +623,12 @@ const GenerationRapide = () => {
     const cible = items.length > 0
       ? items
       : doc.perStagiaire
-        ? stagiairesValides.map((s) => ({ doc, stagiaire: s, stagiaireIdx: stagiaires.indexOf(s) }))
+        ? stagiairesValides
+            // Même règle que le pack : avec entreprise → convention tripartite ; sans → contrat.
+            .filter((s) => (doc.key === "convention" ? conventionPossible(s) : doc.key === "contrat" ? !conventionPossible(s) : true))
+            .map((s) => ({ doc, stagiaire: s, stagiaireIdx: stagiaires.indexOf(s) }))
         : [{ doc, stagiaire: null as StagiaireInfo | null, stagiaireIdx: null as number | null }];
-    if (doc.perStagiaire && cible.length === 0) { toast.error("Ajoutez d'abord un stagiaire"); return; }
+    if (doc.perStagiaire && cible.length === 0) { toast.error("Aucun stagiaire concerné par ce document"); return; }
 
     setDownloadingKey(doc.key);
     const t = toast.loading(`Préparation : ${doc.label}…`);
@@ -1107,18 +1113,20 @@ const GenerationRapide = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
             {PACK_DOCS.map((doc, docIdx) => {
               const conventionGrisee = doc.key === "convention" && stagiairesValides.length > 0 && stagiairesValides.every((s) => !conventionPossible(s));
+              const contratGrisee = doc.key === "contrat" && stagiairesValides.length > 0 && stagiairesValides.every((s) => conventionPossible(s));
+              const grisee = conventionGrisee || contratGrisee;
               const count = planned.filter((p) => p.doc.key === doc.key).length;
               const firstIdx = planned.find((p) => p.doc.key === doc.key)?.stagiaireIdx ?? null;
-              const actif = !!selected[doc.key] && !conventionGrisee;
+              const actif = !!selected[doc.key] && !grisee;
               return (
                 <div
                   key={doc.key}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest("[data-no-check]")) return;
-                    if (!conventionGrisee) setSelected((p) => ({ ...p, [doc.key]: !p[doc.key] }));
+                    if (!grisee) setSelected((p) => ({ ...p, [doc.key]: !p[doc.key] }));
                   }}
                   className={`group flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                    conventionGrisee
+                    grisee
                       ? "opacity-60 cursor-not-allowed"
                       : actif
                         ? "border-primary/50 bg-primary/5 shadow-card ring-1 ring-primary/20"
@@ -1146,7 +1154,9 @@ const GenerationRapide = () => {
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {conventionGrisee
                         ? "Sans entreprise, il s'agit d'un contrat bilatéral et non d'une convention."
-                        : doc.perStagiaire ? `1 par stagiaire${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
+                        : contratGrisee
+                          ? "Avec entreprise, la convention tripartite remplace automatiquement le contrat."
+                          : doc.perStagiaire ? `1 par stagiaire${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
                     </p>
                   </div>
                   <Button

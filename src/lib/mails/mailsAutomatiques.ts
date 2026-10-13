@@ -102,8 +102,8 @@ function v<T>(c: Ctx, cle: string, options: T[]): T {
 type Regime = "cpf" | "convention" | "contrat" | "aif";
 
 /**
- * Cadre contractuel déduit du financeur (déjà corrigé par financeursEffectifs :
- * une AF non certifiante est toujours en financement personnel).
+ * Cadre contractuel : stagiaire avec entreprise → convention de formation tripartite
+ * (jamais de contrat) ; sans entreprise → contrat de formation professionnelle.
  */
 function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: string } {
   const fin = (c.s.financeur || "").toLowerCase();
@@ -111,10 +111,10 @@ function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: st
   if (certifiante && /cpf|compte formation/.test(fin)) {
     return { r: "cpf", piece: "", libelle: "", phrase: "Votre inscription a été validée sur Mon Compte Formation : les conditions générales d'utilisation de la plateforme tiennent lieu de contrat, aucune convention n'est à signer." };
   }
-  if (/france travail|aif/.test(fin)) {
+  if (/france travail|aif/.test(fin) && !(c.s.entreprise || "").trim()) {
     return { r: "aif", piece: "Devis AIF", libelle: "devis AIF", phrase: "Le devis d'aide individuelle à la formation (AIF) est à valider avec votre conseiller France Travail avant le démarrage." };
   }
-  if (/opco|entreprise|employeur|plan|r[ée]gion/.test(fin) || (!fin && (c.s.entreprise || "").trim())) {
+  if (/opco|entreprise|employeur|plan|r[ée]gion/.test(fin) || (c.s.entreprise || "").trim()) {
     return { r: "convention", piece: "Convention de formation", libelle: "convention de formation", phrase: `La convention de formation est à signer par ${esc((c.s.entreprise || "votre employeur").trim())} et à nous retourner avant le démarrage.` };
   }
   return { r: "contrat", piece: "Contrat de formation professionnelle", libelle: "contrat de formation professionnelle", phrase: "Conformément à l'article L.6353-5 du Code du travail, vous disposez d'un délai de rétractation de 10 jours à compter de la signature du contrat ; aucune somme ne peut être exigée avant l'expiration de ce délai." };

@@ -288,7 +288,7 @@ export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
     civ: s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : "",
     situation,
     financeur,
-    contratAvecEmployeur: financeur === "Employeur / OPCO",
+    contratAvecEmployeur: financeur === "Employeur / OPCO" || !!s.entreprise?.trim(),
     poste: metier,
     structure: s.entreprise?.trim() || "—",
     anneesLien,
