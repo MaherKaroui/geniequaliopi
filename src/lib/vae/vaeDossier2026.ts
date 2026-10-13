@@ -14,6 +14,7 @@
  * - pas de signature simulée : image réelle ou case vide.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import { FORMATIONS_CENTRE_IND22 } from "../formationsCentreInd22";
 import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
 import { getRNCPByCode } from "../rncpData";
 import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "../qualite2026";
@@ -740,6 +741,7 @@ export function genVAEPlanDevAccompagnateurs(o: OrganismeInfo, f: FormationInfo)
   return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES – ACCOMPAGNATEURS VAE", subtitle: `Année ${annee}`, table: {
     headers: ["Besoin", "Action", "Bénéficiaire", "Échéance", "Statut"],
     rows: [
+      ...FORMATIONS_CENTRE_IND22.map((formation) => ["Gestion du centre et outils numériques", `${formation.nom} — IZIBUSINESS / Nadine DENDANI`, "Participants à confirmer", "Dates effectives à confirmer", "Déclarée suivie — attestation IZIBUSINESS à joindre"]),
       ["Actualisation réglementaire VAE", "Veille et appropriation de la réforme (loi n° 2022-1598, décret n° 2023-1275, plateforme vae.gouv.fr)", esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
       ["Référentiel qualité 2026", "Appropriation du décret n° 2026-728 (33 indicateurs)", esc(o.referentQualite), `${annee}`, "Planifiée"],
       ["Accueil du handicap", "Sensibilisation (ressources Agefiph)", esc(o.referentHandicap), `${annee}`, "Planifiée"],

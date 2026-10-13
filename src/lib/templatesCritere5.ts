@@ -4,6 +4,7 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
+import { FORMATIONS_CENTRE_IND22 } from "./formationsCentreInd22";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
@@ -253,6 +254,7 @@ export interface PlanDevAction {
   financement: string;
   priorite: "Haute" | "Moyenne" | "Normale";
   efficacite: string;     // critère d'évaluation de l'efficacité
+  statut?: string;
 }
 
 type Metier = { origine: string; nom: string; objectif: string; type: string; formateur: string; duree: string };
@@ -367,6 +369,15 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   const out: PlanDevAction[] = [];
   const add = (a: Omit<PlanDevAction, "ref">) => out.push({ ref: "", ...a });
 
+  FORMATIONS_CENTRE_IND22.forEach((formation) => add({
+    famille: formation.famille, besoin: "Professionnalisation de la gestion du centre et de ses outils", indicateurs: "22",
+    nom: formation.nom, objectif: formation.objectif, beneficiaires: "Participants à confirmer",
+    modalite: "À confirmer", prestataire: "IZIBUSINESS — Nadine DENDANI",
+    duree: "À confirmer sur l’attestation", periode: "Dates effectives à confirmer", financement: "À confirmer",
+    priorite: "Haute", efficacite: "Attestation délivrée par IZIBUSINESS ; application dans la gestion du centre",
+    statut: "Déclarée suivie — attestation IZIBUSINESS à joindre",
+  }));
+
   // 1. Compétences métier (IND 21-22 : expertise à jour dans le domaine enseigné)
   if (!isVAE && !isBC) {
     formationsMetier(f).forEach((m) => add({
@@ -410,7 +421,7 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   out.forEach((a, i) => {
     a.ref = `PDC-${String(i + 1).padStart(2, "0")}`;
     const trimIdx = Math.floor((moisDebut - 1) / 3) + Math.floor(i / 2);
-    a.periode = `T${(trimIdx % 4) + 1} ${an + Math.floor(trimIdx / 4)}`;
+    if (!a.periode) a.periode = `T${(trimIdx % 4) + 1} ${an + Math.floor(trimIdx / 4)}`;
   });
   void formateurs;
   return out;
@@ -459,7 +470,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   h += sec("2. ACTIONS DE DÉVELOPPEMENT DES COMPÉTENCES");
   h += `<tr><th>Réf.</th><th>Besoin identifié (source)</th><th>Action</th><th>Objectifs attendus</th><th>Bénéficiaire(s)</th><th>Modalité</th><th>Prestataire / animateur</th><th>Durée</th><th>Période</th><th>Financement</th><th>Critère d'efficacité</th><th>Statut</th></tr>`;
   actions.forEach((a) => {
-    h += `<tr><td>${a.ref}</td><td>${a.besoin}</td><td>${a.nom}</td><td>${a.objectif}</td><td>${a.beneficiaires}</td><td>${a.modalite}</td><td>${a.prestataire}</td><td>${a.duree}</td><td>${a.periode}</td><td>${a.financement}</td><td>${a.efficacite}</td><td>${a.priorite === "Haute" ? "Prioritaire — " : ""}${statut}</td></tr>`;
+    h += `<tr><td>${a.ref}</td><td>${a.besoin}</td><td>${a.nom}</td><td>${a.objectif}</td><td>${a.beneficiaires}</td><td>${a.modalite}</td><td>${a.prestataire}</td><td>${a.duree}</td><td>${a.periode}</td><td>${a.financement}</td><td>${a.efficacite}</td><td>${a.priorite === "Haute" ? "Prioritaire — " : ""}${a.statut || statut}</td></tr>`;
   });
 
   h += sec("3. AUTRES LEVIERS DE PROFESSIONNALISATION");
