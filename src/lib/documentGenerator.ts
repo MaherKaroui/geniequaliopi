@@ -33,6 +33,7 @@ import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./v
 import { isOngulaireFormation, getOngulaireBesoin, getOngulaireEvalBesoins } from "./ongulaireHumanized";
 import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins, rpmsBonnesQcmDebut, rpmsReponsesQcmDebut } from "./rpmsHumanized";
 import { isWM14Formation, getWM14Besoin, getWM14EvalBesoins, wm14BonnesQcmDebut, wm14ReponsesQcmDebut } from "./webmarketing14hHumanized";
+import { parseObjectifsCompetences, objectifsPedagogiquesHtml, competencesDeveloppeesHtml } from "./objectifsCompetences";
 import { isTVTEFormation, getTVTEBesoin, getTVTEEvalBesoins, tvteBonnesQcmDebut, tvteReponsesQcmDebut } from "./ventesEnergie35hHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
@@ -2128,27 +2129,10 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     derouleHtml += `</table>`;
   }
 
-  // Build objectifs as list items
-  const objectifsList = f.objectifs
-    .split(/\n|\.(?=\s)/)
-    .map(l => l.trim())
-    .filter(l => l.length > 5)
-    .map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`)
-    .join("");
-  const objectifsHtml = objectifsList ? `<ul>${objectifsList}</ul>` : `<p>${f.objectifs}</p>`;
-
-  // Generate competences from objectifs (reformulated)
-  const objectifsItems = f.objectifs
-    .split(/\n|\.(?=\s)/)
-    .map(l => l.trim().replace(/^[-•]\s*/, "").replace(/^À l'issue.*capable de\s*:?\s*/i, ""))
-    .filter(l => l.length > 5);
-  const competencesHtml = objectifsItems.length > 0
-    ? `<ul>${objectifsItems.map(item => {
-        // Reformulate as a competence
-        const comp = item.charAt(0).toUpperCase() + item.slice(1);
-        return `<li>${comp}</li>`;
-      }).join("")}</ul>`
-    : objectifsHtml;
+  // Sections 4 et 5 : objectifs (général + opérationnels) et compétences (savoirs mobilisés) — contenus distincts.
+  const objComp = parseObjectifsCompetences(f.objectifs || "", f.programme || "");
+  const objectifsHtml = objectifsPedagogiquesHtml(objComp, undefined, `<p>${f.objectifs}</p>`);
+  const competencesHtml = competencesDeveloppeesHtml(objComp, undefined, objectifsHtml);
 
   // Build public visé as list
   const publicItems = f.publicVise

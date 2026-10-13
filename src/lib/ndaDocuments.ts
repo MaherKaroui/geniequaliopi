@@ -6,6 +6,7 @@
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { CVData } from "@/lib/cvGenerator";
+import { parseObjectifsCompetences, objectifsPedagogiquesHtml, competencesDeveloppeesHtml } from "@/lib/objectifsCompetences";
 import { buildCSS, headerHtml, footerHtml, escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS } from "@/lib/ndaContratReglement";
 
 function wrap(body: string): string {
@@ -30,6 +31,7 @@ export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     ? `<ul>${objectifsList.map(o => `<li>${escapeHtml(o)}</li>`).join("")}</ul>`
     : `<p>${v(f.objectifs)}</p>`;
 
+  const objComp = parseObjectifsCompetences(f.objectifs || "", f.programme || "");
   const programmeHtml = (f.programme || DOTS).split(/\r?\n/).map(escapeHtml).join("<br>");
 
   const body = `
@@ -53,11 +55,11 @@ ${o.email ? `<strong>Email :</strong> ${escapeHtml(o.email)}<br>` : ""}
 
 <h3>4. Objectifs pédagogiques</h3>
 <p>À l'issue de la formation, le stagiaire sera capable de :</p>
-${objectifsHtml}
+${objectifsPedagogiquesHtml(objComp, escapeHtml, objectifsHtml)}
 
 <h3>5. Compétences développées</h3>
 <p>À l'issue de cette formation, les compétences suivantes seront acquises et mobilisables en situation professionnelle :</p>
-${objectifsHtml}
+${competencesDeveloppeesHtml(objComp, escapeHtml, objectifsHtml)}
 
 <h3>6. Public visé</h3>
 <p>${v(f.publicVise)}</p>
