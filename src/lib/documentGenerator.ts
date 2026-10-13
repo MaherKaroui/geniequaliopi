@@ -51,6 +51,7 @@ import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiaires
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
 import inserjeunesNtcAsset from "@/assets/inserjeunes-ntc.png.asset.json";
 import izibusinessTamponAsset from "@/assets/izibusiness_tampon.png.asset.json";
+import { genAttestationIzibusiness } from "./attestationIzibusiness";
 import { genNewsletterMissionCFA } from "./newslettersMissionsCFA";
 import { getModuleSpecificConsigne, buildModuleSpecificResponse } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genCasRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
@@ -840,6 +841,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
+    case "attestation_izibusiness": return genAttestationIzibusiness(o, String(params?.formationIzi || "gerer_centre"));
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
