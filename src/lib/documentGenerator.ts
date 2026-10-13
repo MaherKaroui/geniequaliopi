@@ -1965,11 +1965,11 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   // Tableau récapitulatif des stagiaires avec leurs dates individuelles
   let tableStag = "";
   if (stagiaires.length > 0) {
-    const financements = ["OPCO", "Pôle Emploi", "Financement personnel"];
     const rows = stagiaires.map((s, i) => {
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
-      const financement = financements[i % financements.length];
+      // Prise en charge déterministe : sans entreprise → OPCO, avec entreprise → Financement personnel.
+      const financement = s.entreprise?.trim() ? "Financement personnel" : "OPCO";
       const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
