@@ -59,16 +59,17 @@ describe("dossier VAE", () => {
     expect(em.t).toMatch(/0 heure\(s\) réalisée\(s\)/);
   });
 
-  it("une seule pièce contractuelle, choisie selon le financeur", () => {
+  it("une seule pièce contractuelle, choisie selon l'entreprise (convention tripartite si entreprise)", () => {
     const docs = dossier();
     const contrats = docs.filter(({ d }) => d.template === "vae_contrat_accompagnement");
     expect(contrats).toHaveLength(STAGIAIRES_TEST.length * 2);
     for (const indicateur of [4, 9]) {
       const contratsIndicateur = contrats.filter(({ d }) => d.indicateur === indicateur);
       expect(contratsIndicateur).toHaveLength(STAGIAIRES_TEST.length);
-      expect(contratsIndicateur[0].t).toMatch(/Mon Compte Formation/); // CPF
+      expect(contratsIndicateur[0].t).toMatch(/TRIPARTITE/); // ALPHA : entreprise présente → convention tripartite
+      expect(contratsIndicateur[0].t).toContain("Société Alpha");
       expect(contratsIndicateur[1].t).toMatch(/TRIPARTITE/); // OPCO
-      expect(contratsIndicateur[2].t).toMatch(/rétractation de 10 jours/); // personnel
+      expect(contratsIndicateur[2].t).toMatch(/rétractation de 10 jours/); // sans entreprise
     }
     expect(docs.some(({ d }) => /convention_tripartite|convention_accompagnement/.test(d.template))).toBe(false);
   });
