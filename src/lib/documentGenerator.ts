@@ -1968,8 +1968,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     const rows = stagiaires.map((s, i) => {
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
-      // Prise en charge déterministe : sans entreprise → OPCO, avec entreprise → Financement personnel.
-      const financement = s.entreprise?.trim() ? "Financement personnel" : "OPCO";
+      // Prise en charge déterministe : avec entreprise → OPCO, sans entreprise → Financement personnel.
+      const financement = s.entreprise?.trim() ? "OPCO" : "Financement personnel";
       const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
