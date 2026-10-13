@@ -1,9 +1,5 @@
 # Roadmap
 
-- [x] Ajouter à l’IND 22 « Gérer son centre » et « Automatisation Make et Airtable ».
-- [x] Préparer les projets d’attestations IZIBUSINESS sans inventer de dates, durées ou signatures.
-- [ ] Finaliser les attestations : en attente des noms des participants, dates et durées réelles, puis validation IZIBUSINESS.
-
 - [x] Centraliser les niveaux de qualité PDF et les chartes déterministes.
 - [x] Ajouter un contrôle partagé qualité/design aux générateurs.
 - [x] Appliquer le style et la qualité aux aperçus, téléchargements et ZIP.

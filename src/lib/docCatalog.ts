@@ -4,7 +4,6 @@ import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { estJourFormation } from "./joursFeries";
 import { getUnitesExercices } from "./parcoursStagiaire";
-import { FORMATIONS_CENTRE_IND22 } from "./formationsCentreInd22";
 
 /** Nombre de jours de formation réels d'un stagiaire (fériés exclus, samedi de bord inclus). */
 function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
@@ -1634,11 +1633,6 @@ export function buildFullCatalog(
       });
     });
   }
-
-  // On ne conserve que les mails réellement générables.
-  FORMATIONS_CENTRE_IND22.forEach((formation) => {
-    add(`commun_c5i22_attestation_${formation.id}`, `CT5 - IND 22 PROJET D’ATTESTATION – ${formation.nom}`, 5, 22, "projet_attestation_centre_ind22", { formationId: formation.id });
-  });
 
   // On ne conserve que les mails réellement générables.
   // Cela évite l'apparition d'un dossier "Critere_0" dans les ZIP et garde l'UI
