@@ -382,6 +382,8 @@ export function buildFullCatalog(
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
     add("af_c5i22_attestations_formation", "CT5 - IND 22 ATTESTATIONS DE FORMATION CONTINUE (à joindre)", 5, 22, "attestation_fin_formation");
+    add("af_c5i22_attestation_izi_gerer_centre", "CT5 - IND 22 ATTESTATION FORMATION GÉRER SON CENTRE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "gerer_centre" });
+    add("af_c5i22_attestation_izi_make_airtable", "CT5 - IND 22 ATTESTATION FORMATION AUTOMATISATION MAKE ET AIRTABLE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "make_airtable" });
     intervenantsAF.forEach((fname) => {
       add(`af_c5i22_fiche_entretien_${slugNom(fname)}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
     });
@@ -1138,6 +1140,8 @@ export function buildFullCatalog(
 
     // IND 22 — Entretien et développement des compétences
     add("cfa_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
+    add("cfa_c5i22_attestation_izi_gerer_centre", "CT5 - IND 22 ATTESTATION FORMATION GÉRER SON CENTRE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "gerer_centre" });
+    add("cfa_c5i22_attestation_izi_make_airtable", "CT5 - IND 22 ATTESTATION FORMATION AUTOMATISATION MAKE ET AIRTABLE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "make_airtable" });
     
 
     uniqueFormateursCFA.forEach((fName) => {
