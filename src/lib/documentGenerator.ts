@@ -1970,7 +1970,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
       // Prise en charge déterministe : avec entreprise → OPCO, sans entreprise → Financement personnel.
-      const financement = s.entreprise?.trim() ? "OPCO" : "Financement personnel";
+      const financement = financeParEntreprise(s) ? "OPCO" : "Financement personnel";
       const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
@@ -8385,11 +8385,12 @@ const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong
 const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
 /** Formation non certifiante : pas d'éligibilité au CPF, la question ne le propose pas. */
 const QUESTION_FINANCEMENT_NON_CERTIFIANTE = "Quel budget avez-vous prévu pour cette formation et comment la financez-vous (financement personnel, employeur, France Travail) ?";
-/** La formation est-elle financée par l'entreprise (OPCO, plan, employeur) ? Décidé par le financeur saisi, l'entreprise seule ne suffit pas. */
+/** Prise en charge de l'évaluation des besoins (IND 4) : un stagiaire rattaché à une entreprise
+ *  est financé par l'OPCO (plan de développement des compétences) ; sans entreprise, le
+ *  financement est personnel. Le champ « financeur » saisi ne change pas cette règle. */
 function financeParEntreprise(s: StagiaireInfo): boolean {
-  const fin = (s.financeur || "").toLowerCase();
-  if (fin) return /opco|entreprise|employeur|plan de d[ée]veloppement|r[ée]gion/.test(fin);
-  return !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  const ent = (s.entreprise || "").trim();
+  return !!ent && ent.toLowerCase() !== "entreprise";
 }
 function questionFinancementPour(s: StagiaireInfo, f: FormationInfo): string {
   if (financeParEntreprise(s)) return QUESTION_FINANCEMENT_ENTREPRISE;
@@ -8731,35 +8732,21 @@ const __GEN_NONCE__ = 0;
 export function bumpEvalBesoinsNonce() { /* graine déterministe */ }
 function _refreshNonceIfStale() { /* graine déterministe */ }
 
-/** Financement déclaré à partir du champ « financeur » saisi pour le stagiaire. */
-function financementDeclare(s: StagiaireInfo): string | null {
-  const fin = (s.financeur || "").trim().toLowerCase();
-  if (!fin) return null;
-  if (fin.includes("cpf")) return "Je mobilise mon Compte Personnel de Formation (CPF) via Mon Compte Formation.";
-  if (fin.includes("opco")) return `Formation prise en charge par l'OPCO de ${s.entreprise?.trim() || "mon employeur"} au titre du plan de développement des compétences.`;
-  if (fin.includes("entreprise") || fin.includes("employeur")) return `Formation financée directement par ${s.entreprise?.trim() || "mon employeur"} (plan de développement des compétences).`;
-  if (fin.includes("france travail") || fin.includes("pôle emploi") || fin.includes("pole emploi")) return "Financement France Travail (aide individuelle à la formation), validé avec mon conseiller.";
-  if (fin.includes("région") || fin.includes("region")) return "Financement de la Région dans le cadre de son programme de formation.";
-  if (fin.includes("perso")) return "Je finance la formation personnellement.";
-  return `Financement : ${s.financeur}.`;
-}
 
 function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
   _refreshNonceIfStale();
   const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
   const isCFAAlternance = (Array.isArray(o.typesActions) && o.typesActions.includes('apprentissage')) || !!f.rythmeAlternance?.trim();
-  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  const hasEntreprise = financeParEntreprise(s);
   // Données saisies prioritaires, pour TOUTES les formations (y compris presets vitrage / ongulaire).
   if ((s.diplome || "").trim()) result.diplome = s.diplome!.trim();
-  const declare = financementDeclare(s);
+  // Prise en charge IND 4 : stagiaire avec entreprise → OPCO, sans entreprise → Financement personnel.
   if (isCFAAlternance) {
     result.budget = ALTERNANCE_OPCO_FINANCEMENT;
-  } else if (declare) {
-    result.budget = declare;
-  } else if (!isVitrageFormation(f.intitule, f.codeRNCP) && !isOngulaireFormation(f.intitule, f.codeRNCP)) {
-    result.budget = financeParEntreprise(s)
-      ? "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences."
-      : "Financement personnel";
+  } else if (hasEntreprise) {
+    result.budget = `Formation prise en charge par l'OPCO de ${(s.entreprise || "").trim()} au titre du plan de développement des compétences.`;
+  } else {
+    result.budget = "Financement personnel";
   }
   if (isStagiairePSH(s)) {
     result.handicap = `Oui, je bénéficie d'une reconnaissance de la qualité de travailleur handicapé (RQTH). Je souhaite échanger avec le référent handicap (${o.referentHandicap || o.dirigeant}) pour définir les aménagements utiles : rythme, pauses, supports adaptés.`;

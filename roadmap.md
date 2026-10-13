@@ -13,3 +13,4 @@
 - [x] Corriger la convention CFA tripartite : CFA, entreprise et apprenant, puis vérifier les signatures.
 - [x] Ajouter le contrat d’accompagnement de chaque bénéficiaire VAE à l’indicateur 9.
 - [x] Reprendre la durée saisie dans tous les fichiers concernés du pack rapide sans recalcul depuis les dates.
+- [x] Appliquer la règle IND 4 : stagiaire avec entreprise → OPCO, sans entreprise → Financement personnel.
