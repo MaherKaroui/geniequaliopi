@@ -12,6 +12,7 @@
 //  - Statut (✅ Couvert / ⚠ Partiel / À faire)
 //  - Documents générés par l'application (liste)
 
+import { clampCells } from "./xlsxSafe";
 import * as XLSX from "xlsx";
 import { DocEntry, OrganismeInfo } from "@/types/qualiopi";
 
@@ -135,7 +136,7 @@ export function generateFeuilleRouteQualiopi(
     `${REF.filter((r) => (byInd.get(r.ind) || []).length > 0).length}/${REF.length} indicateurs couverts`,
   ]);
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const ws = XLSX.utils.aoa_to_sheet(clampCells(rows));
 
   // Largeurs de colonnes
   ws["!cols"] = [
