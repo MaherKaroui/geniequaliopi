@@ -105,19 +105,19 @@ type Regime = "cpf" | "convention" | "contrat" | "aif";
  * Cadre contractuel : stagiaire avec entreprise → convention de formation tripartite
  * (jamais de contrat) ; sans entreprise → contrat de formation professionnelle.
  */
-function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: string } {
+function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: string; art: string; participe: string } {
   const fin = (c.s.financeur || "").toLowerCase();
   const certifiante = /^(RS|RNCP)\d+$/i.test(String(c.f.codeRNCP || "").replace(/\s+/g, ""));
   if (certifiante && /cpf|compte formation/.test(fin)) {
-    return { r: "cpf", piece: "", libelle: "", phrase: "Votre inscription a été validée sur Mon Compte Formation : les conditions générales d'utilisation de la plateforme tiennent lieu de contrat, aucune convention n'est à signer." };
+    return { r: "cpf", piece: "", libelle: "", phrase: "Votre inscription a été validée sur Mon Compte Formation : les conditions générales d'utilisation de la plateforme tiennent lieu de contrat, aucune convention n'est à signer.", art: "", participe: "" };
   }
   if (/france travail|aif/.test(fin) && !(c.s.entreprise || "").trim()) {
-    return { r: "aif", piece: "Devis AIF", libelle: "devis AIF", phrase: "Le devis d'aide individuelle à la formation (AIF) est à valider avec votre conseiller France Travail avant le démarrage." };
+    return { r: "aif", piece: "Devis AIF", libelle: "devis AIF", phrase: "Le devis d'aide individuelle à la formation (AIF) est à valider avec votre conseiller France Travail avant le démarrage.", art: "le", participe: "signé" };
   }
   if (/opco|entreprise|employeur|plan|r[ée]gion/.test(fin) || (c.s.entreprise || "").trim()) {
-    return { r: "convention", piece: "Convention de formation", libelle: "convention de formation", phrase: `La convention de formation est à signer par ${esc((c.s.entreprise || "votre employeur").trim())} et à nous retourner avant le démarrage.` };
+    return { r: "convention", piece: "Convention de formation", libelle: "convention de formation", phrase: `La convention de formation est à signer par ${esc((c.s.entreprise || "votre employeur").trim())} et à nous retourner avant le démarrage.`, art: "la", participe: "signée" };
   }
-  return { r: "contrat", piece: "Contrat de formation professionnelle", libelle: "contrat de formation professionnelle", phrase: "Conformément à l'article L.6353-5 du Code du travail, vous disposez d'un délai de rétractation de 10 jours à compter de la signature du contrat ; aucune somme ne peut être exigée avant l'expiration de ce délai." };
+  return { r: "contrat", piece: "Contrat de formation professionnelle", libelle: "contrat de formation professionnelle", phrase: "Conformément à l'article L.6353-5 du Code du travail, vous disposez d'un délai de rétractation de 10 jours à compter de la signature du contrat ; aucune somme ne peut être exigée avant l'expiration de ce délai.", art: "le", participe: "signé" };
 }
 
 function scenarioAF(c: Ctx): MailAuto[] {
@@ -162,11 +162,11 @@ function scenarioAF(c: Ctx): MailAuto[] {
       `<p>${c.appel},</p><p>Nous avons le plaisir de vous confirmer votre inscription à la formation ${formation}, qui se déroulera ${periode}.</p>`,
       `<p>${c.appel},</p><p>Votre inscription à la formation ${formation} est confirmée. La session aura lieu ${periode}, ${modalite(c)}.</p>`,
       `<p>${c.appel},</p><p>Bonne nouvelle : votre place est réservée pour la formation ${formation} (${periode}).</p>`,
-    ]) + `<p>Vous trouverez ci-joint ${reg.piece ? `le ${reg.libelle}${reg.r === "aif" ? "" : " à nous retourner signé"}, ` : ""}le programme, les conditions générales de vente et le règlement intérieur, à lire avant le démarrage.</p><p>${reg.phrase}</p>`, piecesInscription),
+    ]) + `<p>Vous trouverez ci-joint ${reg.piece ? `${reg.art} ${reg.libelle}${reg.r === "aif" ? "" : ` à nous retourner ${reg.participe}`}, ` : ""}le programme, les conditions générales de vente et le règlement intérieur, à lire avant le démarrage.</p><p>${reg.phrase}</p>`, piecesInscription),
   ];
   if (reg.r === "contrat" || reg.r === "convention") {
     msgsInscription.push(deStagiaire(c, aHeure(signatureContrat, k + "i2"), v(c, "ri", [
-      `<p>Bonjour,</p><p>Vous trouverez ci-joint le ${reg.libelle} signé.</p><p>Cordialement,</p>`,
+      `<p>Bonjour,</p><p>Vous trouverez ci-joint ${reg.art} ${reg.libelle} ${reg.participe}.</p><p>Cordialement,</p>`,
       `<p>Bonjour,</p><p>Merci, voici le document signé. J'ai bien pris connaissance du règlement intérieur et des CGV.</p><p>Cordialement,</p>`,
     ]), [pj(c, `${reg.piece} signe`)]));
   }

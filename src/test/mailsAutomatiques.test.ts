@@ -12,16 +12,22 @@ describe("mails automatiques", () => {
     expect(clientMailOrganisme({ email: "of@hotmail.fr" })).toBe("outlook");
   });
 
-  it("AF non certifiante : financement personnel → contrat avec rétractation, jamais CPF", () => {
+  it("AF non certifiante : avec entreprise → convention tripartite ; sans entreprise → contrat avec rétractation, jamais CPF", () => {
     const f = FORMATIONS_TEST["actions-formation"];
     const stag = financeursEffectifs(STAGIAIRES_TEST, f, ORG_TEST);
     expect(stag.every((s) => s.financeur === "Personnel")).toBe(true);
     for (const s of stag) {
       const ins = mailsStagiaire(ORG_TEST, f, s, "actions-formation").find((m) => m.key === "af_inscription")!;
       const t = texte(ins.messages[0].body);
-      expect(t).toMatch(/contrat de formation professionnelle/);
-      expect(t).toMatch(/rétractation de 10 jours/);
       expect(t).not.toMatch(/Mon Compte Formation/);
+      if (s.entreprise?.trim()) {
+        expect(t).toMatch(/convention de formation/);
+        expect(t).not.toMatch(/contrat de formation professionnelle/);
+        expect(t).toContain(s.entreprise.trim());
+      } else {
+        expect(t).toMatch(/contrat de formation professionnelle/);
+        expect(t).toMatch(/rétractation de 10 jours/);
+      }
       expect(ins.messages[0].atts.map((a) => a.name).join(" ")).toMatch(/Programme.*|Reglement_interieur|Conditions_generales/);
     }
   });
