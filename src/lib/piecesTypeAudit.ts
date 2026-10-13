@@ -155,7 +155,7 @@ export function genBilanPlanDeveloppement(o: OrganismeInfo, f: FormationInfo, st
     const m = a.periode.match(/^T(\d) (\d{4})$/);
     const finTrim = m ? new Date(+m[2], +m[1] * 3, 0) : null;
     const echue = !finTrim || finTrim <= dRevue;
-    return [a.ref, a.nom, a.beneficiaires, a.besoin, a.periode, echue ? "Réalisée — attestation jointe ☐    Reportée — motif : ……… ☐" : "Échéance non atteinte — maintenue au plan"];
+    return [a.ref, a.nom, a.beneficiaires, a.besoin, a.periode, a.statut || (echue ? "Réalisée — attestation jointe ☐    Reportée — motif : ……… ☐" : "Échéance non atteinte — maintenue au plan")];
   });
   return buildDocument({
     org: o, title: "BILAN DE RÉALISATION DU PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", subtitle: `Indicateur 22 — ${LIBELLES_AUDIT[type]}`,

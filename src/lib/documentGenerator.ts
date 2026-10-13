@@ -13,6 +13,7 @@ import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheComp
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
 import { planDevActions } from "./templatesCritere5";
+import { genProjetAttestationCentreInd22 } from "./formationsCentreInd22";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel } from "@/lib/bdc/bdcNTXlsx";
@@ -840,6 +841,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
+    case "projet_attestation_centre_ind22": return genProjetAttestationCentreInd22(o, params?.formationId || "");
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
