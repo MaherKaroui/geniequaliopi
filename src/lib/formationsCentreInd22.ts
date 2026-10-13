@@ -1,5 +1,5 @@
 import type { OrganismeInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument } from "./docBuilder";
 
 /** Identités demandées, sans reprendre les données administratives des presets. */
 export const FORMATIONS_CENTRE_IND22 = [
@@ -20,7 +20,7 @@ export const FORMATIONS_CENTRE_IND22 = [
 export function genProjetAttestationCentreInd22(o: OrganismeInfo, formationId: string): string {
   const formation = FORMATIONS_CENTRE_IND22.find((item) => item.id === formationId);
   if (!formation) throw new Error("Formation IND 22 inconnue");
-  const date = formatDate(new Date().toISOString().slice(0, 10));
+  const date = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   return buildDocument({
     org: o,
     title: "PROJET D’ATTESTATION DE FORMATION",
