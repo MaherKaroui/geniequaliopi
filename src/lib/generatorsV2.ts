@@ -33,6 +33,7 @@ import { pickOngulaireExerciceAnswer } from "./ongulaireHumanized";
 import { pickRPMSExerciceAnswer, isRPMSFormation, rpmsNoteExercice } from "./rpmsHumanized";
 import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./webmarketing14hHumanized";
 import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ventesEnergie35hHumanized";
+import { pickIAP21ExerciceAnswer, isIAP21Formation, iap21NoteExercice } from "./iaPro21hHumanized";
 
 // ========== HELPERS ==========
 
@@ -774,7 +775,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   // IA générative (RS6776) : QCM complets générés directement depuis la banque
   // intégrée (pas de dépendance au cache), même si la formation n'est pas terminée.
   const _tIA = (f.intitule || "").toLowerCase();
-  const _isIAGen = _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
+  const _isIAGen = !isIAP21Formation(f.intitule, f.codeRNCP) && _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
   const evalPackIA = _isIAGen ? IA_GENERATIVE_EVAL_PACK : null;
   const termine = isStagiaireFormationTerminee(s, f) || !!evalPackIA;
   if (!termine) {
@@ -1078,6 +1079,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, wm14NoteExercice(stagiaireIdx, ei, true))
         : isTVTEFormation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, tvteNoteExercice(stagiaireIdx, ei, true))
+        : isIAP21Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, iap21NoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1138,6 +1141,8 @@ D) Drive faster to finish the ride.`,
       ? wm14NoteExercice(stagiaireIdx, ei, false)
       : isTVTEFormation(f.intitule, f.codeRNCP)
       ? tvteNoteExercice(stagiaireIdx, ei, false)
+      : isIAP21Formation(f.intitule, f.codeRNCP)
+      ? iap21NoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1189,6 +1194,7 @@ D) Drive faster to finish the ride.`,
       || pickRPMSExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickTVTEExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickIAP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;

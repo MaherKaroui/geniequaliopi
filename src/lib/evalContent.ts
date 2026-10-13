@@ -13,6 +13,8 @@ import { WM14_EXERCICES_COMPLETS, WM14_QCM_DEBUT, WM14_QCM_FIN } from "./webmark
 import { isWM14Formation, getWM14AutoAnswers, WM14_QUESTIONS_OUVERTES } from "./webmarketing14hHumanized";
 import { TVTE_EXERCICES_COMPLETS, TVTE_QCM_DEBUT, TVTE_QCM_FIN } from "./ventesEnergie35hPreset";
 import { isTVTEFormation, getTVTEAutoAnswers, TVTE_QUESTIONS_OUVERTES } from "./ventesEnergie35hHumanized";
+import { IAP21_EXERCICES_COMPLETS, IAP21_QCM_DEBUT, IAP21_QCM_FIN } from "./iaPro21hPreset";
+import { isIAP21Formation, getIAP21AutoAnswers, IAP21_QUESTIONS_OUVERTES } from "./iaPro21hHumanized";
 
 
 
@@ -1221,6 +1223,28 @@ EVAL_CONTENT["TVTE"] = {
   ],
 };
 
+// ===== Intelligence artificielle : intégrer les outils d'IA dans son activité professionnelle – 21 h (non certifiante, C1 à C5) =====
+EVAL_CONTENT["IAP21"] = {
+  qcmPositionnement: IAP21_QCM_DEBUT,
+  qcmFinal: IAP21_QCM_FIN,
+  exercices: IAP21_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Comprendre le fonctionnement, les possibilités et les limites de l'IA générative",
+    "C2 – Rédiger des requêtes (prompts) efficaces et améliorer les réponses par itération",
+    "C3 – Produire et vérifier des contenus professionnels avec l'IA",
+    "C4 – Intégrer l'IA dans ses processus de travail et automatiser des tâches simples",
+    "C5 – Utiliser l'IA de façon responsable et conforme à la réglementation",
+  ],
+  appreciations: [
+    "Requêtes nettement mieux structurées (rôle, contexte, format). La vérification des chiffres produits par l'IA doit devenir systématique.",
+    "Bonne compréhension des limites des outils : repère les hallucinations et cite ses sources. Peut gagner en rapidité dans l'itération.",
+    "Contenus clients clairs et adaptés au ton de l'entreprise, sans promesse invérifiable. Relecture humaine bien intégrée.",
+    "Plan d'automatisation réaliste, avec mesure du temps gagné. Réflexes de confidentialité acquis : aucune donnée client identifiante saisie.",
+    "Implication constante dans les ateliers. Charte d'usage de l'IA pertinente et directement applicable dans son entreprise.",
+    "Très bonne maîtrise du cadre RGPD et du règlement européen sur l'IA. Doit encore enrichir sa bibliothèque de requêtes métier.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1442,6 +1466,8 @@ function getContentKey(intitule: string): string {
   if (isWM14Formation(lower)) return "WM14";
   // Techniques de vente – travaux énergétiques 35 h (non certifiante) — avant les contenus génériques
   if (isTVTEFormation(lower)) return "TVTE";
+  // IA – intégrer les outils d'IA 21 h (non certifiante) — avant la règle IA générative (RS6776)
+  if (isIAP21Formation(lower)) return "IAP21";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2175,6 +2201,9 @@ QUESTIONS_OUVERTES["WM14"] = WM14_QUESTIONS_OUVERTES;
 // situation (diagnostic puis C1 à C6), le même ordre que les réponses de ventesEnergie35hHumanized.ts.
 QUESTIONS_OUVERTES["TVTE"] = TVTE_QUESTIONS_OUVERTES;
 
+// IA – intégrer les outils d'IA 21 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["IAP21"] = IAP21_QUESTIONS_OUVERTES;
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2571,6 +2600,18 @@ export function generateStagiaireOpenAnswers(
 
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
+  // IA – intégrer les outils d'IA 21 h : moteur humanisé (une copie différente par stagiaire).
+  if (isIAP21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoIa = getIAP21AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoIa.reponses, autoIa.scores);
+  }
+
   // Techniques de vente – travaux énergétiques 35 h : moteur humanisé (une copie différente par stagiaire).
   if (isTVTEFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoTv = getTVTEAutoAnswers(

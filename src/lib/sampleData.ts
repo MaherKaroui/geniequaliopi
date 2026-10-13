@@ -193,6 +193,8 @@ import { FORMATION_WM14 } from "./webmarketing14hPreset";
 export { FORMATION_WM14, seedWM14AICaches } from "./webmarketing14hPreset";
 import { FORMATION_TVTE } from "./ventesEnergie35hPreset";
 export { FORMATION_TVTE, seedTVTEAICaches } from "./ventesEnergie35hPreset";
+import { FORMATION_IAP21 } from "./iaPro21hPreset";
+export { FORMATION_IAP21, seedIAP21AICaches } from "./iaPro21hPreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -538,6 +540,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_WM14,
   // Techniques de vente – travaux énergétiques 35 h (non certifiante, C1 à C6) : contenus pré-remplis (ventesEnergie35hPreset), aucun stagiaire importé
   FORMATION_TVTE,
+  // IA – intégrer les outils d'IA dans son activité professionnelle 21 h (non certifiante, C1 à C5) : contenus pré-remplis (iaPro21hPreset), aucun stagiaire importé
+  FORMATION_IAP21,
   {
     intitule: "Anglais Niveau A1 – Débutant",
     objectifs: "Acquérir les bases de la langue anglaise au niveau A1 du CECRL : se présenter, comprendre et utiliser des expressions familières et quotidiennes, poser des questions simples, décrire son environnement immédiat, rédiger des messages courts en anglais.",
