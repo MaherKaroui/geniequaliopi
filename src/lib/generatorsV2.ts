@@ -4,6 +4,7 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation, isStagiaireFormationTerminee } from "./docBuilder";
 import { mentionTVA } from "./mentionsLegales";
+import { parseMontant } from "./templatesCA";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 import { getUnitesExercices } from "./parcoursStagiaire";
 
@@ -526,6 +527,104 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     + '</div></div>';
   return buildDocument({ org: o, title: 'CONVENTION DE FORMATION TRIPARTITE – ' + s.prenom + ' ' + s.nom, extraHtml: extra });
 }
+
+/**
+ * Une seule convention pour plusieurs stagiaires d'une même entreprise :
+ * l'entreprise signe une fois, chaque stagiaire a son cadre de signature.
+ * Avec un seul stagiaire, la convention individuelle est reprise à l'identique.
+ */
+export function genConventionFormationTripartiteGroupe(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], idxs: number[]) {
+  const liste = idxs.map((i) => stagiaires[i]).filter((s): s is StagiaireInfo => Boolean(s));
+  if (liste.length <= 1) return genConventionFormationTripartite(o, f, stagiaires, idxs[0] ?? 0);
+  const premier = (k: keyof StagiaireInfo) => liste.map((s) => String(s[k] ?? "").trim()).find(Boolean) || "";
+  const entrepriseNom = premier("entreprise") || "_______________";
+  const respEntreprise = premier("responsableEntreprise") || "son représentant légal";
+  const siretEnt = premier("siretEntreprise");
+  const adresseEnt = premier("adresseEntreprise");
+  const emailResp = premier("emailResponsable");
+  const respSigUrl = premier("signatureResponsableUrl");
+  const debutGroupe = liste.map((s) => getStagiaireDateDebut(s, f)).filter(Boolean).sort()[0] || f.dateDebut;
+  const sigDate = formatDate(getDateSignatureDossier(debutGroupe));
+
+  let total = 0;
+  let manquants = 0;
+  const rows = liste.map((s) => {
+    const m = parseMontant(getStagiaireTarif(s, f));
+    if (m === null) manquants++; else total += m;
+    return [
+      `<strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br><small>${s.poste}</small>` : ""}`,
+      `du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}`,
+      getStagiaireDuree(s, f),
+      horairesLigneFor(s),
+      m !== null ? fmtEurConv(m) : "Non renseigné",
+    ];
+  });
+  rows.push(["<strong>TOTAL</strong>", "", "", "", `<strong>${fmtEurConv(total)}</strong>`]);
+
+  let extra = `
+    <h2>CONVENTION DE FORMATION PROFESSIONNELLE TRIPARTITE</h2>
+    <p style="font-style:italic">(Articles L.6353-1 et L.6353-2 du Code du travail)</p>
+    <h3>Entre les soussignés</h3>
+    <h4>1. L'Organisme de formation</h4>
+    <p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}, en qualité de Dirigeant<br>Email : ${o.email}</p>
+    <p>Ci-après dénommé « l'Organisme de formation »,</p>
+    <h4>2. L'Entreprise</h4>
+    <p><strong>${entrepriseNom}</strong>${siretEnt ? `<br>SIRET : ${siretEnt}` : ""}${adresseEnt ? `<br>Adresse : ${adresseEnt}` : ""}<br>Représentée par : ${respEntreprise}${emailResp ? ` (${emailResp})` : ""}</p>
+    <p>Ci-après dénommée « l'Entreprise »,</p>
+    <h4>3. Les Stagiaires (${liste.length})</h4>
+    <ul>${liste.map((s) => `<li><strong>${s.prenom} ${s.nom}</strong>${s.poste ? ` – ${s.poste}` : ""}${s.email ? ` – ${s.email}` : ""}</li>`).join("")}</ul>
+    <p>Ci-après dénommés « les Stagiaires »,</p>
+    <h3>Article 1 – Objet de la convention</h3>
+    <p>La présente convention définit les conditions de l'action de formation au bénéfice des ${liste.length} Stagiaires, salarié(e)s de l'Entreprise :</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> ${natureActionLabel(f)}</p>
+    <h3>Article 2 – Objectifs de la formation</h3>
+    <p>À l'issue de la formation, chaque stagiaire sera capable de :</p>
+    <p>${listeObjectifs(f)}</p>
+    <h3>Article 3 – Organisation de la formation</h3>
+    <p><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
+    ${tableHTML(["Stagiaire", "Dates", "Durée", "Horaires", "Coût"], rows)}
+    <h3>Article 4 – Programme</h3>
+    <p>Le programme détaillé est annexé à la présente convention.</p>
+    <p><strong>Prérequis :</strong> ${f.prerequis || 'Aucun prérequis spécifique'}</p>
+    <h3>Article 5 – Moyens pédagogiques</h3>
+    <ul><li>Apports théoriques et méthodologiques</li><li>Démonstrations commentées</li><li>Exercices pratiques et mises en situation</li><li>Support de cours remis à chaque stagiaire</li></ul>
+    <p><strong>Moyens mobilisés :</strong> ${f.moyensPedagogiques}</p>
+    <h3>Article 6 – Modalités d'évaluation</h3>
+    <ul><li>Test de positionnement en début de formation</li><li>Exercices pratiques en cours de formation</li><li>Évaluation finale en fin de formation</li><li>Grille d'acquisition des compétences</li></ul>
+    <p>Une attestation de fin de formation et un certificat de réalisation seront remis à chaque stagiaire et à l'Entreprise.</p>
+    <h3>Article 7 – Engagements de l'Entreprise</h3>
+    <ul><li>Libérer les salarié(e)s pendant toute la durée de la formation</li><li>Maintenir leur rémunération</li><li>Informer l'Organisme de tout changement</li></ul>
+    <h3>Article 8 – Dispositions financières</h3>
+    <p><strong>Coût total :</strong> ${fmtEurConv(total)} pour ${liste.length} stagiaires (détail à l'article 3).${manquants > 0 ? ` <em>Tarif non renseigné pour ${manquants} stagiaire(s).</em>` : ""}</p>
+    <p>${mentionTVA(o)} Facturation adressée à l'Entreprise, règlement à 30 jours à réception de facture, après réalisation de la formation.</p>
+    <h3>Article 9 – Accessibilité</h3>
+    <div class="section section-green"><p>Formation accessible aux personnes en situation de handicap.<br><strong>Référent handicap :</strong> ${o.referentHandicap} – ${o.email}</p></div>
+    <h3>Article 10 – Annulation</h3>
+    <p>Annulation moins de 7 jours ouvrés avant le début : indemnité de 30 % du prix. Abandon en cours de formation : facturation des heures réalisées au prorata, majorée de 30 % du reliquat à titre de dédit, non imputable sur les fonds de la formation professionnelle (art. L.6354-1).</p>
+    <h3>Article 11 – Règlement intérieur</h3>
+    <p>Les Stagiaires s'engagent à respecter le règlement intérieur de l'Organisme.</p>
+    <h3>Article 12 – RGPD</h3>
+    <p>Données personnelles traitées conformément au RGPD.</p>
+    <h3>Article 13 – Litiges</h3>
+    <p>Solution amiable privilégiée. À défaut, juridictions compétentes de ${o.ville}.</p>
+    <h3>Article 14 – Entrée en vigueur</h3>
+    <p>Convention effective à la signature par l'ensemble des parties.</p>
+    <p><strong>Fait en ${liste.length + 2} exemplaires, à ${o.ville}, le ${sigDate}</strong></p>
+  `;
+  const cadre = (titre: string, corps: string) =>
+    `<div style="flex:0 1 31%;min-width:180px;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center"><p style="font-weight:bold;margin-bottom:8px">${titre}</p>${corps}</div>`;
+  extra += '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:30px;gap:15px">'
+    + cadre("Pour l'Organisme de formation", `<p>${o.nom}</p><p>Nom : ${o.dirigeant}</p><p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Cachet :</p>`
+      + (o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""))
+    + cadre("Pour l'Entreprise", `<p>${entrepriseNom}</p><p>Nom : ${respEntreprise}</p><p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>`
+      + (respSigUrl ? `<img src="${respSigUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`))
+    + liste.map((s) => cadre("Le/La Stagiaire", `<p>Nom : ${s.prenom} ${s.nom}</p><p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>`
+      + (s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999">Signé par ${s.prenom} ${s.nom}</p>`))).join("")
+    + '</div>';
+  return buildDocument({ org: o, title: `CONVENTION DE FORMATION TRIPARTITE – ${entrepriseNom}`, extraHtml: extra });
+}
+
+const fmtEurConv = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 
 export function genProcedureAccueil_V2(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES STAGIAIRES", sections: [

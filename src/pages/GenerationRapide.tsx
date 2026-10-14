@@ -38,6 +38,7 @@ import RapideHistory from "@/components/RapideHistory";
 import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
 import { Badge } from "@/components/ui/badge";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
+import { grouperStagiairesParClient } from "@/lib/rapideFacturation";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -73,13 +74,15 @@ interface PackDoc {
   folder: string;
   template: string;
   perStagiaire: boolean;
+  /** Un document par client : « entreprise » = entreprises seulement ; « tous » = entreprises + particuliers. */
+  perClient?: "entreprise" | "tous";
   params?: Record<string, any>;
 }
 
 const PACK_DOCS: PackDoc[] = [
   { key: "programme", label: "Programme de formation", folder: "01_PROGRAMME", template: "programme_formation", perStagiaire: false, params: { fi: 0 } },
   { key: "contrat", label: "Contrat de formation professionnelle", folder: "02_CONTRAT", template: "contrat_formation_pro_stagiaire", perStagiaire: true },
-  { key: "convention", label: "Convention de formation tripartite", folder: "03_CONVENTION", template: "convention_formation_tripartite", perStagiaire: true },
+  { key: "convention", label: "Convention de formation tripartite", folder: "03_CONVENTION", template: "convention_formation_tripartite", perStagiaire: true, perClient: "entreprise" },
   { key: "cgv", label: "Conditions générales de vente", folder: "04_CGV", template: "cgv_stagiaire", perStagiaire: true },
   { key: "ri", label: "Règlement intérieur", folder: "05_REGLEMENT_INTERIEUR", template: "reglement_interieur_stagiaire", perStagiaire: true },
   { key: "emargement", label: "Feuille d'émargement", folder: "06_EMARGEMENT", template: "emargement_stagiaire", perStagiaire: true },
@@ -87,7 +90,54 @@ const PACK_DOCS: PackDoc[] = [
   { key: "organigramme", label: "Organigramme", folder: "08_ORGANIGRAMME", template: "organigramme", perStagiaire: false },
   { key: "ca", label: "Chiffre d'affaires de la session", folder: "09_CHIFFRE_AFFAIRES", template: "ca_session", perStagiaire: false },
   { key: "cerfa", label: "CERFA 10103*14 — contrat d'apprentissage", folder: "10_CERFA", template: "cerfa_apprentissage", perStagiaire: true },
+  { key: "devis", label: "Devis", folder: "11_DEVIS", template: "devis_client", perStagiaire: true, perClient: "tous" },
+  { key: "facture", label: "Facture", folder: "12_FACTURE", template: "facture_client", perStagiaire: true, perClient: "tous" },
 ];
+
+/** Élément du plan de génération : un document, éventuellement pour un stagiaire ou un client. */
+type PlannedDoc = {
+  doc: PackDoc;
+  /** Stagiaire concerné ; pour un document d'entreprise, porte le nom de l'entreprise (nommage des fichiers). */
+  stagiaire: StagiaireInfo | null;
+  stagiaireIdx: number | null;
+  /** Stagiaires couverts par un document client (convention d'entreprise, devis, facture). */
+  idxs?: number[];
+  clientNo?: number;
+};
+
+/** Paramètres du générateur. Un document de groupe ne fixe pas stagiaireIdx : les dates restent individuelles. */
+const paramsFor = (p: PlannedDoc): Record<string, any> => ({
+  ...(p.doc.params || {}),
+  ...(p.stagiaireIdx !== null ? { stagiaireIdx: p.stagiaireIdx } : {}),
+  ...(p.idxs ? { stagiaireIdxs: p.idxs } : {}),
+  ...(p.clientNo ? { clientNo: p.clientNo } : {}),
+});
+
+/** Documents à produire pour un type de pièce, indépendamment de la sélection. */
+function planDoc(doc: PackDoc, stagiaires: StagiaireInfo[]): PlannedDoc[] {
+  if (!doc.perStagiaire) return [{ doc, stagiaire: null, stagiaireIdx: null }];
+  if (doc.perClient) {
+    return grouperStagiairesParClient(stagiaires)
+      .map((g, n) => ({ g, clientNo: n + 1 }))
+      .filter(({ g }) => doc.perClient === "tous" || g.entreprise)
+      .map(({ g, clientNo }) => ({
+        doc,
+        // Groupe d'entreprise : fichier et dossier au nom de l'entreprise.
+        stagiaire: g.idxs.length === 1 ? stagiaires[g.idxs[0]] : { ...emptyStagiaire, nom: g.label },
+        stagiaireIdx: g.idxs.length === 1 ? g.idxs[0] : null,
+        idxs: g.idxs,
+        clientNo,
+      }));
+  }
+  const out: PlannedDoc[] = [];
+  stagiaires.forEach((s, i) => {
+    if (!s.prenom?.trim() || !s.nom?.trim()) return;
+    // Avec entreprise : convention tripartite automatique, jamais de contrat.
+    if (doc.key === "contrat" && s.entreprise?.trim()) return;
+    out.push({ doc, stagiaire: s, stagiaireIdx: i });
+  });
+  return out;
+}
 
 // rAF coûteux (~16 ms) : une fois tous les 5 documents seulement.
 let yieldTick = 0;
@@ -520,25 +570,10 @@ const GenerationRapide = () => {
 
   const conventionPossible = (s: StagiaireInfo) => Boolean(s.entreprise?.trim());
 
-  type PlannedDoc = { doc: PackDoc; stagiaire: StagiaireInfo | null; stagiaireIdx: number | null };
-
-  const planned: PlannedDoc[] = useMemo(() => {
-    const out: PlannedDoc[] = [];
-    for (const doc of PACK_DOCS) {
-      if (!selected[doc.key]) continue;
-      if (doc.key === "convention" && !stagiaires.some((s) => s.prenom?.trim() && s.nom?.trim() && conventionPossible(s))) continue;
-      if (doc.key === "contrat" && !stagiaires.some((s) => s.prenom?.trim() && s.nom?.trim() && !conventionPossible(s))) continue;
-      if (!doc.perStagiaire) { out.push({ doc, stagiaire: null, stagiaireIdx: null }); continue; }
-      stagiaires.forEach((s, i) => {
-        if (!s.prenom?.trim() || !s.nom?.trim()) return;
-        // Avec entreprise : convention tripartite automatique, jamais de contrat.
-        if (doc.key === "convention" && !conventionPossible(s)) return;
-        if (doc.key === "contrat" && conventionPossible(s)) return;
-        out.push({ doc, stagiaire: s, stagiaireIdx: i });
-      });
-    }
-    return out;
-  }, [selected, stagiaires]);
+  const planned: PlannedDoc[] = useMemo(
+    () => PACK_DOCS.filter((doc) => selected[doc.key]).flatMap((doc) => planDoc(doc, stagiaires)),
+    [selected, stagiaires],
+  );
 
   const estimationSec = useMemo(
     () => planned.reduce((sum, p) => sum + (p.doc.key === "cerfa" ? 3 : exportFormat === "pdf" ? PDF_QUALITIES[pdfQuality].seconds : 1), 0),
@@ -588,7 +623,8 @@ const GenerationRapide = () => {
   }, [organisme, formation, stagiairesValides, selected]);
 
   /* ---------- Aperçu ---------- */
-  const openPreview = async (doc: PackDoc, stagiaireIdx: number | null) => {
+  const openPreview = async (item: PlannedDoc) => {
+    const { doc, stagiaireIdx } = item;
     if (previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); }
     setPreviewHtml(null);
     setPreviewTitle(doc.label);
@@ -602,8 +638,7 @@ const GenerationRapide = () => {
         const blob = await genCerfaApprentissagePdf(organisme, safeFormation, s);
         setPreviewBlobUrl(URL.createObjectURL(blob));
       } else {
-        const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-        const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires), safeFormation.typeAction);
+        const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction);
         if (exportFormat === "pdf") {
           const blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options);
           setPreviewBlobUrl(URL.createObjectURL(blob));
@@ -619,15 +654,8 @@ const GenerationRapide = () => {
 
   /* ---------- Téléchargement d'un document seul ---------- */
   const downloadDoc = async (doc: PackDoc) => {
-    const items = planned.filter((p) => p.doc.key === doc.key);
-    const cible = items.length > 0
-      ? items
-      : doc.perStagiaire
-        ? stagiairesValides
-            // Même règle que le pack : avec entreprise → convention tripartite ; sans → contrat.
-            .filter((s) => (doc.key === "convention" ? conventionPossible(s) : doc.key === "contrat" ? !conventionPossible(s) : true))
-            .map((s) => ({ doc, stagiaire: s, stagiaireIdx: stagiaires.indexOf(s) }))
-        : [{ doc, stagiaire: null as StagiaireInfo | null, stagiaireIdx: null as number | null }];
+    // Même règle que le pack : avec entreprise → une convention par entreprise ; sans → contrat.
+    const cible = planDoc(doc, stagiaires);
     if (doc.perStagiaire && cible.length === 0) { toast.error("Aucun stagiaire concerné par ce document"); return; }
 
     setDownloadingKey(doc.key);
@@ -635,7 +663,8 @@ const GenerationRapide = () => {
     try {
       const { saveAs } = await import("file-saver");
       const safeFormation = buildFormationSafe(formation, organisme, stagiairesValides);
-      for (const { stagiaire, stagiaireIdx } of cible) {
+      for (const item of cible) {
+        const { stagiaire } = item;
         setDocStyle(effectiveDocStyle);
         let blob: Blob;
         let ext: string;
@@ -644,8 +673,7 @@ const GenerationRapide = () => {
           blob = await genCerfaApprentissagePdf(organisme, safeFormation, stagiaire);
           ext = ".pdf";
         } else {
-          const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-          const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, organisme, safeFormation, stagiaires), safeFormation.typeAction);
+          const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction);
           if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options); ext = ".pdf"; }
           else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
         }
@@ -695,7 +723,8 @@ const GenerationRapide = () => {
         const pdfOptions = PDF_QUALITIES[snapQuality].options;
 
         for (let i = 0; i < snapPlan.length; i++) {
-          const { doc, stagiaire, stagiaireIdx } = snapPlan[i];
+          const item = snapPlan[i];
+          const { doc, stagiaire } = item;
           const label = stagiaire ? `${doc.label} — ${stagiaire.prenom} ${stagiaire.nom}` : doc.label;
           reporter.setProgress(Math.round((i / snapPlan.length) * 92));
           reporter.setMessage(`${i + 1}/${snapPlan.length} — ${doc.label}`);
@@ -708,8 +737,7 @@ const GenerationRapide = () => {
               blob = await genCerfaApprentissagePdf(snapOrg, snapForm, stagiaire);
               ext = ".pdf";
             } else {
-              const params = { ...(doc.params || {}), ...(stagiaireIdx !== null ? { stagiaireIdx } : {}) };
-              const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, params, snapOrg, snapForm, snapStag), snapForm.typeAction);
+              const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), snapOrg, snapForm, snapStag), snapForm.typeAction);
               if (snapFormat === "pdf") { blob = await htmlToPdfBlob(content, pdfOptions); ext = ".pdf"; }
               else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
             }
@@ -1116,7 +1144,8 @@ const GenerationRapide = () => {
               const contratGrisee = doc.key === "contrat" && stagiairesValides.length > 0 && stagiairesValides.every((s) => conventionPossible(s));
               const grisee = conventionGrisee || contratGrisee;
               const count = planned.filter((p) => p.doc.key === doc.key).length;
-              const firstIdx = planned.find((p) => p.doc.key === doc.key)?.stagiaireIdx ?? null;
+              const apercu = planned.find((p) => p.doc.key === doc.key) ?? planDoc(doc, stagiaires)[0] ?? { doc, stagiaire: null, stagiaireIdx: doc.perStagiaire ? 0 : null };
+              const unite = doc.perClient === "entreprise" ? "1 par entreprise" : doc.perClient === "tous" ? "1 par entreprise ou particulier" : "1 par stagiaire";
               const actif = !!selected[doc.key] && !grisee;
               return (
                 <div
@@ -1156,14 +1185,14 @@ const GenerationRapide = () => {
                         ? "Sans entreprise, il s'agit d'un contrat bilatéral et non d'une convention."
                         : contratGrisee
                           ? "Avec entreprise, la convention tripartite remplace automatiquement le contrat."
-                          : doc.perStagiaire ? `1 par stagiaire${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
+                          : doc.perStagiaire ? `${unite}${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
                     </p>
                   </div>
                   <Button
                     data-no-check
                     variant="outline"
                     size="sm"
-                    onClick={() => openPreview(doc, doc.perStagiaire ? firstIdx ?? 0 : null)}
+                    onClick={() => openPreview(apercu)}
                     title="Aperçu"
                     aria-label={`Aperçu : ${doc.label}`}
                     className="h-8 w-8 p-0 shrink-0 rounded-lg"
@@ -1176,7 +1205,7 @@ const GenerationRapide = () => {
                     size="sm"
                     disabled={downloadingKey !== null || conventionGrisee}
                     onClick={() => downloadDoc(doc)}
-                    title={`Télécharger ${doc.perStagiaire ? "(1 fichier par stagiaire)" : ""}`}
+                    title={`Télécharger ${doc.perStagiaire ? `(${unite})` : ""}`}
                     aria-label={`Télécharger : ${doc.label}`}
                     className="h-8 w-8 p-0 shrink-0 rounded-lg"
                   >

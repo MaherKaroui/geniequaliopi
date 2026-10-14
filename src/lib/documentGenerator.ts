@@ -38,9 +38,10 @@ import { isTVTEFormation, getTVTEBesoin, getTVTEEvalBesoins, tvteBonnesQcmDebut,
 import { isIAP21Formation, getIAP21Besoin, getIAP21EvalBesoins, iap21BonnesQcmDebut, iap21ReponsesQcmDebut } from "./iaPro21hHumanized";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
-import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
+import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genExamenFinalStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite, genConventionFormationTripartiteGroupe } from "./generatorsV2";
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
 import { genChiffreAffairesSession } from "./templatesCA";
+import { genDevisClient, genFactureClient } from "./rapideFacturation";
 import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne, genChecklistFormateur } from "./templatesCritere6";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
@@ -473,8 +474,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "convention_formation_tripartite": {
       const si = params?.stagiaireIdx ?? 0;
+      // Plusieurs stagiaires d'une même entreprise : une seule convention.
+      if (Array.isArray(params?.stagiaireIdxs) && params.stagiaireIdxs.length > 1)
+        return genConventionFormationTripartiteGroupe(o, f, stagiaires, params.stagiaireIdxs);
       return genConventionFormationTripartite(o, f, stagiaires, si);
     }
+    // Génération rapide : un devis / une facture par client (entreprise ou particulier).
+    case "devis_client":
+      return genDevisClient(o, f, stagiaires, Array.isArray(params?.stagiaireIdxs) ? params.stagiaireIdxs : [params?.stagiaireIdx ?? 0], params?.clientNo ?? 1);
+    case "facture_client":
+      return genFactureClient(o, f, stagiaires, Array.isArray(params?.stagiaireIdxs) ? params.stagiaireIdxs : [params?.stagiaireIdx ?? 0], params?.clientNo ?? 1);
     case "convention_formation": return genConvention(o, f, stagiaires);
     case "emargement_jour": return genEmargementJour_V2(o, f, stagiaires, params?.jour ?? 0, params?.jourLabel ?? "");
     case "emargement_stagiaire": {
