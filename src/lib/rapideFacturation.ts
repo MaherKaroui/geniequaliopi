@@ -9,6 +9,7 @@ import {
   getStagiaireDuree,
   getDateSignatureDossier,
   subtractBusinessDays,
+  addBusinessDays,
 } from "./docBuilder";
 import { mentionTVA } from "./mentionsLegales";
 import { parseMontant } from "./templatesCA";
@@ -175,6 +176,9 @@ export function genDevisClient(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const entreprise = Boolean(liste[0].entreprise?.trim());
   const debut = minDate(liste.map((s) => getStagiaireDateDebut(s, f))) || f.dateDebut;
   const dateDevisISO = debut ? subtractBusinessDays(getDateSignatureDossier(debut), 5) : new Date().toISOString().slice(0, 10);
+  // Acceptation : 2 jours ouvrés après le devis, au plus tard le jour de signature de la convention / du contrat.
+  const signatureISO = debut ? getDateSignatureDossier(debut) : dateDevisISO;
+  const acceptationISO = (() => { const a = addBusinessDays(dateDevisISO, 2); return a > signatureISO ? signatureISO : a; })();
   const validiteISO = (() => { const d = new Date(dateDevisISO); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); })();
   const { rows, total, manquants } = lignesFormation(f, liste);
   const signataireClient = entreprise ? (premier(liste, "responsableEntreprise") || "Le représentant de l'entreprise") : `${liste[0].prenom} ${liste[0].nom}`;
@@ -197,7 +201,7 @@ export function genDevisClient(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       </div>
       <div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">
         <p style="font-weight:bold;margin-bottom:8px">Bon pour accord — ${entreprise ? "Le Client" : "Le/La Stagiaire"}</p>
-        ${entreprise ? `<p>${premier(liste, "entreprise")}</p>` : ""}<p>Nom : ${signataireClient}</p><p>Date : ____________</p>
+        ${entreprise ? `<p>${premier(liste, "entreprise")}</p>` : ""}<p>Nom : ${signataireClient}</p><p>Le ${formatDate(acceptationISO)}</p>
         ${sigClientUrl ? `<img src="${sigClientUrl}" alt="Signature client" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`}
       </div>
     </div>`;

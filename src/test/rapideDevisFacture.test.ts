@@ -59,6 +59,10 @@ describe("génération rapide : regroupement par client", () => {
       const avecTampon = generateDocumentById("x", template, { stagiaireIdxs: [0, 2], clientNo: 1 }, org, formation, stagiaires);
       expect(avecTampon).toContain("data:image/png;base64,TAMPON");
       if (template === "facture_client") expect(avecTampon).not.toContain("Financement prévu");
+
+      // Dates calculées depuis la formation : facture au dernier jour, devis sans date à remplir.
+      if (template === "facture_client") expect(ent).toContain("FAC-2026-001 — 06/11/2026");
+      else expect(ent).not.toContain("Date : ____");
     });
   }
 });
