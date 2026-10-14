@@ -150,6 +150,13 @@ function blocFinanceur(liste: StagiaireInfo[]): string {
   return fin.length ? `<p><strong>Financement prévu :</strong> ${fin.join(", ")}</p>` : "";
 }
 
+/** Cachet de l'organisme : tampon, à défaut signature du dirigeant (jamais les deux). */
+function cachetOF(o: OrganismeInfo): string {
+  if (o.tamponUrl) return `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:90px;max-width:180px;object-fit:contain;margin-top:5px;opacity:0.9" />`;
+  if (o.signatureUrl) return `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />`;
+  return `<div style="height:60px"></div>`;
+}
+
 const numero = (prefixe: string, dateISO: string, clientNo: number) =>
   `${prefixe}-${(dateISO || new Date().toISOString()).slice(0, 4)}-${String(clientNo).padStart(3, "0")}`;
 
@@ -185,8 +192,8 @@ export function genDevisClient(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <div style="display:flex;justify-content:space-between;margin-top:24px;gap:15px">
       <div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">
         <p style="font-weight:bold;margin-bottom:8px">Pour l'Organisme de formation</p>
-        <p>${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Le ${formatDate(dateDevisISO)}</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+        <p>${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Le ${formatDate(dateDevisISO)}</p><p>Cachet :</p>
+        ${cachetOF(o)}
       </div>
       <div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">
         <p style="font-weight:bold;margin-bottom:8px">Bon pour accord — ${entreprise ? "Le Client" : "Le/La Stagiaire"}</p>
@@ -228,10 +235,16 @@ export function genFactureClient(o: OrganismeInfo, f: FormationInfo, stagiaires:
     ${blocTotaux(o, total, manquants, rows.length)}
     <h2>Règlement</h2>
     <p><strong>Date de la facture :</strong> ${formatDate(dateFactureISO)}<br><strong>Date d'échéance :</strong> ${formatDate(echeanceISO)} (30 jours)${dateDevisISO ? `<br><strong>Référence devis :</strong> ${numero("DEV", dateDevisISO, clientNo)}` : ""}<br><strong>Mode de règlement :</strong> virement bancaire</p>
-    ${blocFinanceur(liste)}
     <p style="font-size:12px">Pas d'escompte pour paiement anticipé.${entreprise
       ? " En cas de retard de paiement, pénalités au taux de trois fois le taux d'intérêt légal et indemnité forfaitaire pour frais de recouvrement de 40 € (art. L.441-10 et D.441-5 du Code de commerce)."
-      : " En cas de retard de paiement, pénalités au taux de trois fois le taux d'intérêt légal."}</p>`;
+      : " En cas de retard de paiement, pénalités au taux de trois fois le taux d'intérêt légal."}</p>
+    <div style="display:flex;justify-content:flex-end;margin-top:24px">
+      <div style="width:45%;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">
+        <p style="font-weight:bold;margin-bottom:8px">Pour l'Organisme de formation</p>
+        <p>${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Le ${formatDate(dateFactureISO)}</p><p>Cachet :</p>
+        ${cachetOF(o)}
+      </div>
+    </div>`;
 
   return buildDocument({
     org: o,

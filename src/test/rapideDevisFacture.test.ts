@@ -53,6 +53,12 @@ describe("génération rapide : regroupement par client", () => {
       expect(part).toContain("bruno@example.com");
       expect(part).not.toContain("ACME");
       expect(part).toMatch(/1\s000,00\s€/);
+
+      // Tampon de l'organisme sur le devis et la facture.
+      const org = { ...ORG_TEST, tamponUrl: "data:image/png;base64,TAMPON" };
+      const avecTampon = generateDocumentById("x", template, { stagiaireIdxs: [0, 2], clientNo: 1 }, org, formation, stagiaires);
+      expect(avecTampon).toContain("data:image/png;base64,TAMPON");
+      if (template === "facture_client") expect(avecTampon).not.toContain("Financement prévu");
     });
   }
 });
