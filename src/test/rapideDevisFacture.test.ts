@@ -27,6 +27,11 @@ describe("génération rapide : regroupement par client", () => {
     expect(html).not.toContain("Bruno Petit");
     expect(html).toMatch(/2\s500,00\s€/);
     expect(html).toContain("Paul Durand");
+    // Deux signataires seulement : l'organisme et l'entreprise.
+    expect(html).toContain("Pour l'Organisme de formation");
+    expect(html).toContain("Pour l'Entreprise");
+    expect(html).not.toContain("Le/La Stagiaire");
+    expect(html).not.toContain("TRIPARTITE");
   });
 
   it("garde la convention individuelle à l'identique pour un seul stagiaire", () => {
