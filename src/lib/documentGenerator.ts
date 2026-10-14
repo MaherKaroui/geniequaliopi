@@ -782,6 +782,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "tableau_amelioration_continue_excel": return genTableauAmeliorationContinueExcel(o, f, formations, stagiaires);
     case "suivi_dysfonctionnements_excel": return genSuiviDysfonctionnementsExcel(o, f, stagiaires);
     case "relances_appreciations_excel": return genRelancesAppreciationsExcel(o, f, stagiaires);
+    case "procedure_relance_appreciations": return genProcedureRelanceAppreciations(o, f);
     case "procedure_amelioration_continue": return genProcedureAmeliorationContinue(o);
     case "appreciations_beneficiaires": return genAppreciationsBeneficiaires(o, f, stagiaires);
     case "appreciations_beneficiaires_stagiaire": {
@@ -11807,6 +11808,22 @@ function genCompteRenduFormateur(o: OrganismeInfo, f: FormationInfo) {
     { heading: "6. Quelles seraient, de manière générale, les améliorations à apporter ?", content: "<p>________________________________________________________________________________________________</p>" },
     { heading: "7. Autres observations", content: "<p>________________________________________________________________________________________________</p>" },
   ] });
+}
+
+function genProcedureRelanceAppreciations(o: OrganismeInfo, f: FormationInfo) {
+  const resp = o.referentQualite || o.responsablePedagogique || o.dirigeant || "Le responsable qualité";
+  return buildDocument({ org: o, title: "PROCÉDURE DE RELANCE DES APPRÉCIATIONS", sections: [
+    { heading: "1. Objet", content: `<p>Cette procédure définit les modalités de recueil et de relance des appréciations des parties prenantes (bénéficiaires, entreprises, financeurs, formateurs) afin d'obtenir un taux de retour représentatif, conformément à l'indicateur 30 du référentiel Qualiopi.</p>` },
+    { heading: "2. Champ d'application", content: `<p>Toutes les actions dispensées par ${o.nom || "l'organisme"}${f.intitule ? `, dont la formation « ${f.intitule} »` : ""}.</p>` },
+    { heading: "3. Responsable", content: `<p>${resp} pilote l'envoi des questionnaires, les relances et la consolidation des résultats.</p>` },
+    { heading: "4. Calendrier des relances", table: undefined, content: `<table><tr><th>Échéance</th><th>Action</th><th>Support</th></tr>
+<tr><td>J+0 (dernier jour)</td><td>Envoi du questionnaire à chaud aux bénéficiaires</td><td>Courriel / lien en ligne</td></tr>
+<tr><td>J+7</td><td>1ʳᵉ relance des non-répondants</td><td>Courriel</td></tr>
+<tr><td>J+14</td><td>2ᵉ relance</td><td>Appel téléphonique</td></tr>
+<tr><td>J+21</td><td>Clôture de la campagne et consolidation</td><td>Tableau de relance</td></tr>
+<tr><td>J+90</td><td>Questionnaire à froid, puis mêmes relances</td><td>Courriel / téléphone</td></tr></table>` },
+    { heading: "5. Traçabilité", content: `<p>Chaque envoi, relance et retour est consigné dans le tableau de relance (Excel). Les résultats sont analysés et les axes d'amélioration reportés au tableau d'amélioration continue (indicateur 32).</p>` },
+  ] } as any);
 }
 
 function genTableauRelanceAppreciations(o: OrganismeInfo) {

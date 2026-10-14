@@ -510,6 +510,8 @@ export function buildFullCatalog(
       add(`af_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
     });
     add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
+    add("af_c7i30_tableau_relance_excel", "CT7 - IND 30 TABLEAU DE RELANCE", 7, 30, "relances_appreciations_excel");
+    add("af_c7i30_procedure_relance", "CT7 - IND 30 PROCÉDURE DE RELANCE", 7, 30, "procedure_relance_appreciations");
     
 
     // IND 31 — Réclamations et dysfonctionnements
@@ -1270,6 +1272,8 @@ export function buildFullCatalog(
       add(`cfa_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
     });
     add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
+    add("cfa_c7i30_tableau_relance_excel", "CT7 - IND 30 TABLEAU DE RELANCE", 7, 30, "relances_appreciations_excel");
+    add("cfa_c7i30_procedure_relance", "CT7 - IND 30 PROCÉDURE DE RELANCE", 7, 30, "procedure_relance_appreciations");
     
 
     add("cfa_c7i30_pv_session_global", "CT7 - IND 30 PROCÈS-VERBAL GLOBAL DE SESSION", 7, 30, "pv_session_global");
