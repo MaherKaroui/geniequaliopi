@@ -11816,7 +11816,7 @@ function genProcedureRelanceAppreciations(o: OrganismeInfo, f: FormationInfo) {
     { heading: "1. Objet", content: `<p>Cette procédure définit les modalités de recueil et de relance des appréciations des parties prenantes (bénéficiaires, entreprises, financeurs, formateurs) afin d'obtenir un taux de retour représentatif, conformément à l'indicateur 30 du référentiel Qualiopi.</p>` },
     { heading: "2. Champ d'application", content: `<p>Toutes les actions dispensées par ${o.nom || "l'organisme"}${f.intitule ? `, dont la formation « ${f.intitule} »` : ""}.</p>` },
     { heading: "3. Responsable", content: `<p>${resp} pilote l'envoi des questionnaires, les relances et la consolidation des résultats.</p>` },
-    { heading: "4. Calendrier des relances", table: undefined, content: `<table><tr><th>Échéance</th><th>Action</th><th>Support</th></tr>
+    { heading: "4. Calendrier des relances", content: `<table><tr><th>Échéance</th><th>Action</th><th>Support</th></tr>
 <tr><td>J+0 (dernier jour)</td><td>Envoi du questionnaire à chaud aux bénéficiaires</td><td>Courriel / lien en ligne</td></tr>
 <tr><td>J+7</td><td>1ʳᵉ relance des non-répondants</td><td>Courriel</td></tr>
 <tr><td>J+14</td><td>2ᵉ relance</td><td>Appel téléphonique</td></tr>
