@@ -246,7 +246,8 @@ export function genVAEContrat(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const ch = chronoVAE(s, f, o);
   const d = frVAE(ch.contrat);
   const tarif = getStagiaireTarif(s, f);
-  const tripartite = p.contratAvecEmployeur;
+  // Règle : entreprise renseignée → convention tripartite ; sans entreprise → contrat (le financeur ne décide pas).
+  const tripartite = !!s.entreprise?.trim();
   const titre = tripartite ? "CONVENTION D'ACCOMPAGNEMENT VAE (TRIPARTITE)" : "CONTRAT D'ACCOMPAGNEMENT VAE";
   const parties = `<p><strong>L'organisme :</strong> ${esc(o.nom)}, SIRET ${esc(o.siret)}, ${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)}${o.nda ? `, déclaration d'activité n° ${esc(o.nda)} (cet enregistrement ne vaut pas agrément de l'État)` : ""}, représenté par ${esc(o.dirigeant)}.<br><strong>Le candidat :</strong> ${esc(p.civ)} ${esc(p.nomComplet)}, ${esc(s.email)}.${tripartite ? `<br><strong>L'employeur :</strong> ${esc(s.entreprise)}${s.siretEntreprise ? `, SIRET ${esc(s.siretEntreprise)}` : ""}${s.responsableEntreprise ? `, représenté par ${esc(s.responsableEntreprise)}` : ""}.` : ""}</p>`;
   const financement = p.financeur === "CPF"
