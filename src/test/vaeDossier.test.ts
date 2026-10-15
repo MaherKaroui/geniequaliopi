@@ -74,6 +74,20 @@ describe("dossier VAE", () => {
     expect(docs.some(({ d }) => /convention_tripartite|convention_accompagnement/.test(d.template))).toBe(false);
   });
 
+  it("sans entreprise, un financeur OPCO ne déclenche pas de convention : c'est un contrat", () => {
+    const sansEntreprise = { ...STAGIAIRES_TEST[2], entreprise: "", financeur: "OPCO" };
+    const docs = dossier(FORMATIONS_TEST.vae, [sansEntreprise]);
+    const c9 = docs.find(({ d }) => d.template === "vae_contrat_accompagnement" && d.indicateur === 9)!;
+    expect(c9.t).toMatch(/CONTRAT D'ACCOMPAGNEMENT VAE/);
+    expect(c9.t).not.toMatch(/TRIPARTITE/);
+    expect(c9.t).toMatch(/rétractation de 10 jours/);
+    const avecEntreprise = { ...STAGIAIRES_TEST[2], entreprise: "Société Beta", financeur: "Personnel" };
+    const docs2 = dossier(FORMATIONS_TEST.vae, [avecEntreprise]);
+    const c9b = docs2.find(({ d }) => d.template === "vae_contrat_accompagnement" && d.indicateur === 9)!;
+    expect(c9b.t).toMatch(/TRIPARTITE/);
+    expect(c9b.t).toContain("Société Beta");
+  });
+
   it("certificateur et blocs issus de la fiche RNCP", () => {
     const c = certifVAE(FORMATIONS_TEST.vae);
     expect(c.certificateur).toMatch(/Éducation nationale/);
