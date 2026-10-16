@@ -16,7 +16,7 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
 import { getRNCPByCode } from "../rncpData";
-import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "../qualite2026";
+import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite } from "../qualite2026";
 import {
   certifVAE, profilVAE, calendrierVAE, chronoVAE, heuresVAE, frVAE, frLongVAE, parseDateVAE, estPasse, aujourdhui, graine,
   type SeanceVAE, type CertifVAE,
