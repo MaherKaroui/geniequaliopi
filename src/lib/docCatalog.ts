@@ -428,8 +428,8 @@ export function buildFullCatalog(
       });
       add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     }
-    if (/externe/i.test(referentQualiteNom || "")) {
-      add("af_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", 6, 27, "mandat_qualiopi");
+    if (/externe|fd\s*certif/i.test(referentQualiteNom || "")) {
+      add("af_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", 6, 27, "mandat_qualiopi", { actionType: "actions-formation" });
     }
 
     // IND 28 — Formation en situation de travail (seulement si la formation comporte de l'alternance)
@@ -1184,7 +1184,7 @@ export function buildFullCatalog(
     add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
     if (hasExternalFormateur) add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
     add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
-    add("cfa_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
+    add("cfa_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi", { actionType: "apprentissage" });
     add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
     // Checklist formateur — un fichier par session (groupé par dates)
     {
@@ -1641,6 +1641,12 @@ export function buildFullCatalog(
         );
       });
     });
+  }
+
+  // La prestation qualité externe reste distincte de la sous-traitance pédagogique.
+  if (/fd\s*certif/i.test(referentQualiteNom || "")) {
+    if (isBDC) add("bdc_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "bilans-competences" });
+    if (isVAE) add("vae_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "vae" });
   }
 
   // On ne conserve que les mails réellement générables.

@@ -1,4 +1,5 @@
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
+import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs } from "./formationResolue";
@@ -783,7 +784,9 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaireForDoc, sessionDates);
     }
     case "liste_partenaires": return genListePartenairesV2(o);
-    case "mandat_qualiopi": return genMandatQualiopi(o);
+    case "mandat_qualiopi": return /fd\s*certif/i.test(o.referentQualite || "")
+      ? genContratPrestationQualiopi(o, params?.actionType)
+      : genMandatQualiopi(o);
     case "referentiel_handicap": return genReferentielHandicap(o);
     case "procedure_adaptation": return genProcedureAdaptation_V2(o, f);
     case "tableau_suivi_parcours": return genTableauSuiviParcours_V2(o, f, stagiaires);
