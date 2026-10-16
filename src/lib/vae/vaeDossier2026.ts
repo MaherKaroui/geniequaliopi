@@ -16,7 +16,7 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
 import { getRNCPByCode } from "../rncpData";
-import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "../qualite2026";
+import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite } from "../qualite2026";
 import {
   certifVAE, profilVAE, calendrierVAE, chronoVAE, heuresVAE, frVAE, frLongVAE, parseDateVAE, estPasse, aujourdhui, graine,
   type SeanceVAE, type CertifVAE,
@@ -917,8 +917,6 @@ export function genVAEPlanAmelioration(o: OrganismeInfo, f: FormationInfo) {
 // ───────────────────────────── Registre 2026 ─────────────────────────────
 
 export const genVAEAnalyseRisques = (o: OrganismeInfo, f: FormationInfo) => genAnalyseRisquesQualite(o, "VAE", f);
-export const genVAERegistreSousTraitance = (o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) => genRegistreSousTraitancePortage(o, "VAE", f, stagiaires);
-export const genVAEClausesQualite = (o: OrganismeInfo) => genClausesQualiteContrat(o, "VAE");
 
 /** Point d'entrée unique du switch de documentGenerator pour les templates « vae_* ». */
 export function renderVAETemplate(template: string, params: Record<string, any> | undefined, o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string | null {
@@ -1002,8 +1000,6 @@ export function renderVAETemplate(template: string, params: Record<string, any> 
     case "vae_veille_innovations": return genVAEVeilleInnovations(o);
     case "vae_accessibilite_handicap": return genVAEAccessibiliteHandicap(o);
     case "vae_partenaires": return genVAEPartenaires(o, f);
-    case "vae_registre_sous_traitance": return genVAERegistreSousTraitance(o, f, stagiaires);
-    case "vae_clauses_qualite": return genVAEClausesQualite(o);
     case "vae_satisfaction": return genVAESatisfaction(o, f, stagiaires, si);
     case "vae_synthese_satisfaction": return genVAESyntheseSatisfaction(o, f, stagiaires);
     case "vae_appreciations_parties_prenantes": return genVAEAppreciationsPartiesPrenantes(o);

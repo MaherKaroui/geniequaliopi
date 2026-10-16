@@ -1556,8 +1556,6 @@ export function buildFullCatalog(
     add("vae_c6i25_veille_innovations", "CT6 - IND 25 Veille innovations pédagogiques et technologiques", 6, 25, "vae_veille_innovations");
     add("vae_c6i26_accessibilite_handicap", "CT6 - IND 26 Accessibilité et réseau handicap", 6, 26, "vae_accessibilite_handicap");
     add("vae_c6i27_partenaires_vae", "CT6 - IND 27 Partenaires et certificateur", 6, 27, "vae_partenaires");
-    add("vae_c6i27_registre_sous_traitance", "CT6 - IND 27 Registre de sous-traitance et de portage salarial", 6, 27, "vae_registre_sous_traitance");
-    add("vae_c6i27_clauses_qualite", "CT6 - IND 27 Annexe clauses qualité des contrats", 6, 27, "vae_clauses_qualite");
 
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
     per("vae_c7i30_satisfaction", "CT7 - IND 30 Questionnaire de satisfaction", 7, 30, "vae_satisfaction");
