@@ -917,8 +917,6 @@ export function genVAEPlanAmelioration(o: OrganismeInfo, f: FormationInfo) {
 // ───────────────────────────── Registre 2026 ─────────────────────────────
 
 export const genVAEAnalyseRisques = (o: OrganismeInfo, f: FormationInfo) => genAnalyseRisquesQualite(o, "VAE", f);
-export const genVAERegistreSousTraitance = (o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) => genRegistreSousTraitancePortage(o, "VAE", f, stagiaires);
-export const genVAEClausesQualite = (o: OrganismeInfo) => genClausesQualiteContrat(o, "VAE");
 
 /** Point d'entrée unique du switch de documentGenerator pour les templates « vae_* ». */
 export function renderVAETemplate(template: string, params: Record<string, any> | undefined, o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string | null {
