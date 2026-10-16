@@ -1,8 +1,9 @@
 import type { OrganismeInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument } from "./docBuilder";
 import type { ActionType } from "./docCatalog";
 
 const esc = (value: string) => String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const formatDate = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 export const FD_CERTIF_PRESTATAIRE = {
   nom: "FD CERTIF EXPERT", forme: "Société par actions simplifiée (SAS)",
