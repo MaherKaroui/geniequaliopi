@@ -1000,8 +1000,6 @@ export function renderVAETemplate(template: string, params: Record<string, any> 
     case "vae_veille_innovations": return genVAEVeilleInnovations(o);
     case "vae_accessibilite_handicap": return genVAEAccessibiliteHandicap(o);
     case "vae_partenaires": return genVAEPartenaires(o, f);
-    case "vae_registre_sous_traitance": return genVAERegistreSousTraitance(o, f, stagiaires);
-    case "vae_clauses_qualite": return genVAEClausesQualite(o);
     case "vae_satisfaction": return genVAESatisfaction(o, f, stagiaires, si);
     case "vae_synthese_satisfaction": return genVAESyntheseSatisfaction(o, f, stagiaires);
     case "vae_appreciations_parties_prenantes": return genVAEAppreciationsPartiesPrenantes(o);
