@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Adapter le contrat de prestation qualité AF/CFA/BC/VAE au modèle FD Certif Expert fourni et vérifier les quatre dossiers.
+
 - [x] Centraliser les niveaux de qualité PDF et les chartes déterministes.
 - [x] Ajouter un contrôle partagé qualité/design aux générateurs.
 - [x] Appliquer le style et la qualité aux aperçus, téléchargements et ZIP.
