@@ -15,6 +15,8 @@ import { TVTE_EXERCICES_COMPLETS, TVTE_QCM_DEBUT, TVTE_QCM_FIN } from "./ventesE
 import { isTVTEFormation, getTVTEAutoAnswers, TVTE_QUESTIONS_OUVERTES } from "./ventesEnergie35hHumanized";
 import { IAP21_EXERCICES_COMPLETS, IAP21_QCM_DEBUT, IAP21_QCM_FIN } from "./iaPro21hPreset";
 import { isIAP21Formation, getIAP21AutoAnswers, IAP21_QUESTIONS_OUVERTES } from "./iaPro21hHumanized";
+import { MSP21_EXERCICES_COMPLETS, MSP21_QCM_DEBUT, MSP21_QCM_FIN, MSP21_QCM_COMPETENCES } from "./msp21Preset";
+import { isMSP21Formation, getMSP21AutoAnswers, MSP21_QUESTIONS_OUVERTES } from "./msp21Humanized";
 
 
 
@@ -1245,6 +1247,22 @@ EVAL_CONTENT["IAP21"] = {
   ],
 };
 
+// ===== Techniques de maquillage semi-permanent (RS6459) – 21 h (certifiante RS, C1 à C11) =====
+EVAL_CONTENT["MSP21"] = {
+  qcmPositionnement: MSP21_QCM_DEBUT,
+  qcmFinal: MSP21_QCM_FIN,
+  exercices: MSP21_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: MSP21_QCM_COMPETENCES.map(q => q.titre.replace(/^QCM /, "")),
+  appreciations: [
+    "Entretien conseil bien conduit et contre-indications vérifiées. Le dessin préparatoire des sourcils doit gagner en symétrie avant l'effraction.",
+    "Chaîne d'hygiène rigoureuse et traçabilité des lots complète. Profondeur d'effraction encore irrégulière en technique manuelle.",
+    "Bon choix des pigments selon le phototype et neutralisation maîtrisée. Le mouvement en technique électrique peut être plus régulier.",
+    "Eye-liner réalisé en sécurité, tension de la paupière correcte. Consignes post-prestation claires et bien expliquées à la cliente.",
+    "Lèvres : contour net et neutralisation adaptée au phototype. Encore un peu d'hésitation dans la gestion de l'œdème.",
+    "Taches de rousseur naturelles et bien réparties. Implication constante ; poursuivre l'entraînement sur peau latex avant la certification.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1468,6 +1486,8 @@ function getContentKey(intitule: string): string {
   if (isTVTEFormation(lower)) return "TVTE";
   // IA – intégrer les outils d'IA 21 h (non certifiante) — avant la règle IA générative (RS6776)
   if (isIAP21Formation(lower)) return "IAP21";
+  // Techniques de maquillage semi-permanent (RS6459) — avant les contenus esthétique / maquillage génériques
+  if (isMSP21Formation(lower)) return "MSP21";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2204,6 +2224,9 @@ QUESTIONS_OUVERTES["TVTE"] = TVTE_QUESTIONS_OUVERTES;
 // IA – intégrer les outils d'IA 21 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["IAP21"] = IAP21_QUESTIONS_OUVERTES;
 
+// Maquillage semi-permanent (RS6459) — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["MSP21"] = MSP21_QUESTIONS_OUVERTES;
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2601,6 +2624,18 @@ export function generateStagiaireOpenAnswers(
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
   // IA – intégrer les outils d'IA 21 h : moteur humanisé (une copie différente par stagiaire).
+  // Maquillage semi-permanent (RS6459) : moteur humanisé (une copie différente par stagiaire).
+  if (isMSP21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoMsp = getMSP21AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoMsp.reponses, autoMsp.scores);
+  }
+
   if (isIAP21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoIa = getIAP21AutoAnswers(
       stagiaireInfo?.nom,

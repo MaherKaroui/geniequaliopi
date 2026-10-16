@@ -467,6 +467,8 @@ import { getWebmarketing14hChapters } from "./courseContentWebmarketing14h";
 import { getVentesEnergie35hChapters } from "./courseContentVentesEnergie35h";
 import { getIAPro21hChapters } from "./courseContentIAPro21h";
 import { isIAP21Formation } from "./iaPro21hHumanized";
+import { getMSP21Chapters } from "./courseContentMSP21";
+import { isMSP21Formation } from "./msp21Humanized";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
@@ -527,6 +529,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('techniques de vente') && /[ée]nerg/.test(t)) return getVentesEnergie35hChapters();
   // IA – intégrer les outils d'IA dans son activité professionnelle 21 h (non certifiante) : avant la règle IA générative RS6776
   if (isIAP21Formation(formationIntitule)) return getIAPro21hChapters();
+  // Techniques de maquillage semi-permanent (RS6459) : avant la règle « maquilleur / maquillage professionnel »
+  if (isMSP21Formation(formationIntitule)) return getMSP21Chapters();
   if (mot(t, 'gestionnaire de paie') || mot(t, 'gestionnaire paie') || (mot(t, 'paie') && (mot(t, 'formation') || mot(t, 'bulletin') || mot(t, 'gestion')))) return getPaieChapters();
   if (mot(t, 'secrétariat') || mot(t, 'secretariat') || mot(t, 'secrétaire') || mot(t, 'secretaire') || mot(t, 'office manager') || mot(t, 'assistanat')) return getSecretariatChapters();
   if (mot(t, 'gotrm') || mot(t, 'gestionnaire des op\u00e9rations de transport') || mot(t, 'exploitant transport') || mot(t, 'tp-01329') || mot(t, 'rncp40990')) return getGOTRMChapters();

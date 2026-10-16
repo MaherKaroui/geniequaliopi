@@ -35,6 +35,7 @@ import { pickRPMSExerciceAnswer, isRPMSFormation, rpmsNoteExercice } from "./rpm
 import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./webmarketing14hHumanized";
 import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ventesEnergie35hHumanized";
 import { pickIAP21ExerciceAnswer, isIAP21Formation, iap21NoteExercice } from "./iaPro21hHumanized";
+import { pickMSP21ExerciceAnswer, isMSP21Formation, msp21NoteExercice } from "./msp21Humanized";
 
 // ========== HELPERS ==========
 
@@ -1176,6 +1177,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, tvteNoteExercice(stagiaireIdx, ei, true))
         : isIAP21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, iap21NoteExercice(stagiaireIdx, ei, true))
+        : isMSP21Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, msp21NoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1238,6 +1241,8 @@ D) Drive faster to finish the ride.`,
       ? tvteNoteExercice(stagiaireIdx, ei, false)
       : isIAP21Formation(f.intitule, f.codeRNCP)
       ? iap21NoteExercice(stagiaireIdx, ei, false)
+      : isMSP21Formation(f.intitule, f.codeRNCP)
+      ? msp21NoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1290,6 +1295,7 @@ D) Drive faster to finish the ride.`,
       || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickTVTEExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickIAP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickMSP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;
