@@ -101,4 +101,19 @@ describe("dossier VAE", () => {
     const docs = dossier(f);
     for (const { d, t } of docs) expect(t, d.id).not.toMatch(/NaN|Invalid Date|undefined/);
   });
+
+  it.each(["", "Société Beta"])("la pièce contractuelle %s conserve le tarif et les dates individuels dans les IND 4 et 9", (entreprise) => {
+    const candidat = { ...STAGIAIRES_TEST[2], entreprise, tarifFormation: "2 375 € TTC", dateDebutFormation: "2026-04-06", dateFinFormation: "2026-07-17" };
+    const docs = dossier(FORMATIONS_TEST.vae, [candidat]);
+    const contrats = docs.filter(({ d }) => d.template === "vae_contrat_accompagnement");
+    expect(contrats.map(({ d }) => d.indicateur).sort()).toEqual([4, 9]);
+    for (const { t } of contrats) {
+      expect(t).toContain("2 375 € TTC");
+      expect(t).not.toContain("1 800 €");
+      expect(t).toContain("6 avril 2026");
+      expect(t).toContain("17 juillet 2026");
+      expect(t).toContain("24 heures");
+    }
+    expect(contrats[0]?.t).toEqual(contrats[1]?.t);
+  });
 });
