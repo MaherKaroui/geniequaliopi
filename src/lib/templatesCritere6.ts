@@ -469,7 +469,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
           <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
           <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Cachet :</p>
-          ${tamponHtml}
+          ${cachetDirigeantHtml(o)}
         </div>
       </div>
     `

@@ -5966,7 +5966,7 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
         <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
         <p>Date : ${formatDate(dateDebut)}</p>
         <p style="margin-top:20px">Signature :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+        ${signatureDirigeantHtml(o)}
       </div>
     </div>`, stagiaires: [s] });
 }
@@ -7691,7 +7691,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
     extraHtml: (() => {
       const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
       const fmtSigHtml = fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
-      const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+      const tamponHtml = cachetDirigeantHtml(o);
       return `<p style="margin-top:20px"><strong>Date de fin de formation :</strong> ${formatDate(dateFinFormateur)}</p>
       <div class="signature-block-2">
         <div class="sig-box"><p class="sig-label">VISA DU FORMATEUR</p><p>Nom : ${formateurNom}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
