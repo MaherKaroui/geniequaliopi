@@ -1,6 +1,6 @@
 import { buildDocument, tableHTML } from "@/lib/docBuilder";
 import { withActiveDossierStyle } from "@/lib/dossierDesign";
-import { formatDuree, formatPrix, fmtDateFR, typeContrat, parseDateAny } from "./bdcModel";
+import { formatDuree, formatPrix, typeContrat, parseDateAny } from "./bdcModel";
 import { bdcEffectiveDates, bdcFollowupDate, bdcFollowupDue, bdcIsFinished, standaloneBdcContext } from "./standaloneModel";
 import type { StandaloneBdcData, BdcDeclarations } from "./standaloneTypes";
 
@@ -36,6 +36,7 @@ const answer = (title: string, value: string) => h(title, value.trim() ? text(va
 const rows = (headers: string[], data: string[][]) => tableHTML(headers.map(bdcEscape), data.map(row => row.map(bdcEscape)));
 const questions = (items: string[]) => items.map((item, i) => answer(`${i + 1}. ${item}`, "")).join("");
 const safeImage = (src?: string) => src && (/^data:image\/(png|jpeg|webp);base64,/i.test(src) || /^https:\/\//i.test(src)) ? bdcEscape(src) : "";
+const longDate = (value: Date | null) => value ? value.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "";
 
 function signatures(d: StandaloneBdcData, beneficiary = true, company = false, actual = true) {
   const parties = [{ label: "L’organisme — représentant légal", name: d.organisme.dirigeant, image: actual ? d.organisme.tamponUrl || d.organisme.signatureUrl : "" }];
@@ -53,8 +54,8 @@ export function buildStandaloneBdcDocument(d: StandaloneBdcData, id: BdcDocument
   const ctx = standaloneBdcContext(d), p = ctx.prestation;
   const o = d.organisme, b = d.beneficiaire, c = d.declarations;
   const dates = bdcEffectiveDates(d), finished = bdcIsFinished(d);
-  const date = (v: string) => fmtDateFR(parseDateAny(v));
-  const followup = fmtDateFR(bdcFollowupDate(d));
+  const date = (v: string) => longDate(parseDateAny(v));
+  const followup = longDate(bdcFollowupDate(d));
   const confidentiality = "Les résultats détaillés et le document de synthèse sont remis au seul bénéficiaire. Aucune transmission à un tiers sans son accord écrit. Le consultant est tenu au secret professionnel (art. L6313-4 du Code du travail). Les documents sont détruits au terme du bilan, sauf accord écrit de conservation motivé par le suivi, pour trois ans au plus (art. R6313-7).";
   const programme = rows(["Phase", "Objectifs et méthodes", "Livrables"], [
     ["Préliminaire", "Analyser la demande ; définir conjointement le format, les objectifs et les modalités du bilan ; entretien individuel.", "Recueil des besoins, objectifs et planning individualisé"],

@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import StepIndicator from "@/components/StepIndicator";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import BdcImageInput from "@/components/bdc/BdcImageInput";
 import { emptyBdcData, BDC_DECLARATION_FIELDS, type StandaloneBdcData } from "@/lib/bdc/standaloneTypes";
@@ -87,7 +86,7 @@ export default function BilanCompetences() {
         {history.filter(item => `${item.name} ${item.data.organisme.nom} ${item.data.beneficiaire.nom} ${item.data.beneficiaire.prenom}`.toLocaleLowerCase("fr").includes(search.toLocaleLowerCase("fr"))).map(item => <div key={item.id} className="flex flex-wrap justify-between items-center gap-2 border-b py-2"><div className="min-w-0"><p className="font-medium break-words">{item.name}</p><p className="text-xs text-muted-foreground">{item.data.organisme.nom} · {new Date(item.updatedAt).toLocaleDateString("fr-FR")}</p></div><div className="flex gap-1"><Button variant="outline" size="sm" onClick={() => load(item)} disabled={busy}><FolderOpen className="h-4 w-4 mr-2" /> Charger</Button><Button variant="ghost" size="icon" title="Supprimer" aria-label={`Supprimer ${item.name}`} onClick={() => remove(item)} disabled={busy}><Trash2 className="h-4 w-4" /></Button></div></div>)}
       </div></details>
       {draftFailed && <p role="alert" className="text-destructive text-sm">La sauvegarde automatique est impossible : l’espace du navigateur est plein.</p>}
-      <StepIndicator steps={STEPS} currentStep={step} onStepClick={s => { if (!busy) setStep(s); }} />
+      <nav aria-label="Étapes du bilan" className="grid grid-cols-5 gap-1 border-b pb-4">{STEPS.map(item => <Button key={item.id} variant={step === item.id ? "default" : "ghost"} disabled={busy} aria-current={step === item.id ? "step" : undefined} aria-label={item.label} onClick={() => setStep(item.id)} className="min-w-0 h-auto flex-col gap-1 px-1 py-2 text-xs sm:flex-row sm:gap-2"><span className="h-6 w-6 shrink-0 rounded-full border border-current flex items-center justify-center">{step > item.id ? "✓" : item.id}</span><span className="hidden md:inline whitespace-normal">{item.label}</span></Button>)}</nav>
       <section className="py-2 space-y-5">
         {step === 1 && <><h2 className="text-xl font-semibold">Organisme prestataire</h2><div className="grid sm:grid-cols-2 gap-4">
           {field("Nom de l’organisme *", org.nom, v => updateOrg({ nom: v }))}{field("SIRET *", org.siret, v => updateOrg({ siret: v }))}
@@ -135,6 +134,6 @@ export default function BilanCompetences() {
       </section>
       <div className="flex justify-between gap-3 border-t pt-5"><Button variant="outline" disabled={step === 1 || busy} onClick={() => setStep(s => s - 1)}><ChevronLeft className="h-4 w-4 mr-2" /> Précédent</Button><Button disabled={step === 5 || busy} onClick={() => setStep(s => s + 1)}>Suivant<ChevronRight className="h-4 w-4 ml-2" /></Button></div>
     </main>
-    <Dialog open={!!preview} onOpenChange={open => { if (!open) setPreview(null); }}><DialogContent className="max-w-5xl h-[85vh]"><DialogTitle>{preview?.title}</DialogTitle><DialogDescription className="sr-only">Aperçu du PDF du dossier individuel</DialogDescription>{preview && <iframe src={preview.url} title={preview.title} className="w-full h-full min-h-0 border rounded" />}</DialogContent></Dialog>
+    <Dialog open={!!preview} onOpenChange={open => { if (!open) setPreview(null); }}><DialogContent className="max-w-5xl w-[calc(100%-2rem)] h-[85vh] flex flex-col"><DialogTitle className="pr-6">{preview?.title}</DialogTitle><DialogDescription className="sr-only">Aperçu du PDF du dossier individuel</DialogDescription>{preview && <iframe src={preview.url} title={preview.title} className="w-full flex-1 min-h-0 border rounded" />}</DialogContent></Dialog>
   </div>;
 }

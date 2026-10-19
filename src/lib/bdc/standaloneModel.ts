@@ -49,7 +49,7 @@ export function generateStandaloneBdcPlanning(d: StandaloneBdcData): BdcSessionI
   });
   if (!result.ok) throw new Error(result.erreurs.join("\n"));
   if (result.seances.some(s => s.date < p.dateDebut || s.date > p.dateFin)) throw new Error("La période est trop courte pour les disponibilités choisies.");
-  return result.seances.map(s => ({ ...s, date: `${s.date.getFullYear()}-${String(s.date.getMonth() + 1).padStart(2, "0")}-${String(s.date.getDate()).padStart(2, "0")}`, presence: false, compteRendu: "" }));
+  return result.seances.map((s, index) => ({ ...s, modalite: p.modalite === "mixte" && index % 2 === 1 ? "distanciel" : s.modalite, date: `${s.date.getFullYear()}-${String(s.date.getMonth() + 1).padStart(2, "0")}-${String(s.date.getDate()).padStart(2, "0")}`, presence: false, compteRendu: "" }));
 }
 
 export function bdcIsFinished(d: StandaloneBdcData, now = new Date()) {
