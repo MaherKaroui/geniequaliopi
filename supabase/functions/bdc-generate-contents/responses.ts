@@ -1,5 +1,6 @@
 import { createOpenAI } from "npm:@ai-sdk/openai@3";
 import { streamText, Output, jsonSchema, type ModelMessage } from "npm:ai@6";
+import { finalOnlyOutput } from "./final-only-output.ts";
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -28,7 +29,7 @@ export function createResponsesCall(
     ...(instructions ? { system: instructions } : {}),
     messages,
     maxRetries: 0,
-    ...(schema ? { output: Output.object({ schema: jsonSchema(schema) }) } : {}),
+    ...(schema ? { output: finalOnlyOutput(Output.object({ schema: jsonSchema(schema) })) } : {}),
     providerOptions: {
       openai: {
         store: false,
