@@ -373,7 +373,6 @@ export function buildFullCatalog(
     add("af_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
     intervenantsAF.forEach((fname) => {
       const slug = slugNom(fname);
-      add(`af_c5i21_competences_${slug}`, `CT5 - IND 21 FICHE DE COMPÉTENCES – ${fname}`, 5, 21, "fiche_competences_intervenant", { formateurNom: fname });
       if (normalizeName(fname) !== dirigeantKey) {
         add(`af_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
       }

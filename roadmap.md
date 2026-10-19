@@ -20,3 +20,4 @@
 - [x] Retirer « CT4 - IND 17 JUSTIFICATIFS DES OUTILS ET LICENCES (à joindre) » du dossier.
 - [x] Descriptif des moyens IND 17 : signature du dirigeant et tampon uniquement, sans bloc responsable pédagogique.
 - [x] Responsable pédagogique : faire porter à chaque case la marque du dirigeant (formulaire organisme) dans tous les dossiers.
+- [x] Retirer « CT5 - IND 21 FICHE DE COMPÉTENCES – <intervenant> » du dossier.

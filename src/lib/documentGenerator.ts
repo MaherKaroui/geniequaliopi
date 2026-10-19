@@ -10,7 +10,7 @@ import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
-import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
+import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
 import { planDevActions } from "./templatesCritere5";
@@ -622,7 +622,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "diplome_referent_handicap_docx":
       return genPieceAFournir(o, "FORMATION DU RÉFÉRENT HANDICAP", ["Attestation de formation ou de sensibilisation du référent handicap (Agefiph, Ressource Handicap Formation, organisme de formation)", "À défaut : programme de sensibilisation suivi et date prévue"]);
     case "moyens_environnement_af": return genMoyensEnvironnement(o, f, stagiaires);
-    case "fiche_competences_intervenant": return genFicheCompetencesIntervenant(o, f, params?.formateurNom || f.formateur || o.dirigeant);
     case "cr_reunion_pedagogique_af": return genCRReunionPedagogique(o, f, stagiaires);
     case "planning_intervenants_af": return genPlanningIntervenantsAF(o, f, stagiaires);
     case "cooperation_socio_eco_af": return genCooperationSocioEconomique(o, f, stagiaires);
