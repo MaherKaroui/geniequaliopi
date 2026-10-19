@@ -24,6 +24,7 @@ export default function BdcPdfPreview({ url }: { url: string }) {
     let active = true;
     let render: ReturnType<Awaited<ReturnType<PDFDocumentProxy["getPage"]>>["render"]> | undefined;
     setLoading(true);
+    setError("");
     pdf.getPage(pageNumber).then(page => {
       const element = canvas.current;
       if (!active || !element) return;
@@ -33,7 +34,7 @@ export default function BdcPdfPreview({ url }: { url: string }) {
       element.width = viewport.width; element.height = viewport.height;
       render = page.render({ canvasContext: context, canvas: element, viewport });
       return render.promise;
-    }).then(() => { if (active) setLoading(false); }).catch(e => { if (active && e?.name !== "RenderingCancelledException") { setError("Cette page ne peut pas être affichée."); setLoading(false); } });
+    }).then(() => { if (active) setLoading(false); }).catch(e => { if (active && e?.name !== "RenderingCancelledException") { console.error("BDC PDF preview", e); setError("Cette page ne peut pas être affichée."); setLoading(false); } });
     return () => { active = false; render?.cancel(); };
   }, [pdf, pageNumber]);
   return <div className="flex flex-col flex-1 min-h-0 gap-2">
