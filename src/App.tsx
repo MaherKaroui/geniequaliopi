@@ -17,6 +17,7 @@ import GOTRMPage from "./pages/GOTRM";
 import MuseeDossier from "./pages/MuseeDossier";
 import QualiopiCheck from "./pages/QualiopiCheck";
 import VAEPage from "./pages/VAE";
+import BilanCompetences from "./pages/BilanCompetences";
 import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
 import Admin from "./pages/Admin";
@@ -57,6 +58,7 @@ const ApplicationContent = () => {
           <Route path="/musee" element={<MuseeDossier />} />
           <Route path="/audit-live" element={<QualiopiCheck />} />
           <Route path="/vae" element={<VAEPage />} />
+          <Route path="/bilan-competences" element={<BilanCompetences />} />
           <Route path="/rapide" element={<GenerationRapide />} />
           <Route path="/analyse-bpf" element={<AnalyseBPF />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
