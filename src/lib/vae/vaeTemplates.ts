@@ -190,7 +190,8 @@ function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, 
 }
 
 function organismeMark(o: VAEOrganisme): { signature?: string; tampon?: string } {
-  return { signature: o.signature || undefined, tampon: o.tampon || undefined };
+  // Dirigeant : tampon seul s'il existe (jamais signature + tampon), sinon signature.
+  return o.tampon ? { tampon: o.tampon } : { signature: o.signature || undefined };
 }
 
 function organismeSignatureBlock(o: VAEOrganisme): string {
