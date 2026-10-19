@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Ajouter la génération IA des contenus BDC, leur relecture et leur reprise dans les 18 pièces ; vérifier un appel réel.
+- [x] Ajouter la génération IA des contenus BDC et leur relecture ; appel réel réussi (16 rubriques), reprise dans les documents et conservation après rechargement vérifiées.
 
 - [x] Créer le générateur autonome Bilan de compétences et son accès depuis l’accueil.
 - [x] Automatiser les 18 pièces demandées depuis les données déclarées, avec planning, signatures, aperçu, PDF/Word/ZIP et historique local séparé.

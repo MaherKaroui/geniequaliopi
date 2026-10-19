@@ -44,6 +44,8 @@ export interface StandaloneBdcData {
   mediateur: string;
   declarations: BdcDeclarations;
   sessions: BdcSessionInput[];
+  aiDraft?: boolean;
+  aiContext?: string;
 }
 
 export function emptyBdcData(): StandaloneBdcData {

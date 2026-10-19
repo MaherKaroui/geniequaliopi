@@ -43,7 +43,8 @@ export default function BilanCompetences() {
   const [draftFailed, setDraftFailed] = useState(false);
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiError, setAiError] = useState("");
-  const [aiContext, setAiContext] = useState("");
+  const aiContext = data.aiContext || "";
+  const setAiContext = (value: string) => setData(d => ({ ...d, aiContext: value }));
   const generateAI = async () => {
     if (!data.beneficiaire.nom.trim() || !data.beneficiaire.prenom.trim() || aiContext.trim().length < 20) { setAiError("Renseignez le prénom, le nom et le parcours ou projet (20 caractères minimum)."); return; }
     if (Object.values(data.declarations).some(Boolean) && !window.confirm("L’IA va reformuler les contenus existants. Continuer ?")) return;

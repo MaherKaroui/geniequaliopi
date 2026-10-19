@@ -5,5 +5,5 @@ export function applyBdcAI(data: StandaloneBdcData, result: Record<string, unkno
   for (const key of Object.keys(declarations) as Array<keyof BdcDeclarations>) {
     if (typeof result[key] === "string") declarations[key] = result[key] as string;
   }
-  return { ...data, declarations, formation: { ...data.formation, objectifs: typeof result.objectifs === "string" ? result.objectifs : data.formation.objectifs, programme: typeof result.programme === "string" ? result.programme : data.formation.programme } };
+  return { ...data, aiDraft: true, declarations, formation: { ...data.formation, objectifs: typeof result.objectifs === "string" ? result.objectifs : data.formation.objectifs, programme: typeof result.programme === "string" ? result.programme : data.formation.programme } };
 }
