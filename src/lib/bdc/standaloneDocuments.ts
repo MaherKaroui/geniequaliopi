@@ -104,6 +104,11 @@ export function buildStandaloneBdcDocument(d: StandaloneBdcData, id: BdcDocument
       content = h("Date du suivi proposé", text(followup)) + (!bdcFollowupDue(d) ? text("Suivi non encore échu : aucune réponse ni réalisation n’est présumée.") : "") + answer("Réponses et compte rendu recueillis", bdcFollowupDue(d) ? c.suivi : "") + questions(["Quelle est votre situation professionnelle actuelle ?", "Quelles étapes du plan d’action ont été engagées ?", "Quelles difficultés et quels résultats constatez-vous ?", "Quel appui complémentaire serait utile ?", "Quel est votre recul sur l’utilité du bilan ?"]) + h("Compte rendu de suivi", rows(["Date réelle de l’entretien", "Modalité", "Consultant", "Suites convenues"], [["À renseigner", "", d.formation.formateur, ""]])); sign = signatures(d, true, false, bdcFollowupDue(d) && !!c.suivi.trim()); break;
   }
   const identity = rows(["Dossier individuel", "Informations"], [["Bénéficiaire", `${b.prenom} ${b.nom}`], ["Consultant", d.formation.formateur], ["Période", `Du ${date(dates.debut)} au ${date(dates.fin)}`], ["Durée", formatDuree(p)], ["Modalité", d.formation.modalites], ["Document établi le", date(o.dateMaj)]]);
+  const aiNarrative = d.aiDraft && ["besoins", "entretien", "parcours", "competences", "motivations", "metiers", "carnet", "planAction", "synthese", "satisfaction", "suivi"].includes(id);
+  if (aiNarrative) {
+    content = text("PROPOSITION RÉDIGÉE AVEC IA — à relire et valider avec le bénéficiaire ; ne constitue pas une preuve d’entretien, de réponse recueillie ou de résultat réalisé.") + content;
+    sign = signatures(d, true, false, false);
+  }
   const escapedOrg = Object.fromEntries(Object.entries(o).map(([key, value]) => [key, typeof value === "string" && !key.endsWith("Url") ? bdcEscape(value) : value])) as typeof o;
   escapedOrg.logoUrl = safeImage(o.logoUrl);
   let html = buildDocument({ org: escapedOrg, title: bdcDocumentTitle(id, d), extraHtml: identity + content + sign });
