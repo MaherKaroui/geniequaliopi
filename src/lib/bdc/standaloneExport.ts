@@ -16,11 +16,13 @@ export async function exportStandaloneBdcDocument(d: StandaloneBdcData, id: BdcD
   return { blob, filename: `${bdcFileTag(bdcDocumentTitle(id, d))}_${bdcFileTag(d.beneficiaire.nom)}_${bdcFileTag(d.beneficiaire.prenom)}_${d.organisme.dateMaj}.${extension}` };
 }
 
-export async function exportStandaloneBdcZip(d: StandaloneBdcData, format: "pdf" | "word", onProgress: (message: string) => void) {
+export async function exportStandaloneBdcZip(d: StandaloneBdcData, format: "pdf" | "word", onProgress: (message: string) => void, selected: readonly BdcDocumentId[] = BDC_STANDALONE_DOCUMENTS.map(doc => doc.id)) {
   const zip = new JSZip();
-  for (let i = 0; i < BDC_STANDALONE_DOCUMENTS.length; i++) {
-    const doc = BDC_STANDALONE_DOCUMENTS[i];
-    onProgress(`${i + 1} / 18 — ${bdcDocumentTitle(doc.id, d)}`);
+  const docs = BDC_STANDALONE_DOCUMENTS.filter(doc => selected.includes(doc.id));
+  if (!docs.length) throw new Error("Sélectionnez au moins un document.");
+  for (let i = 0; i < docs.length; i++) {
+    const doc = docs[i];
+    onProgress(`${i + 1} / ${docs.length} — ${bdcDocumentTitle(doc.id, d)}`);
     // Fail explicitly instead of quietly returning an incomplete dossier.
     const { blob, filename } = await exportStandaloneBdcDocument(d, doc.id, format);
     zip.file(`${String(i + 1).padStart(2, "0")}_${filename}`, blob);

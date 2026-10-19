@@ -13,7 +13,7 @@ import DossierOutputSettings from "@/components/DossierOutputSettings";
 import BdcImageInput from "@/components/bdc/BdcImageInput";
 import { emptyBdcData, BDC_DECLARATION_FIELDS, type StandaloneBdcData } from "@/lib/bdc/standaloneTypes";
 import { generateStandaloneBdcPlanning, validateStandaloneBdc, bdcFollowupDate, bdcIsFinished, bdcFollowupDue } from "@/lib/bdc/standaloneModel";
-import { BDC_STANDALONE_DOCUMENTS, buildStandaloneBdcDocument, bdcDocumentTitle, type BdcDocumentId } from "@/lib/bdc/standaloneDocuments";
+import { BDC_STANDALONE_DOCUMENTS, bdcDocumentTitle, type BdcDocumentId } from "@/lib/bdc/standaloneDocuments";
 import { exportStandaloneBdcDocument, exportStandaloneBdcZip, downloadBdcBlob, bdcFileTag } from "@/lib/bdc/standaloneExport";
 import { readBdcHistory, writeBdcHistory, type BdcHistoryEntry } from "@/lib/bdc/standaloneHistory";
 import type { Jour, Creneau } from "@/lib/bdc/bdcModel";

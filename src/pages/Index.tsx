@@ -212,6 +212,9 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
               <GraduationCap className="w-5 h-5" /> Génération VAE
             </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/bilan-competences")}>
+              <FileCheck className="w-5 h-5" /> Génération Bilan de compétences
+            </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://outlook-modifiable.netlify.app/", "_blank")}>
               <Mail className="w-5 h-5" /> Outlook 
             </Button>
