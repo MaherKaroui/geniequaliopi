@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Corriger le dépassement CPU de la génération IA BDC (546) et vérifier un appel authentifié complet.
+
 - [x] Ajouter la génération IA des contenus BDC et leur relecture ; appel réel réussi (16 rubriques), reprise dans les documents et conservation après rechargement vérifiées.
 
 - [x] Créer le générateur autonome Bilan de compétences et son accès depuis l’accueil.
