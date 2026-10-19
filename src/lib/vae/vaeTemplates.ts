@@ -190,14 +190,14 @@ function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, 
 }
 
 function organismeMark(o: VAEOrganisme): { signature?: string; tampon?: string } {
-  return o.tampon ? { tampon: o.tampon } : { signature: o.signature };
+  return { signature: o.signature || undefined, tampon: o.tampon || undefined };
 }
 
 function organismeSignatureBlock(o: VAEOrganisme): string {
   const mark = organismeMark(o);
   return `<table class="vae-signatures"><tr><td>
     <strong>Pour ${esc(o.nom)}</strong><p>${esc(o.dirigeant)} — Dirigeant</p>
-    ${mark.tampon ? `<img src="${mark.tampon}" alt="Tampon" width="190" height="120" style="width:190px;height:120px;object-fit:contain;" />` : mark.signature ? `<img src="${mark.signature}" alt="Signature" width="190" height="75" style="width:190px;height:75px;object-fit:contain;" />` : "<p>Signature :</p>"}
+    ${mark.signature ? `<img src="${mark.signature}" alt="Signature" width="190" height="75" style="width:190px;height:75px;object-fit:contain;display:block;" />` : ""}${mark.tampon ? `<img src="${mark.tampon}" alt="Tampon" width="190" height="120" style="width:190px;height:120px;object-fit:contain;display:block;" />` : ""}${!mark.signature && !mark.tampon ? "<p>Signature :</p>" : ""}
   </td></tr></table>`;
 }
 
@@ -577,6 +577,7 @@ export function getConvocationHTML(d: VAEData): string {
       <strong>Pour ${esc(o.nom)}</strong><br/>
       ${esc(o.dirigeant)} — Dirigeant
     </div>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Convocation", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — à distance");
 }
@@ -825,6 +826,7 @@ export function getProgrammeHTML(d: VAEData): string {
       <li>Durée du parcours : ${esc(dureeParcours)}.</li>
       <li>Tarif : ${esc(o.prixTTC)} — Financement : ${esc(s.financement)}.</li>
     </ul>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, `Programme VAE — ${titreCourt}`, body, `RNCP ${rncp} — ${modalite}`);
 }
@@ -877,6 +879,7 @@ export function getCGVHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
     <p><strong>Pour ${esc(o.nom)}</strong> — ${esc(o.dirigeant)}, Dirigeant.</p>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Conditions Générales de Vente", body);
 }
@@ -959,6 +962,7 @@ export function getLivretAccueilHTML(d: VAEData): string {
 
     <h2>Contacts utiles</h2>
     <p>France Compétences : <a href="https://www.francecompetences.fr">www.francecompetences.fr</a> — Mon Compte Formation : <a href="https://www.moncompteformation.gouv.fr">www.moncompteformation.gouv.fr</a> — CNIL : <a href="https://www.cnil.fr">www.cnil.fr</a>.</p>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Livret d'accueil du candidat", body);
 }
@@ -1047,6 +1051,7 @@ export function getChecklistHTML(d: VAEData): string {
     <table>${trs}</table>
     <p style="margin-top:18px;">Ce document sert de suivi à la constitution complète du dossier d'accompagnement. Chaque pièce doit être cochée dès sa réception ou sa validation par le référent.</p>
     <p><strong>Référent :</strong> ${esc(o.dirigeant)} — ${esc(o.email)}</p>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Checklist du dossier VAE", body);
 }
