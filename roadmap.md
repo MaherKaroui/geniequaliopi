@@ -1,8 +1,8 @@
 # Roadmap
 
-- [ ] Créer le générateur autonome Bilan de compétences et son accès depuis l’accueil.
-- [ ] Automatiser les 18 pièces demandées depuis les données déclarées, avec planning, signatures, aperçu, PDF/Word/ZIP et historique local séparé.
-- [ ] Vérifier les règles BDC, les téléchargements et le rechargement du dossier.
+- [x] Créer le générateur autonome Bilan de compétences et son accès depuis l’accueil.
+- [x] Automatiser les 18 pièces demandées depuis les données déclarées, avec planning, signatures, aperçu, PDF/Word/ZIP et historique local séparé.
+- [x] Vérifier les règles BDC, le ZIP de 18 PDF, les marques fournies, le Word de secours et le rechargement du dossier ; rendu Microsoft Word non vérifié.
 
 - [x] Corriger la mise en page des exports VAE et vérifier le ZIP/PDF avec signatures/cachets fournis ; images présentes dans le Word de secours (.doc), rendu Microsoft Word non vérifié.
 

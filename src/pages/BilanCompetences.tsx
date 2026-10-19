@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import BdcImageInput from "@/components/bdc/BdcImageInput";
+import BdcPdfPreview from "@/components/bdc/BdcPdfPreview";
 import { emptyBdcData, BDC_DECLARATION_FIELDS, type StandaloneBdcData } from "@/lib/bdc/standaloneTypes";
 import { generateStandaloneBdcPlanning, validateStandaloneBdc, bdcFollowupDate, bdcIsFinished, bdcFollowupDue } from "@/lib/bdc/standaloneModel";
 import { BDC_STANDALONE_DOCUMENTS, bdcDocumentTitle, type BdcDocumentId } from "@/lib/bdc/standaloneDocuments";
@@ -134,6 +135,6 @@ export default function BilanCompetences() {
       </section>
       <div className="flex justify-between gap-3 border-t pt-5"><Button variant="outline" disabled={step === 1 || busy} onClick={() => setStep(s => s - 1)}><ChevronLeft className="h-4 w-4 mr-2" /> Précédent</Button><Button disabled={step === 5 || busy} onClick={() => setStep(s => s + 1)}>Suivant<ChevronRight className="h-4 w-4 ml-2" /></Button></div>
     </main>
-    <Dialog open={!!preview} onOpenChange={open => { if (!open) setPreview(null); }}><DialogContent className="max-w-5xl w-[calc(100%-2rem)] h-[85vh] flex flex-col"><DialogTitle className="pr-6">{preview?.title}</DialogTitle><DialogDescription className="sr-only">Aperçu du PDF du dossier individuel</DialogDescription>{preview && <iframe src={preview.url} title={preview.title} className="w-full flex-1 min-h-0 border rounded" />}</DialogContent></Dialog>
+    <Dialog open={!!preview} onOpenChange={open => { if (!open) setPreview(null); }}><DialogContent className="max-w-5xl w-[calc(100%-2rem)] h-[85vh] flex flex-col"><DialogTitle className="pr-6">{preview?.title}</DialogTitle><DialogDescription className="sr-only">Aperçu du PDF du dossier individuel</DialogDescription>{preview && <BdcPdfPreview url={preview.url} />}</DialogContent></Dialog>
   </div>;
 }
