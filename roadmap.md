@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Corriger le dépassement CPU de la génération IA BDC (546) et vérifier un appel authentifié complet.
+- [x] Corriger le dépassement CPU de la génération IA BDC (546) ; 18 tests réussis et appel authentifié complet vérifié (200, 16 rubriques, persistance après rechargement).
 
 - [x] Ajouter la génération IA des contenus BDC et leur relecture ; appel réel réussi (16 rubriques), reprise dans les documents et conservation après rechargement vérifiées.
 
