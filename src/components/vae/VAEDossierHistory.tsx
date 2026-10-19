@@ -6,7 +6,8 @@ import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshC
 import type { VAEOrganisme, VAECertification, VAECandidat, VAESession, VAEContents } from "@/lib/vae/vaeTypes";
 
 interface Props {
-  userId: string;
+  /** Absent = mode sans compte : historique conservé dans ce navigateur uniquement. */
+  userId?: string;
   organisme: VAEOrganisme;
   certification: VAECertification;
   candidat: VAECandidat;
@@ -27,6 +28,10 @@ interface SavedVAE {
   updated_at: string;
 }
 
+const LOCAL_KEY = "vae_local_history";
+const readLocal = (): SavedVAE[] => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
+const writeLocal = (list: SavedVAE[]) => localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+
 export default function VAEDossierHistory({ userId, organisme, certification, candidat, session, contents, onLoad }: Props) {
   const [dossiers, setDossiers] = useState<SavedVAE[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,7 +41,9 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
   const [currentId, setCurrentId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const local = !userId;
   const fetch = async () => {
+    if (local) { setDossiers(readLocal().sort((a, b) => b.updated_at.localeCompare(a.updated_at))); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from("saved_vae_dossiers")
@@ -58,6 +65,13 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
   const handleSave = async () => {
     setSaving(true);
     const name = saveName.trim() || defaultName();
+    if (local) {
+      const now = new Date().toISOString();
+      const rec: SavedVAE = { id: crypto.randomUUID(), name, organisme, certification, candidat, session, contents, created_at: now, updated_at: now };
+      try { writeLocal([rec, ...readLocal()]); setCurrentId(rec.id); setSaveName(""); fetch(); toast({ title: "Sauvegardé !", description: `Dossier "${name}" enregistré sur cet appareil.` }); }
+      catch { toast({ title: "Espace plein", description: "Supprimez d'anciens dossiers pour enregistrer celui-ci.", variant: "destructive" }); }
+      setSaving(false); return;
+    }
     const { data, error } = await supabase
       .from("saved_vae_dossiers")
       .insert({ user_id: userId, name, organisme: organisme as any, certification: certification as any, candidat: candidat as any, session: session as any, contents: contents as any })
@@ -74,6 +88,11 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
     if (!currentId) return;
     setSaving(true);
     const name = saveName.trim() || defaultName();
+    if (local) {
+      try { writeLocal(readLocal().map(d => d.id === currentId ? { ...d, name, organisme, certification, candidat, session, contents, updated_at: new Date().toISOString() } : d)); fetch(); toast({ title: "Mis à jour", description: `Dossier "${name}" actualisé.` }); }
+      catch { toast({ title: "Espace plein", description: "Supprimez d'anciens dossiers pour mettre à jour.", variant: "destructive" }); }
+      setSaving(false); return;
+    }
     const { error } = await supabase.from("saved_vae_dossiers").update({
       name, organisme: organisme as any, certification: certification as any, candidat: candidat as any, session: session as any, contents: contents as any,
       updated_at: new Date().toISOString(),
@@ -84,6 +103,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
   };
 
   const handleDelete = async (id: string) => {
+    if (local) { writeLocal(readLocal().filter(d => d.id !== id)); if (currentId === id) setCurrentId(null); fetch(); toast({ title: "Supprimé" }); return; }
     const { error } = await supabase.from("saved_vae_dossiers").delete().eq("id", id);
     if (error) toast({ title: "Erreur", description: error.message, variant: "destructive" });
     else { toast({ title: "Supprimé" }); if (currentId === id) setCurrentId(null); setDossiers(p => p.filter(d => d.id !== id)); }
@@ -101,6 +121,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
         <div className="flex items-center gap-2 font-semibold text-sm">
           <Clock className="w-4 h-4 text-primary" />
           Historique des dossiers VAE
+          {local && <span className="text-xs font-normal text-muted-foreground">(sur cet appareil)</span>}
           {dossiers.length > 0 && <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{dossiers.length}</span>}
           {currentId && <span className="bg-emerald-500/10 text-emerald-700 text-xs px-2 py-0.5 rounded-full">Édition en cours</span>}
         </div>

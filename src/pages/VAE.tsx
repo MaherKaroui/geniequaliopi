@@ -67,9 +67,9 @@ export default function VAEPage({ embedded = false }: { embedded?: boolean }) {
           compact
         />
         )}
-        {!embedded && user && (
+        {(embedded || user) && (
           <VAEDossierHistory
-            userId={user.id}
+            userId={embedded ? undefined : user?.id}
             organisme={organisme}
             certification={certification}
             candidat={candidat}
