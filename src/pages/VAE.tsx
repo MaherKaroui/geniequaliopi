@@ -26,7 +26,7 @@ const STEPS = [
 
 const ORG_KEY = "vae_organisme";
 
-export default function VAEPage() {
+export default function VAEPage({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [step, setStep] = useState(1);
@@ -50,7 +50,7 @@ export default function VAEPage() {
             <GraduationCap className="w-5 h-5 text-primary" />
             <span className="font-bold text-lg">Génération VAE</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1"><Home className="w-4 h-4" /> Accueil</Button>
+          {!embedded && <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1"><Home className="w-4 h-4" /> Accueil</Button>}
         </div>
       </header>
 
@@ -60,7 +60,7 @@ export default function VAEPage() {
           scope="vae"
           compact
         />
-        {user && (
+        {!embedded && user && (
           <VAEDossierHistory
             userId={user.id}
             organisme={organisme}
