@@ -1050,8 +1050,8 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
       || tamponImg(urls.tamponUrl)
       || `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
-  // Référent qualité / Référent handicap → no auto signature (different people)
-  if (/qualité|handicap|référent/i.test(l)) {
+  // Équipe pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
+  if (/qualité|handicap|référent|[ée]quipe/i.test(l)) {
     return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Responsable (of org) → tampon only
