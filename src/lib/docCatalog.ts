@@ -417,7 +417,6 @@ export function buildFullCatalog(
 
     // IND 27 — Sous-traitance et partenariats
     // IND 27 — Sous-traitance et portage salarial (décret n° 2026-728 : traçabilité contractuelle)
-    add("af_c6i27_registre_sous_traitance", "CT6 - IND 27 REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL", 6, 27, "registre_sous_traitance_portage", { type: "AF" });
     add("af_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
     if (hasExternalFormateur) {
       add("af_c6i27_clauses_qualite", "CT6 - IND 27 ANNEXE CLAUSES QUALITÉ DES CONTRATS DE SOUS-TRAITANCE / PORTAGE", 6, 27, "clauses_qualite_contrat", { type: "AF" });
@@ -1177,7 +1176,6 @@ export function buildFullCatalog(
     add("cfa_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
 
     // IND 27 — Sous-traitance et partenariats
-    add("cfa_c6i27_registre_sous_traitance", "CT6 - IND 27 REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL", 6, 27, "registre_sous_traitance_portage_cfa", { typePrestation: "CFA" });
     add("cfa_c6i27_clauses_qualite", "CT6 - IND 27 ANNEXE – CLAUSES QUALITÉ DES CONTRATS DE SOUS-TRAITANCE ET DE PORTAGE", 6, 27, "clauses_qualite_contrat_cfa", { typePrestation: "CFA" });
     add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
     if (hasExternalFormateur) add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
@@ -1414,7 +1412,6 @@ export function buildFullCatalog(
     add("bdc_nt_phase_2", "CT3 - IND 10 Phase 2 – Phase d'investigation", 3, 10, "bdc_nt_phase", { phase: 2 });
     add("bdc_nt_phase_3", "CT3 - IND 10 Phase 3 – Phase de conclusion & suivi à 6 mois", 3, 10, "bdc_nt_phase", { phase: 3 });
     // Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32
-    add("bdc_q2026_registre_st", "CT6 - IND 27 Registre de sous-traitance et de portage salarial", 6, 27, "bdc_q2026", { piece: "registre" });
     add("bdc_q2026_clauses", "CT6 - IND 27 Annexe clauses qualité des contrats de sous-traitance", 6, 27, "bdc_q2026", { piece: "clauses" });
     add("bdc_q2026_risques", "CT7 - IND 32 Analyse des risques sur la qualité des prestations", 7, 32, "bdc_q2026", { piece: "risques" });
     // Pièces obligatoires BC (synthèse, attestation de remise, émargements, satisfaction, veilles…)

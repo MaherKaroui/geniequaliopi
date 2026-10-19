@@ -20,7 +20,7 @@ import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
 import { BDC_CLASSEURS, texteClasseur } from "./bdcClasseursXlsx";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, type BdcContext, type Beneficiaire } from "./bdcModel";
-import { genAnalyseRisquesQualite, genRegistreSousTraitancePortage, genClausesQualiteContrat } from "@/lib/qualite2026";
+import { genAnalyseRisquesQualite, genClausesQualiteContrat } from "@/lib/qualite2026";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
@@ -2271,7 +2271,6 @@ export async function buildBDCNTConseilsZip(
   // === 8. Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32 ===
   {
     const pieces2026: Array<{ ind: number; nom: string; html: string }> = [
-      { ind: 27, nom: "Indicateur 27 - Registre de sous-traitance et de portage salarial", html: genRegistreSousTraitancePortage(org, "BC", formation, benList) },
       { ind: 27, nom: "Indicateur 27 - Annexe clauses qualité des contrats de sous-traitance", html: genClausesQualiteContrat(org, "BC") },
       { ind: 32, nom: "Indicateur 32 - Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
 
