@@ -25,6 +25,7 @@ import { RouteActivityTracker } from "./components/RouteActivityTracker";
 import AccessGate from "./components/AccessGate";
 import { installActivityTracker } from "./lib/activityTracker";
 import { isEmbeddedVAE } from "./lib/vae/embedMode";
+import { isEmbeddedBDC } from "./lib/bdc/embedMode";
 
 installActivityTracker();
 
@@ -32,6 +33,9 @@ const queryClient = new QueryClient();
 
 const ApplicationContent = () => {
   const location = useLocation();
+  if (isEmbeddedBDC(location.pathname, location.search)) {
+    return <BackgroundJobsProvider><BilanCompetences embedded /></BackgroundJobsProvider>;
+  }
   if (isEmbeddedVAE(location.pathname, location.search)) {
     return (
       <BackgroundJobsProvider>
