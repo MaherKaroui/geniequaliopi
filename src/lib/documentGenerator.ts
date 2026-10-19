@@ -10,7 +10,7 @@ import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
-import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genFicheCompetencesIntervenant, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
+import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
 import { planDevActions } from "./templatesCritere5";

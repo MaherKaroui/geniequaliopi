@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getFullCatalog } from "@/lib/docCatalog";
+import { getFullCatalog } from "@/lib/documentGenerator";
 import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST } from "./dossierAudit.harness";
 
 describe("fiche de compétences des intervenants retirée du dossier", () => {
