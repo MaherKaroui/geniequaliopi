@@ -23,4 +23,14 @@ describe("IND 17 — moyens et environnement", () => {
     expect(html.match(/class="sig-box"/g)).toHaveLength(1);
     expect(html).not.toContain("Le responsable pédagogique");
   });
+
+  it("avec un tampon enregistré, c'est le tampon qui apparaît sous le dirigeant", () => {
+    const orgTampon = { ...org, tamponUrl: "/images/tampon-test.png" };
+    const piece = getFullCatalog(orgTampon, formation, STAGIAIRES_TEST)
+      .find((d) => d.template === "moyens_environnement_af");
+    if (!piece) throw new Error("Descriptif des moyens absent du catalogue");
+    const html = generateDocumentById(piece.id, piece.template, piece.params, orgTampon, formation, STAGIAIRES_TEST);
+    expect(html).toContain('src="/images/tampon-test.png"');
+    expect(html).toContain('alt="Tampon"');
+  });
 });
