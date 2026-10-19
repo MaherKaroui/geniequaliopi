@@ -36,6 +36,12 @@ describe("Générateur autonome Bilan de compétences", () => {
     expect(validateStandaloneBdc(d).some(v => v.includes("24 heures"))).toBe(true);
     expect(() => generateStandaloneBdcPlanning(d)).toThrow();
   });
+  it("alterne les modalités du planning mixte sans modifier ses heures", () => {
+    const d = dossier(); d.formation.modalites = "Mixte";
+    const sessions = generateStandaloneBdcPlanning(d);
+    expect(sessions.map(s => s.modalite)).toEqual(sessions.map((_, i) => i % 2 ? "distanciel" : "presentiel"));
+    expect(sessions.reduce((sum, s) => sum + s.duree, 0)).toBe(22);
+  });
   it("sans entreprise produit un contrat même avec OPCO", () => {
     const d = dossier(); d.beneficiaire.financeur = "OPCO";
     expect(standaloneBdcContext(d).prestation.origineDemande).toBe("beneficiaire");
