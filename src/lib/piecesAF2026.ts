@@ -106,7 +106,7 @@ export function genMoyensEnvironnement(o: OrganismeInfo, f: FormationInfo, stagi
     ],
     table: { headers: ["Moyen", "Description", "Justificatif à joindre"], rows },
     extraHtml: `<p style="margin-top:10px">Descriptif établi le ${dateMajFr(o)} et revu avant chaque session. Les justificatifs de la dernière colonne sont des pièces de l'organisme ou de ses fournisseurs : ils sont joints au dossier, ils ne sont pas produits par le générateur.</p>`,
-    signatures: { type: "2", labels: ["Le dirigeant", "Le responsable pédagogique"], names: [o.dirigeant, o.responsablePedagogique || o.dirigeant], dates: [dateMajFr(o), dateMajFr(o)] },
+    signatures: { type: "1", labels: ["Le dirigeant"], names: [o.dirigeant], dates: [dateMajFr(o)] },
   });
 }
 
