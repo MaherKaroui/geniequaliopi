@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Corriger la mise en page des exports VAE et vérifier les signatures/cachets fournis dans les PDF et Word.
+- [x] Corriger la mise en page des exports VAE et vérifier le ZIP/PDF avec signatures/cachets fournis ; images présentes dans le Word de secours (.doc), rendu Microsoft Word non vérifié.
 
 - [x] Ajouter et vérifier le mode VAE seule intégrable, sans menu ni code d’accès, sans modifier les documents.
 
