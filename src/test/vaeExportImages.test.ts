@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML } from "@/lib/vae/vaeTemplates";
+import { getConvocationHTML, getProgrammeHTML, getCGVHTML, getLivretAccueilHTML, getChecklistHTML, getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML } from "@/lib/vae/vaeTemplates";
 import { DEFAULT_ORGANISME, EMPTY_CANDIDAT, EMPTY_CERTIFICATION, EMPTY_SESSION, EMPTY_CONTENTS, type VAEData } from "@/lib/vae/vaeTypes";
 
 const candidateImage = "data:image/png;base64,Y2FuZGlkYXRl";
@@ -17,10 +17,10 @@ describe("images fournies dans les documents VAE", () => {
     expect(html).toContain(candidateImage);
     expect(html).toContain(directorImage);
   });
-  it.each([getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML])("utilise le tampon de l'organisme lorsqu'il est fourni (%#)", (generate) => {
+  it.each([getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML, getConvocationHTML, getProgrammeHTML, getCGVHTML, getLivretAccueilHTML, getChecklistHTML])("appose signature du dirigeant ET tampon de l'organisme (%#)", (generate) => {
     const html = generate({ ...data, organisme: { ...data.organisme, tampon: stampImage } });
     expect(html).toContain(stampImage);
-    expect(html).not.toContain(directorImage);
+    expect(html).toContain(directorImage);
   });
   it("ne crée aucune image de signature absente", () => {
     const html = getBesoinsHTML({ ...data, organisme: DEFAULT_ORGANISME, candidat: EMPTY_CANDIDAT });
