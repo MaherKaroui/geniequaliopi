@@ -9,7 +9,7 @@ describe("IND 17 — moyens et environnement", () => {
   it("ne produit plus la pièce « JUSTIFICATIFS DES OUTILS ET LICENCES »", () => {
     const catalog = getFullCatalog(org, formation, STAGIAIRES_TEST);
     const outils = catalog.filter((d) => d.critere === 4 && d.indicateur === 17
-      && /JUSTIFICATIFS DES OUTILS/i.test(d.titre));
+      && /JUSTIFICATIFS DES OUTILS/i.test(d.nom));
     expect(outils).toHaveLength(0);
   });
 
