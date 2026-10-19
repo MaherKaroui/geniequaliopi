@@ -1,7 +1,7 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { BackgroundJobsProvider } from "@/lib/backgroundJobs";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -23,16 +23,23 @@ import Admin from "./pages/Admin";
 import { RouteActivityTracker } from "./components/RouteActivityTracker";
 import AccessGate from "./components/AccessGate";
 import { installActivityTracker } from "./lib/activityTracker";
+import { isEmbeddedVAE } from "./lib/vae/embedMode";
 
 installActivityTracker();
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Sonner />
-      <BrowserRouter>
+const ApplicationContent = () => {
+  const location = useLocation();
+  if (isEmbeddedVAE(location.pathname, location.search)) {
+    return (
+      <BackgroundJobsProvider>
+        <VAEPage embedded />
+      </BackgroundJobsProvider>
+    );
+  }
+
+  return (
         <AccessGate>
         <BackgroundJobsProvider>
         <RouteActivityTracker />
@@ -58,6 +65,15 @@ const App = () => (
         <SophieChat />
         </BackgroundJobsProvider>
         </AccessGate>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Sonner />
+      <BrowserRouter>
+        <ApplicationContent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

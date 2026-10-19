@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Ajouter et vérifier le mode VAE seule intégrable, sans menu ni code d’accès, sans modifier les documents.
+
 - [x] Adapter le contrat de prestation qualité AF/CFA/BC/VAE au modèle FD Certif Expert fourni et vérifier les quatre dossiers.
 
 - [x] Centraliser les niveaux de qualité PDF et les chartes déterministes.
