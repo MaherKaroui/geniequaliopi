@@ -20,7 +20,7 @@ function boites(html: string) {
   });
 }
 
-describe("sweep responsable pédagogique", () => {
+describe("cases du responsable pédagogique dans les dossiers", () => {
   beforeAll(async () => { await preloadFormationsTest(); }, 120_000);
   for (const type of TYPES) {
     it(`${type} : chaque case du responsable pédagogique porte la marque du dirigeant`, () => {
