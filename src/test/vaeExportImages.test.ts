@@ -17,10 +17,10 @@ describe("images fournies dans les documents VAE", () => {
     expect(html).toContain(candidateImage);
     expect(html).toContain(directorImage);
   });
-  it.each([getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML, getConvocationHTML, getProgrammeHTML, getCGVHTML, getLivretAccueilHTML, getChecklistHTML])("appose signature du dirigeant ET tampon de l'organisme (%#)", (generate) => {
+  it.each([getBesoinsHTML, getLivret1HTML, getLivret2HTML, getConventionHTML, getAutorisationRGPDHTML, getCharteHTML, getReglementInterieurHTML, getConvocationHTML, getProgrammeHTML, getCGVHTML, getLivretAccueilHTML, getChecklistHTML])("met seulement le tampon du dirigeant, sans sa signature (%#)", (generate) => {
     const html = generate({ ...data, organisme: { ...data.organisme, tampon: stampImage } });
     expect(html).toContain(stampImage);
-    expect(html).toContain(directorImage);
+    expect(html).not.toContain(directorImage);
   });
   it("ne crée aucune image de signature absente", () => {
     const html = getBesoinsHTML({ ...data, organisme: DEFAULT_ORGANISME, candidat: EMPTY_CANDIDAT });
