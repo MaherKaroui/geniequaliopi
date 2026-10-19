@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Corriger la mise en page des exports VAE et vérifier le ZIP/PDF avec signatures/cachets fournis ; images présentes dans le Word de secours (.doc), rendu Microsoft Word non vérifié.
+
 - [x] Ajouter et vérifier le mode VAE seule intégrable, sans menu ni code d’accès, sans modifier les documents.
 
 - [x] Adapter le contrat de prestation qualité AF/CFA/BC/VAE au modèle FD Certif Expert fourni et vérifier les quatre dossiers.
