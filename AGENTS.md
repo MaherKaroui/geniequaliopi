@@ -8,3 +8,4 @@
 - Standalone VAE exports use template-local PDF margins and opt into row-by-row table pagination; the shared export default remains unchanged to isolate layout corrections from other generators.
 - The standalone BDC generator uses a dedicated typed dossier and export catalog around the existing BDC legal/financial model; explicit declarations and confirmed sessions replace inferred profiles to avoid fabricated evidence, and its separate browser history never changes access rights.
 - Standalone BDC AI drafting runs in an authenticated server function and only updates editable narrative fields; financial, identity, scheduling and signature data remain unchanged to prevent AI-generated evidence.
+- BDC final-result-only AI output retains SDK strict schema and final validation but disables unused partial-object parsing to avoid quadratic CPU work on long streamed drafts.
