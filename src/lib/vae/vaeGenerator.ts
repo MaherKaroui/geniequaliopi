@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import { htmlToWordBlob } from "@/lib/wordExport";
-import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { htmlToPdfBlob, getActivePdfOptions } from "@/lib/pdfExport";
 import { withActiveDossierStyle } from "@/lib/dossierDesign";
 import type { VAEData } from "./vaeTypes";
 import {
@@ -74,7 +74,7 @@ export async function buildVAEZip(
     onProgress?.(name);
     try {
       const styledHtml = withActiveDossierStyle(fn());
-      const blob = options?.format === "pdf" ? await htmlToPdfBlob(styledHtml) : await htmlToWordBlob(styledHtml);
+      const blob = options?.format === "pdf" ? await htmlToPdfBlob(styledHtml, { ...getActivePdfOptions(), keepTablesTogether: false }) : await htmlToWordBlob(styledHtml);
       const isDocx = blob.type.includes("officedocument");
       const finalName = options?.format === "pdf" ? name.replace(/\.docx$/i, ".pdf") : isDocx ? name : name.replace(/\.docx$/i, ".doc");
       zip.file(finalName, blob);

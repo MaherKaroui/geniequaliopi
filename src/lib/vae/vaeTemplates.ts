@@ -92,6 +92,8 @@ function g(c: VAECandidat, masc: string, fem: string): string {
 const STYLE = `
 <style>
   body { font-family: "Calibri", Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; margin: 0; }
+  .pdf-root { box-sizing: border-box; padding: 32px 42px 0; }
+  .pdf-page-footer .footer { margin: 0 42px; }
   .doc-header { text-align: center; margin-bottom: 14px; }
   .doc-header .org { font-weight: bold; font-size: 12pt; color: #0f172a; letter-spacing: 0.5px; }
   .doc-header .meta { font-size: 9.5pt; color: #475569; margin-top: 2px; }
@@ -102,13 +104,18 @@ const STYLE = `
   p { margin: 6px 0; text-align: justify; }
   table { border-collapse: collapse; width: 100%; margin: 8px 0 14px 0; }
   th, td { border: 1px solid #94a3b8; padding: 6px 9px; vertical-align: top; font-size: 10.5pt; }
-  th { background: #e2e8f0; color: #0f172a; text-align: left; font-weight: bold; width: 32%; }
+  th { background: #e2e8f0; color: #0f172a; text-align: left; font-weight: bold; }
+  td, th { overflow-wrap: anywhere; }
+  table { table-layout: fixed; }
+  .vae-signatures { break-inside: avoid; page-break-inside: avoid; }
+  .vae-signatures td { background: #fff; }
+  .vae-signatures img { object-fit: contain; max-width: 100%; }
   .kv td:first-child { background: #f1f5f9; font-weight: bold; width: 32%; }
   .sign-row { display: table; width: 100%; margin-top: 40px; }
   .sign-cell { display: table-cell; width: 50%; border: 1px solid #94a3b8; padding: 12px; vertical-align: top; height: 90px; }
   .sign-cell .lbl { font-weight: bold; font-size: 10pt; }
   .sign-cell .sub { font-size: 9.5pt; color: #475569; margin-top: 3px; }
-  .footer { margin-top: 36px; padding-top: 8px; border-top: 1px solid #94a3b8; font-size: 8.5pt; color: #475569; text-align: center; }
+  .footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #94a3b8; font-size: 8.5pt; color: #475569; text-align: center; }
   .footer strong { color: #0f172a; }
   .notice { background: #f8fafc; border-left: 3px solid #0f172a; padding: 10px 14px; margin: 12px 0; font-size: 10.5pt; }
   ul { margin: 6px 0 6px 22px; padding: 0; }
@@ -167,8 +174,8 @@ function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
 
 function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string, leftImgs?: { signature?: string; tampon?: string }, rightImgs?: { signature?: string; tampon?: string }): string {
   const cell = (label: string, sub: string, i?: { signature?: string; tampon?: string }) => {
-    const sig = i?.signature ? `<div style="margin-top:8px;"><img src="${i.signature}" alt="Signature" width="170" height="60" style="width:170px;height:60px;display:block;" /></div>` : "";
-    const tam = i?.tampon ? `<div style="margin-top:8px;"><img src="${i.tampon}" alt="Tampon" width="120" height="75" style="width:120px;height:75px;display:block;" /></div>` : "";
+    const sig = i?.signature ? `<div style="margin-top:8px;"><img src="${i.signature}" alt="Signature" width="190" height="75" style="width:190px;height:75px;object-fit:contain;display:block;" /></div>` : "";
+    const tam = i?.tampon ? `<div style="margin-top:8px;"><img src="${i.tampon}" alt="Tampon" width="190" height="120" style="width:190px;height:120px;object-fit:contain;display:block;" /></div>` : "";
     return `<td width="50%" valign="top" style="border:1px solid #94a3b8;padding:12px;">
       <div style="font-weight:bold;font-size:10pt;">${esc(label)}</div>
       <div style="font-size:9.5pt;color:#475569;">${esc(sub)}</div>
@@ -176,10 +183,22 @@ function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, 
       ${sig}${tam}
     </td>`;
   };
-  return `<table cellpadding="0" cellspacing="0" style="width:100%;margin-top:30px;border-collapse:collapse;"><tr>
+  return `<table class="vae-signatures" cellpadding="0" cellspacing="0" style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
     ${cell(leftLabel, leftSub, leftImgs)}
     ${cell(rightLabel, rightSub, rightImgs)}
   </tr></table>`;
+}
+
+function organismeMark(o: VAEOrganisme): { signature?: string; tampon?: string } {
+  return o.tampon ? { tampon: o.tampon } : { signature: o.signature };
+}
+
+function organismeSignatureBlock(o: VAEOrganisme): string {
+  const mark = organismeMark(o);
+  return `<table class="vae-signatures"><tr><td>
+    <strong>Pour ${esc(o.nom)}</strong><p>${esc(o.dirigeant)} — Dirigeant</p>
+    ${mark.tampon ? `<img src="${mark.tampon}" alt="Tampon" width="190" height="120" style="width:190px;height:120px;object-fit:contain;" />` : mark.signature ? `<img src="${mark.signature}" alt="Signature" width="190" height="75" style="width:190px;height:75px;object-fit:contain;" />` : "<p>Signature :</p>"}
+  </td></tr></table>`;
 }
 
 // ------------------------------------------------------------------
@@ -254,7 +273,7 @@ export function getBesoinsHTML(d: VAEData): string {
     <h2>Conclusion</h2>
     <p>À l'issue de cet entretien, le parcours d'accompagnement VAE peut être engagé selon les modalités convenues avec le candidat, sur la base des éléments recueillis ci-dessus.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, organismeMark(o))}
   `;
   return wrap(o, "Évaluation des besoins", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — Entretien de positionnement");
 }
@@ -352,7 +371,7 @@ export function getLivret1HTML(d: VAEData): string {
     <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent dossier et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateDemandeRecevabilite || s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, organismeMark(o))}
   `;
   return wrap(o, "Dossier de faisabilité — demande de recevabilité", body, "Validation des Acquis de l'Expérience (VAE)");
 }
@@ -454,7 +473,7 @@ export function getLivret2HTML(d: VAEData): string {
     <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> atteste sur l'honneur que les informations fournies dans le présent dossier de validation sont exactes et que les activités décrites ont été personnellement réalisées.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, organismeMark(o))}
   `;
   return wrap(o, "Dossier de validation", body, "Description et analyse de l'expérience");
 }
@@ -507,7 +526,7 @@ export function getConventionHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature || villeDepuisAdresse(o.adresse))}, le ${shortDate(s.dateSignature)}, en deux exemplaires originaux.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, organismeMark(o))}
   `;
   return wrap(o, "Convention d'accompagnement VAE", body, "Validation des Acquis de l'Expérience — Accompagnement individualisé");
 }
@@ -607,7 +626,7 @@ export function getAutorisationRGPDHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature || villeDepuisAdresse(o.adresse))}, le ${shortDate(s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, organismeMark(o))}
   `;
   return wrap(o, "Autorisation RGPD", body);
 }
@@ -886,13 +905,7 @@ export function getCharteHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
 
-    <div class="sign-row">
-      <div class="sign-cell" style="width:100%;">
-        <div class="lbl">Pour ${esc(o.nom)}</div>
-        <div class="sub">${esc(o.dirigeant)} — Dirigeant</div>
-        <div class="sub" style="margin-top:24px;">Signature :</div>
-      </div>
-    </div>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Charte Qualité", body);
 }
@@ -995,6 +1008,7 @@ export function getReglementInterieurHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
     <p><strong>Pour ${esc(o.nom)}</strong> — ${esc(o.dirigeant)}, Dirigeant.</p>
+    ${organismeSignatureBlock(o)}
   `;
   return wrap(o, "Règlement Intérieur", body);
 }

@@ -32,6 +32,7 @@ export type PdfExportOptions = {
   scale?: number;
   imageQuality?: number;
   pageYieldMs?: number;
+  keepTablesTogether?: boolean;
 };
 
 export type PdfQuality = "standard" | "high" | "maximum";
@@ -316,6 +317,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     scale = 2,
     imageQuality = 0.95,
     pageYieldMs = 0,
+    keepTablesTogether = true,
   } = options;
 
   // Caches valables uniquement pour cet appel (CSS spécifique au document).
@@ -395,7 +397,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
-        if (current.content.childNodes.length > 0 && nodeFitsOnFreshPage(host, node, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+        if (keepTablesTogether && current.content.childNodes.length > 0 && nodeFitsOnFreshPage(host, node, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
           const wholeTable = node.cloneNode(true);
           current.content.appendChild(wholeTable);
           if (current.content.scrollHeight > current.content.clientHeight + 1) {
@@ -486,7 +488,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
               continue;
             }
             if (child instanceof HTMLElement && child.tagName === "TABLE") {
-              if (nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+              if (keepTablesTogether && nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
                 const wholeTable = child.cloneNode(true);
                 splitWrapper.appendChild(wholeTable);
                 if (current.content.scrollHeight > current.content.clientHeight + 1) {
