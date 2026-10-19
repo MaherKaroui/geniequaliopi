@@ -12,14 +12,14 @@ import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection 
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
-import { genRegistreSousTraitancePortage, genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
+import { genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
 import { planDevActions } from "./templatesCritere5";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel } from "@/lib/bdc/bdcNTXlsx";
 import { BDC_CLASSEURS } from "@/lib/bdc/bdcClasseursXlsx";
 import { buildBdcContext } from "@/lib/bdc/bdcModel";
-import { genAnalyseRisquesQualite as genAnalyseRisquesQualiteBC, genRegistreSousTraitancePortage as genRegistreSousTraitanceBC, genClausesQualiteContrat as genClausesQualiteBC } from "@/lib/qualite2026";
+import { genAnalyseRisquesQualite as genAnalyseRisquesQualiteBC, genClausesQualiteContrat as genClausesQualiteBC } from "@/lib/qualite2026";
 import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTStatsXlsx";
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
@@ -378,7 +378,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "bdc_q2026": {
       const piece = String(params?.piece || "risques");
-      if (piece === "registre") return genRegistreSousTraitanceBC(o, "BC", f, stagiaires);
       if (piece === "clauses") return genClausesQualiteBC(o, "BC");
       return genAnalyseRisquesQualiteBC(o, "BC", f);
     }
@@ -626,7 +625,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "planning_intervenants_af": return genPlanningIntervenantsAF(o, f, stagiaires);
     case "cooperation_socio_eco_af": return genCooperationSocioEconomique(o, f, stagiaires);
     case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f);
-    case "registre_sous_traitance_portage": return genRegistreSousTraitancePortage(o, params?.type ?? "AF", f, stagiaires);
     case "clauses_qualite_contrat": return genClausesQualiteContrat(o, params?.type ?? "AF");
     case "preuves_veille_reglementaire": return genPreuvesVeilleReglementaire(o, f);
     case "fiche_innovation": return genFicheInnovation(o, params?.sujet ?? "");
@@ -1075,7 +1073,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "justificatifs_intervenants_cfa": return genJustificatifsIntervenantsCFA(o, f, stagiaires);
     case "veille_sourcee_cfa": return genVeilleSourceeCFA(o, f);
     case "procedure_insertion_poursuite_etudes_cfa": return genProcedureInsertionPoursuiteEtudesCFA(o, f);
-    case "registre_sous_traitance_portage_cfa": return genRegistreSousTraitancePortage(o, params?.typePrestation ?? "CFA", f, stagiaires);
     case "clauses_qualite_contrat_cfa": return genClausesQualiteContrat(o, params?.typePrestation ?? "CFA");
     case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f);
     case "procedure_evaluation_enseignements_cfa": return genProcedureEvaluationEnseignements(o, f);
