@@ -2,7 +2,7 @@
 import { typeAuditEffectif } from "./typeAudit";
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
