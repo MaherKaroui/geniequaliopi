@@ -46,6 +46,16 @@ export interface StandaloneBdcData {
   sessions: BdcSessionInput[];
   aiDraft?: boolean;
   aiContext?: string;
+  /** Réponses aux questionnaires, par clé `groupe_n` (voir standaloneQuestions). */
+  reponses?: Record<string, string>;
+  /** Analyse STAR : situation, actions, résultats, compétences transférables. */
+  star?: string[][];
+  /** Journal du carnet de bord, aligné sur les séances réalisées : exercice, enseignement, suite. */
+  journal?: string[][];
+  /** Plan d’action : action, échéance, ressources, résultat attendu. */
+  actions?: string[][];
+  /** Notes de satisfaction 1 à 5, reprises seulement quand le bilan est terminé. */
+  notesSatisfaction?: number[];
 }
 
 export function emptyBdcData(): StandaloneBdcData {
