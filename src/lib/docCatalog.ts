@@ -336,7 +336,6 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       add(`af_c4i17_moyens_${fi}`, "CT4 - IND 17 DESCRIPTIF DES MOYENS ET DE L'ENVIRONNEMENT", 4, 17, "moyens_environnement_af", { fi });
     });
-    add("af_c4i17_justificatifs_outils", "CT4 - IND 17 JUSTIFICATIFS DES OUTILS ET LICENCES (à joindre)", 4, 17, "facture_pack_office");
     const afModaLower = (formations[0]?.modalites || '').toLowerCase();
     const afIsPureDistanciel = afModaLower.includes('distanciel') && !afModaLower.includes('mixte') && !/pr[ée]sentiel/.test(afModaLower);
     if (!afIsPureDistanciel) {

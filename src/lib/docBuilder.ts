@@ -513,6 +513,7 @@ td{padding:8px 6px;vertical-align:top;font-size:${s.fontSize - 1}px}
 .footer{margin-top:40px;padding-top:20px;font-size:${s.fontSize - 1}px;color:#666;text-align:center}
 .signature-block{display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:40px}
 .signature-block-2{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}
+.signature-block-1{display:grid;grid-template-columns:1fr;gap:40px;margin-top:40px}
 .sig-box{padding:15px;min-height:120px}
 .sig-box p{margin:4px 0;font-size:${s.fontSize - 1}px}
 .sig-label{font-weight:700;color:${s.primaryColor};font-size:${s.fontSize}px;margin-bottom:8px !important;font-family:${s.headingFont}}
