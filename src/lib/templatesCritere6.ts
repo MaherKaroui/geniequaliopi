@@ -1,7 +1,7 @@
 // Critère 6 — IND 23-27 generators (based on real SELECT FORMATION documents)
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, subtractBusinessDays } from "./docBuilder";
+import { buildDocument, formatDate, subtractBusinessDays, cachetDirigeantHtml } from "./docBuilder";
 import { entreesVeille, genVeilleExploitee } from "./veilleExploitee";
 import { genVeilleSourcee } from "./piecesAF2026";
 import type { TypePrestation } from "./qualite2026";
@@ -469,7 +469,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
           <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
           <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Cachet :</p>
-          ${tamponHtml}
+          ${cachetDirigeantHtml(o)}
         </div>
       </div>
     `

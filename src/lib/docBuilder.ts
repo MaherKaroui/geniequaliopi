@@ -996,6 +996,16 @@ function tamponOuSignature(urls: SignatureUrls): string {
   return urls.tamponUrl ? tamponImg(urls.tamponUrl) : sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
 }
 
+/** Signature du dirigeant (formulaire organisme) : sa signature, à défaut son tampon. */
+export function signatureDirigeantHtml(o: Pick<OrganismeInfo, "signatureUrl" | "tamponUrl">): string {
+  return sigImg(o.signatureUrl, "Signature dirigeant") || tamponImg(o.tamponUrl);
+}
+
+/** Cachet du dirigeant : son tampon, à défaut sa signature (formulaire organisme). */
+export function cachetDirigeantHtml(o: Pick<OrganismeInfo, "signatureUrl" | "tamponUrl">): string {
+  return tamponImg(o.tamponUrl) || sigImg(o.signatureUrl, "Signature dirigeant");
+}
+
 function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
   const l = label.toLowerCase();
   // Référent qualité externe FD CERTIF EXPERT : son tampon (sauf libellé combiné avec le dirigeant).
@@ -1034,8 +1044,12 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/dirigeant|directeur/i.test(l)) {
     return tamponOuSignature(urls);
   }
-  // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
-  if (/pédagogique|qualité|handicap|référent/i.test(l)) {
+  // Responsable pédagogique : c'est le dirigeant (formulaire organisme) qui signe à sa place.
+  if (/p[ée]dagogique/i.test(l) && !/[ée]quipe/i.test(l)) {
+    return tamponOuSignature(urls) || `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
+  }
+  // Équipe pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
+  if (/qualité|handicap|référent|[ée]quipe/i.test(l)) {
     return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Responsable (of org) → tampon only

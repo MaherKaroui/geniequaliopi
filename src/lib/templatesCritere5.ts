@@ -2,7 +2,7 @@
 import { typeAuditEffectif } from "./typeAudit";
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
@@ -176,7 +176,7 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
     <p><strong>Organisme de formation :</strong> ${o.nom}</p>
     <div class="signature-block-2">
       <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${formateurNom}</p><p>Date : ${formatDate(dateSig)}</p><p style="margin-top:20px">Signature :</p>${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}</div>
-      <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(dateSig)}</p><p style="margin-top:20px">Cachet :</p>${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}</div>
+      <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(dateSig)}</p><p style="margin-top:20px">Cachet :</p>${cachetDirigeantHtml(o)}</div>
     </div>
   ` });
 }

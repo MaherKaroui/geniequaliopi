@@ -24,7 +24,7 @@ import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTSt
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement, signatureDirigeantHtml, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { estJourFormation } from "./joursFeries";
 import { buildFullCatalog } from "./docCatalog";
@@ -5966,7 +5966,7 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
         <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
         <p>Date : ${formatDate(dateDebut)}</p>
         <p style="margin-top:20px">Signature :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+        ${signatureDirigeantHtml(o)}
       </div>
     </div>`, stagiaires: [s] });
 }
@@ -7691,7 +7691,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
     extraHtml: (() => {
       const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
       const fmtSigHtml = fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
-      const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+      const tamponHtml = cachetDirigeantHtml(o);
       return `<p style="margin-top:20px"><strong>Date de fin de formation :</strong> ${formatDate(dateFinFormateur)}</p>
       <div class="signature-block-2">
         <div class="sig-box"><p class="sig-label">VISA DU FORMATEUR</p><p>Nom : ${formateurNom}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
