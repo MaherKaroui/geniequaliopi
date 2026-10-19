@@ -184,10 +184,15 @@ function scenarioAF(c: Ctx): MailAuto[] {
   ]));
 
   if (c.distanciel) {
+    // Lien Google Meet réaliste et stable par stagiaire (format xxx-xxxx-xxx)
+    const lettres = "abcdefghijkmnopqrstuvwxyz";
+    const sd = seed(`${k}|meet`);
+    const seg = (n: number, off: number) => Array.from({ length: n }, (_, i) => lettres[(sd + off * 7 + i * 13) % lettres.length]).join("");
+    const meet = `https://meet.google.com/${seg(3, 1)}-${seg(4, 2)}-${seg(3, 3)}`;
     out.push(mail("af_connexion", "Lien de connexion et assistance technique", v(c, "sl", [`Vos accès à la classe virtuelle – ${f.intitule}`, `Connexion à votre formation de demain`]), [
       deOF(c, aHeure(jo(c.debut, -1), k + "l1"), v(c, "bl", [
-        `<p>${c.appel},</p><p>Voici les informations de connexion pour demain : la classe virtuelle ouvre 15 minutes avant le début de la séance. En cas de difficulté technique, répondez à ce message.</p><p>Pensez à tester votre micro et votre caméra.</p>`,
-        `<p>${c.appel},</p><p>Votre formation démarre demain. Le lien de connexion est actif dès 8 h 45 ; une assistance technique est assurée pendant toute la session par ${esc(c.o.dirigeant)}.</p>`,
+        `<p>${c.appel},</p><p>Voici les informations de connexion pour demain : la classe virtuelle ouvre 15 minutes avant le début de la séance.</p><p>Lien Google Meet : <a href="${meet}">${meet}</a></p><p>En cas de difficulté technique, répondez à ce message. Pensez à tester votre micro et votre caméra.</p>`,
+        `<p>${c.appel},</p><p>Votre formation démarre demain. Voici votre lien de connexion Google Meet : <a href="${meet}">${meet}</a> — il sera actif dès 8 h 45. Une assistance technique est assurée pendant toute la session par ${esc(c.o.dirigeant)}.</p>`,
       ])),
     ]));
   }
