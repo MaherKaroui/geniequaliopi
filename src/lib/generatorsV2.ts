@@ -241,7 +241,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <h3>Horaires</h3><p>${horairesTexteFor(s)}</p>
       <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
       <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
-      ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
+      ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Assistance technique et pédagogique</h3><p>Pendant toute la durée de la formation, une assistance technique et pédagogique est assurée par ${o.nom}. Contact : <a href="mailto:${o.email}">${o.email}</a>${o.telephone?.trim() ? ` – Tél. : ${o.telephone}` : ""}.</p>`}
       <h3>Documents remis avant l'entrée en formation</h3>
       <ul><li>Contrat de formation</li><li>Règlement intérieur</li><li>Programme de formation</li><li>Conditions Générales de Vente (CGV)</li></ul>
       ${isPresentiel(f) ? `<h3>Matériel à prévoir</h3><ul><li>Un stylo et de quoi prendre des notes</li><li>(Le matériel informatique est mis à disposition sur place)</li></ul>` : `<h3>Matériel requis</h3><ul><li>Un ordinateur avec connexion internet stable</li><li>Un casque avec microphone</li><li>Un navigateur web récent (Chrome, Firefox, Edge)</li></ul>`}
@@ -356,7 +356,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <h3>Horaires</h3><p>${horairesTexteFor(s)}</p>
     <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
     <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
-    ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
+    ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Assistance technique et pédagogique</h3><p>Pendant toute la durée de la formation, une assistance technique et pédagogique est assurée par ${o.nom}. Contact : <a href="mailto:${o.email}">${o.email}</a>${o.telephone?.trim() ? ` – Tél. : ${o.telephone}` : ""}.</p>`}
     <h3>Documents remis avant l'entrée en formation</h3>
     <ul><li>Contrat de formation</li><li>Règlement intérieur</li><li>Programme de formation</li><li>Conditions Générales de Vente (CGV)</li></ul>
     ${isPresentiel(f) ? `<h3>Matériel à prévoir</h3><ul><li>Un stylo et de quoi prendre des notes</li><li>(Le matériel informatique est mis à disposition sur place)</li></ul>` : `<h3>Matériel requis</h3><ul><li>Un ordinateur avec connexion internet stable</li><li>Un casque avec microphone</li><li>Un navigateur web récent (Chrome, Firefox, Edge)</li></ul>`}
