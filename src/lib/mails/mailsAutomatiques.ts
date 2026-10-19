@@ -385,7 +385,7 @@ export function payloadCapture(m: MailAuto, client: ClientMail, precedents: Mail
   }
   const last = m.messages[m.messages.length - 1];
   const pjs = (x: MessageMail) => x.atts.length
-    ? `<div class="qatts"><span class="qatts-n">📎 ${x.atts.length} pièce${x.atts.length > 1 ? "s" : ""} jointe${x.atts.length > 1 ? "s" : ""}</span><div class="qatts-l">${x.atts.map((a) => `<span class="qatt"><span class="qatt-ico">PDF</span><span class="qatt-nom">${esc(a.name)}</span><span class="qatt-taille">${esc(a.size)}</span></span>`).join("")}</div></div>`
+    ? `<div class="qatts"><span class="qatts-n"><span class="mdl2">&#xE723;</span> ${x.atts.length} pièce${x.atts.length > 1 ? "s" : ""} jointe${x.atts.length > 1 ? "s" : ""}</span><div class="qatts-l">${x.atts.map((a) => `<span class="qatt"><span class="qatt-ico">PDF</span><span class="qatt-nom">${esc(a.name)}</span><span class="qatt-taille">${esc(a.size)}</span></span>`).join("")}</div></div>`
     : "";
   const quote = m.messages.slice(0, -1).reverse().map((x) => `<div class="quote"><div class="q1"><b>De :</b> ${esc(x.fromName)} &lt;${esc(x.fromEmail)}&gt;<br><b>Envoyé :</b> ${esc(dateOutlook(x.date))}<br><b>Objet :</b> ${esc(m.subject)}</div>${pjs(x)}${x.body}</div>`).join("");
   const texte = (h: string) => h.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
