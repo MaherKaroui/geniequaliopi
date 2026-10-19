@@ -1098,6 +1098,21 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   </div>`;
 }
 
+/** Bloc de signature unique : un seul intervenant (tampon ou signature selon son rôle). */
+export function signatureBlock1(label: string, nom: string, signatureUrl?: string, tamponUrl?: string, dates?: string[]): string {
+  const urls: SignatureUrls = {
+    dirigeantSignatureUrl: signatureUrl,
+    tamponUrl,
+  };
+  const sigHtml = resolveSignature(label, nom, urls);
+  const fallbackDate = docRefDateISO ? formatDate(docRefDateISO) : new Date().toLocaleDateString("fr-FR");
+  const hideDate = dates !== undefined && (dates[0] === "" || dates[0] === null);
+  const dateLine = hideDate ? "" : `<p>Date : ${dates?.[0] || fallbackDate}</p>`;
+  return `<div class="signature-block-1">
+    <div class="sig-box"><p class="sig-label">${label}</p><p>Nom : ${nom}</p>${dateLine}<p style="margin-top:20px">Signature :</p>${sigHtml}</div>
+  </div>`;
+}
+
 export function tableHTML(headers: string[], rows: string[][]): string {
   return `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
@@ -1138,7 +1153,7 @@ export interface DocBuildConfig {
   sections?: { heading: string; content: string; variant?: "green" | "orange" }[];
   table?: { headers: string[]; rows: string[][] };
   extraHtml?: string;
-  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; responsableEntrepriseSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
+  signatures?: { type: "3" | "2" | "1"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; responsableEntrepriseSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
   stagiaires?: StagiaireInfo[];
 }
 
@@ -1176,6 +1191,14 @@ export function buildDocument(config: DocBuildConfig): string {
     }
     if (config.signatures.type === "3") {
       body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl, sigDates);
+    } else if (config.signatures.type === "1") {
+      body += signatureBlock1(
+        config.signatures.labels?.[0] || "Le dirigeant",
+        config.signatures.names?.[0] || "",
+        config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
+        config.org.tamponUrl,
+        sigDates
+      );
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
