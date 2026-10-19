@@ -110,31 +110,6 @@ export function genMoyensEnvironnement(o: OrganismeInfo, f: FormationInfo, stagi
   });
 }
 
-// ─── IND 21 ─────────────────────────────────────────────────────────────────
-
-export function genFicheCompetencesIntervenant(o: OrganismeInfo, f: FormationInfo, nom: string): string {
-  const interne = estDirigeant(o, nom);
-  const competences = (f.objectifs || "").split("\n").map((l) => l.replace(/^\s*[-•]\s*/, "").trim()).filter((l) => l && !/capable de\s*:?\s*$/i.test(l) && !/^à l'issue/i.test(l)).slice(0, 6);
-  const rows: string[][] = [
-    ...competences.map((c) => [`Technique — ${c.replace(/\.$/, "")}`, "Maîtrise opérationnelle attendue", "CV, expérience professionnelle dans le domaine, diplôme ou certification"]),
-    ["Pédagogie pour adultes", "Animer, adapter le rythme, évaluer les acquis", "Expérience de formateur, titre FPA ou attestation de formation de formateur"],
-    ...(modalite(f) !== "presentiel" ? [["Animation à distance", "Classe virtuelle, partage d'écran, suivi de l'assiduité", "Sessions réalisées, formation aux outils"]] : []),
-    ["Accueil des publics en situation de handicap", "Repérer un besoin, alerter le référent handicap", "Sensibilisation au handicap (IND 26)"],
-    ["Démarche qualité", "Émargements, évaluations, remontée des réclamations", "Engagement signé (charte / contrat)"],
-  ];
-  return buildDocument({
-    org: o,
-    title: "FICHE DE COMPÉTENCES REQUISES ET VÉRIFIÉES",
-    subtitle: `Indicateur 21 — ${nom} — ${f.intitule}`,
-    sections: [
-      { heading: "Intervenant", content: `<p><strong>${nom}</strong> — ${interne ? `dirigeant de ${o.nom}, intervenant interne` : "intervenant externe (sous-traitance ou portage salarial, voir registre IND 27)"}.<br>Formation concernée : ${f.intitule}${f.codeRNCP ? ` (${f.codeRNCP})` : ""}.</p>` },
-      { heading: "Méthode", content: `<p>Les compétences requises sont définies <strong>avant</strong> l'affectation de l'intervenant, à partir des objectifs de la formation. Leur maîtrise est vérifiée sur pièces (CV, diplômes, expérience) puis évaluée après chaque session (évaluations des stagiaires, auto-évaluation, entretien annuel — IND 22).</p>` },
-    ],
-    table: { headers: ["Compétence requise", "Niveau attendu", "Preuve à joindre"], rows },
-    extraHtml: `<p style="margin-top:10px"><strong>Justificatifs à joindre au dossier :</strong> CV daté et signé de ${nom}, copies des diplômes et certifications, attestations d'expérience ou de formation continue. Ces pièces personnelles ne sont pas produites par le générateur.</p>`,
-    signatures: { type: "2", labels: ["Le responsable pédagogique", "L'intervenant"], names: [o.responsablePedagogique || o.dirigeant, nom], dates: [dateMajFr(o), dateMajFr(o)] },
-  });
-}
 
 // ─── IND 18 ─────────────────────────────────────────────────────────────────
 

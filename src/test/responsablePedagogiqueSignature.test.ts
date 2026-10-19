@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { buildDocument } from "@/lib/docBuilder";
 import { mergeOrganisme } from "@/lib/sampleData";
-import { genFicheCompetencesIntervenant } from "@/lib/piecesAF2026";
-import { ORG_TEST, FORMATIONS_TEST } from "./dossierAudit.harness";
+import { genCRReunionPedagogique } from "@/lib/piecesAF2026";
+import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST } from "./dossierAudit.harness";
 
-const SIG = "data:image/png;base64,SIGNATURE_DIRIGEANT";
+const SIG = "data:image/png;base64,SIGNATUREDIRIGEANT";
 const TAMPON = "data:image/png;base64,TAMPON_ORG";
 const PEDAGOGUE = ["Le responsable pédagogique", "Le/La Stagiaire"];
 
@@ -41,12 +41,13 @@ describe("signature du responsable pédagogique", () => {
       doc({ ...ORG_TEST }, ["Le référent qualité", "Le/La Stagiaire"], [ORG_TEST.referentQualite, ""])
     ).toContain("/images/FD_CERTIF_TAMPON.png");
   });
-  it("un document réel signé par le responsable pédagogique porte la marque du dirigeant", () => {
-    const html = genFicheCompetencesIntervenant(
+  it("un compte rendu de réunion pédagogique porte la marque du dirigeant", () => {
+    const html = genCRReunionPedagogique(
       mergeOrganisme({ ...ORG_TEST, signatureUrl: SIG, tamponUrl: "" }),
       FORMATIONS_TEST["actions-formation"],
-      "Paul TESTARD"
+      STAGIAIRES_TEST
     );
+    expect(html).toContain("Le responsable pédagogique");
     expect(html).toContain(SIG);
   });
 });
