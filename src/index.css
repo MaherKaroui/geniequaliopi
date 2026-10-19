@@ -99,6 +99,59 @@
 }
 
 @layer utilities {
+  /* The host-app palette is limited to the standalone VAE screen. */
+  .vae-embedded {
+    --background: 40 60% 97%;
+    --foreground: 183 65% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 183 65% 12%;
+    --primary: 183 65% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 25% 91%;
+    --secondary-foreground: 183 45% 20%;
+    --muted: 40 32% 94%;
+    --muted-foreground: 180 10% 40%;
+    --accent: 174 52% 85%;
+    --accent-foreground: 183 65% 12%;
+    --border: 40 22% 86%;
+    --input: 40 22% 82%;
+    --ring: 174 45% 40%;
+  }
+
+  .dark .vae-embedded {
+    --background: 180 20% 9%;
+    --foreground: 40 25% 94%;
+    --card: 180 16% 13%;
+    --card-foreground: 40 25% 94%;
+    --primary: 174 52% 75%;
+    --primary-foreground: 183 65% 12%;
+    --secondary: 180 15% 18%;
+    --secondary-foreground: 40 25% 94%;
+    --muted: 180 15% 16%;
+    --muted-foreground: 180 10% 68%;
+    --accent: 174 40% 28%;
+    --accent-foreground: 174 52% 92%;
+    --border: 180 12% 25%;
+    --input: 180 12% 30%;
+  }
+
+  .vae-embedded .vae-step input:not([type="file"]),
+  .vae-embedded .vae-step textarea {
+    background: hsl(var(--card));
+    border-radius: 6px;
+  }
+
+  .vae-embedded .vae-step input[type="file"] {
+    width: 100%;
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .vae-embedded .vae-step h2 {
+    font-size: 20px;
+    letter-spacing: 0;
+  }
+
   .text-gradient-hero {
     background: var(--gradient-hero);
     -webkit-background-clip: text;
