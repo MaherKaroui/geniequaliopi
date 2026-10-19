@@ -50,44 +50,6 @@ function nomIntervenants(o: OrganismeInfo, f?: FormationInfo, stagiaires?: Stagi
 // IND 27 — Sous-traitance et portage salarial
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Registre de sous-traitance et de portage salarial (IND 27, décret 2026-728).
- * Les intervenants distincts du dirigeant sont listés comme intervenants à
- * contractualiser ; sans intervenant externe, le registre vaut déclaration de
- * non-recours (indicateur non applicable, à réviser à chaque nouvelle session).
- */
-export function genRegistreSousTraitancePortage(o: OrganismeInfo, type: TypePrestation, f?: FormationInfo, stagiaires?: StagiaireInfo[]): string {
-  const L = LIBELLE[type];
-  const dir = (o.dirigeant || "").trim().toLowerCase();
-  const externes = nomIntervenants(o, f, stagiaires).filter((n) => n.toLowerCase() !== dir);
-  const qualiteExterne = /externe/i.test(o.referentQualite || "") ? (o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() : "";
-  const rows: string[][] = externes.map((n) => [
-    n, `Intervention en ${L.prestation} « ${f?.intitule || ""} »`, "Sous-traitance (contrat de prestation) ou portage salarial — nature à confirmer à la signature",
-    "Contrat signé avant la 1re intervention, clause qualité Qualiopi (annexe)", "CV, diplômes, NDA ou attestation d'activité, Kbis / URSSAF de moins de 6 mois", "Évaluation par les " + L.publicPl + " + revue annuelle",
-  ]);
-  if (qualiteExterne) {
-    rows.push([qualiteExterne, "Accompagnement du système qualité (référent qualité externe)", "Prestation de conseil — hors réalisation de la prestation", "Lettre de mission / contrat de prestation", "Kbis, références", "Revue annuelle de la mission"]);
-  }
-  const aucun = externes.length === 0;
-  return buildDocument({
-    org: o,
-    title: "REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL",
-    subtitle: `Indicateur 27 — référentiel national qualité (décret n° 2026-728) — ${L.prestation}`,
-    sections: [
-      { heading: "Exigence", content: `<p>« Lorsque le prestataire fait appel à la sous-traitance ou au portage salarial, il s'assure du respect de la conformité au présent référentiel et en assure la traçabilité dans les contrats de sous-traitance. » (indicateur 27, décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026).</p>` },
-      {
-        heading: "Situation de l'organisme",
-        content: aucun
-          ? `<p><strong>${o.nom}</strong> réalise ses prestations avec ses ressources internes : aucun ${L.intervenant} sous-traitant ni salarié porté n'intervient à la date du ${dateSysteme(o)}. L'indicateur 27 est déclaré <strong>non applicable</strong> à ce jour.</p><p>Ce registre est revu avant chaque nouvelle session : tout recours futur à la sous-traitance ou au portage salarial y sera inscrit avant la première intervention, avec le contrat correspondant.</p>`
-          : `<p>${o.nom} fait intervenir ${externes.length} intervenant(s) externe(s). Chacun est inscrit ci-dessous <strong>avant sa première intervention</strong> ; le contrat reprend l'annexe « Clauses qualité » qui transmet les exigences du référentiel et en assure la traçabilité.</p>`,
-        variant: aucun ? "green" : undefined,
-      },
-      { heading: "Modalités de maîtrise", content: `<ul><li><strong>Sélection :</strong> vérification des compétences (CV, diplômes, expérience) au regard de la prestation (IND 21).</li><li><strong>Contractualisation :</strong> contrat de sous-traitance ou convention de portage salarial signé avant l'intervention, comportant l'annexe « Clauses qualité Qualiopi » (engagement sur les indicateurs, remise des preuves, accès de l'auditeur).</li><li><strong>Portage salarial :</strong> contrat commercial avec l'entreprise de portage + contrat de travail du salarié porté ; l'organisme vérifie que le salarié porté respecte les mêmes exigences que ses propres intervenants et conserve les preuves.</li><li><strong>Pilotage :</strong> transmission des procédures et supports, planning validé, émargements et évaluations restitués après chaque session.</li><li><strong>Contrôle :</strong> évaluation par les ${L.publicPl}, revue annuelle, arrêt de la collaboration en cas de manquement répété.</li></ul>` },
-    ],
-    table: rows.length ? { headers: ["Intervenant", "Objet", "Nature du recours", "Traçabilité contractuelle", "Pièces vérifiées", "Contrôle"], rows } : undefined,
-    signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite], dates: [dateSysteme(o), dateSysteme(o)] },
-  });
-}
 
 /** Annexe type à joindre à chaque contrat de sous-traitance ou de portage (traçabilité IND 27). */
 export function genClausesQualiteContrat(o: OrganismeInfo, type: TypePrestation): string {
