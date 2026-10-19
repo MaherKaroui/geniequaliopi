@@ -1046,9 +1046,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   }
   // Responsable pédagogique : c'est le dirigeant (formulaire organisme) qui signe à sa place.
   if (/p[ée]dagogique/i.test(l) && !/[ée]quipe/i.test(l)) {
-    return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant")
-      || tamponImg(urls.tamponUrl)
-      || `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
+    return tamponOuSignature(urls) || `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
   }
   // Équipe pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
   if (/qualité|handicap|référent|[ée]quipe/i.test(l)) {

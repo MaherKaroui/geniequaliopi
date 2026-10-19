@@ -20,11 +20,13 @@ const doc = (org: typeof ORG_TEST, labels = PEDAGOGUE, names?: string[]) => buil
 });
 
 describe("signature du responsable pédagogique", () => {
-  it("reprend la signature du dirigeant du formulaire organisme", () => {
-    expect(doc({ ...ORG_TEST, signatureUrl: SIG, tamponUrl: TAMPON })).toContain(SIG);
+  it("porte la marque du dirigeant : son tampon quand il existe", () => {
+    const html = doc({ ...ORG_TEST, signatureUrl: SIG, tamponUrl: TAMPON });
+    expect(html).toContain(TAMPON);
+    expect(html).not.toContain(SIG);
   });
-  it("à défaut de signature, reprend le tampon du dirigeant", () => {
-    expect(doc({ ...ORG_TEST, signatureUrl: "", tamponUrl: TAMPON })).toContain(TAMPON);
+  it("à défaut de tampon, porte la signature du dirigeant", () => {
+    expect(doc({ ...ORG_TEST, signatureUrl: SIG, tamponUrl: "" })).toContain(SIG);
   });
   it("sans signature ni tampon, laisse une ligne pointillée", () => {
     const html = doc({ ...ORG_TEST, signatureUrl: "", tamponUrl: "" });
@@ -39,7 +41,7 @@ describe("signature du responsable pédagogique", () => {
       doc({ ...ORG_TEST }, ["Le référent qualité", "Le/La Stagiaire"], [ORG_TEST.referentQualite, ""])
     ).toContain("/images/FD_CERTIF_TAMPON.png");
   });
-  it("un document réel signé par le responsable pédagogique porte la signature du dirigeant", () => {
+  it("un document réel signé par le responsable pédagogique porte la marque du dirigeant", () => {
     const html = genFicheCompetencesIntervenant(
       mergeOrganisme({ ...ORG_TEST, signatureUrl: SIG, tamponUrl: "" }),
       FORMATIONS_TEST["actions-formation"],
