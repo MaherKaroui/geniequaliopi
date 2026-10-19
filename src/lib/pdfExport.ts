@@ -40,7 +40,7 @@ export type PdfQuality = "standard" | "high" | "maximum";
 export const PDF_QUALITY_PRESETS: Record<PdfQuality, {
   label: string;
   seconds: number;
-  options: Required<PdfExportOptions>;
+  options: Required<Omit<PdfExportOptions, "keepTablesTogether">>;
 }> = {
   standard: { label: "Standard — rapide", seconds: 5, options: { scale: 1.5, imageQuality: 0.9, pageYieldMs: 8 } },
   high: { label: "Haute — recommandé", seconds: 9, options: { scale: 2, imageQuality: 0.95, pageYieldMs: 8 } },
@@ -53,7 +53,7 @@ export function setActivePdfQuality(quality: PdfQuality): void {
   activePdfQuality = quality;
 }
 
-export function getActivePdfOptions(): Required<PdfExportOptions> {
+export function getActivePdfOptions(): Required<Omit<PdfExportOptions, "keepTablesTogether">> {
   return { ...PDF_QUALITY_PRESETS[activePdfQuality].options };
 }
 
