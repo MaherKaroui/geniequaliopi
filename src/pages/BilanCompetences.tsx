@@ -26,7 +26,7 @@ const STEPS = [{ id: 1, label: "Organisme" }, { id: 2, label: "Bénéficiaire" }
 const DRAFT_KEY = "bdc_standalone_draft_v1";
 const field = (label: string, value: string | undefined, onChange: (value: string) => void, type = "text") => <div className="space-y-1"><Label htmlFor={`bdc-${label}`}>{label}</Label><Input id={`bdc-${label}`} type={type} value={value || ""} onChange={e => onChange(e.target.value)} /></div>;
 
-export default function BilanCompetences() {
+export default function BilanCompetences({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate();
   const [data, setData] = useState<StandaloneBdcData>(() => {
     try { const saved = localStorage.getItem(DRAFT_KEY); return saved ? { ...emptyBdcData(), ...JSON.parse(saved) } : emptyBdcData(); } catch { return emptyBdcData(); }
@@ -97,7 +97,7 @@ export default function BilanCompetences() {
     } catch (error) { toast.error(error instanceof Error ? error.message : "Dossier impossible à générer"); } finally { setBusy(false); setProgress(""); }
   };
   return <div className="min-h-screen bg-background text-foreground">
-    <header className="border-b bg-card sticky top-0 z-10"><div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-3"><h1 className="text-lg sm:text-xl font-bold flex items-center gap-2"><BriefcaseBusiness className="h-6 w-6 text-primary shrink-0" /> Bilan de compétences</h1><Button variant="ghost" size="sm" onClick={() => navigate("/")}><Home className="h-4 w-4 mr-2" /> Accueil</Button></div></header>
+    <header className="border-b bg-card sticky top-0 z-10"><div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-3"><h1 className="text-lg sm:text-xl font-bold flex items-center gap-2"><BriefcaseBusiness className="h-6 w-6 text-primary shrink-0" /> Bilan de compétences</h1>{!embedded && <Button variant="ghost" size="sm" onClick={() => navigate("/")}><Home className="h-4 w-4 mr-2" /> Accueil</Button>}</div></header>
     <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
       <details className="border-b pb-4"><summary className="cursor-pointer font-semibold flex items-center gap-2"><FolderOpen className="h-4 w-4 text-primary" /> Historique des dossiers BDC ({history.length})</summary><div className="pt-4 space-y-3">
         <p className="text-xs text-muted-foreground">Dossiers confidentiels conservés uniquement dans ce navigateur, sur cet appareil.</p>
