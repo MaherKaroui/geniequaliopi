@@ -17,3 +17,5 @@
 - [x] Reprendre la durée saisie dans tous les fichiers concernés du pack rapide sans recalcul depuis les dates.
 - [x] Appliquer la règle IND 4 : stagiaire avec entreprise → OPCO, sans entreprise → Financement personnel.
 - [x] Ajouter dans l’IND 10 AF les mêmes évaluations des besoins individuelles qu’en IND 4 et vérifier leurs réponses.
+- [x] Retirer « CT4 - IND 17 JUSTIFICATIFS DES OUTILS ET LICENCES (à joindre) » du dossier.
+- [x] Descriptif des moyens IND 17 : signature du dirigeant et tampon uniquement, sans bloc responsable pédagogique.
