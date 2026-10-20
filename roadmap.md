@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Automatiser le remplissage des documents IZILearn comme Qualiopi ; conserver les réponses et preuves importées, puis vérifier les aperçus et exports.
+- [x] Automatiser le remplissage des documents IZILearn comme Qualiopi ; réponses et preuves importées prioritaires, exercices futurs et bilans non échus vierges. 6 tests réussis, aperçu et Word vérifiés avec une session de contrôle ; connexion à une vraie session IZILearn et retour des fichiers non vérifiés.
 
 - [x] Regrouper les deux attestations IZIBUSINESS selon le modèle EMI EVOLUTION ; synchroniser les formations antérieures à la MAJ dans les plans AF, NTC/CFA, BC et VAE. 32 tests réussis ; unique attestation et téléchargement PDF vérifiés en session connectée. Relecture visuelle des deux pages : cachet initialement absent corrigé, titres/dates lisibles et pied de page complet ; rendu Word non vérifié.
 
