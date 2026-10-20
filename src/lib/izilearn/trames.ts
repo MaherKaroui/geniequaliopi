@@ -353,7 +353,10 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   if (!c.p.creneaux.length) for (const jour of joursSession(c.p, c.s, c.f)) jours.set(cleJour(jour), jour);
   for (const x of cx) { const jour = d(x.debut); if (jour) jours.set(cleJour(jour), jour); }
   const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut", "Signature du stagiaire"];
+  let renderedDays = 0;
   for (const [key, jour] of [...jours.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    if (renderedDays > 0 && renderedDays % 5 === 0) h += '<div class="page-break"></div>';
+    renderedDays++;
     const connexions = cx.filter((x) => { const debut = d(x.debut); return debut && cleJour(debut) === key; });
     const matin = connexions.filter((x) => (d(x.debut)?.getHours() ?? 24) < 12);
     const apresMidi = connexions.filter((x) => (d(x.debut)?.getHours() ?? 0) >= 12);
@@ -369,9 +372,11 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
       connexions.length ? "Connexion relevée" : futur ? "À venir" : "Non relevé",
       "",
     ];
-    h += `<table style="width:100%;table-layout:fixed"><thead><tr>${headers.map((x) => `<th style="overflow-wrap:anywhere">${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x, i) => `<td${i === cells.length - 1 ? ' style="height:60px"' : ""}>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
+    h += `<table style="width:100%;table-layout:fixed"><thead><tr>${headers.map((x) => `<th style="overflow-wrap:anywhere">${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x, i) => `<td${i === cells.length - 1 ? ` style="height:60px"${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""}` : ""}>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
   }
   h += `<p><strong>Temps total relevé :</strong> ${duree(total)} · <strong>Durée formation :</strong> ${esc(c.f.duree)}</p>`;
+  const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;
+  if (heuresPrevues > 0) h += `<p><strong>Taux de connexion relevé :</strong> ${Math.min(100, Math.round(total / (heuresPrevues * 3600) * 100))} %${(d(c.p.session.dateFin)?.getTime() || 0) >= Date.now() ? " (en cours)" : ""}</p>`;
   h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
   return { html: doc(c, "RELEVÉ DES TEMPS DE CONNEXION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: cx.length > 0 };
 }

@@ -90,6 +90,8 @@ export interface IzApprenant {
   dateNaissance?: string;
   adresse?: string;
   poste?: string;
+  /** Reusable signature supplied explicitly by the learner, not attendance evidence. */
+  signatureUrl?: string;
   entreprise?: { nom: string; siret?: string; adresse?: string; representant?: string; email?: string } | null;
   financeur?: string;
   statut: string;

@@ -9,6 +9,16 @@ const image = "data:image/png;base64,aGVsbG8=";
 const companyImage = "data:image/png;base64,Y29tcGFueQ==";
 
 describe("Signatures manuelles IZILearn", () => {
+  it("reprend la signature disponible seulement sur les jours enregistrés sans écraser une signature existante", () => {
+    const cx = contexteAvecSignatures(contexte({ ...payload, apprenants: [{ ...payload.apprenants[0], signatureUrl: image }, payload.apprenants[1]] }), {});
+    expect(cx.stagiaires[0].signatureUrl).toBe(image);
+    const html = `<body><table><tr><td data-learner-signature="recorded-connection"></td><td data-learner-signature="recorded-connection"><img src="${companyImage}"></td><td>Non relevé</td><td></td></tr></table></body>`;
+    const doc = new DOMParser().parseFromString(applyLearnerSignatures(html, piece, cx), "text/html");
+    expect(doc.querySelectorAll('img[alt="Signature stagiaire reprise"]')).toHaveLength(1);
+    expect(doc.querySelectorAll("img")).toHaveLength(2);
+    expect(doc.querySelectorAll("td")[3].querySelector("img")).toBeNull();
+    expect(doc.body.textContent).toContain("Signature reprise");
+  });
   it("isole les signatures entre apprenants, entreprises et sessions", () => {
     const key = signatureKey(payload, 0, "stagiaire");
     expect(key).not.toBeNull();

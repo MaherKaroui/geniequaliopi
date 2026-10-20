@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Reprendre la signature stagiaire dans les emplacements non signés et les jours de connexion enregistrés ; récapitulatif et pagination harmonisés avec Qualiopi sans créer de preuves de présence. 20 tests réussis, aperçu et Word du relevé vérifiés sur une session de contrôle ; jours non relevés non signés. Session réelle non disponible ; non publié.
+
 - [x] Enrichir le livret d’accueil IZILearn, proposer le changement de design et appliquer la date MAJ à tous les fichiers sans modifier les dates des preuves ; 19 tests réussis, aperçu du livret, changement de design et Word vérifiés sur une session de contrôle. Session réelle et retour distant non vérifiés ; non publié.
 
 - [x] Remplacer la signature par fichier par un bouton Signature à côté de chaque apprenant et un bouton responsable d’entreprise si société ; 18 tests réussis, dessin/import, reprise automatique dans besoins/convention/relevé et deux signatures dans le Word vérifiés sur une session de contrôle, aucune erreur. Présences enregistrées inchangées ; session réelle et retour distant non vérifiés ; non publié.
