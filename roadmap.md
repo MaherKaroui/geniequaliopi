@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Ajouter la création persistante de contenus dédiés : correspondance exacte, génération reprenable, validation et reprise dans formulaire, rapide, historique et IZILearn.
+- [ ] Vérifier les protections des données stagiaires, les sources RNCP/URL et le parcours de génération/validation avec tests et aperçu.
+
 - [x] Reprendre exactement le tableau Qualiopi IND 11 dans IZILearn avec ses sept colonnes et son rendu partagé, sans modifier les connexions enregistrées ; signatures sous les tableaux. 21 tests réussis, aperçu et Word vérifiés sur une session de contrôle, aucune erreur ; session réelle non disponible, non publié.
 
 - [x] Reprendre la signature stagiaire dans les emplacements non signés et les jours de connexion enregistrés ; récapitulatif et pagination harmonisés avec Qualiopi sans créer de preuves de présence. 20 tests réussis, aperçu et Word du relevé vérifiés sur une session de contrôle ; jours non relevés non signés. Session réelle non disponible ; non publié.
