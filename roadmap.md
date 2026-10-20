@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Ajouter la modification des documents du pack rapide, conserver les corrections dans le dossier et les reprendre dans tous les exports ; vérifier sauvegarde et rechargement.
+- [x] Ajouter la modification des documents du pack rapide : corrections conservées dans le dossier/historique et le brouillon local par compte ; sauvegarde, rechargement, aperçu, Word individuel, ZIP et PDF vérifiés en session connectée, 15 tests réussis. Le CERFA reste modifiable par ses champs de formulaire.
 
 - [x] Ajouter et vérifier la page Bilan de compétences seule intégrable, sans menu ni code d’accès : sauvegarde, rechargement et accès aux documents testés sans compte ; autres outils protégés, 24 tests réussis et compilation OK. La génération IA conserve son accès authentifié existant.
 
