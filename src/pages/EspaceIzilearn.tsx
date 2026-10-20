@@ -24,6 +24,10 @@ import { champsManquants } from "@/lib/izilearn/mapping";
 import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Piece } from "@/lib/izilearn/pieces";
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
 import type { IzFichierRetour } from "@/lib/izilearn/types";
+import IzilearnMailPreview from "@/components/IzilearnMailPreview";
+import { captureMail } from "@/lib/mails/captureMail";
+import { clientMailOrganisme } from "@/lib/mails/mailsAutomatiques";
+import { mailPourCapture } from "@/lib/izilearn/mailCapture";
 
 type Format = "pdf" | "word";
 
@@ -64,8 +68,11 @@ export default function EspaceIzilearn() {
   const rendre = (p: Piece) => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); return p.rendre(); };
 
   async function fichier(p: Piece, fmt: Format): Promise<{ blob: Blob; nom: string }> {
+    if (p.mail && cx) return {
+      blob: await captureMail(mailPourCapture(p.mail, cx.o), clientMailOrganisme(cx.o)),
+      nom: `${p.fichier}.png`,
+    };
     const html = rendre(p);
-    if (p.categorie === "mails") return { blob: new Blob([html], { type: "text/html;charset=utf-8" }), nom: `${p.fichier}.html` };
     if (fmt === "pdf") return { blob: await htmlToPdfBlob(html), nom: `${p.fichier}.pdf` };
     const blob = await htmlToWordBlob(html);
     return { blob, nom: `${p.fichier}${blob.type.includes("officedocument") ? ".docx" : ".doc"}` };
@@ -291,10 +298,10 @@ export default function EspaceIzilearn() {
           <DialogHeader className="px-5 py-3 border-b">
             <DialogTitle className="text-base pr-8 truncate">{apercu?.titre}</DialogTitle>
           </DialogHeader>
-          {apercu && <iframe title="Aperçu" className="flex-1 w-full bg-white" srcDoc={rendre(apercu)} />}
+          {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
           {apercu && (
             <div className="px-5 py-3 border-t flex justify-end">
-              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger le mail" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
+              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger la capture" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
             </div>
           )}
         </DialogContent>
