@@ -1,5 +1,6 @@
 import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { isIAP21Formation } from "./iaPro21hHumanized";
+import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
@@ -255,7 +256,8 @@ export function buildFullCatalog(
           "Organisation, archivage et employabilité",
         ];
         const isIAForm = !isIAP21Formation(f.intitule, f.codeRNCP) && (tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative"));
-        const moduleTitles = isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
+        // Gérer son centre de formation – 35 h : jamais de modules paie / secrétariat (exercices du preset).
+        const moduleTitles = isGSC35Formation(f.intitule, f.codeRNCP) ? null : isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
         // Nombre d'exercices / QCM dérivé du parcours RÉEL du stagiaire :
         // ≤ 12 jours de formation → 1 par jour ; au-delà → 1 par semaine calendaire.

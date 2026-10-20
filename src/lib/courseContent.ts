@@ -480,6 +480,8 @@ import { getIAPro21hChapters } from "./courseContentIAPro21h";
 import { isIAP21Formation } from "./iaPro21hHumanized";
 import { getMSP21Chapters } from "./courseContentMSP21";
 import { isMSP21Formation } from "./msp21Humanized";
+import { getGererCentre35hChapters } from "./courseContentGererCentre35h";
+import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { getARH41366Chapters } from "./courseContentARH41366";
 import { isARH41366Formation } from "./arh41366Humanized";
 import { getCRMChapters } from "./courseContentCRM";
@@ -546,6 +548,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (isIAP21Formation(formationIntitule)) return getIAPro21hChapters();
   // Techniques de maquillage semi-permanent (RS6459) : avant la règle « maquilleur / maquillage professionnel »
   if (isMSP21Formation(formationIntitule)) return getMSP21Chapters();
+  // Gérer son centre de formation – 35 h (non certifiante) : avant les règles « gestion » / « création d'entreprise » génériques
+  if (isGSC35Formation(formationIntitule)) return getGererCentre35hChapters();
   if (mot(t, 'gestionnaire de paie') || mot(t, 'gestionnaire paie') || (mot(t, 'paie') && (mot(t, 'formation') || mot(t, 'bulletin') || mot(t, 'gestion')))) return getPaieChapters();
   if (mot(t, 'secrétariat') || mot(t, 'secretariat') || mot(t, 'secrétaire') || mot(t, 'secretaire') || mot(t, 'office manager') || mot(t, 'assistanat')) return getSecretariatChapters();
   if (mot(t, 'gotrm') || mot(t, 'gestionnaire des op\u00e9rations de transport') || mot(t, 'exploitant transport') || mot(t, 'tp-01329') || mot(t, 'rncp40990')) return getGOTRMChapters();

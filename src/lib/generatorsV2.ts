@@ -37,6 +37,7 @@ import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ven
 import { pickIAP21ExerciceAnswer, isIAP21Formation, iap21NoteExercice } from "./iaPro21hHumanized";
 import { pickMSP21ExerciceAnswer, isMSP21Formation, msp21NoteExercice } from "./msp21Humanized";
 import { pickARH41366ExerciceAnswer, isARH41366Formation, arh41366NoteExercice } from "./arh41366Humanized";
+import { pickGSC35ExerciceAnswer, isGSC35Formation, gsc35NoteExercice } from "./gererCentre35hHumanized";
 
 // ========== HELPERS ==========
 
@@ -1182,6 +1183,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, msp21NoteExercice(stagiaireIdx, ei, true))
         : isARH41366Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, arh41366NoteExercice(stagiaireIdx, ei, true))
+        : isGSC35Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, gsc35NoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1248,6 +1251,8 @@ D) Drive faster to finish the ride.`,
       ? msp21NoteExercice(stagiaireIdx, ei, false)
       : isARH41366Formation(f.intitule, f.codeRNCP)
       ? arh41366NoteExercice(stagiaireIdx, ei, false)
+      : isGSC35Formation(f.intitule, f.codeRNCP)
+      ? gsc35NoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1302,6 +1307,7 @@ D) Drive faster to finish the ride.`,
       || pickTVTEExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickIAP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickMSP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickGSC35ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;

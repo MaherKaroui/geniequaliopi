@@ -19,6 +19,8 @@ import { MSP21_EXERCICES_COMPLETS, MSP21_QCM_DEBUT, MSP21_QCM_FIN, MSP21_QCM_COM
 import { isMSP21Formation, getMSP21AutoAnswers, MSP21_QUESTIONS_OUVERTES } from "./msp21Humanized";
 import { ARH41366_EXERCICES_COMPLETS, ARH41366_QCM_DEBUT, ARH41366_QCM_FIN, ARH41366_QCM_COMPETENCES } from "./arh41366Preset";
 import { isARH41366Formation, getARH41366AutoAnswers, ARH41366_QUESTIONS_OUVERTES } from "./arh41366Humanized";
+import { GSC35_EXERCICES_COMPLETS, GSC35_QCM_DEBUT, GSC35_QCM_FIN } from "./gererCentre35hPreset";
+import { isGSC35Formation, getGSC35AutoAnswers, GSC35_QUESTIONS_OUVERTES } from "./gererCentre35hHumanized";
 
 
 
@@ -1281,6 +1283,29 @@ EVAL_CONTENT["MSP21"] = {
   ],
 };
 
+// ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
+EVAL_CONTENT["GSC35"] = {
+  qcmPositionnement: GSC35_QCM_DEBUT,
+  qcmFinal: GSC35_QCM_FIN,
+  exercices: GSC35_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Maîtriser le cadre juridique et administratif d'un organisme de formation",
+    "C2 – Concevoir et contractualiser une offre de formation conforme",
+    "C3 – Mettre en place la démarche qualité et préparer la certification Qualiopi",
+    "C4 – Financer et commercialiser son offre",
+    "C5 – Assurer la gestion administrative et financière",
+    "C6 – Piloter l'activité, l'équipe pédagogique et l'amélioration continue",
+  ],
+  appreciations: [
+    "Démarches de création bien maîtrisées : statut justifié et déclaration d'activité préparée. Le registre des obligations doit encore être daté.",
+    "Programme et contrat conformes ; délai de rétractation et règles d'acompte bien appliqués. Les objectifs peuvent gagner en précision.",
+    "Bonne lecture du référentiel national qualité et autodiagnostic sérieux. Le classement des preuves reste à finaliser avant l'audit.",
+    "Coût de revient et seuil de rentabilité justes ; prix argumenté. Plan commercial loyal, à compléter par des indicateurs de suivi.",
+    "Parcours administratif complet et facture conforme. La lecture du bilan pédagogique et financier demande encore un peu de pratique.",
+    "Tableau de pilotage pertinent et plan d'amélioration intégrant l'analyse des risques. Implication constante tout au long des cinq jours.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1508,6 +1533,8 @@ function getContentKey(intitule: string): string {
   if (isIAP21Formation(lower)) return "IAP21";
   // Techniques de maquillage semi-permanent (RS6459) — avant les contenus esthétique / maquillage génériques
   if (isMSP21Formation(lower)) return "MSP21";
+  // Gérer son centre de formation – 35 h (non certifiante) — avant les contenus génériques
+  if (isGSC35Formation(lower)) return "GSC35";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2247,6 +2274,9 @@ QUESTIONS_OUVERTES["IAP21"] = IAP21_QUESTIONS_OUVERTES;
 // Maquillage semi-permanent (RS6459) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["MSP21"] = MSP21_QUESTIONS_OUVERTES;
 
+// Gérer son centre de formation – 35 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["GSC35"] = GSC35_QUESTIONS_OUVERTES;
+
 // TP ARH RNCP41366 — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["ARH41366"] = ARH41366_QUESTIONS_OUVERTES;
 
@@ -2658,6 +2688,18 @@ export function generateStagiaireOpenAnswers(
       stagiaireIndex,
     );
     return toAnswers(autoArh.reponses, autoArh.scores);
+  }
+
+  // Gérer son centre de formation – 35 h : moteur humanisé (une copie différente par stagiaire).
+  if (isGSC35Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoGsc = getGSC35AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoGsc.reponses, autoGsc.scores);
   }
 
   // Maquillage semi-permanent (RS6459) : moteur humanisé (une copie différente par stagiaire).

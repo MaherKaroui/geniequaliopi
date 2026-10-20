@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches, FORMATION_GSC35, seedGSC35AICaches } from "@/lib/sampleData";
 import { isAncienExempleARH } from "@/lib/arhExercises";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
@@ -301,6 +301,14 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         onChange(arh);
         seedARH41366AICaches(arh);
         toast.success("TP ARH RNCP41366 : référentiel 2 blocs / 6 compétences, évaluation des besoins, tests de positionnement, 10 mises en situation corrigées, 6 QCM par compétence (CP1 à CP6), support de cours et veilles inclus");
+      }
+      // Gérer son centre de formation – 35 h (non certifiante) : contenus 100 % pré-remplis, AUCUN stagiaire importé ;
+      // le formateur déjà saisi dans le dossier est conservé.
+      if (selected.intitule === FORMATION_GSC35.intitule) {
+        const gsc = { ...selected, formateur: data.formateur || selected.formateur, formateurSignatureUrl: data.formateurSignatureUrl };
+        onChange(gsc);
+        seedGSC35AICaches(gsc);
+        toast.success("Gérer son centre de formation – 35 h : évaluation des besoins, tests de positionnement, 10 mises en situation corrigées, 6 QCM par compétence (C1 à C6), support de cours et veilles inclus");
       }
       // Techniques de prothésie ongulaire (RS7302) : contenus 100 % pré-remplis, AUCUN stagiaire importé
       const lowerOngulaire = selected.intitule.toLowerCase();

@@ -5,6 +5,8 @@ import { isMSP21Formation } from "@/lib/msp21Humanized";
 import { seedMSP21AICaches } from "@/lib/msp21Preset";
 import { isARH41366Formation } from "@/lib/arh41366Humanized";
 import { seedARH41366AICaches } from "@/lib/arh41366Preset";
+import { isGSC35Formation } from "@/lib/gererCentre35hHumanized";
+import { seedGSC35AICaches } from "@/lib/gererCentre35hPreset";
 import { getCachedContentPack } from "@/lib/aiContentPack";
 import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
@@ -156,6 +158,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // TP ARH RNCP41366 : même rechargement des packs du preset.
     if (d.formation && isARH41366Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedARH41366AICaches(d.formation);
+    }
+    // Gérer son centre de formation – 35 h : même rechargement des packs du preset.
+    if (d.formation && isGSC35Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedGSC35AICaches(d.formation);
     }
     onLoad(d.organisme, d.formation, d.stagiaires);
     setCurrentDossierId(d.id);
