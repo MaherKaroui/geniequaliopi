@@ -45,6 +45,31 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("ne laisse pas un questionnaire vide importé bloquer le remplissage Qualiopi", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
+    const p = payload("actions-formation", 3);
+    const vide = { titre: "Questionnaire", date: "2026-11-04", reponses: [{ question: "Avis", reponse: "  " }] };
+    p.apprenants[0].besoins = vide;
+    p.apprenants[0].besoinsEntreprise = vide;
+    p.apprenants[0].positionnement = [{ titre: "Test", date: "2026-11-02", score: null, appreciation: "" }];
+    p.apprenants[0].bilanChaud = vide;
+    p.apprenants[0].bilanFroid = vide;
+    const pieces = planPieces(contexte(p));
+    for (const id of ["besoins_0", "positionnement_0", "bilan_chaud_0", "bilan_froid_0"]) {
+      expect(pieces.find((x) => x.id === id)?.source, id).toBe("document");
+    }
+  });
+
+  it("conserve un résultat réel de zéro et une réponse négative", () => {
+    const p = payload("actions-formation", 3);
+    p.apprenants[0].positionnement = [{ titre: "Test", date: "2026-11-02", score: 0, max: 10, reussi: false }];
+    p.apprenants[0].besoins = { titre: "Besoins", date: "2026-10-01", reponses: [{ question: "Adaptation ?", reponse: "Non" }] };
+    const pieces = planPieces(contexte(p));
+    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("0 / 10");
+    expect(pieces.find((x) => x.id === "besoins_0")?.source).toBe("izilearn");
+  });
+
   it("additionne seulement les temps enregistrés sans transformer les horaires prévus en connexions", () => {
     const p = payload("actions-formation", 1, "distanciel");
     p.apprenants[0].connexions = [
