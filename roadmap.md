@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Remplacer la signature par fichier par un bouton Signature à côté de chaque apprenant et un bouton responsable d’entreprise si société ; reprise automatique dans ses documents et exports.
+- [x] Remplacer la signature par fichier par un bouton Signature à côté de chaque apprenant et un bouton responsable d’entreprise si société ; 18 tests réussis, dessin/import, reprise automatique dans besoins/convention/relevé et deux signatures dans le Word vérifiés sur une session de contrôle, aucune erreur. Présences enregistrées inchangées ; session réelle et retour distant non vérifiés ; non publié.
 
 - [x] Ajouter un bouton Signer par document stagiaire IZILearn, dessin/import et reprise au point commun des aperçus et exports sans modifier les présences enregistrées ; 17 tests réussis, dessin, aperçu, Word avec image et retrait vérifiés sur une session de contrôle, aucune erreur. Signature conservée dans la page ouverte ; session réelle et enregistrement distant non vérifiés ; non publié.
 
