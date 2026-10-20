@@ -1,5 +1,7 @@
 # Architecture rules
 
+- IZIBUSINESS completed training records and dates are resolved by one shared helper for the combined attestation and every IND 22 plan, preventing planned dates from overwriting completed actions.
+
 - Rapid document edits are sanitized HTML overrides stored inside the rapid formation JSON and resolved at the shared preview/export boundary; identity-based recipient/action keys prevent corrections leaking to another person or action, and the account-scoped local draft survives browser restarts without changing database schema.
 
 - Rapid generation enables `FormationInfo.dureeSaisiePrioritaire` at its shared preparation boundary; duration helpers honor it to preserve entered duration without changing other generators.

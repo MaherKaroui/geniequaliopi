@@ -383,8 +383,7 @@ export function buildFullCatalog(
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
     add("af_c5i22_attestations_formation", "CT5 - IND 22 ATTESTATIONS DE FORMATION CONTINUE (à joindre)", 5, 22, "attestation_fin_formation");
-    add("af_c5i22_attestation_izi_gerer_centre", "CT5 - IND 22 ATTESTATION FORMATION GÉRER SON CENTRE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "gerer_centre" });
-    add("af_c5i22_attestation_izi_make_airtable", "CT5 - IND 22 ATTESTATION FORMATION AUTOMATISATION MAKE ET AIRTABLE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "make_airtable" });
+    add("af_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
     intervenantsAF.forEach((fname) => {
       add(`af_c5i22_fiche_entretien_${slugNom(fname)}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
     });
@@ -1142,8 +1141,7 @@ export function buildFullCatalog(
 
     // IND 22 — Entretien et développement des compétences
     add("cfa_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
-    add("cfa_c5i22_attestation_izi_gerer_centre", "CT5 - IND 22 ATTESTATION FORMATION GÉRER SON CENTRE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "gerer_centre" });
-    add("cfa_c5i22_attestation_izi_make_airtable", "CT5 - IND 22 ATTESTATION FORMATION AUTOMATISATION MAKE ET AIRTABLE (IZIBUSINESS)", 5, 22, "attestation_izibusiness", { formationIzi: "make_airtable" });
+    add("cfa_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
     
 
     uniqueFormateursCFA.forEach((fName) => {
@@ -1404,6 +1402,7 @@ export function buildFullCatalog(
       );
     });
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
+    add("bdc_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
     // Classeurs (cahier de contacts, suivi de l'adaptation, contacts handicap, dysfonctionnements)
     BDC_CLASSEURS.forEach((cl, idx) => {
       add(`bdc_classeur_${idx}`, `CT${critereForIndicateur(cl.indicateur)} - IND ${cl.indicateur} ${cl.name.replace(/^Indicateur\s+\d+\s*-\s*/, "").replace(/\.xlsx$/i, "")} (Excel)`, critereForIndicateur(cl.indicateur), cl.indicateur, "bdc_classeur", { classeurIdx: idx });
@@ -1546,6 +1545,7 @@ export function buildFullCatalog(
     add("vae_c5i21_fiche_poste_accompagnateur", "CT5 - IND 21 Fiche de poste accompagnateur VAE", 5, 21, "vae_fiche_poste_accompagnateur");
     add("vae_c5i21_competences_accompagnateur", "CT5 - IND 21 Compétences de l'accompagnateur et justificatifs", 5, 21, "vae_competences_accompagnateur");
     add("vae_c5i22_plan_dev_accompagnateurs", "CT5 - IND 22 Plan de développement des compétences", 5, 22, "vae_plan_dev_accompagnateurs");
+    add("vae_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
 
     // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
     add("vae_c6i23_veille_reglementaire", "CT6 - IND 23 Veille légale et réglementaire VAE", 6, 23, "vae_veille_reglementaire");

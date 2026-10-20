@@ -26,32 +26,42 @@ export const FORMATIONS_IZIBUSINESS: FormationIzi[] = [
   },
 ];
 
-function baseDate(o: OrganismeInfo): Date {
-  const m = (o.dateMaj || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+function baseDate(o: Pick<OrganismeInfo, "dateMaj">): Date {
+  const value = (o.dateMaj || "").trim();
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const fr = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (fr) return new Date(+fr[3], +fr[2] - 1, +fr[1]);
   return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
 }
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 function ouvre(d: Date, sens: 1 | -1): Date { const r = new Date(d); while (r.getDay() === 0 || r.getDay() === 6) r.setDate(r.getDate() + sens); return r; }
 
 /** Dates de réalisation (2 jours ouvrés consécutifs) avant la date de MAJ. */
-export function datesFormationIzi(o: OrganismeInfo, fi: FormationIzi): { debut: string; fin: string } {
-  const d = new Date(baseDate(o)); d.setDate(d.getDate() - fi.joursAvantMaj);
+export function datesFormationIzi(o: Pick<OrganismeInfo, "dateMaj">, fi: FormationIzi): { debut: string; fin: string } {
+  const maj = baseDate(o);
+  const d = new Date(maj); d.setDate(d.getDate() - Math.max(7, fi.joursAvantMaj));
   const debut = ouvre(d, 1); const fin = new Date(debut); fin.setDate(fin.getDate() + 1);
   return { debut: iso(debut), fin: iso(ouvre(fin, 1)) };
 }
 
-export function genAttestationIzibusiness(o: OrganismeInfo, id: string, beneficiaire?: string): string {
-  const fi = FORMATIONS_IZIBUSINESS.find((x) => x.id === id) || FORMATIONS_IZIBUSINESS[0];
-  const { debut, fin } = datesFormationIzi(o, fi);
+/** One source for completed training records in the attestation and every IND 22 plan. */
+export function formationsIziRealisees(o: Pick<OrganismeInfo, "dateMaj">) {
+  return FORMATIONS_IZIBUSINESS.map(fi => ({ ...fi, ...datesFormationIzi(o, fi) }));
+}
+
+const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] || c));
+
+export function genAttestationIzibusiness(o: OrganismeInfo, beneficiaire?: string): string {
+  const formations = formationsIziRealisees(o);
+  const fin = formations.map(fi => fi.fin).sort().at(-1) || iso(baseDate(o));
   const nom = (beneficiaire || o.dirigeant || "").trim();
   const izi = { ...o, ...IZIBUSINESS_ORG, telephone: "", logoUrl: "", tamponUrl: izibusinessTamponAsset.url, signatureUrl: "", dateMaj: fin } as OrganismeInfo;
   return buildDocument({
-    org: izi, title: "ATTESTATION DE FIN DE FORMATION", subtitle: fi.nom,
+    org: izi, title: "ATTESTATION DE FIN DE FORMATION",
     sections: [
-      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}, déclaration d'activité n° ${IZIBUSINESS_ORG.nda}), atteste que :</p><p><strong>${nom}</strong>${o.nom ? `, ${o.nom}` : ""}${o.siret ? ` (SIRET ${o.siret})` : ""},</p><p>a suivi la formation <strong>« ${fi.nom} »</strong> du ${formatDate(debut)} au ${formatDate(fin)}, d'une durée de <strong>${fi.duree}</strong>, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 %.</p>` },
-      { heading: "Objectif", content: `<p>${fi.objectif}</p>` },
-      { heading: "Contenu", content: `<ul>${fi.programme.map((p) => `<li>${p}</li>`).join("")}</ul>` },
-      { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique en fin de formation.</p>`, variant: "green" },
+      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}, déclaration d'activité n° ${IZIBUSINESS_ORG.nda}), atteste que :</p><p>${nom ? `<strong>${esc(nom)}</strong>` : ""}${o.nom ? `${nom ? ", " : ""}${esc(o.nom)}` : ""}${o.siret ? ` (SIRET ${esc(o.siret)})` : ""},</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
+      ...formations.map((fi, i) => ({ heading: `Formation ${i + 1} — « ${fi.nom} »`, content: `<p>Du ${formatDate(fi.debut)} au ${formatDate(fi.fin)}, d'une durée de <strong>${fi.duree}</strong>.</p><p><strong>Objectif :</strong> ${fi.objectif}</p><p><strong>Contenu :</strong><br>${fi.programme.join("<br>")}</p>${i === formations.length - 1 ? `<p><strong>Durée totale : 4 jours (${formations.reduce((n, item) => n + item.heures, 0)} heures).</strong></p>` : ""}` })),
+      { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique en fin de chaque formation.</p>`, variant: "green" },
     ],
     extraHtml: `<p style="margin-top:24px">Fait à Paris, le ${formatDate(fin)}.</p><div style="margin-top:10px"><p><strong>Nadine DENDANI</strong>, dirigeante — IZIBUSINESS</p><img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="max-height:110px;max-width:220px;object-fit:contain" /></div>`,
   });
