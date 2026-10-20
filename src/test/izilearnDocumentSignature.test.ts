@@ -9,6 +9,18 @@ const image = "data:image/png;base64,aGVsbG8=";
 const companyImage = "data:image/png;base64,Y29tcGFueQ==";
 
 describe("Signatures manuelles IZILearn", () => {
+  it("reprend la signature sous le relevé uniquement pour le jour enregistré", () => {
+    const p = { ...payload, apprenants: [{ ...payload.apprenants[0], signatureUrl: image, connexions: [{ debut: "2026-01-05T09:05:00", secondes: 9000, source: "lms" as const }] }] };
+    const cx = contexteAvecSignatures(contexte(p), {});
+    const report = planPieces(cx).find((p) => p.id === "connexion_0");
+    if (!report) throw new Error("Relevé absent");
+    const doc = new DOMParser().parseFromString(applyLearnerSignatures(report.rendre(), report, cx), "text/html");
+    const copied = doc.querySelectorAll('img[alt="Signature stagiaire reprise"]');
+    expect(copied).toHaveLength(1);
+    expect(copied[0].closest("table")).toBeNull();
+    expect(doc.querySelector('[data-learner-signature="recorded-connection"]')?.textContent).toContain("Signature reprise");
+    expect(doc.body.textContent).toContain("Non relevé");
+  });
   it("reprend la signature disponible seulement sur les jours enregistrés sans écraser une signature existante", () => {
     const cx = contexteAvecSignatures(contexte({ ...payload, apprenants: [{ ...payload.apprenants[0], signatureUrl: image }, payload.apprenants[1]] }), {});
     expect(cx.stagiaires[0].signatureUrl).toBe(image);

@@ -9,7 +9,7 @@
  * jamais une réponse, une note, une appréciation ou une signature générée.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument } from "@/lib/docBuilder";
+import { buildDocument, tableHTML } from "@/lib/docBuilder";
 import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie } from "@/lib/evalContent";
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
@@ -344,7 +344,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const total = cx.reduce((n, x) => n + (x.secondes || 0), 0);
-  let h = enTete(c, [["Modalité", c.f.modalites || "distanciel"], ["Plateforme", "IZILearn / Google Meet"], ["Durée prévue", c.a.heuresPrevues ? `${String(c.a.heuresPrevues).replace(".", ",")} h` : c.f.duree]]);
+  let h = `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> IZILearn / Google Meet</p>`;
   const jours = new Map<string, Date>();
   for (const sl of c.p.creneaux) {
     const jour = d(sl.debut);
@@ -352,7 +352,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   }
   if (!c.p.creneaux.length) for (const jour of joursSession(c.p, c.s, c.f)) jours.set(cleJour(jour), jour);
   for (const x of cx) { const jour = d(x.debut); if (jour) jours.set(cleJour(jour), jour); }
-  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut", "Signature du stagiaire"];
+  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"];
   let renderedDays = 0;
   for (const [key, jour] of [...jours.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     if (renderedDays > 0 && renderedDays % 5 === 0) h += '<div class="page-break"></div>';
@@ -362,21 +362,21 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     const apresMidi = connexions.filter((x) => (d(x.debut)?.getHours() ?? 0) >= 12);
     const derniereFin = (xs: typeof cx) => xs.filter((x) => x.fin).map((x) => x.fin).sort().at(-1);
     const futur = jour.getTime() > new Date().setHours(0, 0, 0, 0);
-    const heuresPrevues = c.p.creneaux.filter((sl) => { const debut = d(sl.debut); return debut && cleJour(debut) === key && /distanciel|elearning|hybride|mixte/i.test(sl.mode); });
-    h += `<h3>${dateLongue(jour)}</h3>`;
-    if (heuresPrevues.length) h += `<p><strong>Horaires prévus :</strong> ${heuresPrevues.map((sl) => `${heure(sl.debut)} – ${heure(sl.fin)}`).join(" / ")}</p>`;
+    h += `<h4>📅 ${dateLongue(jour)}</h4>`;
     const cells = [
       connexions.length ? [...new Set(connexions.map((x) => x.source === "meet" ? "Google Meet" : "IZILearn"))].join(" / ") : "IZILearn / Google Meet",
       heure(matin[0]?.debut), heure(derniereFin(matin)), heure(apresMidi[0]?.debut), heure(derniereFin(apresMidi)),
       connexions.length ? duree(connexions.reduce((n, x) => n + (x.secondes || 0), 0)) : "",
       connexions.length ? "Connexion relevée" : futur ? "À venir" : "Non relevé",
-      "",
     ];
-    h += `<table style="width:100%;table-layout:fixed"><thead><tr>${headers.map((x) => `<th style="overflow-wrap:anywhere">${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x, i) => `<td${i === cells.length - 1 ? ` style="height:60px"${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""}` : ""}>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
+    // Exact same table renderer and seven columns as Qualiopi IND 11.
+    // Keep the signature outside the table so it does not change its layout.
+    h += tableHTML(headers, [cells.map(esc)]);
+    h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
   }
   h += `<p><strong>Temps total relevé :</strong> ${duree(total)} · <strong>Durée formation :</strong> ${esc(c.f.duree)}</p>`;
   const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;
   if (heuresPrevues > 0) h += `<p><strong>Taux de connexion relevé :</strong> ${Math.min(100, Math.round(total / (heuresPrevues * 3600) * 100))} %${(d(c.p.session.dateFin)?.getTime() || 0) >= Date.now() ? " (en cours)" : ""}</p>`;
   h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
-  return { html: doc(c, "RELEVÉ DES TEMPS DE CONNEXION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: cx.length > 0 };
+  return { html: buildDocument({ org: c.o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: c.f.intitule, formation: c.f, showFormationInfo: true, stagiaires: [c.s], extraHtml: h }), reel: cx.length > 0 };
 }
