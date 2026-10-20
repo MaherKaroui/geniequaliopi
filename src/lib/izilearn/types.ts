@@ -28,6 +28,14 @@ export interface IzOrganisme {
   tvaExonere?: boolean;
 }
 
+export interface IzContenu {
+  chapitres: { titre: string; description?: string; sections: { titre: string; html: string }[] }[];
+  exercices: { titre: string; consigne: string; reponseAttendue?: string }[];
+  positionnement: { question: string; options: string[] }[];
+  /** Contenu créé par l'IA et pas encore validé par un formateur. */
+  brouillonIA?: boolean;
+}
+
 export interface IzModule { titre: string; objectifs?: string; dureeHeures?: number | null; bloc?: string }
 export interface IzBloc { code: string; intitule: string; competences?: string[] }
 
@@ -51,6 +59,8 @@ export interface IzFormation {
   blocs: IzBloc[];
   /** Date de version du programme (sert de date de mise à jour des documents). */
   miseAJour?: string;
+  /** Contenu pédagogique de la formation dans IZILearn (leçons, exercices, test d'entrée) — créé automatiquement par l'IA d'IZILearn s'il manquait. */
+  contenu?: IzContenu | null;
   version?: number;
 }
 

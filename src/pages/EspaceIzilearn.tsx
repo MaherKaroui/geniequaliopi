@@ -19,6 +19,7 @@ import { htmlToWordBlob } from "@/lib/wordExport";
 import { setDocStyle } from "@/lib/docBuilder";
 import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { useIzilearn } from "@/lib/izilearn/bridge";
+import { installerContenu } from "@/lib/izilearn/contenu";
 import { champsManquants } from "@/lib/izilearn/mapping";
 import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Piece } from "@/lib/izilearn/pieces";
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
@@ -51,6 +52,7 @@ export default function EspaceIzilearn() {
   const cx = useMemo(() => (payload ? contexte(payload) : null), [payload]);
   useEffect(() => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); }, [cx]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
+  const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx]);
   const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx]);
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
   useEffect(() => { setApercuId(null); }, [payload?.source.orgId, payload?.source.sessionId]);
@@ -187,6 +189,15 @@ export default function EspaceIzilearn() {
           </div>
         )}
       </header>
+
+      {contenu === "izilearn" && (
+        <div className="max-w-7xl mx-auto px-4 pt-4">
+          <div className="rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 px-4 py-3 text-sm flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>Support de cours, exercices et questions tirés du contenu de la formation dans IZILearn{payload.formation.contenu?.brouillonIA ? " (créé automatiquement par l'IA, à relire par le formateur)" : ""}.</span>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 py-5 grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-auto">

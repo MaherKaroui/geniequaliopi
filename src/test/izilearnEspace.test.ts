@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { contexte, planPieces } from "@/lib/izilearn/pieces";
 import { unitesExercices } from "@/lib/izilearn/trames";
+import { installerContenu } from "@/lib/izilearn/contenu";
 import type { IzApprenant, IzPayload, IzSlot } from "@/lib/izilearn/types";
 
 function creneaux(debut: string, nbJours: number): IzSlot[] {
@@ -134,6 +135,23 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2027-02-05T13:48:00Z"));
     expect(planPieces(contexte(p)).find((x) => x.id === "bilan_froid_0")?.source).toBe("document");
   });
+  it("formation inconnue : support de cours et exercices tirés du contenu IZILearn", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = {
+      chapitres: [{ titre: "Cadrer le projet", description: "Bases", sections: [{ titre: "La note de cadrage", html: "<p>MARQUEUR_LECON_IZILEARN</p>" }] }],
+      exercices: [{ titre: "Rédiger une note", consigne: "MARQUEUR_CONSIGNE_IZILEARN", reponseAttendue: "CORRIGE_SECRET" }],
+      positionnement: [{ question: "Qu'est-ce qu'un jalon ?", options: ["Une étape clé", "Un budget"] }],
+      brouillonIA: true,
+    };
+    const cx = contexte(p);
+    expect(installerContenu(cx.p, cx.f)).toBe("izilearn");
+    const pieces = planPieces(cx);
+    expect(pieces.find((x) => x.id === "support")!.rendre()).toContain("MARQUEUR_LECON_IZILEARN");
+    const ex = pieces.find((x) => x.categorie === "exercices" && x.source === "trame")!.rendre();
+    expect(ex).toContain("MARQUEUR_CONSIGNE_IZILEARN");
+    expect(ex).not.toContain("CORRIGE_SECRET");
+  });
+
   it("rythme des exercices : jour si court, semaine si long ou CFA", () => {
     const court = contexte(payload("actions-formation", 5));
     expect(unitesExercices(court.p, court.stagiaires[0], court.f).map((u) => u.type)).toEqual(Array(5).fill("jour"));

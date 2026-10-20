@@ -145,7 +145,14 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
       `<tr><td>${esc(o)}</td><td style="text-align:center">${CASE}</td><td style="text-align:center">${CASE}</td><td style="text-align:center">${CASE}</td><td style="text-align:center">${CASE}</td></tr>`).join("")}</tbody></table>`;
   }
 
-  if (hasEvalContentDedie(c.f.intitule)) {
+  const qcmIzilearn = (c.p.formation.contenu?.positionnement || []).filter((q) => q.options?.length);
+  if (qcmIzilearn.length) {
+    h += `<h2>2. Questionnaire à choix multiples</h2><p style="font-size:11px;color:#6b7280">Cochez la ou les bonnes réponses.</p>`;
+    qcmIzilearn.forEach((q, i) => {
+      h += `<p style="margin:10px 0 4px"><strong>${i + 1}. ${esc(q.question)}</strong></p><p style="margin:0 0 0 12px">${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
+    });
+  }
+  if (!qcmIzilearn.length && hasEvalContentDedie(c.f.intitule)) {
     const qcm = getEvalContent(c.f.intitule).qcmPositionnement || [];
     if (qcm.length) {
       h += `<h2>2. Questionnaire à choix multiples</h2><p style="font-size:11px;color:#6b7280">Cochez la ou les bonnes réponses.</p>`;
@@ -156,7 +163,7 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
   }
   const ouvertes = getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).debut || [];
   if (ouvertes.length) {
-    h += `<h2>${hasEvalContentDedie(c.f.intitule) ? "3" : "2"}. Questions ouvertes</h2>`;
+    h += `<h2>${hasEvalContentDedie(c.f.intitule) || qcmIzilearn.length ? "3" : "2"}. Questions ouvertes</h2>`;
     ouvertes.slice(0, 10).forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p>${LIGNES(3)}`; });
   }
   h += `<h2>Positionnement retenu par le formateur</h2>`;
@@ -199,6 +206,9 @@ interface Sujet { titre: string; consigne: string; competence?: string }
 
 /** Sujets d'exercices : contenu pédagogique dédié, sinon blocs RNCP, sinon modules du programme IZILearn. */
 function sujets(c: Ctx): Sujet[] {
+  // Exercices de la formation dans IZILearn d'abord (consignes seules, jamais le corrigé).
+  const izi = (c.p.formation.contenu?.exercices || []).filter((e) => e.consigne);
+  if (izi.length) return izi.map((e) => ({ titre: e.titre, consigne: e.consigne }));
   if (hasEvalContentDedie(c.f.intitule)) {
     const ex = getEvalContent(c.f.intitule).exercices || [];
     if (ex.length) return ex.map((e) => ({ titre: e.titre, consigne: e.consigne }));
