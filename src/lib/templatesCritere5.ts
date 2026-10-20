@@ -4,6 +4,7 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
+import { formationsIziRealisees, formatDateIzi } from "./attestationIzibusiness";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
@@ -253,6 +254,7 @@ export interface PlanDevAction {
   financement: string;
   priorite: "Haute" | "Moyenne" | "Normale";
   efficacite: string;     // critère d'évaluation de l'efficacité
+  realisee?: boolean;
 }
 
 type Metier = { origine: string; nom: string; objectif: string; type: string; formateur: string; duree: string };
@@ -399,10 +401,9 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   add({ famille: "handicap", besoin: "Accueil des personnes en situation de handicap — référent handicap (IND 26)", indicateurs: "26, 22", nom: "Référent handicap : accueil, compensation et mobilisation du réseau", objectif: "Identifier les besoins de compensation, mobiliser les partenaires (Agefiph, Cap emploi, MDPH) et adapter la prestation", beneficiaires: o.referentHandicap || o.dirigeant || tous, modalite: "Externe — distanciel", prestataire: "Ressource Handicap Formation (RHF) de la région / Agefiph", duree: "1 jour", periode: "", financement: "Sans coût ou OPCO selon l'offre régionale", priorite: "Haute", efficacite: "Demandes d'aménagement traitées sous 8 jours" });
   // 6. Qualité et réglementation (IND 23, 27, 32)
   add({ famille: "reglementaire", besoin: "Veille réglementaire : décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026 (IND 23)", indicateurs: "23, 27, 32, 33", nom: "Référentiel national qualité 2026 : indicateurs 27, 32 et 33", objectif: "Intégrer la traçabilité sous-traitance / portage, l'analyse des risques qualité et, pour un CFA, l'évaluation des enseignements", beneficiaires: tous, modalite: "Autoformation (texte du décret, guide de lecture) + réunion interne", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour", periode: "", financement: "Sans coût", priorite: "Haute", efficacite: "Registre IND 27 et analyse des risques IND 32 à jour" });
-  // 7. Gestion du centre et automatisation (IZIBUSINESS — Nadine DENDANI), attestations jointes.
+  // 7. Completed actions share their exact dates with the combined attestation.
   const dirigeantOuTous = o.dirigeant || tous;
-  add({ famille: "qualite", besoin: "Pilotage administratif, financier et réglementaire de l'organisme (IND 22, 32)", indicateurs: "22, 32", nom: "Gérer son centre de formation", objectif: "Piloter l'organisme : NDA, BPF, Qualiopi, financements OPCO / CPF, indicateurs", beneficiaires: dirigeantOuTous, modalite: "Externe — présentiel", prestataire: "IZIBUSINESS — Nadine DENDANI", duree: "2 jours (14 heures)", periode: "", financement, priorite: "Haute", efficacite: "Attestation de fin de formation IZIBUSINESS jointe ; BPF et indicateurs à jour" });
-  add({ famille: "numerique", besoin: "Automatisation du suivi administratif des stagiaires (IND 22, 32)", indicateurs: "22, 32", nom: "Automatiser la gestion de son centre avec Make et Airtable", objectif: "Structurer une base Airtable et automatiser convocations, relances et suivi avec Make", beneficiaires: dirigeantOuTous, modalite: "Externe — présentiel", prestataire: "IZIBUSINESS — Nadine DENDANI", duree: "2 jours (14 heures)", periode: "", financement, priorite: "Haute", efficacite: "Attestation de fin de formation IZIBUSINESS jointe ; scénarios Make en production" });
+  formationsIziRealisees(o).forEach(fi => add({ famille: fi.id === "gerer_centre" ? "qualite" : "numerique", besoin: fi.id === "gerer_centre" ? "Pilotage administratif, financier et réglementaire de l'organisme (IND 22, 32)" : "Automatisation du suivi administratif (IND 22, 32)", indicateurs: "22, 32", nom: fi.nom, objectif: fi.objectif, beneficiaires: dirigeantOuTous, modalite: "Externe — présentiel", prestataire: "IZIBUSINESS — Nadine DENDANI", duree: fi.duree, periode: `Du ${formatDateIzi(fi.debut)} au ${formatDateIzi(fi.fin)}`, financement, priorite: "Haute", efficacite: "Attestation de fin de formation commune IZIBUSINESS jointe (2 formations, 28 heures)", realisee: true }));
   add({ famille: "qualite", besoin: "Démarche d'amélioration continue et préparation de l'audit (IND 30 à 32)", indicateurs: "30, 31, 32", nom: "Piloter la démarche qualité : appréciations, réclamations, analyse des risques", objectif: "Exploiter les appréciations et réclamations et suivre le plan d'amélioration", beneficiaires: tous, modalite: "Interne — revue qualité", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour par semestre", periode: "", financement: "Sans coût", priorite: "Moyenne", efficacite: "Actions d'amélioration closes dans les délais" });
 
   // Références et périodes : répartition sur l'année du plan, priorités en premier.
@@ -413,6 +414,7 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   const moisDebut = maj ? Number(maj.slice(5, 7)) : 1;
   out.forEach((a, i) => {
     a.ref = `PDC-${String(i + 1).padStart(2, "0")}`;
+    if (a.realisee) return;
     const trimIdx = Math.floor((moisDebut - 1) / 3) + Math.floor(i / 2);
     a.periode = `T${(trimIdx % 4) + 1} ${an + Math.floor(trimIdx / 4)}`;
   });
@@ -463,7 +465,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   h += sec("2. ACTIONS DE DÉVELOPPEMENT DES COMPÉTENCES");
   h += `<tr><th>Réf.</th><th>Besoin identifié (source)</th><th>Action</th><th>Objectifs attendus</th><th>Bénéficiaire(s)</th><th>Modalité</th><th>Prestataire / animateur</th><th>Durée</th><th>Période</th><th>Financement</th><th>Critère d'efficacité</th><th>Statut</th></tr>`;
   actions.forEach((a) => {
-    h += `<tr><td>${a.ref}</td><td>${a.besoin}</td><td>${a.nom}</td><td>${a.objectif}</td><td>${a.beneficiaires}</td><td>${a.modalite}</td><td>${a.prestataire}</td><td>${a.duree}</td><td>${a.periode}</td><td>${a.financement}</td><td>${a.efficacite}</td><td>${a.priorite === "Haute" ? "Prioritaire — " : ""}${statut}</td></tr>`;
+    h += `<tr><td>${a.ref}</td><td>${a.besoin}</td><td>${a.nom}</td><td>${a.objectif}</td><td>${a.beneficiaires}</td><td>${a.modalite}</td><td>${a.prestataire}</td><td>${a.duree}</td><td>${a.periode}</td><td>${a.financement}</td><td>${a.efficacite}</td><td>${a.realisee ? "Réalisée — attestation commune jointe" : `${a.priorite === "Haute" ? "Prioritaire — " : ""}${statut}`}</td></tr>`;
   });
 
   h += sec("3. AUTRES LEVIERS DE PROFESSIONNALISATION");

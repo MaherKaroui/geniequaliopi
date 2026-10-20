@@ -18,6 +18,8 @@ import type { BdcContext } from "./bdcModel";
  * réglementaires et mentions légales obligatoires).
  */
 export const PHRASES_PROTEGEES: string[] = [
+  "Gérer son centre de formation",
+  "Automatiser la gestion de son centre avec Make et Airtable",
   "Mon Compte Formation",
   "formation professionnelle continue",
   "Formation professionnelle continue",

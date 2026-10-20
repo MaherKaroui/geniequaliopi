@@ -9,6 +9,7 @@ import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor
 import type { FormationInfo } from "@/types/qualiopi";
 import { REFERENCES_REGLEMENTAIRES_2026 } from "@/lib/qualite2026";
 import { blocSignatureHtml } from "./signatureMatrix";
+import { formationsIziRealisees, formatDateIzi as formatDate } from "@/lib/attestationIzibusiness";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 
@@ -1011,6 +1012,7 @@ const planDeveloppementConsultant: BdcDocDef = {
       `_Établi le ${dateSysteme(ctx)} (V1). Personnel concerné : ${p.consultant.nom} (consultant)${o.referentHandicap.nom && o.referentHandicap.nom !== p.consultant.nom ? `, ${o.referentHandicap.nom} (référent handicap)` : ""}._\n`,
       "| Action | Objectif | Modalité | Échéance prévue | Statut | Preuve attendue |",
       "|---|---|---|---|---|---|",
+      ...formationsIziRealisees({ dateMaj: `${d0.getFullYear()}-${String(d0.getMonth() + 1).padStart(2, "0")}-${String(d0.getDate()).padStart(2, "0")}` }).map(fi => `| ${fi.nom} (${fi.duree}) — ${o.representantLegal.nom} | ${fi.objectif} | IZIBUSINESS — Nadine DENDANI, présentiel | Du ${formatDate(fi.debut)} au ${formatDate(fi.fin)} | Réalisée | Attestation commune IZIBUSINESS jointe (28 heures) |`),
       `| Actualisation réglementaire : référentiel national qualité (décret n° 2026-728) | Intégrer les indicateurs 27, 32 et 33 au système qualité | Autoformation, webinaire | ${trim(2)} | Prévue | Attestation / support |`,
       `| Outils d'investigation (intérêts, personnalité) | Actualiser la maîtrise des outils utilisés | Formation courte | ${trim(6)} | Prévue | Attestation de formation |`,
       `| Analyse de pratiques / supervision | Prendre du recul sur les accompagnements | Supervision entre pairs, 2 séances/an | ${trim(9)} | Prévue | Compte rendu |`,

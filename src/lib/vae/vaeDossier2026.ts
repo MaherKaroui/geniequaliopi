@@ -16,6 +16,7 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
 import { getRNCPByCode } from "../rncpData";
+import { formationsIziRealisees, formatDateIzi } from "../attestationIzibusiness";
 import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite } from "../qualite2026";
 import {
   certifVAE, profilVAE, calendrierVAE, chronoVAE, heuresVAE, frVAE, frLongVAE, parseDateVAE, estPasse, aujourdhui, graine,
@@ -760,6 +761,7 @@ export function genVAEPlanDevAccompagnateurs(o: OrganismeInfo, f: FormationInfo)
   return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES – ACCOMPAGNATEURS VAE", subtitle: `Année ${annee}`, table: {
     headers: ["Besoin", "Action", "Bénéficiaire", "Échéance", "Statut"],
     rows: [
+      ...formationsIziRealisees(o).map(fi => ["Gestion et automatisation du centre", `${fi.nom} — IZIBUSINESS / Nadine DENDANI — ${fi.duree}`, esc(o.dirigeant), `Du ${formatDateIzi(fi.debut)} au ${formatDateIzi(fi.fin)}`, "Réalisée — attestation commune jointe (28 heures)"]),
       ["Actualisation réglementaire VAE", "Veille et appropriation de la réforme (loi n° 2022-1598, décret n° 2023-1275, plateforme vae.gouv.fr)", esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
       ["Référentiel qualité 2026", "Appropriation du décret n° 2026-728 (33 indicateurs)", esc(o.referentQualite), `${annee}`, "Planifiée"],
       ["Accueil du handicap", "Sensibilisation (ressources Agefiph)", esc(o.referentHandicap), `${annee}`, "Planifiée"],
