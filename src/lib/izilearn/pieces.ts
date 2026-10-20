@@ -12,6 +12,7 @@ import { estDistanciel, versFormation, versOrganisme, versStagiaires } from "./m
 import * as T from "./trames";
 import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
 import { mailHtml, mailsModeles, type MailModele } from "./mails";
+import { appliquerRevision, developperLivret } from "./presentation";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
@@ -57,8 +58,10 @@ export interface Contexte {
   stagiaires: StagiaireInfo[];
 }
 
-export function contexte(p: IzPayload): Contexte {
-  return { p, o: versOrganisme(p), f: versFormation(p), stagiaires: versStagiaires(p) };
+export function contexte(p: IzPayload, dateMaj?: string): Contexte {
+  const o = versOrganisme(p);
+  if (dateMaj && /^\d{4}-\d{2}-\d{2}$/.test(dateMaj) && !Number.isNaN(new Date(`${dateMaj}T12:00:00`).getTime())) o.dateMaj = dateMaj;
+  return { p, o, f: versFormation(p), stagiaires: versStagiaires(p) };
 }
 
 const slug = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
@@ -153,5 +156,8 @@ export function planPieces(cx: Contexte): Piece[] {
       par("mails", m.titre, `${stamp}_${slug(m.titre).toUpperCase()}`, "modele", () => mailHtml(m, o), { id: `m${k}`, mail: m });
     });
   });
-  return out;
+  return out.map((piece) => {
+    const rendre = piece.rendre;
+    return { ...piece, rendre: () => appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o) };
+  });
 }
