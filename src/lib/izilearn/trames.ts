@@ -325,18 +325,33 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
 export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   const cx = [...c.a.connexions].sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const total = cx.reduce((n, x) => n + (x.secondes || 0), 0);
-  let h = enTete(c, [["Modalité", c.f.modalites || "distanciel"], ...(c.a.heuresPrevues ? [["Durée prévue", `${String(c.a.heuresPrevues).replace(".", ",")} h`] as [string, string]] : [])]);
-  if (cx.length) {
-    h += sourceIzilearn("connexions relevées automatiquement (classe virtuelle Google Meet et plateforme e-learning IZILearn), données brutes non retouchées.");
-    h += `<table style="width:100%"><thead><tr><th>Date</th><th>Source</th><th>Connexion</th><th>Déconnexion</th><th>Durée</th></tr></thead><tbody>${cx.map((x) =>
-      `<tr><td>${dateFr(x.debut)}</td><td>${x.source === "meet" ? "Classe virtuelle" : "Plateforme e-learning"}</td><td>${heure(x.debut)}</td><td>${heure(x.fin) || "—"}</td><td>${duree(x.secondes || 0)}</td></tr>`).join("")}</tbody></table>`;
-    h += `<p style="margin-top:10px"><strong>Temps total relevé :</strong> ${duree(total)}${c.a.heuresPrevues ? ` sur ${String(c.a.heuresPrevues).replace(".", ",")} h prévues` : ""}</p>`;
-    return { html: doc(c, "RELEVÉ DU TEMPS DE CONNEXION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };
+  let h = enTete(c, [["Modalité", c.f.modalites || "distanciel"], ["Plateforme", "IZILearn / Google Meet"], ["Durée prévue", c.a.heuresPrevues ? `${String(c.a.heuresPrevues).replace(".", ",")} h` : c.f.duree]]);
+  const jours = new Map<string, Date>();
+  for (const sl of c.p.creneaux) {
+    const jour = d(sl.debut);
+    if (jour && /distanciel|elearning|hybride|mixte/i.test(sl.mode)) jours.set(cleJour(jour), jour);
   }
-  h += trameVierge("Aucune connexion encore relevée par IZILearn pour cet apprenant : relevé à compléter par séance.");
-  const lignes = c.p.creneaux.length
-    ? c.p.creneaux.map((sl) => `<tr><td>${dateLongue(sl.debut)}</td><td>${sl.demiJournee === "matin" ? "Matin" : "Après-midi"} (${heure(sl.debut)} – ${heure(sl.fin)})</td><td></td><td></td><td></td></tr>`)
-    : joursSession(c.p, c.s, c.f).map((x) => `<tr><td>${dateLongue(x)}</td><td></td><td></td><td></td><td></td></tr>`);
-  h += `<table style="width:100%"><thead><tr><th>Date</th><th>Séance</th><th>Connexion</th><th>Déconnexion</th><th>Durée</th></tr></thead><tbody>${lignes.join("")}</tbody></table>`;
-  return { html: doc(c, "RELEVÉ DU TEMPS DE CONNEXION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: false };
+  if (!c.p.creneaux.length) for (const jour of joursSession(c.p, c.s, c.f)) jours.set(cleJour(jour), jour);
+  for (const x of cx) { const jour = d(x.debut); if (jour) jours.set(cleJour(jour), jour); }
+  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"];
+  for (const [key, jour] of [...jours.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    const connexions = cx.filter((x) => { const debut = d(x.debut); return debut && cleJour(debut) === key; });
+    const matin = connexions.filter((x) => (d(x.debut)?.getHours() ?? 24) < 12);
+    const apresMidi = connexions.filter((x) => (d(x.debut)?.getHours() ?? 0) >= 12);
+    const derniereFin = (xs: typeof cx) => xs.filter((x) => x.fin).map((x) => x.fin).sort().at(-1);
+    const futur = jour.getTime() > new Date().setHours(0, 0, 0, 0);
+    const heuresPrevues = c.p.creneaux.filter((sl) => { const debut = d(sl.debut); return debut && cleJour(debut) === key && /distanciel|elearning|hybride|mixte/i.test(sl.mode); });
+    h += `<h3>${dateLongue(jour)}</h3>`;
+    if (heuresPrevues.length) h += `<p><strong>Horaires prévus :</strong> ${heuresPrevues.map((sl) => `${heure(sl.debut)} – ${heure(sl.fin)}`).join(" / ")}</p>`;
+    const cells = [
+      connexions.length ? [...new Set(connexions.map((x) => x.source === "meet" ? "Google Meet" : "IZILearn"))].join(" / ") : "IZILearn / Google Meet",
+      heure(matin[0]?.debut), heure(derniereFin(matin)), heure(apresMidi[0]?.debut), heure(derniereFin(apresMidi)),
+      connexions.length ? duree(connexions.reduce((n, x) => n + (x.secondes || 0), 0)) : "",
+      connexions.length ? "Connexion relevée" : futur ? "À venir" : "Non relevé",
+    ];
+    h += `<table style="width:100%"><thead><tr>${headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x) => `<td>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
+  }
+  h += `<p><strong>Temps total relevé :</strong> ${duree(total)} · <strong>Durée formation :</strong> ${esc(c.f.duree)}</p>`;
+  h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
+  return { html: doc(c, "RELEVÉ DES TEMPS DE CONNEXION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: cx.length > 0 };
 }
