@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Ajouter un bouton Signer par document stagiaire IZILearn, dessin/import et reprise au point commun des aperçus et exports sans modifier les présences enregistrées ; 17 tests réussis, dessin, aperçu, Word avec image et retrait vérifiés sur une session de contrôle, aucune erreur. Signature conservée dans la page ouverte ; session réelle et enregistrement distant non vérifiés ; non publié.
+
 - [x] Remplacer les aperçus texte des mails IZILearn par les captures automatiques Gmail/Outlook de Qualiopi ; téléchargement PNG et 8 captures dans le ZIP vérifiés avec une session de contrôle, deux présentations relues, 14 tests réussis et aucune erreur. Envoi distant IZILearn non vérifié ; non publié.
 
 - [x] Ajouter les mails générés au modèle Qualiopi dans IZILearn : modèles conservés même sans adresse, aperçu avec pièces jointes en cartes, copie et téléchargement HTML ; 13 tests réussis et aperçu/téléchargement vérifiés avec une session de contrôle, sans erreur. Session réelle et enregistrement distant non vérifiés ; non publié.
