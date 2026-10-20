@@ -2,8 +2,8 @@
 
 - [x] Retirer la mise à jour, sa date et V1 des captures de mails IZILearn ; captures Gmail/Outlook, téléchargement PNG et ZIP de 8 captures vérifiés, date du message conservée.
 
-- [ ] Ajouter la création persistante de contenus dédiés : correspondance exacte, génération reprenable, validation et reprise dans formulaire, rapide, historique et IZILearn.
-- [ ] Vérifier les protections des données stagiaires, les sources RNCP/URL et le parcours de génération/validation avec tests et aperçu.
+- [ ] Finaliser la génération complète des contenus dédiés : catalogue, sauvegarde, boutons des trois écrans, première fiche GPT-6 Astra et relecture de ses 16 chapitres fonctionnent ; la longue étape des évaluations dépasse encore le temps CPU du service et nécessite un découpage en sous-étapes avant livraison complète. Aucun appel de contrôle actif.
+- [ ] Vérifier la génération complète, validation et exports du support après résolution de ce blocage CPU. 73 tests concernés passent ; captures Gmail/Outlook, boutons des trois écrans et reprise du plan sauvegardé vérifiés ; parcours complet et source RNCP réelle non vérifiés, non publié.
 
 - [x] Reprendre exactement le tableau Qualiopi IND 11 dans IZILearn avec ses sept colonnes et son rendu partagé, sans modifier les connexions enregistrées ; signatures sous les tableaux. 21 tests réussis, aperçu et Word vérifiés sur une session de contrôle, aucune erreur ; session réelle non disponible, non publié.
 
