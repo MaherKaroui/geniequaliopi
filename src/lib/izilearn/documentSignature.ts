@@ -31,12 +31,13 @@ export function applyLearnerSignatures(html: string, piece: Piece, cx: Contexte)
   const learner = cx.stagiaires[piece.apprenantIdx];
   if (!learner || (!learner.signatureUrl && !learner.signatureResponsableUrl)) return html;
   const doc = new DOMParser().parseFromString(html, "text/html");
-  for (const box of doc.querySelectorAll(".sig-box")) {
-    const label = box.querySelector(".sig-label")?.textContent ?? "";
+  const targets = [...doc.querySelectorAll(".sig-box"), ...[...doc.querySelectorAll("p")].filter((p) => !p.closest(".sig-box") && /^Signature\s+(du|de|d[’'])/i.test(p.textContent?.trim() ?? ""))];
+  for (const box of targets) {
+    const label = box.classList.contains("sig-box") ? box.querySelector(".sig-label")?.textContent ?? "" : box.textContent ?? "";
     const enterprise = /entreprise|employeur|ma[iî]tre/i.test(label);
     const trainee = /stagiaire|apprenant|apprenti|bénéficiaire|candidat|client/i.test(label);
     const url = enterprise ? learner.signatureResponsableUrl : trainee ? learner.signatureUrl : undefined;
-    if (!url || !validSignatureImage(url) || box.querySelector("img")) continue;
+    if (!url || !validSignatureImage(url) || box.querySelector("img") || box.nextElementSibling?.tagName === "IMG") continue;
     const image = doc.createElement("img");
     image.src = url;
     image.alt = enterprise ? "Signature responsable entreprise" : "Signature stagiaire";
