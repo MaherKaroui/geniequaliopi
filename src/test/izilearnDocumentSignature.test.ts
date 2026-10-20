@@ -1,32 +1,51 @@
 import { describe, it, expect } from "vitest";
-import { applyDocumentSignature, signatureKey } from "@/lib/izilearn/documentSignature";
+import { applyLearnerSignatures, contexteAvecSignatures, signatureKey, validSignatureImage } from "@/lib/izilearn/documentSignature";
 import type { IzPayload } from "@/lib/izilearn/types";
-import type { Piece } from "@/lib/izilearn/pieces";
+import { contexte, planPieces, type Piece } from "@/lib/izilearn/pieces";
 
-const payload = { source: { orgId: "org", sessionId: "session" }, apprenants: [{ inscriptionId: "enrollment", contactId: "contact" }, { inscriptionId: "other", contactId: "other" }] } as IzPayload;
+const payload = { source: { orgId: "org", sessionId: "session" }, organisme: { nom: "Centre TEST" }, formation: { typeAction: "actions-formation", intitule: "Formation TEST", modules: [], blocs: [] }, session: { dateDebut: "2026-01-05", dateFin: "2026-01-06", modalite: "distanciel" }, creneaux: [], apprenants: [{ inscriptionId: "enrollment", contactId: "contact", prenom: "Camille", nom: "TEST", entreprise: { nom: "ACME", representant: "Alex TEST" }, signatures: [], connexions: [] }, { inscriptionId: "other", contactId: "other", prenom: "Autre", nom: "TEST", signatures: [], connexions: [] }] } as unknown as IzPayload;
 const piece: Piece = { id: "connexion_0", categorie: "connexion", titre: "Connexion", fichier: "CONNEXION_CAMILLE", apprenantIdx: 0, source: "trame", rendre: () => "" };
-const signature = { image: "data:image/png;base64,aGVsbG8=", signedAt: "2026-10-20T14:30:00Z", name: "Camille TEST" };
+const image = "data:image/png;base64,aGVsbG8=";
+const companyImage = "data:image/png;base64,Y29tcGFueQ==";
 
 describe("Signatures manuelles IZILearn", () => {
-  it("isole la signature du document choisi des autres stagiaires et sessions", () => {
-    const key = signatureKey(payload, piece);
+  it("isole les signatures entre apprenants, entreprises et sessions", () => {
+    const key = signatureKey(payload, 0, "stagiaire");
     expect(key).not.toBeNull();
-    expect(key).not.toBe(signatureKey(payload, { ...piece, apprenantIdx: 1 }));
-    expect(key).not.toBe(signatureKey({ ...payload, source: { ...payload.source, sessionId: "other" } }, piece));
-    expect(key).not.toBe(signatureKey(payload, { ...piece, fichier: "AUTRE_DOCUMENT" }));
-    expect(signatureKey(payload, { ...piece, apprenantIdx: null })).toBeNull();
+    expect(key).not.toBe(signatureKey(payload, 1, "stagiaire"));
+    expect(key).not.toBe(signatureKey({ ...payload, source: { ...payload.source, sessionId: "other" } }, 0, "stagiaire"));
+    expect(key).not.toBe(signatureKey(payload, 0, "entreprise"));
+    expect(signatureKey(payload, 1, "entreprise")).toBeNull();
   });
-  it("ajoute seulement la signature apposée maintenant sans changer les preuves de présence", () => {
-    const html = '<body><table><tr><td>Non relevé</td><td></td></tr></table><footer>Organisme</footer></body>';
-    const result = applyDocumentSignature(html, signature);
-    expect(result).toContain(signature.image);
-    expect(result).toContain("20 octobre 2026");
-    expect(result).toContain('<tr><td>Non relevé</td><td></td></tr>');
-    expect(result.indexOf(signature.image)).toBeLessThan(result.indexOf("<footer>"));
-    expect(applyDocumentSignature(html)).toBe(html);
+  it("reprend une seule signature dans tous les documents du stagiaire et celle de son responsable dans sa convention", () => {
+    const key = signatureKey(payload, 0, "stagiaire");
+    const company = signatureKey(payload, 0, "entreprise");
+    if (!key || !company) throw new Error("Clés absentes");
+    const cx = contexteAvecSignatures(contexte(payload), { [key]: image, [company]: companyImage });
+    expect(cx.stagiaires[0].signatureUrl).toBe(image);
+    expect(cx.stagiaires[0].signatureResponsableUrl).toBe(companyImage);
+    expect(cx.stagiaires[1].signatureUrl).toBeUndefined();
+    const pieces = planPieces(cx);
+    for (const category of ["convention", "besoins"]) {
+      const p = pieces.find((p) => p.categorie === category && p.apprenantIdx === 0);
+      if (!p) throw new Error("Pièce absente");
+      expect(applyLearnerSignatures(p.rendre(), p, cx)).toContain(image);
+    }
+    const convention = pieces.find((p) => p.categorie === "convention" && p.apprenantIdx === 0);
+    expect(convention?.rendre()).toContain(companyImage);
+  });
+  it("remplit les cases importées sans signer les lignes de présence ou les autres rôles", () => {
+    const cx = contexte(payload);
+    cx.stagiaires[0].signatureUrl = image;
+    const html = '<body><table><tr><td>Non relevé</td><td></td></tr></table><div class="sig-box"><p class="sig-label">L’apprenant</p></div><div class="sig-box"><p class="sig-label">Le formateur</p></div></body>';
+    const result = applyLearnerSignatures(html, piece, cx);
+    const doc = new DOMParser().parseFromString(result, "text/html");
+    expect(doc.querySelector("table img")).toBeNull();
+    expect(doc.querySelectorAll(".sig-box img")).toHaveLength(1);
+    expect(applyLearnerSignatures(html, { ...piece, apprenantIdx: null }, cx)).toBe(html);
   });
   it("refuse les images actives ou invalides", () => {
-    expect(applyDocumentSignature("original", { ...signature, image: 'data:image/svg+xml,<svg onload="alert(1)"/>' })).toBe("original");
-    expect(applyDocumentSignature("original", { ...signature, signedAt: "invalid" })).toBe("original");
+    expect(validSignatureImage('data:image/svg+xml,<svg onload="alert(1)"/>')).toBe(false);
+    expect(validSignatureImage(image)).toBe(true);
   });
 });

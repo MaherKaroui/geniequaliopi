@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import JSZip from "jszip";
 import { toast } from "sonner";
 import {
-  CheckCircle2, Download, Eye, FileText, Link2, Loader2, Mail, RefreshCw, Send, Upload, Users, AlertTriangle, FileDown, Copy, PenLine, Trash2,
+  CheckCircle2, Download, Eye, FileText, Link2, Loader2, Mail, RefreshCw, Send, Upload, Users, AlertTriangle, FileDown, Copy, PenLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,7 @@ import { captureMail } from "@/lib/mails/captureMail";
 import { clientMailOrganisme } from "@/lib/mails/mailsAutomatiques";
 import { mailPourCapture } from "@/lib/izilearn/mailCapture";
 import IzilearnSignatureDialog from "@/components/IzilearnSignatureDialog";
-import { applyDocumentSignature, signatureKey, validSignatureImage, type DocumentSignature } from "@/lib/izilearn/documentSignature";
+import { applyLearnerSignatures, contexteAvecSignatures, signatureKey, validSignatureImage, type LearnerSignatures, type SignatureRole } from "@/lib/izilearn/documentSignature";
 
 type Format = "pdf" | "word";
 
@@ -53,39 +53,38 @@ export default function EspaceIzilearn() {
   const [apprenants, setApprenants] = useState<Set<number>>(new Set());
   const [categories, setCategories] = useState<Set<CategorieKey>>(new Set(CATEGORIES.map((c) => c.key)));
   const [apercuId, setApercuId] = useState<string | null>(null);
-  const [signatureId, setSignatureId] = useState<string | null>(null);
-  const [signatures, setSignatures] = useState<Record<string, DocumentSignature>>({});
+  const [signatureTarget, setSignatureTarget] = useState<{ index: number; role: SignatureRole } | null>(null);
+  const [signatures, setSignatures] = useState<LearnerSignatures>({});
   const [travail, setTravail] = useState<{ label: string; fait: number; total: number } | null>(null);
 
-  const cx = useMemo(() => (payload ? contexte(payload) : null), [payload]);
+  const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload), signatures) : null), [payload, signatures]);
   useEffect(() => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); }, [cx]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
   const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx]);
   const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx]);
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
-  const aSigner = pieces.find((piece) => piece.id === signatureId) ?? null;
-  useEffect(() => { setApercuId(null); setSignatureId(null); }, [payload?.source.orgId, payload?.source.sessionId]);
+  const aSigner = signatureTarget ? payload?.apprenants[signatureTarget.index] : null;
+  useEffect(() => { setApercuId(null); setSignatureTarget(null); }, [payload?.source.orgId, payload?.source.sessionId]);
   const manquants = useMemo(() => (payload ? champsManquants(payload) : []), [payload]);
 
   const visibles = pieces.filter((p) => categories.has(p.categorie) && (p.apprenantIdx === null || apprenants.has(p.apprenantIdx)));
   const categoriesPresentes = CATEGORIES.filter((c) => pieces.some((p) => p.categorie === c.key));
 
-  const cleSignature = (piece: Piece) => payload ? signatureKey(payload, piece) : null;
-  const signatureDocument = (piece: Piece) => { const key = cleSignature(piece); return key ? signatures[key] : undefined; };
-  const rendre = (p: Piece) => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); return applyDocumentSignature(p.rendre(), signatureDocument(p)); };
+  const rendre = (p: Piece) => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); return cx ? applyLearnerSignatures(p.rendre(), p, cx) : p.rendre(); };
   const enregistrerSignature = (image: string) => {
-    if (!aSigner || !payload || !validSignatureImage(image)) return;
-    const key = cleSignature(aSigner);
-    const learner = aSigner.apprenantIdx === null ? null : payload.apprenants[aSigner.apprenantIdx];
-    if (!key || !learner) return;
-    setSignatures((previous) => ({ ...previous, [key]: { image, signedAt: new Date().toISOString(), name: `${learner.prenom} ${learner.nom}`.trim() } }));
-    setSignatureId(null);
-    toast.success("Signature ajoutée au document et à ses exports");
+    if (!signatureTarget || !payload || !validSignatureImage(image)) return;
+    const key = signatureKey(payload, signatureTarget.index, signatureTarget.role);
+    if (!key) return;
+    setSignatures((previous) => ({ ...previous, [key]: image }));
+    setSignatureTarget(null);
+    toast.success("Signature appliquée automatiquement aux documents concernés");
   };
-  const retirerSignature = (piece: Piece) => {
-    const key = cleSignature(piece);
+  const retirerSignature = () => {
+    if (!payload || !signatureTarget) return;
+    const key = signatureKey(payload, signatureTarget.index, signatureTarget.role);
     if (!key) return;
     setSignatures((previous) => { const next = { ...previous }; delete next[key]; return next; });
+    setSignatureTarget(null);
   };
 
   async function fichier(p: Piece, fmt: Format): Promise<{ blob: Blob; nom: string }> {
@@ -238,13 +237,17 @@ export default function EspaceIzilearn() {
             <ul className="space-y-1.5 max-h-72 overflow-auto">
               {p.apprenants.map((a, i) => (
                 <li key={a.inscriptionId}>
-                  <label className="flex items-start gap-2 text-sm cursor-pointer">
+                  <div className="flex items-start gap-2">
+                  <label className="flex min-w-0 flex-1 items-start gap-2 text-sm cursor-pointer">
                     <Checkbox checked={apprenants.has(i)} onCheckedChange={(v) => { const n = new Set(apprenants); if (v) n.add(i); else n.delete(i); setApprenants(n); }} className="mt-0.5" />
-                    <span className="min-w-0">
+                    <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{stagiaires[i].prenom} {stagiaires[i].nom}</span>
                       {stagiaires[i].entreprise && <span className="block truncate text-xs text-muted-foreground">{stagiaires[i].entreprise}</span>}
                     </span>
                   </label>
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-xs shrink-0" disabled={!!travail} aria-label={`Signature de ${a.prenom} ${a.nom}`} onClick={() => setSignatureTarget({ index: i, role: "stagiaire" })}>{stagiaires[i].signatureUrl ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <PenLine className="w-3 h-3 mr-1" />}Signature</Button>
+                  </div>
+                  {a.entreprise?.nom?.trim() && <div className="flex items-center justify-between gap-2 pl-6 mt-1"><span className="text-xs text-muted-foreground min-w-0 truncate">{a.entreprise.representant || "Resp. entreprise"}</span><Button variant="outline" size="sm" className="h-7 px-2 text-xs shrink-0" disabled={!!travail} aria-label={`Signature responsable entreprise de ${a.prenom} ${a.nom}`} onClick={() => setSignatureTarget({ index: i, role: "entreprise" })}>{stagiaires[i].signatureResponsableUrl ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <PenLine className="w-3 h-3 mr-1" />}Signature resp.</Button></div>}
                 </li>
               ))}
             </ul>
@@ -295,7 +298,6 @@ export default function EspaceIzilearn() {
                       </div>
                       <Badge variant="outline" className={SOURCE_BADGE[x.source].cls}>{SOURCE_BADGE[x.source].label}</Badge>
                       <Button variant="ghost" size="sm" onClick={() => setApercuId(x.id)}><Eye className="w-4 h-4 mr-1" />Aperçu</Button>
-                      {cleSignature(x) && <Button variant="outline" size="sm" disabled={!!travail} onClick={() => setSignatureId(x.id)}><PenLine className="w-4 h-4 mr-1" />{signatureDocument(x) ? "Modifier la signature" : "Signer"}</Button>}
                       {x.mail ? (
                         <>
                           <Button variant="ghost" size="sm" onClick={async () => { if (!x.mail) return; try { await navigator.clipboard.writeText(`${x.mail.objet}\n\n${corpsTexte(x.mail)}`); toast.success("Mail copié"); } catch { toast.error("Copie impossible"); } }}><Copy className="w-4 h-4 mr-1" />Copier</Button>
@@ -323,14 +325,12 @@ export default function EspaceIzilearn() {
           {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
           {apercu && (
             <div className="px-5 py-3 border-t flex flex-wrap gap-2 justify-end">
-              {cleSignature(apercu) && <Button variant="outline" size="sm" disabled={!!travail} onClick={() => setSignatureId(apercu.id)}><PenLine className="w-4 h-4 mr-1" />{signatureDocument(apercu) ? "Modifier la signature" : "Signer"}</Button>}
-              {signatureDocument(apercu) && <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => retirerSignature(apercu)}><Trash2 className="w-4 h-4 mr-1" />Retirer la signature</Button>}
               <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger la capture" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
             </div>
           )}
         </DialogContent>
       </Dialog>
-      <IzilearnSignatureDialog open={!!aSigner} name={aSigner?.apprenantIdx !== null && aSigner?.apprenantIdx !== undefined ? `${stagiaires[aSigner.apprenantIdx]?.prenom ?? ""} ${stagiaires[aSigner.apprenantIdx]?.nom ?? ""}`.trim() : ""} onClose={() => setSignatureId(null)} onSave={enregistrerSignature} />
+      <IzilearnSignatureDialog open={!!aSigner} role={signatureTarget?.role} name={signatureTarget?.role === "entreprise" ? aSigner?.entreprise?.representant || aSigner?.entreprise?.nom || "" : `${aSigner?.prenom ?? ""} ${aSigner?.nom ?? ""}`.trim()} onClose={() => setSignatureTarget(null)} onSave={enregistrerSignature} onRemove={signatureTarget && payload && signatures[signatureKey(payload, signatureTarget.index, signatureTarget.role) ?? ""] ? retirerSignature : undefined} />
     </div>
   );
 }
