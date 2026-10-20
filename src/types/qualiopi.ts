@@ -158,6 +158,8 @@ export interface FormationInfo {
   commentaireIndicateurs?: string;
   /** Fiche France Compétences analysée, conservée avec le dossier. */
   referentiel?: ReferentielAnalyse;
+  /** Corrections manuelles du pack rapide, sauvegardées avec son dossier. */
+  rapideDocumentEdits?: Record<string, string>;
 }
 
 export interface IndicateurData {
