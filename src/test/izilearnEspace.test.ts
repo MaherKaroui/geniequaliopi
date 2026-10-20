@@ -47,6 +47,36 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("ajoute un examen final par apprenant sans inventer les résultats après la formation", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
+    const exams = planPieces(contexte(payload("actions-formation", 3))).filter((x) => x.categorie === "examen_final");
+    expect(exams.map((x) => x.apprenantIdx)).toEqual([0, 1]);
+    expect(exams.map((x) => x.source)).toEqual(["trame", "trame"]);
+    expect(exams[0].rendre()).not.toContain("Réponse du stagiaire");
+    expect(exams[0].rendre()).not.toContain("Atteint</td>");
+  });
+
+  it("conserve la note finale réelle de zéro sans reprendre le test de début", () => {
+    const p = payload("actions-formation", 3);
+    p.apprenants[0].positionnement = [{ titre: "Test de début", date: "2026-11-02", score: 9, max: 10 }];
+    p.apprenants[0].examenFinal = [{ titre: "Examen enregistré", date: "2026-11-04", score: 0, max: 20, reussi: false, appreciation: "Compétences à retravailler" }];
+    const exam = planPieces(contexte(p)).find((x) => x.id === "examen_final_0");
+    expect(exam?.source).toBe("izilearn");
+    expect(exam?.rendre()).toContain("0 / 20");
+    expect(exam?.rendre()).toContain("Non atteint");
+    expect(exam?.rendre()).not.toContain("9 / 10");
+  });
+
+  it("utilise les questions finales IZILearn sans résultats préremplis", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = { chapitres: [], exercices: [], positionnement: [], examenFinal: [{ question: "Livrable final du projet ?", options: ["Bilan du projet", "Planning initial"] }] };
+    const exam = planPieces(contexte(p)).find((x) => x.id === "examen_final_0");
+    expect(exam?.rendre()).toContain("Livrable final du projet ?");
+    expect(exam?.rendre()).toContain("Planning initial");
+    expect(exam?.source).toBe("trame");
+  });
+
   it("applique une MAJ commune sans remplacer les dates de session et de preuves", () => {
     const p = payload("actions-formation", 3, "hybride");
     p.formation.miseAJour = "2026-09-01";
