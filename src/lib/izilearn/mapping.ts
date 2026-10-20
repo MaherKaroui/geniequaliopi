@@ -136,6 +136,10 @@ export function champsManquants(p: IzPayload): string[] {
   if (!t(o.nda)) m.push("Organisme : numéro de déclaration d'activité");
   if (!t(o.adresse)) m.push("Organisme : adresse");
   if (!t(o.dirigeant)) m.push("Organisme : nom du dirigeant");
+  if (!t(o.email)) m.push("Organisme : adresse e-mail pour envoyer les mails");
+  for (const a of p.apprenants) {
+    if (!t(a.email)) m.push(`Apprenant ${t(a.prenom)} ${t(a.nom)} : adresse e-mail`);
+  }
   if (!t(f.objectifs)) m.push("Formation : objectifs");
   if (!f.dureeHeures) m.push("Formation : durée en heures");
   if (!(f.modules || []).length) m.push("Formation : modules du programme");
