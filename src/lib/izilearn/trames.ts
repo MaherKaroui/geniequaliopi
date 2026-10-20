@@ -13,6 +13,7 @@ import { buildDocument } from "@/lib/docBuilder";
 import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie } from "@/lib/evalContent";
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
+import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
 
 export interface Ctx {
   p: IzPayload;
@@ -95,9 +96,9 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
   const qa = c.p.questionsBesoins?.apprenant?.length ? c.p.questionsBesoins.apprenant : BESOINS_APPRENANT;
   const qe = c.p.questionsBesoins?.entreprise?.length ? c.p.questionsBesoins.entreprise : BESOINS_ENTREPRISE;
   let h = enTete(c);
-  const reel = !!c.a.besoins;
+  const reel = hasRecordedResponses(c.a.besoins) || hasRecordedResponses(c.a.besoinsEntreprise);
   h += `<h2>Partie apprenant</h2>`;
-  if (c.a.besoins) {
+  if (c.a.besoins && hasRecordedResponses(c.a.besoins)) {
     h += sourceIzilearn(`réponses envoyées en ligne le ${dateFr(c.a.besoins.date)}${c.a.besoins.signataire ? `, signées par ${c.a.besoins.signataire}` : ""}.`);
     h += reponsesReelles(c.a.besoins);
   } else {
@@ -106,7 +107,7 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
   }
   if (c.s.entreprise || c.a.besoinsEntreprise) {
     h += `<h2>Partie entreprise</h2>`;
-    if (c.a.besoinsEntreprise) {
+    if (c.a.besoinsEntreprise && hasRecordedResponses(c.a.besoinsEntreprise)) {
       h += sourceIzilearn(`réponses envoyées en ligne le ${dateFr(c.a.besoinsEntreprise.date)}${c.a.besoinsEntreprise.signataire ? `, signées par ${c.a.besoinsEntreprise.signataire}` : ""}.`);
       h += reponsesReelles(c.a.besoinsEntreprise);
     } else {
@@ -127,7 +128,7 @@ const lignesObjectifs = (f: FormationInfo) => String(f.objectifs || "").split(/\
 
 export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
   let h = enTete(c, [["Moment", `Début de formation — ${dateFr(c.p.session.dateDebut)}`], ["Durée indicative", "20 à 30 minutes"]]);
-  const reels = (c.a.positionnement || []).filter((q) => q.date);
+  const reels = (c.a.positionnement || []).filter(hasRecordedQuiz);
   if (reels.length) {
     h += `<h2>Résultats enregistrés dans IZILearn</h2>`;
     h += sourceIzilearn("tests de positionnement passés par l'apprenant sur la plateforme.");
@@ -247,7 +248,7 @@ const CRITERES_CHAUD = [
 
 export function bilanChaud(c: Ctx): { html: string; reel: boolean } {
   let h = enTete(c, [["À compléter le", dateFr(c.p.session.dateFin)]]);
-  if (c.a.bilanChaud) {
+  if (c.a.bilanChaud && hasRecordedResponses(c.a.bilanChaud)) {
     h += sourceIzilearn(`questionnaire « ${c.a.bilanChaud.titre} » rempli par l'apprenant le ${dateFr(c.a.bilanChaud.date)}.`);
     h += reponsesReelles(c.a.bilanChaud);
     return { html: doc(c, "BILAN À CHAUD — SATISFACTION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };
@@ -264,7 +265,7 @@ export function bilanFroid(c: Ctx): { html: string; reel: boolean } {
   const fin = d(c.p.session.dateFin);
   const envoi = fin ? new Date(fin.getFullYear(), fin.getMonth() + 3, fin.getDate()) : null;
   let h = enTete(c, [["Envoi prévu", envoi ? `${dateFr(envoi)} (3 mois après la fin de la formation)` : "3 mois après la fin de la formation"]]);
-  if (c.a.bilanFroid) {
+  if (c.a.bilanFroid && hasRecordedResponses(c.a.bilanFroid)) {
     h += sourceIzilearn(`questionnaire « ${c.a.bilanFroid.titre} » rempli par l'apprenant le ${dateFr(c.a.bilanFroid.date)}.`);
     h += reponsesReelles(c.a.bilanFroid);
     return { html: doc(c, "BILAN À FROID", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };

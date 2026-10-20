@@ -10,6 +10,7 @@ import { adaptHtmlToTypeAction } from "@/lib/adaptTypeAction";
 import type { IzPayload } from "./types";
 import { estDistanciel, versFormation, versOrganisme, versStagiaires } from "./mapping";
 import * as T from "./trames";
+import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
 import { mailHtml, mailsModeles, type MailModele } from "./mails";
 
 export type CategorieKey =
@@ -103,10 +104,10 @@ export function planPieces(cx: Contexte): Piece[] {
     const par = (categorie: CategorieKey, titre: string, fichier: string, source: Source, rendre: () => string, extra: { id?: string; mail?: MailModele } = {}) =>
       out.push({ id: `${categorie}_${i}${extra.id ? `_${extra.id}` : ""}`, categorie, titre: `${titre} — ${nom}`, apprenantIdx: i, source, fichier: `${fichier}_${suffixe}`, rendre, mail: extra.mail });
 
-    const besoins = !!(a.besoins || a.besoinsEntreprise);
+    const besoins = hasRecordedResponses(a.besoins) || hasRecordedResponses(a.besoinsEntreprise);
     par("besoins", "Évaluation des besoins", "EVALUATION_DES_BESOINS", besoins ? "izilearn" : "document",
       besoins ? () => T.evaluationBesoins(c).html : gen(`besoins_${i}`, "trame_eval_besoins_combine", { stagiaireIdx: i }));
-    const positionnement = (a.positionnement || []).some((q) => q.date);
+    const positionnement = (a.positionnement || []).some(hasRecordedQuiz);
     par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", positionnement ? "izilearn" : "document",
       positionnement ? () => T.testPositionnement(c).html : gen(`positionnement_${i}`, "test_positionnement_debut_stagiaire", { stagiaireIdx: i }));
     par("convocation", "Convocation", "CONVOCATION", "document", gen(`convocation_${i}`, g.convocation, { stagiaireIdx: i }));
@@ -140,10 +141,12 @@ export function planPieces(cx: Contexte): Piece[] {
     const suivi = new Date(finSession);
     suivi.setMonth(suivi.getMonth() + 3);
     const suiviEchu = suivi.getTime() < new Date().setHours(0, 0, 0, 0);
-    par("bilan_chaud", "Bilan à chaud", "BILAN_A_CHAUD", a.bilanChaud ? "izilearn" : termine ? "document" : "trame",
-      a.bilanChaud || !termine ? () => T.bilanChaud(c).html : gen(`bilan_chaud_${i}`, "bilan_chaud_stagiaire", { stagiaireIdx: i }));
-    par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", a.bilanFroid ? "izilearn" : suiviEchu ? "document" : "trame",
-      a.bilanFroid || !suiviEchu ? () => T.bilanFroid(c).html : gen(`bilan_froid_${i}`, "bilan_froid_stagiaire", { stagiaireIdx: i }));
+    const chaud = hasRecordedResponses(a.bilanChaud);
+    const froid = hasRecordedResponses(a.bilanFroid);
+    par("bilan_chaud", "Bilan à chaud", "BILAN_A_CHAUD", chaud ? "izilearn" : termine ? "document" : "trame",
+      chaud || !termine ? () => T.bilanChaud(c).html : gen(`bilan_chaud_${i}`, "bilan_chaud_stagiaire", { stagiaireIdx: i }));
+    par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", froid ? "izilearn" : suiviEchu ? "document" : "trame",
+      froid || !suiviEchu ? () => T.bilanFroid(c).html : gen(`bilan_froid_${i}`, "bilan_froid_stagiaire", { stagiaireIdx: i }));
 
     mailsModeles(o, f, s).forEach((m, k) => {
       const stamp = `${m.dateEnvoi.getFullYear()}-${String(m.dateEnvoi.getMonth() + 1).padStart(2, "0")}-${String(m.dateEnvoi.getDate()).padStart(2, "0")}`;

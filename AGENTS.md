@@ -1,6 +1,6 @@
 # Architecture rules
 
-- IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; imported responses override generated content, future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence.
+- IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; only substantive imported responses/results override generated content (empty questionnaire shells do not), future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence. Previews resolve the current piece by ID so refreshed session data cannot leave stale content open.
 
 - IZIBUSINESS completed training records and dates are resolved by one shared helper for the combined attestation and every IND 22 plan, preventing planned dates from overwriting completed actions.
 

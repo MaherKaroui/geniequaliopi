@@ -45,13 +45,15 @@ export default function EspaceIzilearn() {
   const [format, setFormat] = useState<Format>("pdf");
   const [apprenants, setApprenants] = useState<Set<number>>(new Set());
   const [categories, setCategories] = useState<Set<CategorieKey>>(new Set(CATEGORIES.map((c) => c.key)));
-  const [apercu, setApercu] = useState<Piece | null>(null);
+  const [apercuId, setApercuId] = useState<string | null>(null);
   const [travail, setTravail] = useState<{ label: string; fait: number; total: number } | null>(null);
 
   const cx = useMemo(() => (payload ? contexte(payload) : null), [payload]);
   useEffect(() => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); }, [cx]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
   const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx]);
+  const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
+  useEffect(() => { setApercuId(null); }, [payload?.source.orgId, payload?.source.sessionId]);
   const manquants = useMemo(() => (payload ? champsManquants(payload) : []), [payload]);
 
   const visibles = pieces.filter((p) => categories.has(p.categorie) && (p.apprenantIdx === null || apprenants.has(p.apprenantIdx)));
@@ -252,7 +254,7 @@ export default function EspaceIzilearn() {
                         )}
                       </div>
                       <Badge variant="outline" className={SOURCE_BADGE[x.source].cls}>{SOURCE_BADGE[x.source].label}</Badge>
-                      <Button variant="ghost" size="sm" onClick={() => setApercu(x)}><Eye className="w-4 h-4 mr-1" />Aperçu</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setApercuId(x.id)}><Eye className="w-4 h-4 mr-1" />Aperçu</Button>
                       {x.mail ? (
                         <>
                           <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(`${x.mail!.objet}\n\n${corpsTexte(x.mail!)}`); toast.success("Mail copié"); }}><Copy className="w-4 h-4 mr-1" />Copier</Button>
@@ -271,7 +273,7 @@ export default function EspaceIzilearn() {
         </div>
       </main>
 
-      <Dialog open={!!apercu} onOpenChange={(o) => !o && setApercu(null)}>
+      <Dialog open={!!apercu} onOpenChange={(o) => !o && setApercuId(null)}>
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0 gap-0">
           <DialogHeader className="px-5 py-3 border-b">
             <DialogTitle className="text-base pr-8 truncate">{apercu?.titre}</DialogTitle>
