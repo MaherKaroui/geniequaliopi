@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Ajouter et vérifier l’examen final par apprenant dans IZILearn, aperçu et exports, sans résultats inventés.
+
 - [x] Retirer la mise à jour, sa date et V1 des captures de mails IZILearn ; captures Gmail/Outlook, téléchargement PNG et ZIP de 8 captures vérifiés, date du message conservée.
 
 - [ ] Finaliser la génération complète des contenus dédiés : catalogue, sauvegarde, boutons des trois écrans, première fiche GPT-6 Astra et relecture de ses 16 chapitres fonctionnent ; la longue étape des évaluations dépasse encore le temps CPU du service et nécessite un découpage en sous-étapes avant livraison complète. Aucun appel de contrôle actif.

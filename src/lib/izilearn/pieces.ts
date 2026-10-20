@@ -16,7 +16,7 @@ import { appliquerRevision, developperLivret } from "./presentation";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
-  | "livret" | "support" | "exercices" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
+  | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
 
 export interface Categorie { key: CategorieKey; label: string; dossier: string; aide: string }
 
@@ -31,6 +31,7 @@ export const CATEGORIES: Categorie[] = [
   { key: "livret", label: "Livret d'accueil", dossier: "08_Livret_d_accueil", aide: "Livret d'accueil de l'apprenant." },
   { key: "support", label: "Support de cours", dossier: "09_Support_de_cours", aide: "Support de cours de la formation." },
   { key: "exercices", label: "Exercices pratiques", dossier: "10_Exercices_pratiques", aide: "CFA : un exercice par semaine. Formation courte (≤ 12 jours) : un par jour. Formation longue : un par semaine." },
+  { key: "examen_final", label: "Examen final", dossier: "10_Examen_final", aide: "Évaluation de fin de formation ; résultats IZILearn enregistrés, sinon examen à compléter." },
   { key: "emargement", label: "Feuille d'émargement", dossier: "11_Emargement", aide: "Demi-journées réelles de la session, signatures IZILearn horodatées." },
   { key: "connexion", label: "Temps de connexion", dossier: "11_Temps_de_connexion", aide: "Connexions Meet et e-learning relevées par IZILearn (formation à distance)." },
   { key: "bilan_chaud", label: "Bilan à chaud", dossier: "12_Bilan_a_chaud", aide: "Questionnaire de fin de formation." },
@@ -137,6 +138,8 @@ export function planPieces(cx: Contexte): Piece[] {
         }, { id: `ex${k}` });
     });
 
+    const examen = (a.examenFinal || []).some(hasRecordedQuiz);
+    par("examen_final", "Examen final", "EXAMEN_FINAL", examen ? "izilearn" : "trame", () => T.examenFinal(c).html);
     if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "trame", () => T.emargement(c).html);
     if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "trame", () => T.tempsConnexion(c).html);
     const finSession = new Date(`${p.session.dateFin}T00:00:00`);

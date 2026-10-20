@@ -32,6 +32,7 @@ export interface IzContenu {
   chapitres: { titre: string; description?: string; sections: { titre: string; html: string }[] }[];
   exercices: { titre: string; consigne: string; reponseAttendue?: string }[];
   positionnement: { question: string; options: string[] }[];
+  examenFinal?: { question: string; options: string[] }[];
   /** Contenu créé par l'IA et pas encore validé par un formateur. */
   brouillonIA?: boolean;
 }
@@ -102,6 +103,7 @@ export interface IzApprenant {
   besoins?: IzReponses | null;
   besoinsEntreprise?: IzReponses | null;
   positionnement?: IzQuiz[];
+  examenFinal?: IzQuiz[];
   bilanChaud?: IzReponses | null;
   bilanFroid?: IzReponses | null;
 }

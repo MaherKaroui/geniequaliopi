@@ -174,6 +174,41 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
 
 // ───────────────────────── exercices pratiques ─────────────────────────
 
+export function examenFinal(c: Ctx): { html: string; reel: boolean } {
+  const reels = (c.a.examenFinal || []).filter(hasRecordedQuiz);
+  let h = enTete(c, [["Examen prévu le", dateLongue(c.p.session.dateFin)]]);
+  if (reels.length) {
+    h += `<h2>Résultats enregistrés dans IZILearn</h2>`;
+    h += tableHTML(["Examen", "Date", "Score", "Résultat", "Appréciation du formateur"], reels.map((q) => [
+      esc(q.titre), dateLongue(q.date),
+      q.score != null ? `${esc(q.score)}${q.max != null ? ` / ${esc(q.max)}` : ""}` : "",
+      q.reussi == null ? "" : q.reussi ? "Atteint" : "Non atteint", nl2br(q.appreciation),
+    ]));
+  } else {
+    const qcm = (c.p.formation.contenu?.examenFinal || []).filter((q) => q.options?.length);
+    const questions = qcm.length ? qcm : hasEvalContentDedie(c.f.intitule) ? getEvalContent(c.f.intitule).qcmFinal : [];
+    if (questions.length) {
+      h += `<h2>Questionnaire à choix multiples</h2>`;
+      questions.forEach((q, i) => {
+        h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
+      });
+    }
+    const ouvertes = getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || [];
+    if (ouvertes.length) {
+      h += `<h2>Questions ouvertes</h2>`;
+      ouvertes.slice(0, 10).forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p>${LIGNES(3)}`; });
+    }
+    const objectifs = lignesObjectifs(c.f);
+    if (objectifs.length) {
+      h += `<h2>Évaluation des acquis</h2>`;
+      h += tableHTML(["Objectif", "Acquis", "En cours", "Non acquis"], objectifs.map((o) => [esc(o), CASE, CASE, CASE]));
+    }
+    h += `<p><strong>Note finale :</strong> ____________________</p><p><strong>Appréciation du formateur :</strong></p>${LIGNES(3)}`;
+  }
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
+  return { html: doc(c, "EXAMEN FINAL", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };
+}
+
 export interface Unite { type: "jour" | "semaine"; label: string; debut: Date; fin: Date }
 
 function lundi(x: Date) { const r = new Date(x); const j = r.getDay(); r.setDate(r.getDate() + (j === 0 ? -6 : 1 - j)); r.setHours(0, 0, 0, 0); return r; }
