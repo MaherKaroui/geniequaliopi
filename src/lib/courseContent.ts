@@ -184,6 +184,15 @@ const YOUTUBE_CIP: CourseData['youtubeVideos'] = [
   { title: "France Travail (Pôle emploi) – Outils et dispositifs", url: "https://www.youtube.com/watch?v=8oH6YXQs2eU", description: "Les principaux dispositifs et outils mobilisables par un CIP pour accompagner vers l'emploi." },
 ];
 
+const YOUTUBE_ARH41366: CourseData['youtubeVideos'] = [
+  { title: "Le métier d'assistant ressources humaines", url: "https://www.youtube.com/results?search_query=m%C3%A9tier+assistant+ressources+humaines", description: "Recherche YouTube : missions, environnement et compétences de l'assistant RH." },
+  { title: "DPAE et formalités d'embauche", url: "https://www.youtube.com/results?search_query=DPAE+formalit%C3%A9s+embauche+employeur", description: "Recherche YouTube : déclaration préalable à l'embauche, registre unique du personnel." },
+  { title: "Les éléments variables de paie", url: "https://www.youtube.com/results?search_query=%C3%A9l%C3%A9ments+variables+de+paie+collecte", description: "Recherche YouTube : collecte et contrôle des variables avant la paie." },
+  { title: "Construire un tableau de bord RH", url: "https://www.youtube.com/results?search_query=tableau+de+bord+RH+Excel+indicateurs", description: "Recherche YouTube : indicateurs, formules et graphiques sur tableur." },
+  { title: "Conduire un entretien de recrutement", url: "https://www.youtube.com/results?search_query=conduire+entretien+de+recrutement+structur%C3%A9", description: "Recherche YouTube : guide d'entretien structuré et questions comportementales." },
+  { title: "Le plan de développement des compétences", url: "https://www.youtube.com/results?search_query=plan+de+d%C3%A9veloppement+des+comp%C3%A9tences+entreprise", description: "Recherche YouTube : construction du plan, dispositifs et financement." },
+];
+
 const YOUTUBE_RPMS: CourseData['youtubeVideos'] = [
   { title: "Responsable de petite et moyenne structure (RPMS) – Présentation", url: "https://www.youtube.com/watch?v=2yE6bzj3hFw", description: "Découverte du titre RPMS : missions, blocs de compétences et secteurs d'activité." },
   { title: "Pilotage d'une PME – Indicateurs et tableaux de bord", url: "https://www.youtube.com/watch?v=Y6YKb7BncwY", description: "Construire des tableaux de bord de pilotage : KPI commerciaux, financiers et RH." },
@@ -311,6 +320,8 @@ function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtube
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
+  // TP ARH RNCP41366 : avant les règles paie / secrétariat / management
+  if (isARH41366Formation(formationIntitule)) return YOUTUBE_ARH41366;
   // CQP Opérateur vitrage (RNCP36223)
   if (t.includes('vitrage') || t.includes('rncp36223') || t.includes('pare-brise') || t.includes('pare brise')) return YOUTUBE_VITRAGE;
   // Massages spécifiques (avant générique)
@@ -469,6 +480,8 @@ import { getIAPro21hChapters } from "./courseContentIAPro21h";
 import { isIAP21Formation } from "./iaPro21hHumanized";
 import { getMSP21Chapters } from "./courseContentMSP21";
 import { isMSP21Formation } from "./msp21Humanized";
+import { getARH41366Chapters } from "./courseContentARH41366";
+import { isARH41366Formation } from "./arh41366Humanized";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
@@ -522,6 +535,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t0 = formationIntitule.toLowerCase();
   if (mot(t0, 'ongulaire') || mot(t0, 'rs7302')) return getOngulaireChapters();
   if (mot(t0, 'vitrage') || mot(t0, 'rncp36223') || mot(t0, 'pare-brise') || mot(t0, 'pare brise')) return getVitrageChapters();
+  // TP ARH RNCP41366 : support de cours propre, avant toute règle « paie », « secrétariat » ou RH générique
+  if (isARH41366Formation(formationIntitule)) return getARH41366Chapters();
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();

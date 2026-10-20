@@ -10,6 +10,7 @@ import { buildDocument, formatDate, tableHTML, getStagiaireDateDebut, getStagiai
 import { getRNCPByCode } from "./rncpData";
 import { REFERENCES_REGLEMENTAIRES_2026 } from "./qualite2026";
 import { semainesEcole, cycleAlternance } from "./calendrierMissionsCFA";
+import { isARH41366Formation, arh41366MissionEntreprise } from "./arh41366Humanized";
 
 function dateSysteme(o: OrganismeInfo): string {
   return formatDate((o.dateMaj || "").trim() || new Date().toISOString().slice(0, 10));
@@ -64,7 +65,9 @@ export function genTableauMissionsBlocsCFA(o: OrganismeInfo, f: FormationInfo, s
     const comps = b.competences.length ? b.competences : [b.titre];
     comps.slice(0, 4).forEach((c, ci) => {
       const h = horizons[Math.min(2, Math.floor(((bi * 4 + ci) * 3) / Math.max(1, blocs.length * 4)))];
-      rows.push([b.titre, c, `Réaliser en entreprise, sous la responsabilité du maître d'apprentissage : ${c.charAt(0).toLowerCase() + c.slice(1)}`, h]);
+      // TP ARH RNCP41366 : mission concrète du service RH reliée à la compétence.
+      const missionARH = isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366MissionEntreprise(c) : null;
+      rows.push([b.titre, c, missionARH ? `${missionARH}, sous la responsabilité du maître d'apprentissage` : `Réaliser en entreprise, sous la responsabilité du maître d'apprentissage : ${c.charAt(0).toLowerCase() + c.slice(1)}`, h]);
     });
   });
   return buildDocument({

@@ -150,9 +150,21 @@ export const ARH_MODULE_EXERCISES: PaieModuleExercises[] = [
 /** Détecte une formation Assistant ressources humaines (ARH). */
 export function isARHFormation(intitule: string): boolean {
   const t = (intitule || "").toLowerCase();
+  // Le TP ARH RNCP41366 a ses propres contenus (arh41366Preset) : jamais ceux de l'ancien exemple.
+  if (t.includes("41366")) return false;
   return t.includes("assistant ressources humaines")
     || t.includes("assistante ressources humaines")
     || t.includes("(arh)")
     || t.includes("rncp35030")
     || t.includes("tp-01284");
+}
+
+/**
+ * Sélection de l'ancien exemple ARH (RNCP35030) dans le formulaire : organisme IZIBUSINESS et
+ * 6 stagiaires importés. Jamais pour le TP ARH RNCP41366 (aucun organisme ni stagiaire importé).
+ */
+export function isAncienExempleARH(intitule: string, codeRNCP?: string): boolean {
+  const t = (intitule || "").toLowerCase();
+  if (t.includes("41366") || (codeRNCP || "").includes("41366")) return false;
+  return t.includes("ressources humaines") || t.includes("rncp35030") || t.includes("(arh)");
 }

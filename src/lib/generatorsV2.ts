@@ -36,6 +36,7 @@ import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./web
 import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ventesEnergie35hHumanized";
 import { pickIAP21ExerciceAnswer, isIAP21Formation, iap21NoteExercice } from "./iaPro21hHumanized";
 import { pickMSP21ExerciceAnswer, isMSP21Formation, msp21NoteExercice } from "./msp21Humanized";
+import { pickARH41366ExerciceAnswer, isARH41366Formation, arh41366NoteExercice } from "./arh41366Humanized";
 
 // ========== HELPERS ==========
 
@@ -1179,6 +1180,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, iap21NoteExercice(stagiaireIdx, ei, true))
         : isMSP21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, msp21NoteExercice(stagiaireIdx, ei, true))
+        : isARH41366Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, arh41366NoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
       const wrongIdx = new Set<number>();
       // Choisit (10 - targetScore) questions à rater de manière déterministe
@@ -1243,6 +1246,8 @@ D) Drive faster to finish the ride.`,
       ? iap21NoteExercice(stagiaireIdx, ei, false)
       : isMSP21Formation(f.intitule, f.codeRNCP)
       ? msp21NoteExercice(stagiaireIdx, ei, false)
+      : isARH41366Formation(f.intitule, f.codeRNCP)
+      ? arh41366NoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
@@ -1289,7 +1294,8 @@ D) Drive faster to finish the ride.`,
       .replace(/\[.*?\]/g, '');
 
     // Output the student response as a single flowing block — no extra filler paragraphs
-    const creaRep = pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
+    const creaRep = pickARH41366ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickVitrageExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickOngulaireExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, `${ex.titre} ${ex.consigne}`)
       || pickRPMSExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)

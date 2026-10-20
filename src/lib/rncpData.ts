@@ -1934,6 +1934,69 @@ export const RNCP_FICHES: RNCPFiche[] = [
     ],
     dureeIndicative: "1 350 heures sur 2 ans en centre de formation (grille horaire hebdomadaire : Culture générale et expression 3h, LV étrangère 3h, CEJM 4h, CEJM appliqué 1h, Bloc 1 – Relation client 5h, Bloc 2 – Animation offre 5h, Bloc 3 – Gestion opérationnelle 4h, Bloc 4 – Management équipe 4h, Atelier de professionnalisation 4h) + 16 semaines de stage minimum en milieu professionnel (réparties sur les deux années). Examen : 7 épreuves dont 4 professionnelles (E4, E5, E6, E7).",
   },
+  {
+    code: "RNCP41366",
+    intitule: "TP - Assistant ressources humaines",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "05/11/2025",
+    dateEcheance: "04/11/2027",
+    codeNSF: "315m – Ressources humaines, gestion de l'emploi",
+    formacodes: "35014 – Secrétariat assistanat ressources humaines / 33071 – Contrat travail / 33072 – Intégration salarié / 33060 – Recrutement / 44508 – Plan développement compétences",
+    resume: "Dans le respect des règles juridiques, l'assistant ressources humaines assure tout ou partie des opérations liées à la gestion administrative du personnel. Il contribue au recrutement de nouveaux collaborateurs et au développement des compétences. Il traite des informations émanant de la direction du personnel ou de tiers et respecte les règles de confidentialité en toutes circonstances. Titre professionnel de niveau 5 (code titre TP-01284), il remplace la fiche RNCP35030.",
+    activitesVisees: "L'assistant ressources humaines crée et met à jour les dossiers individuels du personnel, répond aux questions du personnel sur ses droits et obligations, collecte et transmet les éléments variables de paie au service spécialisé interne ou externe dans le respect des délais, collecte et sélectionne les données nécessaires à l'élaboration des documents de gestion RH et des indicateurs. Il planifie les entretiens et suit leur réalisation avec le management, rédige les profils de poste et les offres d'emploi, présélectionne les candidats, participe à l'intégration des nouveaux collaborateurs, recueille les demandes de développement des compétences, consulte les organismes de formation et gère le suivi administratif et budgétaire des actions. Il exerce en large autonomie, dans la limite de ses attributions, sous la responsabilité de son manager.",
+    blocsCompetences: [
+      {
+        titre: "Bloc 1 – Assurer les missions opérationnelles de la gestion des ressources humaines",
+        competences: [
+          "CP1 – Assurer la gestion administrative du personnel",
+          "CP2 – Assurer la gestion des variables et paramètres de paie",
+          "CP3 – Mettre en place et suivre les indicateurs ressources humaines",
+        ],
+        matieres: [
+          { competence: "Accueil, intégration, méthodologie de l'alternance et du dossier professionnel", contenu: "Accueil au CFA, règlement intérieur, référent handicap et médiateur de l'apprentissage, prise en main de la plateforme et des classes virtuelles, positionnement, présentation du titre (CCP, compétences, épreuve, ECF), méthodologie du dossier professionnel, livret d'apprentissage, fil rouge ALTÉA SERVICES", volume: "14h" },
+          { competence: "CP1 – Assurer la gestion administrative du personnel", contenu: "Sources du droit du travail et recherche juridique, formalités d'embauche (DPAE, registre unique du personnel, visite d'information et de prévention, complémentaire santé et prévoyance), contrats de travail et mentions obligatoires, période d'essai, dossiers individuels et archivage, RGPD, durée du travail et repos, heures supplémentaires, congés payés et absences, ruptures du contrat et indemnités de fin de contrat, documents de fin de contrat, règlement intérieur et procédures internes, CSE et élections professionnelles, veille juridique et sociale", volume: "98h" },
+          { competence: "CP2 – Assurer la gestion des variables et paramètres de paie", contenu: "Structure, présentation et diffusion du bulletin de paie, calendrier de paie et DSN, éléments variables collectifs et individuels (entrées et sorties, heures, primes, absences, congés payés, arrêts de travail, acomptes, saisies des rémunérations, complémentaire santé et prévoyance), justificatifs et contrôles, transmission au service paie interne ou externe, contrôle des bulletins, dossier paie numérisé et confidentialité", volume: "56h" },
+          { competence: "CP3 – Mettre en place et suivre les indicateurs ressources humaines", contenu: "Indicateurs sociaux et ratios (effectif, ETP, turnover, absentéisme, ancienneté, pyramide des âges, masse salariale), tableaux de bord et graphiques sur tableur, BDESE, index de l'égalité professionnelle, obligation d'emploi des travailleurs handicapés, bilan social, transparence des rémunérations, CSRD, analyse écrite adaptée au destinataire, confidentialité", volume: "56h" },
+        ],
+        modalitesEval: "CCP « Assurer les missions opérationnelles de la gestion des ressources humaines » : mise en situation professionnelle (étude de cas en une seule épreuve, 2 h, précédée de 15 min de prise en main du poste ; documentation professionnelle et notes professionnelles autorisées) et entretien technique de 20 min (10 min sur les choix opérés lors de la mise en situation, 10 min sur la compétence « Assurer la gestion administrative du personnel »), soit 2 h 20. Dans le parcours complet, ces compétences sont évaluées lors de l'épreuve du titre (mise en situation de 3 h 30, entretien technique de 30 min, entretien final de 20 min), sur la base du dossier professionnel et des résultats des évaluations passées en cours de formation.",
+      },
+      {
+        titre: "Bloc 2 – Contribuer au développement des ressources humaines",
+        competences: [
+          "CP4 – Contribuer aux opérations liées à la gestion des emplois et carrières",
+          "CP5 – Contribuer au processus de recrutement et d'intégration du personnel",
+          "CP6 – Contribuer à l'élaboration et au suivi du développement des compétences du personnel",
+        ],
+        matieres: [
+          { competence: "CP4 – Contribuer aux opérations liées à la gestion des emplois et carrières", contenu: "Gestion des emplois et des parcours professionnels, entretien de parcours professionnel issu de la loi du 24 octobre 2025 (dans l'année suivant l'embauche puis tous les 4 ans, état des lieux récapitulatif à 8 ans, entretien de mi-carrière, entretien avant 60 ans, abondement correctif du CPF), entretien annuel d'évaluation, planning et supports d'entretien, exploitation des comptes rendus, fiches de postes et référentiels de compétences, communication avec les managers et les représentants du personnel, confidentialité", volume: "49h" },
+          { competence: "CP5 – Contribuer au processus de recrutement et d'intégration du personnel", contenu: "Recueil du besoin, profil de poste, offre d'emploi non discriminante et transparence de la rémunération, sourcing (France Travail, jobboards, réseaux sociaux, cooptation), grille de présélection, guide et grille d'entretien, conduite d'entretien et synthèse, gestion administrative et logistique, conservation des données des candidats, programme d'intégration, livret d'accueil, rapport d'étonnement", volume: "63h" },
+          { competence: "CP6 – Contribuer à l'élaboration et au suivi du développement des compétences du personnel", contenu: "Cadre légal de la formation professionnelle, plan de développement des compétences, dispositifs (CPF et participation forfaitaire, période de reconversion, projet de transition professionnelle, VAE, bilan de compétences), financement et OPCO, consultation des organismes de formation, calcul des coûts et suivi budgétaire, traitement administratif et logistique, évaluations à chaud et à froid, qualité de vie et des conditions de travail, information du CSE", volume: "49h" },
+          { competence: "Préparation au titre : dossier professionnel, ECF, mise en situation blanche et entretiens blancs", contenu: "Finalisation du dossier professionnel, évaluations en cours de formation, mise en situation professionnelle blanche de 3 h 30, entretiens techniques blancs sur CP1 et CP5, entretien final blanc, bilan de parcours", volume: "35h" },
+        ],
+        modalitesEval: "CCP « Contribuer au développement des ressources humaines » : mise en situation professionnelle (étude de cas en une seule épreuve, 2 h, précédée de 15 min de prise en main du poste ; documentation professionnelle et notes professionnelles autorisées) et entretien technique de 20 min (10 min sur les choix opérés lors de la mise en situation, 10 min sur la compétence « Contribuer au processus de recrutement et d'intégration du personnel »), soit 2 h 20. Épreuve du titre : mise en situation professionnelle de 3 h 30 portant sur les six compétences, entretien technique de 30 min (10 min sur les choix, 20 min sur CP1 et CP5), entretien final de 20 min avec le dossier professionnel, soit 4 h 20.",
+      },
+    ],
+    secteursActivite: "Entreprises privées et publiques, cabinets de recrutement, entreprises d'emploi et associations, dans tous les secteurs d'activité.",
+    typesEmplois: [
+      "Assistant ressources humaines",
+      "Assistant formation",
+      "Assistant recrutement",
+      "Assistant RH et paie",
+      "Gestionnaire des emplois et carrières",
+      "Chargé des ressources humaines",
+    ],
+    codesROME: ["M1501 – Assistanat en ressources humaines", "M1502 – Développement des ressources humaines"],
+    voiesAcces: [
+      "Après un parcours de formation sous statut d'élève ou d'étudiant",
+      "En contrat d'apprentissage",
+      "Après un parcours de formation continue",
+      "En contrat de professionnalisation",
+      "Par candidature individuelle",
+      "Par expérience (VAE)",
+    ],
+    dureeIndicative: "Parcours par apprentissage de 420 h au CFA sur 12 mois (1 semaine au CFA / 3 semaines en entreprise). Épreuve du titre : mise en situation professionnelle de 3 h 30, entretien technique de 30 min et entretien final de 20 min (4 h 20), sur la base du dossier professionnel et des résultats des évaluations passées en cours de formation ; titre obtenu en totalité ou par CCP.",
+  },
 ];
 
 const isoToFr = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split("-").reverse().join("/") : d);

@@ -3,6 +3,8 @@ import { isIAP21Formation } from "@/lib/iaPro21hHumanized";
 import { seedIAP21AICaches } from "@/lib/iaPro21hPreset";
 import { isMSP21Formation } from "@/lib/msp21Humanized";
 import { seedMSP21AICaches } from "@/lib/msp21Preset";
+import { isARH41366Formation } from "@/lib/arh41366Humanized";
+import { seedARH41366AICaches } from "@/lib/arh41366Preset";
 import { getCachedContentPack } from "@/lib/aiContentPack";
 import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
@@ -150,6 +152,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // Maquillage semi-permanent RS6459 : même rechargement des packs du preset.
     if (d.formation && isMSP21Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedMSP21AICaches(d.formation);
+    }
+    // TP ARH RNCP41366 : même rechargement des packs du preset.
+    if (d.formation && isARH41366Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedARH41366AICaches(d.formation);
     }
     onLoad(d.organisme, d.formation, d.stagiaires);
     setCurrentDossierId(d.id);

@@ -17,6 +17,8 @@ import { IAP21_EXERCICES_COMPLETS, IAP21_QCM_DEBUT, IAP21_QCM_FIN } from "./iaPr
 import { isIAP21Formation, getIAP21AutoAnswers, IAP21_QUESTIONS_OUVERTES } from "./iaPro21hHumanized";
 import { MSP21_EXERCICES_COMPLETS, MSP21_QCM_DEBUT, MSP21_QCM_FIN, MSP21_QCM_COMPETENCES } from "./msp21Preset";
 import { isMSP21Formation, getMSP21AutoAnswers, MSP21_QUESTIONS_OUVERTES } from "./msp21Humanized";
+import { ARH41366_EXERCICES_COMPLETS, ARH41366_QCM_DEBUT, ARH41366_QCM_FIN, ARH41366_QCM_COMPETENCES } from "./arh41366Preset";
+import { isARH41366Formation, getARH41366AutoAnswers, ARH41366_QUESTIONS_OUVERTES } from "./arh41366Humanized";
 
 
 
@@ -1247,6 +1249,22 @@ EVAL_CONTENT["IAP21"] = {
   ],
 };
 
+// ===== Titre Professionnel Assistant Ressources Humaines (TP ARH) – RNCP41366 (2 CCP, CP1 à CP6) =====
+EVAL_CONTENT["ARH41366"] = {
+  qcmPositionnement: ARH41366_QCM_DEBUT,
+  qcmFinal: ARH41366_QCM_FIN,
+  exercices: ARH41366_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: ARH41366_QCM_COMPETENCES.map(q => q.titre.replace(/^QCM /, "")),
+  appreciations: [
+    "Formalités d'embauche exactes et dossiers bien tenus. La recherche de la source juridique doit devenir systématique avant de répondre à un salarié.",
+    "Variables de paie collectées avec leurs justificatifs ; les contrôles de cohérence sur les absences gagneront à être plus réguliers.",
+    "Tableau de bord juste et lisible ; la note d'analyse doit davantage hiérarchiser les éléments significatifs pour la direction.",
+    "Bonne organisation des entretiens professionnels et exploitation pertinente des comptes rendus. Confidentialité bien respectée.",
+    "Offre d'emploi conforme et grille cohérente avec le profil ; la synthèse d'entretien peut être plus concise et factuelle.",
+    "Dispositifs de formation bien maîtrisés et coûts exacts. Implication constante ; poursuivre l'entraînement en temps limité avant la session de validation.",
+  ],
+};
+
 // ===== Techniques de maquillage semi-permanent (RS6459) – 21 h (certifiante RS, C1 à C11) =====
 EVAL_CONTENT["MSP21"] = {
   qcmPositionnement: MSP21_QCM_DEBUT,
@@ -1465,6 +1483,8 @@ EVAL_CONTENT["Restauration"] = {
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
+  // TP ARH RNCP41366 — avant toute règle « assistant », « paie », « secrétariat » ou « social »
+  if (isARH41366Formation(lower)) return "ARH41366";
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
   if (mot(lower, "ongulaire") || mot(lower, "rs7302")) return "Ongulaire";
   if (mot(lower, "vitrage") || mot(lower, "rncp36223") || mot(lower, "pare-brise") || mot(lower, "pare brise")) return "Vitrage";
@@ -2227,6 +2247,9 @@ QUESTIONS_OUVERTES["IAP21"] = IAP21_QUESTIONS_OUVERTES;
 // Maquillage semi-permanent (RS6459) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["MSP21"] = MSP21_QUESTIONS_OUVERTES;
 
+// TP ARH RNCP41366 — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["ARH41366"] = ARH41366_QUESTIONS_OUVERTES;
+
 QUESTIONS_OUVERTES["Assistant de Direction"] = {
   debut: [
     { question: "Avez-vous déjà exercé des fonctions d'assistanat ou de secrétariat ?", reponseAttendue: "Oui/Non avec description : type de structure, secteur d'activité, missions exercées (gestion d'agenda, courrier, organisation de réunions), durée d'expérience." },
@@ -2624,6 +2647,19 @@ export function generateStagiaireOpenAnswers(
   // Tous les autres stagiaires du CQP vitrage : moteur humanisé déterministe
   // (une copie différente par stagiaire, accords selon la civilité du formulaire).
   // IA – intégrer les outils d'IA 21 h : moteur humanisé (une copie différente par stagiaire).
+  // TP ARH RNCP41366 : moteur humanisé (une copie différente par apprenti, rang dans la session).
+  if (isARH41366Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoArh = getARH41366AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+      stagiaireIndex,
+    );
+    return toAnswers(autoArh.reponses, autoArh.scores);
+  }
+
   // Maquillage semi-permanent (RS6459) : moteur humanisé (une copie différente par stagiaire).
   if (isMSP21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoMsp = getMSP21AutoAnswers(
