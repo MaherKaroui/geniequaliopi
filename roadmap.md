@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Ajouter la modification des documents du pack rapide, conserver les corrections dans le dossier et les reprendre dans tous les exports ; vérifier sauvegarde et rechargement.
+
 - [x] Ajouter et vérifier la page Bilan de compétences seule intégrable, sans menu ni code d’accès : sauvegarde, rechargement et accès aux documents testés sans compte ; autres outils protégés, 24 tests réussis et compilation OK. La génération IA conserve son accès authentifié existant.
 
 - [x] Corriger le dépassement CPU de la génération IA BDC (546) ; 18 tests réussis et appel authentifié complet vérifié (200, 16 rubriques, persistance après rechargement).
