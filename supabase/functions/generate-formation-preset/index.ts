@@ -4,6 +4,7 @@ import { createOpenAI } from 'npm:@ai-sdk/openai@3';
 import { streamText, Output, jsonSchema } from 'npm:ai@6';
 import { zodToJsonSchema } from 'npm:zod-to-json-schema@3';
 import { z } from 'npm:zod@3';
+import { normalizeStrictSchema } from './strict-schema.ts';
 import { finalOnlyOutput } from './final-only-output.ts';
 import { createLovableAiGatewayRunIdFetch } from './run-id.ts';
 import { bodySchema,planSchema,evalSchema,chapterSchema,sourcesSchema } from './schema.ts';
@@ -55,7 +56,7 @@ Deno.serve(async req=>{
   try{
    const schema=step==='plan'?planSchema:step==='evaluations'?evalSchema:step==='sources'?sourcesSchema:chapterSchema;
    const wireSchema=zodToJsonSchema(schema, { target:'openAi', $refStrategy:'none' });
-   const normalizeSchema=(value:any)=>{if(!value||typeof value!=='object')return;if(value.exclusiveMinimum===true){value.exclusiveMinimum=value.minimum;delete value.minimum;}if(value.exclusiveMaximum===true){value.exclusiveMaximum=value.maximum;delete value.maximum;}if(value.type==='object'&&value.properties){value.additionalProperties=false;value.required=Object.keys(value.properties);}for(const child of Object.values(value))normalizeSchema(child);};normalizeSchema(wireSchema);
+   normalizeStrictSchema(wireSchema);
    const scope=step==='plan'?'Rédige la fiche pédagogique et un plan de EXACTEMENT 16 chapitres de 6 à 12 sections chacun. Pas de dates de session, tarif, formateur ou stagiaires inventés.':step==='evaluations'?'Rédige les 10 mises en situation corrigées, 10 QCM par compétence EXACTEMENT, 10 questions pour chaque positionnement, questions ouvertes, cas intermédiaire et examen avec grille. Aucune réponse réelle de stagiaire.':step==='sources'?'Trouve uniquement des références réelles et pertinentes avec URL HTTPS et titre exact de la page. Sources réglementaires officielles, métier et technologie. Date réelle de publication si connue, sinon vide. Exploitation = action possible, jamais preuve réalisée. Vidéos YouTube réelles uniquement ; si incertain renvoie des listes vides. N’insère aucun lien dans les champs HTML des ressources, ceux-ci sont ajoutés après vérification.':`Rédige le chapitre ${index+1}/16 : ${JSON.stringify(p.data.plan.chapters[index])}. Rédige un véritable support professionnel très détaillé d’au moins 32 000 caractères HTML (idéalement 35 000), PAS de remplissage répétitif. Chaque section contient théorie approfondie, démarches, exemples pédagogiques fictifs clairement désignés et exercices. Termine avec 10 questions de quiz corrigées et un cas pratique avec corrigé. Aucune image ni URL inventée.`;
    const system='Tu rédiges un contenu pédagogique français, jamais des preuves d’audit réalisées. Corrigés réservés à l’usage pédagogique, aucune réponse, note, appréciation, satisfaction, présence ou signature de stagiaire. Ne fabrique aucun bloc RNCP/RS, certificateur ou date : seule la référence officielle fournie est autorisée. Si une donnée est inconnue, laisse vide. HTML sûr : p, listes, titres, tables, sans scripts ni attributs actifs. Respecte intégralement le schéma.';
    let generated:any,attempt=0;
