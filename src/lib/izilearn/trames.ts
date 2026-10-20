@@ -9,7 +9,8 @@
  * jamais une réponse, une note, une appréciation ou une signature générée.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML } from "@/lib/docBuilder";
+import { buildDocument, tableHTML, formatDate } from "@/lib/docBuilder";
+import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "@/lib/attendancePresentation";
 import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie } from "@/lib/evalContent";
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
@@ -346,28 +347,31 @@ const STATUT: Record<string, string> = { present: "Présent", absent: "Absent", 
 export function emargement(c: Ctx): { html: string; reel: boolean } {
   const maintenant = Date.now();
   let reel = false;
-  const rows = c.p.creneaux.map((sl) => {
-    const sig = c.a.signatures.find((x) => x.slotId === sl.id);
-    const fsig = c.p.session.formateurSignatures?.find((x) => x.slotId === sl.id);
-    const passe = (d(sl.fin)?.getTime() || 0) < maintenant;
-    if (sig || fsig) reel = true;
-    const cellA = sig
-      ? `${svgImg(sig.svg)}<div style="font-size:10px;color:#047857">${STATUT[sig.statut] || esc(sig.statut)}${sig.retardMinutes ? ` (${sig.retardMinutes} min)` : ""} — signé le ${dateFr(sig.signeLe)} à ${heure(sig.signeLe)}</div>`
-      : passe ? `<span style="font-size:10px;color:#b91c1c">Non signé dans IZILearn</span>` : "";
-    const cellF = fsig ? `${svgImg(fsig.svg)}<div style="font-size:10px;color:#047857">signé le ${dateFr(fsig.signeLe)} à ${heure(fsig.signeLe)}</div>` : "";
-    return `<tr><td>${dateLongue(sl.debut)}</td><td>${sl.demiJournee === "matin" ? "Matin" : "Après-midi"}</td><td>${heure(sl.debut)} – ${heure(sl.fin)}</td><td style="height:46px">${cellA}</td><td>${esc(sl.formateur || c.f.formateur)}<br>${cellF}</td></tr>`;
+  const nom = `${c.s.civilite ? c.s.civilite + " " : ""}${c.s.prenom} ${c.s.nom.toUpperCase()}`.trim();
+  let h = `<p><strong>Stagiaire :</strong> ${esc(nom)}</p><p><strong>Session :</strong> Du ${formatDate(c.p.session.dateDebut)} au ${formatDate(c.p.session.dateFin)}</p>`;
+  if (c.f.dureeSaisiePrioritaire) h += `<p><strong>Durée :</strong> ${esc(c.f.duree)}</p>`;
+  if (c.f.formateur) h += `<p><strong>Formateur :</strong> ${esc(c.f.formateur)}</p>`;
+  const horaires = [...new Set(c.p.creneaux.map((sl) => `${heure(sl.debut)} – ${heure(sl.fin)}`))];
+  if (horaires.length) h += `<p><strong>Horaires :</strong> ${horaires.join(" et ")}</p>`;
+  if (/mixte|hybride/i.test(c.p.session.modalite)) h += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
+  const jours = joursSession(c.p, c.s, c.f);
+  jours.forEach((jour, index) => {
+    if (index > 0 && index % 5 === 0) h += '<div class="page-break"></div>';
+    const slots = c.p.creneaux.filter((sl) => { const date = d(sl.debut); return date && cleJour(date) === cleJour(jour); });
+    const rows = slots.map((sl, i) => {
+      const sig = c.a.signatures.find((x) => x.slotId === sl.id);
+      const fsig = c.p.session.formateurSignatures?.find((x) => x.slotId === sl.id);
+      const passe = (d(sl.fin)?.getTime() || 0) < maintenant;
+      if (sig || fsig) reel = true;
+      const learner = sig
+        ? `${esc(nom)}${svgImg(sig.svg)}<div style="font-size:10px">${STATUT[sig.statut] || esc(sig.statut)}${sig.retardMinutes ? ` (${sig.retardMinutes} min)` : ""} — signé le ${dateFr(sig.signeLe)} à ${heure(sig.signeLe)}</div>`
+        : passe ? "Non signé dans IZILearn" : "";
+      const trainer = fsig ? `${esc(sl.formateur || c.f.formateur)}${svgImg(fsig.svg)}<div style="font-size:10px">signé le ${dateFr(fsig.signeLe)} à ${heure(fsig.signeLe)}</div>` : "";
+      return { date: i === 0 ? dateLongue(jour) : "", label: sl.demiJournee === "matin" ? "Matin" : "Après-midi", horaire: `${heure(sl.debut)} – ${heure(sl.fin)}`, learner, trainer };
+    });
+    h += attendanceDayTable(rows.length ? rows : ["Matin", "Après-midi"].map((label, i) => ({ date: i === 0 ? dateLongue(jour) : "", label, horaire: "____h____ – ____h____", learner: "", trainer: "" })));
   });
-  let h = enTete(c, [["Lieu / modalité", c.f.lieu || c.f.modalites]]);
-  h += reel ? sourceIzilearn("signatures électroniques horodatées enregistrées dans IZILearn ; les cases vides correspondent à des demi-journées à venir.")
-    : trameVierge("Feuille à faire signer par demi-journée (ou émargement électronique depuis IZILearn › Session › Émargement).");
-  if (rows.length) {
-    h += `<table style="width:100%"><thead><tr><th>Date</th><th>Demi-journée</th><th>Horaires</th><th style="width:26%">Signature de l'apprenant</th><th style="width:22%">Formateur</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
-  } else {
-    const jours = joursSession(c.p, c.s, c.f);
-    h += `<table style="width:100%"><thead><tr><th>Date</th><th>Demi-journée</th><th>Horaires</th><th style="width:26%">Signature de l'apprenant</th><th style="width:22%">Signature du formateur</th></tr></thead><tbody>${jours.flatMap((x) =>
-      ["Matin", "Après-midi"].map((dj) => `<tr><td>${dateLongue(x)}</td><td>${dj}</td><td>____h____ – ____h____</td><td style="height:46px"></td><td></td></tr>`)).join("")}</tbody></table>`;
-  }
-  return { html: doc(c, "FEUILLE D'ÉMARGEMENT", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel };
+  return { html: buildDocument({ org: c.o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${c.f.intitule} – ${nom}`, extraHtml: h }), reel };
 }
 
 // ───────────────────────── temps de connexion ─────────────────────────
@@ -381,7 +385,8 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const total = cx.reduce((n, x) => n + (x.secondes || 0), 0);
-  let h = `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> IZILearn / Google Meet</p>`;
+  let h = connectionIntro("IZILearn / Google Meet");
+  h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> IZILearn / Google Meet</p>`;
   const jours = new Map<string, Date>();
   for (const sl of c.p.creneaux) {
     const jour = d(sl.debut);
@@ -389,7 +394,6 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   }
   if (!c.p.creneaux.length) for (const jour of joursSession(c.p, c.s, c.f)) jours.set(cleJour(jour), jour);
   for (const x of cx) { const jour = d(x.debut); if (jour) jours.set(cleJour(jour), jour); }
-  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"];
   let renderedDays = 0;
   for (const [key, jour] of [...jours.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     if (renderedDays > 0 && renderedDays % 5 === 0) h += '<div class="page-break"></div>';
@@ -408,12 +412,13 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     ];
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
-    h += tableHTML(headers, [cells.map(esc)]);
+    h += connectionDayTable(cells.map(esc));
     h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
   }
-  h += `<p><strong>Temps total relevé :</strong> ${duree(total)} · <strong>Durée formation :</strong> ${esc(c.f.duree)}</p>`;
   const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;
-  if (heuresPrevues > 0) h += `<p><strong>Taux de connexion relevé :</strong> ${Math.min(100, Math.round(total / (heuresPrevues * 3600) * 100))} %${(d(c.p.session.dateFin)?.getTime() || 0) >= Date.now() ? " (en cours)" : ""}</p>`;
+  const enCours = (d(c.p.session.dateFin)?.getTime() || 0) >= Date.now();
+  const taux = heuresPrevues > 0 ? `${Math.min(100, Math.round(total / (heuresPrevues * 3600) * 100))} %${enCours ? " (en cours)" : ""}` : "";
+  h += connectionSummary(duree(total), esc(c.f.duree), taux, enCours ? "⏳ Formation en cours" : "");
   h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
   return { html: buildDocument({ org: c.o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: c.f.intitule, formation: c.f, showFormationInfo: true, stagiaires: [c.s], extraHtml: h }), reel: cx.length > 0 };
 }
