@@ -18,6 +18,8 @@ export function appliquerRevision(html: string, o: OrganismeInfo): string {
 /** Complements the action-specific booklet without altering shared templates. */
 export function developperLivret(html: string, cx: Contexte): string {
   const { o, f, p } = cx;
+  html = html.replace(/À définir selon le groupe/g, esc(f.duree))
+    .replace(/Horaires\s*:\s*Lun-Ven 09h00-12h30 \/ 13h30-17h00 \(7 h\/jour\)/g, "Horaires : selon le planning de votre session IZILearn");
   const rows = [
     ["Organisme", o.nom], ["Adresse", [o.adresse, o.codePostal, o.ville].filter(Boolean).join(" ")],
     ["Contact administratif et pédagogique", o.dirigeant], ["E-mail", o.email], ["Téléphone", o.telephone],
