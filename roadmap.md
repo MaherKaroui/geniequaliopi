@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Remplacer les présentations IZILearn d’émargement et connexion par les rendus partagés Qualiopi, en conservant uniquement les preuves enregistrées.
+- [x] Remplacer les anciennes présentations IZILearn d’émargement et connexion par les tableaux et récapitulatifs partagés avec Qualiopi ; 36 tests réussis, les deux aperçus et Word connexion vérifiés sur une session de contrôle, preuves conservées et aucune erreur. Session réelle et retour distant non vérifiés ; non publié.
 
 - [x] Ajouter l’examen final par apprenant dans IZILearn : questions adaptées, résultats réels prioritaires, signatures et exports partagés ; 24 tests réussis, aperçu et PDF vérifiés sur une session de contrôle, aucune erreur. Session réelle et retour distant non vérifiés ; non publié.
 
