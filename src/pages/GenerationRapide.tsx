@@ -846,6 +846,9 @@ const GenerationRapide = () => {
   const stagComplet = stagiairesValides.length > 0;
 
   /* ------------------------------------------------------------------ */
+  if (!loaded) return <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground gap-2">
+    <Loader2 className="w-4 h-4 animate-spin" /> Chargement du dossier…
+  </div>;
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 border-b bg-gradient-hero text-primary-foreground shadow-card">
