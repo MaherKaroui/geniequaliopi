@@ -46,6 +46,24 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("génère les mails même sans adresses, sans inventer de destinataire", () => {
+    const p = payload("actions-formation", 3, "distanciel");
+    p.organisme.email = "";
+    p.apprenants = [apprenant(1, { email: "" })];
+    const mails = planPieces(contexte(p)).filter((x) => x.mail);
+    expect(mails.length).toBeGreaterThan(0);
+    expect(mails.every((x) => x.mail?.destinataireEmail === "")).toBe(true);
+    expect(mails.some((x) => x.mail?.key === "af_convocation")).toBe(true);
+  });
+
+  it("ne présente pas un lien Meet fictif comme l’accès réel de la session", () => {
+    const mails = planPieces(contexte(payload("actions-formation", 3, "distanciel"))).filter((x) => x.mail);
+    const connexion = mails.find((x) => x.mail?.key === "af_connexion");
+    expect(connexion).toBeDefined();
+    expect(connexion?.mail?.corpsHtml).not.toContain("https://meet.google.com/");
+    expect(connexion?.mail?.destinataireEmail).toBe("a1@exemple.fr");
+  });
+
   it("ne laisse pas un questionnaire vide importé bloquer le remplissage Qualiopi", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
