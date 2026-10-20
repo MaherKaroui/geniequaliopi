@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Vérifier et corriger les documents IZILearn restant vierges dans une session chargée ; contrôler les questionnaires importés vides et l’aperçu actualisé.
+
 - [x] Adapter le relevé de connexion IZILearn au modèle Qualiopi et ajouter un emplacement pour la signature du stagiaire ; 7 tests réussis, aperçu et Word vérifiés avec une session de contrôle. Connexions réelles conservées, horaires manquants non inventés.
 
 - [x] Automatiser le remplissage des documents IZILearn comme Qualiopi ; réponses et preuves importées prioritaires, exercices futurs et bilans non échus vierges. 6 tests réussis, aperçu et Word vérifiés avec une session de contrôle ; connexion à une vraie session IZILearn et retour des fichiers non vérifiés.
