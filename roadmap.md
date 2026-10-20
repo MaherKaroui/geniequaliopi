@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Préremplir les émargements et connexions IZILearn depuis le planning comme Qualiopi, sans exiger de relevés ; distinguer prévu/constaté et conserver les signatures enregistrées.
+- [x] Préremplir les émargements et connexions IZILearn depuis le planning comme Qualiopi, sans exiger de relevés ; horaires proposés distincts des connexions constatées, signatures enregistrées conservées. Aperçus et Word vérifiés sur une session de contrôle sans relevés ; session réelle non disponible, non publié.
 
 - [x] Remplacer les anciennes présentations IZILearn d’émargement et connexion par les tableaux et récapitulatifs partagés avec Qualiopi ; 36 tests réussis, les deux aperçus et Word connexion vérifiés sur une session de contrôle, preuves conservées et aucune erreur. Session réelle et retour distant non vérifiés ; non publié.
 
