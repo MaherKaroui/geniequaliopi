@@ -1,6 +1,7 @@
 # Architecture rules
 
-- IZILearn owns a presentation boundary for booklet supplements and common revision footers, reuses the shared dossier design controls, and passes a local MAJ override into its context; session/evidence dates remain unchanged and all preview/export paths use the same resolved context.
+- Database-backed formation presets use exact title/code identity, a shared in-memory registry and server-owned checkpoint/lease operations; pedagogical corrections never populate learner evidence, and explicit IZILearn lessons retain priority.
+- IZILearn owns a presentation boundary for booklet supplements and document revision footers, excluding email captures, reuses the shared dossier design controls, and passes a local MAJ override into its context; session/evidence dates remain unchanged and all preview/export paths use the same resolved context.
 - IZILearn connection reports reuse Qualiopi IND 11's seven-column `tableHTML` and document wrapper with recorded evidence only; daily signature slots sit below the table to preserve its identical layout.
 
 - IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; only substantive imported responses/results override generated content (empty questionnaire shells do not), future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence. Previews resolve the current piece by ID so refreshed session data cannot leave stale content open.

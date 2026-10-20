@@ -1,0 +1,2 @@
+REVOKE INSERT, UPDATE ON public.formation_presets FROM authenticated;
+COMMENT ON TABLE public.formation_presets IS 'Authenticated generation and validation writes are performed through generate-formation-preset with verified owner identity; public reads only validated pedagogical content.';

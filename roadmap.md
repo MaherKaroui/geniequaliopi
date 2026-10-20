@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Retirer la mise à jour, sa date et V1 des captures de mails IZILearn ; captures Gmail/Outlook, téléchargement PNG et ZIP de 8 captures vérifiés, date du message conservée.
+
 - [ ] Ajouter la création persistante de contenus dédiés : correspondance exacte, génération reprenable, validation et reprise dans formulaire, rapide, historique et IZILearn.
 - [ ] Vérifier les protections des données stagiaires, les sources RNCP/URL et le parcours de génération/validation avec tests et aperçu.
 

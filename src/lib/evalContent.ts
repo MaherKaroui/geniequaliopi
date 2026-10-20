@@ -1,4 +1,6 @@
 // Formation-specific QCM questions, exercises, and evaluation content
+import { presetEvalContent } from "./formationPresets/registry";
+import { hasExactStaticContent } from "./formationPresets/catalog";
 import { getCachedContentPack } from "./aiContentPack";
 import { mot } from "./resolveurFormation";
 import { EVAL_COMPLEMENTS } from "./evalContentComplements";
@@ -1700,11 +1702,14 @@ for (const [cle, contenu] of Object.entries(EVAL_COMPLEMENTS)) {
 
 /** Vrai si la formation dispose d'un contenu d'évaluation dédié (et pas du contenu générique). */
 export function hasEvalContentDedie(formationIntitule: string): boolean {
-  const key = getContentKey(formationIntitule);
-  return !!key && !!EVAL_CONTENT[key];
+  if (presetEvalContent(formationIntitule)) return true;
+  return hasExactStaticContent({ intitule: formationIntitule });
 }
 
 export function getEvalContent(formationIntitule: string): FormationEvalContent {
+  const preset = presetEvalContent(formationIntitule);
+  if (preset) return preset;
+  if (!hasExactStaticContent({ intitule: formationIntitule })) return DEFAULT_CONTENT;
   const key = getContentKey(formationIntitule);
   return EVAL_CONTENT[key] || DEFAULT_CONTENT;
 }
@@ -2602,6 +2607,8 @@ export function getQuestionsOuvertes(
   objectifs?: string,
   programme?: string
 ): QuestionsOuvertesFormation {
+  const preset = presetEvalContent(formationIntitule);
+  if (preset) return { debut: preset.questionsOuvertesDebut ?? [], fin: preset.questionsOuvertesFin ?? [] };
   const key = getContentKey(formationIntitule);
   const hasSpecificContent = !!QUESTIONS_OUVERTES[key];
   const source = QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;

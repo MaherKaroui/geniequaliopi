@@ -2,6 +2,7 @@ import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualio
 import { SAMPLE_FORMATIONS } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { getFicheFC, ficheToReferentiel } from "./franceCompetences";
+import { getFormationPreset } from "./formationPresets/registry";
 
 /** Nombre d'heures déduit des dates (7 h par jour ouvré), 0 si incalculable. */
 function heuresDepuisDates(deb?: string, fin?: string): number {
@@ -40,6 +41,12 @@ export function resolveFormation(
 ): FormationInfo {
   if (!userFormation || !(userFormation.intitule || "").trim()) return SAMPLE_FORMATIONS[0];
   const f: FormationInfo = { ...userFormation };
+  const dedicated = getFormationPreset(userFormation)?.data.plan?.formation;
+  if (dedicated) {
+    for (const key of ["objectifs", "prerequis", "publicVise", "programme", "methodesEvaluation", "moyensPedagogiques"] as const) {
+      if (dedicated[key]) f[key] = dedicated[key];
+    }
+  }
   const v = (x: unknown) => (x == null ? "" : String(x).trim());
   const types = org?.typesActions || [];
   const isVAE = types.includes("vae");

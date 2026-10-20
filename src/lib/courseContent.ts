@@ -1,3 +1,4 @@
+import { presetContentPack } from "./formationPresets/registry";
 // Course content data for generating 30+ page support de cours documents
 // Organized by formation keyword matching
 
@@ -319,6 +320,8 @@ function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtube
 }
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
+  const preset = presetContentPack({ intitule: formationIntitule });
+  if (preset) return preset.ressources.videos;
   const t = formationIntitule.toLowerCase();
   // TP ARH RNCP41366 : avant les règles paie / secrétariat / management
   if (isARH41366Formation(formationIntitule)) return YOUTUBE_ARH41366;
@@ -534,6 +537,8 @@ function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
 }
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
+  const preset = presetContentPack({ intitule: formationIntitule });
+  if (preset?.chapters.length) return preset.chapters.map(ch => ({ title: ch.title, description: ch.description, sections: ch.sections.map(s => ({ title: s.title, content: s.contentHtml })) }));
   const t0 = formationIntitule.toLowerCase();
   if (mot(t0, 'ongulaire') || mot(t0, 'rs7302')) return getOngulaireChapters();
   if (mot(t0, 'vitrage') || mot(t0, 'rncp36223') || mot(t0, 'pare-brise') || mot(t0, 'pare brise')) return getVitrageChapters();

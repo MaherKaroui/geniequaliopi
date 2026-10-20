@@ -119,6 +119,51 @@ export type Database = {
         }
         Relationships: []
       }
+      formation_presets: {
+        Row: {
+          code_rncp: string | null
+          created_at: string
+          created_by: string
+          data: Json
+          duree_heures: number
+          id: string
+          intitule: string
+          intitule_normalise: string
+          progression: Json
+          statut: string
+          type_action: string
+          updated_at: string
+        }
+        Insert: {
+          code_rncp?: string | null
+          created_at?: string
+          created_by: string
+          data?: Json
+          duree_heures?: number
+          id?: string
+          intitule: string
+          intitule_normalise: string
+          progression?: Json
+          statut?: string
+          type_action?: string
+          updated_at?: string
+        }
+        Update: {
+          code_rncp?: string | null
+          created_at?: string
+          created_by?: string
+          data?: Json
+          duree_heures?: number
+          id?: string
+          intitule?: string
+          intitule_normalise?: string
+          progression?: Json
+          statut?: string
+          type_action?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       modeles_formation: {
         Row: {
           created_at: string
@@ -505,12 +550,55 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_formation_preset_step: {
+        Args: { p_id: string; p_lease: string; p_step: string; p_user: string }
+        Returns: Json
+      }
+      finish_formation_preset_step: {
+        Args: {
+          p_error?: Json
+          p_id: string
+          p_lease: string
+          p_result: Json
+          p_step: string
+          p_user: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      transition_formation_preset: {
+        Args: {
+          p_action: string
+          p_id: string
+          p_index?: number
+          p_user: string
+        }
+        Returns: {
+          code_rncp: string | null
+          created_at: string
+          created_by: string
+          data: Json
+          duree_heures: number
+          id: string
+          intitule: string
+          intitule_normalise: string
+          progression: Json
+          statut: string
+          type_action: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "formation_presets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {

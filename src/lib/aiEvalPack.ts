@@ -4,6 +4,7 @@
  * - Caches per formation in sessionStorage
  * - Provides deterministic per-stagiaire variation
  */
+import { presetEvalPack } from "./formationPresets/registry";
 import { supabase } from "@/integrations/supabase/client";
 import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
@@ -52,6 +53,8 @@ function cacheKey(f: FormationInfo): string {
 }
 
 export function getCachedPack(f: FormationInfo): AIEvalPack | null {
+  const preset = presetEvalPack(f);
+  if (preset) return preset;
   try {
     const raw = sessionStorage.getItem(cacheKey(f));
     if (!raw) return null;

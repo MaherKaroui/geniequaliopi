@@ -1,3 +1,4 @@
+import { presetBlankDocument } from "./formationPresets/blankDocuments";
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
 import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
@@ -184,6 +185,8 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
+  const presetBlank = presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
+  if (presetBlank) return presetBlank;
   // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
   const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
   let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
