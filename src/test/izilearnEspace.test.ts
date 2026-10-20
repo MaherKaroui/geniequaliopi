@@ -45,6 +45,19 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("additionne seulement les temps enregistrés sans transformer les horaires prévus en connexions", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.apprenants[0].connexions = [
+      { debut: "2026-11-02T09:05:00", fin: "2026-11-02T10:05:00", secondes: 3600, source: "meet" },
+      { debut: "2026-11-02T13:35:00", fin: "2026-11-02T15:05:00", secondes: 5400, source: "lms" },
+    ];
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre();
+    expect(html).toContain("2 h 30");
+    expect(html).toContain("09:05");
+    expect(html).toContain("15:05");
+    expect(html).not.toContain("7 h 00");
+  });
+
   it("remplit les besoins et le positionnement avec les mêmes générateurs que Qualiopi", () => {
     const pieces = planPieces(contexte(payload("actions-formation", 3)));
     const besoins = pieces.find((p) => p.id === "besoins_0");
