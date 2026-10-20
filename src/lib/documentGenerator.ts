@@ -1,4 +1,5 @@
 import { presetBlankDocument } from "./formationPresets/blankDocuments";
+import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "./attendancePresentation";
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
 import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
@@ -3294,12 +3295,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     const stagDisplay = isPast ? stagName : '';
     const formDisplay = isPast ? f.formateur : '';
     const blocs = getEmargementBlocs(f, day.dow);
-    let tableRows = '';
-    blocs.forEach((b, bi) => {
-      const dateCell = bi === 0 ? `${day.label}${modaliteLabel}` : '';
-      tableRows += `<tr style="background:#fff;border-bottom:1px solid ${bi === blocs.length - 1 ? '#ccc' : '#ddd'}"><td>${dateCell}</td><td>${b.label}<br><small>${b.horaire}</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
-    });
-    extra += `<table><tr><th>Date</th><th>Horaires</th><th>Signature du Stagiaire</th><th>Signature du Formateur</th></tr>${tableRows}</table>`;
+    extra += attendanceDayTable(blocs.map((b, bi) => ({ date: bi === 0 ? `${day.label}${modaliteLabel}` : '', label: b.label, horaire: b.horaire, learner: `${stagDisplay}${sigStag}`, trainer: `${formDisplay}${sigForm}` })));
   });
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
 }
@@ -3462,7 +3458,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   let extra = '';
   const outilClasse = (o.outilsUtilises || 'Classe virtuelle').split(/[,;/]/)[0].trim() || 'Classe virtuelle';
-  extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Plateforme :</strong> ${o.outilsUtilises || 'Classe virtuelle'}</p>`;
+  extra += connectionIntro(o.outilsUtilises || 'Classe virtuelle');
   extra += `<p style="font-size:11px;color:#555"><em>Relevé établi par le formateur à partir de la liste des participants de chaque classe virtuelle. L'export des journaux de l'outil (rapport de participation) est conservé et joint en annexe.</em></p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
   if (isCFA) extra += `<p><em>Rythme d'alternance : ${f.rythmeAlternance}. Seules les semaines en CFA apparaissent dans le relevé (les semaines en entreprise ne génèrent pas de connexion LMS).</em></p>`;
@@ -3490,10 +3486,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
       // Jour futur → ligne vide
       if (!isFrLongDayPast(day)) {
-        extra += tableHTML(
-          ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-          [["—", "—", "—", "—", "—", "—", "⏳ À venir"]]
-        );
+        extra += connectionDayTable(["—", "—", "—", "—", "—", "—", "⏳ À venir"]);
         renderedDays++;
         return;
       }
@@ -3504,10 +3497,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const hTotal = Math.floor(d.dureeTotalMin / 60);
       const mTotal = d.dureeTotalMin % 60;
 
-      extra += tableHTML(
-        ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-        [[outilClasse, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, 'Présent(e)']]
-      );
+      extra += connectionDayTable([outilClasse, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, 'Présent(e)']);
       renderedDays++;
     });
 
@@ -3525,7 +3515,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const taux = dureeFormationH > 0 ? Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100)) : 0;
     const termine = isStagiaireFormationTerminee(s, f);
     const tauxLabel = termine ? `${taux}%` : `${taux}% (en cours)`;
-    extra += `<p style="margin-top:10px"><strong>Total connecté :</strong> ${hT}h${String(mT).padStart(2, '0')}min | <strong>Durée formation :</strong> ${stagDuree} | <strong>Taux :</strong> ${tauxLabel} | ${termine ? (taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant') : '⏳ Formation en cours'}</p>`;
+    extra += connectionSummary(`${hT}h${String(mT).padStart(2, '0')}min`, stagDuree, tauxLabel, termine ? (taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant') : '⏳ Formation en cours');
   });
 
   return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
