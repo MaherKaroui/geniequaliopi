@@ -322,7 +322,7 @@ describe("Gérer son centre de formation – 35 h — câblage", () => {
     expect(ev.exercices[0].titre).toBe(GSC35_EXERCICES[0].titre);
     expect(ev.qcmPositionnement).toEqual(GSC35_QCM_DEBUT);
     expect(ev.qcmFinal).toEqual(GSC35_QCM_FIN);
-    expect(getEvalContent("gestion d'un centre de formation 35h").qcmPositionnement).toEqual(GSC35_QCM_DEBUT);
+    expect(getEvalContent("gestion d'un centre de formation 35h").qcmPositionnement).not.toEqual(GSC35_QCM_DEBUT);
   });
 
   it("les autres formations gardent leur contenu", async () => {

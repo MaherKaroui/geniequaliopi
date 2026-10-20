@@ -6,12 +6,13 @@
  * de contenu (getCachedContentPack).
  */
 import { setCachedContentPack, clearCachedContentPack, type AIContentPack } from "@/lib/aiContentPack";
-import { hasEvalContentDedie } from "@/lib/evalContent";
+import { hasExactDedicatedContent } from "@/lib/formationPresets/catalog";
+import { setIzilearnContentOverride } from "@/lib/formationPresets/registry";
 import type { FormationInfo } from "@/types/qualiopi";
 import type { IzPayload } from "./types";
 
 /** Formation dont Génie Qualiopi a un contenu rédigé (utilisé si IZILearn n'en a pas). */
-export const formationConnue = (f: FormationInfo) => hasEvalContentDedie(f.intitule);
+export const formationConnue = (f: FormationInfo) => hasExactDedicatedContent(f);
 
 export type EtatContenu = "dedie" | "izilearn" | "aucun";
 
@@ -34,6 +35,7 @@ export function packDepuisIzilearn(p: IzPayload): AIContentPack | null {
 // Génie Qualiopi, retrouvé seulement par mots de l'intitulé (« digital » → webmarketing…).
 export function installerContenu(p: IzPayload, f: FormationInfo): EtatContenu {
   const pack = packDepuisIzilearn(p);
+  setIzilearnContentOverride(f.intitule, pack);
   if (pack) { setCachedContentPack(f, pack); return "izilearn"; }
   clearCachedContentPack(f);
   return formationConnue(f) ? "dedie" : "aucun";

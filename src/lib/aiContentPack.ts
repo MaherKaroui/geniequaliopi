@@ -2,6 +2,7 @@
  * AI Content Pack — pack pédagogique complet (besoins, cours, exercices, ressources)
  * généré par modèle fort (gemini-2.5-pro). Cache sessionStorage par formation.
  */
+import { presetContentPack } from "./formationPresets/registry";
 import { supabase } from "@/integrations/supabase/client";
 import { FormationInfo } from "@/types/qualiopi";
 
@@ -58,6 +59,8 @@ function cacheKey(f: FormationInfo): string {
 }
 
 export function getCachedContentPack(f: FormationInfo): AIContentPack | null {
+  const preset = presetContentPack(f);
+  if (preset) return preset;
   try {
     const raw = sessionStorage.getItem(cacheKey(f));
     if (!raw) return null;

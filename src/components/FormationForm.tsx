@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { generateAIVeillePack, clearCachedVeillePack } from "@/lib/aiVeillePack";
 import { generateAIContentPack, clearCachedContentPack } from "@/lib/aiContentPack";
+import FormationPresetControl from "@/components/FormationPresetControl";
 import ReferentielGenerator from "@/components/ReferentielGenerator";
 
 interface FormationFormProps {
@@ -760,6 +761,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         )}
       </div>
 
+      <FormationPresetControl formation={data} onApply={onChange} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
           <Label htmlFor="intitule">Intitulé de la formation *</Label>

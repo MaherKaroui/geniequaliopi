@@ -1,5 +1,6 @@
 // Pack de veilles (réglementaire / métier / technologique) généré par IA
 // et mis en cache sessionStorage pour rester cohérent avec la formation pendant la session.
+import { getFormationPreset } from "./formationPresets/registry";
 import { supabase } from "@/integrations/supabase/client";
 import type { FormationInfo } from "@/types/qualiopi";
 
@@ -40,6 +41,8 @@ function writeRaw(key: string, value: string): void {
 }
 
 export function getCachedVeillePack(f: FormationInfo): AIVeillePack | null {
+  const preset = getFormationPreset(f);
+  if (preset) return preset.data.sources?.veille ?? { reglementaire: [], metier: [], technologique: [] };
   try {
     const raw = readRaw(cacheKey(f));
     if (!raw) return null;

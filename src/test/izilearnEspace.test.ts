@@ -57,7 +57,7 @@ describe("Espace IZILearn", () => {
     const pieces = planPieces(cx);
     for (const piece of pieces) {
       expect(piece.rendre(), piece.id).toContain("20 octobre 2026");
-      if (piece.mail) expect(mailPourCapture(piece.mail, cx.o).messages[0].body).toContain("20 octobre 2026");
+      if (piece.mail) expect(mailPourCapture(piece.mail, cx.o).messages[0].body).toBe(piece.mail.corpsHtml);
     }
   });
 

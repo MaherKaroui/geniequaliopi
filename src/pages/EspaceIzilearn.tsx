@@ -3,7 +3,7 @@
  * Les données (organisme, formation, session, apprenants, preuves) arrivent d'IZILearn ;
  * les pièces générées peuvent être renvoyées dans les documents de la session.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import JSZip from "jszip";
 import { toast } from "sonner";
 import {
@@ -29,6 +29,8 @@ import { captureMail } from "@/lib/mails/captureMail";
 import { clientMailOrganisme } from "@/lib/mails/mailsAutomatiques";
 import { mailPourCapture } from "@/lib/izilearn/mailCapture";
 import IzilearnSignatureDialog from "@/components/IzilearnSignatureDialog";
+import FormationPresetControl from "@/components/FormationPresetControl";
+import { subscribePresets, presetRevision } from "@/lib/formationPresets/registry";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +55,7 @@ const telecharger = (blob: Blob, nom: string) => {
 
 export default function EspaceIzilearn() {
   const { payload, etat, actualiser, envoyer } = useIzilearn();
+  const contentRevision = useSyncExternalStore(subscribePresets, presetRevision);
   const [format, setFormat] = useState<Format>("pdf");
   const [dateMaj, setDateMaj] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<DocStyleConfig | null>(null);
@@ -67,8 +70,8 @@ export default function EspaceIzilearn() {
   useEffect(() => { setDateMaj(""); setSelectedStyle(null); }, [payload?.source.orgId, payload?.source.sessionId]);
   useEffect(() => { if (cx) setDocStyle(selectedStyle ?? getAutomaticDossierDesign(cx.o, 0).style); }, [cx, selectedStyle]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
-  const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx]);
-  const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx]);
+  const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx, contentRevision]);
+  const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx, contentRevision]);
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
   const aSigner = signatureTarget ? payload?.apprenants[signatureTarget.index] : null;
   useEffect(() => { setApercuId(null); setSignatureTarget(null); }, [payload?.source.orgId, payload?.source.sessionId]);
@@ -235,6 +238,7 @@ export default function EspaceIzilearn() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 pt-5 space-y-3">
+        {!p.formation.contenu?.chapitres?.length && <FormationPresetControl formation={f} />}
         <div className="flex flex-wrap items-center gap-3">
           <Label htmlFor="izilearn-date-maj">Date de mise à jour des fichiers</Label>
           <Input id="izilearn-date-maj" type="date" className="w-44" value={cx.o.dateMaj} disabled={!!travail} onChange={(e) => setDateMaj(e.target.value)} />

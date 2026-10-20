@@ -34,6 +34,7 @@ import { setDocStyle } from "@/lib/docBuilder";
 import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { PDF_QUALITY_PRESETS, type PdfQuality } from "@/lib/pdfExport";
 
+import FormationPresetControl from "@/components/FormationPresetControl";
 import RapideHistory from "@/components/RapideHistory";
 import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
 import { Badge } from "@/components/ui/badge";
@@ -934,6 +935,7 @@ const GenerationRapide = () => {
 
         {/* BLOC B — FORMATION */}
         <Section step="2" icon={<GraduationCap className="w-5 h-5" />} title="Formation" subtitle="Le contenu pédagogique peut être rédigé automatiquement" done={formComplet}>
+          <FormationPresetControl formation={formation} onApply={f => setFormation(f)} />
           <div className="space-y-1">
             <Label className="text-xs">Charger une formation d'exemple (remplace le contenu de la formation)</Label>
             <Select value={sampleFormationKey} onValueChange={(v) => { setSampleFormationKey(v); loadSampleFormation(v); }}>
