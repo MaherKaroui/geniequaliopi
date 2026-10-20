@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formationsIziRealisees, genAttestationIzibusiness } from "@/lib/attestationIzibusiness";
-import { formatDate } from "@/lib/docBuilder";
+import { formationsIziRealisees, genAttestationIzibusiness, formatDateIzi as formatDate } from "@/lib/attestationIzibusiness";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { planDevActions } from "@/lib/templatesCritere5";
 import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST } from "./dossierAudit.harness";

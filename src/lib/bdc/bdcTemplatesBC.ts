@@ -9,8 +9,7 @@ import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor
 import type { FormationInfo } from "@/types/qualiopi";
 import { REFERENCES_REGLEMENTAIRES_2026 } from "@/lib/qualite2026";
 import { blocSignatureHtml } from "./signatureMatrix";
-import { formationsIziRealisees } from "@/lib/attestationIzibusiness";
-import { formatDate } from "@/lib/docBuilder";
+import { formationsIziRealisees, formatDateIzi as formatDate } from "@/lib/attestationIzibusiness";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 

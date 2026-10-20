@@ -3,7 +3,7 @@
  * Les formations sont datées avant la date de mise à jour du dossier (réalisées, donc attestables).
  */
 import type { OrganismeInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument } from "./docBuilder";
 import izibusinessTamponAsset from "@/assets/izibusiness_tampon.png.asset.json";
 
 export const IZIBUSINESS_ORG = {
@@ -34,6 +34,10 @@ function baseDate(o: Pick<OrganismeInfo, "dateMaj">): Date {
   return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
 }
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export function formatDateIzi(value: string): string {
+  return new Date(`${value}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+const formatDate = formatDateIzi;
 function ouvre(d: Date, sens: 1 | -1): Date { const r = new Date(d); while (r.getDay() === 0 || r.getDay() === 6) r.setDate(r.getDate() + sens); return r; }
 
 /** Dates de réalisation (2 jours ouvrés consécutifs) avant la date de MAJ. */
