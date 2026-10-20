@@ -228,10 +228,6 @@ export default function EspaceIzilearn() {
               <p className="text-xs mt-2">Les documents restent générés ; les champs manquants y apparaissent vides plutôt qu'inventés.</p>
             </section>
           )}
-          <p className="text-xs text-muted-foreground px-1">
-            Les évaluations, exercices, bilans et émargements ne contiennent que ce qu'IZILearn a enregistré (réponses envoyées, signatures horodatées, connexions relevées).
-            Sans donnée, la pièce est une trame vierge au nom de l'apprenant.
-          </p>
         </aside>
 
         <div className="space-y-5">

@@ -1,5 +1,7 @@
 # Architecture rules
 
+- IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; imported responses override generated content, future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence.
+
 - IZIBUSINESS completed training records and dates are resolved by one shared helper for the combined attestation and every IND 22 plan, preventing planned dates from overwriting completed actions.
 
 - Rapid document edits are sanitized HTML overrides stored inside the rapid formation JSON and resolved at the shared preview/export boundary; identity-based recipient/action keys prevent corrections leaking to another person or action, and the account-scoped local draft survives browser restarts without changing database schema.
