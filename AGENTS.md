@@ -1,5 +1,7 @@
 # Architecture rules
 
+- IZILearn owns a presentation boundary for booklet supplements and common revision footers, reuses the shared dossier design controls, and passes a local MAJ override into its context; session/evidence dates remain unchanged and all preview/export paths use the same resolved context.
+
 - IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; only substantive imported responses/results override generated content (empty questionnaire shells do not), future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence. Previews resolve the current piece by ID so refreshed session data cannot leave stale content open.
 - IZILearn email drafts reuse the shared Qualiopi scenarios and Gmail/Outlook capture engine for previews and PNG exports; the capture adapter includes only organizer messages without injecting status text into their body, missing addresses never suppress drafts, and synthetic meeting links are replaced with session-access instructions to avoid fabricated evidence. Generated captures do not record or confirm actual delivery.
 - IZILearn signatures are captured beside each learner (and their company representative when present), held in page state and keyed by organization/session/enrollment/contact/identity/role; they feed the shared Qualiopi signature fields plus imported form signature boxes for previews and all exports, never platform attendance rows or fabricated electronic-signing timestamps.

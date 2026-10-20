@@ -29,6 +29,10 @@ import { captureMail } from "@/lib/mails/captureMail";
 import { clientMailOrganisme } from "@/lib/mails/mailsAutomatiques";
 import { mailPourCapture } from "@/lib/izilearn/mailCapture";
 import IzilearnSignatureDialog from "@/components/IzilearnSignatureDialog";
+import DossierOutputSettings from "@/components/DossierOutputSettings";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { DocStyleConfig } from "@/types/qualiopi";
 import { applyLearnerSignatures, contexteAvecSignatures, signatureKey, validSignatureImage, type LearnerSignatures, type SignatureRole } from "@/lib/izilearn/documentSignature";
 
 type Format = "pdf" | "word";
@@ -50,6 +54,8 @@ const telecharger = (blob: Blob, nom: string) => {
 export default function EspaceIzilearn() {
   const { payload, etat, actualiser, envoyer } = useIzilearn();
   const [format, setFormat] = useState<Format>("pdf");
+  const [dateMaj, setDateMaj] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState<DocStyleConfig | null>(null);
   const [apprenants, setApprenants] = useState<Set<number>>(new Set());
   const [categories, setCategories] = useState<Set<CategorieKey>>(new Set(CATEGORIES.map((c) => c.key)));
   const [apercuId, setApercuId] = useState<string | null>(null);
@@ -57,8 +63,9 @@ export default function EspaceIzilearn() {
   const [signatures, setSignatures] = useState<LearnerSignatures>({});
   const [travail, setTravail] = useState<{ label: string; fait: number; total: number } | null>(null);
 
-  const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload), signatures) : null), [payload, signatures]);
-  useEffect(() => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); }, [cx]);
+  const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload, dateMaj), signatures) : null), [payload, signatures, dateMaj]);
+  useEffect(() => { setDateMaj(""); setSelectedStyle(null); }, [payload?.source.orgId, payload?.source.sessionId]);
+  useEffect(() => { if (cx) setDocStyle(selectedStyle ?? getAutomaticDossierDesign(cx.o, 0).style); }, [cx, selectedStyle]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
   const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx]);
   const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx]);
@@ -70,7 +77,7 @@ export default function EspaceIzilearn() {
   const visibles = pieces.filter((p) => categories.has(p.categorie) && (p.apprenantIdx === null || apprenants.has(p.apprenantIdx)));
   const categoriesPresentes = CATEGORIES.filter((c) => pieces.some((p) => p.categorie === c.key));
 
-  const rendre = (p: Piece) => { if (cx) setDocStyle(getAutomaticDossierDesign(cx.o, 0).style); return cx ? applyLearnerSignatures(p.rendre(), p, cx) : p.rendre(); };
+  const rendre = (p: Piece) => { if (cx) setDocStyle(selectedStyle ?? getAutomaticDossierDesign(cx.o, 0).style); return cx ? applyLearnerSignatures(p.rendre(), p, cx) : p.rendre(); };
   const enregistrerSignature = (image: string) => {
     if (!signatureTarget || !payload || !validSignatureImage(image)) return;
     const key = signatureKey(payload, signatureTarget.index, signatureTarget.role);
@@ -227,6 +234,15 @@ export default function EspaceIzilearn() {
         </div>
       )}
 
+      <div className="max-w-7xl mx-auto px-4 pt-5 space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Label htmlFor="izilearn-date-maj">Date de mise à jour des fichiers</Label>
+          <Input id="izilearn-date-maj" type="date" className="w-44" value={cx.o.dateMaj} disabled={!!travail} onChange={(e) => setDateMaj(e.target.value)} />
+        </div>
+        <fieldset disabled={!!travail}>
+          <DossierOutputSettings key={`${p.source.orgId}_${p.source.sessionId}`} organisme={cx.o} scope={`izilearn_${p.source.orgId}_${p.source.sessionId}`} onEffectiveStyleChange={setSelectedStyle} />
+        </fieldset>
+      </div>
       <main className="max-w-7xl mx-auto px-4 py-5 grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-auto">
           <section className="bg-card border rounded-xl p-4">

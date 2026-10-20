@@ -47,6 +47,20 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("applique une MAJ commune sans remplacer les dates de session et de preuves", () => {
+    const p = payload("actions-formation", 3, "hybride");
+    p.formation.miseAJour = "2026-09-01";
+    const cx = contexte(p, "2026-10-20");
+    expect(cx.o.dateMaj).toBe("2026-10-20");
+    expect(cx.f.dateDebut).toBe("2026-11-02");
+    expect(cx.p.apprenants[0].signatures[0].signeLe).toBe("2026-11-02T09:05:00");
+    const pieces = planPieces(cx);
+    for (const piece of pieces) {
+      expect(piece.rendre(), piece.id).toContain("20 octobre 2026");
+      if (piece.mail) expect(mailPourCapture(piece.mail, cx.o).messages[0].body).toContain("20 octobre 2026");
+    }
+  });
+
   it("reprend automatiquement le mail dans une capture sans inventer de réponse du stagiaire", () => {
     const cx = contexte(payload("actions-formation", 3));
     const modele = planPieces(cx).find((p) => p.mail?.key === "af_convocation")?.mail;
