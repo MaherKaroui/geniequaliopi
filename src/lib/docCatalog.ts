@@ -4,7 +4,7 @@ import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
-import { estJourFormation } from "./joursFeries";
+import { estJourFormation, estFormationHebdo } from "./joursFeries";
 import { getUnitesExercices } from "./parcoursStagiaire";
 
 /** Nombre de jours de formation réels d'un stagiaire (fériés exclus, samedi de bord inclus). */
@@ -22,7 +22,7 @@ function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
   let n = 0;
   const cur = new Date(start);
   while (cur <= end) {
-    if (estJourFormation(cur, start, end)) n++;
+    if (estJourFormation(cur, start, end, { hebdo: estFormationHebdo(f) })) n++;
     cur.setDate(cur.getDate() + 1);
   }
   return n;

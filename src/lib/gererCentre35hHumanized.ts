@@ -899,7 +899,7 @@ const BESOINS_DIPLOMES = [
 
 const BESOINS_HANDICAP = [
   "Non, je n'ai aucune situation de handicap et je n'ai pas besoin d'adaptation particulière.",
-  "Non. Je souhaite simplement recevoir les supports à l'avance pour les lire avant les cinq journées.",
+  "Non. Je souhaite simplement recevoir les supports à l'avance pour les lire avant chaque journée hebdomadaire.",
   "Non, aucune situation de handicap déclarée. Des pauses régulières loin de l'écran me conviennent.",
   "Non. Je porte des lunettes et j'apprécie une taille d'affichage suffisamment grande.",
   "Non, pas de handicap. Je suis peu à l'aise avec le tableur ; un binôme me rassurerait sur les calculs.",
@@ -913,16 +913,16 @@ const BESOINS_HANDICAP = [
 ];
 
 const BESOINS_DISPOS = [
-  "Je suis disponible les cinq jours de formation, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, en salle de formation.",
-  "J'ai libéré les cinq journées dans mon agenda (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) ; mes interventions de la semaine sont reportées.",
-  "Je suis disponible les cinq jours de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>. J'apporterai les documents actuels de mon projet pour les exercices.",
-  "Je peux suivre l'intégralité des cinq journées en présentiel, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, sans contrainte particulière.",
-  "Je suis disponible les cinq jours (<strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>) ; j'ai organisé la garde de mes enfants pour la semaine.",
-  "Disponibilité complète sur les cinq journées (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>). Je viendrai en transports en commun.",
-  "Les cinq jours de formation, je suis disponible de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> ; je consulterai mes messages pendant les pauses seulement.",
-  "Je suis disponible sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> les cinq jours. Je dois seulement partir à 16h45 le mercredi, ce que j'ai signalé à la formatrice.",
-  "Je suivrai les cinq journées en salle (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) et je prévois de retravailler mon dossier le soir.",
-  "Aucune contrainte sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> des cinq jours. J'ai prévenu mes clients de mon indisponibilité.",
+  "Je suis disponible une journée par semaine pendant cinq semaines, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, en salle de formation.",
+  "J'ai bloqué le même jour chaque semaine pendant un mois (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) ; ce rythme me permet de continuer mes autres activités le reste de la semaine.",
+  "Je suis disponible les cinq journées, une par semaine, de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>. J'apporterai les documents de mon projet à chaque séance.",
+  "Je peux suivre les cinq journées hebdomadaires en présentiel, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, sans contrainte particulière.",
+  "Je suis disponible une journée par semaine sur le mois (<strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>) ; j'ai organisé la garde de mes enfants ces jours-là.",
+  "Disponibilité complète sur les cinq journées réparties sur un mois (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>). Je viendrai en transports en commun.",
+  "Un jour par semaine pendant cinq semaines, je suis disponible de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> ; je consulterai mes messages pendant les pauses seulement.",
+  "Je suis disponible sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> une journée par semaine. Je dois seulement partir à 16h45 lors d'une des séances, ce que je signalerai à l'avance.",
+  "Je suivrai les cinq journées hebdomadaires en salle (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) et je retravaillerai mon dossier entre deux séances.",
+  "Aucune contrainte sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, une journée par semaine pendant un mois. J'ai prévenu mes clients de mon indisponibilité ces jours-là.",
 ];
 
 /** Réponses d'évaluation des besoins propres à la formation « Gérer son centre de formation – 35 h », différentes pour chaque stagiaire. */

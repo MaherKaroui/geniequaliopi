@@ -26,7 +26,7 @@ import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, gen
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement, signatureDirigeantHtml, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
-import { estJourFormation } from "./joursFeries";
+import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
@@ -2549,7 +2549,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation && !f.dureeSaisiePrioritaire ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
+      <p><strong>Horaires :</strong> ${estFormationHebdo(f) ? texteHorairesHebdo(f.dateDebut) : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"}</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${f.nombreParticipants || nbStagiaires}</p>
@@ -3256,7 +3256,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
       const current = new Date(start);
       while (current <= end) {
         const dow = current.getDay();
-        if (estJourFormation(current, start, end, { includeSat })) {
+        if (estJourFormation(current, start, end, { includeSat, hebdo: estFormationHebdo(f) })) {
           days.push({
             label: current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
             dow,
@@ -3279,7 +3279,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   if (f.dureeSaisiePrioritaire) extra += `<p><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
-  extra += `<p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>`;
+  extra += `<p><strong>Horaires :</strong> ${estFormationHebdo(f) ? texteHorairesHebdo(dateDebut) : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"}</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
@@ -3326,7 +3326,7 @@ export function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
   const current = new Date(start);
   const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    if (estJourFormation(current, start, end, { includeSat })) {
+    if (estJourFormation(current, start, end, { includeSat, hebdo: estFormationHebdo(f) })) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);
@@ -4239,7 +4239,7 @@ function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
-    { heading: "Horaires", content: "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
+    { heading: "Horaires", content: estFormationHebdo(f) ? `<p>${texteHorairesHebdo(f.dateDebut)}<br>Pause déjeuner : 12h30 – 13h30</p>` : "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
   ] });
 }
 

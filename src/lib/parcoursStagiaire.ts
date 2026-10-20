@@ -1,7 +1,7 @@
 // Calcul du parcours réel d'un stagiaire (jours de formation, semaines couvertes)
 // Utilisé pour dimensionner les exercices / QCM de l'indicateur 11 par stagiaire.
 import type { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { estJourFormation } from "./joursFeries";
+import { estJourFormation, estFormationHebdo } from "./joursFeries";
 
 /** Seuil séparant les parcours courts (1 exercice / jour) des parcours longs (1 exercice / semaine). */
 export const SEUIL_JOURS_PARCOURS_COURT = 12;
@@ -22,7 +22,7 @@ export function getJoursStagiaire(s: StagiaireInfo | undefined, f: FormationInfo
   const out: Date[] = [];
   const cur = new Date(start);
   while (cur <= end) {
-    if (estJourFormation(cur, start, end)) out.push(new Date(cur));
+    if (estJourFormation(cur, start, end, { hebdo: estFormationHebdo(f) })) out.push(new Date(cur));
     cur.setDate(cur.getDate() + 1);
   }
   return out;

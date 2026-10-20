@@ -75,14 +75,37 @@ export function estJourFormation(
   current: Date,
   start: Date,
   end: Date,
-  opts?: { includeSat?: boolean },
+  opts?: { includeSat?: boolean; hebdo?: boolean },
 ): boolean {
   if (estJourFerie(current)) return false;
   const dow = current.getDay();
   if (dow === 0) return false;
+  // Rythme hebdomadaire : une seule journée par semaine, le même jour que la date de début.
+  if (opts?.hebdo) return dow === start.getDay();
   if (dow === 6) {
     if (opts?.includeSat) return true;
     return cleDate(current) === cleDate(start) || cleDate(current) === cleDate(end);
   }
   return true;
+}
+
+/**
+ * Formations suivies à raison d'une journée de 7 h par semaine (35 h réparties sur un mois) :
+ * « Gérer son centre de formation – 35 h ». Seules ces formations passent en rythme hebdomadaire.
+ */
+export function estFormationHebdo(f?: { intitule?: string } | null): boolean {
+  const t = (f?.intitule || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[‘’`´]/g, "'").replace(/\s+/g, " ");
+  return /\bgerer (son|un|mon|votre) centre de formation\b/.test(t)
+    || /\bgestion (d'un|de son|du|d'une structure de|de mon) centre de formation\b/.test(t);
+}
+
+/** Libellé des horaires d'une formation hebdomadaire : le jour de la semaine est celui de la date de début. */
+export function texteHorairesHebdo(dateDebut?: string): string {
+  const v = (dateDebut || "").trim();
+  const fr = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const iso = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const d = fr ? new Date(+fr[3], +fr[2] - 1, +fr[1]) : iso ? new Date(+iso[1], +iso[2] - 1, +iso[3]) : null;
+  const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const jour = d && !isNaN(d.getTime()) ? `, le ${jours[d.getDay()]}` : "";
+  return `Une journée de 7 h par semaine${jour}, pendant 5 semaines (35 h réparties sur 1 mois) : 09h00 – 12h30 et 13h30 – 17h00`;
 }

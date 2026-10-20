@@ -1,7 +1,7 @@
 import { joursFeriesDeLAnnee } from "./joursFeries";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
-import { estJourFormation } from "./joursFeries";
+import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
 
 /** Return telephone string only if non-empty, otherwise "" */
 export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
@@ -908,7 +908,7 @@ export function getStagiaireDuree(s: StagiaireInfo, f: FormationInfo): string {
     let businessDays = 0;
     const current = new Date(start);
     while (current <= end) {
-      if (estJourFormation(current, start, end)) businessDays++;
+      if (estJourFormation(current, start, end, { hebdo: estFormationHebdo(f) })) businessDays++;
       current.setDate(current.getDate() + 1);
     }
     if (businessDays > 0) {
@@ -1513,6 +1513,8 @@ export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
 
   const horaires = dist
     ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : Lun-Ven 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"
+    : estFormationHebdo(f)
+    ? texteHorairesHebdo(f.dateDebut)
     : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)";
 
   const moyensPedagogiques = dist

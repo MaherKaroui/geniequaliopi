@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { estJourFormation } from "./joursFeries";
+import { estJourFormation, estFormationHebdo } from "./joursFeries";
 
 export const SAMPLE_ORGANISME: OrganismeInfo = {
   nom: "FormaPro Excellence",
@@ -1245,7 +1245,7 @@ export function getFormationDays(f: FormationInfo): string[] {
   const current = new Date(start);
   const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    if (estJourFormation(current, start, end, { includeSat })) {
+    if (estJourFormation(current, start, end, { includeSat, hebdo: estFormationHebdo(f) })) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);

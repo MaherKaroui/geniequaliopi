@@ -52,7 +52,7 @@ const INTITULE_TVTE = "Techniques de vente dans le secteur des travaux énergét
 describe("Gérer son centre de formation – 35 h — formation exemple non certifiante", () => {
   it("intitulé, durée, modalités, public, tarif et délai d'accès conformes à la fiche", () => {
     expect(FORMATION_GSC35.intitule).toBe("Gérer son centre de formation – 35 h");
-    expect(FORMATION_GSC35.duree).toBe("35 heures (5 jours de 7 h)");
+    expect(FORMATION_GSC35.duree).toBe("35 heures réparties sur 1 mois (5 journées de 7 h, une par semaine)");
     expect(FORMATION_GSC35.modalites).toBe("présentiel");
     expect(FORMATION_GSC35.lieu).toBe("");
     expect(FORMATION_GSC35.formateur).toBe("");
@@ -71,7 +71,7 @@ describe("Gérer son centre de formation – 35 h — formation exemple non cert
     expect(new Date(FORMATION_GSC35.dateDebut).getUTCDay()).toBe(1);
     const jours = (new Date(FORMATION_GSC35.dateFin).getTime() - new Date(FORMATION_GSC35.dateDebut).getTime()) / 86400000 + 1;
     expect(jours).toBe(5);
-    for (const j of ["JOUR 1", "JOUR 2", "JOUR 3", "JOUR 4", "JOUR 5"]) expect(FORMATION_GSC35.programme).toContain(j);
+    for (const n of [1, 2, 3, 4, 5]) expect(FORMATION_GSC35.programme).toContain(`SEMAINE ${n} · JOURNÉE ${n}`);
     for (const c of ["C1", "C2", "C3", "C4", "C5", "C6"]) expect(FORMATION_GSC35.objectifs).toContain(c);
     expect(FORMATION_GSC35.objectifs).toMatch(/2026-728/);
     expect(FORMATION_GSC35.objectifs).toMatch(/33 indicateurs/);
@@ -246,7 +246,7 @@ describe("Gérer son centre de formation – 35 h — formation exemple non cert
     expect(new Set(besoins.map(b => b.attentes)).size).toBe(12);
     expect(new Set(besoins.map(b => b.diplome)).size).toBe(12);
     expect(besoins.every(b => !/\{|\}/.test(Object.values(b).join(" ")))).toBe(true);
-    expect(besoins.every(b => /cinq jours|cinq journées/.test(b.disponibilites))).toBe(true);
+    expect(besoins.every(b => /par semaine|hebdomadaires|réparties sur un mois|pendant un mois/.test(b.disponibilites))).toBe(true);
     expect(besoins.every(b => /propres frais/.test(b.budget) && /rétractation/.test(b.budget))).toBe(true);
     expect(besoins.every(b => !/employeur|OPCO|plan de développement/.test(b.budget))).toBe(true);
     const besoinsPrincipaux = noms.map((s, i) => getGSC35Besoin(s.nom, s.prenom, s.civilite, i));
