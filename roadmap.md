@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Remplacer les aperçus texte des mails IZILearn par des captures automatiques Gmail/Outlook comme Qualiopi et les reprendre dans les téléchargements/ZIP.
+
 - [x] Ajouter les mails générés au modèle Qualiopi dans IZILearn : modèles conservés même sans adresse, aperçu avec pièces jointes en cartes, copie et téléchargement HTML ; 13 tests réussis et aperçu/téléchargement vérifiés avec une session de contrôle, sans erreur. Session réelle et enregistrement distant non vérifiés ; non publié.
 
 - [x] Compléter le relevé IZILearn depuis les horaires et durées enregistrés et ajouter un emplacement de signature stagiaire par jour, ainsi qu’aux bilans importés ; 10 tests réussis, relevé rempli avec 2 h 30 et signatures visibles vérifiés en aperçu sur une session de contrôle. Connexions de la session réelle non disponibles ; modifications non publiées.
