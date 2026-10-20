@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { contexte, planPieces } from "@/lib/izilearn/pieces";
-import { unitesExercices } from "@/lib/izilearn/trames";
+import { plannedSessionDay, unitesExercices } from "@/lib/izilearn/trames";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import type { IzApprenant, IzPayload, IzSlot } from "@/lib/izilearn/types";
 import { mailPourCapture } from "@/lib/izilearn/mailCapture";
@@ -157,7 +157,7 @@ describe("Espace IZILearn", () => {
     expect(html).toContain("2 h 30");
     expect(html).toContain("09:05");
     expect(html).toContain("15:05");
-    expect(html).not.toContain("7 h 00");
+    expect(html).toContain("Total connecté :</strong> 2 h 30");
   });
 
   it("complète la déconnexion depuis le début et la durée réellement enregistrés", () => {
@@ -171,6 +171,30 @@ describe("Espace IZILearn", () => {
     expect(html).toContain("15:05");
     expect(html).toContain("2 h 30");
     expect(html).not.toContain("17:00");
+  });
+
+  it("reprend les deux blocs horaires Qualiopi sans relevé ni créneau IZILearn", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.creneaux = [];
+    const cx = contexte(p);
+    const a = p.apprenants[1], s = cx.stagiaires[1];
+    const blocks = plannedSessionDay({ ...cx, a, s }, new Date("2026-11-02T00:00:00"));
+    expect(blocks.map(({ start, end, seconds }) => ({ start, end, seconds }))).toEqual([
+      { start: "09:00", end: "12:30", seconds: 12600 },
+      { start: "13:30", end: "17:00", seconds: 12600 },
+    ]);
+    expect(a.connexions).toEqual([]);
+    expect(a.signatures).toEqual([]);
+  });
+
+  it("donne priorité aux créneaux saisis plutôt qu’aux horaires proposés", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.creneaux = [{ id: "custom", debut: "2026-11-02T10:00:00", fin: "2026-11-02T11:15:00", demiJournee: "matin", mode: "distanciel" }];
+    const cx = contexte(p);
+    const blocks = plannedSessionDay({ ...cx, a: p.apprenants[1], s: cx.stagiaires[1] }, new Date("2026-11-02T00:00:00"));
+    expect(blocks.map(({ start, end, seconds }) => ({ start, end, seconds }))).toEqual([
+      { start: "10:00", end: "11:15", seconds: 4500 },
+    ]);
   });
 
   it("remplit les besoins et le positionnement avec les mêmes générateurs que Qualiopi", () => {
