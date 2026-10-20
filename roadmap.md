@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Ajouter les mails générés au modèle Qualiopi dans IZILearn, vérifier l’aperçu et le téléchargement sans inventer d’envoi.
+- [x] Ajouter les mails générés au modèle Qualiopi dans IZILearn : modèles conservés même sans adresse, aperçu avec pièces jointes en cartes, copie et téléchargement HTML ; 13 tests réussis et aperçu/téléchargement vérifiés avec une session de contrôle, sans erreur. Session réelle et enregistrement distant non vérifiés ; non publié.
 
 - [x] Compléter le relevé IZILearn depuis les horaires et durées enregistrés et ajouter un emplacement de signature stagiaire par jour, ainsi qu’aux bilans importés ; 10 tests réussis, relevé rempli avec 2 h 30 et signatures visibles vérifiés en aperçu sur une session de contrôle. Connexions de la session réelle non disponibles ; modifications non publiées.
 
