@@ -2,7 +2,7 @@
  * Plan des pièces de l'espace IZILearn, par catégorie et par apprenant.
  * Pièces « à remettre » (programme, convocation, convention / contrat, CGV, RI,
  * livret d'accueil, support de cours) : générateurs existants du dossier Qualiopi.
- * Pièces « à compléter » : trames.ts (données IZILearn réelles ou trame vierge).
+ * Remplissage Qualiopi par défaut ; les réponses et preuves IZILearn priment.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
@@ -20,8 +20,8 @@ export interface Categorie { key: CategorieKey; label: string; dossier: string; 
 
 export const CATEGORIES: Categorie[] = [
   { key: "programme", label: "Programme", dossier: "01_Programme", aide: "Programme de formation (indicateur 1)." },
-  { key: "besoins", label: "Évaluation des besoins", dossier: "02_Evaluation_des_besoins", aide: "Réponses envoyées en ligne si elles existent, sinon trame nominative." },
-  { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Résultats IZILearn + trame du test de début de formation." },
+  { key: "besoins", label: "Évaluation des besoins", dossier: "02_Evaluation_des_besoins", aide: "Évaluation personnalisée ; réponses IZILearn conservées lorsqu'elles existent." },
+  { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Test personnalisé comme Qualiopi ; résultats IZILearn prioritaires." },
   { key: "convocation", label: "Convocation", dossier: "04_Convocation", aide: "Convocation de l'apprenant à la session." },
   { key: "convention", label: "Convention ou contrat", dossier: "05_Convention_Contrat", aide: "Convention si l'apprenant est rattaché à une entreprise, contrat de formation sinon (CFA : convention de formation par apprentissage)." },
   { key: "cgv", label: "CGV", dossier: "06_CGV", aide: "Conditions générales de vente." },
@@ -104,8 +104,11 @@ export function planPieces(cx: Contexte): Piece[] {
       out.push({ id: `${categorie}_${i}${extra.id ? `_${extra.id}` : ""}`, categorie, titre: `${titre} — ${nom}`, apprenantIdx: i, source, fichier: `${fichier}_${suffixe}`, rendre, mail: extra.mail });
 
     const besoins = !!(a.besoins || a.besoinsEntreprise);
-    par("besoins", "Évaluation des besoins", "EVALUATION_DES_BESOINS", besoins ? "izilearn" : "trame", () => T.evaluationBesoins(c).html);
-    par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", (a.positionnement || []).length ? "izilearn" : "trame", () => T.testPositionnement(c).html);
+    par("besoins", "Évaluation des besoins", "EVALUATION_DES_BESOINS", besoins ? "izilearn" : "document",
+      besoins ? () => T.evaluationBesoins(c).html : gen(`besoins_${i}`, "trame_eval_besoins_combine", { stagiaireIdx: i }));
+    const positionnement = (a.positionnement || []).some((q) => q.date);
+    par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", positionnement ? "izilearn" : "document",
+      positionnement ? () => T.testPositionnement(c).html : gen(`positionnement_${i}`, "test_positionnement_debut_stagiaire", { stagiaireIdx: i }));
     par("convocation", "Convocation", "CONVOCATION", "document", gen(`convocation_${i}`, g.convocation, { stagiaireIdx: i }));
     const entreprise = !!s.entreprise;
     par("convention", p.formation.typeAction === "apprentissage" ? "Convention de formation par apprentissage" : entreprise ? "Convention de formation" : "Contrat de formation",
@@ -116,14 +119,31 @@ export function planPieces(cx: Contexte): Piece[] {
 
     const unites = T.unitesExercices(p, s, f);
     unites.forEach((u, k) => {
-      par("exercices", `Exercice ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `EXERCICE_${String(k + 1).padStart(2, "0")}`, "trame",
-        () => T.exercicePratique(c, u, k, unites.length), { id: `ex${k}` });
+      const passe = u.fin.getTime() < new Date().setHours(0, 0, 0, 0);
+      par("exercices", `Exercice ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `EXERCICE_${String(k + 1).padStart(2, "0")}`, passe ? "document" : "trame",
+        () => {
+          if (!passe) return T.exercicePratique(c, u, k, unites.length);
+          // Une pièce par unité réelle IZILearn : le générateur ne doit pas
+          // reconstruire tout le calendrier de la session dans chaque fichier.
+          const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+          const debut = iso(u.debut), fin = iso(u.fin);
+          const formation = { ...f, dateDebut: debut, dateFin: fin };
+          const personnes = stagiaires.map((personne, idx) => idx === i ? { ...personne, dateDebutFormation: debut, dateFinFormation: fin } : personne);
+          return adaptHtmlToTypeAction(generateDocumentById(`exercice_${i}_${k}`, "exercices_stagiaire", { stagiaireIdx: i, exerciceIdx: k }, o, formation, personnes), f.typeAction);
+        }, { id: `ex${k}` });
     });
 
     if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "trame", () => T.emargement(c).html);
     if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "trame", () => T.tempsConnexion(c).html);
-    par("bilan_chaud", "Bilan à chaud", "BILAN_A_CHAUD", a.bilanChaud ? "izilearn" : "trame", () => T.bilanChaud(c).html);
-    par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", a.bilanFroid ? "izilearn" : "trame", () => T.bilanFroid(c).html);
+    const finSession = new Date(`${p.session.dateFin}T00:00:00`);
+    const termine = finSession.getTime() < new Date().setHours(0, 0, 0, 0);
+    const suivi = new Date(finSession);
+    suivi.setMonth(suivi.getMonth() + 3);
+    const suiviEchu = suivi.getTime() < new Date().setHours(0, 0, 0, 0);
+    par("bilan_chaud", "Bilan à chaud", "BILAN_A_CHAUD", a.bilanChaud ? "izilearn" : termine ? "document" : "trame",
+      a.bilanChaud || !termine ? () => T.bilanChaud(c).html : gen(`bilan_chaud_${i}`, "bilan_chaud_stagiaire", { stagiaireIdx: i }));
+    par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", a.bilanFroid ? "izilearn" : suiviEchu ? "document" : "trame",
+      a.bilanFroid || !suiviEchu ? () => T.bilanFroid(c).html : gen(`bilan_froid_${i}`, "bilan_froid_stagiaire", { stagiaireIdx: i }));
 
     mailsModeles(o, f, s).forEach((m, k) => {
       const stamp = `${m.dateEnvoi.getFullYear()}-${String(m.dateEnvoi.getMonth() + 1).padStart(2, "0")}-${String(m.dateEnvoi.getDate()).padStart(2, "0")}`;
