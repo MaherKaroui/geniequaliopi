@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Reprendre exactement le tableau Qualiopi dans IZILearn avec ses sept colonnes et son rendu partagé, sans modifier les connexions enregistrées ; conserver les signatures sous les tableaux.
+
 - [x] Reprendre la signature stagiaire dans les emplacements non signés et les jours de connexion enregistrés ; récapitulatif et pagination harmonisés avec Qualiopi sans créer de preuves de présence. 20 tests réussis, aperçu et Word du relevé vérifiés sur une session de contrôle ; jours non relevés non signés. Session réelle non disponible ; non publié.
 
 - [x] Enrichir le livret d’accueil IZILearn, proposer le changement de design et appliquer la date MAJ à tous les fichiers sans modifier les dates des preuves ; 19 tests réussis, aperçu du livret, changement de design et Word vérifiés sur une session de contrôle. Session réelle et retour distant non vérifiés ; non publié.
