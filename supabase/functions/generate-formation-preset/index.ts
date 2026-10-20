@@ -34,25 +34,9 @@ Deno.serve(async req=>{
  }
  const {data:p,error}=await db.from('formation_presets').select('*').eq('id',input.id).single();if(error||!p)throw new PresetError('Formation introuvable',404);
  if(p.created_by!==user.id)throw new PresetError('Seul le créateur peut modifier ou valider cette formation.',403);
- if(input.action==='resume'){
-  if(Object.values(p.progression.leases??{}).some((l:any)=>new Date(l.expires).getTime()>Date.now()))throw new PresetError('Une génération est encore réservée ; réessayez après la fin du traitement.',409);
-  if(p.progression.error?.terminal)throw new PresetError(p.progression.error.message,p.progression.error.status,true);
-  const {data,error}=await db.from('formation_presets').update({statut:'generation',progression:{...p.progression,paused:false,error:null}}).eq('id',p.id).select('*').single();if(error)throw error;return json({preset:data});
- }
- if(input.action==='regenerate'){
-  if(p.progression.paused)throw new PresetError(p.progression.error?.message??'Génération suspendue');
-  if(Object.values(p.progression.leases??{}).some((l:any)=>new Date(l.expires).getTime()>Date.now()))throw new PresetError('Un chapitre est déjà en cours.',409);
-  if(!p.data.plan?.chapters[input.index])throw new PresetError('Chapitre introuvable');
-  const key=`chapter_${input.index}`,data={...p.data};delete data[key];
-  const {data:updated,error}=await db.from('formation_presets').update({data,statut:'generation',progression:{...p.progression,completed:p.progression.completed.filter((s:string)=>s!==key),leases:{},paused:false}}).eq('id',p.id).select('*').single();if(error)throw error;return json({preset:updated});
- }
- if(input.action==='validate'||input.action==='finalize'){
-  if(p.progression.paused)throw new PresetError(p.progression.error?.message??'Génération suspendue');
-  if(Object.values(p.progression.leases??{}).some((l:any)=>new Date(l.expires).getTime()>Date.now()))throw new PresetError('Des chapitres sont encore en cours.',409);
-  const plan=p.data.plan;if(!plan||!p.data.evaluations||!p.data.sources||plan.chapters.some((_:unknown,i:number)=>!p.data[`chapter_${i}`]))throw new PresetError('Terminez toutes les étapes avant la validation.');
-  const count=plan.chapters.reduce((n:number,_:unknown,i:number)=>n+p.data[`chapter_${i}`].sections.reduce((t:number,s:any)=>t+s.contentHtml.length,0),0);
-  if(count<500000)throw new PresetError(`Le support contient ${count.toLocaleString('fr-FR')} caractères sur 500 000 attendus ; régénérez les chapitres incomplets.`);
-  const {data,error}=await db.from('formation_presets').update({statut:input.action==='validate'?'valide':'brouillon',progression:{...p.progression,characters:count}}).eq('id',p.id).select('*').single();if(error)throw error;return json({preset:data});
+ if(['resume','regenerate','validate','finalize'].includes(input.action)){
+  if(input.action==='resume'&&p.progression.error?.terminal)throw new PresetError(p.progression.error.message,p.progression.error.status,true);
+  const {data,error}=await db.rpc('transition_formation_preset',{p_id:p.id,p_user:user.id,p_action:input.action,p_index:input.action==='regenerate'?input.index:null});if(error)throw new PresetError(error.message,409);return json({preset:data});
  }
  if(input.action!=='step')throw new PresetError('Action inconnue');
  const step=input.step,done=new Set(p.progression.completed);
