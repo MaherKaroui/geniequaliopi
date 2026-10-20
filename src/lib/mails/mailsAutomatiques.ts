@@ -340,10 +340,10 @@ function scenarioBC(c: Ctx): MailAuto[] {
  * Mails d'un stagiaire pour le type d'action du dossier, triés, sans aucun mail
  * postérieur à `aujourdhui` (un dossier d'audit ne montre jamais un mail futur).
  */
-export function mailsStagiaire(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, type: TypeAction, aujourdhui: Date = new Date()): MailAuto[] {
+export function mailsStagiaire(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, type: TypeAction, aujourdhui: Date = new Date(), options: { allowMissingRecipientEmail?: boolean } = {}): MailAuto[] {
   const debut = parseDate(s.dateDebutFormation) || parseDate(f.dateDebut);
   const fin = parseDate(s.dateFinFormation) || parseDate(f.dateFin) || debut;
-  if (!debut || !fin || !(s.email || "").trim()) return [];
+  if (!debut || !fin || (!options.allowMissingRecipientEmail && !(s.email || "").trim())) return [];
   const nom = `${s.prenom} ${s.nom}`.trim();
   const c: Ctx = {
     o, f, s, debut, fin, nom,

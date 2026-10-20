@@ -72,8 +72,9 @@ export default function EspaceIzilearn() {
   }
 
   const chemin = (p: Piece) => {
-    const cat = CATEGORIES.find((c) => c.key === p.categorie)!;
-    const s = p.apprenantIdx !== null ? cx!.stagiaires[p.apprenantIdx] : null;
+    const cat = CATEGORIES.find((c) => c.key === p.categorie);
+    if (!cat) return "Documents";
+    const s = p.apprenantIdx !== null ? cx?.stagiaires[p.apprenantIdx] : null;
     return s ? `${cat.dossier}/${dossierApprenant(s)}` : cat.dossier;
   };
 
@@ -268,8 +269,9 @@ export default function EspaceIzilearn() {
                       <Button variant="ghost" size="sm" onClick={() => setApercuId(x.id)}><Eye className="w-4 h-4 mr-1" />Aperçu</Button>
                       {x.mail ? (
                         <>
-                          <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(`${x.mail!.objet}\n\n${corpsTexte(x.mail!)}`); toast.success("Mail copié"); }}><Copy className="w-4 h-4 mr-1" />Copier</Button>
-                          <Button variant="ghost" size="sm" asChild><a href={lienMailto(x.mail)}><Send className="w-4 h-4 mr-1" />Envoyer</a></Button>
+                          <Button variant="ghost" size="sm" onClick={async () => { if (!x.mail) return; try { await navigator.clipboard.writeText(`${x.mail.objet}\n\n${corpsTexte(x.mail)}`); toast.success("Mail copié"); } catch { toast.error("Copie impossible"); } }}><Copy className="w-4 h-4 mr-1" />Copier</Button>
+                          {x.mail.destinataireEmail && cx.o.email ? <Button variant="ghost" size="sm" asChild><a href={lienMailto(x.mail)}><Send className="w-4 h-4 mr-1" />Ouvrir la messagerie</a></Button> : <span className="text-xs text-muted-foreground">Adresse e-mail à compléter</span>}
+                          <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => unique(x)}><FileDown className="w-4 h-4 mr-1" />Télécharger</Button>
                         </>
                       ) : (
                         <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => unique(x)}><FileDown className="w-4 h-4 mr-1" />{format === "pdf" ? "PDF" : "Word"}</Button>
@@ -290,9 +292,9 @@ export default function EspaceIzilearn() {
             <DialogTitle className="text-base pr-8 truncate">{apercu?.titre}</DialogTitle>
           </DialogHeader>
           {apercu && <iframe title="Aperçu" className="flex-1 w-full bg-white" srcDoc={rendre(apercu)} />}
-          {apercu && !apercu.mail && (
+          {apercu && (
             <div className="px-5 py-3 border-t flex justify-end">
-              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />Télécharger en {format === "pdf" ? "PDF" : "Word"}</Button>
+              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger le mail" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
             </div>
           )}
         </DialogContent>
