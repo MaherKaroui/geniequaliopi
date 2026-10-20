@@ -83,6 +83,19 @@ describe("Espace IZILearn", () => {
     expect(html).not.toContain("7 h 00");
   });
 
+  it("complète la déconnexion depuis le début et la durée réellement enregistrés", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.apprenants[0].connexions = [
+      { debut: "2026-11-02T09:05:00", secondes: 3600, source: "meet" },
+      { debut: "2026-11-02T13:35:00", secondes: 5400, source: "lms" },
+    ];
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre();
+    expect(html).toContain("10:05");
+    expect(html).toContain("15:05");
+    expect(html).toContain("2 h 30");
+    expect(html).not.toContain("17:00");
+  });
+
   it("remplit les besoins et le positionnement avec les mêmes générateurs que Qualiopi", () => {
     const pieces = planPieces(contexte(payload("actions-formation", 3)));
     const besoins = pieces.find((p) => p.id === "besoins_0");

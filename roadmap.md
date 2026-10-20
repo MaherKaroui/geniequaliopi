@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Compléter le relevé IZILearn depuis les horaires et durées enregistrés et ajouter un emplacement de signature stagiaire par jour, ainsi qu’aux bilans importés.
+
 - [x] Corriger les questionnaires IZILearn importés vides qui bloquent le remplissage Qualiopi et l’aperçu obsolète après actualisation ; 9 tests réussis, aperçu actualisé et zone de signature vérifiés sur une session de contrôle, compilation OK. Données de la session réelle de l’utilisateur non disponibles ; correction non publiée.
 
 - [x] Adapter le relevé de connexion IZILearn au modèle Qualiopi et ajouter un emplacement pour la signature du stagiaire ; 7 tests réussis, aperçu et Word vérifiés avec une session de contrôle. Connexions réelles conservées, horaires manquants non inventés.
