@@ -19,7 +19,8 @@ describe("Signatures manuelles IZILearn", () => {
     expect(copied).toHaveLength(1);
     expect(copied[0].closest("table")).toBeNull();
     expect(doc.querySelector('[data-learner-signature="recorded-connection"]')?.textContent).toContain("Signature reprise");
-    expect(doc.body.textContent).toContain("Non relevé");
+    expect(doc.querySelectorAll('[data-learner-signature="recorded-connection"]')).toHaveLength(1);
+    expect(doc.querySelectorAll('img[alt="Signature stagiaire reprise"]')).toHaveLength(1);
   });
   it("reprend la signature disponible seulement sur les jours enregistrés sans écraser une signature existante", () => {
     const cx = contexteAvecSignatures(contexte({ ...payload, apprenants: [{ ...payload.apprenants[0], signatureUrl: image }, payload.apprenants[1]] }), {});
