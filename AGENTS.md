@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Rapid document edits are sanitized HTML overrides stored inside the rapid formation JSON and resolved at the shared preview/export boundary; identity-based recipient/action keys prevent corrections leaking to another person or action, and the account-scoped local draft survives browser restarts without changing database schema.
+
 - Rapid generation enables `FormationInfo.dureeSaisiePrioritaire` at its shared preparation boundary; duration helpers honor it to preserve entered duration without changing other generators.
 - VAE contractual articles are generated through the shared `genVAEContrat` for indicators 4 and 9; company presence selects the parties while the declared funding selects payment terms, avoiding divergent documents.
 - External quality-services contracts use the shared `genContratPrestationQualiopi` across action types, distinct from trainer and beneficiary contracts, so mandate clauses and provider identity cannot diverge.

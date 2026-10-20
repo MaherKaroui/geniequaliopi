@@ -39,6 +39,8 @@ import FakeStagiairesToolbar from "@/components/FakeStagiairesToolbar";
 import { Badge } from "@/components/ui/badge";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { grouperStagiairesParClient } from "@/lib/rapideFacturation";
+import RapideDocumentEditor from "@/components/RapideDocumentEditor";
+import { rapideDocumentEditKey, resolveRapideDocument } from "@/lib/rapideDocumentEdits";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -112,6 +114,13 @@ const paramsFor = (p: PlannedDoc): Record<string, any> => ({
   ...(p.idxs ? { stagiaireIdxs: p.idxs } : {}),
   ...(p.clientNo ? { clientNo: p.clientNo } : {}),
 });
+
+const editKeyFor = (item: PlannedDoc, form: FormationInfo, people: StagiaireInfo[]) =>
+  rapideDocumentEditKey(item.doc.key, form.typeAction,
+    item.idxs ? item.idxs.flatMap(i => people[i] ? [people[i]] : []) : item.stagiaire ? [item.stagiaire] : [],
+    Boolean(item.doc.perClient));
+
+const rapidDraftKey = (id: string) => `qualiopi_rapide_draft_v1_${id}`;
 
 /** Documents à produire pour un type de pièce, indépendamment de la sélection. */
 function planDoc(doc: PackDoc, stagiaires: StagiaireInfo[]): PlannedDoc[] {
@@ -299,10 +308,6 @@ const GenerationRapide = () => {
   const [historyKey, setHistoryKey] = useState(0);
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-  }, []);
-
   const [selected, setSelected] = useState<Record<string, boolean>>(() => {
     try {
       const raw = sessionStorage.getItem("qualiopi_rapide_docs");
@@ -342,6 +347,8 @@ const GenerationRapide = () => {
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<PackDoc | null>(null);
+  const [editingIndex, setEditingIndex] = useState("0");
 
   const docFileRef = useRef<HTMLInputElement>(null);
   const edofFileRef = useRef<HTMLInputElement>(null);
@@ -357,12 +364,24 @@ const GenerationRapide = () => {
       }
       return fallback;
     };
-    setOrganisme(read("qualiopi_rapide_org", "qualiopi_org", emptyOrganisme));
-    setFormation(read("qualiopi_rapide_form", "qualiopi_form", emptyFormation));
-    const st = read<StagiaireInfo[]>("qualiopi_rapide_stag", "qualiopi_stag", []);
-    setStagiaires(st.length > 0 ? st : [{ ...emptyStagiaire }]);
-    setLoaded(true);
+    void supabase.auth.getUser().then(({ data }) => {
+      const id = data.user?.id ?? null;
+      setUserId(id);
+      let draft: { organisme?: OrganismeInfo; formation?: FormationInfo; stagiaires?: StagiaireInfo[] } | null = null;
+      try { if (id) draft = JSON.parse(localStorage.getItem(rapidDraftKey(id)) || "null"); } catch { /* ignore invalid draft */ }
+      setOrganisme(draft?.organisme || read("qualiopi_rapide_org", "qualiopi_org", emptyOrganisme));
+      setFormation(draft?.formation || read("qualiopi_rapide_form", "qualiopi_form", emptyFormation));
+      const st = draft?.stagiaires || read<StagiaireInfo[]>("qualiopi_rapide_stag", "qualiopi_stag", []);
+      setStagiaires(st.length > 0 ? st : [{ ...emptyStagiaire }]);
+      setLoaded(true);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!loaded || !userId) return;
+    try { localStorage.setItem(rapidDraftKey(userId), JSON.stringify({ organisme, formation, stagiaires })); }
+    catch { toast.error("Sauvegarde locale impossible : enregistrez le dossier dans l’historique."); }
+  }, [loaded, userId, organisme, formation, stagiaires]);
 
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_org", JSON.stringify(organisme)); }, [organisme, loaded]);
   useEffect(() => { if (loaded) sessionStorage.setItem("qualiopi_rapide_form", JSON.stringify(formation)); }, [formation, loaded]);
@@ -584,6 +603,16 @@ const GenerationRapide = () => {
   const effectiveDocStyle = automaticStyle ? autoDesign.style : manualStyle;
   const effectiveDesignName = automaticStyle ? autoDesign.name : "Personnalisé";
 
+  const editingTargets = editingDoc ? planDoc(editingDoc, stagiaires) : [];
+  const editingItem = editingTargets[Number(editingIndex)];
+  const editingHtml = useMemo(() => {
+    if (!editingItem) return "";
+    setDocStyle(effectiveDocStyle);
+    const safe = buildFormationSafe(formation, organisme, stagiairesValides);
+    return resolveRapideDocument(formation, editKeyFor(editingItem, formation, stagiaires), () =>
+      adaptHtmlToTypeAction(generateDocumentById(editingItem.doc.key, editingItem.doc.template, paramsFor(editingItem), organisme, safe, stagiaires), safe.typeAction));
+  }, [editingDoc, editingIndex, formation, organisme, stagiaires, effectiveDocStyle]);
+
   /* ---------- Contrôles bloquants ---------- */
   const erreurs = useMemo(() => {
     const e: string[] = [];
@@ -638,7 +667,7 @@ const GenerationRapide = () => {
         const blob = await genCerfaApprentissagePdf(organisme, safeFormation, s);
         setPreviewBlobUrl(URL.createObjectURL(blob));
       } else {
-        const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction);
+        const content = resolveRapideDocument(formation, editKeyFor(item, formation, stagiaires), () => adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction));
         if (exportFormat === "pdf") {
           const blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options);
           setPreviewBlobUrl(URL.createObjectURL(blob));
@@ -673,7 +702,7 @@ const GenerationRapide = () => {
           blob = await genCerfaApprentissagePdf(organisme, safeFormation, stagiaire);
           ext = ".pdf";
         } else {
-          const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction);
+          const content = resolveRapideDocument(formation, editKeyFor(item, formation, stagiaires), () => adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), organisme, safeFormation, stagiaires), safeFormation.typeAction));
           if (exportFormat === "pdf") { blob = await htmlToPdfBlob(content, PDF_QUALITIES[pdfQuality].options); ext = ".pdf"; }
           else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
         }
@@ -737,7 +766,7 @@ const GenerationRapide = () => {
               blob = await genCerfaApprentissagePdf(snapOrg, snapForm, stagiaire);
               ext = ".pdf";
             } else {
-              const content = adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), snapOrg, snapForm, snapStag), snapForm.typeAction);
+              const content = resolveRapideDocument(snapForm, editKeyFor(item, snapForm, snapStag), () => adaptHtmlToTypeAction(generateDocumentById(doc.key, doc.template, paramsFor(item), snapOrg, snapForm, snapStag), snapForm.typeAction));
               if (snapFormat === "pdf") { blob = await htmlToPdfBlob(content, pdfOptions); ext = ".pdf"; }
               else { blob = await htmlToWordBlob(content); ext = blob.type.includes("officedocument") ? ".docx" : ".doc"; }
             }
@@ -793,17 +822,20 @@ const GenerationRapide = () => {
         .eq("name", name)
         .limit(1);
       if (existing && existing.length > 0) {
-        await supabase
+        const { error } = await supabase
           .from("rapide_generations")
           .update({ ...payload, updated_at: new Date().toISOString() })
           .eq("id", (existing[0] as any).id);
+        if (error) throw error;
       } else {
-        await supabase.from("rapide_generations").insert({ user_id: userId, name, ...payload });
+        const { error } = await supabase.from("rapide_generations").insert({ user_id: userId, name, ...payload });
+        if (error) throw error;
       }
       setHistoryKey((k) => k + 1);
       toast.success("Génération enregistrée dans l'historique rapide");
     } catch (e) {
       console.error("[HISTORIQUE RAPIDE]", e);
+      toast.error("Enregistrement dans l’historique impossible ; votre dossier reste conservé dans ce navigateur.");
     }
   };
 
@@ -1188,6 +1220,13 @@ const GenerationRapide = () => {
                           : doc.perStagiaire ? `${unite}${actif ? ` — ${count} document(s)` : ""}` : "1 exemplaire"}
                     </p>
                   </div>
+                  {doc.key !== "cerfa" && (
+                    <Button data-no-check variant="outline" size="sm" disabled={grisee || planDoc(doc, stagiaires).length === 0}
+                      onClick={() => { setEditingIndex("0"); setEditingDoc(doc); }}
+                      title="Modifier" aria-label={`Modifier : ${doc.label}`} className="h-8 w-8 p-0 shrink-0 rounded-lg">
+                      <PenTool className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button
                     data-no-check
                     variant="outline"
@@ -1324,6 +1363,25 @@ const GenerationRapide = () => {
       </div>
 
       {/* APERÇU */}
+      <Dialog open={!!editingDoc} onOpenChange={(open) => { if (!open) setEditingDoc(null); }}>
+        <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
+          <DialogHeader><DialogTitle>Modifier — {editingDoc?.label}</DialogTitle></DialogHeader>
+          {editingTargets.length > 1 && <Select value={editingIndex} onValueChange={setEditingIndex}>
+            <SelectTrigger aria-label="Document à modifier"><SelectValue /></SelectTrigger>
+            <SelectContent>{editingTargets.map((item, index) => <SelectItem key={index} value={String(index)}>
+              {item.stagiaire ? `${item.stagiaire.prenom} ${item.stagiaire.nom}` : item.doc.label}
+            </SelectItem>)}</SelectContent>
+          </Select>}
+          {editingItem && <RapideDocumentEditor key={editKeyFor(editingItem, formation, stagiaires)} html={editingHtml} onSave={(html) => {
+            const key = editKeyFor(editingItem, formation, stagiaires);
+            const nextForm = { ...formation, rapideDocumentEdits: { ...formation.rapideDocumentEdits, [key]: html } };
+            setFormation(nextForm);
+            void saveHistorique(organisme, nextForm, stagiaires);
+            setEditingDoc(null);
+            toast.success("Modifications conservées pour les prochains téléchargements.");
+          }} />}
+        </DialogContent>
+      </Dialog>
       <Dialog open={previewOpen} onOpenChange={(o) => { setPreviewOpen(o); if (!o && previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); } }}>
         <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
           <DialogHeader><DialogTitle className="text-base">{previewTitle}</DialogTitle></DialogHeader>
