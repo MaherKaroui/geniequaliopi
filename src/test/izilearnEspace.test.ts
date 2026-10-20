@@ -3,6 +3,7 @@ import { contexte, planPieces } from "@/lib/izilearn/pieces";
 import { unitesExercices } from "@/lib/izilearn/trames";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import type { IzApprenant, IzPayload, IzSlot } from "@/lib/izilearn/types";
+import { mailPourCapture } from "@/lib/izilearn/mailCapture";
 
 function creneaux(debut: string, nbJours: number): IzSlot[] {
   const out: IzSlot[] = [];
@@ -45,6 +46,19 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 
 describe("Espace IZILearn", () => {
   afterEach(() => vi.useRealTimers());
+
+  it("reprend automatiquement le mail dans une capture sans inventer de réponse du stagiaire", () => {
+    const cx = contexte(payload("actions-formation", 3));
+    const modele = planPieces(cx).find((p) => p.mail?.key === "af_convocation")?.mail;
+    if (!modele) throw new Error("Convocation absente");
+    const capture = mailPourCapture(modele, cx.o);
+    expect(capture.messages).toHaveLength(1);
+    expect(capture.messages[0].fromEmail).toBe("contact@organisme-test.fr");
+    expect(capture.messages[0].toEmail).toBe("a1@exemple.fr");
+    expect(capture.messages[0].date).toEqual(modele.dateEnvoi);
+    expect(capture.messages[0].atts.map((a) => a.name)).toEqual(modele.piecesJointes);
+    expect(capture.messages[0].atts.every((a) => a.size === "")).toBe(true);
+  });
 
   it("génère les mails même sans adresses, sans inventer de destinataire", () => {
     const p = payload("actions-formation", 3, "distanciel");

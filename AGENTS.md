@@ -1,7 +1,7 @@
 # Architecture rules
 
 - IZILearn resolves document autofill in its shared piece catalog with existing Qualiopi generators; only substantive imported responses/results override generated content (empty questionnaire shells do not), future exercises/evaluations remain blank, and attendance/signatures/connections only use recorded platform evidence. Previews resolve the current piece by ID so refreshed session data cannot leave stale content open.
-- IZILearn email drafts reuse the shared Qualiopi scenarios with an explicit missing-recipient opt-in; only organizer messages are exposed, missing addresses never suppress drafts, and synthetic meeting links are replaced with session-access instructions to avoid fabricated evidence.
+- IZILearn email drafts reuse the shared Qualiopi scenarios and Gmail/Outlook capture engine for previews and PNG exports; the capture adapter includes only organizer messages and explicit unconfirmed-draft status, missing addresses never suppress drafts, and synthetic meeting links are replaced with session-access instructions to avoid fabricated evidence.
 
 - IZIBUSINESS completed training records and dates are resolved by one shared helper for the combined attestation and every IND 22 plan, preventing planned dates from overwriting completed actions.
 
