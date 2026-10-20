@@ -19,7 +19,7 @@ export function contexteAvecSignatures(cx: Contexte, signatures: LearnerSignatur
   return { ...cx, stagiaires: cx.stagiaires.map((s, i) => {
     const traineeKey = signatureKey(cx.p, i, "stagiaire");
     const companyKey = signatureKey(cx.p, i, "entreprise");
-    const image = traineeKey ? signatures[traineeKey] : undefined;
+    const image = (traineeKey ? signatures[traineeKey] : undefined) || cx.p.apprenants[i]?.signatureUrl;
     const company = companyKey ? signatures[companyKey] : undefined;
     return { ...s, signatureUrl: image && validSignatureImage(image) ? image : s.signatureUrl, signatureResponsableUrl: company && validSignatureImage(company) ? company : s.signatureResponsableUrl };
   }) };
@@ -43,6 +43,19 @@ export function applyLearnerSignatures(html: string, piece: Piece, cx: Contexte)
     image.alt = enterprise ? "Signature responsable entreprise" : "Signature stagiaire";
     image.setAttribute("style", "max-width:150px;max-height:65px;object-fit:contain");
     box.appendChild(image);
+  }
+  // Copy only to recorded connection days, never to an unsigned attendance row.
+  if (piece.categorie === "connexion" && learner.signatureUrl && validSignatureImage(learner.signatureUrl)) {
+    for (const cell of doc.querySelectorAll('[data-learner-signature="recorded-connection"]')) {
+      if (cell.querySelector("img")) continue;
+      const image = doc.createElement("img");
+      image.src = learner.signatureUrl;
+      image.alt = "Signature stagiaire reprise";
+      image.setAttribute("style", "max-width:100%;max-height:45px;object-fit:contain");
+      const label = doc.createElement("small");
+      label.textContent = "Signature reprise";
+      cell.append(image, label);
+    }
   }
   return "<!DOCTYPE html>" + doc.documentElement.outerHTML;
 }
