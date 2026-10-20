@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 import { contexte, planPieces } from "@/lib/izilearn/pieces";
 import { unitesExercices } from "@/lib/izilearn/trames";
 import type { IzApprenant, IzPayload, IzSlot } from "@/lib/izilearn/types";
@@ -43,6 +43,46 @@ function payload(type: IzPayload["formation"]["typeAction"], nbJours: number, mo
 }
 
 describe("Espace IZILearn", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("remplit les besoins et le positionnement avec les mêmes générateurs que Qualiopi", () => {
+    const pieces = planPieces(contexte(payload("actions-formation", 3)));
+    const besoins = pieces.find((p) => p.id === "besoins_0");
+    const test = pieces.find((p) => p.id === "positionnement_0");
+    expect(besoins?.source).toBe("document");
+    expect(besoins?.rendre()).toContain("ACME");
+    expect(test?.source).toBe("document");
+    expect(test?.rendre()).toContain("Réponse du stagiaire");
+  });
+
+  it("conserve les réponses, notes, signatures et connexions importées", () => {
+    const p = payload("actions-formation", 3, "distanciel");
+    p.apprenants[0].positionnement = [{ titre: "Test réel", date: "2026-11-02", score: 3, max: 10, appreciation: "À approfondir" }];
+    p.apprenants[0].bilanChaud = { titre: "Retour réel", date: "2026-11-04", reponses: [{ question: "Avis", reponse: "Organisation à améliorer" }] };
+    p.apprenants[0].connexions = [{ debut: "2026-11-02T09:00:00", fin: "2026-11-02T10:00:00", secondes: 3600, source: "meet" }];
+    const pieces = planPieces(contexte(p));
+    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("3 / 10");
+    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("À approfondir");
+    expect(pieces.find((x) => x.id === "bilan_chaud_0")?.rendre()).toContain("Organisation à améliorer");
+    expect(pieces.find((x) => x.id === "connexion_0")?.rendre()).toContain("1 h 00");
+  });
+
+  it("laisse les exercices futurs et bilans non échus vides, remplit ceux échus", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T13:48:00Z"));
+    const p = payload("actions-formation", 3);
+    const future = planPieces(contexte(p));
+    expect(future.find((x) => x.id === "exercices_0_ex0")?.source).toBe("trame");
+    expect(future.find((x) => x.id === "bilan_chaud_0")?.source).toBe("trame");
+    expect(future.find((x) => x.id === "bilan_froid_0")?.source).toBe("trame");
+    vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
+    const held = planPieces(contexte(p));
+    expect(held.find((x) => x.id === "exercices_0_ex0")?.source).toBe("document");
+    expect(held.find((x) => x.id === "bilan_chaud_0")?.source).toBe("document");
+    expect(held.find((x) => x.id === "bilan_froid_0")?.source).toBe("trame");
+    vi.setSystemTime(new Date("2027-02-05T13:48:00Z"));
+    expect(planPieces(contexte(p)).find((x) => x.id === "bilan_froid_0")?.source).toBe("document");
+  });
   it("rythme des exercices : jour si court, semaine si long ou CFA", () => {
     const court = contexte(payload("actions-formation", 5));
     expect(unitesExercices(court.p, court.stagiaires[0], court.f).map((u) => u.type)).toEqual(Array(5).fill("jour"));
@@ -55,7 +95,7 @@ describe("Espace IZILearn", () => {
   });
 
   for (const type of ["actions-formation", "apprentissage"] as const) {
-    it(`génère toutes les pièces sans réponse ni signature inventée (${type})`, () => {
+    it(`génère toutes les pièces et conserve les preuves IZILearn (${type})`, () => {
       const cx = contexte(payload(type, 3, "hybride"));
       const pieces = planPieces(cx);
       const cats = new Set(pieces.map((p) => p.categorie));
@@ -65,7 +105,9 @@ describe("Espace IZILearn", () => {
       for (const p of pieces) {
         const html = p.rendre();
         expect(html.length, p.titre).toBeGreaterThan(300);
-        expect(html, p.titre).not.toMatch(/Signé [A-Z]\.|Réponse du stagiaire|Appréciation du formateur :<\/strong> [A-Z]/);
+        if (p.categorie === "emargement" || p.categorie === "connexion") {
+          expect(html, p.titre).not.toMatch(/Signé [A-Z]\.|Réponse du stagiaire/);
+        }
       }
       const em = pieces.find((p) => p.id === "emargement_0")!;
       expect(em.source).toBe("izilearn");
