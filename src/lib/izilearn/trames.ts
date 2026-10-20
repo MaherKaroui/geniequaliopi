@@ -193,7 +193,9 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
         h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
       });
     }
-    const ouvertes = getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || [];
+    const ouvertes = hasEvalContentDedie(c.f.intitule)
+      ? getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || []
+      : lignesObjectifs(c.f).map((objectif) => ({ question: `Expliquez votre démarche et illustrez par une réalisation l'objectif suivant : ${objectif}.` }));
     if (ouvertes.length) {
       h += `<h2>Questions ouvertes</h2>`;
       ouvertes.slice(0, 10).forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p>${LIGNES(3)}`; });
