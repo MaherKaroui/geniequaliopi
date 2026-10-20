@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Regrouper les deux attestations IZIBUSINESS selon le modèle EMI EVOLUTION, personnaliser les données et synchroniser les formations antérieures à la MAJ dans les plans AF, NTC/CFA, BC et VAE ; vérifier les exports.
+- [x] Regrouper les deux attestations IZIBUSINESS selon le modèle EMI EVOLUTION ; synchroniser les formations antérieures à la MAJ dans les plans AF, NTC/CFA, BC et VAE. 32 tests réussis ; unique attestation et téléchargement PDF vérifiés en session connectée. Relecture visuelle des deux pages : cachet initialement absent corrigé, titres/dates lisibles et pied de page complet ; rendu Word non vérifié.
 
 - [x] Ajouter la modification des documents du pack rapide : corrections conservées dans le dossier/historique et le brouillon local par compte ; sauvegarde, rechargement, aperçu, Word individuel, ZIP et PDF vérifiés en session connectée, 15 tests réussis. Le CERFA reste modifiable par ses champs de formulaire.
 
