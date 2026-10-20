@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Ajouter et vérifier l’examen final par apprenant dans IZILearn, aperçu et exports, sans résultats inventés.
+- [x] Ajouter l’examen final par apprenant dans IZILearn : questions adaptées, résultats réels prioritaires, signatures et exports partagés ; 24 tests réussis, aperçu et PDF vérifiés sur une session de contrôle, aucune erreur. Session réelle et retour distant non vérifiés ; non publié.
 
 - [x] Retirer la mise à jour, sa date et V1 des captures de mails IZILearn ; captures Gmail/Outlook, téléchargement PNG et ZIP de 8 captures vérifiés, date du message conservée.
 
