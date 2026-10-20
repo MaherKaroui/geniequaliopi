@@ -38,8 +38,7 @@ export function mailsModeles(o: OrganismeInfo, f: FormationInfo, s: StagiaireInf
         destinataire: x.toName,
         destinataireEmail: x.toEmail,
         // Les liens Meet du catalogue fictif ne constituent pas un accès IZILearn réel.
-        corpsHtml: x.body.replace(/<p>[^<]*(?:Lien Google Meet|Voici les informations de connexion)[\s\S]*?<\/p>/gi, (p) => p.includes("https://meet.google.com/") ? "" : p)
-          .replace(/<p>[^]*?https:\/\/meet\.google\.com\/[^]*?<\/p>/gi, "<p>Les informations de connexion sont disponibles dans votre session IZILearn. Pour toute assistance technique ou pédagogique, contactez l’organisme.</p>"),
+        corpsHtml: x.body.replace(/<p>(?:(?!<\/p>)[\s\S])*https:\/\/meet\.google\.com\/(?:(?!<\/p>)[\s\S])*<\/p>/gi, "<p>Les informations de connexion sont disponibles dans votre session IZILearn. Pour toute assistance technique ou pédagogique, contactez l’organisme.</p>"),
         piecesJointes: x.atts.map((a) => a.name),
       });
     });
