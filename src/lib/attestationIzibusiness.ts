@@ -4,7 +4,8 @@
  */
 import type { OrganismeInfo } from "@/types/qualiopi";
 import { buildDocument } from "./docBuilder";
-import izibusinessTamponAsset from "@/assets/izibusiness_tampon.png.asset.json";
+// Existing source-controlled stamp is served directly in preview and exports.
+const izibusinessTamponAsset = { url: "/images/izibusiness_tampon.png" };
 
 export const IZIBUSINESS_ORG = {
   nom: "IZIBUSINESS", siret: "892 035 320 00019", adresse: "6 rue d'Armaillé", codePostal: "75017", ville: "PARIS",
@@ -60,13 +61,22 @@ export function genAttestationIzibusiness(o: OrganismeInfo, beneficiaire?: strin
   const fin = formations.map(fi => fi.fin).sort().at(-1) || iso(baseDate(o));
   const nom = (beneficiaire || o.dirigeant || "").trim();
   const izi = { ...o, ...IZIBUSINESS_ORG, telephone: "", logoUrl: "", tamponUrl: izibusinessTamponAsset.url, signatureUrl: "", dateMaj: fin } as OrganismeInfo;
-  return buildDocument({
+  const html = buildDocument({
     org: izi, title: "ATTESTATION DE FIN DE FORMATION",
     sections: [
       { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}, déclaration d'activité n° ${IZIBUSINESS_ORG.nda}), atteste que :</p><p>${nom ? `<strong>${esc(nom)}</strong>` : ""}${o.nom ? `${nom ? ", " : ""}${esc(o.nom)}` : ""}${o.siret ? ` (SIRET ${esc(o.siret)})` : ""},</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
       ...formations.map((fi, i) => ({ heading: `Formation ${i + 1} — « ${fi.nom} »`, content: `<p>Du ${formatDate(fi.debut)} au ${formatDate(fi.fin)}, d'une durée de <strong>${fi.duree}</strong>.</p><p><strong>Objectif :</strong> ${fi.objectif}</p><p><strong>Contenu :</strong><br>${fi.programme.join("<br>")}</p>${i === formations.length - 1 ? `<p><strong>Durée totale : 4 jours (${formations.reduce((n, item) => n + item.heures, 0)} heures).</strong></p>` : ""}` })),
       { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique en fin de chaque formation.</p>`, variant: "green" },
     ],
-    extraHtml: `<p style="margin-top:24px">Fait à Paris, le ${formatDate(fin)}.</p><div style="margin-top:10px"><p><strong>Nadine DENDANI</strong>, dirigeante — IZIBUSINESS</p><img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="max-height:110px;max-width:220px;object-fit:contain" /></div>`,
+    extraHtml: `<p style="margin-top:12px">Fait à Paris, le ${formatDate(fin)}.</p><div style="margin-top:6px"><p><strong>Nadine DENDANI</strong>, dirigeante — IZIBUSINESS</p><img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="height:65px;max-width:160px;object-fit:contain" /></div>`,
   });
+  return html.replace("</head>", `<style>
+    body{font-size:12px;line-height:1.35}
+    .header{margin-bottom:12px}.org-name{font-size:20px}.subtitle{font-size:11px}
+    h1{font-size:19px;margin-bottom:12px}
+    h2{font-size:13px;margin:10px 0 5px;padding-bottom:3px!important}
+    p{font-size:12px;margin-bottom:5px}
+    .section{margin:5px 0 8px;padding:0;background:none;border:0;border-radius:0}
+    .footer{margin-top:12px;padding-top:8px;font-size:10px;line-height:1.2}
+  </style></head>`);
 }
