@@ -10,7 +10,7 @@ export function mailPourCapture(m: MailModele, o: OrganismeInfo): MailAuto {
       fromName: o.nom, fromEmail: o.email,
       toName: m.destinataire, toEmail: m.destinataireEmail,
       date: m.dateEnvoi,
-      body: "<p><strong>MODÈLE DE MAIL — ENVOI NON CONFIRMÉ</strong></p>" + m.corpsHtml,
+      body: "<p><small>Brouillon</small></p>" + m.corpsHtml,
       atts: m.piecesJointes.map((name) => ({ name, size: "" })),
     }],
   };
