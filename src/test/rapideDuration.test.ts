@@ -17,6 +17,19 @@ const stagiaire = {
 };
 
 describe("durée saisie du pack rapide", () => {
+  it("reprend la durée du formulaire dans les contrats IND 9 même hors pack rapide", () => {
+    const jenna = { ...stagiaire, prenom: "Jenna", nom: "CHEBEL", entreprise: "",
+      dateDebutFormation: "2026-03-02", dateFinFormation: "2026-04-30" };
+    for (const template of ["contrat_formation_pro_stagiaire", "contrat_formation_pro"]) {
+      const html = generateDocumentById("af_c3i9_contrat_formation_0", template, { stagiaireIdx: 0 },
+        ORG_TEST, { ...formation, typeAction: "actions-formation", dureeSaisiePrioritaire: false }, [jenna]);
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const organisation = Array.from(doc.querySelectorAll("h3"))
+        .find(h => h.textContent?.includes("Article 3"))?.nextElementSibling;
+      expect(organisation?.childNodes[1]?.textContent?.trim(), template).toBe(formation.duree);
+    }
+  });
+
   it("conserve exactement la durée saisie malgré des dates individuelles différentes", () => {
     expect(getStagiaireDuree(stagiaire, formation)).toBe("24 heures réparties sur 3 mois");
     expect(getStagiaireDuree(stagiaire, { ...formation, duree: "14h30" })).toBe("14h30");
