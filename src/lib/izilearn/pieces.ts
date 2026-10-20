@@ -140,8 +140,8 @@ export function planPieces(cx: Contexte): Piece[] {
 
     const examen = (a.examenFinal || []).some(hasRecordedQuiz);
     par("examen_final", "Examen final", "EXAMEN_FINAL", examen ? "izilearn" : "trame", () => T.examenFinal(c).html);
-    if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "trame", () => T.emargement(c).html);
-    if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "trame", () => T.tempsConnexion(c).html);
+    if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "document", () => T.emargement(c).html);
+    if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "document", () => T.tempsConnexion(c).html);
     const finSession = new Date(`${p.session.dateFin}T00:00:00`);
     const termine = finSession.getTime() < new Date().setHours(0, 0, 0, 0);
     const suivi = new Date(finSession);
