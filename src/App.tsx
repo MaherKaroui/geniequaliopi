@@ -26,6 +26,7 @@ import AccessGate from "./components/AccessGate";
 import { installActivityTracker } from "./lib/activityTracker";
 import { isEmbeddedVAE } from "./lib/vae/embedMode";
 import { isEmbeddedBDC } from "./lib/bdc/embedMode";
+import EspaceIzilearn from "./pages/EspaceIzilearn";
 
 installActivityTracker();
 
@@ -33,6 +34,8 @@ const queryClient = new QueryClient();
 
 const ApplicationContent = () => {
   const location = useLocation();
+  // Espace IZILearn : accessible par lien, sans code d'accès ; ses données viennent d'IZILearn.
+  if (location.pathname === "/izilearn") return <EspaceIzilearn />;
   if (isEmbeddedBDC(location.pathname, location.search)) {
     return <BackgroundJobsProvider><BilanCompetences embedded /></BackgroundJobsProvider>;
   }

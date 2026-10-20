@@ -1,0 +1,134 @@
+/**
+ * Plan des pièces de l'espace IZILearn, par catégorie et par apprenant.
+ * Pièces « à remettre » (programme, convocation, convention / contrat, CGV, RI,
+ * livret d'accueil, support de cours) : générateurs existants du dossier Qualiopi.
+ * Pièces « à compléter » : trames.ts (données IZILearn réelles ou trame vierge).
+ */
+import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import { generateDocumentById } from "@/lib/documentGenerator";
+import { adaptHtmlToTypeAction } from "@/lib/adaptTypeAction";
+import type { IzPayload } from "./types";
+import { estDistanciel, versFormation, versOrganisme, versStagiaires } from "./mapping";
+import * as T from "./trames";
+import { mailHtml, mailsModeles, type MailModele } from "./mails";
+
+export type CategorieKey =
+  | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
+  | "livret" | "support" | "exercices" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
+
+export interface Categorie { key: CategorieKey; label: string; dossier: string; aide: string }
+
+export const CATEGORIES: Categorie[] = [
+  { key: "programme", label: "Programme", dossier: "01_Programme", aide: "Programme de formation (indicateur 1)." },
+  { key: "besoins", label: "Évaluation des besoins", dossier: "02_Evaluation_des_besoins", aide: "Réponses envoyées en ligne si elles existent, sinon trame nominative." },
+  { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Résultats IZILearn + trame du test de début de formation." },
+  { key: "convocation", label: "Convocation", dossier: "04_Convocation", aide: "Convocation de l'apprenant à la session." },
+  { key: "convention", label: "Convention ou contrat", dossier: "05_Convention_Contrat", aide: "Convention si l'apprenant est rattaché à une entreprise, contrat de formation sinon (CFA : convention de formation par apprentissage)." },
+  { key: "cgv", label: "CGV", dossier: "06_CGV", aide: "Conditions générales de vente." },
+  { key: "ri", label: "Règlement intérieur", dossier: "07_Reglement_interieur", aide: "Règlement intérieur applicable aux apprenants." },
+  { key: "livret", label: "Livret d'accueil", dossier: "08_Livret_d_accueil", aide: "Livret d'accueil de l'apprenant." },
+  { key: "support", label: "Support de cours", dossier: "09_Support_de_cours", aide: "Support de cours de la formation." },
+  { key: "exercices", label: "Exercices pratiques", dossier: "10_Exercices_pratiques", aide: "CFA : un exercice par semaine. Formation courte (≤ 12 jours) : un par jour. Formation longue : un par semaine." },
+  { key: "emargement", label: "Feuille d'émargement", dossier: "11_Emargement", aide: "Demi-journées réelles de la session, signatures IZILearn horodatées." },
+  { key: "connexion", label: "Temps de connexion", dossier: "11_Temps_de_connexion", aide: "Connexions Meet et e-learning relevées par IZILearn (formation à distance)." },
+  { key: "bilan_chaud", label: "Bilan à chaud", dossier: "12_Bilan_a_chaud", aide: "Questionnaire de fin de formation." },
+  { key: "bilan_froid", label: "Bilan à froid", dossier: "13_Bilan_a_froid", aide: "Enquête à 3 mois." },
+  { key: "mails", label: "Mails", dossier: "14_Mails", aide: "Mêmes scénarios que la partie Qualiopi, en modèles à envoyer avec leur date prévue." },
+];
+
+export type Source = "izilearn" | "trame" | "document" | "modele";
+
+export interface Piece {
+  id: string;
+  categorie: CategorieKey;
+  titre: string;
+  apprenantIdx: number | null;
+  source: Source;
+  fichier: string;          // nom sans extension
+  mail?: MailModele;
+  rendre: () => string;     // HTML complet
+}
+
+export interface Contexte {
+  p: IzPayload;
+  o: OrganismeInfo;
+  f: FormationInfo;
+  stagiaires: StagiaireInfo[];
+}
+
+export function contexte(p: IzPayload): Contexte {
+  return { p, o: versOrganisme(p), f: versFormation(p), stagiaires: versStagiaires(p) };
+}
+
+const slug = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
+export const dossierApprenant = (s: StagiaireInfo) => slug(`${s.nom}_${s.prenom}`.toUpperCase());
+
+/** Gabarits du générateur par type d'action. */
+function gabarits(type: IzPayload["formation"]["typeAction"]) {
+  const cfa = type === "apprentissage";
+  const vae = type === "vae";
+  const bc = type === "bilans-competences";
+  return {
+    programme: vae ? { t: "vae_programme_accompagnement" } : bc ? { t: "bdc_nt_programme_phases" } : { t: "programme_formation", params: { fi: 0, ...(cfa ? { isCFA: true } : {}) } },
+    convocation: cfa ? "convocation_cfa" : "convocation_stagiaire",
+    convention: (entreprise: boolean) => cfa ? "convention_formation_cfa" : entreprise ? "convention_formation_tripartite" : "contrat_formation_pro_stagiaire",
+    cgv: vae ? "vae_cgv" : cfa ? "cgv_cfa" : "cgv_stagiaire",
+    ri: vae ? "vae_reglement_interieur" : cfa ? "reglement_interieur_cfa_v2" : "reglement_interieur_stagiaire",
+    livret: vae ? { t: "vae_livret_accueil", parApprenant: false } : cfa ? { t: "livret_accueil_cfa_v2", parApprenant: true } : { t: "livret_accueil", parApprenant: false },
+    support: cfa ? "support_cours_cfa" : "support_cours_ref",
+  };
+}
+
+export function planPieces(cx: Contexte): Piece[] {
+  const { p, o, f, stagiaires } = cx;
+  const g = gabarits(p.formation.typeAction);
+  const out: Piece[] = [];
+  const gen = (key: string, template: string, params: Record<string, unknown> = {}) => () =>
+    adaptHtmlToTypeAction(generateDocumentById(key, template, params, o, f, stagiaires), f.typeAction);
+  const nomF = slug(f.intitule).toUpperCase();
+
+  // Pièces de session
+  out.push({ id: "programme", categorie: "programme", titre: `Programme — ${f.intitule}`, apprenantIdx: null, source: "document", fichier: `PROGRAMME_${nomF}`, rendre: gen("programme", g.programme.t, g.programme.params) });
+  if (!g.livret.parApprenant) out.push({ id: "livret", categorie: "livret", titre: "Livret d'accueil", apprenantIdx: null, source: "document", fichier: "LIVRET_D_ACCUEIL", rendre: gen("livret", g.livret.t) });
+  out.push({ id: "support", categorie: "support", titre: `Support de cours — ${f.intitule}`, apprenantIdx: null, source: "document", fichier: `SUPPORT_DE_COURS_${nomF}`, rendre: gen("support", g.support, { fi: 0 }) });
+
+  const distanciel = estDistanciel(p);
+  const mixte = /hybride|mixte/i.test(p.session.modalite || "");
+
+  p.apprenants.forEach((a, i) => {
+    const s = stagiaires[i];
+    const nom = `${s.prenom} ${s.nom}`.trim();
+    const suffixe = dossierApprenant(s);
+    const c: T.Ctx = { p, o, f, s, a };
+    const par = (categorie: CategorieKey, titre: string, fichier: string, source: Source, rendre: () => string, extra: { id?: string; mail?: MailModele } = {}) =>
+      out.push({ id: `${categorie}_${i}${extra.id ? `_${extra.id}` : ""}`, categorie, titre: `${titre} — ${nom}`, apprenantIdx: i, source, fichier: `${fichier}_${suffixe}`, rendre, mail: extra.mail });
+
+    const besoins = !!(a.besoins || a.besoinsEntreprise);
+    par("besoins", "Évaluation des besoins", "EVALUATION_DES_BESOINS", besoins ? "izilearn" : "trame", () => T.evaluationBesoins(c).html);
+    par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", (a.positionnement || []).length ? "izilearn" : "trame", () => T.testPositionnement(c).html);
+    par("convocation", "Convocation", "CONVOCATION", "document", gen(`convocation_${i}`, g.convocation, { stagiaireIdx: i }));
+    const entreprise = !!s.entreprise;
+    par("convention", p.formation.typeAction === "apprentissage" ? "Convention de formation par apprentissage" : entreprise ? "Convention de formation" : "Contrat de formation",
+      entreprise || p.formation.typeAction === "apprentissage" ? "CONVENTION" : "CONTRAT", "document", gen(`convention_${i}`, g.convention(entreprise), { stagiaireIdx: i }));
+    par("cgv", "CGV", "CGV", "document", gen(`cgv_${i}`, g.cgv, { stagiaireIdx: i }));
+    par("ri", "Règlement intérieur", "REGLEMENT_INTERIEUR", "document", gen(`ri_${i}`, g.ri, { stagiaireIdx: i }));
+    if (g.livret.parApprenant) par("livret", "Livret d'accueil", "LIVRET_D_ACCUEIL", "document", gen(`livret_${i}`, g.livret.t, { stagiaireIdx: i }));
+
+    const unites = T.unitesExercices(p, s, f);
+    unites.forEach((u, k) => {
+      par("exercices", `Exercice ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `EXERCICE_${String(k + 1).padStart(2, "0")}`, "trame",
+        () => T.exercicePratique(c, u, k, unites.length), { id: `ex${k}` });
+    });
+
+    if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "trame", () => T.emargement(c).html);
+    if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "trame", () => T.tempsConnexion(c).html);
+    par("bilan_chaud", "Bilan à chaud", "BILAN_A_CHAUD", a.bilanChaud ? "izilearn" : "trame", () => T.bilanChaud(c).html);
+    par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", a.bilanFroid ? "izilearn" : "trame", () => T.bilanFroid(c).html);
+
+    mailsModeles(o, f, s).forEach((m, k) => {
+      const stamp = `${m.dateEnvoi.getFullYear()}-${String(m.dateEnvoi.getMonth() + 1).padStart(2, "0")}-${String(m.dateEnvoi.getDate()).padStart(2, "0")}`;
+      par("mails", m.titre, `${stamp}_${slug(m.titre).toUpperCase()}`, "modele", () => mailHtml(m, o), { id: `m${k}`, mail: m });
+    });
+  });
+  return out;
+}
