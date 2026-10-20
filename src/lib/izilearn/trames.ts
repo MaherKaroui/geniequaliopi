@@ -251,6 +251,7 @@ export function bilanChaud(c: Ctx): { html: string; reel: boolean } {
   if (c.a.bilanChaud && hasRecordedResponses(c.a.bilanChaud)) {
     h += sourceIzilearn(`questionnaire « ${c.a.bilanChaud.titre} » rempli par l'apprenant le ${dateFr(c.a.bilanChaud.date)}.`);
     h += reponsesReelles(c.a.bilanChaud);
+    h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
     return { html: doc(c, "BILAN À CHAUD — SATISFACTION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };
   }
   h += trameVierge("Questionnaire à remplir par l'apprenant le dernier jour de la formation (ou en ligne depuis IZILearn › Questionnaires).");
@@ -268,6 +269,7 @@ export function bilanFroid(c: Ctx): { html: string; reel: boolean } {
   if (c.a.bilanFroid && hasRecordedResponses(c.a.bilanFroid)) {
     h += sourceIzilearn(`questionnaire « ${c.a.bilanFroid.titre} » rempli par l'apprenant le ${dateFr(c.a.bilanFroid.date)}.`);
     h += reponsesReelles(c.a.bilanFroid);
+    h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
     return { html: doc(c, "BILAN À FROID", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };
   }
   h += trameVierge("Enquête à adresser à l'apprenant 3 mois après la formation ; en l'absence de retour, relance sous une semaine puis entretien téléphonique.");
@@ -324,7 +326,13 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
 // ───────────────────────── temps de connexion ─────────────────────────
 
 export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
-  const cx = [...c.a.connexions].sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
+  const cx = c.a.connexions.map((x) => {
+    const debut = d(x.debut);
+    // Déduire la fin uniquement d'une durée enregistrée, jamais du planning.
+    const fin = x.fin || (debut && x.secondes > 0
+      ? new Date(debut.getTime() + x.secondes * 1000).toISOString() : null);
+    return { ...x, fin };
+  }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const total = cx.reduce((n, x) => n + (x.secondes || 0), 0);
   let h = enTete(c, [["Modalité", c.f.modalites || "distanciel"], ["Plateforme", "IZILearn / Google Meet"], ["Durée prévue", c.a.heuresPrevues ? `${String(c.a.heuresPrevues).replace(".", ",")} h` : c.f.duree]]);
   const jours = new Map<string, Date>();
@@ -334,7 +342,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   }
   if (!c.p.creneaux.length) for (const jour of joursSession(c.p, c.s, c.f)) jours.set(cleJour(jour), jour);
   for (const x of cx) { const jour = d(x.debut); if (jour) jours.set(cleJour(jour), jour); }
-  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"];
+  const headers = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut", "Signature du stagiaire"];
   for (const [key, jour] of [...jours.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     const connexions = cx.filter((x) => { const debut = d(x.debut); return debut && cleJour(debut) === key; });
     const matin = connexions.filter((x) => (d(x.debut)?.getHours() ?? 24) < 12);
@@ -349,8 +357,9 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
       heure(matin[0]?.debut), heure(derniereFin(matin)), heure(apresMidi[0]?.debut), heure(derniereFin(apresMidi)),
       connexions.length ? duree(connexions.reduce((n, x) => n + (x.secondes || 0), 0)) : "",
       connexions.length ? "Connexion relevée" : futur ? "À venir" : "Non relevé",
+      "",
     ];
-    h += `<table style="width:100%"><thead><tr>${headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x) => `<td>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
+    h += `<table style="width:100%;table-layout:fixed"><thead><tr>${headers.map((x) => `<th style="overflow-wrap:anywhere">${x}</th>`).join("")}</tr></thead><tbody><tr>${cells.map((x, i) => `<td${i === cells.length - 1 ? ' style="height:60px"' : ""}>${esc(x)}</td>`).join("")}</tr></tbody></table>`;
   }
   h += `<p><strong>Temps total relevé :</strong> ${duree(total)} · <strong>Durée formation :</strong> ${esc(c.f.duree)}</p>`;
   h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
