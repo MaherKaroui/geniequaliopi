@@ -118,7 +118,7 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
   h += `<h2>Analyse du besoin par le référent pédagogique</h2>`;
   h += `<p>${CASE} Besoin compatible avec la formation &nbsp;&nbsp; ${CASE} Adaptations à prévoir &nbsp;&nbsp; ${CASE} Réorientation proposée</p>`;
   h += `<p><strong>Adaptations du parcours (rythme, supports, accessibilité) :</strong></p>${LIGNES(3)}`;
-  h += ZONE_SIGNATURE(["L'apprenant", "Le référent pédagogique"]);
+  h += ZONE_SIGNATURE(["L'apprenant", ...(c.s.entreprise ? ["Le responsable d’entreprise"] : []), "Le référent pédagogique"]);
   return { html: doc(c, "ÉVALUATION DES BESOINS", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel };
 }
 
