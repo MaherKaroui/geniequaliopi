@@ -3195,7 +3195,7 @@ function getAsOfDate(): Date {
   return today;
 }
 
-function isFrLongDayPast(dayStr: string): boolean {
+export function isFrLongDayPast(dayStr: string): boolean {
   try {
     const months: Record<string, number> = { "janvier":0,"février":1,"fevrier":1,"mars":2,"avril":3,"mai":4,"juin":5,"juillet":6,"août":7,"aout":7,"septembre":8,"octobre":9,"novembre":10,"décembre":11,"decembre":11 };
     const m = dayStr.toLowerCase().match(/(\d{1,2})\s+([a-zéèêûôîçà]+)\s+(\d{4})/);
@@ -3211,7 +3211,7 @@ function isFrLongDayPast(dayStr: string): boolean {
 
 /** Determine the modalité (présentiel/distanciel) for a given day index based on formation modalités.
  * For mixte: alternates day by day (even=Présentiel, odd=Distanciel). */
-function getDayModalite(f: FormationInfo, dayIdx: number): 'P' | 'D' {
+export function getDayModalite(f: FormationInfo, dayIdx: number): 'P' | 'D' {
   if (isMixte(f)) return dayIdx % 2 === 0 ? 'P' : 'D';
   if (hasDistanciel(f) && !hasPresentiel(f)) return 'D';
   return 'P';
@@ -3386,7 +3386,7 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
  * - matin ≈ 3h30 (±10 min), pause déjeuner ≈ 1h (±10 min), après-midi = reste
  * - secondes mises à 0, minutes variables, IP cohérente avec la box du stagiaire
  */
-function buildRealisticConnectionDay(
+export function buildRealisticConnectionDay(
   seedBase: number,
   hoursPerDay: number,
 ): {
