@@ -3,14 +3,11 @@ import type { OrganismeInfo } from "@/types/qualiopi";
 import type { Contexte } from "./pieces";
 import { esc } from "./trames";
 
-export function revisionHtml(o: OrganismeInfo): string {
-  const date = new Date(`${o.dateMaj}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return "";
-  return `<p class="document-revision">Mise à jour : ${date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} · Version ${esc(o.version || "1")}</p>`;
-}
 
 export function appliquerRevision(html: string, o: OrganismeInfo): string {
-  const bloc = footer(o).replace("</div>", `${revisionHtml(o)}</div>`);
+  // Le pied de page standard (docBuilder.footer) affiche déjà « V{version} {dateMaj} » :
+  // ne rien ajouter de plus pour éviter la mention « Mise à jour » en double.
+  const bloc = footer(o);
   if (/<div class="footer">/.test(html)) return html.replace(/<div class="footer">[\s\S]*?<\/div>/, bloc);
   return html.replace(/<\/body>/i, `${bloc}</body>`);
 }
