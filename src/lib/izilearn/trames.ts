@@ -187,8 +187,10 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
       q.reussi == null ? "" : q.reussi ? "Atteint" : "Non atteint", nl2br(q.appreciation),
     ]));
   } else {
-    const qcm = (c.p.formation.contenu?.examenFinal || []).filter((q) => q.options?.length);
-    const questions: QcmQ[] = qcm.length ? qcm : hasEvalContentDedie(c.f.intitule) ? getEvalContent(c.f.intitule).qcmFinal : [];
+    // Examen IZILearn s'il est corrigé ; sinon QCM final corrigé Qualiopi (dédié ou générique).
+    const qcm = normaliserQcm(c.p.formation.contenu?.examenFinal as unknown[]);
+    const qualiopi = normaliserQcm(getEvalContent(c.f.intitule).qcmFinal as unknown[]);
+    const questions: QcmQ[] = qcm.length && qcm.every(aCorrige) ? qcm : qualiopi.length ? qualiopi : qcm;
     // Remplissage automatique façon Qualiopi : examen passé → réponses cochées
     // de façon déterministe par apprenant (majorité de bonnes réponses), score
     // calculé. Examen à venir ou corrigé inconnu → trame vierge.
