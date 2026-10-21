@@ -254,6 +254,30 @@ describe("Espace IZILearn", () => {
     expect(ex).not.toContain("MARQUEUR_CONSIGNE_IZILEARN");
   });
 
+  it("chaque période reçoit un QCM différent, sans réponses pré-remplies", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = {
+      chapitres: [], exercices: [],
+      positionnement: [
+        { question: "Q1 ?", options: ["A", "B"] }, { question: "Q2 ?", options: ["A", "B"] },
+        { question: "Q3 ?", options: ["A", "B"] }, { question: "Q4 ?", options: ["A", "B"] },
+        { question: "Q5 ?", options: ["A", "B"] }, { question: "Q6 ?", options: ["A", "B"] },
+      ],
+    };
+    const qcms = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
+    expect(qcms.length).toBe(3);
+    const htmls = qcms.map((x) => x.rendre());
+    for (const h of htmls) {
+      expect(h).toContain("QCM D'ÉVALUATION");
+      expect(h).not.toContain("Consigne");
+    }
+    // Chaque QCM contient des questions que les autres n'ont pas.
+    expect(htmls[0]).toContain("Q1 ?");
+    expect(htmls[0]).not.toContain("Q4 ?");
+    expect(htmls[1]).toContain("Q4 ?");
+    expect(htmls[1]).not.toContain("Q1 ?");
+  });
+
   it("rythme des exercices : jour si court, semaine si long ou CFA", () => {
     const court = contexte(payload("actions-formation", 5));
     expect(unitesExercices(court.p, court.stagiaires[0], court.f).map((u) => u.type)).toEqual(Array(5).fill("jour"));
