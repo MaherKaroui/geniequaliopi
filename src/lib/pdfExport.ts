@@ -5,6 +5,7 @@
  */
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { ceder } from "@/lib/arrierePlan";
 
 const A4_WIDTH_PX = 794; // 210mm @ 96dpi
 const A4_HEIGHT_PX = 1123; // 297mm @ 96dpi
@@ -59,9 +60,7 @@ export function getActivePdfOptions(): Required<Omit<PdfExportOptions, "keepTabl
 
 const loadedGoogleFontHrefs = new Set<string>();
 
-function yieldToBrowser(ms = 0): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, ms)));
-}
+const yieldToBrowser = ceder;
 
 function extractCssAndBody(htmlContent: string): { cssText: string; bodyContent: string } {
   const styleMatches = htmlContent.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
@@ -695,7 +694,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       const batch = renderPages.slice(start, start + batchSize);
 
       if (pageYieldMs > 0 && start > 0) {
-        await new Promise<void>((r) => setTimeout(r, 0));
+        await ceder();
       }
 
       if (batch.length === 1) {
@@ -747,7 +746,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
               sctx.drawImage(stripCanvas, 0, top, sliceW, srcH, 0, 0, sliceW, srcH);
               await addPageFromCanvas(slice, batch[i]);
               disposeCanvas(slice);
-              if ((i + 1) % 4 === 0) await new Promise<void>((r) => setTimeout(r, 0));
+              if ((i + 1) % 4 === 0) await ceder();
             }
           } finally {
             disposeCanvas(stripCanvas);

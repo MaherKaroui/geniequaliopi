@@ -68,20 +68,11 @@ import {
   limiterCheminsZip,
 } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
+import { ceder, garderActif } from "@/lib/arrierePlan";
 
-// Un rAF coûte ~16 ms : on ne le paie qu'un document sur 5, le reste du temps
-// un simple setTimeout(0) suffit à garder l'onglet réactif.
-let yieldTick = 0;
-const yieldToBrowser = (delayMs = 0) =>
-  new Promise<void>((resolve) => {
-    if (++yieldTick % 5 === 0) {
-      requestAnimationFrame(() => {
-        window.setTimeout(resolve, delayMs);
-      });
-    } else {
-      window.setTimeout(resolve, 0);
-    }
-  });
+// rAF un document sur 5 au premier plan ; onglet masqué : ni rAF ni timer
+// bridé, la génération continue (voir arrierePlan.ts).
+const yieldToBrowser = ceder;
 
 // Templates générant directement un Blob .xlsx via SheetJS (sans passer par du HTML)
 // Doivent être traités avant la branche REAL_XLSX_TEMPLATES dans les ZIPs.
@@ -1529,6 +1520,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
     setUploadingDrive(true);
     const toastId = toast.loading("Connexion à Google Drive…");
     try {
+      await garderActif(async () => {
       // Consentement Google d'abord : la fenêtre doit s'ouvrir pendant le clic.
       const accessToken = await connecterGoogleDrive();
       const nomRacine = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
@@ -1544,6 +1536,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
         description: nomRacine,
         duration: 20000,
         action: { label: "Ouvrir", onClick: () => window.open(result.webViewLink, "_blank") },
+      });
       });
     } catch (error: any) {
       console.error("Google Drive upload error:", error);

@@ -3,6 +3,7 @@
  * envoi direct depuis le navigateur vers l'API Drive.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { pause } from "@/lib/arrierePlan";
 
 let cachedClientId: string | null = null;
 
@@ -90,7 +91,7 @@ async function driveFetch(url: string, init: RequestInit, accessToken: string): 
     const detail = await resp.text().catch(() => "");
     const reessayable = resp.status === 429 || resp.status >= 500 || (resp.status === 403 && /rateLimit/i.test(detail));
     if (!reessayable || essai >= 5) throw new Error(`Google Drive ${resp.status} : ${detail.slice(0, 200)}`);
-    await new Promise((r) => setTimeout(r, 1000 * 2 ** essai + Math.random() * 500));
+    await pause(1000 * 2 ** essai + Math.random() * 500);
   }
 }
 

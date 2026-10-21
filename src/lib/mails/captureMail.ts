@@ -6,6 +6,7 @@
  */
 import { domToBlob } from "modern-screenshot";
 import { payloadCapture, type ClientMail, type MailAuto } from "./mailsAutomatiques";
+import { pause } from "@/lib/arrierePlan";
 
 const LARGEUR = 1400;
 const HAUTEUR_MIN = 900;
@@ -27,7 +28,6 @@ function chargerIframe(client: ClientMail): Promise<HTMLIFrameElement> {
   });
 }
 
-const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Rend un mail en image PNG. `precedents` alimente la liste de gauche d'Outlook. */
 export async function captureMail(m: MailAuto, client: ClientMail, precedents: MailAuto[] = [], scale = 1.5): Promise<Blob> {

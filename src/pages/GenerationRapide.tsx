@@ -42,6 +42,7 @@ import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { grouperStagiairesParClient } from "@/lib/rapideFacturation";
 import RapideDocumentEditor from "@/components/RapideDocumentEditor";
 import { rapideDocumentEditKey, resolveRapideDocument } from "@/lib/rapideDocumentEdits";
+import { ceder } from "@/lib/arrierePlan";
 
 /* ------------------------------------------------------------------ */
 /* Constantes                                                          */
@@ -150,15 +151,7 @@ function planDoc(doc: PackDoc, stagiaires: StagiaireInfo[]): PlannedDoc[] {
 }
 
 // rAF coûteux (~16 ms) : une fois tous les 5 documents seulement.
-let yieldTick = 0;
-const yieldToBrowser = (delayMs = 0) =>
-  new Promise<void>((resolve) => {
-    if (++yieldTick % 5 === 0) {
-      requestAnimationFrame(() => { window.setTimeout(resolve, delayMs); });
-    } else {
-      window.setTimeout(resolve, 0);
-    }
-  });
+const yieldToBrowser = ceder;
 
 const fileToDataUrl = (file: File) =>
   new Promise<string>((resolve, reject) => {

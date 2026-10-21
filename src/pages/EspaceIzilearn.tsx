@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { DocStyleConfig } from "@/types/qualiopi";
 import { applyLearnerSignatures, contexteAvecSignatures, signatureKey, validSignatureImage, type LearnerSignatures, type SignatureRole } from "@/lib/izilearn/documentSignature";
+import { ceder } from "@/lib/arrierePlan";
 
 type Format = "pdf" | "word";
 
@@ -130,7 +131,7 @@ export default function EspaceIzilearn() {
       setTravail({ label: p.titre, fait: i, total: visibles.length });
       const f = await fichier(p, format);
       res.push({ p, ...f });
-      await new Promise((r) => setTimeout(r, 0));
+      await ceder();
     }
     return res;
   }

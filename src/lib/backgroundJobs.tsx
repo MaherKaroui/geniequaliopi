@@ -24,6 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, Download, Loader2, X, AlertCircle } from "lucide-react";
 import { logActivityStandalone } from "@/lib/activityTracker";
+import { garderActif } from "@/lib/arrierePlan";
 
 export type JobStatus = "running" | "done" | "error" | "cancelled";
 
@@ -116,7 +117,7 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
       // Détaché du composant appelant : on ne await pas ici.
       (async () => {
         try {
-          const blob = await opts.run(reporter);
+          const blob = await garderActif(() => opts.run(reporter));
           if (blob instanceof Blob) {
             updateJob(id, {
               status: "done",
