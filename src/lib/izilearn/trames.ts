@@ -237,10 +237,15 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     const objectifs = lignesObjectifs(c.f);
     if (objectifs.length) {
       h += `<h2>Évaluation des acquis</h2>`;
-      h += tableHTML(["Objectif", "Acquis", "En cours", "Non acquis"], objectifs.map((o) => [esc(o), CASE, CASE, CASE]));
+      h += tableHTML(["Objectif", "Acquis", "En cours", "Non acquis"], objectifs.map((o, oi) => {
+        if (!fill || score == null) return [esc(o), CASE, CASE, CASE];
+        const r = score / questions.length;
+        const enCours = r < 0.75 && oi % 2 === 1;
+        return [esc(o), enCours ? "" : "X", enCours ? "X" : "", ""];
+      }));
     }
     const noteFinale = fill && score != null ? `${Math.round((score / questions.length) * 20)} / 20` : "____________________";
-    h += `<p><strong>Note finale :</strong> ${noteFinale}</p><p><strong>Appréciation du formateur :</strong></p>${LIGNES(3)}`;
+    h += `<p><strong>Note finale :</strong> ${noteFinale}</p><p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / questions.length, c.s.prenom, `${c.s.nom}examen`, true))}</p>` : LIGNES(3)}`;
   }
   h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
   return { html: doc(c, "EXAMEN FINAL", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };
@@ -318,6 +323,38 @@ export function exercicePratique(c: Ctx, u: Unite, i: number, n: number): string
   h += `<p><strong>Appréciation :</strong></p>${LIGNES(3)}`;
   h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
   return doc(c, `EXERCICE PRATIQUE ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
+}
+
+/** Appréciation formateur générée selon le score, comme Qualiopi (déterministe par apprenant). */
+export function appreciationAuto(ratio: number, prenom: string, cle: string, final: boolean): string {
+  const seed = Math.abs(`${prenom}${cle}`.split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
+  const pick = (l: string[]) => l[seed % l.length];
+  const p = prenom || "L'apprenant";
+  if (ratio >= 0.9) return pick(final ? [
+    `${p} a démontré une excellente maîtrise des notions de la formation. Les objectifs sont pleinement atteints ; compétences directement transférables en situation professionnelle.`,
+    `Très bon examen : ${p} maîtrise l'ensemble des acquis visés et argumente avec précision. Objectifs atteints.`,
+    `Résultats remarquables. ${p} a consolidé toutes les compétences du programme ; aucune lacune relevée.`,
+  ] : [
+    `Excellente compréhension des notions de la période. ${p} est très investi(e) et participe activement.`,
+    `Très bons résultats ; les acquis de la séance sont maîtrisés.`,
+    `${p} maîtrise parfaitement les points abordés. Continuer sur cette dynamique.`,
+  ]);
+  if (ratio >= 0.7) return pick(final ? [
+    `${p} a acquis les compétences essentielles de la formation. Quelques points de détail restent à consolider par la pratique. Objectifs atteints.`,
+    `Bon examen dans l'ensemble : les acquis sont solides ; une révision ciblée des notions les plus techniques est conseillée.`,
+    `Objectifs atteints. ${p} fait preuve de rigueur ; poursuivre la mise en pratique pour gagner en autonomie.`,
+  ] : [
+    `Bonne compréhension générale ; une notion est à revoir lors de la prochaine séance.`,
+    `${p} progresse bien. Quelques hésitations sur un point, reprises en correction collective.`,
+    `Acquis satisfaisants ; consolider les points d'erreur avec les ressources du support de cours.`,
+  ]);
+  return pick(final ? [
+    `${p} a progressé au cours de la formation ; certains objectifs restent en cours d'acquisition. Un accompagnement complémentaire est recommandé.`,
+    `Résultats encourageants mais à consolider. Reprise conseillée des modules les moins maîtrisés.`,
+  ] : [
+    `Notions partiellement acquises ; reprise prévue en début de séance suivante.`,
+    `${p} doit consolider plusieurs points ; exercices complémentaires proposés.`,
+  ]);
 }
 
 interface QcmQ { question: string; options: string[]; correctIndex?: number }
@@ -435,7 +472,7 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
   if (fill) {
     h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${qs.map((q, k) => `${k + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
   }
-  h += `<p><strong>Appréciation du formateur :</strong></p>${LIGNES(2)}`;
+  h += `<p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / per, c.s.prenom, `${c.s.nom}${i}`, false))}</p>` : LIGNES(2)}`;
   h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
   return doc(c, `QCM D'ÉVALUATION ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
 }
