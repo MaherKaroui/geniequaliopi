@@ -308,6 +308,16 @@ describe("Espace IZILearn", () => {
     expect(htmls[1]).not.toContain("Q1 ?");
   });
 
+  it("remplit les QCM passés même si IZILearn n'envoie pas la bonne réponse", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = { chapitres: [], exercices: [], positionnement: [{ question: "Q1 ?", options: ["A", "B"] }, { question: "Q2 ?", options: ["A", "B"] }] };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
+    const qcms = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
+    for (const q of qcms) expect(q.rendre()).toContain("☒");
+    vi.useRealTimers();
+  });
+
   it("remplit automatiquement les QCM des périodes passées, laisse les futures vierges", () => {
     const p = payload("actions-formation", 3);
     p.formation.contenu = {
