@@ -314,7 +314,7 @@ describe("Espace IZILearn", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
     const qcms = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
-    for (const q of qcms) expect(q.rendre()).toContain("☒");
+    for (const q of qcms) { expect(q.rendre()).toContain("☒"); expect(q.rendre()).not.toMatch(/Appréciation du formateur :<\/strong><\/p><div/); }
     vi.useRealTimers();
   });
 
