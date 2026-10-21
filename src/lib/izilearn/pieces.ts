@@ -125,17 +125,8 @@ export function planPieces(cx: Contexte): Piece[] {
     const unites = T.unitesExercices(p, s, f);
     unites.forEach((u, k) => {
       const passe = u.fin.getTime() < new Date().setHours(0, 0, 0, 0);
-      par("exercices", `Exercice ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `EXERCICE_${String(k + 1).padStart(2, "0")}`, passe ? "document" : "trame",
-        () => {
-          if (!passe) return T.exercicePratique(c, u, k, unites.length);
-          // Une pièce par unité réelle IZILearn : le générateur ne doit pas
-          // reconstruire tout le calendrier de la session dans chaque fichier.
-          const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-          const debut = iso(u.debut), fin = iso(u.fin);
-          const formation = { ...f, dateDebut: debut, dateFin: fin };
-          const personnes = stagiaires.map((personne, idx) => idx === i ? { ...personne, dateDebutFormation: debut, dateFinFormation: fin } : personne);
-          return adaptHtmlToTypeAction(generateDocumentById(`exercice_${i}_${k}`, "exercices_stagiaire", { stagiaireIdx: i, exerciceIdx: k }, o, formation, personnes), f.typeAction);
-        }, { id: `ex${k}` });
+      par("exercices", `QCM ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `QCM_${String(k + 1).padStart(2, "0")}`, passe ? "document" : "trame",
+        () => T.qcmPeriodique(c, u, k, unites.length), { id: `ex${k}` });
     });
 
     const examen = (a.examenFinal || []).some(hasRecordedQuiz);

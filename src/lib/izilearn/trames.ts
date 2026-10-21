@@ -287,6 +287,52 @@ export function exercicePratique(c: Ctx, u: Unite, i: number, n: number): string
   return doc(c, `EXERCICE PRATIQUE ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
 }
 
+interface QcmQ { question: string; options: string[] }
+
+/** Questions de QCM disponibles : test d'entrée IZILearn, puis QCM du contenu pédagogique dédié. Doublons retirés. */
+function poolQcm(c: Ctx): QcmQ[] {
+  const seen = new Set<string>();
+  const out: QcmQ[] = [];
+  const push = (qs?: { question: string; options: string[] }[]) => {
+    for (const q of qs || []) {
+      if (!q.question || !(q.options || []).length) continue;
+      const k = q.question.trim().toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push({ question: q.question, options: q.options });
+    }
+  };
+  push(c.p.formation.contenu?.positionnement);
+  if (hasEvalContentDedie(c.f.intitule)) {
+    const ec = getEvalContent(c.f.intitule);
+    push(ec.qcmPositionnement);
+    push(ec.qcmFinal);
+  }
+  return out;
+}
+
+/**
+ * QCM d'évaluation par période : chaque période reçoit une série de questions
+ * différente (rotation sans répétition dans le pool). Aucune réponse n'est
+ * pré-remplie ni dévoilée. Sans question disponible, repli sur l'exercice pratique.
+ */
+export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number): string {
+  const pool = poolQcm(c);
+  if (!pool.length) return exercicePratique(c, u, i, n);
+  const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
+  const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
+  let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`]]);
+  h += trameVierge("QCM à compléter par l'apprenant ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
+  h += `<h2>Questionnaire à choix multiples</h2>`;
+  qs.forEach((q, k) => {
+    h += `<p><strong>${k + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
+  });
+  h += `<p><strong>Score :</strong> ______ / ${per}</p>`;
+  h += `<p><strong>Appréciation du formateur :</strong></p>${LIGNES(2)}`;
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
+  return doc(c, `QCM D'ÉVALUATION ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
+}
+
 // ───────────────────────── bilans ─────────────────────────
 
 const CRITERES_CHAUD = [
