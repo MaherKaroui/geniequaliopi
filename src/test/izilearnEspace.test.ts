@@ -52,9 +52,10 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
     const exams = planPieces(contexte(payload("actions-formation", 3))).filter((x) => x.categorie === "examen_final");
     expect(exams.map((x) => x.apprenantIdx)).toEqual([0, 1]);
-    // Session terminée mais sans corrigé connu : trame vierge, rien d'inventé.
+    // Session terminée sans examen IZILearn : QCM final corrigé Qualiopi rempli automatiquement.
     expect(exams.map((x) => x.source)).toEqual(["document", "document"]);
-    expect(exams[0].rendre()).not.toContain("☒");
+    expect(exams[0].rendre()).toContain("☒");
+    expect(exams[0].rendre()).toMatch(/Score :<\/strong> \d+ \/ \d+/);
     expect(exams[0].rendre()).not.toContain("Réponse du stagiaire");
     expect(exams[0].rendre()).not.toContain("Atteint</td>");
   });
@@ -305,6 +306,16 @@ describe("Espace IZILearn", () => {
     expect(htmls[0]).not.toContain("Q4 ?");
     expect(htmls[1]).toContain("Q4 ?");
     expect(htmls[1]).not.toContain("Q1 ?");
+  });
+
+  it("remplit les QCM passés même si IZILearn n'envoie pas la bonne réponse", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = { chapitres: [], exercices: [], positionnement: [{ question: "Q1 ?", options: ["A", "B"] }, { question: "Q2 ?", options: ["A", "B"] }] };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
+    const qcms = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
+    for (const q of qcms) expect(q.rendre()).toContain("☒");
+    vi.useRealTimers();
   });
 
   it("remplit automatiquement les QCM des périodes passées, laisse les futures vierges", () => {

@@ -187,13 +187,15 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
       q.reussi == null ? "" : q.reussi ? "Atteint" : "Non atteint", nl2br(q.appreciation),
     ]));
   } else {
-    const qcm = (c.p.formation.contenu?.examenFinal || []).filter((q) => q.options?.length);
-    const questions: QcmQ[] = qcm.length ? qcm : hasEvalContentDedie(c.f.intitule) ? getEvalContent(c.f.intitule).qcmFinal : [];
+    // Examen IZILearn s'il est corrigé ; sinon QCM final corrigé Qualiopi (dédié ou générique).
+    const qcm = normaliserQcm(c.p.formation.contenu?.examenFinal as unknown[]);
+    const qualiopi = normaliserQcm(getEvalContent(c.f.intitule).qcmFinal as unknown[]);
     // Remplissage automatique façon Qualiopi : examen passé → réponses cochées
     // de façon déterministe par apprenant (majorité de bonnes réponses), score
-    // calculé. Examen à venir ou corrigé inconnu → trame vierge.
+    // calculé. Examen à venir → questions IZILearn en trame vierge.
     const fin = d(c.p.session.dateFin);
     const passe = fin ? fin.getTime() < new Date().setHours(0, 0, 0, 0) : false;
+    const questions: QcmQ[] = qcm.length && (!passe || qcm.every(aCorrige)) ? qcm : qualiopi.length ? qualiopi : qcm;
     const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
     const fill = passe && corrigeComplet;
     let answers: number[] = [];
@@ -320,26 +322,67 @@ export function exercicePratique(c: Ctx, u: Unite, i: number, n: number): string
 
 interface QcmQ { question: string; options: string[]; correctIndex?: number }
 
-/** Questions de QCM disponibles : test d'entrée IZILearn, puis QCM du contenu pédagogique dédié. Doublons retirés. */
+/** Index de la bonne réponse, quel que soit le format envoyé (index, lettre ou texte de l'option). */
+function indexCorrect(q: Record<string, unknown>, options: string[]): number | undefined {
+  const keys = ["correctIndex", "correct_index", "bonneReponseIndex", "answerIndex", "correctAnswer", "correct_answer", "bonneReponse", "bonne_reponse", "reponseCorrecte", "answer", "correct", "solution"];
+  for (const k of keys) {
+    const v = q[k];
+    if (v == null || v === "") continue;
+    if (typeof v === "number" && Number.isInteger(v) && v >= 0 && v < options.length) return v;
+    if (typeof v === "string") {
+      const t = v.trim();
+      if (/^\d+$/.test(t) && Number(t) < options.length) return Number(t);
+      if (/^[A-Za-z]$/.test(t)) { const i = t.toUpperCase().charCodeAt(0) - 65; if (i < options.length) return i; }
+      const i = options.findIndex((o) => o.trim().toLowerCase() === t.toLowerCase());
+      if (i >= 0) return i;
+    }
+  }
+  const opts = q.options as unknown[] | undefined;
+  if (Array.isArray(opts)) {
+    const i = opts.findIndex((o) => o && typeof o === "object" && ((o as Record<string, unknown>).correct === true || (o as Record<string, unknown>).isCorrect === true));
+    if (i >= 0) return i;
+  }
+  return undefined;
+}
+
+function normaliserQcm(qs?: unknown[]): QcmQ[] {
+  const out: QcmQ[] = [];
+  for (const raw of qs || []) {
+    if (!raw || typeof raw !== "object") continue;
+    const q = raw as Record<string, unknown>;
+    const question = String(q.question ?? q.intitule ?? q.texte ?? "").trim();
+    const options = (Array.isArray(q.options) ? q.options : Array.isArray(q.choix) ? q.choix : [])
+      .map((o: unknown) => (o && typeof o === "object" ? String((o as Record<string, unknown>).texte ?? (o as Record<string, unknown>).text ?? (o as Record<string, unknown>).label ?? "") : String(o ?? "")).trim())
+      .filter(Boolean);
+    if (!question || options.length < 2) continue;
+    out.push({ question, options, correctIndex: indexCorrect(q, options) });
+  }
+  return out;
+}
+
+const aCorrige = (q: QcmQ) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length;
+
+/**
+ * Questions de QCM disponibles : test d'entrée IZILearn, puis QCM corrigés
+ * Qualiopi de la formation (contenu dédié ou banque générique, comme la
+ * génération Qualiopi). Les questions au corrigé connu passent en premier.
+ */
 function poolQcm(c: Ctx): QcmQ[] {
   const seen = new Set<string>();
-  const out: QcmQ[] = [];
-  const push = (qs?: { question: string; options: string[]; correctIndex?: number }[]) => {
+  const all: QcmQ[] = [];
+  const push = (qs?: QcmQ[]) => {
     for (const q of qs || []) {
-      if (!q.question || !(q.options || []).length) continue;
       const k = q.question.trim().toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
-      out.push({ question: q.question, options: q.options, correctIndex: q.correctIndex });
+      all.push(q);
     }
   };
-  push(c.p.formation.contenu?.positionnement);
-  if (hasEvalContentDedie(c.f.intitule)) {
-    const ec = getEvalContent(c.f.intitule);
-    push(ec.qcmPositionnement);
-    push(ec.qcmFinal);
-  }
-  return out;
+  push(normaliserQcm(c.p.formation.contenu?.positionnement as unknown[]));
+  const ec = getEvalContent(c.f.intitule);
+  push(normaliserQcm(ec.qcmPositionnement as unknown[]));
+  push(normaliserQcm(ec.qcmFinal as unknown[]));
+  return all;
 }
 
 /**
@@ -350,8 +393,15 @@ function poolQcm(c: Ctx): QcmQ[] {
  * Sans question disponible, repli sur l'exercice pratique.
  */
 export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = false): string {
-  const pool = poolQcm(c);
-  if (!pool.length) return exercicePratique(c, u, i, n);
+  const tout = poolQcm(c);
+  if (!tout.length) return exercicePratique(c, u, i, n);
+  // Questions IZILearn prioritaires ; période passée : seules les questions au
+  // corrigé connu (IZILearn, sinon banque Qualiopi) permettent de cocher les réponses.
+  const iz = normaliserQcm(c.p.formation.contenu?.positionnement as unknown[]);
+  const izCorr = iz.filter(aCorrige);
+  const pool = rempli
+    ? (izCorr.length >= 3 ? izCorr : tout.filter(aCorrige).length ? tout.filter(aCorrige) : tout)
+    : (iz.length ? iz : tout);
   const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
   const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
   // Remplissage automatique seulement si la bonne réponse est connue pour chaque question.
