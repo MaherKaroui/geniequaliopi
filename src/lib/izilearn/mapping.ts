@@ -121,6 +121,7 @@ export function versStagiaire(a: IzApprenant, p: IzPayload): StagiaireInfo {
     rqth: a.handicap ? (a.handicap.declare ? "oui" : "non") : "",
     formateur: t(p.session.formateur) || undefined,
     financeur: FINANCEUR[t(a.financeur).toLowerCase()] || undefined,
+    signatureUrl: t(a.signatureUrl) || undefined,
   };
 }
 
