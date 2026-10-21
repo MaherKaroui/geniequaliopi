@@ -11,7 +11,7 @@
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate } from "@/lib/docBuilder";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "@/lib/attendancePresentation";
-import { getEmargementBlocs } from "@/lib/documentGenerator";
+import { getEmargementBlocs, buildRealisticConnectionDay, isFrLongDayPast, getDayModalite } from "@/lib/documentGenerator";
 import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie } from "@/lib/evalContent";
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
