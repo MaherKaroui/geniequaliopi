@@ -12,7 +12,7 @@ import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualio
 import { buildDocument, tableHTML, formatDate } from "@/lib/docBuilder";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "@/lib/attendancePresentation";
 import { getEmargementBlocs, buildRealisticConnectionDay, isFrLongDayPast, getDayModalite } from "@/lib/documentGenerator";
-import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie } from "@/lib/evalContent";
+import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie, generateStagiaireOpenAnswers } from "@/lib/evalContent";
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
 import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
@@ -227,14 +227,22 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
         h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${questions.map((q, i) => `${i + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
       }
     }
-    const ouvertes = hasEvalContentDedie(c.f.intitule)
-      ? getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || []
-      : lignesObjectifs(c.f).map((objectif) => ({ question: `Expliquez votre démarche et illustrez par une réalisation l'objectif suivant : ${objectif}.` }));
+    // Questions ouvertes Qualiopi (dédiées ou générées depuis l'intitulé/objectifs), toujours présentes.
+    let ouvertes = (getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || []).slice(0, 6);
+    if (!ouvertes.length) ouvertes = lignesObjectifs(c.f).slice(0, 6).map((objectif) => ({ question: `Expliquez votre démarche et illustrez par une réalisation l'objectif suivant : ${objectif}.`, reponseAttendue: "" }));
     if (ouvertes.length) {
+      const idx = Math.abs(`${c.s.prenom}${c.s.nom}`.split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0)) % 50;
+      const reps = fill ? generateStagiaireOpenAnswers(ouvertes, idx, false, { nom: c.s.nom, prenom: c.s.prenom, entreprise: c.s.entreprise, civilite: c.s.civilite }, { intitule: c.f.intitule }) : [];
       h += `<h2>Questions ouvertes</h2>`;
-      ouvertes.slice(0, 10).forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p>${LIGNES(3)}`; });
+      ouvertes.forEach((q, i) => {
+        h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p>`;
+        const r = reps[i];
+        h += r?.reponse ? `<p style="border-left:3px solid #9ca3af;padding-left:8px"><em>${esc(r.reponse)}</em></p>` : LIGNES(3);
+      });
     }
-    const objectifs = lignesObjectifs(c.f);
+    let objectifs = lignesObjectifs(c.f);
+    if (!objectifs.length) objectifs = String(c.f.programme || "").split(/\n+|;\s+|•/).map((x) => x.replace(/^[-*\d.)\s]+/, "").replace(/<[^>]+>/g, "").trim()).filter((x) => x.length > 3 && x.length < 160).slice(0, 8);
+    if (!objectifs.length) objectifs = ["Maîtriser les notions fondamentales de la formation", "Appliquer les méthodes et outils présentés en situation professionnelle", "Analyser une situation et proposer une solution adaptée", "Évaluer ses pratiques et identifier les axes de progrès"];
     if (objectifs.length) {
       h += `<h2>Évaluation des acquis</h2>`;
       h += tableHTML(["Objectif", "Acquis", "En cours", "Non acquis"], objectifs.map((o, oi) => {
