@@ -47,8 +47,9 @@ export const duree = (sec: number) => { const m = Math.round(sec / 60); return `
 
 const LIGNES = (n: number) => `<div style="margin:6px 0 12px">${Array.from({ length: n }, () => `<div style="border-bottom:1px dotted #9ca3af;height:22px"></div>`).join("")}</div>`;
 const CASE = `<span style="display:inline-block;width:12px;height:12px;border:1px solid #444;border-radius:2px;vertical-align:-2px"></span>`;
-const ZONE_SIGNATURE = (labels: string[]) => `<table style="width:100%;margin-top:18px;border-collapse:collapse"><tr>${labels.map((l) =>
-  `<td style="width:${Math.floor(100 / labels.length)}%;vertical-align:top;padding:6px"><div class="sig-box" style="padding:10px;min-height:90px"><p class="sig-label" style="margin:0 0 6px;font-weight:700">${esc(l)}</p><p style="margin:0;color:#6b7280;font-size:11px">Date : ____ / ____ / ________</p><p style="margin:4px 0 0;color:#6b7280;font-size:11px">Signature :</p></div></td>`).join("")}</tr></table>`;
+const dateCourteLongue = (v?: string | Date | null) => { const x = d(v); return x ? x.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : ""; };
+const ZONE_SIGNATURE = (labels: string[], date?: string) => `<table style="width:100%;margin-top:18px;border-collapse:collapse"><tr>${labels.map((l) =>
+  `<td style="width:${Math.floor(100 / labels.length)}%;vertical-align:top;padding:6px"><div class="sig-box" style="padding:10px;min-height:90px"><p class="sig-label" style="margin:0 0 6px;font-weight:700">${esc(l)}</p><p style="margin:0;color:#6b7280;font-size:11px">Date : ${date ? esc(date) : "____ / ____ / ________"}</p><p style="margin:4px 0 0;color:#6b7280;font-size:11px">Signature :</p></div></td>`).join("")}</tr></table>`;
 
 const nomComplet = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`.trim();
 
@@ -178,6 +179,7 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
 
 export function examenFinal(c: Ctx): { html: string; reel: boolean } {
   const reels = (c.a.examenFinal || []).filter(hasRecordedQuiz);
+  let fillDate: string | undefined;
   let h = enTete(c, [["Examen prévu le", dateLongue(c.p.session.dateFin)]]);
   if (reels.length) {
     h += `<h2>Résultats enregistrés dans IZILearn</h2>`;
@@ -198,6 +200,7 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     const questions: QcmQ[] = qcm.length && (!passe || qcm.every(aCorrige)) ? qcm : qualiopi.length ? qualiopi : qcm;
     const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
     const fill = passe && corrigeComplet;
+    if (fill) fillDate = dateCourteLongue(c.p.session.dateFin);
     let answers: number[] = [];
     if (fill) {
       const seed = Math.abs((`${c.s.prenom}${c.s.nom}examen`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
@@ -255,7 +258,7 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     const noteFinale = fill && score != null ? `${Math.round((score / questions.length) * 20)} / 20` : "____________________";
     h += `<p><strong>Note finale :</strong> ${noteFinale}</p><p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / questions.length, c.s.prenom, `${c.s.nom}examen`, true))}</p>` : LIGNES(3)}`;
   }
-  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], reels.length ? undefined : fillDate);
   return { html: doc(c, "EXAMEN FINAL", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };
 }
 
@@ -467,7 +470,7 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
     });
   }
   const score = fill ? answers.filter((a, qi) => a === qs[qi].correctIndex).length : null;
-  let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`]]);
+  let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`], ...(fill ? [["Réalisé le", dateCourteLongue(u.fin)] as [string, string]] : [])]);
   if (!fill) h += trameVierge("QCM à compléter par l'apprenant ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
   h += `<h2>Questionnaire à choix multiples</h2>`;
   qs.forEach((q, k) => {
@@ -481,7 +484,7 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
     h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${qs.map((q, k) => `${k + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
   }
   h += `<p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / per, c.s.prenom, `${c.s.nom}${i}`, false))}</p>` : LIGNES(2)}`;
-  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], fill ? dateCourteLongue(u.fin) : undefined);
   return doc(c, `QCM D'ÉVALUATION ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
 }
 
