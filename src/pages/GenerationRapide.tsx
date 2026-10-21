@@ -23,7 +23,7 @@ import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { adaptHtmlToTypeAction } from "@/lib/adaptTypeAction";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
-import { buildDocumentFileName, buildGenericFileName, buildStagiaireFolderName } from "@/lib/fileNaming";
+import { buildDocumentFileName, buildGenericFileName, buildStagiaireFolderName, limiterCheminsZip } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
@@ -797,6 +797,7 @@ const GenerationRapide = () => {
 
         if (!snapZip) { reporter.setProgress(100); reporter.setMessage("Terminé"); return; }
         reporter.setMessage("Compression du ZIP…");
+        await limiterCheminsZip(zip);
         const blob = await zip.generateAsync({ type: "blob" }, (meta) => reporter.setProgress(92 + meta.percent * 0.08));
         return blob;
       },

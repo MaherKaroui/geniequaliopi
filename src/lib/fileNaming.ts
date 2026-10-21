@@ -205,6 +205,40 @@ export function buildGenericFileName(label: string, orgName: string, version: st
 
 export const MAX_LABEL_LENGTH = 60;
 
+/**
+ * Raccourcit un libellé UPPER_SNAKE en retirant les mots du milieu : on garde
+ * les deux premiers mots et la fin (numéros compris, ex. « EX_1_5 »), qui
+ * distinguent les pièces entre elles. Couper la fin créait des doublons dans
+ * le ZIP (EX_1_5 … EX_5_5 tronqués au même nom s'écrasaient).
+ */
+export function compacterLibelle(label: string, max = MAX_LABEL_LENGTH, queueProtegee?: number): string {
+  const mots = label.split("_").filter(Boolean);
+  let numeros = 0;
+  while (numeros < mots.length && /^\d+$/.test(mots[mots.length - 1 - numeros])) numeros++;
+  const queue = queueProtegee ?? numeros + 2;
+  const tete = 2;
+  while (mots.join("_").length > max) {
+    // Les mots partent avant les numéros, qui distinguent souvent deux pièces.
+    let idx = -1;
+    for (let i = mots.length - queue - 1; i >= tete; i--) {
+      if (!/^\d+$/.test(mots[i])) { idx = i; break; }
+    }
+    if (idx < 0) idx = mots.length - queue - 1;
+    if (idx < tete) break;
+    mots.splice(idx, 1);
+  }
+  return mots.join("_");
+}
+
+/** QCM des 14 missions : le titre de la mission est déjà le nom du dossier. */
+function libelleMissionStagiaire(doc: DocEntry, stagiaire?: StagiaireInfo | null): string | null {
+  const num = doc.params?.missionNumero;
+  if (!stagiaire || typeof num !== "number") return null;
+  const segments = normalizeDocumentLabel(doc.nom, stagiaire).split(/\s+[–—-]\s+/);
+  const piece = segments.length > 1 ? toUpperSnakeCase(segments[segments.length - 1]) : "";
+  return piece ? `MISSION_${num}_${piece}` : null;
+}
+
 export function buildDocumentFileName(
   doc: DocEntry,
   orgName: string,
@@ -215,8 +249,9 @@ export function buildDocumentFileName(
 ): string {
   // Libellé raccourci : Windows refuse les chemins > 260 caractères après
   // décompression, et Google Drive affiche alors « Fichier introuvable ».
-  let label = toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)).replace(/^14_MISSIONS_/, "");
-  if (label.length > MAX_LABEL_LENGTH) label = label.slice(0, MAX_LABEL_LENGTH).replace(/_[^_]*$/, "");
+  let label = libelleMissionStagiaire(doc, stagiaire)
+    ?? toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)).replace(/^14_MISSIONS_/, "");
+  if (label.length > MAX_LABEL_LENGTH) label = compacterLibelle(label);
   const parts = [label || "DOCUMENT"];
 
   if (stagiaire?.prenom) parts.push(toTitleSnakeCase(stagiaire.prenom));
@@ -227,4 +262,61 @@ export function buildDocumentFileName(
   parts.push(formatDateCompact(dateMaj));
 
   return `${parts.filter(Boolean).join("_")}${extension}`;
+}
+
+/**
+ * Longueur maximale d'un chemin dans le ZIP. Windows limite le chemin complet
+ * à 260 caractères : on laisse ~80 caractères au dossier de décompression
+ * (C:\Users\<nom>\Downloads\<dossier>\), sinon l'import du dossier dans
+ * Google Drive échoue (« Fichier introuvable »).
+ */
+export const MAX_CHEMIN_ZIP = 175;
+
+/** Raccourcit un chemin trop long en gardant dossiers, extension et suffixe Prénom_NOM_OF_Vx_date. */
+export function raccourcirCheminZip(chemin: string, max = MAX_CHEMIN_ZIP): string {
+  if (chemin.length <= max) return chemin;
+  const coupe = chemin.lastIndexOf("/");
+  const dossier = coupe >= 0 ? chemin.slice(0, coupe + 1) : "";
+  const fichier = chemin.slice(coupe + 1);
+  const point = fichier.lastIndexOf(".");
+  const ext = point > 0 ? fichier.slice(point) : "";
+  const base = point > 0 ? fichier.slice(0, point) : fichier;
+  const budget = Math.max(20, max - dossier.length - ext.length);
+  return `${dossier}${compacterLibelle(base, budget, 7)}${ext}`;
+}
+
+type ZipLike = {
+  files: Record<string, { dir: boolean; date?: Date; async(type: "uint8array"): Promise<Uint8Array> }>;
+  file(path: string, data: Uint8Array, options?: { date?: Date }): unknown;
+  remove(path: string): unknown;
+};
+
+/**
+ * À appeler juste avant `zip.generateAsync` : renomme les fichiers dont le
+ * chemin dépasse MAX_CHEMIN_ZIP, sans jamais écraser un fichier existant.
+ */
+export async function limiterCheminsZip(zip: ZipLike, max = MAX_CHEMIN_ZIP): Promise<number> {
+  const pris = new Set(Object.keys(zip.files));
+  const longs = Object.entries(zip.files).filter(([chemin, f]) => !f.dir && chemin.length > max);
+  for (const [chemin, f] of longs) {
+    let cible = raccourcirCheminZip(chemin, max);
+    if (pris.has(cible)) {
+      // Numéro inséré avant le suffixe Prénom_NOM_OF_Vx_date, qui reste intact.
+      const coupe = cible.lastIndexOf("/");
+      const point = cible.lastIndexOf(".");
+      const ext = point > coupe ? cible.slice(point) : "";
+      const mots = cible.slice(coupe + 1, ext ? point : undefined).split("_");
+      const pos = Math.max(1, mots.length - 7);
+      let n = 2;
+      const essai = () => `${cible.slice(0, coupe + 1)}${[...mots.slice(0, pos), String(n), ...mots.slice(pos)].join("_")}${ext}`;
+      while (pris.has(essai())) n++;
+      cible = essai();
+    }
+    const data = await f.async("uint8array");
+    zip.remove(chemin);
+    zip.file(cible, data, { date: f.date });
+    pris.delete(chemin);
+    pris.add(cible);
+  }
+  return longs.length;
 }

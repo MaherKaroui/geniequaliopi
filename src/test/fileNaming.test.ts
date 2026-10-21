@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildDocumentFileName, normalizeLooseFileName, shortCriterePath } from "@/lib/fileNaming";
+import JSZip from "jszip";
+import { buildDocumentFileName, limiterCheminsZip, MAX_CHEMIN_ZIP, normalizeLooseFileName, shortCriterePath } from "@/lib/fileNaming";
 import { auditImportedFolder } from "@/lib/importInspector";
 import { DocEntry, StagiaireInfo } from "@/types/qualiopi";
 
@@ -31,11 +32,36 @@ describe("file naming convention", () => {
   });
 
   it("raccourcit les noms des QCM des 14 missions CFA pour Google Drive", () => {
-    const qcm = { ...doc, nom: "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Mobilité nationale et internationale – QCM EXERCICE – Abdelkrim LAMBARKI" };
-    const name = buildDocumentFileName(qcm, "SKILLBOOSTED", "1", "2024-11-28", ".pdf", stagiaire);
-    expect(name.startsWith("14_MISSIONS_")).toBe(false);
-    expect(name.length).toBeLessThanOrEqual(120);
-    expect(name.endsWith("_Abdelkrim_LAMBARKI_SKILLBOOSTED_V1_2024_11_28.pdf")).toBe(true);
+    const qcm = { ...doc, nom: "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Diversité & lutte contre les discriminations – QCM Exercice – Abdelkrim LAMBARKI", params: { stagiaireIdx: 0, missionNumero: 9, folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations" } };
+    expect(buildDocumentFileName(qcm, "SKILLBOOSTED", "1", "2024-11-28", ".pdf", stagiaire)).toBe(
+      "MISSION_9_QCM_EXERCICE_Abdelkrim_LAMBARKI_SKILLBOOSTED_V1_2024_11_28.pdf",
+    );
+  });
+
+  it("garde le numéro d'exercice quand le libellé est raccourci (pas de doublon)", () => {
+    const noms = [1, 2, 3, 4, 5].map((n) => buildDocumentFileName(
+      { ...doc, nom: `CT3 - IND 11 EXERCICE PRATIQUE (Bloc 1 – CP3 Mettre en place et suivre les indicateurs… – Ex. ${n}/5) – Abdelkrim LAMBARKI` },
+      "SKILLBOOSTED", "1", "2024-11-28", ".pdf", stagiaire,
+    ));
+    expect(new Set(noms).size).toBe(5);
+    noms.forEach((nom, i) => expect(nom).toContain(`_EX_${i + 1}_5_Abdelkrim_LAMBARKI_`));
+  });
+
+  it("limite la longueur des chemins du ZIP sans écraser de fichier", async () => {
+    const zip = new JSZip();
+    const dossier = "Critere_3/Indicateur_10/14_MISSIONS_CFA/Mission_9_Diversite_Discriminations/Stephanie_MANSOURI";
+    const long = (n: number) => `${dossier}/14_MISSIONS_MISSION_9_DIVERSITE_LUTTE_CONTRE_DISCRIMINATIONS_QCM_EXERCICE_VARIANTE_${n}_Stephanie_MANSOURI_SKILLBOOSTED_V1_2024_11_28.pdf`;
+    zip.file(long(1), "a");
+    zip.file(long(2), "b");
+    zip.file("Critere_1/Indicateur_1/COURT_SKILLBOOSTED_V1_2024_11_28.pdf", "c");
+    expect(await limiterCheminsZip(zip)).toBe(2);
+    const chemins = Object.keys(zip.files).filter((c) => !zip.files[c].dir);
+    expect(chemins).toHaveLength(3);
+    chemins.forEach((c) => expect(c.length).toBeLessThanOrEqual(MAX_CHEMIN_ZIP + 3));
+    expect(chemins).toContain("Critere_1/Indicateur_1/COURT_SKILLBOOSTED_V1_2024_11_28.pdf");
+    expect(chemins.filter((c) => c.endsWith("_Stephanie_MANSOURI_SKILLBOOSTED_V1_2024_11_28.pdf"))).toHaveLength(2);
+    const contenus = await Promise.all(chemins.map((c) => zip.file(c)!.async("string")));
+    expect(contenus.sort()).toEqual(["a", "b", "c"]);
   });
 
   it("normalizes accents, apostrophes and parenthesis", () => {

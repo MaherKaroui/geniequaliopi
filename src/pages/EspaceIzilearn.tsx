@@ -5,6 +5,7 @@
  */
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import JSZip from "jszip";
+import { limiterCheminsZip } from "@/lib/fileNaming";
 import { toast } from "sonner";
 import {
   CheckCircle2, Download, Eye, FileText, Link2, Loader2, Mail, RefreshCw, Send, Upload, Users, AlertTriangle, FileDown, Copy, PenLine,
@@ -141,6 +142,7 @@ export default function EspaceIzilearn() {
       const racine = `${(cx.p.session.code || cx.f.intitule).replace(/[^\w-]+/g, "_")}_${cx.p.session.dateDebut}`;
       for (const r of await lot()) zip.file(`${racine}/${chemin(r.p)}/${r.nom}`, r.blob);
       setTravail({ label: "Compression…", fait: visibles.length, total: visibles.length });
+      await limiterCheminsZip(zip);
       telecharger(await zip.generateAsync({ type: "blob" }), `${racine}.zip`);
       toast.success(`${visibles.length} pièce(s) téléchargée(s)`);
     } catch (e) { toast.error(`Export impossible : ${(e as Error).message}`); } finally { setTravail(null); }

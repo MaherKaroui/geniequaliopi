@@ -65,6 +65,7 @@ import {
   PER_STAGIAIRE_TEMPLATES,
   replaceFileExtension,
   shortCriterePath,
+  limiterCheminsZip,
 } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
@@ -736,6 +737,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
       }
 
       zip.file("RAPPORT_IMPORT.txt", buildImportReport(importAudit));
+      await limiterCheminsZip(zip);
       const blob = await zip.generateAsync({ type: "blob" });
       saveAs(blob, buildGenericFileName("DOSSIER_RENOMME", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
       toast.success("ZIP renommé prêt au téléchargement.");
@@ -1214,6 +1216,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
       }
 
     reporter?.setMessage("Compression du ZIP...");
+    await limiterCheminsZip(zip);
     const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
       reporter?.setProgress(95 + meta.percent * 0.05);
     });
@@ -1354,6 +1357,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
         }
       }
 
+      await limiterCheminsZip(zip);
       const blob = await zip.generateAsync({ type: "blob" });
       saveAs(blob, buildGenericFileName(`CRITERE_${critereNum}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
       toast.success(`ZIP Critère ${critereNum} téléchargé.`);
@@ -1499,6 +1503,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
         }
       }
 
+      await limiterCheminsZip(zip);
       const blob = await zip.generateAsync({ type: "blob" });
       saveAs(blob, buildGenericFileName(`CT${critereNum}_IND_${indicateurNum}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
       toast.success(`ZIP Indicateur ${indicateurNum} téléchargé.`);
@@ -1578,6 +1583,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
         }
       }
 
+      await limiterCheminsZip(zip);
       const zipBlob = await zip.generateAsync({ type: "blob" });
       const zipName = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip");
       const folderName = `Qualiopi_${mergedOrganisme.nom}`.substring(0, 60);
@@ -2022,6 +2028,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                         }
                       }
                     }
+                    await limiterCheminsZip(zip);
                     const blob = await zip.generateAsync({ type: "blob" });
                     saveAs(blob, buildGenericFileName("MAIL", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
                     toast.success("ZIP MAIL téléchargé.");
@@ -2107,6 +2114,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                         console.error(`[SITE WEB] échec ${doc.nom}`, err);
                       }
                     }
+                    await limiterCheminsZip(zip);
                     const blob = await zip.generateAsync({ type: "blob" });
                     saveAs(blob, buildGenericFileName("DOCUMENTS_SITE_WEB", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
                     toast.success("ZIP SITE WEB téléchargé.");

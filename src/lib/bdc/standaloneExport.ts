@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import { limiterCheminsZip } from "@/lib/fileNaming";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { htmlToPdfBlob, getActivePdfOptions } from "@/lib/pdfExport";
 import { buildStandaloneBdcDocument, bdcDocumentTitle, BDC_STANDALONE_DOCUMENTS, type BdcDocumentId } from "./standaloneDocuments";
@@ -27,6 +28,7 @@ export async function exportStandaloneBdcZip(d: StandaloneBdcData, format: "pdf"
     const { blob, filename } = await exportStandaloneBdcDocument(d, doc.id, format);
     zip.file(`${String(i + 1).padStart(2, "0")}_${filename}`, blob);
   }
+  await limiterCheminsZip(zip);
   return zip.generateAsync({ type: "blob" });
 }
 

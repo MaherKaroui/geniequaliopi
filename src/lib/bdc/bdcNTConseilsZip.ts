@@ -9,6 +9,7 @@
  *   - Assets statiques (xlsx, pdf) téléchargés depuis /pdfs/bdc_nt/
  */
 import JSZip from "jszip";
+import { limiterCheminsZip } from "@/lib/fileNaming";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { htmlWrap, orgHeader, footer as docFooter } from "@/lib/docBuilder";
@@ -2318,6 +2319,7 @@ export async function buildBDCNTConseilsZip(
 
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
+  await limiterCheminsZip(zip);
   const blob = await zip.generateAsync(
     { type: "blob", compression: "STORE", streamFiles: true },
     (meta) => reporter?.setProgress(Math.min(100, 99 + meta.percent / 100))

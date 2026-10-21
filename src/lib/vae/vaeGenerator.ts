@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import { limiterCheminsZip } from "@/lib/fileNaming";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { htmlToPdfBlob, getActivePdfOptions } from "@/lib/pdfExport";
 import { withActiveDossierStyle } from "@/lib/dossierDesign";
@@ -95,6 +96,7 @@ export async function buildVAEZip(
     ].join("\n")
   );
 
+  await limiterCheminsZip(zip);
   return zip.generateAsync({ type: "blob" });
 }
 
