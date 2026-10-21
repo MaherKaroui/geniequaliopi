@@ -3,11 +3,6 @@ import type { OrganismeInfo } from "@/types/qualiopi";
 import type { Contexte } from "./pieces";
 import { esc } from "./trames";
 
-export function revisionHtml(o: OrganismeInfo): string {
-  const date = new Date(`${o.dateMaj}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return "";
-  return `<p class="document-revision">Mise à jour : ${date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} · Version ${esc(o.version || "1")}</p>`;
-}
 
 export function appliquerRevision(html: string, o: OrganismeInfo): string {
   // Le pied de page standard (docBuilder.footer) affiche déjà « V{version} {dateMaj} » :
