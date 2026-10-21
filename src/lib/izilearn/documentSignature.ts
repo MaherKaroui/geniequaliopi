@@ -40,7 +40,7 @@ export function contexteAvecSignatures(cx: Contexte, signatures: LearnerSignatur
 export function applyLearnerSignatures(html: string, piece: Piece, cx: Contexte): string {
   if (piece.mail || piece.apprenantIdx === null) return html;
   const learner = cx.stagiaires[piece.apprenantIdx];
-  if (!learner || (!learner.signatureUrl && !learner.signatureResponsableUrl)) return html;
+  if (!learner || (!learner.signatureUrl && !learner.signatureResponsableUrl && !cx.f.formateurSignatureUrl)) return html;
   const doc = new DOMParser().parseFromString(html, "text/html");
   const targets = [...doc.querySelectorAll(".sig-box"), ...[...doc.querySelectorAll("p")].filter((p) => !p.closest(".sig-box") && /^Signature\s+(du|de|d[’'])/i.test(p.textContent?.trim() ?? ""))];
   for (const box of targets) {
