@@ -395,9 +395,13 @@ function poolQcm(c: Ctx): QcmQ[] {
 export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = false): string {
   const tout = poolQcm(c);
   if (!tout.length) return exercicePratique(c, u, i, n);
-  // Période passée : seules les questions au corrigé connu permettent de cocher les réponses.
-  const corriges = tout.filter(aCorrige);
-  const pool = rempli && corriges.length ? corriges : tout;
+  // Questions IZILearn prioritaires ; période passée : seules les questions au
+  // corrigé connu (IZILearn, sinon banque Qualiopi) permettent de cocher les réponses.
+  const iz = normaliserQcm(c.p.formation.contenu?.positionnement as unknown[]);
+  const izCorr = iz.filter(aCorrige);
+  const pool = rempli
+    ? (izCorr.length >= 3 ? izCorr : tout.filter(aCorrige).length ? tout.filter(aCorrige) : tout)
+    : (iz.length ? iz : tout);
   const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
   const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
   // Remplissage automatique seulement si la bonne réponse est connue pour chaque question.
