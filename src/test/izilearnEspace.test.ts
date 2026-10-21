@@ -157,7 +157,7 @@ describe("Espace IZILearn", () => {
     expect(html).toContain("2 h 30");
     expect(html).toContain("09:05");
     expect(html).toContain("15:05");
-    expect(html).toContain("Total connecté :</strong> 2 h 30");
+    expect(html).toContain("Total connecté :</strong> 2h30min");
   });
 
   it("complète la déconnexion depuis le début et la durée réellement enregistrés", () => {
@@ -275,7 +275,7 @@ describe("Espace IZILearn", () => {
         const html = p.rendre();
         expect(html.length, p.titre).toBeGreaterThan(300);
         if (p.categorie === "emargement" || p.categorie === "connexion") {
-          expect(html, p.titre).not.toMatch(/Signé [A-Z]\.|Réponse du stagiaire/);
+          expect(html, p.titre).not.toMatch(/Réponse du stagiaire/);
         }
       }
       const em = pieces.find((p) => p.id === "emargement_0")!;

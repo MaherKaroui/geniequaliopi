@@ -22,8 +22,11 @@ describe("Preuves d'émargement IZILearn", () => {
     const doc = new DOMParser().parseFromString(applyLearnerSignatures(piece.rendre(), piece, cx), "text/html");
     const rows = doc.querySelectorAll("table tr");
     expect(rows).toHaveLength(3);
+    // Créneau signé dans IZILearn : signature horodatée conservée.
     expect(rows[1].querySelectorAll("td")[2].querySelectorAll("img")).toHaveLength(1);
-    expect(rows[2].querySelectorAll("td")[2].querySelectorAll("img")).toHaveLength(0);
     expect(doc.body.textContent).toContain("signé le 06/01/2020 à 09:02");
+    // Autre demi-journée passée : remplissage automatique Qualiopi avec la signature réutilisable.
+    expect(rows[2].querySelectorAll("td")[2].querySelectorAll("img")).toHaveLength(1);
+    expect(rows[2].querySelectorAll("td")[2].textContent).not.toContain("signé le");
   });
 });
