@@ -278,6 +278,36 @@ describe("Espace IZILearn", () => {
     expect(htmls[1]).not.toContain("Q1 ?");
   });
 
+  it("remplit automatiquement les QCM des périodes passées, laisse les futures vierges", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = {
+      chapitres: [], exercices: [],
+      positionnement: [
+        { question: "Q1 ?", options: ["A", "B", "C"], correctIndex: 1 },
+        { question: "Q2 ?", options: ["A", "B", "C"], correctIndex: 0 },
+        { question: "Q3 ?", options: ["A", "B", "C"], correctIndex: 2 },
+        { question: "Q4 ?", options: ["A", "B", "C"], correctIndex: 1 },
+        { question: "Q5 ?", options: ["A", "B", "C"], correctIndex: 0 },
+        { question: "Q6 ?", options: ["A", "B", "C"], correctIndex: 2 },
+      ],
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T13:48:00Z"));
+    const futur = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
+    for (const q of futur) {
+      expect(q.rendre()).not.toContain("☒");
+      expect(q.rendre()).toContain("______ /");
+    }
+    vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
+    const passes = planPieces(contexte(p)).filter((x) => x.categorie === "exercices" && x.apprenantIdx === 0);
+    for (const q of passes) {
+      const html = q.rendre();
+      expect(html).toContain("☒");
+      expect(html).toMatch(/Score :<\/strong> \d+ \/ \d+/);
+      expect(html).toContain("Corrigé (réservé au formateur)");
+    }
+  });
+
   it("rythme des exercices : jour si court, semaine si long ou CFA", () => {
     const court = contexte(payload("actions-formation", 5));
     expect(unitesExercices(court.p, court.stagiaires[0], court.f).map((u) => u.type)).toEqual(Array(5).fill("jour"));

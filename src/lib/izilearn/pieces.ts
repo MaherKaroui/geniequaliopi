@@ -126,7 +126,7 @@ export function planPieces(cx: Contexte): Piece[] {
     unites.forEach((u, k) => {
       const passe = u.fin.getTime() < new Date().setHours(0, 0, 0, 0);
       par("exercices", `QCM ${k + 1} (${u.type === "jour" ? "jour" : "semaine"} ${k + 1})`, `QCM_${String(k + 1).padStart(2, "0")}`, passe ? "document" : "trame",
-        () => T.qcmPeriodique(c, u, k, unites.length), { id: `ex${k}` });
+        () => T.qcmPeriodique(c, u, k, unites.length, passe), { id: `ex${k}` });
     });
 
     const examen = (a.examenFinal || []).some(hasRecordedQuiz);

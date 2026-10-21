@@ -287,19 +287,19 @@ export function exercicePratique(c: Ctx, u: Unite, i: number, n: number): string
   return doc(c, `EXERCICE PRATIQUE ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
 }
 
-interface QcmQ { question: string; options: string[] }
+interface QcmQ { question: string; options: string[]; correctIndex?: number }
 
 /** Questions de QCM disponibles : test d'entrée IZILearn, puis QCM du contenu pédagogique dédié. Doublons retirés. */
 function poolQcm(c: Ctx): QcmQ[] {
   const seen = new Set<string>();
   const out: QcmQ[] = [];
-  const push = (qs?: { question: string; options: string[] }[]) => {
+  const push = (qs?: { question: string; options: string[]; correctIndex?: number }[]) => {
     for (const q of qs || []) {
       if (!q.question || !(q.options || []).length) continue;
       const k = q.question.trim().toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
-      out.push({ question: q.question, options: q.options });
+      out.push({ question: q.question, options: q.options, correctIndex: q.correctIndex });
     }
   };
   push(c.p.formation.contenu?.positionnement);
@@ -313,21 +313,47 @@ function poolQcm(c: Ctx): QcmQ[] {
 
 /**
  * QCM d'évaluation par période : chaque période reçoit une série de questions
- * différente (rotation sans répétition dans le pool). Aucune réponse n'est
- * pré-remplie ni dévoilée. Sans question disponible, repli sur l'exercice pratique.
+ * différente (rotation sans répétition dans le pool). Période passée → rempli
+ * comme Qualiopi : réponses cochées de façon déterministe par apprenant
+ * (majorité de bonnes réponses), score calculé ; période future → vierge.
+ * Sans question disponible, repli sur l'exercice pratique.
  */
-export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number): string {
+export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = false): string {
   const pool = poolQcm(c);
   if (!pool.length) return exercicePratique(c, u, i, n);
   const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
   const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
+  // Remplissage automatique seulement si la bonne réponse est connue pour chaque question.
+  const corrigeComplet = qs.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
+  const fill = rempli && corrigeComplet;
+  let answers: number[] = [];
+  if (fill) {
+    // Déterministe par apprenant et par période : ~80 % de bonnes réponses.
+    const seed = Math.abs((`${c.s.prenom}${c.s.nom}${i}`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
+    const nbBonnes = Math.max(per - 1, Math.round(per * 0.8));
+    const fausses = new Set<number>();
+    let k = 0;
+    while (fausses.size < per - nbBonnes && k < per * 4) { fausses.add((seed + k * 7) % per); k++; }
+    answers = qs.map((q, qi) => {
+      if (!fausses.has(qi)) return q.correctIndex!;
+      const wrong = q.options.map((_, oi) => oi).filter((oi) => oi !== q.correctIndex);
+      return wrong[(seed + qi * 11) % wrong.length];
+    });
+  }
+  const score = fill ? answers.filter((a, qi) => a === qs[qi].correctIndex).length : null;
   let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`]]);
-  h += trameVierge("QCM à compléter par l'apprenant ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
+  if (!fill) h += trameVierge("QCM à compléter par l'apprenant ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
   h += `<h2>Questionnaire à choix multiples</h2>`;
   qs.forEach((q, k) => {
-    h += `<p><strong>${k + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
+    h += `<p><strong>${k + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op, oi) => {
+      const coche = fill && answers[k] === oi;
+      return `${coche ? "☒" : CASE} ${coche ? `<strong>${esc(op)}</strong>` : esc(op)}`;
+    }).join("<br>")}</p>`;
   });
-  h += `<p><strong>Score :</strong> ______ / ${per}</p>`;
+  h += `<p><strong>Score :</strong> ${score != null ? `${score} / ${per}` : `______ / ${per}`}</p>`;
+  if (fill) {
+    h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${qs.map((q, k) => `${k + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
+  }
   h += `<p><strong>Appréciation du formateur :</strong></p>${LIGNES(2)}`;
   h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
   return doc(c, `QCM D'ÉVALUATION ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
