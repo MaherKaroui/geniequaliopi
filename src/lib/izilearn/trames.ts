@@ -193,7 +193,7 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     // de façon déterministe par apprenant (majorité de bonnes réponses), score
     // calculé. Examen à venir ou corrigé inconnu → trame vierge.
     const fin = d(c.p.session.dateFin);
-    const passe = fin ? isFrLongDayPast(fin) : false;
+    const passe = fin ? fin.getTime() < new Date().setHours(0, 0, 0, 0) : false;
     const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
     const fill = passe && corrigeComplet;
     let answers: number[] = [];
