@@ -415,7 +415,6 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
       ? new Date(debut.getTime() + x.secondes * 1000).toISOString() : null);
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
-  const total = cx.reduce((n, x) => n + (x.secondes || 0), 0);
   let h = connectionIntro("IZILearn / Google Meet");
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> IZILearn / Google Meet</p>`;
   const jours = new Map<string, Date>();
