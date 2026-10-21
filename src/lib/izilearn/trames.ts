@@ -377,9 +377,11 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
   const sigStagAuto = c.s.signatureUrl
     ? `<br><img src="${c.s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
     : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${initiale}.${nomStag}</span>`;
+  const formateurNom = (c.f.formateur || "").trim();
+  const formateurParts = formateurNom.split(/\s+/);
   const sigFormAuto = c.f.formateurSignatureUrl
     ? `<br><img src="${c.f.formateurSignatureUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
-    : "";
+    : formateurNom ? `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${formateurParts[0]?.charAt(0) || "F"}.${(formateurParts.at(-1) || "").toUpperCase()}</span>` : "";
   const attente = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
   const jours = joursSession(c.p, c.s, c.f);
   jours.forEach((jour, index) => {
