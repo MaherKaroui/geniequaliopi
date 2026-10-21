@@ -10,7 +10,9 @@ export function revisionHtml(o: OrganismeInfo): string {
 }
 
 export function appliquerRevision(html: string, o: OrganismeInfo): string {
-  const bloc = footer(o).replace("</div>", `${revisionHtml(o)}</div>`);
+  // Le pied de page standard (docBuilder.footer) affiche déjà « V{version} {dateMaj} » :
+  // ne rien ajouter de plus pour éviter la mention « Mise à jour » en double.
+  const bloc = footer(o);
   if (/<div class="footer">/.test(html)) return html.replace(/<div class="footer">[\s\S]*?<\/div>/, bloc);
   return html.replace(/<\/body>/i, `${bloc}</body>`);
 }
