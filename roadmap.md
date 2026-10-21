@@ -1,6 +1,7 @@
 # Roadmap
 
 - [x] Remplir automatiquement les émargements et relevés de connexion IZILearn comme la génération rapide Qualiopi : jours passés signés (nom + « Signé X.Nom » ou signature réutilisable, formateur) et horaires de connexion réalistes (buildRealisticConnectionDay, « Présent(e) »), jours futurs vierges, preuves IZILearn enregistrées prioritaires. 27 tests réussis, aperçus émargement (hybride) et connexion (distanciel) vérifiés sur sessions de contrôle. Session réelle non disponible, non publié.
+- [x] Signature formateur IZILearn : bouton « Signature formateur » dans la barre latérale (dessin ou import), appliquée automatiquement aux émargements et aux cases « Le formateur » des documents ; sinon mention « Signé X.Nom » sur les jours passés. 28 tests réussis, aperçu vérifié. Non publié.
 
 - [x] Remplacer les anciennes présentations IZILearn d’émargement et connexion par les tableaux et récapitulatifs partagés avec Qualiopi ; 36 tests réussis, les deux aperçus et Word connexion vérifiés sur une session de contrôle, preuves conservées et aucune erreur. Session réelle et retour distant non vérifiés ; non publié.
 

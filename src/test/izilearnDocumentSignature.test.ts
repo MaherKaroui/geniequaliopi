@@ -71,4 +71,24 @@ describe("Signatures manuelles IZILearn", () => {
     expect(validSignatureImage('data:image/svg+xml,<svg onload="alert(1)"/>')).toBe(false);
     expect(validSignatureImage(image)).toBe(true);
   });
+  it("applique la signature du formateur à toute la session et signe les jours passés comme Qualiopi", () => {
+    const p = { ...payload, session: { ...payload.session, modalite: "presentiel", formateur: "Paul DURAND" } } as IzPayload;
+    const key = signatureKey(p, -1, "formateur");
+    expect(key).not.toBeNull();
+    expect(key).not.toBe(signatureKey(p, 0, "stagiaire"));
+    expect(signatureKey(payload, -1, "formateur")).toBeNull();
+    // Sans image : mention « Signé P.DURAND » sur les jours passés, comme Qualiopi.
+    const cx0 = contexteAvecSignatures(contexte(p), {});
+    const em0 = planPieces(cx0).find((x) => x.id === "emargement_0");
+    expect(em0?.rendre()).toContain("Signé P.DURAND");
+    // Avec la signature capturée : image reprise dans les cases formateur de l'émargement.
+    const cx = contexteAvecSignatures(contexte(p), { [key!]: image });
+    expect(cx.f.formateurSignatureUrl).toBe(image);
+    const em = planPieces(cx).find((x) => x.id === "emargement_0");
+    expect(em?.rendre()).toContain(image);
+    // Les cases « Le formateur » des autres documents sont remplies aussi.
+    const html = '<body><div class="sig-box"><p class="sig-label">Le formateur</p></div></body>';
+    const doc = new DOMParser().parseFromString(applyLearnerSignatures(html, piece, cx), "text/html");
+    expect(doc.querySelectorAll(".sig-box img")).toHaveLength(1);
+  });
 });

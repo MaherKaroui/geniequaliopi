@@ -6,13 +6,13 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import { validSignatureImage } from "@/lib/izilearn/documentSignature";
 
-interface Props { open: boolean; name: string; role?: "stagiaire" | "entreprise"; onClose: () => void; onSave: (image: string) => void; onRemove?: () => void }
+interface Props { open: boolean; name: string; role?: "stagiaire" | "entreprise" | "formateur"; onClose: () => void; onSave: (image: string) => void; onRemove?: () => void }
 
 export default function IzilearnSignatureDialog({ open, name, role = "stagiaire", onClose, onSave, onRemove }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   return <Dialog open={open} onOpenChange={(value) => { if (!value) onClose(); }}>
     <DialogContent className="max-w-xl max-h-[90vh] overflow-auto">
-      <DialogHeader><DialogTitle>{role === "entreprise" ? "Signature du responsable d’entreprise" : "Signature du stagiaire"} — {name}</DialogTitle></DialogHeader>
+      <DialogHeader><DialogTitle>{role === "entreprise" ? "Signature du responsable d’entreprise" : role === "formateur" ? "Signature du formateur" : "Signature du stagiaire"} — {name}</DialogTitle></DialogHeader>
       <SignaturePad onSave={onSave} onCancel={onClose} label={name} />
       <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label="Importer la signature du stagiaire" className="hidden" onChange={async (event) => {
         const file = event.target.files?.[0];
