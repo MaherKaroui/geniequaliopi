@@ -31,7 +31,7 @@ export interface IzOrganisme {
 export interface IzContenu {
   chapitres: { titre: string; description?: string; sections: { titre: string; html: string }[] }[];
   exercices: { titre: string; consigne: string; reponseAttendue?: string }[];
-  positionnement: { question: string; options: string[] }[];
+  positionnement: { question: string; options: string[]; correctIndex?: number }[];
   examenFinal?: { question: string; options: string[] }[];
   /** Contenu créé par l'IA et pas encore validé par un formateur. */
   brouillonIA?: boolean;
