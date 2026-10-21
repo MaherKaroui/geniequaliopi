@@ -368,23 +368,39 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
   if (c.f.dureeSaisiePrioritaire) h += `<p><strong>Durée :</strong> ${esc(c.f.duree)}</p>`;
   if (c.f.formateur) h += `<p><strong>Formateur :</strong> ${esc(c.f.formateur)}</p>`;
   const horaires = [...new Set(c.p.creneaux.map((sl) => `${heure(sl.debut)} – ${heure(sl.fin)}`))];
-  h += `<p><strong>Horaires prévus :</strong> ${horaires.length ? horaires.join(" et ") : getEmargementBlocs(c.f).map((b) => b.horaire).join(" et ")}</p>`;
-  if (/mixte|hybride/i.test(c.p.session.modalite)) h += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
+  h += `<p><strong>Horaires :</strong> ${horaires.length ? horaires.join(" et ") : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"}</p>`;
+  const mixte = /mixte|hybride/i.test(c.p.session.modalite);
+  if (mixte) h += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
+  // Remplissage automatique identique à Qualiopi : jours passés signés, jours futurs en attente.
+  const initiale = c.s.prenom?.trim().charAt(0) || "S";
+  const nomStag = c.s.nom?.trim() || "Stagiaire";
+  const sigStagAuto = c.s.signatureUrl
+    ? `<br><img src="${c.s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
+    : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${initiale}.${nomStag}</span>`;
+  const sigFormAuto = c.f.formateurSignatureUrl
+    ? `<br><img src="${c.f.formateurSignatureUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
+    : "";
+  const attente = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
   const jours = joursSession(c.p, c.s, c.f);
   jours.forEach((jour, index) => {
     if (index > 0 && index % 5 === 0) h += '<div class="page-break"></div>';
+    const passe = isFrLongDayPast(dateLongue(jour));
+    const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${getDayModalite(c.f, index) === "P" ? "Présentiel" : "Distanciel"})</span>` : "";
     const rows = plannedSessionDay(c, jour).map((bloc, i) => {
       const sl = bloc.slot;
       const sig = sl ? c.a.signatures.find((x) => x.slotId === sl.id) : undefined;
       const fsig = sl ? c.p.session.formateurSignatures?.find((x) => x.slotId === sl.id) : undefined;
       if (sig || fsig) reel = true;
+      // Signatures IZILearn enregistrées prioritaires ; sinon remplissage Qualiopi.
       const learner = sig
         ? `${esc(nom)}${svgImg(sig.svg)}<div style="font-size:10px">${STATUT[sig.statut] || esc(sig.statut)}${sig.retardMinutes ? ` (${sig.retardMinutes} min)` : ""} — signé le ${dateFr(sig.signeLe)} à ${heure(sig.signeLe)}</div>`
-        : `${esc(nom)}<br>`;
-      const trainer = fsig ? `${esc(sl?.formateur || c.f.formateur)}${svgImg(fsig.svg)}<div style="font-size:10px">signé le ${dateFr(fsig.signeLe)} à ${heure(fsig.signeLe)}</div>` : esc(sl?.formateur || c.f.formateur);
-      return { date: i === 0 ? dateLongue(jour) : "", label: bloc.label, horaire: `${bloc.start} – ${bloc.end}`, learner, trainer };
+        : passe ? `${esc(nom)}${sigStagAuto}` : attente;
+      const trainer = fsig
+        ? `${esc(sl?.formateur || c.f.formateur)}${svgImg(fsig.svg)}<div style="font-size:10px">signé le ${dateFr(fsig.signeLe)} à ${heure(fsig.signeLe)}</div>`
+        : passe ? `${esc(sl?.formateur || c.f.formateur)}${sigFormAuto}` : attente;
+      return { date: i === 0 ? `${dateLongue(jour)}${modaliteLabel}` : "", label: bloc.label, horaire: `${bloc.start} – ${bloc.end}`, learner, trainer };
     });
-    h += attendanceDayTable(rows.length ? rows : ["Matin", "Après-midi"].map((label, i) => ({ date: i === 0 ? dateLongue(jour) : "", label, horaire: "____h____ – ____h____", learner: "", trainer: "" })));
+    h += attendanceDayTable(rows.length ? rows : ["Matin", "Après-midi"].map((label, i) => ({ date: i === 0 ? `${dateLongue(jour)}${modaliteLabel}` : "", label, horaire: "____h____ – ____h____", learner: "", trainer: "" })));
   });
   return { html: buildDocument({ org: c.o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${c.f.intitule} – ${nom}`, extraHtml: h }), reel };
 }
