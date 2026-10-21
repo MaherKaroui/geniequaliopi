@@ -1,10 +1,15 @@
 import type { IzPayload } from "./types";
 import type { Piece, Contexte } from "./pieces";
 
-export type SignatureRole = "stagiaire" | "entreprise";
+export type SignatureRole = "stagiaire" | "entreprise" | "formateur";
 export type LearnerSignatures = Record<string, string>;
 
 export function signatureKey(payload: IzPayload, index: number, role: SignatureRole): string | null {
+  if (role === "formateur") {
+    const nom = payload.session.formateur?.trim();
+    if (!nom) return null;
+    return JSON.stringify([payload.source.orgId, payload.source.sessionId, "formateur", nom]);
+  }
   const learner = payload.apprenants[index];
   if (!learner) return null;
   if (role === "entreprise" && !learner.entreprise?.nom?.trim()) return null;
@@ -16,13 +21,19 @@ export function validSignatureImage(image: string): boolean {
 }
 
 export function contexteAvecSignatures(cx: Contexte, signatures: LearnerSignatures): Contexte {
-  return { ...cx, stagiaires: cx.stagiaires.map((s, i) => {
-    const traineeKey = signatureKey(cx.p, i, "stagiaire");
-    const companyKey = signatureKey(cx.p, i, "entreprise");
-    const image = (traineeKey ? signatures[traineeKey] : undefined) || cx.p.apprenants[i]?.signatureUrl;
-    const company = companyKey ? signatures[companyKey] : undefined;
-    return { ...s, signatureUrl: image && validSignatureImage(image) ? image : s.signatureUrl, signatureResponsableUrl: company && validSignatureImage(company) ? company : s.signatureResponsableUrl };
-  }) };
+  const trainerKey = signatureKey(cx.p, -1, "formateur");
+  const trainer = trainerKey ? signatures[trainerKey] : undefined;
+  return {
+    ...cx,
+    f: trainer && validSignatureImage(trainer) ? { ...cx.f, formateurSignatureUrl: trainer } : cx.f,
+    stagiaires: cx.stagiaires.map((s, i) => {
+      const traineeKey = signatureKey(cx.p, i, "stagiaire");
+      const companyKey = signatureKey(cx.p, i, "entreprise");
+      const image = (traineeKey ? signatures[traineeKey] : undefined) || cx.p.apprenants[i]?.signatureUrl;
+      const company = companyKey ? signatures[companyKey] : undefined;
+      return { ...s, signatureUrl: image && validSignatureImage(image) ? image : s.signatureUrl, signatureResponsableUrl: company && validSignatureImage(company) ? company : s.signatureResponsableUrl };
+    }),
+  };
 }
 
 /** Fill imported form signature boxes; generators already use the shared Qualiopi URLs. */
@@ -35,8 +46,9 @@ export function applyLearnerSignatures(html: string, piece: Piece, cx: Contexte)
   for (const box of targets) {
     const label = box.classList.contains("sig-box") ? box.querySelector(".sig-label")?.textContent ?? "" : box.textContent ?? "";
     const enterprise = /entreprise|employeur|ma[iî]tre/i.test(label);
+    const trainer = /formateur|intervenant/i.test(label);
     const trainee = /stagiaire|apprenant|apprenti|bénéficiaire|candidat|client/i.test(label);
-    const url = enterprise ? learner.signatureResponsableUrl : trainee ? learner.signatureUrl : undefined;
+    const url = enterprise ? learner.signatureResponsableUrl : trainer ? cx.f.formateurSignatureUrl : trainee ? learner.signatureUrl : undefined;
     if (!url || !validSignatureImage(url) || box.querySelector("img") || box.nextElementSibling?.tagName === "IMG") continue;
     const image = doc.createElement("img");
     image.src = url;
