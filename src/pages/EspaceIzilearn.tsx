@@ -359,7 +359,7 @@ export default function EspaceIzilearn() {
           )}
         </DialogContent>
       </Dialog>
-      <IzilearnSignatureDialog open={!!aSigner} role={signatureTarget?.role} name={signatureTarget?.role === "entreprise" ? aSigner?.entreprise?.representant || aSigner?.entreprise?.nom || "" : `${aSigner?.prenom ?? ""} ${aSigner?.nom ?? ""}`.trim()} onClose={() => setSignatureTarget(null)} onSave={enregistrerSignature} onRemove={signatureTarget && payload && signatures[signatureKey(payload, signatureTarget.index, signatureTarget.role) ?? ""] ? retirerSignature : undefined} />
+      <IzilearnSignatureDialog open={!!signatureTarget && (signatureTarget.role === "formateur" ? !!payload?.session.formateur?.trim() : !!aSigner)} role={signatureTarget?.role} name={signatureTarget?.role === "formateur" ? payload?.session.formateur ?? "" : signatureTarget?.role === "entreprise" ? aSigner?.entreprise?.representant || aSigner?.entreprise?.nom || "" : `${aSigner?.prenom ?? ""} ${aSigner?.nom ?? ""}`.trim()} onClose={() => setSignatureTarget(null)} onSave={enregistrerSignature} onRemove={signatureTarget && payload && signatures[signatureKey(payload, signatureTarget.index, signatureTarget.role) ?? ""] ? retirerSignature : undefined} />
     </div>
   );
 }
