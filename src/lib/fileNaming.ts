@@ -203,6 +203,8 @@ export function buildGenericFileName(label: string, orgName: string, version: st
   return `${parts.filter(Boolean).join("_")}${extension}`;
 }
 
+export const MAX_LABEL_LENGTH = 60;
+
 export function buildDocumentFileName(
   doc: DocEntry,
   orgName: string,
@@ -211,9 +213,11 @@ export function buildDocumentFileName(
   extension: string,
   stagiaire?: StagiaireInfo | null,
 ): string {
-  const parts = [
-    toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
-  ];
+  // Libellé raccourci : Windows refuse les chemins > 260 caractères après
+  // décompression, et Google Drive affiche alors « Fichier introuvable ».
+  let label = toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)).replace(/^14_MISSIONS_/, "");
+  if (label.length > MAX_LABEL_LENGTH) label = label.slice(0, MAX_LABEL_LENGTH).replace(/_[^_]*$/, "");
+  const parts = [label || "DOCUMENT"];
 
   if (stagiaire?.prenom) parts.push(toTitleSnakeCase(stagiaire.prenom));
   if (stagiaire?.nom) parts.push(toUpperSnakeCase(stagiaire.nom));
