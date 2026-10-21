@@ -248,8 +248,10 @@ describe("Espace IZILearn", () => {
     const pieces = planPieces(cx);
     expect(pieces.find((x) => x.id === "support")!.rendre()).toContain("MARQUEUR_LECON_IZILEARN");
     const ex = pieces.find((x) => x.categorie === "exercices" && x.source === "trame")!.rendre();
-    expect(ex).toContain("MARQUEUR_CONSIGNE_IZILEARN");
+    expect(ex).toContain("Qu'est-ce qu'un jalon ?");
+    expect(ex).toContain("Une étape clé");
     expect(ex).not.toContain("CORRIGE_SECRET");
+    expect(ex).not.toContain("MARQUEUR_CONSIGNE_IZILEARN");
   });
 
   it("rythme des exercices : jour si court, semaine si long ou CFA", () => {
