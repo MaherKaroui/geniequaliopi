@@ -52,9 +52,10 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
     const exams = planPieces(contexte(payload("actions-formation", 3))).filter((x) => x.categorie === "examen_final");
     expect(exams.map((x) => x.apprenantIdx)).toEqual([0, 1]);
-    // Session terminée mais sans corrigé connu : trame vierge, rien d'inventé.
+    // Session terminée sans examen IZILearn : QCM final corrigé Qualiopi rempli automatiquement.
     expect(exams.map((x) => x.source)).toEqual(["document", "document"]);
-    expect(exams[0].rendre()).not.toContain("☒");
+    expect(exams[0].rendre()).toContain("☒");
+    expect(exams[0].rendre()).toMatch(/Score :<\/strong> \d+ \/ \d+/);
     expect(exams[0].rendre()).not.toContain("Réponse du stagiaire");
     expect(exams[0].rendre()).not.toContain("Atteint</td>");
   });

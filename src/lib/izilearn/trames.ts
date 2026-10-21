@@ -190,12 +190,12 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     // Examen IZILearn s'il est corrigé ; sinon QCM final corrigé Qualiopi (dédié ou générique).
     const qcm = normaliserQcm(c.p.formation.contenu?.examenFinal as unknown[]);
     const qualiopi = normaliserQcm(getEvalContent(c.f.intitule).qcmFinal as unknown[]);
-    const questions: QcmQ[] = qcm.length && qcm.every(aCorrige) ? qcm : qualiopi.length ? qualiopi : qcm;
     // Remplissage automatique façon Qualiopi : examen passé → réponses cochées
     // de façon déterministe par apprenant (majorité de bonnes réponses), score
-    // calculé. Examen à venir ou corrigé inconnu → trame vierge.
+    // calculé. Examen à venir → questions IZILearn en trame vierge.
     const fin = d(c.p.session.dateFin);
     const passe = fin ? fin.getTime() < new Date().setHours(0, 0, 0, 0) : false;
+    const questions: QcmQ[] = qcm.length && (!passe || qcm.every(aCorrige)) ? qcm : qualiopi.length ? qualiopi : qcm;
     const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
     const fill = passe && corrigeComplet;
     let answers: number[] = [];
@@ -382,8 +382,7 @@ function poolQcm(c: Ctx): QcmQ[] {
   const ec = getEvalContent(c.f.intitule);
   push(normaliserQcm(ec.qcmPositionnement as unknown[]));
   push(normaliserQcm(ec.qcmFinal as unknown[]));
-  const corriges = all.filter(aCorrige);
-  return corriges.length >= 3 ? corriges : all;
+  return all;
 }
 
 /**
@@ -394,8 +393,11 @@ function poolQcm(c: Ctx): QcmQ[] {
  * Sans question disponible, repli sur l'exercice pratique.
  */
 export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = false): string {
-  const pool = poolQcm(c);
-  if (!pool.length) return exercicePratique(c, u, i, n);
+  const tout = poolQcm(c);
+  if (!tout.length) return exercicePratique(c, u, i, n);
+  // Période passée : seules les questions au corrigé connu permettent de cocher les réponses.
+  const corriges = tout.filter(aCorrige);
+  const pool = rempli && corriges.length ? corriges : tout;
   const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
   const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
   // Remplissage automatique seulement si la bonne réponse est connue pour chaque question.
