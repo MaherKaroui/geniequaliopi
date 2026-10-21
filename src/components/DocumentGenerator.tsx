@@ -18,7 +18,7 @@ import { preloadFranceCompetences } from "@/lib/franceCompetences";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronRight, X, Loader2, FolderOpen, RefreshCw, Archive, AlertTriangle, Cloud } from "lucide-react";
-import { saveToDrive } from "@/lib/googleDrive";
+import { connecterGoogleDrive, envoyerZipDansDrive } from "@/lib/googleDrive";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
@@ -1516,89 +1516,44 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
     }
   };
 
+  /** Génère le dossier complet et le dépose, dossiers et fichiers, directement dans Google Drive. */
   const handleUploadToDrive = async () => {
+    const erreurs = controlerStagiairesAF();
+    if (erreurs.length > 0) {
+      toast.error(
+        `Génération bloquée — ${erreurs.length} anomalie(s) à corriger dans la fiche stagiaire : ${erreurs.slice(0, 5).join(" · ")}${erreurs.length > 5 ? " …" : ""}`,
+        { duration: 12000 }
+      );
+      return;
+    }
     setUploadingDrive(true);
+    const toastId = toast.loading("Connexion à Google Drive…");
     try {
-      const zip = new JSZip();
-      const toWordBlob = async (content: string) => {
-        const blob = await htmlToWordBlob(content);
-        const extension = blob.type.includes("officedocument") ? ".docx" : ".doc";
-        return { blob, extension };
-      };
-
-      const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
-      if (exportFormat === "pdf") {
-        zip.file(`BOOK_QUALIOPI.pdf`, await htmlToPdfBlob(bookContent));
-      } else {
-        const wordBlob = await toWordBlob(bookContent);
-        zip.file(`BOOK_QUALIOPI${wordBlob.extension}`, wordBlob.blob);
-      }
-
-      for (const critere of CRITERES_INFO) {
-        for (const ind of critere.indicateurs) {
-          const docs = catalog.filter((d) => d.indicateur === ind.numero);
-          for (const doc of docs) {
-            // Utilise getDocBasePath pour respecter les sous-dossiers (ex: 14_MISSIONS_CFA/Mission_X)
-            // Évite les collisions de noms de fichiers (notamment dans IND 10 qui a 50+ documents)
-            const basePath = getDocBasePath(doc);
-            const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-
-            if (isPerStagiaire) {
-              for (let si = 0; si < allStagiaires.length; si++) {
-                const stagiaire = allStagiaires[si];
-                const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
-                const content = generateContent(doc, si);
-                if (exportFormat === "pdf") {
-                  zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
-                } else {
-                  const wordBlob = await toWordBlob(content);
-                  zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
-                }
-              }
-            } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
-              const resp = await fetch(getStaticFileUrl(doc)!);
-              const fileBlob = await resp.blob();
-              zip.file(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
-            } else if (
-              ["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)
-            ) {
-              const excelContent = doc.template === "indicateurs_performance"
-                ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
-                : doc.template === "tableau_suivi_parcours_excel"
-                  ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
-                  : doc.template === "vae_indicateurs_previsionnels"
-                    ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
-                    : generateContent(doc);
-              zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
-            } else {
-              const content = generateContent(doc);
-              if (exportFormat === "pdf") {
-                zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content));
-              } else {
-                const wordBlob = await toWordBlob(content);
-                zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
-              }
-            }
-          }
-        }
-      }
-
-      await limiterCheminsZip(zip);
-      const zipBlob = await zip.generateAsync({ type: "blob" });
-      const zipName = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip");
-      const folderName = `Qualiopi_${mergedOrganisme.nom}`.substring(0, 60);
-
-      const result = await saveToDrive(zipBlob, zipName, folderName);
-      toast.success("Dossier envoyé sur Google Drive !", {
-        description: "Cliquez pour ouvrir",
-        action: result.webViewLink ? { label: "Ouvrir", onClick: () => window.open(result.webViewLink, "_blank") } : undefined,
+      // Consentement Google d'abord : la fenêtre doit s'ouvrir pendant le clic.
+      const accessToken = await connecterGoogleDrive();
+      const nomRacine = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
+      const zipBlob = await buildFullDossierZip({
+        setProgress: (n) => toast.loading(`Génération du dossier… ${Math.round(n)} %`, { id: toastId }),
+        setMessage: () => {},
+      });
+      const result = await envoyerZipDansDrive(zipBlob, nomRacine, accessToken, (fait, total) => {
+        toast.loading(`Envoi dans Google Drive… ${fait} / ${total} fichiers`, { id: toastId });
+      });
+      toast.success(`Dossier déposé dans Google Drive (${result.envoyes} fichiers)`, {
+        id: toastId,
+        description: nomRacine,
+        duration: 20000,
+        action: { label: "Ouvrir", onClick: () => window.open(result.webViewLink, "_blank") },
       });
     } catch (error: any) {
       console.error("Google Drive upload error:", error);
-      if (error?.message?.includes("popup")) {
-        toast.error("Veuillez autoriser la fenêtre pop-up pour Google Drive.");
+      const message = String(error?.message || error);
+      if (/popup/i.test(message)) {
+        toast.error("Autorisez la fenêtre pop-up de Google pour envoyer le dossier dans Drive.", { id: toastId });
+      } else if (/access_denied/i.test(message)) {
+        toast.error("Accès à Google Drive refusé.", { id: toastId });
       } else {
-        toast.error("Erreur lors de l'envoi sur Google Drive.");
+        toast.error(`Envoi dans Google Drive impossible : ${message}`, { id: toastId, duration: 15000 });
       }
     }
     setUploadingDrive(false);
@@ -1623,7 +1578,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
           </Button>
           <Button onClick={handleUploadToDrive} disabled={generating || uploadingDrive} variant="outline" className="gap-2">
             {uploadingDrive ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
-            {uploadingDrive ? "Envoi…" : "Google Drive"}
+            {uploadingDrive ? "Envoi dans Drive…" : "Envoyer dans Google Drive"}
           </Button>
         </div>
       </div>
