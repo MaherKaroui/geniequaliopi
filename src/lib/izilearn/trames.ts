@@ -188,12 +188,42 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     ]));
   } else {
     const qcm = (c.p.formation.contenu?.examenFinal || []).filter((q) => q.options?.length);
-    const questions = qcm.length ? qcm : hasEvalContentDedie(c.f.intitule) ? getEvalContent(c.f.intitule).qcmFinal : [];
+    const questions: QcmQ[] = qcm.length ? qcm : hasEvalContentDedie(c.f.intitule) ? getEvalContent(c.f.intitule).qcmFinal : [];
+    // Remplissage automatique façon Qualiopi : examen passé → réponses cochées
+    // de façon déterministe par apprenant (majorité de bonnes réponses), score
+    // calculé. Examen à venir ou corrigé inconnu → trame vierge.
+    const fin = d(c.p.session.dateFin);
+    const passe = fin ? fin.getTime() < new Date().setHours(0, 0, 0, 0) : false;
+    const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
+    const fill = passe && corrigeComplet;
+    let answers: number[] = [];
+    if (fill) {
+      const seed = Math.abs((`${c.s.prenom}${c.s.nom}examen`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
+      const nb = questions.length;
+      const nbBonnes = Math.max(nb - 1, Math.round(nb * 0.8));
+      const fausses = new Set<number>();
+      let k = 0;
+      while (fausses.size < nb - nbBonnes && k < nb * 4) { fausses.add((seed + k * 7) % nb); k++; }
+      answers = questions.map((q, qi) => {
+        if (!fausses.has(qi)) return q.correctIndex!;
+        const wrong = q.options.map((_, oi) => oi).filter((oi) => oi !== q.correctIndex);
+        return wrong[(seed + qi * 11) % wrong.length];
+      });
+    }
+    const score = fill ? answers.filter((a, qi) => a === questions[qi].correctIndex).length : null;
     if (questions.length) {
+      if (!fill) h += trameVierge("Examen à compléter par l'apprenant en fin de formation ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
       h += `<h2>Questionnaire à choix multiples</h2>`;
       questions.forEach((q, i) => {
-        h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op) => `${CASE} ${esc(op)}`).join("<br>")}</p>`;
+        h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op, oi) => {
+          const coche = fill && answers[i] === oi;
+          return `${coche ? "☒" : CASE} ${coche ? `<strong>${esc(op)}</strong>` : esc(op)}`;
+        }).join("<br>")}</p>`;
       });
+      h += `<p><strong>Score :</strong> ${score != null ? `${score} / ${questions.length}` : `______ / ${questions.length}`}</p>`;
+      if (fill) {
+        h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${questions.map((q, i) => `${i + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
+      }
     }
     const ouvertes = hasEvalContentDedie(c.f.intitule)
       ? getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).fin || []
@@ -207,7 +237,8 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
       h += `<h2>Évaluation des acquis</h2>`;
       h += tableHTML(["Objectif", "Acquis", "En cours", "Non acquis"], objectifs.map((o) => [esc(o), CASE, CASE, CASE]));
     }
-    h += `<p><strong>Note finale :</strong> ____________________</p><p><strong>Appréciation du formateur :</strong></p>${LIGNES(3)}`;
+    const noteFinale = fill && score != null ? `${Math.round((score / questions.length) * 20)} / 20` : "____________________";
+    h += `<p><strong>Note finale :</strong> ${noteFinale}</p><p><strong>Appréciation du formateur :</strong></p>${LIGNES(3)}`;
   }
   h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
   return { html: doc(c, "EXAMEN FINAL", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };

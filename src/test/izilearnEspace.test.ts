@@ -52,9 +52,38 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2027-03-05T13:48:00Z"));
     const exams = planPieces(contexte(payload("actions-formation", 3))).filter((x) => x.categorie === "examen_final");
     expect(exams.map((x) => x.apprenantIdx)).toEqual([0, 1]);
-    expect(exams.map((x) => x.source)).toEqual(["trame", "trame"]);
+    // Session terminée mais sans corrigé connu : trame vierge, rien d'inventé.
+    expect(exams.map((x) => x.source)).toEqual(["document", "document"]);
+    expect(exams[0].rendre()).not.toContain("☒");
     expect(exams[0].rendre()).not.toContain("Réponse du stagiaire");
     expect(exams[0].rendre()).not.toContain("Atteint</td>");
+  });
+
+  it("remplit automatiquement l'examen final d'une session terminée, le laisse vierge avant", () => {
+    const p = payload("actions-formation", 3);
+    p.formation.contenu = {
+      chapitres: [], exercices: [], positionnement: [],
+      examenFinal: [
+        { question: "E1 ?", options: ["A", "B", "C"], correctIndex: 1 },
+        { question: "E2 ?", options: ["A", "B", "C"], correctIndex: 0 },
+        { question: "E3 ?", options: ["A", "B", "C"], correctIndex: 2 },
+        { question: "E4 ?", options: ["A", "B", "C"], correctIndex: 1 },
+      ],
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T13:48:00Z"));
+    const futur = planPieces(contexte(p)).find((x) => x.id === "examen_final_0");
+    expect(futur?.source).toBe("trame");
+    expect(futur?.rendre()).not.toContain("☒");
+    expect(futur?.rendre()).toContain("______ / 4");
+    vi.setSystemTime(new Date("2026-11-05T13:48:00Z"));
+    const passe = planPieces(contexte(p)).find((x) => x.id === "examen_final_0");
+    expect(passe?.source).toBe("document");
+    const html = passe?.rendre() || "";
+    expect(html).toContain("☒");
+    expect(html).toMatch(/Score :<\/strong> \d+ \/ 4/);
+    expect(html).toMatch(/Note finale :<\/strong> \d+ \/ 20/);
+    expect(html).toContain("Corrigé (réservé au formateur)");
   });
 
   it("conserve la note finale réelle de zéro sans reprendre le test de début", () => {
