@@ -75,7 +75,7 @@ export default function EspaceIzilearn() {
   const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx, contentRevision]);
   const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx, contentRevision]);
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
-  const aSigner = signatureTarget ? payload?.apprenants[signatureTarget.index] : null;
+  const aSigner = signatureTarget && signatureTarget.role !== "formateur" ? payload?.apprenants[signatureTarget.index] : null;
   useEffect(() => { setApercuId(null); setSignatureTarget(null); }, [payload?.source.orgId, payload?.source.sessionId]);
   const manquants = useMemo(() => (payload ? champsManquants(payload) : []), [payload]);
 
@@ -274,6 +274,12 @@ export default function EspaceIzilearn() {
                 </li>
               ))}
             </ul>
+            {p.session.formateur?.trim() && (
+              <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t">
+                <span className="text-xs text-muted-foreground min-w-0 truncate">Formateur : {p.session.formateur}</span>
+                <Button variant="outline" size="sm" className="h-7 px-2 text-xs shrink-0" disabled={!!travail} aria-label={`Signature du formateur ${p.session.formateur}`} onClick={() => setSignatureTarget({ index: -1, role: "formateur" })}>{cx.f.formateurSignatureUrl ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <PenLine className="w-3 h-3 mr-1" />}Signature formateur</Button>
+              </div>
+            )}
           </section>
           <section className="bg-card border rounded-xl p-4">
             <div role="heading" aria-level={2} className="font-semibold text-sm mb-2 flex items-center gap-1.5"><FileText className="w-4 h-4" />Pièces</div>
