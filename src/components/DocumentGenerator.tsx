@@ -18,7 +18,7 @@ import { preloadFranceCompetences } from "@/lib/franceCompetences";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronDown, ChevronRight, X, Loader2, FolderOpen, RefreshCw, Archive, AlertTriangle, Cloud } from "lucide-react";
-import { connecterGoogleDrive, envoyerZipDansDrive } from "@/lib/googleDrive";
+import { envoyerDossiersDansDrive, type DossierDrive } from "@/lib/envoiDrive";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
@@ -68,7 +68,7 @@ import {
   limiterCheminsZip,
 } from "@/lib/fileNaming";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
-import { ceder, garderActif } from "@/lib/arrierePlan";
+import { ceder } from "@/lib/arrierePlan";
 
 // rAF un document sur 5 au premier plan ; onglet masqué : ni rAF ni timer
 // bridé, la génération continue (voir arrierePlan.ts).
@@ -1507,48 +1507,37 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
     }
   };
 
-  /** Génère le dossier complet et le dépose, dossiers et fichiers, directement dans Google Drive. */
+  /** Dépose dans Google Drive les mêmes dossiers que « Télécharger tout » (BDC et/ou AF-CFA-VAE). */
   const handleUploadToDrive = async () => {
-    const erreurs = controlerStagiairesAF();
-    if (erreurs.length > 0) {
-      toast.error(
-        `Génération bloquée — ${erreurs.length} anomalie(s) à corriger dans la fiche stagiaire : ${erreurs.slice(0, 5).join(" · ")}${erreurs.length > 5 ? " …" : ""}`,
-        { duration: 12000 }
-      );
-      return;
+    const dossiers: DossierDrive[] = [];
+    if (isBDCOrg) {
+      dossiers.push({
+        nomRacine: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ""),
+        construire: (suivi) => buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, {
+          setProgress: (n) => suivi(n),
+          setMessage: () => {},
+          report: (n) => suivi(n),
+        }),
+      });
     }
-    setUploadingDrive(true);
-    const toastId = toast.loading("Connexion à Google Drive…");
-    try {
-      await garderActif(async () => {
-      // Consentement Google d'abord : la fenêtre doit s'ouvrir pendant le clic.
-      const accessToken = await connecterGoogleDrive();
-      const nomRacine = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
-      const zipBlob = await buildFullDossierZip({
-        setProgress: (n) => toast.loading(`Génération du dossier… ${Math.round(n)} %`, { id: toastId }),
-        setMessage: () => {},
-      });
-      const result = await envoyerZipDansDrive(zipBlob, nomRacine, accessToken, (fait, total) => {
-        toast.loading(`Envoi dans Google Drive… ${fait} / ${total} fichiers`, { id: toastId });
-      });
-      toast.success(`Dossier déposé dans Google Drive (${result.envoyes} fichiers)`, {
-        id: toastId,
-        description: nomRacine,
-        duration: 20000,
-        action: { label: "Ouvrir", onClick: () => window.open(result.webViewLink, "_blank") },
-      });
-      });
-    } catch (error: any) {
-      console.error("Google Drive upload error:", error);
-      const message = String(error?.message || error);
-      if (/popup/i.test(message)) {
-        toast.error("Autorisez la fenêtre pop-up de Google pour envoyer le dossier dans Drive.", { id: toastId });
-      } else if (/access_denied/i.test(message)) {
-        toast.error("Accès à Google Drive refusé.", { id: toastId });
+    const autresTypes = !isBDCOrg || (mergedOrganisme.typesActions || []).some((t) => t !== "bilans-competences");
+    if (autresTypes) {
+      const erreurs = controlerStagiairesAF();
+      if (erreurs.length > 0) {
+        toast.error(
+          `Génération bloquée — ${erreurs.length} anomalie(s) à corriger dans la fiche stagiaire : ${erreurs.slice(0, 5).join(" · ")}${erreurs.length > 5 ? " …" : ""}`,
+          { duration: 12000 }
+        );
+        if (dossiers.length === 0) return;
       } else {
-        toast.error(`Envoi dans Google Drive impossible : ${message}`, { id: toastId, duration: 15000 });
+        dossiers.push({
+          nomRacine: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ""),
+          construire: (suivi) => buildFullDossierZip({ setProgress: (n) => suivi(n), setMessage: () => {} }),
+        });
       }
     }
+    setUploadingDrive(true);
+    await envoyerDossiersDansDrive(dossiers);
     setUploadingDrive(false);
   };
 

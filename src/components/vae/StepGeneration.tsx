@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, Download } from "lucide-react";
+import { Loader2, Sparkles, Download, Cloud } from "lucide-react";
+import { envoyerDossiersDansDrive } from "@/lib/envoiDrive";
+import { garderActif } from "@/lib/arrierePlan";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { VAEData, VAEContents } from "@/lib/vae/vaeTypes";
@@ -38,7 +40,7 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
   const generateZip = async () => {
     setLoadingZip(true);
     try {
-      const blob = await buildVAEZip(data, setProgress, { format });
+      const blob = await garderActif(() => buildVAEZip(data, setProgress, { format }));
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -52,6 +54,16 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
       setLoadingZip(false);
       setProgress("");
     }
+  };
+
+  const [loadingDrive, setLoadingDrive] = useState(false);
+  const sendToDrive = async () => {
+    setLoadingDrive(true);
+    await envoyerDossiersDansDrive([{
+      nomRacine: `VAE_${data.candidat.nom}_${data.candidat.prenom}_${data.certification.rncp}`,
+      construire: (suivi) => buildVAEZip(data, (msg) => suivi(msg), { format }),
+    }]);
+    setLoadingDrive(false);
   };
 
   const c = data.contents;
@@ -72,9 +84,13 @@ export default function StepGeneration({ data, onContentsChange }: Props) {
           <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
           <SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="word">Word</SelectItem></SelectContent>
         </Select>
-        <Button onClick={generateZip} disabled={loadingZip} variant="default" className="gap-2 bg-gradient-hero border-0">
+        <Button onClick={generateZip} disabled={loadingZip || loadingDrive} variant="default" className="gap-2 bg-gradient-hero border-0">
           {loadingZip ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           Générer le dossier (ZIP {format === "pdf" ? "PDF" : "Word"})
+        </Button>
+        <Button onClick={sendToDrive} disabled={loadingZip || loadingDrive} variant="outline" className="gap-2">
+          {loadingDrive ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
+          {loadingDrive ? "Envoi dans Drive…" : "Envoyer dans Google Drive"}
         </Button>
         {progress && <span className="text-sm text-muted-foreground self-center">{progress}</span>}
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BriefcaseBusiness, ChevronLeft, ChevronRight, Download, Eye, Home, Loader2, Save, Trash2, FolderOpen, RefreshCw, Search, Sparkles } from "lucide-react";
+import { BriefcaseBusiness, ChevronLeft, ChevronRight, Cloud, Download, Eye, Home, Loader2, Save, Trash2, FolderOpen, RefreshCw, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,8 @@ import { emptyBdcData, BDC_DECLARATION_FIELDS, type StandaloneBdcData } from "@/
 import { generateStandaloneBdcPlanning, validateStandaloneBdc, bdcFollowupDate, bdcIsFinished, bdcFollowupDue } from "@/lib/bdc/standaloneModel";
 import { BDC_STANDALONE_DOCUMENTS, bdcDocumentTitle, type BdcDocumentId } from "@/lib/bdc/standaloneDocuments";
 import { exportStandaloneBdcDocument, exportStandaloneBdcZip, downloadBdcBlob, bdcFileTag } from "@/lib/bdc/standaloneExport";
+import { envoyerDossiersDansDrive } from "@/lib/envoiDrive";
+import { garderActif } from "@/lib/arrierePlan";
 import { readBdcHistory, writeBdcHistory, type BdcHistoryEntry } from "@/lib/bdc/standaloneHistory";
 import type { Jour, Creneau } from "@/lib/bdc/bdcModel";
 import { toast } from "sonner";
@@ -91,10 +93,18 @@ export default function BilanCompetences({ embedded = false }: { embedded?: bool
   const exportZip = async () => {
     setBusy(true);
     try {
-      const blob = await exportStandaloneBdcZip(data, format, setProgress, selected);
+      const blob = await garderActif(() => exportStandaloneBdcZip(data, format, setProgress, selected));
       downloadBdcBlob(blob, `BDC_${bdcFileTag(b.nom)}_${bdcFileTag(b.prenom)}_${org.dateMaj}.zip`);
       toast.success("Dossier Bilan de compétences téléchargé");
     } catch (error) { toast.error(error instanceof Error ? error.message : "Dossier impossible à générer"); } finally { setBusy(false); setProgress(""); }
+  };
+  const sendZipToDrive = async () => {
+    setBusy(true);
+    await envoyerDossiersDansDrive([{
+      nomRacine: `BDC_${bdcFileTag(b.nom)}_${bdcFileTag(b.prenom)}_${org.dateMaj}`,
+      construire: (suivi) => exportStandaloneBdcZip(data, format, (msg) => { setProgress(msg); suivi(msg); }, selected),
+    }]);
+    setBusy(false); setProgress("");
   };
   return <div className={`${embedded ? "vae-embedded " : ""}min-h-screen bg-background text-foreground`}>
     <header className={`border-b sticky top-0 z-10 ${embedded ? "bg-card/80 backdrop-blur-sm" : "bg-card"}`}><div className={`${embedded ? "max-w-5xl py-3" : "max-w-6xl py-4"} mx-auto px-4 flex justify-between items-center gap-3`}><h1 className={`${embedded ? "text-lg" : "text-lg sm:text-xl"} font-bold flex items-center gap-2`}><BriefcaseBusiness className={`${embedded ? "h-5 w-5" : "h-6 w-6"} text-primary shrink-0`} /> {embedded ? "Bilan de compétences" : "Bilan de compétences"}</h1>{!embedded && <Button variant="ghost" size="sm" onClick={() => navigate("/")}><Home className="h-4 w-4 mr-2" /> Accueil</Button>}</div></header>
@@ -149,7 +159,7 @@ export default function BilanCompetences({ embedded = false }: { embedded?: bool
         {step === 5 && <><h2 className="text-xl font-semibold">Dossier individuel — 18 pièces</h2><DossierOutputSettings organisme={org} scope="bdc-standalone" compact />
           {errors.length > 0 ? <div role="alert" className="border-l-4 border-destructive pl-4 py-2"><p className="font-semibold">Informations à compléter</p><ul className="text-sm list-disc pl-5">{errors.map((error, i) => <li key={i}>{error}</li>)}</ul></div> : <p className="text-primary font-medium">Dossier prêt à générer · {b.prenom} {b.nom}</p>}
           <p className="text-sm text-muted-foreground">{bdcIsFinished(data) ? "Bilan terminé." : "Bilan en cours : conclusions et satisfaction restent à compléter."} {!bdcFollowupDue(data) && "Le suivi à six mois n’est pas encore échu."}</p>
-          <div className="flex flex-wrap gap-3 items-center"><Select value={format} onValueChange={v => setFormat(v as "pdf" | "word")}><SelectTrigger aria-label="Format des documents" className="w-36"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="word">Word</SelectItem></SelectContent></Select><Button disabled={busy || !!errors.length || !selected.length} onClick={exportZip}>{busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />} Télécharger le dossier ZIP ({selected.length})</Button><span aria-live="polite" className="text-sm text-muted-foreground">{progress}</span></div>
+          <div className="flex flex-wrap gap-3 items-center"><Select value={format} onValueChange={v => setFormat(v as "pdf" | "word")}><SelectTrigger aria-label="Format des documents" className="w-36"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="word">Word</SelectItem></SelectContent></Select><Button disabled={busy || !!errors.length || !selected.length} onClick={exportZip}>{busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />} Télécharger le dossier ZIP ({selected.length})</Button><Button variant="outline" disabled={busy || !!errors.length || !selected.length} onClick={sendZipToDrive}><Cloud className="h-4 w-4 mr-2" /> Envoyer dans Google Drive</Button><span aria-live="polite" className="text-sm text-muted-foreground">{progress}</span></div>
           <div className="divide-y border-y">{BDC_STANDALONE_DOCUMENTS.map((doc, i) => <div key={doc.id} className="flex gap-3 items-center py-3"><Checkbox aria-label={`Inclure ${doc.title}`} checked={selected.includes(doc.id)} onCheckedChange={v => setSelected(ids => v ? [...ids, doc.id] : ids.filter(id => id !== doc.id))} /><span className="text-xs text-muted-foreground w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span><p className="flex-1 min-w-0 text-sm font-medium">{bdcDocumentTitle(doc.id, data)}</p><Button variant="ghost" size="icon" title="Voir le PDF" aria-label={`Voir ${doc.title}`} disabled={busy || !!errors.length} onClick={() => exportOne(doc.id, true)}><Eye className="h-4 w-4" /></Button><Button variant="outline" size="icon" title="Télécharger" aria-label={`Télécharger ${doc.title}`} disabled={busy || !!errors.length} onClick={() => exportOne(doc.id)}><Download className="h-4 w-4" /></Button></div>)}</div>
         </>}
       </section>
