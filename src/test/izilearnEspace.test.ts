@@ -55,6 +55,9 @@ describe("Espace IZILearn", () => {
     // Session terminée sans examen IZILearn : QCM final corrigé Qualiopi rempli automatiquement.
     expect(exams.map((x) => x.source)).toEqual(["document", "document"]);
     expect(exams[0].rendre()).toContain("☒");
+    expect(exams[0].rendre()).toContain("Questions ouvertes");
+    expect(exams[0].rendre()).toContain("Évaluation des acquis");
+    expect(exams[0].rendre()).toContain("<td>X</td>");
     expect(exams[0].rendre()).toMatch(/Score :<\/strong> \d+ \/ \d+/);
     expect(exams[0].rendre()).not.toContain("Réponse du stagiaire");
     expect(exams[0].rendre()).not.toContain("Atteint</td>");
