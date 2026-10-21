@@ -30,6 +30,14 @@ describe("file naming convention", () => {
     );
   });
 
+  it("raccourcit les noms des QCM des 14 missions CFA pour Google Drive", () => {
+    const qcm = { ...doc, nom: "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Mobilité nationale et internationale – QCM EXERCICE – Abdelkrim LAMBARKI" };
+    const name = buildDocumentFileName(qcm, "SKILLBOOSTED", "1", "2024-11-28", ".pdf", stagiaire);
+    expect(name.startsWith("14_MISSIONS_")).toBe(false);
+    expect(name.length).toBeLessThanOrEqual(120);
+    expect(name.endsWith("_Abdelkrim_LAMBARKI_SKILLBOOSTED_V1_2024_11_28.pdf")).toBe(true);
+  });
+
   it("normalizes accents, apostrophes and parenthesis", () => {
     expect(normalizeLooseFileName("CT2 IND 4 Trame d'évaluation (des besoins).pdf")).toBe(
       "CT2_IND_4_TRAME_EVALUATION_BESOINS",
