@@ -129,12 +129,12 @@ export function planPieces(cx: Contexte): Piece[] {
         () => T.qcmPeriodique(c, u, k, unites.length, passe), { id: `ex${k}` });
     });
 
-    const examen = (a.examenFinal || []).some(hasRecordedQuiz);
-    par("examen_final", "Examen final", "EXAMEN_FINAL", examen ? "izilearn" : "trame", () => T.examenFinal(c).html);
-    if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "document", () => T.emargement(c).html);
-    if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "document", () => T.tempsConnexion(c).html);
     const finSession = new Date(`${p.session.dateFin}T00:00:00`);
     const termine = finSession.getTime() < new Date().setHours(0, 0, 0, 0);
+    const examen = (a.examenFinal || []).some(hasRecordedQuiz);
+    par("examen_final", "Examen final", "EXAMEN_FINAL", examen ? "izilearn" : termine ? "document" : "trame", () => T.examenFinal(c).html);
+    if (!distanciel || mixte) par("emargement", "Feuille d'émargement", "EMARGEMENT", a.signatures.length ? "izilearn" : "document", () => T.emargement(c).html);
+    if (distanciel || mixte) par("connexion", "Temps de connexion", "TEMPS_DE_CONNEXION", a.connexions.length ? "izilearn" : "document", () => T.tempsConnexion(c).html);
     const suivi = new Date(finSession);
     suivi.setMonth(suivi.getMonth() + 3);
     const suiviEchu = suivi.getTime() < new Date().setHours(0, 0, 0, 0);
