@@ -16,6 +16,7 @@ import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie, generateStag
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
 import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
+import { proposedNeedAnswer, automaticPositioningHtml } from "./questionnaires";
 
 export interface Ctx {
   p: IzPayload;
@@ -105,8 +106,7 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
     h += sourceIzilearn(`réponses envoyées en ligne le ${dateFr(c.a.besoins.date)}${c.a.besoins.signataire ? `, signées par ${c.a.besoins.signataire}` : ""}.`);
     h += reponsesReelles(c.a.besoins);
   } else {
-    h += trameVierge("Trame à compléter par l'apprenant avant l'entrée en formation (ou à envoyer en ligne depuis IZILearn › CRM › Évaluation des besoins).");
-    qa.forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q)}</strong></p>${LIGNES(3)}`; });
+    qa.forEach((q, i) => { const answer = proposedNeedAnswer(c, q, i); h += `<p><strong>${i + 1}. ${esc(q)}</strong></p>${answer ? `<p>${esc(answer)}</p>` : LIGNES(3)}`; });
   }
   if (c.s.entreprise || c.a.besoinsEntreprise) {
     h += `<h2>Partie entreprise</h2>`;
@@ -114,12 +114,11 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
       h += sourceIzilearn(`réponses envoyées en ligne le ${dateFr(c.a.besoinsEntreprise.date)}${c.a.besoinsEntreprise.signataire ? `, signées par ${c.a.besoinsEntreprise.signataire}` : ""}.`);
       h += reponsesReelles(c.a.besoinsEntreprise);
     } else {
-      h += trameVierge("À compléter par le représentant de l'entreprise ou le tuteur.");
-      qe.forEach((q, i) => { h += `<p><strong>${i + 1}. ${esc(q)}</strong></p>${LIGNES(3)}`; });
+      qe.forEach((q, i) => { const answer = proposedNeedAnswer(c, q, i, true); h += `<p><strong>${i + 1}. ${esc(q)}</strong></p>${answer ? `<p>${esc(answer)}</p>` : LIGNES(3)}`; });
     }
   }
   h += `<h2>Analyse du besoin par le référent pédagogique</h2>`;
-  h += `<p>${CASE} Besoin compatible avec la formation &nbsp;&nbsp; ${CASE} Adaptations à prévoir &nbsp;&nbsp; ${CASE} Réorientation proposée</p>`;
+  h += `<p>${reel ? CASE : "☒"} Besoin compatible avec la formation &nbsp;&nbsp; ${CASE} Adaptations à prévoir &nbsp;&nbsp; ${CASE} Réorientation proposée</p>`;
   h += `<p><strong>Adaptations du parcours (rythme, supports, accessibilité) :</strong></p>${LIGNES(3)}`;
   h += ZONE_SIGNATURE(["L'apprenant", ...(c.s.entreprise ? ["Le responsable d’entreprise"] : []), "Le référent pédagogique"]);
   return { html: doc(c, "ÉVALUATION DES BESOINS", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel };
@@ -130,6 +129,7 @@ export function evaluationBesoins(c: Ctx): { html: string; reel: boolean } {
 const lignesObjectifs = (f: FormationInfo) => String(f.objectifs || "").split(/\n+|;\s+|•/).map((x) => x.replace(/^[-*\d.)\s]+/, "").trim()).filter((x) => x.length > 3).slice(0, 10);
 
 export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
+  if (!(c.a.positionnement || []).some(hasRecordedQuiz)) return { html: automaticPositioningHtml(c), reel: false };
   let h = enTete(c, [["Moment", `Début de formation — ${dateFr(c.p.session.dateDebut)}`], ["Durée indicative", "20 à 30 minutes"]]);
   const reels = (c.a.positionnement || []).filter(hasRecordedQuiz);
   if (reels.length) {
