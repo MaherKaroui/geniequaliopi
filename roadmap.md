@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Ajouter le CERFA CFA par apprenant dans IZILearn, ses signatures disponibles et ses exports PDF, ainsi qu’un mail organisme → entreprise avec apprenant en CC ; vérifier les documents et captures.
+
 - [x] Remplir automatiquement les émargements et relevés de connexion IZILearn comme la génération rapide Qualiopi : jours passés signés (nom + « Signé X.Nom » ou signature réutilisable, formateur) et horaires de connexion réalistes (buildRealisticConnectionDay, « Présent(e) »), jours futurs vierges, preuves IZILearn enregistrées prioritaires. 27 tests réussis, aperçus émargement (hybride) et connexion (distanciel) vérifiés sur sessions de contrôle. Session réelle non disponible, non publié.
 - [x] Signature formateur IZILearn : bouton « Signature formateur » dans la barre latérale (dessin ou import), appliquée automatiquement aux émargements et aux cases « Le formateur » des documents ; sinon mention « Signé X.Nom » sur les jours passés. 28 tests réussis, aperçu vérifié. Non publié.
 
