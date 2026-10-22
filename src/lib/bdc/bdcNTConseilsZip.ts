@@ -1335,7 +1335,7 @@ function preprocessGridTables(md: string): string {
   return out.join("\n");
 }
 
-function mdToHtmlBody(md: string): string {
+export function mdToHtmlBody(md: string): string {
   // Nettoie les artefacts d'échappement (ex: \' → ', \" → ")
   md = md.replace(/\\'/g, "'").replace(/\\"/g, '"');
   // Convertit les antislashs pandoc parasites (issus des template literals) en sauts de ligne / suppression

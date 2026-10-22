@@ -15,7 +15,8 @@ import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { limiterCheminsZip } from "@/lib/fileNaming";
 import { ceder } from "@/lib/arrierePlan";
 import { financeurEffectifBC } from "../bdcModel";
-import { avecPiedUnique, supportsDeCoursBDC } from "../bdcNTConseilsZip";
+import { supportsDeCoursBDC } from "../bdcNTConseilsZip";
+import { footer } from "@/lib/docBuilder";
 import { NEXUS_TEMPLATES } from "./nexusTemplates";
 import { NEXUS_PDF_AGEFIPH, planNexus } from "./nexusDocs";
 
@@ -55,7 +56,13 @@ export async function buildBDCNexusZip(
   avancer("Supports de cours");
   try {
     const benList = stagiaires.map((s) => ({ ...s, financeur: financeurEffectifBC(s, org, formation) }));
-    const toPdf = async (html: string) => await htmlToPdfBlob(avecPiedUnique(html, org));
+    // Même pied de page que les autres pièces (docBuilder.footer), une seule fois.
+    const avecPied = (html: string) => {
+      let out = html;
+      for (let i = 0; i < 5 && /<div class="footer">/.test(out); i++) out = out.replace(/<div class="footer">[\s\S]*?<\/div>/, "");
+      return /<\/body>/i.test(out) ? out.replace(/<\/body>/i, `${footer(org)}</body>`) : out + footer(org);
+    };
+    const toPdf = async (html: string) => await htmlToPdfBlob(avecPied(html));
     for (const p of await supportsDeCoursBDC(org, formation, benList, toPdf)) zip.file(p.chemin, p.blob);
   } catch (e) {
     console.warn("[BDC NEXUS] support de cours échoué", e);

@@ -196,7 +196,7 @@ describe("ZIP d'audit bilan de compétences", () => {
     expect(Object.keys(textes).some((n) => /Pâtisserie/i.test(n))).toBe(false);
   }, 600_000);
 
-  it("suit l'arborescence du dossier audité NEXUS : mêmes pièces, mêmes noms, PDF, pied de page unique", async () => {
+  it("suit l'arborescence du dossier audité NEXUS : mêmes pièces, mêmes noms, PDF, pied de page des autres dossiers Qualiopi", async () => {
     const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
     const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST.slice(0, 1)));
     const noms = Object.keys(textes).map((n) => n.normalize("NFC")).sort();
@@ -211,8 +211,8 @@ describe("ZIP d'audit bilan de compétences", () => {
     // Une seule version et une seule date de mise à jour (celle de la V1) sur chaque PDF
     for (const n of noms.filter((x) => x.endsWith(".pdf"))) {
       const t = textes[n];
-      expect(t.split("Version 1 · Mise à jour du 3 février 2025").length - 1, n).toBe(1);
-      expect(/V\d+ \d{1,2} \w+ \d{4}/.test(t), n).toBe(false);
+      // Pied de page des autres dossiers Qualiopi : « V1 3 février 2025 », une seule fois
+      expect(t.split("V1 3 février 2025").length - 1, n).toBe(1);
     }
     // Rétractation : 14 jours partout ; conservation : trois ans au plus
     for (const [n, t] of Object.entries(textes)) {

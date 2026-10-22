@@ -6,7 +6,8 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildBdcContext, financeurEffectifBC } from "../bdcModel";
 import { htmlClasseurMatrices, htmlRegistreAbandons } from "../bdcNexus";
-import { mdToHtml, avecPiedUnique, classeurIndicateurs2Html } from "../bdcNTConseilsZip";
+import { mdToHtmlBody, classeurIndicateurs2Html } from "../bdcNTConseilsZip";
+import { footer, htmlWrap, orgHeader } from "@/lib/docBuilder";
 import {
   blocs, casesACocher, construireBeneficiaires, contexteNexus, remplir, varsBeneficiaire,
   type BenNexus, type ContexteNexus, type Vars,
@@ -125,47 +126,91 @@ ______________________________________________
 /* Signatures                                                          */
 /* ------------------------------------------------------------------ */
 
+const DATE_SIG = /(?:Signé le|, le|^Le) (\d{2})\/(\d{2})\/(\d{4})/;
+const imgSig = (url: string, alt: string, tampon = false) =>
+  `<img src="${url}" alt="${alt}" style="max-height:${tampon ? 60 : 50}px;max-width:${tampon ? 140 : 120}px;object-fit:contain;margin-top:5px${tampon ? ";opacity:0.85" : ""}" />`;
+const signeManuscrit = (nom: string) => (nom ? `<p style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1a3a8c;margin:4px 0 0">Signé par ${nom}</p>` : "");
+const ligneVide = `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
+
 /**
- * Appose les signatures dans les cellules « … Signé le jj/mm/aaaa » déjà échues : tampon de
- * l'organisme (ou, à défaut, signature du dirigeant) pour l'organisme, signature du consultant,
- * signature du bénéficiaire. Une pièce datée dans le futur n'est jamais signée.
+ * Bloc de signatures au même format que les autres dossiers Qualiopi (signatureBlock2 de docBuilder) :
+ * un cadre par signataire — qualité, nom, date, signature. Signature apposée seulement si la date est
+ * échue : tampon de l'organisme (sinon signature du dirigeant) pour l'organisme, signature enregistrée
+ * du consultant ou du bénéficiaire, à défaut sa signature manuscrite « Signé par … » comme pour les
+ * émargements des actions de formation.
  */
-function signer(md: string, org: OrganismeInfo, f: FormationInfo, b: BenNexus, v: Vars, arrete: Date): string {
-  const img = (url: string | undefined, alt: string) => (url ? ` ⏎ ![${alt}](${url})` : "");
+function blocSignatures(cellules: string[], org: OrganismeInfo, f: FormationInfo, b: BenNexus, v: Vars, arrete: Date): string {
   const dirigeant = org.tamponUrl || org.signatureUrl;
-  const consultant = f.formateurSignatureUrl || (String(v.CONSULTANT) === String(v.DIRIGEANT) ? org.signatureUrl : undefined);
-  return md.replace(/^\|.*\|$/gm, (ligne) => {
-    if (!/(Signé le|, le) \d{2}\/\d{2}\/\d{4}/.test(ligne)) return ligne;
-    return ligne.split(" | ").map((cell) => {
-      const m = cell.match(/(?:Signé le|, le) (\d{2})\/(\d{2})\/(\d{4})/);
-      if (!m) return cell;
-      const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
-      if (d.getTime() > arrete.getTime()) return cell;
-      const fin = cell.endsWith(" |") ? " |" : "";
-      const corps = fin ? cell.slice(0, -2) : cell;
-      let ajout = "";
-      if (/Le bénéficiaire/.test(corps) && b.nomme && v.BEN && corps.includes(String(v.BEN))) ajout = img(b.s.signatureUrl, "Signature du bénéficiaire");
-      else if (/Le consultant|L'intéressé/.test(corps)) ajout = img(consultant, "Signature du consultant");
-      else if (/L'organisme|^\|?\s*Pour |La direction/.test(corps)) ajout = img(dirigeant, org.tamponUrl ? "Tampon de l'organisme" : "Signature du représentant légal");
-      return corps + ajout + fin;
-    }).join(" | ");
+  const consultantUrl = f.formateurSignatureUrl || (String(v.CONSULTANT) === String(v.DIRIGEANT) ? org.signatureUrl : undefined);
+  const cadres = cellules.map((cell) => {
+    const parts = cell.split("⏎").map((x) => x.trim()).filter(Boolean);
+    const libelle = parts[0] || "";
+    const nom = (parts[1] || "").replace(/^_+$/, "");
+    const derniere = parts[parts.length - 1] || "";
+    const m = derniere.match(DATE_SIG) || cell.match(DATE_SIG);
+    const date = m ? `${m[1]}/${m[2]}/${m[3]}` : "____ / ____ / ________";
+    const qualites = parts.slice(2).filter((x) => x !== derniere || !/(Signé le|À signer le|^Le |, le )/.test(x));
+    const echu = !!m && !/À signer/.test(derniere) && new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).getTime() <= arrete.getTime();
+    let sig = ligneVide;
+    if (echu) {
+      if (/bénéficiaire/i.test(libelle)) sig = b.s.signatureUrl ? imgSig(b.s.signatureUrl, "Signature du bénéficiaire") : signeManuscrit(nom) || ligneVide;
+      else if (/consultant|intéressé/i.test(libelle)) sig = consultantUrl ? imgSig(consultantUrl, "Signature du consultant") : signeManuscrit(nom) || ligneVide;
+      else if (/organisme|^pour |direction|donneur d'ordre/i.test(libelle)) sig = dirigeant ? imgSig(dirigeant, org.tamponUrl ? "Tampon de l'organisme" : "Signature du représentant légal", !!org.tamponUrl) : signeManuscrit(String(v.DIRIGEANT)) || ligneVide;
+      else if (/employeur|entreprise/i.test(libelle)) sig = b.s.signatureResponsableUrl ? imgSig(b.s.signatureResponsableUrl, "Signature de l'employeur") : signeManuscrit(nom) || ligneVide;
+      else sig = signeManuscrit(nom) || ligneVide;
+    }
+    return `<div class="sig-box"><p class="sig-label">${libelle}</p><p>Nom : ${nom || "________________________"}</p>${qualites.map((q) => `<p>${q}</p>`).join("")}<p>Date : ${date}</p><p style="margin-top:20px">Signature :</p>${sig}</div>`;
   });
+  const classe = cadres.length >= 3 ? "signature-block" : cadres.length === 2 ? "signature-block-2" : "signature-block-1";
+  return `<div class="${classe}">${cadres.join("")}</div>`;
 }
 
 /* ------------------------------------------------------------------ */
 /* Rendu                                                               */
 /* ------------------------------------------------------------------ */
 
-function rendreHtml(md: string, org: OrganismeInfo): string {
+/** Seconde cellule d'un vrai en-tête de tableau à deux colonnes (« Question | Réponse du bénéficiaire »…). */
+const EN_TETE_2_COLONNES = /^(Ce qu'il faut|Mise en œuvre|Résultat attendu|Réponse du|1 → 5|Objet$|Conditions d'accès|Modalité d'association|Conséquence|Cocher|Concrètement|Information$|Exigence minimale|Caractéristiques|Usage dans|Où elle figure|Jointe)/;
+
+/** Une table markdown de signatures : chaque cellule « Qualité ⏎ Nom ⏎ … ⏎ Signé le / Le ____ ». */
+const estLigneSignature = (l: string) => /^\|.*⏎.*\|\s*$/.test(l.trim()) && /(Signé le|À signer le|Le _{2,}| le _{2,}|, le \d)/.test(l) && /(Le |La |L'|Pour )/.test(l);
+
+/**
+ * Rendu au même format que les autres dossiers Qualiopi (buildDocument de docBuilder) : en-tête de
+ * l'organisme, titre, sections, cadres de signature, pied de page de l'organisme.
+ */
+function rendreHtml(md: string, org: OrganismeInfo, f: FormationInfo, b: BenNexus, v: Vars, arrete: Date, signer: boolean): string {
   const lignes = md.replace(/\r\n/g, "\n").split("\n");
   let i = 0;
   while (i < lignes.length && !lignes[i].trim()) i++;
   const m = (lignes[i] || "").match(/^\*\*(.+)\*\*\s*$/);
   const titre = m ? m[1] : "";
-  const corps = m ? lignes.slice(i + 1).join("\n") : md;
-  return mdToHtml(corps, titre, org, null).replace(/\s*⏎\s*/g, "<br/>");
+  const corps = m ? lignes.slice(i + 1) : lignes;
+  const blocs: string[] = [];
+  const sortie: string[] = [];
+  for (let k = 0; k < corps.length; k++) {
+    const l = corps[k];
+    if (estLigneSignature(l)) {
+      const cellules = l.trim().slice(1, -1).split("|").map((c) => c.trim()).filter(Boolean);
+      if (/^\|[-\s|:]+\|$/.test((corps[k + 1] || "").trim())) k++;
+      blocs.push(blocSignatures(cellules, org, f, b, v, signer ? arrete : new Date(0)));
+      sortie.push("", `§§SIGNATURES${blocs.length - 1}§§`, "");
+      continue;
+    }
+    // Tableau « libellé | valeur » : pas de bandeau d'en-tête (première ligne = donnée), comme les
+    // grilles d'information des autres dossiers ; seuls les vrais en-têtes de colonnes restent en bandeau.
+    if (/^\|[^|]*\|[^|]*\|\s*$/.test(l.trim()) && /^\|\s*-+\s*\|\s*-+\s*\|\s*$/.test((corps[k + 1] || "").trim()) && !/^\|/.test((corps[k - 1] || "").trim())) {
+      const second = l.trim().slice(1, -1).split("|")[1]?.trim() || "";
+      if (!EN_TETE_2_COLONNES.test(second)) sortie.push("§§NOHEADER_TABLE§§");
+    }
+    // Ligne entièrement en gras : intertitre de section, comme les <h2> des autres dossiers.
+    const t = l.match(/^\*\*([^*]+)\*\*\s*$/);
+    sortie.push(t ? `<div class="nexus-section"><h2>${t[1].replace(/&/g, "&amp;").replace(/</g, "&lt;")}</h2></div>` : l);
+  }
+  let corpsHtml = mdToHtmlBody(sortie.join("\n")).replace(/\s*⏎\s*/g, "<br/>");
+  corpsHtml = corpsHtml.replace(/<p>§§SIGNATURES(\d+)§§<\/p>/g, (_, n) => blocs[Number(n)] || "");
+  return htmlWrap(`${orgHeader(org)}${titre ? `<h1>${titre}</h1>` : ""}${corpsHtml}${footer(org)}`);
 }
-
 
 /** Une pièce du dossier : chemin dans le ZIP (sans extension pour les PDF), format et rendu HTML. */
 export interface DocNexus {
@@ -235,8 +280,7 @@ export function planNexus(
       let md = s.md ? s.md(ctx, s.ben, v) : remplir(templates[s.gabarit!], v, bl);
       const restes = md.match(/\{\{[^}]+\}\}/g);
       if (restes) console.warn("[BDC NEXUS] variables non résolues", s.chemin, [...new Set(restes)]);
-      if (s.surcharges?.BEN !== "") md = signer(md, org, formation, s.ben, v, arrete);
-      return avecPiedUnique(rendreHtml(md, org), org);
+      return rendreHtml(md, org, formation, s.ben, v, arrete, s.surcharges?.BEN !== "");
     },
   }));
 
