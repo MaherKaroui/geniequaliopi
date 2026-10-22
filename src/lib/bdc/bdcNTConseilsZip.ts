@@ -25,7 +25,7 @@ import { genAnalyseRisquesQualite, genClausesQualiteContrat } from "@/lib/qualit
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
 import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdFicheCompetencesConsultant, mdReseauActeurs, mdObjectifsIndividualises, dateConventionBC } from "./bdcPiecesMMF";
-import { mdProcessTestPersonnalite, mdMailTestPersonnalite, mdTestPersonnalite, mdConvocation, mdProcessEvaluationObjectifs, mdReperesSynthese, mdTrameSynthese, mdMatrices, htmlClasseurMatrices, fusionnerClasseurs, htmlRegistreAbandons, mdRegistreReclamations, mdProcessCoordination, fichesDePosteNexus, processVeilleNexus, mdQuestionnairePartie } from "./bdcNexus";
+import { mdProcessTestPersonnalite, mdMailTestPersonnalite, mdTestPersonnalite, mdConvocation, mdProcessEvaluationObjectifs, mdReperesSynthese, mdTrameSynthese, mdMatrices, htmlClasseurMatrices, fusionnerClasseurs, htmlRegistreAbandons, mdRegistreReclamations, mdRegistreSousTraitance, mdProcessCoordination, fichesDePosteNexus, processVeilleNexus, mdQuestionnairePartie } from "./bdcNexus";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
@@ -1479,7 +1479,7 @@ function mdToHtmlBody(md: string): string {
 }
 
 /** Markdown → HTML complet autonome — utilise la charte commune Qualiopi (orgHeader + footer). */
-function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: StagiaireInfo | null): string {
+export function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: StagiaireInfo | null): string {
   const body = mdToHtmlBody(md);
   const beneficiaireLine = stagiaire
     ? `<div style="margin:6px 0 18px;color:#475569;font-size:12px">Bénéficiaire : <strong>${stagiaire.prenom} ${stagiaire.nom}</strong></div>`
@@ -1778,7 +1778,7 @@ function alignerNexus(pl: Placement): Placement | null {
 }
 
 /** Noms de fichiers sans accents (comme NEXUS), sauf les fiches de phase « Phase 1 - Phase préliminaire ». */
-function nomFichierNexus(nom: string): string {
+export function nomFichierNexus(nom: string): string {
   if (/^Phase \d - /.test(nom)) return nom;
   return nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’]/g, "'").replace(/\s+—\s+/g, " - ");
 }
@@ -1807,7 +1807,62 @@ export function avecPiedUnique(html: string, org: OrganismeInfo): string {
   return /<\/body>/i.test(out) ? out.replace(/<\/body>/i, `${piedUnique(org)}</body>`) : out + piedUnique(org);
 }
 
+/** Classeur unique de l'indicateur 2 (un onglet par tableau de collecte + méthode de calcul). */
+export function classeurIndicateurs2Html(org: OrganismeInfo, formation: FormationInfo, benList: StagiaireInfo[]): string {
+  const arrete = new Date();
+  const onglets: Array<{ nom: string; html: string }> = [];
+  for (const file of BDC_NT_STATS_FILES) {
+    try {
+      const html = file.build(org, formation, benList);
+      onglets.push({ nom: file.name.replace(/^Indicateur 2 - /, "").replace(/\.xlsx$/i, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+—\s+/g, " - ").slice(0, 31), html });
+    } catch (e) {
+      console.warn("[BDC] indicateurs IND 2 échoués", file.name, e);
+    }
+  }
+  const v = String(org.version || "1").replace(/[^0-9]/g, "") || "1";
+  return fusionnerClasseurs(onglets, { nom: "Méthode de calcul", lignes: [
+    `${org.nom} — Indicateur 2 : indicateurs de résultats`,
+    `${[org.siret ? `SIRET ${org.siret}` : "", org.nda ? `NDA ${org.nda}` : "", `Version ${v}`].filter(Boolean).join(" · ")}`,
+    "Contenu du classeur : un onglet par tableau de collecte, alimenté à partir des pièces justificatives (émargements, synthèses remises, questionnaires, comptes rendus).",
+    "Bilans arrivés à leur terme = synthèses remises ÷ bilans démarrés sur la période.",
+    "Abandons = bilans interrompus avant la remise de la synthèse ÷ bilans démarrés.",
+    "Satisfaction à chaud = moyenne des items du questionnaire (échelle de 1 à 5), calculée sur les questionnaires reçus.",
+    "Suivi à 6 mois = entretiens réalisés ÷ bilans clos depuis plus de six mois.",
+    "Projet confirmé à 6 mois = projets confirmés ou concrétisés ÷ suivis réalisés.",
+    "Règle de publication : effectif inférieur à 10 → publication de la valeur brute avec son volume et sa date d'arrêté, sans pourcentage.",
+    `Données arrêtées au ${fmtShortDate(arrete)}. Aucune valeur n'est saisie par anticipation.`,
+  ] });
+}
+
+/** Supports de cours propres au profil de la formation (Pâtisserie, Manager), versés à l'indicateur 19. */
+export async function supportsDeCoursBDC(org: OrganismeInfo, formation: FormationInfo, benList: StagiaireInfo[], toPdf: (html: string) => Promise<Blob>): Promise<Array<{ chemin: string; blob: Blob }>> {
+  const out: Array<{ chemin: string; blob: Blob }> = [];
+  const ctx = buildBdcContext(org, formation, benList);
+  for (const def of BDC_TEMPLATES_MANQUANTS) {
+    if (!/Support de cours/i.test(def.nom) || !bdcTemplateApplicable(def, formation)) continue;
+    const md = sanitizeBdcMarkdown(autofillDocument(def.build(ctx, null), ctx, null), { titre: def.nom, categorieAction: "BC", antiFabrication: antiFabricationPour(def.nom), raisonSociale: org.nom });
+    const nom = def.nom.replace(/^Indicateur\s+\d+\s*-\s*/i, "");
+    out.push({ chemin: `Critere_${critereForIndicateur(def.indicateur)}/Indicateur_${def.indicateur}/Indicateur ${def.indicateur} - ${nomFichierNexus(nom)}.pdf`, blob: await toPdf(mdToHtml(md, bdcDocTitle(def.nom), org, null)) });
+  }
+  return out;
+}
+
+/**
+ * Dossier BDC complet téléchargé depuis le générateur (bouton « Télécharger » et envoi Google Drive) :
+ * format du dossier audité NEXUS, voir nexus/bdcNexusZip.ts.
+ */
 export async function buildBDCNTConseilsZip(
+  org: OrganismeInfo,
+  formation: FormationInfo,
+  beneficiaires: StagiaireInfo[],
+  reporter?: JobReporter,
+): Promise<Blob> {
+  const { buildBDCNexusZip } = await import("./nexus/bdcNexusZip");
+  return buildBDCNexusZip(org, formation, beneficiaires, reporter);
+}
+
+/** Ancien export au format « MMF - BDC » (conservé pour comparaison, n'est plus appelé). */
+export async function buildBDCMMFZipLegacy(
   org: OrganismeInfo,
   formation: FormationInfo,
   beneficiaires: StagiaireInfo[],
@@ -2067,6 +2122,7 @@ export async function buildBDCNTConseilsZip(
       { ind: 11, nom: "Process Évaluation de l'atteinte des objectifs", md: mdProcessEvaluationObjectifs(bdcCtx) },
       { ind: 18, nom: "Process Coordination des intervenants", md: mdProcessCoordination(bdcCtx, org) },
       { ind: 31, nom: "Registre des réclamations", md: mdRegistreReclamations(bdcCtx, arrete) },
+      { ind: 27, nom: "Registre de sous-traitance et de portage salarial", md: mdRegistreSousTraitance(bdcCtx, org, arrete) },
       ...fichesDePosteNexus(bdcCtx, org).map((f) => ({ ind: 21, nom: f.nom, md: f.md })),
       ...processVeilleNexus(bdcCtx, org).map((v) => ({ ind: v.ind, nom: v.nom, md: v.md })),
       ...[5, 11].flatMap((ind) => [

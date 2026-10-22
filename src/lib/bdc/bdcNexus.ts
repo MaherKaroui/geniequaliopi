@@ -756,6 +756,40 @@ ${Array.from({ length: 6 }, () => "|  |  |  |  |  |  |  |  |  |").join("\n")}
 `;
 }
 
+/** IND 27 — registre déclaratif : aucun intervenant inventé, le référent qualité externe seulement s'il est saisi. */
+export function mdRegistreSousTraitance(ctx: BdcContext, org: OrganismeInfo, arrete: Date): string {
+  const consultant = consultantNom(ctx);
+  const rq = (org.referentQualite || "").trim();
+  const externe = rq && /extern/i.test(rq) ? rq.replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() : "";
+  const lignes = [
+    ...(externe ? [`| ${externe} | Prestation de conseil, hors réalisation des bilans | Appui au système qualité (référent qualité externe) | Lettre de mission | K-bis, références | Revue annuelle |`] : []),
+    ...Array.from({ length: 4 }, () => "|  |  |  |  |  |  |"),
+  ];
+  return `# REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL
+
+_Indicateur 27 — Arrêté au ${fmtDateFR(arrete)}_
+
+Aucun sous-traitant ni salarié porté n'intervient au ${fmtDateFR(arrete)}. Les bilans sont conduits par ${consultant}. Le registre est tenu à jour : tout recours futur y est inscrit avant la première intervention, avec le contrat correspondant.
+
+**Exigence**
+
+Le décret n° 2026-728 du 1er août 2026, applicable aux audits réalisés à compter du 1er novembre 2026, étend l'indicateur 27 au portage salarial et exige la traçabilité du respect du référentiel dans les contrats de sous-traitance.
+
+**Registre**
+
+| Intervenant | Nature du recours | Objet | Contrat et annexe qualité | Pièces vérifiées | Contrôle |
+|---|---|---|---|---|---|
+${lignes.join("\n")}
+
+**Modalités de maîtrise**
+
+- Sélection sur la fiche de poste « Consultant en bilan de compétences » et la trame d'entretien de recrutement (indicateur 21).
+- Contrat de sous-traitance, ou contrat commercial avec l'entreprise de portage, signé avant toute intervention, avec l'engagement de respecter le référentiel national qualité et de restituer les preuves (émargements, évaluations, réclamations).
+- Signature de la charte des consultants sous-traitants.
+- Contrôle à chaque prestation et revue annuelle ; arrêt de la collaboration en cas de manquement répété.
+`;
+}
+
 // ───────────────────────────── IND 18 / 21 / 23-25 ─────────────────────────────
 
 export function mdProcessCoordination(ctx: BdcContext, org: OrganismeInfo): string {

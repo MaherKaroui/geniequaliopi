@@ -37,6 +37,7 @@ async function textesZip(blob: Blob): Promise<Record<string, string>> {
 }
 
 const ARBORESCENCE_NEXUS = [
+  "Critere_1/Indicateur_1/Indicateur 1 - Calendrier annuel.xlsx",
   "Critere_1/Indicateur_1/Indicateur 1 - Cadre legal et reglementaire.pdf",
   "Critere_1/Indicateur_1/Indicateur 1 - Fiche de presentation du bilan de competences.pdf",
   "Critere_1/Indicateur_1/Indicateur 1 - Process de diffusion de l'information.pdf",
@@ -148,8 +149,6 @@ const ARBORESCENCE_NEXUS = [
   "Critere_7/Indicateur_32/Indicateur 32 - Tableau d'amelioration continue.pdf",
 ];
 
-/** Analyse des risques (IND 32) : exigée par le décret n° 2026-728, absente du dossier NEXUS antérieur. */
-const AJOUTS_2026 = ["Critere_7/Indicateur_32/Indicateur 32 - Analyse des risques sur la qualite des prestations.pdf"];
 
 const INTERDITS = ["NT CONSEILS", "NT Conseils", "NANTERRE", "Nanterre", "ÎLE DE FRANCE", "ILE-DE-FRANCE", "évidence pro", "FORMALERTE", "Marion LAURENT", "VTest", "FONGECIF", "OPACIF", "Galaoui", "ZOCLY", "ANTTOISSE", "Pôle emploi", "Pâtisserie", "Cake Design", "détruits au terme d'un an", "[à compléter]", "undefined", "NaN"];
 
@@ -177,7 +176,7 @@ describe("ZIP d'audit bilan de compétences", () => {
     const convFutur = noms.find((n) => /Nora DELTA\/.*Convention de prestation/.test(n))!;
     expect(textes[convFutur]).toMatch(/CONVENTION TRIPARTITE/);
     const convCpf = noms.find((n) => /Claire ALPHA\/.*Convention de prestation/.test(n))!;
-    expect(textes[convCpf]).toMatch(/CONTRAT DE PRESTATION/);
+    expect(textes[convCpf]).toMatch(/CONVENTION DE RÉALISATION/);
   }, 600_000);
 
   it("réserve le support de cours au profil Pâtisserie", async () => {
@@ -201,8 +200,8 @@ describe("ZIP d'audit bilan de compétences", () => {
     const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
     const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST.slice(0, 1)));
     const noms = Object.keys(textes).map((n) => n.normalize("NFC")).sort();
-    // Même arborescence que NEXUS (hors captures PNG et ressources statiques chargées par URL)
-    expect(noms).toEqual([...ARBORESCENCE_NEXUS, ...AJOUTS_2026].sort());
+    // Même arborescence que NEXUS (hors captures PNG et PDF Agefiph chargé par URL)
+    expect(noms).toEqual([...ARBORESCENCE_NEXUS].sort());
     const deux = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST.slice(0, 2)));
     const noms2 = Object.keys(deux);
     // CGV et règlement intérieur versés dans chaque dossier bénéficiaire, comme NEXUS
@@ -245,7 +244,7 @@ describe("ZIP d'audit bilan de compétences", () => {
       expect(pieces.length, String(re)).toBeGreaterThan(0);
       for (const [n, t] of pieces) expect(t, n).not.toMatch(interdit);
     };
-    verifier(/Test de positionnement/, /[1-5]\/5|J'ai exercé|Capacité d'adaptation, sens/);
+    verifier(/Test de personnalite et restitution/, /☒|J'ai exercé/);
     verifier(/personnalit|Restitution de l.inventaire/i, /\d+\/10/);
     verifier(/Questionnaire de satisfaction a chaud|Questionnaire de satisfaction à chaud/, /☒/);
     verifier(/Document de synth[eè]se/, /☒/);
