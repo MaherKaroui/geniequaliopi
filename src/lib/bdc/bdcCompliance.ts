@@ -428,6 +428,26 @@ function remplacerHorsCapitales(texte: string, re: RegExp, rep: string): string 
 }
 
 /** Applique l'ensemble des corrections à un markdown de document BDC. */
+/**
+ * Corrections issues des audits blancs /bdc (SKILLUP, ALTEORA, ORAVYS, NEXUS, SAPIENTIA) :
+ * un seul délai de rétractation (14 jours), conservation R6313-7 limitée à trois ans,
+ * vocabulaire du bilan, pas de mention d'un audit de surveillance pour un nouvel entrant.
+ */
+const CORRECTIONS_BDC_AUDIT: [RegExp, string][] = [
+  // Les formulations complètes d'abord, puis les règles génériques.
+  [/rétractation ou délai de 10 jours respectés/gi, "délai de rétractation de 14 jours (contrat) ou délai d'acceptation de 10 jours (convention tripartite) respectés"],
+  [/rétractation de 10 jours \(art\. L6353-5\), 14 jours à distance \(art\. L221-18 du Code de la consommation\)/gi, "rétractation de 14 jours calendaires (art. L6353-5 du Code du travail et L221-18 du Code de la consommation)"],
+  [/rétractation de 10 jours à compter de la signature du contrat \(art\. L6353-5 du Code du travail\), porté à 14 jours lorsque le contrat est conclu à distance ou hors établissement \(art\. L221-18 du Code de la consommation\)/gi, "rétractation de 14 jours calendaires à compter de la signature du contrat (art. L6353-5 du Code du travail et art. L221-18 du Code de la consommation)"],
+  [/(r[ée]tractation\s+(?:de|d'un d[ée]lai de)\s+)(?:4|7|10)\s+jours(?:\s+calendaires)?/gi, "$1" + "14 jours calendaires"],
+  [/(?:4|7|10) jours de r[ée]tractation/gi, "14 jours de rétractation"],
+  // R6313-7 : conservation de trois ans au plus sur accord écrit (décret n° 2023-1350).
+  [/(conserv(?:ation|[ée]s?)[^.\n]{0,80}?)(?:limit[ée]e? à |pendant |durant )(?:un|1) an\b/gi, "$1pendant trois ans au plus"],
+  [/détruits au terme d'un an/gi, "détruits au terme de trois ans au plus"],
+  [/r[èe]glement intérieur de l'école/gi, "règlement intérieur de l'organisme"],
+  [/\bde l'école\b/gi, "de l'organisme"],
+  [/pas à évaluer des restitution\b/gi, "pas à évaluer des acquis"],
+];
+
 export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
   let out = md;
 
@@ -465,6 +485,7 @@ export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
 
   // BLOC 9 — rendu
   for (const [re, rep] of FAUTES) out = out.replace(re, rep);
+  for (const [re, rep] of CORRECTIONS_BDC_AUDIT) out = out.replace(re, rep);
   out = repairSignatureBlocks(out);
   out = normalizeDates(out);
   out = stripMarkdownResidues(out);

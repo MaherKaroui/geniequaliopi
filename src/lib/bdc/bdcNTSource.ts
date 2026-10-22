@@ -1145,95 +1145,70 @@ Pour chacun de ces indicateurs, un outil spécifique est mis en place
 afin de collecter les informations nécessaires, garantissant ainsi la
 fiabilité et la précision des données recueillies.
 `,
-  "Indicateur 22/Indicateur 22 - Entretien annuel": `**ENTRETIEN ANNUEL**
+  "Indicateur 22/Indicateur 22 - Entretien annuel": `**COMPTE RENDU D'ENTRETIEN ANNUEL — CONSULTANT EN BILAN DE COMPÉTENCES**
 
-**Date de l\'entretien :** {ENTRETIEN_DATE}
+_Trame de l'entretien annuel du consultant (indicateur 22). Elle est renseignée pendant l'entretien, puis signée par les deux parties ; aucune réponse n'est pré-remplie. Le premier entretien a lieu au plus tard douze mois après l'entrée en fonction du consultant ({DATE_MAJ}). Les besoins de développement retenus sont reportés au plan de développement des compétences du consultant._
 
-**Nom :** {ORG_DIRIGEANT}
+**Date de l'entretien :** ____/____/________
 
-**Poste occupé :** Consultant(e) — Bilan de compétences / Formateur(rice) référent(e)
+**Consultant :** {ORG_DIRIGEANT}
 
-**Depuis le :** {DATE_MAJ}
+**Fonction :** Consultant en bilan de compétences
 
-**Entretien réalisé par :** Direction — {ORG_NOM}
+**En fonction depuis le :** {DATE_MAJ}
 
-**MA MISSION**
+**Entretien conduit par :** Direction — {ORG_NOM}
 
-Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui**
+**1. MISSIONS**
 
-| **Si oui, quelles sont les missions que vous réalisez au quotidien ?** |
+| **Missions exercées depuis la prise de fonction ou le dernier entretien** |
 |---|
-| Accueil et analyse de la demande des bénéficiaires, conduite des entretiens (phases préliminaire, d\'investigation et de conclusion), passation et restitution des tests, enquêtes métier {BDC_SECTEUR_TXT}, rédaction des documents de synthèse, suivi à 6 mois. |
-| Animation des séances en présentiel et en visioconférence, mise à jour des supports pédagogiques, veille réglementaire et veille métier sur les domaines accompagnés. |
-| Gestion administrative des dossiers (conventions, CGV, certificats de réalisation), suivi des indicateurs de satisfaction et de réussite des bénéficiaires. |
+| |
+| |
 
-| **Avez-vous eu depuis votre dernier entretien des missions ponctuelles ?** (ex : participation à des projets différents de vos missions habituelles) |
+| **Évolutions souhaitées ou constatées** |
 |---|
-| Refonte du process Qualiopi suite à l\'audit de surveillance, mise à jour des fiches de poste et du livret d\'accueil. |
-| Participation à un groupe de travail interne sur l\'amélioration des outils d\'évaluation et la digitalisation des supports. |
-| Représentation de l\'organisme sur 2 salons professionnels (présentation de l\'offre BDC). |
+| |
 
-| **Avez-vous des commentaires à apporter concernant vos missions et vos activités actuelles ?** |
-|---|
-| Charge de travail soutenue mais cohérente avec mon engagement et mes appétences. La diversité des profils accompagnés (dont {BDC_METIER}) rend le métier passionnant. |
-| Bonne articulation entre face à face pédagogique, suivi administratif et démarche qualité. |
-| Souhait d\'approfondir certaines spécialisations sectorielles dans l\'année à venir. |
+**2. BILAN DE L'ACTIVITÉ**
 
-**MES POINTS FORTS**
+| Élément | Constat (à partir des pièces du dossier qualité) |
+|---|---|
+| Bilans conduits sur la période (tableau de suivi des parcours, IND 2) | |
+| Satisfaction des bénéficiaires (questionnaires à chaud, échelle de 1 à 5, IND 30) | |
+| Réclamations et dysfonctionnements (registre, IND 31) | |
+| Veilles exploitées (registres, IND 23 à 25) | |
 
-| **Quelle activité, quel projet pouvez-vous mettre en avant depuis le dernier entretien pour lesquels vous avez ressenti une réelle satisfaction ?** |
-|---|
-| Accompagnement de plusieurs bénéficiaires jusqu\'à la concrétisation effective de leur projet (entrée en formation, mobilité interne, création d\'activité). |
-| Mise en place d\'un kit de supports actualisés (fiches métier, grille de suivi, livret de restitution) directement réutilisable par toute l\'équipe pédagogique. |
-| Bons retours de satisfaction des bénéficiaires (notes moyennes ≥ 8/10) et taux de complétion du bilan élevé. |
+**3. COMPÉTENCES**
 
-**MES COMPÉTENCES**
-
-| **Savoir** | **Note** | **Commentaires** |
+| Domaine | Niveau (1 à 3) | Observations |
 |---|---|---|
-| Connaissance du secteur de la formation | 3 | Maîtrise du cadre Qualiopi, des dispositifs de financement (CPF, autres) et de la réglementation BDC. |
-| Connaissance des techniques pédagogiques | 3 | Approches individualisées, posture d\'écoute active, outils d\'investigation variés. |
-| Connaissance sur le secteur d\'intervention | 3 | Veille active {BDC_SECTEUR_TXT} et autres secteurs accompagnés. |
+| Conduite des trois phases du bilan (art. R6313-4) | | |
+| Outils d'investigation et restitution | | |
+| Cadre légal, financements et déontologie | | |
+| Accueil des personnes en situation de handicap | | |
+| Conduite d'entretien à distance | | |
 
-*Notation : 1 = débutant — 2 = confirmé — 3 = expert*
+*Échelle : 1 = en apprentissage — 2 = autonome — 3 = capable de transmettre*
 
-| **Savoir-faire** | **Note** | **Commentaires** |
+**4. BESOINS DE DÉVELOPPEMENT ET OBJECTIFS**
+
+| Objectif ou besoin | Action envisagée | Échéance |
 |---|---|---|
-| Sait transmettre ses connaissances | 4 | Pédagogie adaptée à chaque profil, supports clairs et progressifs. |
-| Sait écouter et communiquer | 4 | Écoute active, reformulation, posture bienveillante mais structurante. |
-| Sait transmettre sa motivation | 3 | Capacité à remobiliser les bénéficiaires dans les moments de doute. |
+| | | |
+| | | |
 
-*Notation : 1 = 1er apprentissage — 2 = maitrise à l\'aide de ressources documentaires — 3 = autonomie complète — 4 = capacité à transmettre son savoir*
+**5. CONCLUSION**
 
-| **Savoir-être** | **Note** | **Commentaires** |
-|---|---|---|
-| Est pédagogue | 3 | Pédagogie naturelle, posture rassurante. |
-| Est à l\'écoute | 3 | Disponibilité et qualité d\'écoute reconnues par les bénéficiaires. |
-| Est enthousiaste et positif | 3 | Énergie communicative, soutien constant des bénéficiaires. |
-
-*Notation : 1 = non reconnu comme savoir-être — 2 = identifié comme valeur — 3 = valeur primordiale*
-
-**MES OBJECTIFS**
-
-| **Objectif 1 :** |
+| **Commentaire du consultant** |
 |---|
-| Maintenir un taux de satisfaction bénéficiaires ≥ 90 % et un taux de complétion du bilan ≥ 95 % sur l\'année à venir. |
+| |
 
-| **Objectif 2 :** |
+| **Commentaire de la direction** |
 |---|
-| Approfondir la veille métier sur {BDC_SECTEUR_TXT} et 2 secteurs porteurs supplémentaires (production de fiches sectorielles actualisées). |
+| |
 
-| **Objectif 3 :** |
-|---|
-| Participer activement à la démarche d\'amélioration continue et à la préparation de l\'audit de surveillance Qualiopi. |
-
-**CONCLUSION**
-
-| **Avez-vous un commentaire à apporter concernant votre entretien ?** |
-|---|
-| Entretien constructif, échanges clairs sur les missions, les axes de progrès et les objectifs partagés. |
-| Bonne adéquation entre les missions confiées et mes appétences professionnelles. |
-| Je remercie la direction pour l\'écoute et la qualité du cadre de travail. |
+Signature du consultant : ______________________ Signature de la direction : ______________________
 `,
   "Indicateur 21/Indicateur 21 - Entretien de recrutement": `**ENTRETIEN DE RECRUTEMENT — TRAME**
 

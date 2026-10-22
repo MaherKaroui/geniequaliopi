@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { X, PenTool, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
+import ExperiencesEditor from "@/components/ExperiencesEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
@@ -35,6 +36,8 @@ interface StagiairesFormProps {
   data: StagiaireInfo[];
   onChange: (data: StagiaireInfo[]) => void;
   formation?: FormationInfo;
+  /** Types d'actions de l'organisme : la saisie des expériences s'affiche pour la VAE et le BC. */
+  typesActions?: string[];
 }
 
 const emptyStagiaire: StagiaireInfo = {
@@ -42,7 +45,9 @@ const emptyStagiaire: StagiaireInfo = {
   adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "", dateNaissanceResponsable: "", emailResponsable: "",
 };
 
-const StagiairesForm = ({ data, onChange, formation }: StagiairesFormProps) => {
+const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesFormProps) => {
+  const avecExperiences = !!typesActions?.some((t) => t === "vae" || t === "bilans-competences");
+  const estVAE = !!typesActions?.includes("vae");
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -341,6 +346,14 @@ const StagiairesForm = ({ data, onChange, formation }: StagiairesFormProps) => {
                 <option value="non">Non</option>
               </select>
             </div>
+            {avecExperiences && (
+              <ExperiencesEditor
+                value={stagiaire.experiences || []}
+                onChange={(experiences) => { const updated = [...data]; updated[index] = { ...updated[index], experiences }; onChange(updated); }}
+                projet={stagiaire.projetVAE}
+                onProjetChange={estVAE ? (v) => updateStagiaire(index, 'projetVAE', v) : undefined}
+              />
+            )}
             <div>
               <Label>Entreprise</Label>
               <Input value={stagiaire.entreprise} onChange={e => updateStagiaire(index, 'entreprise', e.target.value)} placeholder="Entreprise" />

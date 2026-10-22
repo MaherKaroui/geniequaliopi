@@ -104,6 +104,25 @@ export interface StagiaireInfo {
   financeur?: string;
   /** true si le stagiaire a été produit par un générateur de données fictives */
   fictif?: boolean;
+  /**
+   * Expériences réelles déclarées par le candidat (VAE) ou le bénéficiaire (BC), avec
+   * justificatifs à l'appui. Source unique du CV et du rapprochement avec le référentiel :
+   * rien n'est inventé quand ce champ est vide.
+   */
+  experiences?: ExperienceDeclaree[];
+  /** Motivation et projet exprimés par le candidat VAE (entretien de faisabilité). */
+  projetVAE?: string;
+}
+
+export interface ExperienceDeclaree {
+  poste: string;
+  employeur: string;
+  /** aaaa-mm ou aaaa-mm-jj */
+  debut: string;
+  /** aaaa-mm, aaaa-mm-jj, ou vide si en cours */
+  fin: string;
+  /** Activités réellement exercées, une par ligne. */
+  activites: string;
 }
 
 export interface ReferentielAnalyse {
