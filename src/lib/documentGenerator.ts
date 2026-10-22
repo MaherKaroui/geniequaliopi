@@ -88,6 +88,7 @@ import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
 import { pickCreaComment, isCreationEntrepriseFormation, CREA_BESOINS } from "./creationEntreprisePreset";
 import { pickIAComment, isIAGenerativeFormation } from "./iaGenerativePreset";
+import { getTPBesoin } from "./formationPresets/builtinTP";
 import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 import { getSatisfactionLabel, getAssiduiteLabel, getNombreStagiairesFormes, getTauxObtention, getCommentaireIndicateurs, getRepartitionParAnnee, NON_COLLECTE } from "./indicateursResultats";
@@ -2018,7 +2019,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getARH41366Besoin(s.nom, s.prenom, s.civilite, i)
         : isGSC35Formation(f.intitule, f.codeRNCP)
         ? getGSC35Besoin(s.nom, s.prenom, s.civilite, i)
-        : domain.besoins[i % domain.besoins.length];
+        : getTPBesoin(f.intitule, f.codeRNCP, s.nom, s.prenom, i) ?? domain.besoins[i % domain.besoins.length];
       return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
     tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Prise en charge", "Besoin principal identifié"], rows);
