@@ -16,7 +16,8 @@ describe("Gmail Ctrl+E before shared captures", () => {
     vi.spyOn(document.body, "appendChild").mockImplementation((node) => {
       const result = append(node);
       if (node instanceof HTMLIFrameElement) {
-        const doc = node.contentDocument;
+        const doc = document.implementation.createHTMLDocument("Gmail");
+        Object.defineProperty(node, "contentDocument", { value: doc });
         const win = node.contentWindow;
         if (!doc || !win) throw new Error("Missing iframe");
         capturedDoc = doc;
