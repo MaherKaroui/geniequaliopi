@@ -64,7 +64,8 @@ export function positioningProposal(c: Ctx) {
     const shift = i % 4;
     return { question: pattern.question, options: pattern.options.map((_, j) => pattern.options[(j + shift) % 4]), correctIndex: (4 - shift) % 4 };
   });
-  const questions = explicit.length ? explicit : dedicated ? getEvalContent(c.f.intitule).qcmPositionnement : generated;
+  const catalogue = dedicated ? getEvalContent(c.f.intitule).qcmPositionnement : [];
+  const questions = explicit.length ? explicit : catalogue.length ? catalogue : generated;
   const correctable = questions.every(q => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
   const target = 5 + seed % 3;
   const correctCount = Math.round(questions.length * target / 10);
@@ -76,8 +77,20 @@ export function positioningProposal(c: Ctx) {
     const choices = q.options.map((_, j) => j).filter(j => j !== q.correctIndex);
     return choices[(seed + i) % choices.length];
   });
+  const prompts = [
+    (topic: string) => `Avec vos mots, comment aborderiez-vous « ${topic} » ?`,
+    (topic: string) => `Quels points vérifieriez-vous dans une première tentative sur « ${topic} » ?`,
+    (topic: string) => `Qu'est-ce qui vous ferait hésiter sur « ${topic} », et quelle aide vous serait utile ?`,
+    (topic: string) => `Comment organiseriez-vous les étapes pour travailler « ${topic} » ?`,
+    (topic: string) => `Qu'aimeriez-vous comprendre en priorité à propos de « ${topic} » ?`,
+    (topic: string) => `Comment expliqueriez-vous votre démarche sur « ${topic} » à une autre personne ?`,
+    (topic: string) => `Quelles informations chercheriez-vous avant de travailler « ${topic} » ?`,
+    (topic: string) => `Comment réagiriez-vous si votre résultat sur « ${topic} » ne correspondait pas à la consigne ?`,
+    (topic: string) => `Comment adapteriez-vous « ${topic} » à un nouveau cas ?`,
+    (topic: string) => `Quels repères vous aideraient à devenir plus autonome sur « ${topic} » ?`,
+  ];
   const openQuestions = dedicated ? getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).debut.slice(0, 10)
-    : Array.from({ length: 10 }, (_, i) => ({ question: `Avec vos mots, comment aborderiez-vous « ${topics[i % topics.length]} »${i >= topics.length ? ' et comment vérifieriez-vous votre démarche' : ''} ?`, reponseAttendue: '' }));
+    : Array.from({ length: 10 }, (_, i) => ({ question: prompts[i](topics[i % topics.length]), reponseAttendue: '' }));
   const shared = dedicated ? generateStagiaireOpenAnswers(openQuestions, seed % 50, true, c.s, c.f) : [];
   const openings = ["Je commencerais par clarifier ce qu'on attend", "Pour ma part, je reprendrais la consigne étape par étape", "J'aurais besoin d'un exemple simple pour démarrer", "Je chercherais d'abord à repérer les informations utiles", "Je préfère poser les étapes avant de me lancer", "Je partirais du résultat attendu pour organiser mon travail"];
   const endings = ["Ensuite, je vérifierais le résultat avec les critères de la consigne. J'aimerais travailler ce point pendant la formation.", "Je demanderais un retour sur mon premier essai pour savoir ce qui doit être amélioré.", "Je comparerais ma démarche à un exemple expliqué. Ce serait utile pour comprendre où je dois faire attention.", "Je prendrais le temps de revoir les points qui me font hésiter, avant de passer à un cas plus complexe."];
