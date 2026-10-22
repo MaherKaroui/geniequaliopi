@@ -13,6 +13,7 @@ describe("Gmail Ctrl+E before shared captures", () => {
     const append = document.body.appendChild.bind(document.body);
     let shortcuts = 0;
     let capturedDoc: Document | undefined;
+    let toolbar: HTMLElement | null = null;
     vi.spyOn(document.body, "appendChild").mockImplementation((node) => {
       const result = append(node);
       if (node instanceof HTMLIFrameElement) {
@@ -22,6 +23,7 @@ describe("Gmail Ctrl+E before shared captures", () => {
         if (!doc || !win) throw new Error("Missing iframe");
         capturedDoc = doc;
         doc.body.innerHTML = `<div id="bar" class="${hidden ? "hidden" : ""}"></div>`;
+        toolbar = doc.getElementById("bar");
         Object.assign(win, { __prefill: () => {} });
         doc.addEventListener("keydown", (event) => {
           const key = event as KeyboardEvent;
@@ -36,7 +38,8 @@ describe("Gmail Ctrl+E before shared captures", () => {
     });
     await captureMail({ key: "mail", titre: "Mail", subject: "Formation", date: new Date(), messages: [] } as MailAuto, "gmail");
     expect(shortcuts).toBe(hidden ? 0 : 1);
-    expect(capturedDoc?.getElementById("bar")?.classList.contains("hidden")).toBe(true);
+    expect((toolbar as HTMLElement | null)?.classList.contains("hidden")).toBe(true);
+    expect(capturedDoc?.getElementById("bar")).toBeNull();
     expect(document.querySelector("iframe")).toBeNull();
   });
 });

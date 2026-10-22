@@ -141,7 +141,8 @@
   .bar button.on{background:#8ab4f8;color:#202124;font-weight:600}
   .bar .sep{width:1px;height:22px;background:#5f6368;margin:0 4px}
   .bar .hint{opacity:.65;margin-left:auto;padding-right:4px}
-  .bar.hidden{transform:translateY(110%)}
+  .bar.hidden,html[data-export="1"] .bar{display:none!important;transition:none}
+  html[data-export="1"] body{padding-bottom:0}
   /* popover avatar */
   .pop{position:absolute;z-index:60;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);padding:12px;width:252px;display:none}
   .pop.show{display:block}
