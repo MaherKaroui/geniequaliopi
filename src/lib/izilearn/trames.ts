@@ -16,6 +16,8 @@ import { getEvalContent, getQuestionsOuvertes, hasEvalContentDedie, generateStag
 import { getJoursStagiaire, SEUIL_JOURS_PARCOURS_COURT } from "@/lib/parcoursStagiaire";
 import type { IzApprenant, IzPayload, IzReponses } from "./types";
 import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
+import { studentAnswerFromCorrection } from "@/lib/aiEvalPack";
+import { reponsesPositionnement } from "./positionnement";
 
 export interface Ctx {
   p: IzPayload;
@@ -132,6 +134,31 @@ const lignesObjectifs = (f: FormationInfo) => String(f.objectifs || "").split(/\
 export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
   let h = enTete(c, [["Moment", `Début de formation — ${dateFr(c.p.session.dateDebut)}`], ["Durée indicative", "20 à 30 minutes"]]);
   const reels = (c.a.positionnement || []).filter(hasRecordedQuiz);
+  if (!reels.length) {
+    const rang = Math.max(0, c.p.apprenants.findIndex(a => a.inscriptionId === c.a.inscriptionId));
+    const iz = normaliserQcm(c.p.formation.contenu?.positionnement as unknown[]);
+    const questions = iz.length && iz.every(aCorrige) ? iz : normaliserQcm(getEvalContent(c.f.intitule).qcmPositionnement as unknown[]).filter(aCorrige);
+    const qs = questions.flatMap(q => q.correctIndex == null ? [] : [{ ...q, correctIndex: q.correctIndex }]);
+    const answers = reponsesPositionnement(qs, rang);
+    const score = answers.filter((answer, i) => answer === qs[i].correctIndex).length;
+    h += `<p><em>Réponses proposées pour le positionnement initial — à valider par l’apprenant et le formateur.</em></p>`;
+    h += `<h2>Questionnaire à choix multiples</h2>`;
+    qs.forEach((q, i) => {
+      h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p>${q.options.map((op, k) => `${answers[i] === k ? "☒" : "☐"} ${esc(op)}`).join("<br>")}</p>`;
+    });
+    if (qs.length) h += `<p><strong>Score proposé :</strong> ${score} / ${qs.length}</p>`;
+    h += `<h2>Questions ouvertes</h2>`;
+    const ouvertes = getQuestionsOuvertes(c.f.intitule, c.f.objectifs, c.f.programme).debut;
+    ouvertes.slice(0, 10).forEach((q, i) => {
+      const reponse = studentAnswerFromCorrection(q.reponseAttendue, c.s, rang, i);
+      h += `<p><strong>${i + 1}. ${esc(q.question)}</strong></p><p><strong>Réponse du stagiaire (proposée) :</strong> ${esc(reponse)}</p>`;
+    });
+    h += `<h2>Auto-positionnement proposé</h2>`;
+    h += tableHTML(["Objectif", "Je ne connais pas", "Notions", "Je pratique", "Je maîtrise"], lignesObjectifs(c.f).map((o, i) => [esc(o), ...Array.from({ length: 4 }, (_, k) => k === (rang + i) % 3 ? "X" : "")]));
+    h += `<h2>Appréciation proposée du formateur</h2><p>${esc(c.s.prenom)} dispose de premières notions à consolider. Le parcours permettra d’approfondir ${esc(lignesObjectifs(c.f)[rang % Math.max(1, lignesObjectifs(c.f).length)] || c.f.intitule)} ; les réponses et le niveau initial restent à confirmer lors de l’entretien de positionnement.</p>`;
+    h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], dateCourteLongue(c.p.session.dateDebut));
+    return { html: doc(c, "TEST DE POSITIONNEMENT — DÉBUT DE FORMATION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: false };
+  }
   if (reels.length) {
     h += `<h2>Résultats enregistrés dans IZILearn</h2>`;
     h += sourceIzilearn("tests de positionnement passés par l'apprenant sur la plateforme.");
