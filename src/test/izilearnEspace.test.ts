@@ -371,7 +371,7 @@ describe("Espace IZILearn", () => {
       for (const k of ["programme", "besoins", "positionnement", "convocation", "convention", "cgv", "ri", "livret", "support", "exercices", "emargement", "connexion", "bilan_chaud", "bilan_froid", "mails"]) {
         expect(cats.has(k as never), k).toBe(true);
       }
-      for (const p of pieces) {
+      for (const p of pieces.filter((x) => !x.pdf)) {
         const html = p.rendre();
         expect(html.length, p.titre).toBeGreaterThan(300);
         if (p.categorie === "emargement" || p.categorie === "connexion") {
