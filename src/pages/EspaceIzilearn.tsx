@@ -22,7 +22,7 @@ import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { useIzilearn } from "@/lib/izilearn/bridge";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import { champsManquants } from "@/lib/izilearn/mapping";
-import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Piece } from "@/lib/izilearn/pieces";
+import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Contexte, type Piece } from "@/lib/izilearn/pieces";
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
 import type { IzFichierRetour } from "@/lib/izilearn/types";
 import IzilearnMailPreview from "@/components/IzilearnMailPreview";
