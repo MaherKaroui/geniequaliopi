@@ -1,10 +1,11 @@
-import { buildDocument, formatDate, tableHTML } from '@/lib/docBuilder';
+import { buildDocument, tableHTML } from '@/lib/docBuilder';
 import { getEvalContent, getQuestionsOuvertes, generateStagiaireOpenAnswers } from '@/lib/evalContent';
 import { formationConnue } from './contenu';
 import type { Ctx } from './trames';
 import type { QCMQuestion } from '@/lib/evalContent';
 
 const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const formatDate = (value: string) => { const date = new Date(`${value}T12:00:00`); return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); };
 const seedFor = (c: Ctx) => Array.from(`${c.a.inscriptionId}|${c.s.prenom}|${c.s.nom}|${c.f.intitule}`).reduce((n, ch) => (Math.imul(n, 31) + ch.charCodeAt(0)) >>> 0, 0);
 
 /** Only topics supplied for this formation; never a fuzzy catalogue match. */
