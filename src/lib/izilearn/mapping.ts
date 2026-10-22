@@ -35,7 +35,7 @@ export function versOrganisme(p: IzPayload): OrganismeInfo {
   const dirigeant = t(o.dirigeant);
   return {
     nom: t(o.nom), siret: t(o.siret), adresse: t(o.adresse), codePostal: t(o.codePostal), ville: t(o.ville),
-    telephone: t(o.telephone), email: t(o.email), siteWeb: t(o.siteWeb), nda: t(o.nda),
+    telephone: t(o.telephone), email: t(o.email), siteWeb: t(o.siteWeb), nda: t(o.nda), uai: t(o.uai) || undefined,
     dirigeant,
     responsablePedagogique: dirigeant,
     referentHandicap: t(o.referentHandicap) || dirigeant,
@@ -112,6 +112,13 @@ export function versStagiaire(a: IzApprenant, p: IzPayload): StagiaireInfo {
     adresseEntreprise: t(a.entreprise?.adresse) || undefined,
     poste: t(a.poste),
     dateNaissance: t(a.dateNaissance),
+    nir: t(a.nir) || undefined,
+    nationalite: t(a.nationalite) || undefined,
+    communeNaissance: t(a.communeNaissance) || undefined,
+    departementNaissance: t(a.departementNaissance) || undefined,
+    diplome: t(a.diplome) || undefined,
+    dateNaissanceResponsable: t(a.entreprise?.dateNaissanceRepresentant) || undefined,
+    signatureResponsableUrl: t(a.entreprise?.signatureUrl) || undefined,
     dateDebutFormation: t(p.session.dateDebut),
     dateFinFormation: t(p.session.dateFin),
     tarifFormation: t(p.session.tarif) || undefined,

@@ -38,6 +38,7 @@ export interface OrganismeInfo {
   email: string;
   siteWeb: string;
   nda: string;
+  uai?: string;
   dirigeant: string;
   responsablePedagogique: string;
   referentHandicap: string;
