@@ -24,7 +24,8 @@ import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePosta
 import { genAnalyseRisquesQualite, genClausesQualiteContrat } from "@/lib/qualite2026";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
-import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessPositionnement, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdAccuseReception, mdFicheCompetencesConsultant, mdReseauActeurs, mdObjectifsIndividualises, mdCVConsultant } from "./bdcPiecesMMF";
+import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdFicheCompetencesConsultant, mdReseauActeurs, mdObjectifsIndividualises, dateConventionBC } from "./bdcPiecesMMF";
+import { mdProcessTestPersonnalite, mdMailTestPersonnalite, mdTestPersonnalite, mdConvocation, mdProcessEvaluationObjectifs, mdReperesSynthese, mdTrameSynthese, mdMatrices, htmlClasseurMatrices, fusionnerClasseurs, htmlRegistreAbandons, mdRegistreReclamations, mdProcessCoordination, fichesDePosteNexus, processVeilleNexus, mdQuestionnairePartie } from "./bdcNexus";
 import { sanitizeBdcMarkdown, isDocumentDeclaratif, mentionStatut } from "./bdcCompliance";
 
 /** Pièces dont le contenu doit rester vierge (renseigné par le bénéficiaire / en séance). */
@@ -1696,6 +1697,7 @@ const REMAP_MMF: Array<{ de: RegExp; vers: Placement | ((ind: number) => Placeme
   { de: /^Compte rendu de suivi à 6 mois$/i, vers: { ind: 2, nom: "Compte rendu de suivi à 6 mois", beneficiaire: true } },
   { de: /^Auto-diagnostic préliminaire$/i, vers: { ind: 8, nom: "Test de positionnement", beneficiaire: true } },
   { de: /^Mail auto-diagnostic préliminaire$/i, vers: { ind: 8, nom: "Mail test de positionnement", beneficiaire: true } },
+  { de: /^Fiche d.analyse de besoin$/i, vers: { ind: 4, nom: "Fiche d'analyse du besoin", beneficiaire: true } },
   { de: /^Programme des 3 phases du bilan de compétences$/i, vers: { ind: 6, nom: "Programme des 3 phases du bilan de compétences" } },
   { de: /^Phase (\d) - (.*)$/i, vers: { ind: 6, nom: "" } },
   { de: /^Convention de prestation$/i, vers: { ind: 9, nom: "Convention de prestation", beneficiaire: true } },
@@ -1704,7 +1706,7 @@ const REMAP_MMF: Array<{ de: RegExp; vers: Placement | ((ind: number) => Placeme
   { de: /^Planning prévisionnel signé/i, vers: { ind: 10, nom: "Planning prévisionnel signé", beneficiaire: true } },
   { de: /^Suivi de l.adaptation à l.accompagnement$/i, vers: (ind) => ({ ind, nom: "Suivi de l'adaptation à l'accompagnement" }) },
   { de: /^Document de synthèse du bilan de compétences/i, vers: { ind: 11, nom: "Document de synthèse (copie anonymisée)", beneficiaire: true } },
-  { de: /^Test de personnalité/i, vers: { ind: 11, nom: "Restitution de l'inventaire de personnalité (copie anonymisée)", beneficiaire: true } },
+  { de: /^Test de personnalité$/i, vers: { ind: 11, nom: "Restitution de l'inventaire de personnalité (copie anonymisée)", beneficiaire: true } },
   { de: /^Process Abandons$/i, vers: { ind: 12, nom: "Process Prévention et traitement des abandons" } },
   { de: /^Guide d.entretien des abandons$/i, vers: { ind: 12, nom: "Guide d'entretien des abandons" } },
   { de: /^CGV$/i, vers: { ind: 9, nom: "Conditions générales de vente", collectif: true } },
@@ -1740,6 +1742,45 @@ export function placementMMF(ind: number, libelle: string, beneficiaire: boolean
   if (ind === 16) return { ind: 2, nom, beneficiaire };
   if (ind === 28) return { ind: 24, nom, beneficiaire };
   return { ind, nom, beneficiaire };
+}
+
+/**
+ * Alignement sur le dossier audité « NEXUS - PDF » : pièces retirées (null), renommées ou
+ * déplacées après le placement MMF. Les libellés sont comparés avec accents.
+ */
+const ALIGNEMENT_NEXUS: Array<{ ind: number | number[]; de: RegExp; collectif?: boolean; vers: { ind?: number; nom: string } | null }> = [
+  { ind: 2, de: /^Compte rendu de suivi à 6 mois$/i, vers: null },
+  { ind: 2, de: /^Indicateurs de résultats - situation/i, vers: null },
+  { ind: 4, de: /^Fiche d'analyse de besoin$/i, vers: { nom: "Fiche d'analyse du besoin" } },
+  { ind: 5, de: /^Objectifs opérationnels et évaluables du bilan$/i, vers: null },
+  { ind: 6, de: /^Contenus et modalités adaptés du bilan$/i, vers: null },
+  { ind: 8, de: /^(Mail )?test de positionnement$|^Process Positionnement/i, vers: null },
+  { ind: 9, de: /^Accusé de réception|^Autorisation d.utilisation d.image|^Autorisation de transmission/i, vers: null },
+  { ind: 10, de: /^Suivi de l.adaptation à l.accompagnement$/i, collectif: true, vers: { ind: 26, nom: "Suivi des adaptations par bénéficiaire" } },
+  { ind: 11, de: /^Restitution de l.inventaire de personnalité/i, vers: { nom: "Restitution du questionnaire d'intérêts professionnels (copie anonymisée)" } },
+  { ind: 21, de: /^CV du consultant|^Fiches de poste des fonctions exercées$/i, vers: null },
+  { ind: 22, de: /^Plan de développement des compétences du consultant$/i, vers: { nom: "Plan de développement des compétences" } },
+  { ind: 23, de: /^Compte rendu d.exploitation des veilles$|^Process Veilles$/i, vers: null },
+  { ind: [23, 24, 25], de: /^Registre de veille .+/i, vers: { nom: "Registre de veille" } },
+  { ind: 27, de: /^Annexe clauses qualité|^Quiz Qualiopi/i, vers: null },
+  { ind: 31, de: /^Registre des dysfonctionnements, réclamations et aléas$/i, vers: { nom: "Tableau des dysfonctionnements" } },
+];
+
+function alignerNexus(pl: Placement): Placement | null {
+  for (const r of ALIGNEMENT_NEXUS) {
+    const inds = Array.isArray(r.ind) ? r.ind : [r.ind];
+    if (!inds.includes(pl.ind) || !r.de.test(pl.nom)) continue;
+    if (r.collectif && pl.beneficiaire) continue;
+    if (!r.vers) return null;
+    return { ...pl, ind: r.vers.ind ?? pl.ind, nom: r.vers.nom };
+  }
+  return pl;
+}
+
+/** Noms de fichiers sans accents (comme NEXUS), sauf les fiches de phase « Phase 1 - Phase préliminaire ». */
+function nomFichierNexus(nom: string): string {
+  if (/^Phase \d - /.test(nom)) return nom;
+  return nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’]/g, "'").replace(/\s+—\s+/g, " - ");
 }
 
 /** Pied de page unique de toutes les pièces : « Version N · Mise à jour du <date de la V1> ». */
@@ -1807,9 +1848,10 @@ export async function buildBDCNTConseilsZip(
   /** Dépose une pièce dans l'arborescence MMF ; une pièce collective n'est versée qu'une fois. */
   const deja = new Set<string>();
   const put = (ind: number, libelle: string, s: StagiaireInfo | null, ext: string, data: Blob | ArrayBuffer) => {
-    const pl = placementMMF(ind, libelle, !!s);
+    const pl = alignerNexus(placementMMF(ind, libelle, !!s));
+    if (!pl) return;
     const dossierBen = pl.beneficiaire && s ? `/Bénéficiaire - ${s.prenom} ${s.nom}` : "";
-    const path = `Critere_${critereForIndicateur(pl.ind)}/Indicateur_${pl.ind}${dossierBen}/Indicateur ${pl.ind} - ${pl.nom}.${ext}`;
+    const path = `Critere_${critereForIndicateur(pl.ind)}/Indicateur_${pl.ind}${dossierBen}/Indicateur ${pl.ind} - ${nomFichierNexus(pl.nom)}.${ext}`;
     if (deja.has(path)) return;
     deja.add(path);
     zip.file(path, data);
@@ -1905,27 +1947,34 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
-  // === 5. IND 2 : indicateurs calculés à partir des pièces réelles ===
-  for (const file of BDC_NT_STATS_FILES) {
-    advance(file.name);
-    try {
-      const html = file.build(org, formation, benList);
-      put(2, file.name.replace(/\.xlsx$/i, ""), null, "xlsx", htmlToXlsxBlob(html));
-      collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
-    } catch (e) {
-      console.warn("[BDC] indicateurs IND 2 échoués", file.name, e);
+  // === 5. IND 2 : un classeur unique « Tableaux de suivi et indicateurs de résultats » (comme NEXUS) ===
+  {
+    advance("Tableaux de suivi et indicateurs de résultats");
+    const arrete = new Date();
+    const onglets: Array<{ nom: string; html: string }> = [];
+    for (const file of BDC_NT_STATS_FILES) {
+      try {
+        const html = file.build(org, formation, benList);
+        onglets.push({ nom: file.name.replace(/^Indicateur 2 - /, "").replace(/\.xlsx$/i, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+—\s+/g, " - ").slice(0, 31), html });
+        collect(file.name.replace(/\.xlsx$/i, ""), texteClasseur(html), null);
+      } catch (e) {
+        console.warn("[BDC] indicateurs IND 2 échoués", file.name, e);
+      }
     }
-  }
-
-  // === 6. Suivi à 6 mois par bénéficiaire (IND 2) ===
-  for (let i = 0; i < benList.length; i++) {
-    const s = benList[i];
-    advance(`Compte rendu de suivi à 6 mois — ${s.prenom} ${s.nom}`);
-    try {
-      put(2, "Compte rendu de suivi à 6 mois", s, "pdf", await toPdf(buildSuivi6MoisIndividuel(org, formation, s, i)));
-    } catch (e) {
-      console.warn("[BDC] suivi 6 mois échoué", e);
-    }
+    const v = String(org.version || "1").replace(/[^0-9]/g, "") || "1";
+    const html = fusionnerClasseurs(onglets, { nom: "Méthode de calcul", lignes: [
+      `${org.nom} — Indicateur 2 : indicateurs de résultats`,
+      `${[org.siret ? `SIRET ${org.siret}` : "", org.nda ? `NDA ${org.nda}` : "", `Version ${v}`].filter(Boolean).join(" · ")}`,
+      "Contenu du classeur : un onglet par tableau de collecte, alimenté à partir des pièces justificatives (émargements, synthèses remises, questionnaires, comptes rendus).",
+      "Bilans arrivés à leur terme = synthèses remises ÷ bilans démarrés sur la période.",
+      "Abandons = bilans interrompus avant la remise de la synthèse ÷ bilans démarrés.",
+      "Satisfaction à chaud = moyenne des items du questionnaire (échelle de 1 à 5), calculée sur les questionnaires reçus.",
+      "Suivi à 6 mois = entretiens réalisés ÷ bilans clos depuis plus de six mois.",
+      "Projet confirmé à 6 mois = projets confirmés ou concrétisés ÷ suivis réalisés.",
+      "Règle de publication : effectif inférieur à 10 → publication de la valeur brute avec son volume et sa date d'arrêté, sans pourcentage.",
+      `Données arrêtées au ${fmtShortDate(arrete)}. Aucune valeur n'est saisie par anticipation.`,
+    ] });
+    put(2, "Tableaux de suivi et indicateurs de résultats", null, "xlsx", htmlToXlsxBlob(html));
   }
 
   // === 7. Pièces obligatoires BC (synthèse, émargements, veilles, plan de développement…) ===
@@ -1965,13 +2014,12 @@ export async function buildBDCNTConseilsZip(
     const collectives: Array<{ ind: number; nom: string; md: string }> = [
       { ind: 2, nom: "Process Suivi à 6 mois", md: mdProcessSuivi6Mois(bdcCtx) },
       { ind: 5, nom: "Process Définition des objectifs", md: mdProcessObjectifs() },
-      { ind: 8, nom: "Process Positionnement à l'entrée", md: mdProcessPositionnement(bdcCtx) },
+      { ind: 8, nom: "Process Test de personnalité à l'entrée", md: mdProcessTestPersonnalite(bdcCtx) },
       { ind: 9, nom: "Process Information des publics", md: mdProcessInformationPublics(bdcCtx) },
       ...(bdcCtx.prestation.modalite !== "presentiel"
         ? [{ ind: 9, nom: "Informations pratiques - prestation à distance", md: mdInformationsPratiquesDistance(bdcCtx) }]
         : []),
       { ind: 21, nom: "Fiche de compétences du consultant", md: mdFicheCompetencesConsultant(bdcCtx) },
-      { ind: 21, nom: `CV du consultant - ${(formation?.formateur || org.responsablePedagogique || org.dirigeant || "consultant").toString().trim()}`, md: mdCVConsultant(bdcCtx) },
       { ind: 24, nom: "Réseau d'acteurs socio-économiques", md: mdReseauActeurs(bdcCtx) },
     ];
     for (const p of collectives) {
@@ -1979,16 +2027,6 @@ export async function buildBDCNTConseilsZip(
       const md = sanitizeBdcMarkdown(p.md, { titre: p.nom, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
       collect(p.nom, md, null);
       put(p.ind, p.nom, null, "pdf", await toPdf(mdToHtml(md, p.nom, org, null)));
-    }
-    for (let i = 0; i < benList.length; i++) {
-      const s = benList[i];
-      const b = bdcCtx.beneficiaires[i];
-      if (!b) continue;
-      const titre = "Accusé de réception des informations";
-      advance(`${titre} — ${s.prenom} ${s.nom}`);
-      const md = sanitizeBdcMarkdown(mdAccuseReception(bdcCtx, b), { titre, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
-      collect(titre, md, s);
-      put(9, titre, s, "pdf", await toPdf(mdToHtml(md, titre, org, s)));
     }
     for (let i = 0; i < benList.length; i++) {
       const s = benList[i];
@@ -2017,32 +2055,88 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
-  // === LISEZMOI ===
+  // === 10. Pièces du dossier de référence NEXUS (test de personnalité, convocation, matrices…) ===
   {
-    const fichiers = Object.keys((zip as unknown as { files: Record<string, unknown> }).files).filter((x) => !x.endsWith("/"));
-    const nominatifs = fichiers.filter((x) => /Bénéficiaire - /.test(x)).length;
-    const v = String(org.version || "1").replace(/[^0-9]/g, "") || "1";
-    const d = parseDateFR(org.dateMaj);
-    const readme = [
-      `DOSSIER BILAN DE COMPÉTENCES — ${(org.nom || "").toUpperCase()}`,
-      "=".repeat(40),
-      "",
-      `Organisme : ${org.nom}`,
-      `SIRET : ${org.siret}    NDA : ${org.nda}`,
-      `Bénéficiaires : ${benList.length}`,
-      `Version ${v}${d ? ` · Mise à jour du ${fmtLongDate(d)}` : ""} (identique sur toutes les pièces)`,
-      "Référentiel : référentiel national qualité, décret n° 2026-728 — indicateurs non applicables au bilan de compétences : 3, 7, 13, 14, 15, 16, 20, 28, 29.",
-      "",
-      "Structure (format « MMF - BDC ») :",
-      "  - Critere_X / Indicateur_Y / Indicateur Y - Libellé.pdf : pièces collectives",
-      "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / : pièces nominatives",
-      "  - Tableaux de suivi et registres en .xlsx ; toutes les autres pièces en PDF.",
-      "  - Document de synthèse et inventaire de personnalité versés en copie anonymisée (art. L6313-4) ; l'attestation de remise est nominative.",
-      "",
-      `Fichiers du dossier : ${fichiers.length + 1}`,
-      `Dont pièces nominatives : ${nominatifs}`,
-    ].join("\n");
-    zip.file("LISEZMOI.txt", readme);
+    const arrete = new Date();
+    const md2pdf = async (md: string, titre: string, s: StagiaireInfo | null) => {
+      const clean = sanitizeBdcMarkdown(md, { titre, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
+      collect(titre, clean, s);
+      return await toPdf(mdToHtml(clean, titre, org, s));
+    };
+    const collectives: Array<{ ind: number; nom: string; md: string }> = [
+      { ind: 11, nom: "Process Évaluation de l'atteinte des objectifs", md: mdProcessEvaluationObjectifs(bdcCtx) },
+      { ind: 18, nom: "Process Coordination des intervenants", md: mdProcessCoordination(bdcCtx, org) },
+      { ind: 31, nom: "Registre des réclamations", md: mdRegistreReclamations(bdcCtx, arrete) },
+      ...fichesDePosteNexus(bdcCtx, org).map((f) => ({ ind: 21, nom: f.nom, md: f.md })),
+      ...processVeilleNexus(bdcCtx, org).map((v) => ({ ind: v.ind, nom: v.nom, md: v.md })),
+      ...[5, 11].flatMap((ind) => [
+        { ind, nom: "Matrices d'évaluation du bilan", md: mdMatrices(bdcCtx) },
+        { ind, nom: "Repères qualité et feuille de route de la synthèse", md: mdReperesSynthese(bdcCtx) },
+        { ind, nom: "Trame du document de synthèse", md: mdTrameSynthese(bdcCtx) },
+      ]),
+    ];
+    for (const p of collectives) {
+      advance(p.nom);
+      put(p.ind, p.nom, null, "pdf", await md2pdf(p.md, p.nom, null));
+    }
+    for (const ind of [5, 11]) put(ind, "Matrices d'évaluation du bilan (classeur)", null, "xlsx", htmlToXlsxBlob(htmlClasseurMatrices(bdcCtx, org)));
+    put(12, "Registre des abandons et des aléas", null, "xlsx", htmlToXlsxBlob(htmlRegistreAbandons(bdcCtx, org, arrete)));
+    // Fiche d'analyse du besoin vierge (IND 6) et livret d'accueil générique (IND 12)
+    {
+      const vierge = { civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+      const dts = computeDates(undefined, org, formation);
+      put(6, "Fiche d'analyse du besoin", null, "pdf", await genPdf(buildFicheAnalyseBesoinMd(vierge, org, dts, formation).replace(/^\| \*\*Nom et prénom\*\* \| Bénéficiaire \|$/m, "| **Nom et prénom** |  |"), "Fiche d'analyse du besoin", null));
+      const livret = BDC_TEMPLATES_MANQUANTS.find((d) => /Livret d.accueil/i.test(d.nom));
+      if (livret) {
+        const md = sanitizeBdcMarkdown(autofillDocument(livret.build(bdcCtx, null), bdcCtx, null), { titre: livret.nom, categorieAction: "BC", antiFabrication: false, raisonSociale: org.nom });
+        put(12, "Livret d'accueil du bénéficiaire", null, "pdf", await toPdf(mdToHtml(md, bdcDocTitle(livret.nom), org, null)));
+      }
+    }
+    for (let i = 0; i < benList.length; i++) {
+      const s = benList[i];
+      const b = bdcCtx.beneficiaires[i];
+      if (!b) continue;
+      advance(`Pièces nominatives NEXUS — ${s.prenom} ${s.nom}`);
+      const p = prestationFor(bdcCtx, b);
+      const finRetractation = new Date(dateConventionBC(p)); finRetractation.setDate(finRetractation.getDate() + 14);
+      put(8, "Mail test de personnalité", s, "pdf", await md2pdf(mdMailTestPersonnalite(bdcCtx, b), "Mail test de personnalité", s));
+      put(8, "Test de personnalité et restitution", s, "pdf", await md2pdf(mdTestPersonnalite(bdcCtx, b), "Test de personnalité et restitution", s));
+      const convoc = await md2pdf(mdConvocation(bdcCtx, b, finRetractation), "Convocation", s);
+      put(9, "Convocation", s, "pdf", convoc);
+      put(10, "Convocation", s, "pdf", convoc);
+      for (const kind of ["entreprise", "financeur", "interne"] as const) {
+        const q = mdQuestionnairePartie(bdcCtx, b, kind, arrete);
+        put(30, q.nom, s, "pdf", await md2pdf(q.md, q.nom, s));
+      }
+      const matrices = htmlToXlsxBlob(htmlClasseurMatrices(bdcCtx, org, b));
+      put(5, "Matrices d'évaluation renseignées (copie anonymisée)", s, "xlsx", matrices);
+      put(11, "Matrices d'évaluation renseignées (copie anonymisée)", s, "xlsx", matrices);
+    }
+  }
+
+  // === 11. Copies voulues par le dossier de référence (même pièce versée à deux indicateurs) ===
+  {
+    const fichiers = () => Object.keys((zip as unknown as { files: Record<string, { dir: boolean }> }).files).filter((x) => !x.endsWith("/"));
+    const copier = async (de: string, vers: string) => {
+      const f = zip.file(de);
+      if (!f || zip.file(vers)) return;
+      zip.file(vers, await f.async("uint8array"));
+    };
+    const ben = (s: StagiaireInfo) => `Bénéficiaire - ${s.prenom} ${s.nom}`;
+    await copier("Critere_1/Indicateur_1/Indicateur 1 - Fiche de presentation du bilan de competences.pdf", "Critere_2/Indicateur_5/Indicateur 5 - Fiche de presentation du bilan de competences.pdf");
+    const cgv = "Critere_3/Indicateur_9/Indicateur 9 - Conditions generales de vente.pdf";
+    const ri = "Critere_3/Indicateur_9/Indicateur 9 - Reglement interieur.pdf";
+    for (const s of benList) {
+      const d = ben(s);
+      await copier(cgv, `Critere_3/Indicateur_9/${d}/Indicateur 9 - Conditions generales de vente.pdf`);
+      await copier(ri, `Critere_3/Indicateur_9/${d}/Indicateur 9 - Reglement interieur.pdf`);
+      await copier(`Critere_3/Indicateur_10/${d}/Indicateur 10 - Planning previsionnel signe.pdf`, `Critere_2/Indicateur_4/${d}/Indicateur 4 - Planning previsionnel signe.pdf`);
+      await copier(`Critere_3/Indicateur_9/${d}/Indicateur 9 - Convention de prestation.pdf`, `Critere_3/Indicateur_10/${d}/Indicateur 10 - Convention de prestation.pdf`);
+      await copier(`Critere_2/Indicateur_4/${d}/Indicateur 4 - Fiche d'analyse du besoin.pdf`, `Critere_3/Indicateur_10/${d}/Indicateur 10 - Fiche d'analyse du besoin.pdf`);
+      await copier(`Critere_3/Indicateur_11/${d}/Indicateur 11 - Document de synthese (copie anonymisee).pdf`, `Critere_2/Indicateur_5/${d}/Indicateur 5 - Document de synthese (copie anonymisee).pdf`);
+    }
+    if (benList.length) { zip.remove(cgv); zip.remove(ri); }
+    void fichiers;
   }
 
   // Contrôle de cohérence : conservé pour l'outil (console), jamais versé au dossier d'audit.

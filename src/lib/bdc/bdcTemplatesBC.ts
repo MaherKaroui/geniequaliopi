@@ -331,18 +331,18 @@ const testPersonnalite: BdcDocDef = {
     // Les scores sont ceux de la passation réelle : la pièce est la grille de restitution, jamais pré-remplie.
     void seed; void metier; void secteur;
     return [
-      H("Test de personnalité"),
-      "_Outil de la phase d'investigation — passé à mi-parcours ; scores reportés depuis la passation et restitués en séance._\n",
+      H("Restitution du questionnaire d'intérêts professionnels"),
+      "_Indicateur 11 — Questionnaire d'intérêts (six familles RIASEC, matrice 06) passé en phase d'investigation ; résultats reportés depuis la passation et restitués en séance._\n",
       entete(o, b, p),
       `**${passe(datePassation) ? "Date de passation" : "Passation prévue le"}** : ${fmtDateFR(datePassation)}`,
       `**Consultant** : ${p.consultant.nom}`,
       "",
-      "| Dimension | Score / 10 | Interprétation |",
+      "| Famille d'intérêts | Résultat | Interprétation |",
       "|---|---|---|",
       ...LETTRES_RIASEC.map((l) => `| **${PROFILS_RIASEC[l].label}** (${l}) |  |  |`),
       "",
-      H2("Profil dominant et secondaire"),
-      "Profil dominant : ________________   Profil secondaire : ________________",
+      H2("Familles dominantes"),
+      "Famille dominante : ________________   Famille secondaire : ________________",
       H2("Lien avec le projet professionnel"),
       "______________________________________________",
       H2("Appréciation du consultant"),
