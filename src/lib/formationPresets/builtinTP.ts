@@ -45,8 +45,8 @@ const CONTEXTES = [
 export function getTPBesoin(intitule: string, code: string | undefined, nom: string, prenom: string, i: number): string | null {
   const p = BUILTIN_TP_PRESETS.find(x => (code && x.code_rncp === code.toUpperCase().replace(/\s/g, '')) || x.intitule_normalise === norm(intitule));
   const list = p?.data.plan?.besoins.besoinsList; if (!list?.length) return null;
-  let h = 0; for (const c of `${prenom}${nom}`) h = (h * 31 + c.charCodeAt(0)) | 0;
-  const k = (i + Math.abs(h)) % 40;
+  void nom; void prenom;
+  const k = ((i % 40) + 40) % 40;
   const b = list[k % list.length].replace(/\.$/, '');
   return `${b}, ${CONTEXTES[(Math.floor(k / list.length) * 2 + (k % 2)) % CONTEXTES.length]}.`;
 }
