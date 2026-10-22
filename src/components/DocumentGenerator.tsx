@@ -12,7 +12,8 @@ import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { resolveFormation, financeursEffectifs } from "@/lib/formationResolue";
 import { typeAuditEffectif, LIBELLES_AUDIT, type TypeAudit, type TypeAuditSaisi } from "@/lib/typeAudit";
-import { clientMailOrganisme, retrouverMail, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
+import { clientMailOrganisme, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
+import { isCaptureMailTemplate, resolveCatalogMail } from "@/lib/mails/catalogMail";
 import { captureMail } from "@/lib/mails/captureMail";
 import { preloadFranceCompetences } from "@/lib/franceCompetences";
 import { Button } from "@/components/ui/button";
@@ -308,7 +309,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
   const captureMailDoc = async (doc: DocEntry): Promise<{ blob: Blob; fileName: string; stagiaire: StagiaireInfo } | null> => {
     const s = allStagiaires[doc.params?.stagiaireIdx as number];
     if (!s) return null;
-    const r = retrouverMail(mergedOrganisme, selectedFormation, s, String(doc.params?.mailKey || ""));
+    const r = resolveCatalogMail(doc, mergedOrganisme, selectedFormation, s);
     if (!r) return null;
     const blob = await captureMail(r.mail, clientMailOrganisme(mergedOrganisme), r.precedents);
     return { blob, fileName: nomFichierCapture(r.mail), stagiaire: s };
@@ -373,7 +374,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
   const handlePreviewInner = async (doc: DocEntry) => {
 
     // Mail automatique → capture Gmail / Outlook (image)
-    if (doc.template === "mail_capture") {
+    if (isCaptureMailTemplate(doc.template)) {
       const cap = await captureMailDoc(doc);
       if (!cap) throw new Error("Mail introuvable pour ce stagiaire.");
       setPreviewContent(null);
@@ -493,7 +494,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
   };
 
   const handleDownload = async (doc: DocEntry) => {
-    if (doc.template === "mail_capture") {
+    if (isCaptureMailTemplate(doc.template)) {
       const cap = await captureMailDoc(doc);
       if (cap) saveAs(cap.blob, cap.fileName);
       return;
@@ -1039,7 +1040,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         const basePath = isBDCOrg && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
-        if (doc.template === "mail_capture") {
+        if (isCaptureMailTemplate(doc.template)) {
           await safeRun(`${doc.nom} (capture)`, async () => {
             const cap = await captureMailDoc(doc);
             if (cap) addFileToZip(`${basePath}/${buildStagiaireFolderName(cap.stagiaire)}/${cap.fileName}`, cap.blob);
@@ -1944,7 +1945,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                   try {
                     const zip = new JSZip();
                     for (const doc of mailDocs) {
-                      if (doc.template === "mail_capture") {
+                      if (isCaptureMailTemplate(doc.template)) {
                         const cap = await captureMailDoc(doc);
                         if (cap) zip.file(`${buildStagiaireFolderName(cap.stagiaire)}/${cap.fileName}`, cap.blob);
                       } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
@@ -1990,6 +1991,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                     </span>
                     <span className="flex-1 truncate">{doc.nom}</span>
                     <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>
+                    {isCaptureMailTemplate(doc.template) && <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => handlePreview(doc)}>Aperçu</Button>}
                     <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
                       DL
                     </button>

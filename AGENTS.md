@@ -1,5 +1,7 @@
 # Architecture rules
 
+- CFA mission QCM and J-1 announcement mails expose structured MailAuto builders and share the catalog mail resolver with standard mails for every capture/export path; this prevents separate Gmail shells and preserves mission scheduling.
+
 - Database-backed formation presets use exact title/code identity, a shared in-memory registry and server-owned checkpoint/lease operations; pedagogical corrections never populate learner evidence, and explicit IZILearn lessons retain priority.
 - IZILearn owns a presentation boundary for booklet supplements and document revision footers, excluding email captures, reuses the shared dossier design controls, and passes a local MAJ override into its context; session/evidence dates remain unchanged and all preview/export paths use the same resolved context.
 - Qualiopi and IZILearn reuse attendancePresentation for IND 11 tables; IZILearn prefills planned schedules (explicit slots first, Qualiopi blocks as fallback). Past days without recorded evidence auto-fill like Qualiopi ("Signé X.Nom" or reusable signature, buildRealisticConnectionDay times, "Présent(e)"); future days stay blank; recorded slot signatures and connection logs always win; connection signatures stay below tables.

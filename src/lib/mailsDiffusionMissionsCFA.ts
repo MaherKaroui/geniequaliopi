@@ -1,8 +1,6 @@
-// Mails d'envoi / d'annonce de DIFFUSION d'une mission CFA
-// Envoyé la veille (J-1) de la semaine école dédiée à la mission.
-// Style Gmail-like, cohérent avec mailsMissionsCFA.ts
 import { lundiMission, dateQCMMission } from "@/lib/calendrierMissionsCFA";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { mailHtmlSimple, type MailAuto } from "@/lib/mails/mailsAutomatiques";
 
 const MISSIONS_DIFFUSION: { num: number; titre: string; supports: string }[] = [
   { num: 1,  titre: "Orientation, réorientation & Handicap",          supports: "Affiche A3 Mission 1 + Livret référent handicap" },
@@ -21,31 +19,10 @@ const MISSIONS_DIFFUSION: { num: number; titre: string; supports: string }[] = [
   { num: 14, titre: "Accès aux aides des apprentis",                  supports: "Affiche A3 Mission 14 + Procédure accès aux aides" },
 ];
 
-function parseDateSafe(s?: string): Date | null {
-  if (!s) return null;
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d;
-}
-function startOfISOWeek(d: Date): Date {
-  const dt = new Date(d);
-  const day = (dt.getDay() + 6) % 7;
-  dt.setDate(dt.getDate() - day);
-  dt.setHours(0, 0, 0, 0);
-  return dt;
-}
-function addDays(d: Date, n: number): Date { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-function fmtLong(d: Date): string {
-  return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-}
-function fmtShort(d: Date): string {
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
-function fmtTime(d: Date): string {
-  return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-}
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const esc = (s: string) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const long = (d: Date) => d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const short = (d: Date) => d.toLocaleDateString("fr-FR");
 
 /** Lundi de la semaine école où la mission est diffusée (rythme saisi, borné au contrat de l'apprenti). */
 export function dateDiffusionMission(f: FormationInfo, missionNumero: number, s?: StagiaireInfo): Date {
@@ -61,116 +38,26 @@ export function dateMailDiffusionMission(f: FormationInfo, missionNumero: number
   return veille;
 }
 
-function renderPieceJointe(missionNumero: number, missionTitre: string): string {
-  const cleanTitre = missionTitre.replace(/[^a-zA-Z0-9]+/g, "_").substring(0, 40);
-  const fileName = `Affiche_A3_Mission_${String(missionNumero).padStart(2, "0")}_${cleanTitre}.pdf`;
-  return `
-    <div style="margin:20px 0 8px;font-size:13px;color:#5f6368;">1 pièce jointe</div>
-    <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;border:1px solid #dadce0;border-radius:4px;background:#fff;width:260px;max-width:100%;page-break-inside:avoid;break-inside:avoid;">
-      <tr>
-        <td style="width:46px;padding:10px 0 10px 12px;vertical-align:middle;">
-          <div style="width:30px;height:36px;background:#d93025;color:#fff;font-size:9px;font-weight:700;text-align:center;line-height:36px;border-radius:2px;">PDF</div>
-        </td>
-        <td style="padding:8px 12px 8px 8px;vertical-align:middle;font-size:12px;line-height:1.3;">
-          <div style="color:#202124;word-break:break-word;">${escapeHtml(fileName)}</div>
-          <div style="color:#5f6368;font-size:11px;margin-top:2px;">PDF · ~220 Ko</div>
-        </td>
-      </tr>
-    </table>
-  `;
+export function mailDiffusionMissionCFA(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, n: number): MailAuto | null {
+  const mission = MISSIONS_DIFFUSION.find(m => m.num === n);
+  if (!mission) return null;
+  const date = dateMailDiffusionMission(f, n, s);
+  const diffusion = dateDiffusionMission(f, n, s);
+  const fin = dateQCMMission(f, n, s);
+  const civilite = s.civilite === "Mme" ? "Madame " : s.civilite === "M." ? "Monsieur " : "";
+  const name = `Affiche_A3_Mission_${String(n).padStart(2, "0")}_${mission.titre.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").slice(0, 40)}.pdf`;
+  const body = `<p>Bonjour ${esc(civilite)}${esc(s.nom)},</p>
+<p>Je vous informe que le CFA <strong>${esc(o.nom)}</strong> lancera dès demain, ${long(diffusion)}, la diffusion de la <strong>Mission ${n} – ${esc(mission.titre)}</strong>, dans le cadre des 14 missions du CFA (article L.6231-2 du Code du travail).</p>
+<p>Cette diffusion s'inscrit dans la <strong>période au CFA consacrée à la mission n°${n}/14</strong> de votre formation <strong>${esc(f.intitule)}</strong> et se tiendra du ${short(diffusion)} au ${short(fin)}.</p>
+<p>Les supports diffusés seront : ${esc(mission.supports)}. Ils seront mis à disposition par affichage en salle commune, dépôt sur l'ENT / LMS et envoi par mail. Vous trouverez ci-joint le visuel A3 qui sera affiché dès demain matin dans le centre.</p>
+<p>Je reste à votre disposition pour toute question ou besoin d'accompagnement complémentaire.</p><p>Cordialement,</p>
+<p><strong>${esc(o.dirigeant || o.nom)}</strong><br>${esc(o.nom)}${o.email ? `<br>${esc(o.email)}` : ""}${o.telephone ? `<br>${esc(o.telephone)}` : ""}</p>`;
+  return { key: `cfa_diffusion_mission_${n}`, titre: `Annonce diffusion J-1 – Mission ${n} ${mission.titre}`, subject: `Diffusion Mission ${n} – ${mission.titre}`, date,
+    messages: [{ fromName: o.nom, fromEmail: o.email || "", toName: `${s.prenom} ${s.nom}`.trim(), toEmail: s.email || "", date, body, atts: [{ name, size: "" }] }] };
 }
 
-export function genMailDiffusionMissionCFA(
-  o: OrganismeInfo,
-  f: FormationInfo,
-  stagiaires: StagiaireInfo[],
-  stagiaireIdx: number,
-  missionNumero: number,
-): string {
+export function genMailDiffusionMissionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, missionNumero: number): string {
   const s = stagiaires[stagiaireIdx];
-  if (!s) return "<p>Stagiaire introuvable.</p>";
-  const mission = MISSIONS_DIFFUSION.find((m) => m.num === missionNumero);
-  if (!mission) return "<p>Mission introuvable.</p>";
-
-  const dEnvoi = dateMailDiffusionMission(f, missionNumero, s);
-  const dDiffusion = dateDiffusionMission(f, missionNumero, s);
-  const finSemaine = dateQCMMission(f, missionNumero, s);
-
-  const dateCourt = dEnvoi.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  const heure = fmtTime(dEnvoi);
-
-  const fromName = o.nom || "Centre de Formation";
-  const fromEmail = o.email || `contact@${(o.nom || "cfa").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`;
-  const toEmail = s.email || `${(s.prenom || "").toLowerCase()}.${(s.nom || "").toLowerCase()}@email.fr`;
-  const civilite = s.civilite === "Mme" ? "Madame" : "Monsieur";
-
-  const sujet = `Diffusion Mission ${missionNumero} – ${mission.titre}`;
-  const pjHtml = renderPieceJointe(missionNumero, mission.titre);
-
-  const threadId = `r${(missionNumero * 8284624083642395367).toString().slice(0, 19)}`;
-  const msgId = `r${(missionNumero * 712068502500123).toString().slice(0, 15)}`;
-  const gmailLink = `https://mail.google.com/mail/u/0/?ik=fe5f9da148&amp;view=pt&amp;search=all&amp;permthid=thread-a:${threadId}&amp;simpl=msg-a:${msgId}…`;
-
-  return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title>
-<style>
-  body{margin:0;padding:0;background:#ffffff;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;color:#000;}
-  .mail-shell{width:760px;max-width:760px;margin:0 auto;background:#ffffff;padding:24px 28px 32px;box-sizing:border-box;font-size:13px;line-height:1.5;}
-  .gmail-top{font-size:11px;color:#5f6368;margin-bottom:18px;}
-  .gmail-top .m{color:#d93025;font-weight:700;}
-  .subject{font-size:16px;font-weight:400;color:#000;margin:0 0 18px;}
-  .from-row{width:100%;border-collapse:collapse;margin-bottom:14px;}
-  .from-row td{vertical-align:top;font-size:12px;}
-  .from-row .from{color:#000;}
-  .from-row .date{text-align:right;color:#000;white-space:nowrap;}
-  .to-row{font-size:12px;color:#000;margin-bottom:18px;}
-  .body p{margin:0 0 12px;font-size:13px;line-height:1.55;}
-  .footer-link{font-size:10px;color:#5f6368;margin-top:28px;word-break:break-all;}
-  .page-num{font-size:10px;color:#5f6368;text-align:right;margin-top:4px;}
-  .pj-section{margin-top:24px;border-top:1px solid #e0e0e0;padding-top:14px;}
-  .keep{page-break-inside:avoid;break-inside:avoid;}
-  @media print{.mail-shell{width:100%;max-width:100%;padding:16px 20px;}}
-</style></head>
-<body>
-<div class="mail-shell">
-
-  <div class="gmail-top"><span class="m">M</span> Gmail - ${escapeHtml(sujet)}</div>
-
-  <div class="subject">${escapeHtml(sujet)}</div>
-
-  <table class="from-row" role="presentation" cellspacing="0" cellpadding="0">
-    <tr>
-      <td class="from"><strong>${escapeHtml(fromName)}</strong> &lt;${escapeHtml(fromEmail)}&gt;</td>
-      <td class="date">${escapeHtml(dateCourt)} à ${escapeHtml(heure)}</td>
-    </tr>
-  </table>
-  <div class="to-row">À : ${escapeHtml(toEmail)}</div>
-
-  <div class="body keep">
-    <p>Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
-
-    <p>Je vous informe que le CFA <strong>${escapeHtml(o.nom || "")}</strong> lancera dès demain, ${escapeHtml(fmtLong(dDiffusion))}, la diffusion officielle de la <strong>Mission ${missionNumero} – ${escapeHtml(mission.titre)}</strong>, dans le cadre des 14 missions du CFA (article L.6231-2 du Code du Travail).</p>
-
-    <p>Cette diffusion s'inscrit dans la <strong>période au CFA consacrée à la mission n°${missionNumero}/14</strong> de votre formation <strong>${escapeHtml(f.intitule || "")}</strong> et se tiendra du ${escapeHtml(fmtShort(dDiffusion))} au ${escapeHtml(fmtShort(finSemaine))}.</p>
-
-    <p>Les supports diffusés seront : ${escapeHtml(mission.supports)}. Ils seront mis à disposition par affichage en salle commune, dépôt sur l'ENT / LMS et envoi par mail. Vous trouverez ci-joint le visuel A3 qui sera affiché dès demain matin dans le centre.</p>
-
-    <p>Je reste à votre disposition pour toute question ou besoin d'accompagnement complémentaire.</p>
-
-    <p>Cordialement,</p>
-
-    <p><strong>${escapeHtml(o.dirigeant || o.nom || "L'équipe pédagogique")}</strong><br>
-    ${escapeHtml(o.nom || "")}<br>
-    ${escapeHtml(o.email || "")}${o.telephone ? `<br>${escapeHtml(o.telephone)}` : ""}</p>
-  </div>
-
-  <div class="footer-link">${gmailLink}</div>
-  <div class="page-num">1/1</div>
-
-  <div class="pj-section keep">
-    ${pjHtml}
-  </div>
-
-</div>
-</body></html>`;
+  const mail = s ? mailDiffusionMissionCFA(o, f, s, missionNumero) : null;
+  return mail ? mailHtmlSimple(mail) : "";
 }
