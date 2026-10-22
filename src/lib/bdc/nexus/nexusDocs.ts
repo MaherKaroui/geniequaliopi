@@ -33,7 +33,7 @@ const COPIES: Array<{ de: string; vers: string; ind?: string; vierge?: boolean }
   { de: "Critere_2/Indicateur_4/BEN/Indicateur 4 - Planning previsionnel signe", vers: "Critere_3/Indicateur_10/BEN/Indicateur 10 - Planning previsionnel signe" },
   { de: "Critere_3/Indicateur_9/BEN/Indicateur 9 - Convention de prestation", vers: "Critere_3/Indicateur_10/BEN/Indicateur 10 - Convention de prestation" },
   { de: "Critere_3/Indicateur_9/BEN/Indicateur 9 - Convocation", vers: "Critere_3/Indicateur_10/BEN/Indicateur 10 - Convocation" },
-  { de: "Critere_2/Indicateur_5/BEN/Indicateur 5 - Document de synthese (copie anonymisee)", vers: "Critere_3/Indicateur_11/BEN/Indicateur 11 - Document de synthese (copie anonymisee)" },
+  { de: "Critere_2/Indicateur_5/BEN/Indicateur 5 - Document de synthese", vers: "Critere_3/Indicateur_11/BEN/Indicateur 11 - Document de synthese" },
   { de: "Critere_3/Indicateur_9/BEN/Indicateur 9 - Livret d'accueil du beneficiaire", vers: "Critere_3/Indicateur_12/Indicateur 12 - Livret d'accueil du beneficiaire" },
   { de: "Critere_1/Indicateur_1/Indicateur 1 - Fiche de presentation du bilan de competences", vers: "Critere_2/Indicateur_5/Indicateur 5 - Fiche de presentation du bilan de competences" },
   { de: "Critere_2/Indicateur_5/Indicateur 5 - Matrices d'evaluation du bilan", vers: "Critere_3/Indicateur_11/Indicateur 11 - Matrices d'evaluation du bilan", ind: "11" },
@@ -128,7 +128,7 @@ ______________________________________________
 /**
  * Appose les signatures dans les cellules « … Signé le jj/mm/aaaa » déjà échues : tampon de
  * l'organisme (ou, à défaut, signature du dirigeant) pour l'organisme, signature du consultant,
- * signature du bénéficiaire. Une pièce anonymisée ou datée dans le futur n'est jamais signée.
+ * signature du bénéficiaire. Une pièce datée dans le futur n'est jamais signée.
  */
 function signer(md: string, org: OrganismeInfo, f: FormationInfo, b: BenNexus, v: Vars, arrete: Date): string {
   const img = (url: string | undefined, alt: string) => (url ? ` ⏎ ![${alt}](${url})` : "");
@@ -235,7 +235,7 @@ export function planNexus(
       let md = s.md ? s.md(ctx, s.ben, v) : remplir(templates[s.gabarit!], v, bl);
       const restes = md.match(/\{\{[^}]+\}\}/g);
       if (restes) console.warn("[BDC NEXUS] variables non résolues", s.chemin, [...new Set(restes)]);
-      if (!/copie anonymis/i.test(s.chemin) && s.surcharges?.BEN !== "") md = signer(md, org, formation, s.ben, v, arrete);
+      if (s.surcharges?.BEN !== "") md = signer(md, org, formation, s.ben, v, arrete);
       return avecPiedUnique(rendreHtml(md, org), org);
     },
   }));
@@ -248,7 +248,7 @@ export function planNexus(
     const crit = ind === 5 ? 2 : 3;
     xlsx(`Critere_${crit}/Indicateur_${ind}/Indicateur ${ind} - Matrices d'evaluation du bilan (classeur).xlsx`, () => htmlClasseurMatrices(bdcCtx(), org));
     bens.forEach((b, i) => {
-      const cle = `Critere_${crit}/Indicateur_${ind}/${BEN}/Indicateur ${ind} - Matrices d'evaluation renseignees (copie anonymisee).xlsx`;
+      const cle = `Critere_${crit}/Indicateur_${ind}/${BEN}/Indicateur ${ind} - Matrices d'evaluation renseignees.xlsx`;
       xlsx(cle.replace(`/${BEN}/`, `/${dossierBen(b)}/`), () => htmlClasseurMatrices(bdcCtx(), org, bdcCtx().beneficiaires[i]), i, cle);
     });
   }

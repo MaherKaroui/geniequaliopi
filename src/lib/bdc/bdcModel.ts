@@ -131,6 +131,8 @@ const FINANCEURS_SOUS_QUALIOPI = /cpf|compte formation|opco|france travail|p[ôo
 /** Financeur effectif d'un bénéficiaire : le financement public n'est retenu que si l'OF est certifié BC. */
 export function financeurEffectifBC(s: StagiaireInfo, org: Partial<OrganismeInfo> | undefined, f?: FormationInfo): string {
   const saisi = `${s.financeur || ""}`.trim();
+  // Sans entreprise renseignée, aucun employeur ne peut financer ni être partie à la convention.
+  if (!`${s.entreprise || ""}`.trim() && /entreprise|employeur|plan|opco/i.test(saisi)) return "Personnel";
   const debut = parseDateAny(s.dateDebutFormation) || parseDateAny(f?.dateDebut);
   if (bcCertifieAu(org, debut)) return saisi;
   if (!saisi || FINANCEURS_SOUS_QUALIOPI.test(saisi)) return "Personnel";

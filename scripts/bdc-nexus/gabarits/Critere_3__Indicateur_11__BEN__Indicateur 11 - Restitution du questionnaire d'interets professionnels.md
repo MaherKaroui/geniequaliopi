@@ -1,12 +1,12 @@
 **RESTITUTION DU QUESTIONNAIRE D'INTÉRÊTS PROFESSIONNELS**
 
-Indicateur 11 — Outil de la phase d'investigation — {{#SI MI_PASSE}}passé et restitué{{#SINON}}passation et restitution prévues{{/SI}} le {{S_MI}} (séance {{S_MI_NUM}}) — copie anonymisée
+Indicateur 11 — Outil de la phase d'investigation — {{#SI MI_PASSE}}passé et restitué{{#SINON}}passation et restitution prévues{{/SI}} le {{S_MI}} (séance {{S_MI_NUM}})
 
 | Organisme | {{ORG}} — SIRET {{SIRET}} — NDA {{NDA}} |
 |---|---|
 | Adresse | {{ORG_ADRESSE_COMPLETE}} |
 | Consultant référent | {{CONSULTANT}} — Consultant en bilan de compétences |
-| Bénéficiaire | {{BEN_INITIALES}} — copie anonymisée |
+| Bénéficiaire | {{BEN}}{{BEN_NAISS_TIRET}} |
 | Période de la prestation | du {{S1}} au {{D_FIN}} |
 | Durée | {{DUREE}} heures d'accompagnement individuel avec le consultant, réparties sur {{NB_SEANCES}} séances. Le travail personnel guidé réalisé entre les séances n'est ni décompté de ces {{DUREE}} heures ni facturé. |
 | Modalité | {{MODALITE_LIB}} |

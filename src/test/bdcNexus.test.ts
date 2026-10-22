@@ -76,10 +76,10 @@ describe("dossier BDC au format NEXUS", () => {
     const emarg = t["Critere_3/Indicateur_11/Bénéficiaire - Louis VINCENT/Indicateur 11 - Feuilles d'emargement par seance.pdf"];
     expect(emarg.match(/Séance n° \d+ sur 8/g)).toHaveLength(8);
     expect(t["Critere_7/Indicateur_30/Bénéficiaire - Louis VINCENT/Indicateur 30 - Questionnaire de satisfaction entreprise.pdf"]).toMatch(/Non applicable/);
-    // Copie anonymisée : ni nom ni signature du bénéficiaire
-    const synth = t["Critere_2/Indicateur_5/Bénéficiaire - Louis VINCENT/Indicateur 5 - Document de synthese (copie anonymisee).pdf"];
-    expect(synth).not.toMatch(/VINCENT/);
-    expect(synth).toMatch(/L\. V\./);
+    // Synthèse nominative : nom complet du bénéficiaire, plus de mention « copie anonymisée »
+    const synth = t["Critere_2/Indicateur_5/Bénéficiaire - Louis VINCENT/Indicateur 5 - Document de synthese.pdf"];
+    expect(synth).toMatch(/Louis VINCENT/);
+    expect(synth).not.toMatch(/anonymis/i);
   }, 600_000);
 
   it("adapte la convention au financement (CPF certifié, employeur, OPCO) et à une durée de 12 h", async () => {
@@ -102,7 +102,7 @@ describe("dossier BDC au format NEXUS", () => {
     expect(conv("Louis VINCENT")).toMatch(/12 heures d'accompagnement individuel/);
     // Bilan futur : synthèse et certificat non émis par anticipation, émargement non coché
     const futur = "Paul MARTIN";
-    expect(t[`Critere_2/Indicateur_5/Bénéficiaire - ${futur}/Indicateur 5 - Document de synthese (copie anonymisee).pdf`]).toMatch(/Bilan en cours/);
+    expect(t[`Critere_2/Indicateur_5/Bénéficiaire - ${futur}/Indicateur 5 - Document de synthese.pdf`]).toMatch(/Bilan en cours/);
     expect(t[`Critere_3/Indicateur_9/Bénéficiaire - ${futur}/Indicateur 9 - Certificat de realisation.pdf`]).toMatch(/n'est pas émis par anticipation/);
     expect(t[`Critere_3/Indicateur_11/Bénéficiaire - ${futur}/Indicateur 11 - Feuilles d'emargement par seance.pdf`]).not.toMatch(/☒ Présent/);
     expect(t[`Critere_7/Indicateur_30/Bénéficiaire - Anne DUPONT/Indicateur 30 - Questionnaire de satisfaction entreprise.pdf`]).toMatch(/Destinataire Alpha SAS/);
@@ -118,9 +118,9 @@ describe("pièces nominatives renseignées", () => {
       "Critere_2/Indicateur_4|Indicateur 4 - Fiche prealable au bilan de competences",
       "Critere_2/Indicateur_5|Indicateur 5 - Outil preparatoire",
       "Critere_2/Indicateur_8|Indicateur 8 - Test de personnalite et restitution",
-      "Critere_3/Indicateur_11|Indicateur 11 - Restitution du questionnaire d'interets professionnels (copie anonymisee)",
+      "Critere_3/Indicateur_11|Indicateur 11 - Restitution du questionnaire d'interets professionnels",
       "Critere_3/Indicateur_10|Indicateur 10 - Entretien intermediaire",
-      "Critere_2/Indicateur_5|Indicateur 5 - Document de synthese (copie anonymisee)",
+      "Critere_2/Indicateur_5|Indicateur 5 - Document de synthese",
       "Critere_7/Indicateur_30|Indicateur 30 - Questionnaire de satisfaction a chaud",
     ];
     for (const p of pieces) {
@@ -137,7 +137,7 @@ describe("pièces nominatives renseignées", () => {
   it("adapte le contenu au métier visé par la formation", async () => {
     const f = { ...MANAGER, intitule: "Bilan de compétences – Reconversion vers le métier d'esthéticienne" };
     const t = await textes(await buildBDCNexusZip(NEXUS, f, [LOUIS]));
-    const synth = t["Critere_2/Indicateur_5/Bénéficiaire - Louis VINCENT/Indicateur 5 - Document de synthese (copie anonymisee).pdf"];
+    const synth = t["Critere_2/Indicateur_5/Bénéficiaire - Louis VINCENT/Indicateur 5 - Document de synthese.pdf"];
     expect(synth).toMatch(/métier d'esthéticienne/);
     expect(synth).not.toMatch(/manager de proximité/i);
   }, 600_000);
@@ -153,4 +153,30 @@ describe("pièces nominatives renseignées", () => {
     expect(html).toMatch(/Identifier mes compétences transférables|Vérifier si je suis prêt|Clarifier mon projet/);
     expect(getFullCatalog(NEXUS, MANAGER, [LOUIS]).some((d) => /Auto-diagnostic/i.test(d.nom))).toBe(false);
   });
+});
+
+describe("financement sans entreprise", () => {
+  it("un financement employeur ou OPCO sans entreprise renseignée devient un financement personnel", async () => {
+    const certifie = { ...NEXUS, certifications: "Actions de formation, Bilans de compétences" };
+    const bens: StagiaireInfo[] = [{ ...LOUIS, financeur: "Entreprise", entreprise: "" }, { ...LOUIS, nom: "DURAND", prenom: "Léa", financeur: "OPCO", entreprise: "" }];
+    const t = await textes(await buildBDCNexusZip(certifie, MANAGER, bens));
+    for (const p of ["Louis VINCENT", "Léa DURAND"]) {
+      const conv = t[`Critere_3/Indicateur_9/Bénéficiaire - ${p}/Indicateur 9 - Convention de prestation.pdf`];
+      expect(conv, p).toMatch(/CONVENTION DE RÉALISATION/);
+      expect(conv, p).not.toMatch(/CONVENTION TRIPARTITE/);
+    }
+  }, 600_000);
+});
+
+describe("financement sans entreprise", () => {
+  it("un financement employeur ou OPCO sans entreprise renseignée devient un financement personnel", async () => {
+    const certifie = { ...NEXUS, certifications: "Actions de formation, Bilans de compétences" };
+    const bens: StagiaireInfo[] = [{ ...LOUIS, financeur: "Entreprise", entreprise: "" }, { ...LOUIS, nom: "DURAND", prenom: "Léa", financeur: "OPCO", entreprise: "" }];
+    const t = await textes(await buildBDCNexusZip(certifie, MANAGER, bens));
+    for (const p of ["Louis VINCENT", "Léa DURAND"]) {
+      const conv = t[`Critere_3/Indicateur_9/Bénéficiaire - ${p}/Indicateur 9 - Convention de prestation.pdf`];
+      expect(conv, p).toMatch(/CONVENTION DE RÉALISATION/);
+      expect(conv, p).not.toMatch(/CONVENTION TRIPARTITE/);
+    }
+  }, 600_000);
 });

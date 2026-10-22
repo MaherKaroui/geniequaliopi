@@ -14,7 +14,7 @@ Indicateur 11 — Article L6313-4 du Code du travail — remise du {{D_FIN}}
 
 {{#SI TERMINE}}Je soussigné(e) {{BEN}} reconnais avoir reçu le {{D_FIN}}, à l'issue de la séance {{NB_SEANCES}} de mon bilan de compétences, le document de synthèse et les résultats détaillés de mon bilan, dont je suis le seul destinataire (art. L6313-4 du Code du travail).{{#SINON}}Bilan en cours au {{D_ARRETE}} : la remise du document de synthèse est prévue le {{D_FIN}}, à l'issue de la séance {{NB_SEANCES}}. La présente attestation sera signée à cette date par le bénéficiaire, seul destinataire du document (art. L6313-4 du Code du travail).{{/SI}}
 
-Le document de synthèse est ma propriété exclusive. Seule une copie anonymisée est versée au dossier qualité de l'organisme ; aucun exemplaire nominatif n'est communiqué à un tiers sans mon accord écrit.
+Le document de synthèse est ma propriété exclusive. Une copie est versée au dossier qualité de l'organisme, tenu confidentiel ; aucun exemplaire n'est communiqué à un tiers sans mon accord écrit.
 
 | Mode de remise | Remise à distance, la séance se tenant en visioconférence |
 |---|---|

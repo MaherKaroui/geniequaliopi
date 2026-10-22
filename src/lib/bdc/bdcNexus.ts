@@ -665,7 +665,7 @@ export function htmlClasseurMatrices(ctx: BdcContext, org: OrganismeInfo, b?: Be
   const sheets: Array<{ name: string; rows: string }> = [];
   sheets.push({ name: "Synthèse", rows: [
     tr([tete]), tr(["Synthèse croisée"]),
-    ...(b ? [tr(["Bénéficiaire", `Copie anonymisée — ${b.prenom.charAt(0)}. ${b.nom.charAt(0)}.`]), tr(["Période", `du ${fmtDateFR(p!.dateDebut)} au ${fmtDateFR(p!.dateFin)}`])] : [tr([""])]),
+    ...(b ? [tr(["Bénéficiaire", `${b.prenom} ${b.nom}`]), tr(["Période", `du ${fmtDateFR(p!.dateDebut)} au ${fmtDateFR(p!.dateFin)}`])] : [tr([""])]),
     tr(["Matrice", "Constat retenu", "Preuve ou expérience", "Nuance / contradiction", "Conséquence / action"], true),
     ...MATRICES.map((m) => tr([`${m.code} ${m.titre}`, "", "", "", ""])),
     tr(["Projet ou piste retenue", ""]), tr(["Raisons du choix", ""]), tr(["Première action, responsable et échéance", ""]), tr(["Question à reprendre au suivi", ""]),
@@ -685,7 +685,7 @@ export function htmlClasseurMatrices(ctx: BdcContext, org: OrganismeInfo, b?: Be
   }
   sheets.push({ name: "Guide", rows: [
     tr([tete]), tr(["Guide d'utilisation"]),
-    tr(["Bénéficiaire", b ? `Copie anonymisée — ${b.prenom.charAt(0)}. ${b.nom.charAt(0)}.` : ""]), tr(["Consultant", consultantNom(ctx)]), tr(["Date de travail", ""]),
+    tr(["Bénéficiaire", b ? `${b.prenom} ${b.nom}` : ""]), tr(["Consultant", consultantNom(ctx)]), tr(["Date de travail", ""]),
     ...GUIDE_GENERAL.map(([a, c]) => tr([a, c])),
     tr(["Matrice", "Utilisation et point d'attention"], true),
     ...MATRICES.map((m) => tr([`${m.code} ${m.titre}`, m.guide])),

@@ -1,12 +1,12 @@
 **DOCUMENT DE SYNTHÈSE DU BILAN DE COMPÉTENCES**
 
-Indicateur 11 — Article R6313-4, 3° du Code du travail — {{#SI TERMINE}}remis le {{D_FIN}}{{#SINON}}remise prévue le {{D_FIN}}{{/SI}} — copie anonymisée versée au dossier qualité
+Indicateur 11 — Article R6313-4, 3° du Code du travail — {{#SI TERMINE}}remis le {{D_FIN}}{{#SINON}}remise prévue le {{D_FIN}}{{/SI}} — copie versée au dossier qualité
 
-{{#SI TERMINE}}Copie anonymisée. L'original nominatif est remis au seul bénéficiaire (art. L6313-4 du Code du travail) ; sa remise est attestée par la pièce « Attestation de remise du document de synthèse ». Les parties 02 à 08 sont rédigées avec le bénéficiaire lors de la phase de conclusion, selon la trame du document de synthèse.{{#SINON}}Bilan en cours au {{D_ARRETE}} : la synthèse est rédigée avec le bénéficiaire en phase de conclusion et lui sera remise le {{D_FIN}}. Seul le cadre de la prestation est renseigné ; aucun contenu n'est rédigé par anticipation.{{/SI}}
+{{#SI TERMINE}}Copie versée au dossier qualité. L'original est remis au bénéficiaire (art. L6313-4 du Code du travail) ; sa remise est attestée par la pièce « Attestation de remise du document de synthèse ». Les parties 02 à 08 sont rédigées avec le bénéficiaire lors de la phase de conclusion, selon la trame du document de synthèse.{{#SINON}}Bilan en cours au {{D_ARRETE}} : la synthèse est rédigée avec le bénéficiaire en phase de conclusion et lui sera remise le {{D_FIN}}. Seul le cadre de la prestation est renseigné ; aucun contenu n'est rédigé par anticipation.{{/SI}}
 
 **01 — Cadre et demande**
 
-| Bénéficiaire | {{BEN_INITIALES}} — copie anonymisée |
+| Bénéficiaire | {{BEN}}{{BEN_NAISS_TIRET}} |
 |---|---|
 | Consultant | {{CONSULTANT}} — Consultant en bilan de compétences |
 | Organisme prestataire | {{ORG}} — SIRET {{SIRET}} — NDA {{NDA}} |
@@ -129,5 +129,5 @@ Le document de synthèse est la **seule et exclusive propriété du bénéficiai
 
 Fait à {{ORG_VILLE}}, en deux exemplaires originaux.
 
-| Le bénéficiaire ⏎ {{BEN_INITIALES}} ⏎ Bénéficiaire du bilan de compétences ⏎ Signé le {{D_FIN}} | Le consultant ⏎ {{CONSULTANT}} ⏎ Consultant en bilan de compétences ⏎ Signé le {{D_FIN}} |
+| Le bénéficiaire ⏎ {{BEN}} ⏎ Bénéficiaire du bilan de compétences ⏎ Signé le {{D_FIN}} | Le consultant ⏎ {{CONSULTANT}} ⏎ Consultant en bilan de compétences ⏎ Signé le {{D_FIN}} |
 |---|---|

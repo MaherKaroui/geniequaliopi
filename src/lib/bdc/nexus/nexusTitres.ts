@@ -4,13 +4,13 @@
  */
 const ACCENTS: Array<[RegExp, string]> = [
   [/\bdeveloppement\b/g, "développement"], [/\bcompetences\b/g, "compétences"], [/\bprealable\b/g, "préalable"],
-  [/\bbeneficiaires?\b/g, "bénéficiaire"], [/\bsynthese\b/g, "synthèse"], [/\banonymisee\b/g, "anonymisée"],
+  [/\bbeneficiaires\b/g, "bénéficiaires"], [/\bbeneficiaire\b/g, "bénéficiaire"], [/\bsynthese\b/g, "synthèse"],
   [/\brealisation\b/g, "réalisation"], [/\breglementaire\b/g, "réglementaire"], [/\bpedagogique\b/g, "pédagogique"],
   [/\bemargement\b/g, "émargement"], [/\bseance\b/g, "séance"], [/\binterets\b/g, "intérêts"],
   [/\bpreparatoire\b/g, "préparatoire"], [/\bpersonnalite\b/g, "personnalité"], [/\bintermediaire\b/g, "intermédiaire"],
   [/\bReperes\b/g, "Repères"], [/\bqualite\b/g, "qualité"], [/\bevaluation\b/g, "évaluation"], [/\bEvaluation\b/g, "Évaluation"],
   [/\bprevisionnel signe\b/g, "prévisionnel signé"], [/\baleas\b/g, "aléas"], [/\bamelioration\b/g, "amélioration"],
-  [/\breclamations?\b/g, "réclamation"], [/\bmediation\b/g, "médiation"], [/\bProcedure\b/g, "Procédure"],
+  [/\breclamations\b/g, "réclamations"], [/\breclamation\b/g, "réclamation"], [/\bmediation\b/g, "médiation"], [/\bProcedure\b/g, "Procédure"],
   [/\ba chaud\b/g, "à chaud"], [/\ba froid\b/g, "à froid"], [/\ba disposition\b/g, "à disposition"], [/\ba l'accompagnement\b/g, "à l'accompagnement"],
   [/\bpresentation\b/g, "présentation"], [/\bgenerales\b/g, "générales"], [/\binterieur\b/g, "intérieur"], [/\bdebut\b/g, "début"],
   [/\bspecifiques\b/g, "spécifiques"], [/\bdeontologiques\b/g, "déontologiques"], [/\bperipheriques\b/g, "périphériques"],
