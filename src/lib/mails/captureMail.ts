@@ -34,8 +34,14 @@ export async function captureMail(m: MailAuto, client: ClientMail, precedents: M
   const iframe = await chargerIframe(client);
   try {
     const w = iframe.contentWindow as any;
-    const doc = iframe.contentDocument!;
+    const doc = iframe.contentDocument;
+    if (!doc) throw new Error("Modèle de mail inaccessible");
     w.__prefill(payloadCapture(m, client, precedents));
+    // Ctrl+E masque la barre Gmail. Ne pas basculer si __prefill l'a déjà masquée.
+    if (client === "gmail" && !doc.getElementById("bar")?.classList.contains("hidden")) {
+      doc.dispatchEvent(new w.KeyboardEvent("keydown", { key: "e", code: "KeyE", ctrlKey: true, bubbles: true, cancelable: true }));
+      doc.getElementById("bar")?.classList.add("hidden");
+    }
     try { await (doc as any).fonts?.ready; } catch { /* sans objet */ }
     await pause(250);
     // Hauteur : toute la conversation doit être visible.
