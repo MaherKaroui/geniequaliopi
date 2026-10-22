@@ -37,10 +37,15 @@ export async function captureMail(m: MailAuto, client: ClientMail, precedents: M
     const doc = iframe.contentDocument;
     if (!doc) throw new Error("Modèle de mail inaccessible");
     w.__prefill(payloadCapture(m, client, precedents));
-    // Ctrl+E masque la barre Gmail. Ne pas basculer si __prefill l'a déjà masquée.
-    if (client === "gmail" && !doc.getElementById("bar")?.classList.contains("hidden")) {
-      doc.dispatchEvent(new w.KeyboardEvent("keydown", { key: "e", code: "KeyE", ctrlKey: true, bubbles: true, cancelable: true }));
-      doc.getElementById("bar")?.classList.add("hidden");
+    // Ctrl+E reste idempotent ; une translation CSS ne suffit pas à exclure
+    // la barre d'un rendu pleine hauteur. Retirer l'éditeur de l'iframe jetable.
+    if (client === "gmail") {
+      const bar = doc.getElementById("bar");
+      if (bar && !bar.classList.contains("hidden")) {
+        doc.dispatchEvent(new w.KeyboardEvent("keydown", { key: "e", code: "KeyE", ctrlKey: true, bubbles: true, cancelable: true }));
+      }
+      bar?.classList.add("hidden");
+      bar?.remove();
     }
     try { await (doc as any).fonts?.ready; } catch { /* sans objet */ }
     await pause(250);
