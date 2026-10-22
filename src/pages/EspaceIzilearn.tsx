@@ -26,6 +26,7 @@ import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, 
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
 import type { IzFichierRetour } from "@/lib/izilearn/types";
 import IzilearnMailPreview from "@/components/IzilearnMailPreview";
+import IzilearnPdfPreview from "@/components/IzilearnPdfPreview";
 import { captureMail } from "@/lib/mails/captureMail";
 import { clientMailOrganisme } from "@/lib/mails/mailsAutomatiques";
 import { mailPourCapture } from "@/lib/izilearn/mailCapture";
@@ -100,6 +101,7 @@ export default function EspaceIzilearn() {
   };
 
   async function fichier(p: Piece, fmt: Format): Promise<{ blob: Blob; nom: string }> {
+    if (p.pdf) return { blob: await p.pdf(), nom: `${p.fichier}.pdf` };
     if (p.mail && cx) return {
       blob: await captureMail(mailPourCapture(p.mail, cx.o), clientMailOrganisme(cx.o)),
       nom: `${p.fichier}.png`,
@@ -334,7 +336,7 @@ export default function EspaceIzilearn() {
                           <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => unique(x)}><FileDown className="w-4 h-4 mr-1" />Télécharger</Button>
                         </>
                       ) : (
-                        <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => unique(x)}><FileDown className="w-4 h-4 mr-1" />{format === "pdf" ? "PDF" : "Word"}</Button>
+                        <Button variant="ghost" size="sm" disabled={!!travail} onClick={() => unique(x)}><FileDown className="w-4 h-4 mr-1" />{x.pdf || format === "pdf" ? "PDF" : "Word"}</Button>
                       )}
                     </li>
                   ))}
@@ -351,10 +353,10 @@ export default function EspaceIzilearn() {
           <DialogHeader className="px-5 py-3 border-b">
             <DialogTitle className="text-base pr-8 truncate">{apercu?.titre}</DialogTitle>
           </DialogHeader>
-          {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
+          {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : apercu.pdf ? <IzilearnPdfPreview generate={apercu.pdf} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
           {apercu && (
             <div className="px-5 py-3 border-t flex flex-wrap gap-2 justify-end">
-              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger la capture" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
+              <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger la capture" : `Télécharger en ${apercu.pdf || format === "pdf" ? "PDF" : "Word"}`}</Button>
             </div>
           )}
         </DialogContent>

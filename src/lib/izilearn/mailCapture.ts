@@ -9,6 +9,7 @@ export function mailPourCapture(m: MailModele, o: OrganismeInfo): MailAuto {
     messages: [{
       fromName: o.nom, fromEmail: o.email,
       toName: m.destinataire, toEmail: m.destinataireEmail,
+      cc: m.cc,
       date: m.dateEnvoi,
       body: m.corpsHtml,
       atts: m.piecesJointes.map((name) => ({ name, size: "" })),

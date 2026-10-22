@@ -857,7 +857,10 @@ window.__prefill = function(d){
   const box = $('#atts'); box.innerHTML = '';
   (d.atts || []).forEach(a => box.insertAdjacentHTML('beforeend', attHTML(__esc(a.name), __esc(a.size))));
   $('#replies').innerHTML = '';
-  const cc = $('.ccrow'); if(cc) cc.style.display = 'none';
+  const cc = $('.ccrow'); if(cc) {
+    cc.style.display = d.cc && d.cc.length ? '' : 'none';
+    if(d.cc && d.cc.length) cc.textContent = 'Cc : ' + d.cc.map(c => (c.name || '') + (c.email ? ' <' + c.email + '>' : '')).join(', ');
+  }
   const acct = $('[data-field="acct"]'); if(acct) acct.textContent = d.acct || d.fromEmail || '';
   const ls = $('.lscroll'), on = ls && ls.querySelector('.li.on');
   if(ls && on){

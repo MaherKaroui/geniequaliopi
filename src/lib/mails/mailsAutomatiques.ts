@@ -13,7 +13,7 @@ export type ClientMail = "gmail" | "outlook";
 export type TypeAction = OrganismeInfo["typesActions"][number];
 
 export interface PieceJointe { name: string; size: string }
-export interface MessageMail { fromName: string; fromEmail: string; toName: string; toEmail: string; date: Date; body: string; atts: PieceJointe[] }
+export interface MessageMail { fromName: string; fromEmail: string; toName: string; toEmail: string; cc?: { name: string; email: string }[]; date: Date; body: string; atts: PieceJointe[] }
 export interface MailAuto {
   key: string;          // identifiant stable (ex. af_convocation)
   titre: string;        // libellé du catalogue
@@ -385,7 +385,7 @@ export function payloadCapture(m: MailAuto, client: ClientMail, precedents: Mail
   if (client === "gmail") {
     return {
       subject: m.subject,
-      messages: m.messages.map((x) => ({ name: x.fromName, mail: x.fromEmail, to: x.toEmail, date: dateGmail(x.date), ago: "", body: x.body, atts: x.atts })),
+      messages: m.messages.map((x) => ({ name: x.fromName, mail: x.fromEmail, to: x.toEmail || x.toName, cc: x.cc, date: dateGmail(x.date), ago: "", body: x.body, atts: x.atts })),
     };
   }
   const last = m.messages[m.messages.length - 1];
@@ -399,6 +399,7 @@ export function payloadCapture(m: MailAuto, client: ClientMail, precedents: Mail
     // La boîte affichée est toujours celle de l'organisme (expéditeur du premier message).
     acct: m.messages[0].fromEmail,
     fromName: last.fromName, fromEmail: last.fromEmail, toName: last.toName, toEmail: last.toEmail,
+    cc: last.cc,
     date: dateOutlook(last.date), color: couleur(last.fromName), body: last.body + quote, atts: last.atts,
     history: precedents.slice().reverse().slice(0, 7).map((p) => {
       const l = p.messages[p.messages.length - 1];
