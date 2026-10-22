@@ -27,7 +27,7 @@ async function cerfa(p: IzPayload, signatures: Record<string, string> = {}) {
   const piece = planPieces(cx).find(x => x.id === "cerfa_0");
   if (!piece?.pdf) throw new Error("CERFA absent");
   const blob = await piece.pdf();
-  return PDFDocument.load(await blob.arrayBuffer());
+  return PDFDocument.load(new Uint8Array(await blob.arrayBuffer()));
 }
 
 describe("CERFA et mails entreprise IZILearn", () => {
@@ -60,7 +60,6 @@ describe("CERFA et mails entreprise IZILearn", () => {
     if (!stagiaire || !entreprise) throw new Error("Identité absente");
     const signed = await cerfa(p, { [stagiaire]: image, [entreprise]: image });
     const unsigned = await cerfa(p);
-    expect(signed.getPage(1).node.Resources()?.lookupMaybe).toBeDefined();
     const count = (pdf: PDFDocument) => pdf.getPage(1).node.Resources()?.toString().match(/\/Image-/g)?.length || 0;
     expect(count(signed)).toBe(3);
     expect(count(unsigned)).toBe(1);

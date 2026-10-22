@@ -159,6 +159,7 @@ export function planPieces(cx: Contexte): Piece[] {
     });
   });
   return out.map((piece) => {
+    if (piece.pdf) return piece;
     const rendre = piece.rendre;
     return { ...piece, rendre: () => appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o) };
   });
