@@ -371,7 +371,7 @@ describe("Espace IZILearn", () => {
       for (const k of ["programme", "besoins", "positionnement", "convocation", "convention", "cgv", "ri", "livret", "support", "exercices", "emargement", "connexion", "bilan_chaud", "bilan_froid", "mails"]) {
         expect(cats.has(k as never), k).toBe(true);
       }
-      for (const p of pieces) {
+      for (const p of pieces.filter((x) => !x.pdf)) {
         const html = p.rendre();
         expect(html.length, p.titre).toBeGreaterThan(300);
         if (p.categorie === "emargement" || p.categorie === "connexion") {
@@ -386,4 +386,23 @@ describe("Espace IZILearn", () => {
       for (const p of pieces.filter((x) => x.mail)) expect(p.mail!.destinataireEmail).not.toBe("contact@organisme-test.fr");
     });
   }
+});
+
+describe("CERFA IZILearn", () => {
+  it("ajoute un CERFA par apprenant pour une formation en apprentissage", () => {
+    const pieces = planPieces(contexte(payload("apprentissage", 5)));
+    const cerfas = pieces.filter((x) => x.categorie === "cerfa");
+    expect(cerfas.length).toBe(payload("apprentissage", 5).apprenants.length);
+    expect(cerfas.every((x) => typeof x.pdf === "function")).toBe(true);
+  });
+  it("ajoute le CERFA quand l'organisme a un code UAI (CFA)", () => {
+    const p = payload("actions-formation", 5);
+    p.organisme.uai = "0942677Z";
+    expect(planPieces(contexte(p)).some((x) => x.categorie === "cerfa")).toBe(true);
+  });
+  it("pas de CERFA hors CFA", () => {
+    const p = payload("actions-formation", 5);
+    p.organisme.uai = undefined;
+    expect(planPieces(contexte(p)).some((x) => x.categorie === "cerfa")).toBe(false);
+  });
 });

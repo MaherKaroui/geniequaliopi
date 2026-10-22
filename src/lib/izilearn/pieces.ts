@@ -12,11 +12,12 @@ import { estDistanciel, versFormation, versOrganisme, versStagiaires } from "./m
 import * as T from "./trames";
 import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
 import { mailHtml, mailsModeles, type MailModele } from "./mails";
+import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { appliquerRevision, developperLivret } from "./presentation";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
-  | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
+  | "cerfa" | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
 
 export interface Categorie { key: CategorieKey; label: string; dossier: string; aide: string }
 
@@ -26,6 +27,7 @@ export const CATEGORIES: Categorie[] = [
   { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Test personnalisé comme Qualiopi ; résultats IZILearn prioritaires." },
   { key: "convocation", label: "Convocation", dossier: "04_Convocation", aide: "Convocation de l'apprenant à la session." },
   { key: "convention", label: "Convention ou contrat", dossier: "05_Convention_Contrat", aide: "Convention si l'apprenant est rattaché à une entreprise, contrat de formation sinon (CFA : convention de formation par apprentissage)." },
+  { key: "cerfa", label: "CERFA apprentissage", dossier: "05_CERFA_Apprentissage", aide: "CERFA 10103*14 rempli et signé (CFA : formation en apprentissage ou organisme avec code UAI)." },
   { key: "cgv", label: "CGV", dossier: "06_CGV", aide: "Conditions générales de vente." },
   { key: "ri", label: "Règlement intérieur", dossier: "07_Reglement_interieur", aide: "Règlement intérieur applicable aux apprenants." },
   { key: "livret", label: "Livret d'accueil", dossier: "08_Livret_d_accueil", aide: "Livret d'accueil de l'apprenant." },
@@ -49,6 +51,8 @@ export interface Piece {
   source: Source;
   fichier: string;          // nom sans extension
   mail?: MailModele;
+  /** Pièce PDF native (CERFA officiel) : générée depuis le contexte signé. */
+  pdf?: (cx: Contexte) => Promise<Blob>;
   rendre: () => string;     // HTML complet
 }
 
@@ -82,6 +86,11 @@ function gabarits(type: IzPayload["formation"]["typeAction"]) {
     livret: vae ? { t: "vae_livret_accueil", parApprenant: false } : cfa ? { t: "livret_accueil_cfa_v2", parApprenant: true } : { t: "livret_accueil", parApprenant: false },
     support: cfa ? "support_cours_cfa" : "support_cours_ref",
   };
+}
+
+/** CFA : formation en apprentissage, ou organisme déclaré CFA (code UAI renseigné). */
+export function estCFA(p: IzPayload): boolean {
+  return p.formation.typeAction === "apprentissage" || !!(p.organisme.uai || "").trim();
 }
 
 export function planPieces(cx: Contexte): Piece[] {
@@ -118,6 +127,11 @@ export function planPieces(cx: Contexte): Piece[] {
     const entreprise = !!s.entreprise;
     par("convention", p.formation.typeAction === "apprentissage" ? "Convention de formation par apprentissage" : entreprise ? "Convention de formation" : "Contrat de formation",
       entreprise || p.formation.typeAction === "apprentissage" ? "CONVENTION" : "CONTRAT", "document", gen(`convention_${i}`, g.convention(entreprise), { stagiaireIdx: i }));
+    if (estCFA(p)) out.push({
+      id: `cerfa_${i}`, categorie: "cerfa", titre: `CERFA 10103*14 Contrat d'apprentissage — ${nom}`, apprenantIdx: i, source: "document",
+      fichier: `CERFA_APPRENTISSAGE_${suffixe}`, rendre: () => "",
+      pdf: (signe) => genCerfaApprentissagePdf(signe.o, signe.f, signe.stagiaires[i], { uai: signe.p.organisme.uai }),
+    });
     par("cgv", "CGV", "CGV", "document", gen(`cgv_${i}`, g.cgv, { stagiaireIdx: i }));
     par("ri", "Règlement intérieur", "REGLEMENT_INTERIEUR", "document", gen(`ri_${i}`, g.ri, { stagiaireIdx: i }));
     if (g.livret.parApprenant) par("livret", "Livret d'accueil", "LIVRET_D_ACCUEIL", "document", gen(`livret_${i}`, g.livret.t, { stagiaireIdx: i }));
@@ -152,6 +166,6 @@ export function planPieces(cx: Contexte): Piece[] {
   });
   return out.map((piece) => {
     const rendre = piece.rendre;
-    return { ...piece, rendre: () => appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o) };
+    return piece.pdf ? piece : { ...piece, rendre: () => appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o) };
   });
 }
