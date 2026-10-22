@@ -138,11 +138,18 @@ function clean(s: string | undefined | null): string {
  */
 export const SMIC_BRUT_MENSUEL_REFERENCE = { montant: 1801.80, enVigueurDepuis: "2024-11-01" };
 
+export interface CerfaOptions {
+  declaredOnly?: boolean;
+  contrat?: { dateConclusion?: string; dateDebut?: string; dateFin?: string; typeContrat?: string; heuresHebdomadaires?: string; salaireBrut?: string };
+}
+
 export async function genCerfaApprentissagePdf(
   o: OrganismeInfo,
   f: FormationInfo,
   s: StagiaireInfo,
+  options: CerfaOptions = {},
 ): Promise<Blob> {
+  const strict = options.declaredOnly === true;
   const res = await fetch(TEMPLATE_URL);
   if (!res.ok) throw new Error(`Template CERFA introuvable (${res.status})`);
   const bytes = await res.arrayBuffer();
@@ -151,7 +158,7 @@ export async function genCerfaApprentissagePdf(
 
   // ---------- PAGE 1 — EMPLOYEUR ----------
   // Employeur privé coché par défaut
-  setCheck(form, "Case #C3#A0 cocher 1", true); // privé
+  setCheck(form, "Case #C3#A0 cocher 1", !strict); // privé
   setCheck(form, "Case #C3#A0 cocher 2", false); // public
 
   // Données entreprise du stagiaire
@@ -192,7 +199,7 @@ export async function genCerfaApprentissagePdf(
   // Sexe
   const isM = (s.civilite || "").toUpperCase().startsWith("M.") || (s.civilite || "").toUpperCase() === "M";
   setCheck(form, "Case #C3#A0 cocher 3", isM); // M
-  setCheck(form, "Case #C3#A0 cocher 4", !isM); // F
+  setCheck(form, "Case #C3#A0 cocher 4", strict ? s.civilite === "Mme" : !isM); // F
 
   setText(form, "Zone de texte 8_18", clean(s.nir)); // NIR
   setText(form, "Zone de texte 8_26", clean(s.departementNaissance)); // Département naissance
@@ -213,9 +220,9 @@ export async function genCerfaApprentissagePdf(
   // Sportif haut niveau = Non ; RQTH = valeur saisie pour l'apprenti
   const rqth = (s.rqth || "").toLowerCase() === "oui";
   setCheck(form, "Case #C3#A0 cocher 5_3", false); // sportif Oui
-  setCheck(form, "Case #C3#A0 cocher 5_4", true); // sportif Non
+  setCheck(form, "Case #C3#A0 cocher 5_4", !strict); // sportif Non
   setCheck(form, "Case #C3#A0 cocher 5_5", rqth); // RQTH Oui
-  setCheck(form, "Case #C3#A0 cocher 5_6", !rqth); // RQTH Non
+  setCheck(form, "Case #C3#A0 cocher 5_6", strict ? s.rqth === "non" : !rqth); // RQTH Non
 
   // Représentant légal : obligatoire pour un apprenti mineur, laissé vide si majeur
   // (aucune donnée du représentant n'est saisie dans le dossier : à compléter à la main).
@@ -256,16 +263,16 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_49", "");
 
   // Attestation maître apprentissage
-  setCheck(form, "Case #C3#A0 cocher 6", true);
+  setCheck(form, "Case #C3#A0 cocher 6", !strict);
 
   // ---------- PAGE 2 — CONTRAT ----------
   // Type de contrat (11 = contrat d'apprentissage initial par défaut)
-  setText(form, "Zone de texte 8_71", "11");
+  setText(form, "Zone de texte 8_71", strict ? clean(options.contrat?.typeContrat) : "11");
 
   // Date de conclusion = 7 jours avant le début d'exécution du contrat de l'apprenti
-  const dateDebut = s.dateDebutFormation || f.dateDebut;
-  const dateFin = s.dateFinFormation || f.dateFin;
-  const dateConclusion = dateDebut ? (() => {
+  const dateDebut = strict ? options.contrat?.dateDebut : s.dateDebutFormation || f.dateDebut;
+  const dateFin = strict ? options.contrat?.dateFin : s.dateFinFormation || f.dateFin;
+  const dateConclusion = strict ? options.contrat?.dateConclusion : dateDebut ? (() => {
     const d = new Date(dateDebut);
     d.setDate(d.getDate() - 7);
     return d.toISOString().slice(0, 10);
@@ -292,22 +299,24 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_12", dfA);
 
   // Durée hebdo : 35h
-  setText(form, "Zone de texte 8_68", "35");
-  setText(form, "Zone de texte 8_69", "00");
+  const hebdo = (options.contrat?.heuresHebdomadaires || "").replace(",", ".");
+  const hebdoNumber = Number(hebdo);
+  setText(form, "Zone de texte 8_68", strict ? (hebdo && Number.isFinite(hebdoNumber) ? String(Math.floor(hebdoNumber)) : "") : "35");
+  setText(form, "Zone de texte 8_69", strict ? (hebdo && Number.isFinite(hebdoNumber) ? String(Math.round((hebdoNumber % 1) * 60)).padStart(2, "0") : "") : "00");
 
   // Travail machines dangereuses : Non
   setCheck(form, "Case #C3#A0 cocher 5_13", false); // Oui
-  setCheck(form, "Case #C3#A0 cocher 5_14", true); // Non
+  setCheck(form, "Case #C3#A0 cocher 5_14", !strict); // Non
 
   // ---------- PAGE 2 — FORMATION ----------
   setCheck(form, "Case #C3#A0 cocher 5_11", false); // CFA entreprise Oui
-  setCheck(form, "Case #C3#A0 cocher 5_12", true); // CFA entreprise Non
+  setCheck(form, "Case #C3#A0 cocher 5_12", !strict); // CFA entreprise Non
 
   // Diplôme/titre visé
-  setText(form, "Zone de texte 8_77", clean(f.codeRNCP || ""));
+  setText(form, "Zone de texte 8_77", strict ? "" : clean(f.codeRNCP || ""));
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
-  setText(form, "Zone de texte 8_73", ""); // N° UAI
+  setText(form, "Zone de texte 8_73", clean(o.uai)); // N° UAI
   setText(form, "Zone de texte 8_75", ""); // Code diplôme
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
@@ -321,17 +330,19 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_78", clean(o.ville));
 
   // Date début formation CFA = date début formation
-  setText(form, "Zone de texte 21_25", ddJ);
-  setText(form, "Zone de texte 21_26", ddM);
-  setText(form, "Zone de texte 21_27", ddA);
+  const formationDebut = strict ? splitDate(s.dateDebutFormation || f.dateDebut) : [ddJ, ddM, ddA];
+  setText(form, "Zone de texte 21_25", formationDebut[0]);
+  setText(form, "Zone de texte 21_26", formationDebut[1]);
+  setText(form, "Zone de texte 21_27", formationDebut[2]);
 
   // Date fin épreuves = date fin formation
-  setText(form, "Zone de texte 21_28", dfJ);
-  setText(form, "Zone de texte 21_29", dfM);
-  setText(form, "Zone de texte 21_30", dfA);
+  const formationFin = strict ? splitDate(s.dateFinFormation || f.dateFin) : [dfJ, dfM, dfA];
+  setText(form, "Zone de texte 21_28", formationFin[0]);
+  setText(form, "Zone de texte 21_29", formationFin[1]);
+  setText(form, "Zone de texte 21_30", formationFin[2]);
 
   // CFA = lieu de formation principal
-  setCheck(form, "Case #C3#A0 cocher 7", true);
+  setCheck(form, "Case #C3#A0 cocher 7", !strict);
 
   // Durée formation
   const dureeMatch = (f.duree || "").match(/(\d+)/);
@@ -344,7 +355,7 @@ export async function genCerfaApprentissagePdf(
 
 
   // Attestation pièces justificatives
-  setCheck(form, "Case #C3#A0 cocher 8", true);
+  setCheck(form, "Case #C3#A0 cocher 8", !strict);
 
   // Numéro contrat précédent (vide pour un nouveau contrat type 11)
   setText(form, "Zone de texte 8_55", "");
@@ -361,8 +372,10 @@ export async function genCerfaApprentissagePdf(
   const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
   const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
   // Salaire brut mensuel à l'embauche (euros , centimes)
-  setText(form, "Zone de texte 8_72", montantEuros);
-  setText(form, "Zone de texte 21_73", montantCents);
+  const salaire = options.contrat?.salaireBrut?.replace(/\s/g, "").replace(",", ".");
+  const salaireParts = salaire && Number.isFinite(Number(salaire)) ? Number(salaire).toFixed(2).split(".") : ["", ""];
+  setText(form, "Zone de texte 8_72", strict ? salaireParts[0] : montantEuros);
+  setText(form, "Zone de texte 21_73", strict ? salaireParts[1] : montantCents);
 
   // 1ère année — case de gauche (du/au + % + SMIC/SMC)
   setText(form, "Zone de texte 21_81", ddJ);
@@ -371,8 +384,8 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_84", dfJ);
   setText(form, "Zone de texte 21_85", dfM);
   setText(form, "Zone de texte 21_86", dfA);
-  setText(form, "Zone de texte 8_95", String(tarif.y1));
-  setText(form, "Zone de texte 8_96", "SMIC");
+  setText(form, "Zone de texte 8_95", strict ? "" : String(tarif.y1));
+  setText(form, "Zone de texte 8_96", strict ? "" : "SMIC");
 
   // Case de droite (2e période 1ère année) — laissée vide
   setText(form, "Zone de texte 21_87", "");

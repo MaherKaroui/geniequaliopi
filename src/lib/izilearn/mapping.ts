@@ -35,7 +35,7 @@ export function versOrganisme(p: IzPayload): OrganismeInfo {
   const dirigeant = t(o.dirigeant);
   return {
     nom: t(o.nom), siret: t(o.siret), adresse: t(o.adresse), codePostal: t(o.codePostal), ville: t(o.ville),
-    telephone: t(o.telephone), email: t(o.email), siteWeb: t(o.siteWeb), nda: t(o.nda),
+    telephone: t(o.telephone), email: t(o.email), siteWeb: t(o.siteWeb), nda: t(o.nda), uai: t(o.uai) || undefined,
     dirigeant,
     responsablePedagogique: dirigeant,
     referentHandicap: t(o.referentHandicap) || dirigeant,
@@ -112,6 +112,13 @@ export function versStagiaire(a: IzApprenant, p: IzPayload): StagiaireInfo {
     adresseEntreprise: t(a.entreprise?.adresse) || undefined,
     poste: t(a.poste),
     dateNaissance: t(a.dateNaissance),
+    nir: t(a.nir) || undefined,
+    nationalite: t(a.nationalite) || undefined,
+    communeNaissance: t(a.communeNaissance) || undefined,
+    departementNaissance: t(a.departementNaissance) || undefined,
+    diplome: t(a.diplome) || undefined,
+    dateNaissanceResponsable: t(a.entreprise?.dateNaissanceRepresentant) || undefined,
+    signatureResponsableUrl: t(a.entreprise?.signatureUrl) || undefined,
     dateDebutFormation: t(p.session.dateDebut),
     dateFinFormation: t(p.session.dateFin),
     tarifFormation: t(p.session.tarif) || undefined,
@@ -140,7 +147,18 @@ export function champsManquants(p: IzPayload): string[] {
   if (!t(o.email)) m.push("Organisme : adresse e-mail pour envoyer les mails");
   for (const a of p.apprenants) {
     if (!t(a.email)) m.push(`Apprenant ${t(a.prenom)} ${t(a.nom)} : adresse e-mail`);
+    if (f.typeAction === "apprentissage") {
+      const nom = `${t(a.prenom)} ${t(a.nom)}`;
+      if (!t(a.entreprise?.nom)) m.push(`CERFA ${nom} : entreprise`);
+      if (!t(a.entreprise?.siret)) m.push(`CERFA ${nom} : SIRET entreprise`);
+      if (!t(a.entreprise?.email)) m.push(`Entreprise ${nom} : adresse e-mail`);
+      if (!t(a.nir)) m.push(`CERFA ${nom} : NIR`);
+      if (!t(a.contratApprentissage?.dateDebut) || !t(a.contratApprentissage?.dateFin)) m.push(`CERFA ${nom} : dates du contrat d’apprentissage`);
+      if (!t(a.contratApprentissage?.dateConclusion)) m.push(`CERFA ${nom} : date de conclusion du contrat`);
+      if (!t(a.contratApprentissage?.salaireBrut)) m.push(`CERFA ${nom} : salaire brut déclaré`);
+    }
   }
+  if (f.typeAction === "apprentissage" && !t(o.uai)) m.push("CFA : numéro UAI");
   if (!t(f.objectifs)) m.push("Formation : objectifs");
   if (!f.dureeHeures) m.push("Formation : durée en heures");
   if (!(f.modules || []).length) m.push("Formation : modules du programme");

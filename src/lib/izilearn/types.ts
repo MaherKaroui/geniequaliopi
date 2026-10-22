@@ -89,11 +89,17 @@ export interface IzApprenant {
   email?: string;
   telephone?: string;
   dateNaissance?: string;
+  nir?: string;
+  nationalite?: string;
+  communeNaissance?: string;
+  departementNaissance?: string;
+  diplome?: string;
+  contratApprentissage?: { dateConclusion?: string; dateDebut?: string; dateFin?: string; typeContrat?: string; heuresHebdomadaires?: string; salaireBrut?: string };
   adresse?: string;
   poste?: string;
   /** Reusable signature supplied explicitly by the learner, not attendance evidence. */
   signatureUrl?: string;
-  entreprise?: { nom: string; siret?: string; adresse?: string; representant?: string; email?: string } | null;
+  entreprise?: { nom: string; siret?: string; adresse?: string; representant?: string; email?: string; signatureUrl?: string; dateNaissanceRepresentant?: string } | null;
   financeur?: string;
   statut: string;
   heuresPrevues?: number | null;

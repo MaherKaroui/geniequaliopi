@@ -17,6 +17,7 @@ export interface MailModele {
   aEnvoyer: boolean;
   destinataire: string;
   destinataireEmail: string;
+  cc?: { name: string; email: string }[];
   corpsHtml: string;
   piecesJointes: string[];
 }
@@ -29,14 +30,16 @@ export function mailsModeles(o: OrganismeInfo, f: FormationInfo, s: StagiaireInf
   const out: MailModele[] = [];
   for (const m of mailsStagiaire(o, f, s, typeDossier(o), HORIZON, { allowMissingRecipientEmail: true })) {
     m.messages.filter((x: MessageMail) => x.fromEmail.trim().toLowerCase() === of && x.fromName === o.nom.trim()).forEach((x, i) => {
+      const entreprise = typeDossier(o) === "apprentissage" && ["cfa_convention", "cfa_livret", "cfa_visite"].includes(m.key);
       out.push({
         key: `${m.key}${i ? `_${i + 1}` : ""}`,
         titre: m.titre,
         objet: m.subject,
         dateEnvoi: x.date,
         aEnvoyer: x.date.getTime() >= now,
-        destinataire: x.toName,
-        destinataireEmail: x.toEmail,
+        destinataire: entreprise ? s.responsableEntreprise?.trim() || s.entreprise.trim() : x.toName,
+        destinataireEmail: entreprise ? s.emailResponsable?.trim() || "" : x.toEmail,
+        cc: entreprise ? [{ name: `${s.prenom} ${s.nom}`.trim(), email: s.email.trim() }] : undefined,
         // Les liens Meet du catalogue fictif ne constituent pas un accès IZILearn réel.
         corpsHtml: x.body.replace(/<p>(?:(?!<\/p>)[\s\S])*https:\/\/meet\.google\.com\/(?:(?!<\/p>)[\s\S])*<\/p>/gi, "<p>Les informations de connexion sont disponibles dans votre session IZILearn. Pour toute assistance technique ou pédagogique, contactez l’organisme.</p>"),
         piecesJointes: x.atts.map((a) => a.name),
@@ -56,7 +59,8 @@ export const corpsTexte = (m: MailModele) => texte(m.corpsHtml);
 /** Lien « ouvrir dans ma messagerie » (corps raccourci : limite des liens mailto). */
 export function lienMailto(m: MailModele): string {
   const body = corpsTexte(m) + (m.piecesJointes.length ? `\n\nPièces jointes : ${m.piecesJointes.join(", ")}` : "");
-  return `mailto:${encodeURIComponent(m.destinataireEmail)}?subject=${encodeURIComponent(m.objet)}&body=${encodeURIComponent(body.slice(0, 1800))}`;
+  const cc = m.cc?.map(x => x.email).filter(Boolean).join(",");
+  return `mailto:${encodeURIComponent(m.destinataireEmail)}?subject=${encodeURIComponent(m.objet)}${cc ? `&cc=${encodeURIComponent(cc)}` : ""}&body=${encodeURIComponent(body.slice(0, 1800))}`;
 }
 
 export function mailHtml(m: MailModele, o: OrganismeInfo): string {
@@ -72,6 +76,7 @@ body{--mail-ink:#1f2937;--mail-border:#e5e7eb;--mail-surface:#f9fafb;--mail-acce
 <h2>${esc(m.objet)}</h2>
 <p><b>De :</b> ${esc(o.nom)}${o.email ? ` &lt;${esc(o.email)}&gt;` : ""}</p>
 <p><b>À :</b> ${esc(m.destinataire)}${m.destinataireEmail ? ` &lt;${esc(m.destinataireEmail)}&gt;` : ""}</p>
+${m.cc?.length ? `<p><b>Cc :</b> ${m.cc.map(x => `${esc(x.name)}${x.email ? ` &lt;${esc(x.email)}&gt;` : ""}`).join(", ")}</p>` : ""}
 <p><b>Objet :</b> ${esc(m.objet)}</p>
 <p><b>Envoi prévu :</b> ${esc(quand)}</p>
 </div>

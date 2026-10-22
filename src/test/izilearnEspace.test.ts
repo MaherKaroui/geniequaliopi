@@ -372,6 +372,7 @@ describe("Espace IZILearn", () => {
         expect(cats.has(k as never), k).toBe(true);
       }
       for (const p of pieces) {
+        if (p.pdf) { expect(p.categorie).toBe("cerfa"); continue; }
         const html = p.rendre();
         expect(html.length, p.titre).toBeGreaterThan(300);
         if (p.categorie === "emargement" || p.categorie === "connexion") {
