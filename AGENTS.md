@@ -1,6 +1,7 @@
 # Architecture rules
 
 - CFA mission QCM and J-1 announcement mails expose structured MailAuto builders and share the catalog mail resolver with standard mails for every capture/export path; this prevents separate Gmail shells and preserves mission scheduling.
+- The shared captureMail boundary applies Gmail's Ctrl+E hidden-toolbar state idempotently before rendering, covering Qualiopi and IZILearn without toggling an already hidden toolbar back on.
 
 - Database-backed formation presets use exact title/code identity, a shared in-memory registry and server-owned checkpoint/lease operations; pedagogical corrections never populate learner evidence, and explicit IZILearn lessons retain priority.
 - IZILearn owns a presentation boundary for booklet supplements and document revision footers, excluding email captures, reuses the shared dossier design controls, and passes a local MAJ override into its context; session/evidence dates remain unchanged and all preview/export paths use the same resolved context.
