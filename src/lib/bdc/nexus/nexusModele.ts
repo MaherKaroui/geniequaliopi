@@ -8,6 +8,7 @@
  * rubriques correspondantes restent à renseigner. Une pièce datée après le jour de l'édition est
  * rédigée au futur (« prévu le… ») et n'est pas signée.
  */
+import { formationsIziRealisees, formatDateIzi } from "@/lib/attestationIzibusiness";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getBdcDomainProfile, type BdcDomainProfile } from "@/lib/templatesBDC";
 import { bcCertifieAu, parseDateAny, regionFromCodePostal, tribunalFromCodePostal } from "../bdcModel";
@@ -354,7 +355,7 @@ export function contexteNexus(org: OrganismeInfo, f: FormationInfo, bens: BenNex
   const cats = categoriesCertif(org.certifications);
   const situationCertif = num
     ? `${org.nom} est certifié Qualiopi${org.organismeCertificateur ? ` par ${org.organismeCertificateur}` : ""} (certificat n° ${num}${obt ? ` du ${fmt(obt)}` : ""}${finCert ? `, valable jusqu'au ${fmt(finCert)}` : ""})${cats ? ` au titre ${cats}` : ""}.${certifieBC ? "" : " La catégorie « bilans de compétences » fait l'objet d'une demande d'extension."}`
-    : `${org.nom} n'est pas encore certifié Qualiopi : la catégorie « bilans de compétences » fait partie de la demande de certification.`;
+    : `${org.nom} n'est pas encore titulaire de la certification Qualiopi : la catégorie « bilans de compétences » fait partie de la demande de certification.`;
   const fonctions = [
     consultant === dirigeant ? "Représentant légal" : "",
     "Consultant en bilan de compétences",
@@ -393,6 +394,7 @@ export function contexteNexus(org: OrganismeInfo, f: FormationInfo, bens: BenNex
     EFFECTIF_LIB: `${pluriel(nommes, "bénéficiaire")} : ${termines} parcours terminé${termines > 1 ? "s" : ""}, ${demarres - termines} en cours, ${nommes - demarres} à venir`,
     D_ARRETE: fmt(arrete), DEBUT_VEILLE: fmt(majDate) || fmt(arrete),
     FIN_ANNEE: `31/12/${y}`, FIN_ANNEE_SUIV: `31/12/${y + 1}`, MI_ANNEE_SUIV: `30/06/${y + 1}`,
+    PDC_REALISEES: formationsIziRealisees(org).map((fi) => `| ${fi.nom} — Réalisée | Du ${formatDateIzi(fi.debut)} au ${formatDateIzi(fi.fin)} | ${fi.duree} | IZIBUSINESS (formation en présentiel, Paris 17e) | ☒ Attestation de fin de formation (${formationsIziRealisees(org).reduce((n, x) => n + x.heures, 0)} heures au total) | Compétences mobilisées dans la gestion de l'organisme et l'organisation des prestations |`).join("\n"),
     ANNEE_PDC: `${y}-${y + 1}`, PDC_ECHEANCE_1: `4e trimestre ${y}`, PDC_ECHEANCE_2: `1er trimestre ${y + 1}`, PDC_ECHEANCE_3: `1er semestre ${y + 1}`,
     MANAGER: profil.manager,
     OBJ1: profil.obj[0], OBJ2: profil.obj[1], OBJ3: profil.obj[2], OBJ4: profil.obj[3],
@@ -713,7 +715,7 @@ export function blocs(ctx: ContexteNexus, b: BenNexus, v: Vars): Record<string, 
       const date = fmt(obt ? versApres(plusJours(obt, 3)) : parseDateAny(ctx.org.dateMaj));
       if (num && v.CERTIFIE_BC) return `| 23-01 | ${date} | ${ctx.org.organismeCertificateur || "Organisme certificateur"} — certificat Qualiopi n° ${num} ; art. L6316-1 et L6323-6 du Code du travail | ${v.ORG} est certifié Qualiopi pour la catégorie « bilans de compétences » | Le CPF, les OPCO et France Travail peuvent financer les bilans réalisés par l'organisme | Offre publiée sur Mon Compte Formation ; certificat affiché avec son périmètre exact | ☒ Soldée |`;
       if (num) return `| 23-01 | ${date} | ${ctx.org.organismeCertificateur || "Organisme certificateur"} — certificat Qualiopi n° ${num} ; art. L6316-1 et L6323-6 du Code du travail | ${v.ORG} est certifié Qualiopi ${categoriesCertif(ctx.org.certifications) ? `au titre ${categoriesCertif(ctx.org.certifications)}` : ""}, pas pour les bilans de compétences | Le CPF, les OPCO et France Travail ne peuvent pas financer un bilan réalisé par l'organisme tant que l'extension n'est pas obtenue | Offre et CGV limitées au financement personnel ou employeur ; demande d'extension à la catégorie « bilans de compétences » préparée | ☒ Soldée |`;
-      return `| 23-01 | ${date} | Code du travail, art. L6316-1 et L6323-6 | ${v.ORG} n'est pas encore certifié Qualiopi | Le CPF, les OPCO et France Travail ne peuvent pas financer un bilan réalisé par l'organisme avant la certification | Offre et CGV limitées au financement personnel ou employeur ; demande de certification incluant la catégorie « bilans de compétences » préparée | ☒ Soldée |`;
+      return `| 23-01 | ${date} | Code du travail, art. L6316-1 et L6323-6 | ${v.ORG} n'est pas encore titulaire de la certification Qualiopi | Le CPF, les OPCO et France Travail ne peuvent pas financer un bilan réalisé par l'organisme avant la certification | Offre et CGV limitées au financement personnel ou employeur ; demande de certification incluant la catégorie « bilans de compétences » préparée | ☒ Soldée |`;
     })(),
     VEILLE24_LIGNES: [veille("24-01", p.domaine.veilleMetier), veille("24-02", { intitule: "Certifications et blocs de compétences accessibles par le CPF dans les métiers explorés", source: "France Compétences — répertoires RNCP et RS", lien: "https://www.francecompetences.fr", date: p.domaine.veilleMetier.date, exploitation: "Comparaison des formations qualifiantes selon le niveau, la durée et le financement, intégrée aux plans d'action" })].join("\n"),
     VEILLE25_LIGNES: veille("25-01", p.domaine.veilleTechnologique),

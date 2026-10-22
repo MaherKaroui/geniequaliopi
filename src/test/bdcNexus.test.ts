@@ -8,6 +8,7 @@ vi.mock("@/lib/pdfExport", () => ({
 import JSZip from "jszip";
 import { buildBDCNexusZip } from "@/lib/bdc/nexus/bdcNexusZip";
 import { planifier, heuresPhases, fmt } from "@/lib/bdc/nexus/nexusModele";
+import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 
 const NEXUS: OrganismeInfo = {
@@ -106,4 +107,50 @@ describe("dossier BDC au format NEXUS", () => {
     expect(t[`Critere_3/Indicateur_11/Bénéficiaire - ${futur}/Indicateur 11 - Feuilles d'emargement par seance.pdf`]).not.toMatch(/☒ Présent/);
     expect(t[`Critere_7/Indicateur_30/Bénéficiaire - Anne DUPONT/Indicateur 30 - Questionnaire de satisfaction entreprise.pdf`]).toMatch(/Destinataire Alpha SAS/);
   }, 600_000);
+});
+
+describe("pièces nominatives renseignées", () => {
+  it("remplit fiches, test, questionnaire d'intérêts, entretien intermédiaire, synthèse et satisfaction d'un bilan terminé", async () => {
+    const t = await textes(await buildBDCNexusZip(NEXUS, MANAGER, [LOUIS]));
+    const ben = (p: string) => t[`${p.split("|")[0]}/Bénéficiaire - Louis VINCENT/${p.split("|")[1]}.pdf`];
+    const pieces = [
+      "Critere_2/Indicateur_4|Indicateur 4 - Fiche d'analyse du besoin",
+      "Critere_2/Indicateur_4|Indicateur 4 - Fiche prealable au bilan de competences",
+      "Critere_2/Indicateur_5|Indicateur 5 - Outil preparatoire",
+      "Critere_2/Indicateur_8|Indicateur 8 - Test de personnalite et restitution",
+      "Critere_3/Indicateur_11|Indicateur 11 - Restitution du questionnaire d'interets professionnels (copie anonymisee)",
+      "Critere_3/Indicateur_10|Indicateur 10 - Entretien intermediaire",
+      "Critere_2/Indicateur_5|Indicateur 5 - Document de synthese (copie anonymisee)",
+      "Critere_7/Indicateur_30|Indicateur 30 - Questionnaire de satisfaction a chaud",
+    ];
+    for (const p of pieces) {
+      expect(ben(p), p).toBeTruthy();
+      expect(ben(p), p).not.toMatch(/_{10,}|___ \/ (20|5)/);
+    }
+    expect(ben(pieces[0])).toMatch(/Qu'attendez-vous du bilan de compétences \? (Identifier|Vérifier|Clarifier)/);
+    expect(ben(pieces[3])).toMatch(/Extraversion — \d+ \/ 20/);
+    expect(ben(pieces[4])).toMatch(/Entreprenant \(E\) (9|10) Dominante/);
+    expect(ben(pieces[6])).toMatch(/Fonction visée Manager de proximité/);
+    expect(ben(pieces[7])).toMatch(/Moyenne des 8 items \d,\d\d \/ 5/);
+  }, 600_000);
+
+  it("adapte le contenu au métier visé par la formation", async () => {
+    const f = { ...MANAGER, intitule: "Bilan de compétences – Reconversion vers le métier d'esthéticienne" };
+    const t = await textes(await buildBDCNexusZip(NEXUS, f, [LOUIS]));
+    const synth = t["Critere_2/Indicateur_5/Bénéficiaire - Louis VINCENT/Indicateur 5 - Document de synthese (copie anonymisee).pdf"];
+    expect(synth).toMatch(/métier d'esthéticienne/);
+    expect(synth).not.toMatch(/manager de proximité/i);
+  }, 600_000);
+
+  it("le téléchargement document par document produit la même pièce NEXUS renseignée", () => {
+    const docs = getFullCatalog(NEXUS, MANAGER, [LOUIS]).filter((d) => d.template === "bdc_nexus_doc" || d.template === "bdc_nexus_xlsx");
+    expect(docs.length).toBeGreaterThan(100);
+    const fiche = docs.find((d) => /Fiche d'analyse du besoin – Louis VINCENT/.test(d.nom) && d.indicateur === 4)!;
+    expect(fiche).toBeTruthy();
+    const html = generateDocumentById(fiche.id, fiche.template, fiche.params, NEXUS, MANAGER, [LOUIS]);
+    expect(html).not.toMatch(/\{\{/);
+    expect(html).toMatch(/Louis VINCENT/);
+    expect(html).toMatch(/Identifier mes compétences transférables|Vérifier si je suis prêt|Clarifier mon projet/);
+    expect(getFullCatalog(NEXUS, MANAGER, [LOUIS]).some((d) => /Auto-diagnostic/i.test(d.nom))).toBe(false);
+  });
 });

@@ -16,9 +16,8 @@ Ce registre trace les besoins d'adaptation exprimés ou repérés, les adaptatio
 
 | Date du constat | Besoin identifié | Adaptation mise en œuvre | Modalités retenues | Efficacité constatée |
 |---|---|---|---|---|
-| {{D_PREALABLE}} | Question de l'adaptation posée lors de l'entretien préalable, sans obligation de déclaration. |  | {{MODALITE_LIB}} ; séances {{JOURS_SEANCES}}, espacées de 1 à 2 semaines (planning du {{D_PLANNING}}) |  |
-| {{S_MI}} | Point d'étape de l'entretien intermédiaire |  |  |  |
-|  |  |  |  |  |
+| {{D_PREALABLE}} | Question de l'adaptation posée lors de l'entretien préalable, sans obligation de déclaration. {{REP_AD_PREALABLE}} | Modalité et dates arrêtées à l'avance, d'un commun accord | {{MODALITE_LIB}} ; séances {{JOURS_SEANCES}}, espacées de 1 à 2 semaines (planning du {{D_PLANNING}}) | {{REP_AD_PREALABLE_EFFET}} |
+{{REP_AD_MI}}
 
 | Référent handicap | {{REF_HANDICAP}} — {{ORG_EMAIL}} — {{ORG_TEL}} |
 |---|---|

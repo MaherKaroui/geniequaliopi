@@ -27,7 +27,7 @@ Indicateur 32 — Mise en œuvre de mesures d'amélioration à partir des retour
 | N° | Origine | Constat | Analyse de cause | Action corrective | Responsable | Échéance | Statut | Efficacité vérifiée |
 |---|---|---|---|---|---|---|---|---|
 | 1 | Veille 23-06 (décret n° 2026-728) | Référentiel au 01/11/2026 : l'indicateur 32 intègre une analyse des risques | Évolution réglementaire | Analyse des risques ci-dessous, à revoir chaque semestre | {{CONSULTANT}} | 31/10/2026 | ☐ En cours | ☐ |
-{{#SI CERTIFIE_BC}}{{#SINON}}| 2 | Veille 23-01 | Organisme non certifié Qualiopi pour les bilans de compétences | Offre lancée avant la certification de cette catégorie | Offre et CGV limitées au financement personnel ou par l'employeur sur ses fonds propres ; demande de certification de la catégorie « bilans de compétences » | {{CONSULTANT}} | Audit {{TYPE_AUDIT_LIB}} | ☐ En cours | ☐ |
+{{#SI CERTIFIE_BC}}{{#SINON}}| 2 | Veille 23-01 | Organisme non titulaire de la certification Qualiopi pour les bilans de compétences | Offre lancée avant la certification de cette catégorie | Offre et CGV limitées au financement personnel ou par l'employeur sur ses fonds propres ; demande de certification de la catégorie « bilans de compétences » | {{CONSULTANT}} | Audit {{TYPE_AUDIT_LIB}} | ☐ En cours | ☐ |
 {{/SI}}|  |  |  |  |  |  |  |  |  |
 |  |  |  |  |  |  |  |  |  |
 

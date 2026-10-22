@@ -235,31 +235,25 @@ describe("ZIP d'audit bilan de compétences", () => {
     const conv2 = Object.keys(t2).find((n) => /Claire ALPHA\/.*Convention de prestation/.test(n))!;
     expect(t2[conv2]).toMatch(/compte personnel de formation/i);
   }, 600_000);
-  it("ne rédige ni réponse, ni note, ni résultat à la place du bénéficiaire ou du consultant", async () => {
+  it("renseigne les pièces du bénéficiaire une fois l'étape passée, jamais avant", async () => {
     const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const] };
     const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST));
     const de = (re: RegExp) => Object.entries(textes).filter(([n]) => re.test(n));
-    const verifier = (re: RegExp, interdit: RegExp) => {
-      const pieces = de(re);
-      expect(pieces.length, String(re)).toBeGreaterThan(0);
-      for (const [n, t] of pieces) expect(t, n).not.toMatch(interdit);
-    };
-    verifier(/Test de personnalite et restitution/, /☒|J'ai exercé/);
-    verifier(/personnalit|Restitution de l.inventaire/i, /\d+\/10/);
-    verifier(/Questionnaire de satisfaction a chaud|Questionnaire de satisfaction à chaud/, /☒/);
-    verifier(/Document de synth[eè]se/, /☒/);
-    verifier(/Fiche pr[ée]alable/, /Je ressens le besoin|Bénéficiaire motivé/);
-    verifier(/Entretien interm/, /Oui, la prestation répond|Globalement oui/);
+    const chaud = de(/Questionnaire de satisfaction a chaud/);
+    expect(chaud.length).toBe(STAGIAIRES_TEST.length);
+    // Rempli (notes et moyenne calculée) ou, si le bilan n'est pas terminé, aucune case cochée.
+    for (const [n, t] of chaud) expect(/Moyenne des 8 items \d,\d\d \/ 5/.test(t) || !/☒/.test(t), n).toBe(true);
+    for (const [n, t] of de(/Test de personnalite et restitution/)) expect(/\d+ \/ 20/.test(t) || /Passation prévue/.test(t), n).toBe(true);
     expect(de(/Objectifs individualis/).length).toBe(STAGIAIRES_TEST.length);
     expect(de(/CV du consultant/).length).toBe(0);
     expect(de(/Fiche de poste - /).length).toBe(5);
     for (const [n, t] of de(/Questionnaire de satisfaction (entreprise|financeur|interne)/)) expect(t, n).not.toMatch(/☒/);
-  });
+  }, 600_000);
 
   it("ne mentionne pas l'inscription via Mon Compte Formation pour un organisme non certifié BC", async () => {
     const org = { ...ORG_TEST, typesActions: ["bilans-competences" as const], numeroCertificatQualiopi: "", dateObtentionQualiopi: "" };
     const textes = await textesZip(await buildBDCNTConseilsZip(org, FORMATIONS_TEST["bilans-competences"], STAGIAIRES_TEST));
     const fuites = Object.entries(textes).filter(([, t]) => /via Mon Compte Formation|inscription via Mon Compte/.test(t)).map(([n]) => n);
     expect(fuites).toEqual([]);
-  });
+  }, 600_000);
 });

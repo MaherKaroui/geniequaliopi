@@ -16,26 +16,26 @@ Indicateur 30 — À renseigner par le bénéficiaire à l'issue de la dernière
 
 | Question | 1 → 5 |
 |---|---|
-| Clarté des informations reçues avant l'engagement | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Qualité de l'accueil et des conditions de réalisation à distance | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Écoute et posture du consultant | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Pertinence des outils d'investigation mobilisés | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Respect du rythme et des disponibilités annoncés | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Utilité du document de synthèse | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Atteinte de vos objectifs initiaux | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Satisfaction globale de la prestation | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
+| Clarté des informations reçues avant l'engagement | {{REP_CH1}} |
+| Qualité de l'accueil et des conditions de réalisation à distance | {{REP_CH2}} |
+| Écoute et posture du consultant | {{REP_CH3}} |
+| Pertinence des outils d'investigation mobilisés | {{REP_CH4}} |
+| Respect du rythme et des disponibilités annoncés | {{REP_CH5}} |
+| Utilité du document de synthèse | {{REP_CH6}} |
+| Atteinte de vos objectifs initiaux | {{REP_CH7}} |
+| Satisfaction globale de la prestation | {{REP_CH8}} |
 
-| Recommanderiez-vous ce bilan de compétences à un proche ? | ☐ Oui   ☐ Non |
+| Recommanderiez-vous ce bilan de compétences à un proche ? | {{REP_CH_RECO}} |
 |---|---|
 
 **Commentaire libre**
 
-______________________________________________
+{{REP_CH_COMMENTAIRE}}
 
-| Renseigné le | ____ / ____ / ________ |
+| Renseigné le | {{REP_CH_DATE}} |
 |---|---|
 | Par | {{BEN}} |
-| Moyenne des 8 items | ___ / 5 (calculée à partir des réponses, jamais saisie) |
+| Moyenne des 8 items | {{REP_CH_MOY}} |
 
 **Signatures**
 

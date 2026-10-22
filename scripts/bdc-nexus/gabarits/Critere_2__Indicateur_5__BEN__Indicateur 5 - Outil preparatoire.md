@@ -12,15 +12,15 @@ Indicateur 5 — Support de l'entretien préalable du {{D_PREALABLE}}
 
 | Caractéristiques et spécificités | {{BEN_CARACTERISTIQUES}} |
 |---|---|
-| Situation de handicap | Question posée sans obligation de déclaration : ☐ Aucun besoin exprimé  ☐ Besoin d'adaptation exprimé |
+| Situation de handicap | {{REP_HANDICAP_OUTIL}} |
 
 **2. Désirs et souhaits**
 
 | Bilan à l'initiative du bénéficiaire ? | {{#SI TRIPARTITE}}Non — bilan proposé par l'employeur, avec le consentement du bénéficiaire ; {{FINANCEMENT_LIB_MIN}}{{#SINON}}Oui — démarche individuelle ; {{FINANCEMENT_LIB_MIN}}{{/SI}} |
 |---|---|
-| Motivations |  |
-| Objectifs du bilan |  |
-| Remarques |  |
+| Motivations | {{REP_MOTIVATIONS}} |
+| Objectifs du bilan | {{REP_ATTENTE}} |
+| Remarques | {{REP_REMARQUES}} |
 
 **3. Hypothèses d'accompagnement**
 

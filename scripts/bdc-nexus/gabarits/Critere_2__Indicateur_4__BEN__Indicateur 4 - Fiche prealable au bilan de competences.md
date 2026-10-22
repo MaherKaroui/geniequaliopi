@@ -24,54 +24,54 @@ Indicateur 4 — Renseignée par le bénéficiaire lors de sa demande — {{D_PR
 
 **3. Vos motivations**
 
-•	☐ Faire le point sur ma carrière
+•	{{REP_M1}} Faire le point sur ma carrière
 
-•	☐ Changer de métier
+•	{{REP_M2}} Changer de métier
 
-•	☐ Évoluer professionnellement
+•	{{REP_M3}} Évoluer professionnellement
 
-•	☐ Identifier mes compétences
+•	{{REP_M4}} Identifier mes compétences
 
-•	☐ Confirmer un projet professionnel
+•	{{REP_M5}} Confirmer un projet professionnel
 
-**Situation actuelle et raisons d'envisager un bilan :** ______________________________________________
+**Situation actuelle et raisons d'envisager un bilan :** {{REP_RAISONS}}
 
 **4. Vos attentes**
 
-•	☐ Identifier mes compétences et aptitudes
+•	{{REP_A1}} Identifier mes compétences et aptitudes
 
-•	☐ Construire un projet professionnel
+•	{{REP_A2}} Construire un projet professionnel
 
-•	☐ Valider un projet existant
+•	{{REP_A3}} Valider un projet existant
 
-•	☐ Élaborer un plan d'action
+•	{{REP_A4}} Élaborer un plan d'action
 
-•	☐ Mieux me connaître
+•	{{REP_A5}} Mieux me connaître
 
-**Quels résultats espérez-vous obtenir ?** ______________________________________________
+**Quels résultats espérez-vous obtenir ?** {{REP_RESULTAT_L}}
 
 **5. Votre parcours**
 
-| Niveau d'études |  |
+| Niveau d'études | {{REP_DIPLOME}} |
 |---|---|
 | Principales expériences professionnelles | {{BEN_EXPERIENCES}} |
 
 **6. Contraintes et besoins spécifiques**
 
-| Contraintes particulières |  |
+| Contraintes particulières | {{REP_CONTRAINTES}} |
 |---|---|
 | Accompagnement souhaité | {{CB:MODALITE=presentiel}} Présentiel  {{CB:MODALITE=distanciel}} À distance  {{CB:MODALITE=mixte}} Mixte |
-| Aménagement lié à une situation de handicap | ☐ Oui  ☐ Non |
+| Aménagement lié à une situation de handicap | {{REP_HANDICAP}} |
 
 **7. Disponibilités**
 
-| Jours disponibles | ☐ Lundi  ☐ Mardi  ☐ Mercredi  ☐ Jeudi  ☐ Vendredi  ☐ Samedi |
+| Jours disponibles | {{REP_JOURS}} |
 |---|---|
-| Créneaux souhaités | ☐ Matin  ☐ Après-midi  ☐ Soirée |
+| Créneaux souhaités | {{REP_CRENEAUX}} |
 
 **8. Observations complémentaires**
 
-______________________________________________
+{{REP_OBSERVATIONS}}
 
 **9. Validation**
 

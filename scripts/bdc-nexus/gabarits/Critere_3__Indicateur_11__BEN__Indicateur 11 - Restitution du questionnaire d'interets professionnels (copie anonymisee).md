@@ -24,17 +24,17 @@ Indicateur 11 — Outil de la phase d'investigation — {{#SI MI_PASSE}}passé e
 
 | Dimension | Score / 10 | Lecture |
 |---|---|---|
-| Réaliste (R) |  |  |
-| Investigateur (I) |  |  |
-| Artistique (A) |  |  |
-| Social (S) |  |  |
-| Entreprenant (E) |  |  |
-| Conventionnel (C) |  |  |
+{{REP_R_R}}
+{{REP_R_I}}
+{{REP_R_A}}
+{{REP_R_S}}
+{{REP_R_E}}
+{{REP_R_C}}
 
 **3. Lecture du profil**
 
-______________________________________________
+{{REP_RIASEC_LECTURE}}
 
 **4. Lien avec le projet professionnel**
 
-______________________________________________
+{{REP_RIASEC_VIGILANCE}}

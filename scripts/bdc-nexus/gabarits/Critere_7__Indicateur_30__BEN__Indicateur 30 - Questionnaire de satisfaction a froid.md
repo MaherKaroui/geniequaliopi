@@ -19,17 +19,17 @@ Indicateur 30 — À renseigner lors de l'entretien de suivi du {{D_SUIVI}}
 
 | Question | 1 → 5 |
 |---|---|
-| Mise en œuvre effective du projet défini lors du bilan | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Pertinence du projet avec le recul de six mois | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Utilité des étapes définies dans le document de synthèse | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Appui reçu lors de l'entretien de suivi | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
-| Satisfaction globale avec le recul | 1 ☐   2 ☐   3 ☐   4 ☐   5 ☐ |
+| Mise en œuvre effective du projet défini lors du bilan | {{REP_FR1}} |
+| Pertinence du projet avec le recul de six mois | {{REP_FR2}} |
+| Utilité des étapes définies dans le document de synthèse | {{REP_FR3}} |
+| Appui reçu lors de l'entretien de suivi | {{REP_FR4}} |
+| Satisfaction globale avec le recul | {{REP_FR5}} |
 
 **Situation à six mois**
 
-| Votre projet est-il : | ☐ Concrétisé   ☐ En cours de concrétisation   ☐ Ajusté   ☐ Abandonné |
+| Votre projet est-il : | {{REP_FR_PROJET}} |
 |---|---|
-| Recommanderiez-vous notre bilan de compétences ? | ☐ Oui   ☐ Non |
+| Recommanderiez-vous notre bilan de compétences ? | {{REP_FR_RECO}} |
 
 **Signatures**
 

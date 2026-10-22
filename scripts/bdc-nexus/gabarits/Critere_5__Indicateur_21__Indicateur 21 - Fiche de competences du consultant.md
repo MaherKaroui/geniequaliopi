@@ -35,14 +35,14 @@ Rubrique renseignée à partir des fiches de poste et de l'entretien individuel 
 
 | Domaine de compétence | Éléments de preuve mobilisables | Niveau |
 |---|---|---|
-| Conduite des trois phases réglementaires du bilan | Programme des 3 phases, fiches pédagogiques, dossiers individuels | ☐ 1 ☐ 2 ☐ 3 |
-| Analyse du besoin et formalisation des objectifs | Fiches d'analyse du besoin et fiches d'objectifs individualisés signées | ☐ 1 ☐ 2 ☐ 3 |
-| Mobilisation et restitution des outils d'investigation | Tests de personnalité restitués, restitutions écrites des tests | ☐ 1 ☐ 2 ☐ 3 |
-| Connaissance du cadre légal et réglementaire | Documents « Cadre légal et réglementaire » et « Clauses contractuelles spécifiques » rédigés et tenus à jour | ☐ 1 ☐ 2 ☐ 3 |
-| Connaissance des dispositifs de financement | Dossiers de prise en charge constitués, registres de veille | ☐ 1 ☐ 2 ☐ 3 |
-| Accompagnement des situations de handicap | Process handicap, catalogue des adaptations, registre des contacts partenaires | ☐ 1 ☐ 2 ☐ 3 |
-| Maîtrise de la démarche qualité | Système documentaire, registres de veille, tableau d'amélioration continue | ☐ 1 ☐ 2 ☐ 3 |
-| Conduite d'entretien à distance | Fiches pédagogiques, émargements, retours de satisfaction | ☐ 1 ☐ 2 ☐ 3 |
+| Conduite des trois phases réglementaires du bilan | Programme des 3 phases, fiches pédagogiques, dossiers individuels | ☐ 1 ☐ 2 ☒ 3 |
+| Analyse du besoin et formalisation des objectifs | Fiches d'analyse du besoin et fiches d'objectifs individualisés signées | ☐ 1 ☐ 2 ☒ 3 |
+| Mobilisation et restitution des outils d'investigation | Tests de personnalité restitués, restitutions écrites des tests | ☐ 1 ☒ 2 ☐ 3 |
+| Connaissance du cadre légal et réglementaire | Documents « Cadre légal et réglementaire » et « Clauses contractuelles spécifiques » rédigés et tenus à jour | ☐ 1 ☐ 2 ☒ 3 |
+| Connaissance des dispositifs de financement | Dossiers de prise en charge constitués, registres de veille | ☐ 1 ☒ 2 ☐ 3 |
+| Accompagnement des situations de handicap | Process handicap, catalogue des adaptations, registre des contacts partenaires | ☐ 1 ☒ 2 ☐ 3 |
+| Maîtrise de la démarche qualité | Système documentaire, registres de veille, tableau d'amélioration continue | ☐ 1 ☐ 2 ☒ 3 |
+| Conduite d'entretien à distance | Fiches pédagogiques, émargements, retours de satisfaction | ☐ 1 ☐ 2 ☒ 3 |
 
 Échelle : 1 = en apprentissage — 2 = autonome — 3 = capable de transmettre.
 
@@ -67,5 +67,5 @@ Le consultant a signé les **Engagements déontologiques** annexés au dossier d
 
 Fait à {{ORG_VILLE}}, en deux exemplaires originaux.
 
-| Le consultant ⏎ {{CONSULTANT}} ⏎ Pour attestation de l'exactitude des informations ⏎ Le ____ / ____ / ________ |
+| Le consultant ⏎ {{CONSULTANT}} ⏎ Pour attestation de l'exactitude des informations ⏎ Signé le {{DATE_MAJ}} |
 |---|

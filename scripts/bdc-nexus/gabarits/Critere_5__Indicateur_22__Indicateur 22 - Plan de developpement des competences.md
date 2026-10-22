@@ -30,9 +30,7 @@ Indicateur 22 — Entretien et développement des compétences des salariés et 
 
 | Action réalisée | Date | Durée | Organisme | Justificatif | Effet constaté sur les prestations |
 |---|---|---|---|---|---|
-|  |  |  |  | ☐ |  |
-|  |  |  |  | ☐ |  |
-|  |  |  |  | ☐ |  |
+{{PDC_REALISEES}}
 
 **5. Intervenants externes**
 

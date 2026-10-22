@@ -34,6 +34,7 @@ import { buildBDCNTConseilsZip } from "@/lib/bdc/bdcNTConseilsZip";
 // Templates qui doivent être téléchargés en VRAI fichier .xlsx (et non en .xls HTML déguisé)
 // La sortie HTML générée par leurs générateurs respectifs est convertie via SheetJS.
 const REAL_XLSX_TEMPLATES = new Set<string>([
+  "bdc_nexus_xlsx",
   "decoupage_formation_cfa_excel",
   "matrice_competences_excel",
   "suivi_chiffre_formation_excel",

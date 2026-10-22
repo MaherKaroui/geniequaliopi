@@ -24,61 +24,61 @@ Indicateur 4 — Co-construite lors de l'entretien préalable du {{D_PREALABLE}}
 
 **3. Objet de la démarche**
 
-•	☐ Faire le point sur mes compétences
+•	{{REP_O1}} Faire le point sur mes compétences
 
-•	☐ Évoluer dans mon métier
+•	{{REP_O2}} Évoluer dans mon métier
 
-•	☐ Préparer une reconversion professionnelle
+•	{{REP_O3}} Préparer une reconversion professionnelle
 
-•	☐ Retrouver un emploi
+•	{{REP_O4}} Retrouver un emploi
 
-•	☐ Créer ou reprendre une entreprise
+•	{{REP_O5}} Créer ou reprendre une entreprise
 
-•	☐ Confirmer un projet professionnel
+•	{{REP_O6}} Confirmer un projet professionnel
 
-•	☐ Identifier des pistes d'évolution
+•	{{REP_O7}} Identifier des pistes d'évolution
 
 **4. Situation professionnelle et parcours**
 
-| Formation initiale |  |
+| Formation initiale | {{REP_DIPLOME}} |
 |---|---|
 | Principales expériences professionnelles | {{BEN_EXPERIENCES}} |
-| Compétences ou savoir-faire identifiés |  |
+| Compétences ou savoir-faire identifiés | {{REP_COMPETENCES}} |
 
 **5. Motivations et attentes**
 
-| Qu'attendez-vous du bilan de compétences ? |  |
+| Qu'attendez-vous du bilan de compétences ? | {{REP_ATTENTE}} |
 |---|---|
-| Quels sont vos objectifs à l'issue du bilan ? |  |
-| Commentaire du bénéficiaire |  |
+| Quels sont vos objectifs à l'issue du bilan ? | {{REP_RESULTAT}} |
+| Commentaire du bénéficiaire | {{REP_COMMENTAIRE}} |
 
 **6. Contraintes et points de vigilance**
 
 | Contraintes horaires | Dates arrêtées d'un commun accord au planning prévisionnel : {{JOURS_SEANCES}}. |
 |---|---|
 | Contraintes géographiques | {{#SI DISTANCIEL}}Modalité à distance retenue, sans déplacement.{{#SINON}}Séances dans les locaux de {{ORG}}, {{ORG_ADRESSE_COMPLETE}}.{{/SI}} |
-| Contraintes personnelles ou familiales |  |
-| Situation de handicap nécessitant un aménagement | ☐ Oui  ☐ Non |
+| Contraintes personnelles ou familiales | {{REP_CONTRAINTES}} |
+| Situation de handicap nécessitant un aménagement | {{REP_HANDICAP}} |
 
 **7. Analyse du besoin**
 
-| Le besoin relève-t-il du bilan de compétences ? | ☐ Oui  ☐ Non |
+| Le besoin relève-t-il du bilan de compétences ? | {{REP_RELEVE}} |
 |---|---|
-| Motivation |  |
+| Motivation | {{REP_MOTIVATION}} |
 
 **Besoins identifiés :**
 
-•	☐ Analyse du parcours professionnel
+•	{{REP_B1}} Analyse du parcours professionnel
 
-•	☐ Identification des compétences
+•	{{REP_B2}} Identification des compétences
 
-•	☐ Exploration des métiers et secteurs
+•	{{REP_B3}} Exploration des métiers et secteurs
 
-•	☐ Construction d'un projet professionnel
+•	{{REP_B4}} Construction d'un projet professionnel
 
-•	☐ Validation du projet
+•	{{REP_B5}} Validation du projet
 
-•	☐ Élaboration d'un plan d'action
+•	{{REP_B6}} Élaboration d'un plan d'action
 
 **8. Modalités d'accompagnement retenues**
 
@@ -86,7 +86,7 @@ Indicateur 4 — Co-construite lors de l'entretien préalable du {{D_PREALABLE}}
 |---|---|
 | Durée prévisionnelle | {{DUREE}} heures d'accompagnement individuel avec le consultant, réparties sur {{NB_SEANCES}} séances. Le travail personnel guidé réalisé entre les séances n'est ni décompté de ces {{DUREE}} heures ni facturé. |
 | Rythme envisagé | {{NB_SEANCES}} séances de 2 à 4 heures, {{JOURS_SEANCES}}, espacées de 1 à 2 semaines. |
-| Aménagements spécifiques |  |
+| Aménagements spécifiques | {{REP_AMENAGEMENTS}} |
 
 **9. Validation**
 

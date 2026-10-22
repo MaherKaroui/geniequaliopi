@@ -1,4 +1,7 @@
-import { DocEntry, FormationInfo } from "@/types/qualiopi";
+import { DocEntry, FormationInfo, OrganismeInfo } from "@/types/qualiopi";
+import { planNexus, NEXUS_PDF_AGEFIPH } from "./bdc/nexus/nexusDocs";
+import { titreNexus } from "./bdc/nexus/nexusTitres";
+import { NEXUS_TEMPLATES } from "./bdc/nexus/nexusTemplates";
 import { isIAP21Formation } from "./iaPro21hHumanized";
 import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { StagiaireInfo } from "@/types/qualiopi";
@@ -28,12 +31,9 @@ function nbJoursStagiaireCatalog(s: StagiaireInfo, f: FormationInfo): number {
   return n;
 }
 import { getEvalContent, hasEvalContentDedie } from "./evalContent";
-import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
 import { BDC_TEMPLATES_MANQUANTS, bdcTemplateApplicable } from "./bdc/bdcTemplatesBC";
-import { BDC_CLASSEURS } from "./bdc/bdcClasseursXlsx";
 
-import { BDC_NT_STATS_FILES } from "./bdc/bdcNTStatsXlsx";
-import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
+import { critereForIndicateur } from "./bdc/bdcNTConseilsZip";
 import { dateMailMission } from "./mailsMissionsCFA";
 import { MISSIONS_QCM } from "./templatesCFA14Missions";
 import { dateMailDiffusionMission } from "./mailsDiffusionMissionsCFA";
@@ -1354,105 +1354,34 @@ export function buildFullCatalog(
   }
 
   // ===== Bilan de compétences =====
-  // Mêmes pièces et même classement que le ZIP d'audit (buildBDCNTConseilsZip).
+  // Mêmes pièces, mêmes noms et même contenu que le ZIP complet (format NEXUS, nexus/nexusDocs.ts) :
+  // un document de catalogue par pièce, nominatif quand la pièce est propre au bénéficiaire.
   if (isBDC) {
-    // Un document de catalogue par pièce de la trame BC (source nettoyée).
-    // Classement automatique : critère ← indicateur extrait de la clé.
-    const bdcKeys = Object.keys(BDC_NT_SOURCE).sort();
-    const slug = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").toLowerCase().slice(0, 60);
-    bdcKeys.forEach((key) => {
-      const ind = indicateurFromKey(key);
+    const orgCatalogue = { dirigeant: dirigeantNom || "", codePostal: orgCodePostal || "", referentQualite: referentQualiteNom || "" } as OrganismeInfo;
+    const slug = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^\w]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").toLowerCase();
+    for (const doc of planNexus(orgCatalogue, formations[0], stagiaires, NEXUS_TEMPLATES)) {
+      const ind = Number(doc.cle.match(/Indicateur_(\d+)/)?.[1] || 1);
       const crit = critereForIndicateur(ind);
-      const title = bdcDocTitle(key);
-      const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
-      if (isPerBen && stagiaires.length > 0) {
-        stagiaires.forEach((s, si) => {
-          add(
-            `bdc_nt_${slug(key)}_s${si}`,
-            `CT${crit} - IND ${ind} ${title} – ${s.prenom} ${s.nom}`,
-            crit, ind, "bdc_nt_doc_per_ben",
-            { sourceKey: key, stagiaireIdx: si },
-          );
-        });
-      } else {
-        add(
-          `bdc_nt_${slug(key)}`,
-          `CT${crit} - IND ${ind} ${title}`,
-          crit, ind, "bdc_nt_doc",
-          { sourceKey: key },
-        );
-      }
-    });
-    BDC_NT_STATS_FILES.forEach((file, idx) => {
+      const titre = titreNexus(doc.cle.split("/").pop() || doc.cle).replace(/\.(pdf|xlsx)$/i, "").replace(/^Indicateur\s+\d+\s*-\s*/i, "");
+      const s = typeof doc.ben === "number" ? stagiaires[doc.ben] : undefined;
       add(
-        `bdc_nt_ind2_justificatif_${idx}`,
-        `CT1 - IND 2 ${file.name.replace(/\.xlsx$/i, "")}`,
-        1, 2, "bdc_nt_stats_xlsx",
-        { statsIndex: idx },
+        `bdc_nexus_${slug(doc.cle)}${typeof doc.ben === "number" ? `_s${doc.ben}` : ""}`,
+        `CT${crit} - IND ${ind} ${titre}${doc.format === "xlsx" ? " (Excel)" : ""}${s ? ` – ${s.prenom} ${s.nom}` : ""}`,
+        crit, ind, doc.format === "xlsx" ? "bdc_nexus_xlsx" : "bdc_nexus_doc",
+        { cle: doc.cle, ...(typeof doc.ben === "number" ? { stagiaireIdx: doc.ben } : {}) },
       );
-    });
-    // Compte rendu de suivi à 6 mois — un fichier par bénéficiaire (IND 30, comme dans le ZIP)
-    stagiaires.forEach((s, si) => {
-      add(
-        `bdc_nt_ind30_cr6mois_s${si}`,
-        `CT7 - IND 30 Compte rendu de suivi à 6 mois – ${s.prenom} ${s.nom}`,
-        7, 30, "bdc_nt_cr6mois_stagiaire",
-        { stagiaireIdx: si },
-      );
-    });
-    add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
+    }
+    add("bdc_nexus_contacts_agefiph", "CT6 - IND 26 Contacts AGEFIPH", 6, 26, "pdf_static", { pdfUrl: NEXUS_PDF_AGEFIPH.url });
     add("bdc_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
-    // Classeurs (cahier de contacts, suivi de l'adaptation, contacts handicap, dysfonctionnements)
-    BDC_CLASSEURS.forEach((cl, idx) => {
-      add(`bdc_classeur_${idx}`, `CT${critereForIndicateur(cl.indicateur)} - IND ${cl.indicateur} ${cl.name.replace(/^Indicateur\s+\d+\s*-\s*/, "").replace(/\.xlsx$/i, "")} (Excel)`, critereForIndicateur(cl.indicateur), cl.indicateur, "bdc_classeur", { classeurIdx: idx });
-    });
-    // Programme réglementaire des 3 phases du bilan (art. R6313-4) — contenus et modalités (IND 6)
-    add("bdc_nt_programme_phases", "CT2 - IND 6 Programme des 3 phases du bilan de compétences", 2, 6, "bdc_nt_programme_phases");
-    add("bdc_nt_phase_1", "CT3 - IND 10 Phase 1 – Phase préliminaire", 3, 10, "bdc_nt_phase", { phase: 1 });
-    add("bdc_nt_phase_2", "CT3 - IND 10 Phase 2 – Phase d'investigation", 3, 10, "bdc_nt_phase", { phase: 2 });
-    add("bdc_nt_phase_3", "CT3 - IND 10 Phase 3 – Phase de conclusion & suivi à 6 mois", 3, 10, "bdc_nt_phase", { phase: 3 });
     // Référentiel 2026 (décret n° 2026-728) : IND 27 et IND 32
     add("bdc_q2026_clauses", "CT6 - IND 27 Annexe clauses qualité des contrats de sous-traitance", 6, 27, "bdc_q2026", { piece: "clauses" });
     add("bdc_q2026_risques", "CT7 - IND 32 Analyse des risques sur la qualité des prestations", 7, 32, "bdc_q2026", { piece: "risques" });
-    // Pièces obligatoires BC (synthèse, attestation de remise, émargements, satisfaction, veilles…)
+    // Supports de cours propres au profil de la formation (IND 19), comme dans le ZIP
     BDC_TEMPLATES_MANQUANTS.forEach((def, idx) => {
-      if (!bdcTemplateApplicable(def, formations[0])) return;
+      if (!/Support de cours/i.test(def.nom) || !bdcTemplateApplicable(def, formations[0])) return;
       const ind = def.indicateur;
-      const crit = critereForIndicateur(ind);
-      const titre = def.nom.replace(/^Indicateur\s+\d+(\s*[&et]+\s*\d+)*\s*-\s*/i, "");
-      if (def.parBeneficiaire && stagiaires.length > 0) {
-        stagiaires.forEach((s, si) => {
-          add(
-            `bdc_bc_tpl_${idx}_s${si}`,
-            `CT${crit} - IND ${ind} ${titre} – ${s.prenom} ${s.nom}`,
-            crit, ind, "bdc_bc_template",
-            { templateIdx: idx, stagiaireIdx: si },
-          );
-        });
-      } else {
-        add(
-          `bdc_bc_tpl_${idx}`,
-          `CT${crit} - IND ${ind} ${titre}`,
-          crit, ind, "bdc_bc_template",
-          { templateIdx: idx },
-        );
-      }
-    });
-
-    // Ressources statiques restantes (PDF non générables dynamiquement)
-    BDC_NT_STATIC_ASSETS.forEach((a, idx) => {
-      if (!/\.pdf$/i.test(a.src)) return;
-      const fileName = a.zipPath.split("/").pop() || a.zipPath;
-      const folder = a.zipPath.includes("/") ? a.zipPath.split("/")[0] : "";
-      const ind = folder ? indicateurFromKey(folder) : 1;
-      const crit = critereForIndicateur(ind);
-      add(
-        `bdc_nt_asset_${idx}`,
-        `CT${crit} - IND ${ind} ${fileName} (ressource)`,
-        crit, ind, "bdc_nt_asset",
-        { assetSrc: a.src, assetName: fileName },
-      );
+      add(`bdc_bc_tpl_${idx}`, `CT${critereForIndicateur(ind)} - IND ${ind} ${def.nom.replace(/^Indicateur\s+\d+(\s*[&et]+\s*\d+)*\s*-\s*/i, "")}`, critereForIndicateur(ind), ind, "bdc_bc_template", { templateIdx: idx });
     });
   }
 

@@ -15,7 +15,7 @@ Le bilan de compétences est une action concourant au développement des compét
 | Articles R6313-4 à R6313-8 du Code du travail | Déroulement obligatoire en trois phases, durée maximale de 24 heures, destruction des documents, contenu du document de synthèse et convention. |
 | Articles L6353-3 à L6353-7 du Code du travail | Contrat de formation conclu entre une personne physique et un organisme : mentions obligatoires, délai de rétractation, plafonnement de l'acompte. |
 | Article L221-18 du Code de la consommation | Délai de rétractation de 14 jours pour les contrats conclus à distance ou hors établissement. C'est ce délai, le plus favorable, que {{ORG}} applique. |
-| Articles L6323-1 et suivants du Code du travail | Compte personnel de formation : le bilan de compétences est éligible au CPF, à condition d'être réalisé par un prestataire certifié Qualiopi pour la catégorie « bilans de compétences » (art. L6316-1). |
+| Articles L6323-1 et suivants du Code du travail | Compte personnel de formation : le bilan de compétences est éligible au CPF, à condition d'être réalisé par un prestataire titulaire de la certification Qualiopi pour la catégorie « bilans de compétences » (art. L6316-1). |
 | Article 261-4-4°a du Code général des impôts | Exonération de TVA applicable aux actions de formation professionnelle continue. |
 
 **3. Les trois phases obligatoires (art. R6313-4)**

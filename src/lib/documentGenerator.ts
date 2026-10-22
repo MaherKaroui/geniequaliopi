@@ -17,6 +17,8 @@ import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesV
 import { genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
 import { planDevActions } from "./templatesCritere5";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { planNexus } from "@/lib/bdc/nexus/nexusDocs";
+import { NEXUS_TEMPLATES } from "@/lib/bdc/nexus/nexusTemplates";
 import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml, renderBdcTemplateBCHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel } from "@/lib/bdc/bdcNTXlsx";
 import { BDC_CLASSEURS } from "@/lib/bdc/bdcClasseursXlsx";
@@ -357,6 +359,13 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   }
 
   switch (template) {
+    case "bdc_nexus_doc":
+    case "bdc_nexus_xlsx": {
+      const cle = String(params?.cle || "");
+      const si = params?.stagiaireIdx;
+      const doc = planNexus(o, f, stagiaires, NEXUS_TEMPLATES).find((x) => x.cle === cle && (typeof si !== "number" || x.ben === si));
+      return doc ? doc.html() : buildDocument({ org: o, title: "Pièce introuvable", subtitle: cle, sections: [] });
+    }
     case "bdc_nt_doc":
     case "bdc_nt_doc_per_ben": {
       const sourceKey = params?.sourceKey as string;

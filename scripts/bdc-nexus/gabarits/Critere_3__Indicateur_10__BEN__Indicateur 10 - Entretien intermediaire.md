@@ -20,20 +20,19 @@ L'entretien intermédiaire vérifie, à mi-parcours, l'adéquation entre le dér
 
 | Question | Réponse du bénéficiaire |
 |---|---|
-| La prestation correspond-elle à vos attentes ? |  |
-| Quels éléments appréciez-vous le plus ? |  |
-| Quels éléments appréciez-vous le moins ? |  |
-| Le consultant communique-t-il de façon claire ? |  |
-| Avez-vous d'autres remarques ? |  |
+| La prestation correspond-elle à vos attentes ? | {{REP_MI1}} |
+| Quels éléments appréciez-vous le plus ? | {{REP_MI2}} |
+| Quels éléments appréciez-vous le moins ? | {{REP_MI3}} |
+| Le consultant communique-t-il de façon claire ? | {{REP_MI4}} |
+| Avez-vous d'autres remarques ? | {{REP_MI5}} |
 
 **Suites données par le consultant**
 
 | Point relevé | Ajustement décidé | Mise en œuvre |
 |---|---|---|
-|  |  |  |
-|  |  |  |
+{{REP_MI_SUITES}}
 
-| Objectifs révisés ? | ☐ Non — les objectifs fixés en phase préliminaire sont maintenus  ☐ Oui — avenant à la fiche d'objectifs |
+| Objectifs révisés ? | {{REP_MI_OBJ}} |
 |---|---|
 
 | Toute remarque appelant une action est reportée au Tableau des dysfonctionnements, réclamations et aléas (indicateur 31). |

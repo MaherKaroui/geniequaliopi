@@ -40,6 +40,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
 ]);
 
 const EXCEL_TEMPLATES = new Set([
+  "bdc_nexus_xlsx",
   "tableau_suivi_parcours_excel",
   "plan_dev_competences_excel",
   "tableau_amelioration_continue_excel",

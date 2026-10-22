@@ -24,8 +24,8 @@ La conservation des documents constitue une exception, limitée à **trois ans a
 
 | Choix | Cocher |
 |---|---|
-| Je demande la destruction immédiate de l'ensemble des documents à l'issue de mon bilan de compétences. | ☐ |
-| J'autorise la conservation des documents nécessaires au suivi de ma situation, pour trois ans au plus, soit jusqu'au {{D_CONSERVATION}}. | ☐ |
+| Je demande la destruction immédiate de l'ensemble des documents à l'issue de mon bilan de compétences. | {{REP_CONS_DESTR}} |
+| J'autorise la conservation des documents nécessaires au suivi de ma situation, pour trois ans au plus, soit jusqu'au {{D_CONSERVATION}}. | {{REP_CONS_GARDE}} |
 
 | Choix exprimé le | {{D_FIN}} de la main du bénéficiaire |
 |---|---|

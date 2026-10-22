@@ -24,26 +24,26 @@ Indicateur 8 — {{#SI TEST_PASSE}}Passé par le bénéficiaire le {{D_TEST}}{{#
 
 | N° | Affirmation | Réponse (1-5) |
 |---|---|---|
-| 1 | Je suis l'animateur des moments de convivialité. |  |
-| 2 | Je suis sensible à ce que ressentent les autres. |  |
-| 3 | Je fais les tâches qui m'incombent sans attendre. |  |
-| 4 | Mon humeur change souvent. |  |
-| 5 | J'ai une imagination fertile. |  |
-| 6 | Je ne parle pas beaucoup. |  |
-| 7 | Les problèmes des autres ne m'intéressent pas. |  |
-| 8 | J'oublie souvent de ranger les choses à leur place. |  |
-| 9 | Je suis détendu(e) la plupart du temps. |  |
-| 10 | Les idées abstraites ne m'intéressent pas. |  |
-| 11 | Je parle à beaucoup de personnes différentes lors d'un événement. |  |
-| 12 | Je ressens les émotions des autres. |  |
-| 13 | J'aime l'ordre. |  |
-| 14 | Je me contrarie facilement. |  |
-| 15 | J'ai du mal à comprendre les idées abstraites. |  |
-| 16 | Je reste en retrait. |  |
-| 17 | Je ne m'intéresse pas vraiment aux autres. |  |
-| 18 | Je mets du désordre dans ce que je fais. |  |
-| 19 | Je me sens rarement abattu(e). |  |
-| 20 | Je n'ai pas beaucoup d'imagination. |  |
+| 1 | Je suis l'animateur des moments de convivialité. | {{REP_T1}} |
+| 2 | Je suis sensible à ce que ressentent les autres. | {{REP_T2}} |
+| 3 | Je fais les tâches qui m'incombent sans attendre. | {{REP_T3}} |
+| 4 | Mon humeur change souvent. | {{REP_T4}} |
+| 5 | J'ai une imagination fertile. | {{REP_T5}} |
+| 6 | Je ne parle pas beaucoup. | {{REP_T6}} |
+| 7 | Les problèmes des autres ne m'intéressent pas. | {{REP_T7}} |
+| 8 | J'oublie souvent de ranger les choses à leur place. | {{REP_T8}} |
+| 9 | Je suis détendu(e) la plupart du temps. | {{REP_T9}} |
+| 10 | Les idées abstraites ne m'intéressent pas. | {{REP_T10}} |
+| 11 | Je parle à beaucoup de personnes différentes lors d'un événement. | {{REP_T11}} |
+| 12 | Je ressens les émotions des autres. | {{REP_T12}} |
+| 13 | J'aime l'ordre. | {{REP_T13}} |
+| 14 | Je me contrarie facilement. | {{REP_T14}} |
+| 15 | J'ai du mal à comprendre les idées abstraites. | {{REP_T15}} |
+| 16 | Je reste en retrait. | {{REP_T16}} |
+| 17 | Je ne m'intéresse pas vraiment aux autres. | {{REP_T17}} |
+| 18 | Je mets du désordre dans ce que je fais. | {{REP_T18}} |
+| 19 | Je me sens rarement abattu(e). | {{REP_T19}} |
+| 20 | Je n'ai pas beaucoup d'imagination. | {{REP_T20}} |
 
 **Partie 2 — Cotation**
 
@@ -51,11 +51,11 @@ Score brut de 4 à 20 par dimension ; les items formulés à l'inverse sont reco
 
 | Dimension | Items | Score brut | Zone |
 |---|---|---|---|
-| Extraversion | 1, 6 (inv.), 11, 16 (inv.) | ___ / 20 |  |
-| Agréabilité | 2, 7 (inv.), 12, 17 (inv.) | ___ / 20 |  |
-| Conscience professionnelle | 3, 8 (inv.), 13, 18 (inv.) | ___ / 20 |  |
-| Stabilité émotionnelle | 4 (inv.), 9, 14 (inv.), 19 | ___ / 20 |  |
-| Ouverture | 5, 10 (inv.), 15 (inv.), 20 (inv.) | ___ / 20 |  |
+| Extraversion | 1, 6 (inv.), 11, 16 (inv.) | {{REP_SC_E}} | {{REP_NIV_E}} |
+| Agréabilité | 2, 7 (inv.), 12, 17 (inv.) | {{REP_SC_A}} | {{REP_NIV_A}} |
+| Conscience professionnelle | 3, 8 (inv.), 13, 18 (inv.) | {{REP_SC_C}} | {{REP_NIV_C}} |
+| Stabilité émotionnelle | 4 (inv.), 9, 14 (inv.), 19 | {{REP_SC_N}} | {{REP_NIV_N}} |
+| Ouverture | 5, 10 (inv.), 15 (inv.), 20 (inv.) | {{REP_SC_O}} | {{REP_NIV_O}} |
 
 **Partie 3 — Restitution (matrice 04 « Personnalité : restitution »)**
 
@@ -63,17 +63,17 @@ Restitution orale conduite en séance 2 le {{S2}} : chaque résultat est discut�
 
 | Dimension et résultat | Exemple qui va dans ce sens | Nuance ou contre-exemple | Condition de travail utile | Conséquence pour le projet |
 |---|---|---|---|---|
-| Extraversion — ___ / 20 |  |  |  |  |
-| Agréabilité — ___ / 20 |  |  |  |  |
-| Conscience professionnelle — ___ / 20 |  |  |  |  |
-| Stabilité émotionnelle — ___ / 20 |  |  |  |  |
-| Ouverture — ___ / 20 |  |  |  |  |
+{{REP_LECT_E}}
+{{REP_LECT_A}}
+{{REP_LECT_C}}
+{{REP_LECT_N}}
+{{REP_LECT_O}}
 
 **Repères retenus pour la suite du bilan**
 
-•	Atouts mobilisables : ______________________________________________
+•	{{REP_ATOUTS}}
 
-•	Points de vigilance à explorer : ______________________________________________
+•	{{REP_VIGILANCE}}
 
 •	Matrices mobilisées ensuite : verbes d'action et réalisations STAR (séance {{S_COMP_NUM}}), valeurs et motivation (séance {{S_MI_NUM}}), enquêtes métiers ({{SEANCES_ENQ_LIB}}).
 
