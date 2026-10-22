@@ -48,6 +48,19 @@ const SOURCE_BADGE: Record<Piece["source"], { label: string; cls: string }> = {
   modele: { label: "Modèle de mail", cls: "bg-violet-100 text-violet-800 border-violet-200" },
 };
 
+function CerfaApercu({ piece, cx }: { piece: Piece; cx: Contexte }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [erreur, setErreur] = useState(false);
+  useEffect(() => {
+    let u: string | null = null; let actif = true;
+    setUrl(null); setErreur(false);
+    piece.pdf?.(cx).then((b) => { if (!actif) return; u = URL.createObjectURL(b); setUrl(u); }).catch(() => actif && setErreur(true));
+    return () => { actif = false; if (u) URL.revokeObjectURL(u); };
+  }, [piece, cx]);
+  if (erreur) return <p className="p-6 text-sm text-destructive">CERFA indisponible.</p>;
+  return url ? <iframe title="Aperçu CERFA" className="flex-1 w-full bg-background" src={url} /> : <p className="p-6 text-sm text-muted-foreground">Préparation du CERFA…</p>;
+}
+
 const telecharger = (blob: Blob, nom: string) => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -104,6 +117,7 @@ export default function EspaceIzilearn() {
       blob: await captureMail(mailPourCapture(p.mail, cx.o), clientMailOrganisme(cx.o)),
       nom: `${p.fichier}.png`,
     };
+    if (p.pdf && cx) return { blob: await p.pdf(cx), nom: `${p.fichier}.pdf` };
     const html = rendre(p);
     if (fmt === "pdf") return { blob: await htmlToPdfBlob(html), nom: `${p.fichier}.pdf` };
     const blob = await htmlToWordBlob(html);
@@ -351,7 +365,7 @@ export default function EspaceIzilearn() {
           <DialogHeader className="px-5 py-3 border-b">
             <DialogTitle className="text-base pr-8 truncate">{apercu?.titre}</DialogTitle>
           </DialogHeader>
-          {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
+          {apercu && (apercu.mail ? <IzilearnMailPreview mail={apercu.mail} organisme={cx.o} /> : apercu.pdf ? <CerfaApercu piece={apercu} cx={cx} /> : <iframe title="Aperçu" className="flex-1 w-full bg-background" srcDoc={rendre(apercu)} />)}
           {apercu && (
             <div className="px-5 py-3 border-t flex flex-wrap gap-2 justify-end">
               <Button size="sm" disabled={!!travail} onClick={() => unique(apercu)}><FileDown className="w-4 h-4 mr-1" />{apercu.mail ? "Télécharger la capture" : `Télécharger en ${format === "pdf" ? "PDF" : "Word"}`}</Button>
