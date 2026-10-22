@@ -387,3 +387,22 @@ describe("Espace IZILearn", () => {
     });
   }
 });
+
+describe("CERFA IZILearn", () => {
+  it("ajoute un CERFA par apprenant pour une formation en apprentissage", () => {
+    const pieces = planPieces(contexte(payload("apprentissage", 5)));
+    const cerfas = pieces.filter((x) => x.categorie === "cerfa");
+    expect(cerfas.length).toBe(payload("apprentissage", 5).apprenants.length);
+    expect(cerfas.every((x) => typeof x.pdf === "function")).toBe(true);
+  });
+  it("ajoute le CERFA quand l'organisme a un code UAI (CFA)", () => {
+    const p = payload("actions-formation", 5);
+    p.organisme.uai = "0942677Z";
+    expect(planPieces(contexte(p)).some((x) => x.categorie === "cerfa")).toBe(true);
+  });
+  it("pas de CERFA hors CFA", () => {
+    const p = payload("actions-formation", 5);
+    p.organisme.uai = undefined;
+    expect(planPieces(contexte(p)).some((x) => x.categorie === "cerfa")).toBe(false);
+  });
+});
