@@ -1,9 +1,5 @@
 # Roadmap
 
-- [ ] Sauvegarder et rouvrir les dossiers IZILearn avec signatures, données et réglages sur ce navigateur ; vérifier la persistance après rechargement et l’isolation des sessions.
-
-- [x] Varier et humaniser les réponses des besoins et du positionnement IZILearn ; questionnaires automatiques depuis les objectifs/modules pour les formations inconnues, réponses enregistrées prioritaires, faits administratifs absents non inventés. 36 tests réussis, aperçus besoins/positionnement et PDF vérifiés sur une session de contrôle ; vraie session IZILearn non disponible, non publié.
-
 - [x] Harmoniser les mails QCM et annonces J-1 des 14 missions CFA avec les captures Gmail/Outlook des autres mails Qualiopi, dans les aperçus, téléchargements et ZIP ; 13 tests réussis, deux aperçus et téléchargements PNG contrôlés dans un dossier CFA connecté, ZIP MAIL de 32 fichiers vérifié avec toutes les missions en PNG. Aucune erreur, non publié.
 
 - [x] Remplir automatiquement les émargements et relevés de connexion IZILearn comme la génération rapide Qualiopi : jours passés signés (nom + « Signé X.Nom » ou signature réutilisable, formateur) et horaires de connexion réalistes (buildRealisticConnectionDay, « Présent(e) »), jours futurs vierges, preuves IZILearn enregistrées prioritaires. 27 tests réussis, aperçus émargement (hybride) et connexion (distanciel) vérifiés sur sessions de contrôle. Session réelle non disponible, non publié.
