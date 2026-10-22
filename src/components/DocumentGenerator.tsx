@@ -1991,6 +1991,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                     </span>
                     <span className="flex-1 truncate">{doc.nom}</span>
                     <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>
+                    {isCaptureMailTemplate(doc.template) && <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => handlePreview(doc)}>Aperçu</Button>}
                     <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
                       DL
                     </button>
