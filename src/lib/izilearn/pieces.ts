@@ -122,7 +122,7 @@ export function planPieces(cx: Contexte): Piece[] {
       besoins ? () => T.evaluationBesoins(c).html : gen(`besoins_${i}`, "trame_eval_besoins_combine", { stagiaireIdx: i }));
     const positionnement = (a.positionnement || []).some(hasRecordedQuiz);
     par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", positionnement ? "izilearn" : "document",
-      positionnement ? () => T.testPositionnement(c).html : gen(`positionnement_${i}`, "test_positionnement_debut_stagiaire", { stagiaireIdx: i }));
+      () => T.testPositionnement(c).html);
     par("convocation", "Convocation", "CONVOCATION", "document", gen(`convocation_${i}`, g.convocation, { stagiaireIdx: i }));
     const entreprise = !!s.entreprise;
     par("convention", p.formation.typeAction === "apprentissage" ? "Convention de formation par apprentissage" : entreprise ? "Convention de formation" : "Contrat de formation",

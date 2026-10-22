@@ -2608,7 +2608,9 @@ export function getQuestionsOuvertes(
   programme?: string
 ): QuestionsOuvertesFormation {
   const preset = presetEvalContent(formationIntitule);
-  if (preset) return { debut: preset.questionsOuvertesDebut ?? [], fin: preset.questionsOuvertesFin ?? [] };
+  const presetDebut = preset?.questionsOuvertesDebut?.filter(q => q.question?.trim()) ?? [];
+  const presetFin = preset?.questionsOuvertesFin?.filter(q => q.question?.trim()) ?? [];
+  if (presetDebut.length && presetFin.length) return { debut: presetDebut, fin: presetFin };
   const key = getContentKey(formationIntitule);
   const hasSpecificContent = !!QUESTIONS_OUVERTES[key];
   const source = QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
@@ -2639,11 +2641,11 @@ export function getQuestionsOuvertes(
   } catch { /* ignore */ }
 
   return {
-    debut: ensureMinimumQuestions(
+    debut: presetDebut.length ? presetDebut : ensureMinimumQuestions(
       [...aiDebut, ...dynamicDebut, ...source.debut],
       [...(wordFallback?.debut ?? []), ...DEFAULT_QUESTIONS_OUVERTES.debut]
     ),
-    fin: ensureMinimumQuestions(
+    fin: presetFin.length ? presetFin : ensureMinimumQuestions(
       [...aiFin, ...dynamicFin, ...source.fin],
       [...(wordFallback?.fin ?? []), ...DEFAULT_QUESTIONS_OUVERTES.fin]
     ),
