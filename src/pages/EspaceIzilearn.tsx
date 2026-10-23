@@ -4,6 +4,7 @@
  * les pièces générées peuvent être renvoyées dans les documents de la session.
  */
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { preloadFranceCompetences } from "@/lib/franceCompetences";
 import JSZip from "jszip";
 import { limiterCheminsZip } from "@/lib/fileNaming";
 import { toast } from "sonner";
@@ -73,7 +74,9 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
   definirPlateforme(app);
   const { nom: nomApp, url: urlApp } = PLATEFORMES[app];
   const { payload, etat, actualiser, envoyer } = useIzilearn(app);
-  const contentRevision = useSyncExternalStore(subscribePresets, presetRevision);
+  const presetRev = useSyncExternalStore(subscribePresets, presetRevision);
+  const [ficheRev, setContentRevision] = useState(0);
+  const contentRevision = `${presetRev}-${ficheRev}`;
   const [format, setFormat] = useState<Format>("pdf");
   const [dateMaj, setDateMaj] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<DocStyleConfig | null>(null);
@@ -90,10 +93,11 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
   }, [signatures]);
   const [travail, setTravail] = useState<{ label: string; fait: number; total: number } | null>(null);
 
+  const cx0 = useMemo(() => (payload ? contexte(payload, dateMaj) : null), [payload, dateMaj, ficheRev]);
   const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload, dateMaj), signatures) : null), [payload, signatures, dateMaj]);
   useEffect(() => { setDateMaj(""); setSelectedStyle(null); }, [payload?.source.orgId, payload?.source.sessionId]);
   // Fiche RS/RNCP de la base France Compétences : chargée puis aperçus recalculés.
-  const codeFiche = cx?.f.codeRNCP;
+  const codeFiche = payload ? contexte(payload).f.codeRNCP : undefined;
   useEffect(() => {
     if (!codeFiche) return;
     let actif = true;

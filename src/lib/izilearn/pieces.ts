@@ -5,6 +5,7 @@
  * Remplissage Qualiopi par défaut ; les réponses et preuves IZILearn priment.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import { getFicheFC, ficheToReferentiel } from "@/lib/franceCompetences";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { adaptHtmlToTypeAction } from "@/lib/adaptTypeAction";
 import type { IzPayload } from "./types";
@@ -69,7 +70,10 @@ export function contexte(p: IzPayload, dateMaj?: string): Contexte {
   definirPlateforme(p.source?.app);
   const o = versOrganisme(p);
   if (dateMaj && /^\d{4}-\d{2}-\d{2}$/.test(dateMaj) && !Number.isNaN(new Date(`${dateMaj}T12:00:00`).getTime())) o.dateMaj = dateMaj;
-  return { p, o, f: versFormation(p), stagiaires: versStagiaires(p) };
+  const f = versFormation(p);
+  const fiche = getFicheFC(f.codeRNCP);
+  if (fiche && !f.referentiel?.code) f.referentiel = ficheToReferentiel(fiche);
+  return { p, o, f, stagiaires: versStagiaires(p) };
 }
 
 const slug = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
