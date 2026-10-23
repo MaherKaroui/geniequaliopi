@@ -8578,9 +8578,50 @@ ${lignes}
 </table>`;
 }
 
-function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
+/** Réponse enregistrée en ligne (ex. questionnaire IZILearn) : question + réponse libre. */
+interface ReleveBesoin { question?: string; reponse?: string | null }
+
+/** Réponse exploitable : non vide et pas un placeholder (« Non renseigné », « - »…). */
+const reponseSubstantielle = (v?: string | null) => {
+  const t = (v ?? "").trim();
+  return t.length >= 2 && !/^(non renseign|n\s*\/\s*a|néant|[-–—.]+)$/i.test(t);
+};
+
+/**
+ * Substitue les réponses réellement enregistrées aux réponses générées, question par
+ * question. Les questions sans réponse enregistrée conservent le remplissage Qualiopi :
+ * le document reste toujours complet.
+ */
+function appliquerRelevesBesoins(answers: Record<string, string>, releves: ReleveBesoin[] | undefined, mapping: Array<{ cle: string; motif: RegExp }>) {
+  if (!releves?.length) return;
+  for (const r of releves) {
+    if (!reponseSubstantielle(r.reponse)) continue;
+    const q = (r.question || "").toLowerCase();
+    const m = mapping.find((x) => x.motif.test(q));
+    if (m) answers[m.cle] = (r.reponse || "").trim();
+  }
+}
+
+const MAPPING_BESOINS_APPRENANT: Array<{ cle: string; motif: RegExp }> = [
+  { cle: "diplome", motif: /dipl[oô]me|titre/ },
+  { cle: "objectif", motif: /objectif (professionnel|personnel)|objectif .*atteindre/ },
+  { cle: "budget", motif: /budget|financement|cpf|opco|p[oô]le emploi/ },
+  { cle: "projetPro", motif: /contribuera|contribution|r[ée]alisation de votre projet/ },
+  { cle: "handicap", motif: /handicap/ },
+  { cle: "disponibilites", motif: /disponibilit|am[ée]nagement horaire|cr[ée]neaux/ },
+];
+const MAPPING_BESOINS_ENTREPRISE: Array<{ cle: string; motif: RegExp }> = [
+  { cle: "raisonSociale", motif: /raison sociale|nom commercial/ },
+  { cle: "attentes", motif: /attentes/ },
+  { cle: "missions", motif: /missions/ },
+  { cle: "contribution", motif: /strat[ée]giques|d[ée]veloppement/ },
+];
+
+function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false, releves?: { apprenant?: ReleveBesoin[]; entreprise?: ReleveBesoin[] }) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  appliquerRelevesBesoins(answers as unknown as Record<string, string>, releves?.apprenant, MAPPING_BESOINS_APPRENANT);
+  appliquerRelevesBesoins(answers as unknown as Record<string, string>, releves?.entreprise, MAPPING_BESOINS_ENTREPRISE);
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   if (isAlternanceOPCO) {
     answers.budget = ALTERNANCE_OPCO_FINANCEMENT;
