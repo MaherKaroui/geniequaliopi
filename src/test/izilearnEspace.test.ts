@@ -207,6 +207,15 @@ describe("Espace IZILearn", () => {
     expect(html).not.toContain("17:00");
   });
 
+  it("nomme l'organisme de formation comme plateforme dans le temps de connexion", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.apprenants[0].connexions = [{ debut: "2026-11-02T09:05:00", secondes: 3600, source: "lms" }];
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre() || "";
+    expect(html).toContain("Plateforme :</strong> ORGANISME TEST");
+    expect(html).toContain(">ORGANISME TEST</td>");
+    expect(html).not.toContain("IZILearn");
+  });
+
   it("reprend les deux blocs horaires Qualiopi sans relevé ni créneau IZILearn", () => {
     const p = payload("actions-formation", 1, "distanciel");
     p.creneaux = [];
