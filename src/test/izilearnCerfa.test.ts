@@ -19,4 +19,26 @@ describe("CERFA IZILearn", () => {
     expect(s.nir).toBeUndefined();
     expect(s.cerfa?.idcc).toBe("");
   });
+  it("conserve les champs AcroForm et les données simples CERFA explicites", () => {
+    const cerfaChamps = { "Zone de texte 8_18": "1050993066087", "Case #C3#A0 cocher 3": true };
+    const s = versStagiaire({ ...base, nir: "1050993066087", nomNaissance: "DUPONT",
+      nationalite: "1", departementNaissance: "93", communeNaissance: "Saint-Denis",
+      codePostal: "93200", commune: "Saint-Denis", dateNaissanceCerfa: "2005-09-06",
+      dateNaissance: "2001-01-01", adresse: "12 rue Exemple, 75001 Paris", cerfaChamps }, p);
+    expect(s.cerfaChamps).toEqual(cerfaChamps);
+    expect(s.nir).toBe("1050993066087");
+    expect(s.cerfa?.nomNaissance).toBe("DUPONT");
+    expect(s.nationalite).toBe("1");
+    expect(s.departementNaissance).toBe("93");
+    expect(s.communeNaissance).toBe("Saint-Denis");
+    expect(s.codePostal).toBe("93200");
+    expect(s.commune).toBe("Saint-Denis");
+    expect(s.dateNaissance).toBe("2005-09-06");
+  });
+  it("reconnaît les clés lisibles apprenti du contrat", () => {
+    const s = versStagiaire({ ...base, cerfa: { apprenti_nir: "1050993066087",
+      apprenti_commune_naissance: "Saint-Denis" } }, p);
+    expect(s.nir).toBe("1050993066087");
+    expect(s.communeNaissance).toBe("Saint-Denis");
+  });
 });

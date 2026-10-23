@@ -89,6 +89,16 @@ export interface IzApprenant {
   email?: string;
   telephone?: string;
   dateNaissance?: string;
+  dateNaissanceCerfa?: string;
+  nir?: string;
+  nomNaissance?: string;
+  departementNaissance?: string;
+  communeNaissance?: string;
+  nationalite?: string;
+  codePostal?: string;
+  commune?: string;
+  cerfa?: Record<string, unknown>;
+  cerfaChamps?: Record<string, string | boolean>;
   adresse?: string;
   poste?: string;
   /** Reusable signature supplied explicitly by the learner, not attendance evidence. */
