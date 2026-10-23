@@ -300,6 +300,13 @@ export default function EspaceIzilearn() {
                 <Button variant="outline" size="sm" className="h-7 px-2 text-xs shrink-0" disabled={!!travail} aria-label={`Signature du formateur ${p.session.formateur}`} onClick={() => setSignatureTarget({ index: -1, role: "formateur" })}>{cx.f.formateurSignatureUrl ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <PenLine className="w-3 h-3 mr-1" />}Signature formateur</Button>
               </div>
             )}
+            <Button variant="default" size="sm" className="w-full mt-3 h-8 text-xs" disabled={!!travail} onClick={() => {
+              try {
+                localStorage.setItem("izilearn-signatures", JSON.stringify(signatures));
+                const n = Object.keys(signatures).length;
+                toast.success(n ? `${n} signature${n > 1 ? "s" : ""} sauvegardée${n > 1 ? "s" : ""}` : "Aucune signature à sauvegarder");
+              } catch { toast.error("Sauvegarde impossible : espace du navigateur plein"); }
+            }}><Download className="w-3 h-3 mr-1" />Sauvegarder toutes les signatures</Button>
           </section>
           <section className="bg-card border rounded-xl p-4">
             <div role="heading" aria-level={2} className="font-semibold text-sm mb-2 flex items-center gap-1.5"><FileText className="w-4 h-4" />Pièces</div>
