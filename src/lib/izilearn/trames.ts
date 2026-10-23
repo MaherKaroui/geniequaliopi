@@ -8,6 +8,7 @@
  * donnée réelle, la pièce est une trame vierge nominative à faire remplir —
  * jamais une réponse, une note, une appréciation ou une signature générée.
  */
+import { isLilateFormation, lilateNiveau } from "@/lib/lilateHumanized";
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate } from "@/lib/docBuilder";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "@/lib/attendancePresentation";
@@ -473,6 +474,8 @@ function poolQcm(c: Ctx): QcmQ[] {
  * (majorité de bonnes réponses), score calculé ; période future → vierge.
  * Sans question disponible, repli sur l'exercice pratique.
  */
+const TAUX_LILATE = { A1: 0.4, A2: 0.55, B1: 0.68, B2: 0.8 } as const;
+
 export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = false): string {
   const tout = poolQcm(c);
   if (!tout.length) return exercicePratique(c, u, i, n);
@@ -484,15 +487,22 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
     ? (izCorr.length >= 3 ? izCorr : tout.filter(aCorrige).length ? tout.filter(aCorrige) : tout)
     : (iz.length ? iz : tout);
   const per = Math.min(pool.length, Math.max(3, Math.ceil(pool.length / Math.max(1, n))));
-  const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k) % pool.length]);
+  // LILATE : questions tirées de la banque avec un décalage propre au stagiaire (QCM différent pour chacun).
+  const decalage = isLilateFormation(c.f.intitule, c.f.codeRNCP) ? Math.max(0, c.p.apprenants.indexOf(c.a)) * (per + 1) : 0;
+  const qs = Array.from({ length: per }, (_, k) => pool[(i * per + k + decalage) % pool.length]);
   // Remplissage automatique seulement si la bonne réponse est connue pour chaque question.
   const corrigeComplet = qs.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
   const fill = rempli && corrigeComplet;
   let answers: number[] = [];
   if (fill) {
     // Déterministe par apprenant et par période : ~80 % de bonnes réponses.
-    const seed = Math.abs((`${c.s.prenom}${c.s.nom}${i}`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
-    const nbBonnes = Math.max(per - 1, Math.round(per * 0.8));
+    const idx = Math.max(0, c.p.apprenants.indexOf(c.a));
+    const lilate = isLilateFormation(c.f.intitule, c.f.codeRNCP);
+    const seed = Math.abs((`${c.s.prenom}${c.s.nom}${i}${lilate ? `#${idx}` : ""}`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
+    // LILATE : taux de réussite selon le niveau CECRL estimé du stagiaire, en progression d'une période à l'autre.
+    const nbBonnes = lilate
+      ? Math.max(1, Math.min(per, Math.round(per * Math.min(1, TAUX_LILATE[lilateNiveau(idx, c.s.nom, c.s.prenom)] + 0.15 * (n > 1 ? i / (n - 1) : 1)))))
+      : Math.max(per - 1, Math.round(per * 0.8));
     const fausses = new Set<number>();
     let k = 0;
     while (fausses.size < per - nbBonnes && k < per * 4) { fausses.add((seed + k * 7) % per); k++; }
