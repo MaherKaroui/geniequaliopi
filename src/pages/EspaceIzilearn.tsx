@@ -92,6 +92,14 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
 
   const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload, dateMaj), signatures) : null), [payload, signatures, dateMaj]);
   useEffect(() => { setDateMaj(""); setSelectedStyle(null); }, [payload?.source.orgId, payload?.source.sessionId]);
+  // Fiche RS/RNCP de la base France Compétences : chargée puis aperçus recalculés.
+  const codeFiche = cx?.f.codeRNCP;
+  useEffect(() => {
+    if (!codeFiche) return;
+    let actif = true;
+    preloadFranceCompetences(codeFiche).then((fiche) => { if (actif && fiche) setContentRevision((r) => r + 1); });
+    return () => { actif = false; };
+  }, [codeFiche]);
   useEffect(() => { if (cx) setDocStyle(selectedStyle ?? getAutomaticDossierDesign(cx.o, 0).style); }, [cx, selectedStyle]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
   const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx, contentRevision]);
