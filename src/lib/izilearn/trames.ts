@@ -29,8 +29,10 @@ export interface Ctx {
 
 // ───────────────────────── utilitaires ─────────────────────────
 
+const BR = "\u0000BR\u0000";
 export const esc = (v: unknown) => String(v ?? "")
-  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  .replace(/(?:&lt;|<)\s*br\s*\/?\s*(?:&gt;|>)/gi, BR)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").split(BR).join("<br>");
 
 const nl2br = (v: unknown) => esc(v).replace(/\n/g, "<br>");
 
