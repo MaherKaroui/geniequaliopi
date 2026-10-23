@@ -271,7 +271,7 @@ export async function genCerfaApprentissagePdf(
     const d = new Date(dateDebut);
     d.setDate(d.getDate() - 7);
     return d.toISOString().slice(0, 10);
-  })() : "";
+  })() : "");
 
   const [ccJ, ccM, ccA] = splitDate(dateConclusion);
   setText(form, "Zone de texte 21_16", ccJ);
@@ -362,7 +362,8 @@ export async function genCerfaApprentissagePdf(
   const tarif = tarifApprenti(age);
   const SMIC_BRUT_MENSUEL = SMIC_BRUT_MENSUEL_REFERENCE.montant;
   const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
-  const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
+  const salaireSaisi = Number(String(cx.salaireBrutMensuel || "").replace(/[^\d,.]/g, "").replace(",", "."));
+  const [montantEuros, montantCents] = (salaireSaisi > 0 ? salaireSaisi : montantTarif).toFixed(2).split(".");
   // Salaire brut mensuel à l'embauche (euros , centimes)
   setText(form, "Zone de texte 8_72", montantEuros);
   setText(form, "Zone de texte 21_73", montantCents);
