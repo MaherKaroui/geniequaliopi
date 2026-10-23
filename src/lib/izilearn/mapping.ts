@@ -3,6 +3,7 @@
  * (OrganismeInfo / FormationInfo / StagiaireInfo). Champ absent côté IZILearn =
  * champ vide ici : rien n'est emprunté à une formation ou un organisme d'exemple.
  */
+import { nomPlateforme } from "./plateforme";
 import type { CerfaComplement, FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { IzApprenant, IzPayload } from "./types";
 
@@ -46,7 +47,7 @@ export function versOrganisme(p: IzPayload): OrganismeInfo {
     domainesFormation: "",
     typesActions: [p.formation.typeAction],
     certifications: "",
-    outilsUtilises: "IZILearn",
+    outilsUtilises: nomPlateforme(),
     version: String(p.formation.version || 1),
     dateMaj: t(p.formation.miseAJour) || new Date().toISOString().slice(0, 10),
     logoUrl: t(o.logoUrl) || undefined,

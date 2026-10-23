@@ -37,6 +37,8 @@ const ApplicationContent = () => {
   const location = useLocation();
   // Espace IZILearn : accessible par lien, sans code d'accès ; ses données viennent d'IZILearn.
   if (location.pathname === "/izilearn") return <EspaceIzilearn />;
+  // Espace CRM LMS : même espace, données envoyées par la fiche session de CRM LMS.
+  if (location.pathname === "/crmlms") return <EspaceIzilearn app="crmlms" />;
   if (isEmbeddedBDC(location.pathname, location.search)) {
     return <BackgroundJobsProvider><BilanCompetences embedded /></BackgroundJobsProvider>;
   }

@@ -14,6 +14,7 @@ import { hasRecordedQuiz, hasRecordedResponses } from "./responses";
 import { mailHtml, mailsModeles, type MailModele } from "./mails";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { appliquerRevision, developperLivret } from "./presentation";
+import { definirPlateforme, marque } from "./plateforme";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
@@ -64,6 +65,7 @@ export interface Contexte {
 }
 
 export function contexte(p: IzPayload, dateMaj?: string): Contexte {
+  definirPlateforme(p.source?.app);
   const o = versOrganisme(p);
   if (dateMaj && /^\d{4}-\d{2}-\d{2}$/.test(dateMaj) && !Number.isNaN(new Date(`${dateMaj}T12:00:00`).getTime())) o.dateMaj = dateMaj;
   return { p, o, f: versFormation(p), stagiaires: versStagiaires(p) };
@@ -172,6 +174,8 @@ export function planPieces(cx: Contexte): Piece[] {
   });
   return out.map((piece) => {
     const rendre = piece.rendre;
-    return piece.pdf ? piece : { ...piece, rendre: () => appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o) };
+    // Textes écrits pour IZILearn : nom de la plateforme reliée (CRM LMS…).
+    const mail = piece.mail && { ...piece.mail, corpsHtml: marque(piece.mail.corpsHtml) };
+    return piece.pdf ? piece : { ...piece, mail, rendre: () => marque(appliquerRevision(piece.categorie === "livret" ? developperLivret(rendre(), cx) : rendre(), o)) };
   });
 }

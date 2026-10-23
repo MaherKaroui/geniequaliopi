@@ -1,4 +1,5 @@
 import type { FormationPreset } from './registry';
+import { BUILTIN_LILATE_PRESETS } from './builtinLilate';
 import gotrm from '@/data/tpPresets/gotrm.json';
 import etrm from '@/data/tpPresets/etrm.json';
 import gcf from '@/data/tpPresets/gcf.json';
@@ -43,7 +44,7 @@ const CONTEXTES = [
 ];
 /** 40 besoins individuels distincts (10 besoins × contextes), déterministes par stagiaire. */
 export function getTPBesoin(intitule: string, code: string | undefined, nom: string, prenom: string, i: number): string | null {
-  const p = BUILTIN_TP_PRESETS.find(x => (code && x.code_rncp === code.toUpperCase().replace(/\s/g, '')) || x.intitule_normalise === norm(intitule));
+  const p = [...BUILTIN_TP_PRESETS, ...BUILTIN_LILATE_PRESETS].find(x => (code && x.code_rncp === code.toUpperCase().replace(/\s/g, '')) || x.intitule_normalise === norm(intitule));
   const list = p?.data.plan?.besoins.besoinsList; if (!list?.length) return null;
   void nom; void prenom;
   const k = ((i % 40) + 40) % 40;

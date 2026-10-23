@@ -125,7 +125,7 @@ export interface IzSession {
 
 export interface IzPayload {
   version: 1;
-  source: { app: "izilearn"; url: string; orgId: string; sessionId: string; utilisateur?: string };
+  source: { app: "izilearn" | "crmlms"; url: string; orgId: string; sessionId: string; utilisateur?: string };
   organisme: IzOrganisme;
   formation: IzFormation;
   session: IzSession;

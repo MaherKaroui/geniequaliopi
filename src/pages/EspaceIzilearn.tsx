@@ -1,5 +1,5 @@
 /**
- * /izilearn — espace documentaire relié à IZILearn, accessible par lien sans code d'accès.
+ * /izilearn et /crmlms — espace documentaire relié à IZILearn ou à CRM LMS, accessible par lien sans code d'accès.
  * Les données (organisme, formation, session, apprenants, preuves) arrivent d'IZILearn ;
  * les pièces générées peuvent être renvoyées dans les documents de la session.
  */
@@ -20,6 +20,7 @@ import { htmlToWordBlob } from "@/lib/wordExport";
 import { setDocStyle } from "@/lib/docBuilder";
 import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
 import { useIzilearn } from "@/lib/izilearn/bridge";
+import { PLATEFORMES, definirPlateforme, marque, type AppSource } from "@/lib/izilearn/plateforme";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import { champsManquants } from "@/lib/izilearn/mapping";
 import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Contexte, type Piece } from "@/lib/izilearn/pieces";
@@ -42,7 +43,7 @@ import { ceder } from "@/lib/arrierePlan";
 type Format = "pdf" | "word";
 
 const SOURCE_BADGE: Record<Piece["source"], { label: string; cls: string }> = {
-  izilearn: { label: "Données IZILearn", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+  izilearn: { label: "Données de la plateforme", cls: "bg-emerald-100 text-emerald-800 border-emerald-200" },
   trame: { label: "Trame à compléter", cls: "bg-slate-100 text-slate-700 border-slate-200" },
   document: { label: "Document", cls: "bg-sky-100 text-sky-800 border-sky-200" },
   modele: { label: "Modèle de mail", cls: "bg-violet-100 text-violet-800 border-violet-200" },
@@ -68,8 +69,10 @@ const telecharger = (blob: Blob, nom: string) => {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 };
 
-export default function EspaceIzilearn() {
-  const { payload, etat, actualiser, envoyer } = useIzilearn();
+export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }) {
+  definirPlateforme(app);
+  const { nom: nomApp, url: urlApp } = PLATEFORMES[app];
+  const { payload, etat, actualiser, envoyer } = useIzilearn(app);
   const contentRevision = useSyncExternalStore(subscribePresets, presetRevision);
   const [format, setFormat] = useState<Format>("pdf");
   const [dateMaj, setDateMaj] = useState("");
@@ -176,10 +179,10 @@ export default function EspaceIzilearn() {
         const a = r.p.apprenantIdx !== null ? cx.p.apprenants[r.p.apprenantIdx] : null;
         return { nom: r.nom, dossier: chemin(r.p), categorie: r.p.categorie, inscriptionId: a?.inscriptionId, contactId: a?.contactId, blob: r.blob };
       });
-      setTravail({ label: "Enregistrement dans IZILearn…", fait: fichiers.length, total: fichiers.length });
+      setTravail({ label: `Enregistrement dans ${nomApp}…`, fait: fichiers.length, total: fichiers.length });
       const res = await envoyer(fichiers);
       if (res.erreurs.length) toast.warning(`${res.n} pièce(s) enregistrée(s), ${res.erreurs.length} erreur(s) : ${res.erreurs[0]}`);
-      else toast.success(`${res.n} pièce(s) enregistrée(s) dans les documents de la session IZILearn`);
+      else toast.success(`${res.n} pièce(s) enregistrée(s) dans les documents de la session ${nomApp}`);
     } catch (e) { toast.error((e as Error).message); } finally { setTravail(null); }
   }
 
@@ -190,18 +193,18 @@ export default function EspaceIzilearn() {
           <div className="mx-auto w-14 h-14 rounded-full bg-gradient-hero flex items-center justify-center">
             {etat === "attente" ? <Loader2 className="w-7 h-7 text-primary-foreground animate-spin" /> : <Link2 className="w-7 h-7 text-primary-foreground" />}
           </div>
-          <div role="heading" aria-level={1} className="text-2xl font-bold"><span className="text-gradient-hero">Génie Qualiopi</span> × IZILearn</div>
+          <div role="heading" aria-level={1} className="text-2xl font-bold"><span className="text-gradient-hero">Génie Qualiopi</span> × {nomApp}</div>
           {etat === "attente" ? (
-            <p className="text-sm text-muted-foreground">Connexion à IZILearn…</p>
+            <p className="text-sm text-muted-foreground">Connexion à {nomApp}…</p>
           ) : (
             <>
               <p className="text-sm text-muted-foreground">
-                Cet espace se remplit avec les données d'une session IZILearn. Ouvrez une session dans IZILearn puis l'onglet
+                Cet espace se remplit avec les données d'une session {nomApp}. Ouvrez une session dans {nomApp} puis l'onglet
                 <strong> « Génie Qualiopi »</strong> (ou le bouton « Ouvrir en plein écran ») : programme, évaluations, exercices,
                 émargements, mails et documents contractuels sont générés pour chaque apprenant.
               </p>
               <Button asChild className="bg-gradient-hero border-0 text-primary-foreground">
-                <a href="https://izilearn.netlify.app/sessions" target="_blank" rel="noreferrer">Ouvrir IZILearn</a>
+                <a href={urlApp} target="_blank" rel="noreferrer">Ouvrir {nomApp}</a>
               </Button>
             </>
           )}
@@ -219,7 +222,7 @@ export default function EspaceIzilearn() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="w-3.5 h-3.5" />Connecté à IZILearn</span>
+              <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="w-3.5 h-3.5" />Connecté à {nomApp}</span>
               <span>· {p.organisme.nom}</span>
             </div>
             <div role="heading" aria-level={1} className="text-lg font-bold truncate">{f.intitule}</div>
@@ -233,10 +236,10 @@ export default function EspaceIzilearn() {
               <button key={x} onClick={() => setFormat(x)} className={`px-3 py-1 rounded-md ${format === x ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{x === "pdf" ? "PDF" : "Word"}</button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={actualiser} title="Recharger les données depuis IZILearn"><RefreshCw className="w-4 h-4 mr-1" />Actualiser</Button>
+          <Button variant="outline" size="sm" onClick={actualiser} title={`Recharger les données depuis ${nomApp}`}><RefreshCw className="w-4 h-4 mr-1" />Actualiser</Button>
           <Button variant="outline" size="sm" onClick={zipTout} disabled={!!travail || !visibles.length}><Download className="w-4 h-4 mr-1" />ZIP ({visibles.length})</Button>
           <Button size="sm" onClick={versIzilearn} disabled={!!travail || !visibles.length} className="bg-gradient-hero border-0 text-primary-foreground">
-            <Upload className="w-4 h-4 mr-1" />Enregistrer dans IZILearn
+            <Upload className="w-4 h-4 mr-1" />Enregistrer dans {nomApp}
           </Button>
         </div>
         {travail && (
@@ -255,7 +258,7 @@ export default function EspaceIzilearn() {
         <div className="max-w-7xl mx-auto px-4 pt-4">
           <div className="rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 px-4 py-3 text-sm flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>Support de cours, exercices et questions tirés du contenu de la formation dans IZILearn{payload.formation.contenu?.brouillonIA ? " (créé automatiquement par l'IA, à relire par le formateur)" : ""}.</span>
+            <span>Support de cours, exercices et questions tirés du contenu de la formation dans {nomApp}{payload.formation.contenu?.brouillonIA ? " (créé automatiquement par l'IA, à relire par le formateur)" : ""}.</span>
           </div>
         </div>
       )}
@@ -267,7 +270,7 @@ export default function EspaceIzilearn() {
           <Input id="izilearn-date-maj" type="date" className="w-44" value={cx.o.dateMaj} disabled={!!travail} onChange={(e) => setDateMaj(e.target.value)} />
         </div>
         <fieldset disabled={!!travail}>
-          <DossierOutputSettings key={`${p.source.orgId}_${p.source.sessionId}`} organisme={cx.o} scope={`izilearn_${p.source.orgId}_${p.source.sessionId}`} onEffectiveStyleChange={setSelectedStyle} />
+          <DossierOutputSettings key={`${p.source.orgId}_${p.source.sessionId}`} organisme={cx.o} scope={`${app === "izilearn" ? "izilearn" : app}_${p.source.orgId}_${p.source.sessionId}`} onEffectiveStyleChange={setSelectedStyle} />
         </fieldset>
       </div>
       <main className="max-w-7xl mx-auto px-4 py-5 grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -324,7 +327,7 @@ export default function EspaceIzilearn() {
           </section>
           {manquants.length > 0 && (
             <section className="border border-amber-300 bg-amber-50 rounded-xl p-4 text-amber-900">
-              <div role="heading" aria-level={2} className="font-semibold text-sm flex items-center gap-1.5 mb-1"><AlertTriangle className="w-4 h-4" />À compléter dans IZILearn</div>
+              <div role="heading" aria-level={2} className="font-semibold text-sm flex items-center gap-1.5 mb-1"><AlertTriangle className="w-4 h-4" />À compléter dans {nomApp}</div>
               <ul className="text-xs list-disc pl-4 space-y-0.5">{manquants.map((m) => <li key={m}>{m}</li>)}</ul>
               <p className="text-xs mt-2">Les documents restent générés ; les champs manquants y apparaissent vides plutôt qu'inventés.</p>
             </section>
@@ -339,7 +342,7 @@ export default function EspaceIzilearn() {
               <section key={c.key} className="bg-card border rounded-xl overflow-hidden">
                 <div className="px-4 py-3 border-b bg-muted/30">
                   <div role="heading" aria-level={2} className="font-semibold flex items-center gap-2">{c.key === "mails" ? <Mail className="w-4 h-4" /> : <FileText className="w-4 h-4" />}{c.label}<span className="text-xs font-normal text-muted-foreground">({liste.length})</span></div>
-                  <p className="text-xs text-muted-foreground">{c.aide}</p>
+                  <p className="text-xs text-muted-foreground">{marque(c.aide)}</p>
                 </div>
                 <ul className="divide-y">
                   {liste.map((x) => (

@@ -202,6 +202,9 @@ export { FORMATION_ARH41366, seedARH41366AICaches } from "./arh41366Preset";
 import { FORMATION_GSC35 } from "./gererCentre35hPreset";
 export { FORMATION_GSC35, seedGSC35AICaches } from "./gererCentre35hPreset";
 
+import { FORMATION_LILATE_EN, FORMATION_LILATE_FLE } from "./lilateFormations";
+export { FORMATION_LILATE_EN, FORMATION_LILATE_FLE } from "./lilateFormations";
+
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
   FORMATION_VITRAGE,
@@ -1149,6 +1152,9 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     rythmeAlternance: "",
     codeRNCP: "",
   },
+  // Ajouts en fin de liste : les index existants (sélecteurs) restent inchangés.
+  FORMATION_LILATE_EN,
+  FORMATION_LILATE_FLE,
 ];
 export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Excel Professionnel": [5, 4, 5, 5, 4, 5, 4, 5],
