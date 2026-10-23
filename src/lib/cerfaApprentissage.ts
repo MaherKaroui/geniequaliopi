@@ -152,8 +152,8 @@ export async function genCerfaApprentissagePdf(
 
   // ---------- PAGE 1 — EMPLOYEUR ----------
   // Employeur privé coché par défaut
-  setCheck(form, "Case #C3#A0 cocher 1", true); // privé
-  setCheck(form, "Case #C3#A0 cocher 2", false); // public
+  setCheck(form, "Case #C3#A0 cocher 1", !s.cerfa?.employeurPublic); // privé
+  setCheck(form, "Case #C3#A0 cocher 2", !!s.cerfa?.employeurPublic); // public
 
   // Données entreprise du stagiaire
   const ent = clean(s.entreprise);
@@ -161,26 +161,27 @@ export async function genCerfaApprentissagePdf(
   const adrEnt = splitAdresse(s.adresseEntreprise);
   const cpvEnt = splitCpVille(s.adresseEntreprise);
   // Coordonnées de l'EMPLOYEUR (jamais celles du CFA) : courriel du responsable si saisi.
-  const telEnt = "";
+  const cx = s.cerfa || {};
+  const telEnt = clean(cx.telephoneEmployeur);
   const courrielEnt = clean(s.emailResponsable);
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
-  setText(form, "Zone de texte 8_3", ""); // Type d'employeur : code de la nomenclature CERFA, à renseigner par l'employeur
+  setText(form, "Zone de texte 8_3", clean(cx.typeEmployeur)); // Type d'employeur : code de la nomenclature CERFA, à renseigner par l'employeur
   setText(form, "Zone de texte 8_14", adrEnt.numero); // N° adresse
   setText(form, "Zone de texte 8_13", adrEnt.voie); // Voie
-  setText(form, "Zone de texte 8_4", ""); // Employeur spécifique
-  setText(form, "Zone de texte 8_8", ""); // Complément
-  setText(form, "Zone de texte 8_7", ""); // Code APE
+  setText(form, "Zone de texte 8_4", clean(cx.employeurSpecifique)); // Employeur spécifique
+  setText(form, "Zone de texte 8_8", clean(cx.complementAdresseEmployeur)); // Complément
+  setText(form, "Zone de texte 8_7", clean(cx.codeApe)); // Code APE
   setText(form, "Zone de texte 8_9", cpvEnt.cp); // Code postal entreprise
   setText(form, "Zone de texte 8_10", cpvEnt.ville); // Commune entreprise
-  setText(form, "Zone de texte 8_5", ""); // Effectif total
+  setText(form, "Zone de texte 8_5", clean(cx.effectif)); // Effectif total
   setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise
   setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise
-  setText(form, "Zone de texte 8_6", ""); // Code IDCC
+  setText(form, "Zone de texte 8_6", clean(cx.idcc)); // Code IDCC
 
   // ---------- PAGE 1 — APPRENTI ----------
-  setText(form, "Zone de texte 8_15", clean(s.nom)); // Nom de naissance
+  setText(form, "Zone de texte 8_15", clean(cx.nomNaissance || s.nom)); // Nom de naissance
   setText(form, "Zone de texte 8_16", clean(s.nom)); // Nom d'usage
   setText(form, "Zone de texte 8_17", clean(s.prenom)); // Premier prénom
 
@@ -203,9 +204,9 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_19", adrAp.numero);
   setText(form, "Zone de texte 8_20", adrAp.voie);
   setText(form, "Zone de texte 8_27", clean(s.communeNaissance)); // Commune de naissance
-  setText(form, "Zone de texte 8_21", ""); // Complément adresse apprenti
+  setText(form, "Zone de texte 8_21", clean(cx.complementAdresse)); // Complément adresse apprenti
   setText(form, "Zone de texte 8_33", clean(s.nationalite)); // Nationalité
-  setText(form, "Zone de texte 8_34", ""); // Régime social
+  setText(form, "Zone de texte 8_34", clean(cx.regimeSocial)); // Régime social
   setText(form, "Zone de texte 8_22", clean(s.codePostal)); // Code postal apprenti
   setText(form, "Zone de texte 8_23", clean(s.commune)); // Commune apprenti
   setText(form, "Zone de texte 8_24", clean(s.telephone)); // Téléphone apprenti
@@ -213,27 +214,27 @@ export async function genCerfaApprentissagePdf(
 
   // Sportif haut niveau = Non ; RQTH = valeur saisie pour l'apprenti
   const rqth = (s.rqth || "").toLowerCase() === "oui";
-  setCheck(form, "Case #C3#A0 cocher 5_3", false); // sportif Oui
-  setCheck(form, "Case #C3#A0 cocher 5_4", true); // sportif Non
+  setCheck(form, "Case #C3#A0 cocher 5_3", cx.sportifHautNiveau === true); // sportif Oui
+  setCheck(form, "Case #C3#A0 cocher 5_4", cx.sportifHautNiveau !== true); // sportif Non
   setCheck(form, "Case #C3#A0 cocher 5_5", rqth); // RQTH Oui
   setCheck(form, "Case #C3#A0 cocher 5_6", !rqth); // RQTH Non
 
   // Représentant légal : obligatoire pour un apprenti mineur, laissé vide si majeur
   // (aucune donnée du représentant n'est saisie dans le dossier : à compléter à la main).
-  setText(form, "Zone de texte 8_35", ""); // Nom prénom rep légal
-  setText(form, "Zone de texte 8_37", ""); // N° rep
-  setText(form, "Zone de texte 8_36", ""); // Voie rep
-  setText(form, "Zone de texte 8_38", ""); // Complément rep
-  setText(form, "Zone de texte 8_39", ""); // CP rep
-  setText(form, "Zone de texte 8_40", ""); // Commune rep
-  setText(form, "Zone de texte 8_41", ""); // Courriel rep
+  setText(form, "Zone de texte 8_35", clean(cx.representantLegal?.nom)); // Nom prénom rep légal
+  setText(form, "Zone de texte 8_37", clean(cx.representantLegal?.numero)); // N° rep
+  setText(form, "Zone de texte 8_36", clean(cx.representantLegal?.voie)); // Voie rep
+  setText(form, "Zone de texte 8_38", clean(cx.representantLegal?.complement)); // Complément rep
+  setText(form, "Zone de texte 8_39", clean(cx.representantLegal?.codePostal)); // CP rep
+  setText(form, "Zone de texte 8_40", clean(cx.representantLegal?.commune)); // Commune rep
+  setText(form, "Zone de texte 8_41", clean(cx.representantLegal?.email)); // Courriel rep
 
   // Diplôme dernier préparé / obtenu
-  setText(form, "Zone de texte 8_28", ""); // Situation avant
-  setText(form, "Zone de texte 8_29", ""); // Dernier diplôme préparé
-  setText(form, "Zone de texte 8_30", ""); // Dernière classe
+  setText(form, "Zone de texte 8_28", clean(cx.situationAvant)); // Situation avant
+  setText(form, "Zone de texte 8_29", clean(cx.dernierDiplomePrepare)); // Dernier diplôme préparé
+  setText(form, "Zone de texte 8_30", clean(cx.derniereClasse)); // Dernière classe
   setText(form, "Zone de texte 8_31", clean(s.diplome)); // Intitulé précis dernier diplôme
-  setText(form, "Zone de texte 8_32", ""); // Diplôme le plus élevé obtenu
+  setText(form, "Zone de texte 8_32", clean(cx.diplomePlusEleve)); // Diplôme le plus élevé obtenu
 
   // ---------- PAGE 1 — MAÎTRE D'APPRENTISSAGE ----------
   // Maître n°1 = responsable de l'entreprise du stagiaire
@@ -248,25 +249,25 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_5", mnM);
   setText(form, "Zone de texte 21_6", mnA);
   setText(form, "Zone de texte 8_44", clean(s.emailResponsable)); // Courriel maître 1
-  setText(form, "Zone de texte 8_45", ""); // Emploi occupé par le maître d'apprentissage (distinct du poste de l'apprenti)
+  setText(form, "Zone de texte 8_45", clean(cx.maitreEmploi)); // Emploi occupé par le maître d'apprentissage (distinct du poste de l'apprenti)
 
   // Maître n°2 — vide
-  setText(form, "Zone de texte 8_46", "");
-  setText(form, "Zone de texte 8_47", "");
-  setText(form, "Zone de texte 8_48", "");
-  setText(form, "Zone de texte 8_49", "");
+  setText(form, "Zone de texte 8_46", clean(cx.maitre2?.nom));
+  setText(form, "Zone de texte 8_47", clean(cx.maitre2?.prenom));
+  setText(form, "Zone de texte 8_48", clean(cx.maitre2?.dateNaissance));
+  setText(form, "Zone de texte 8_49", clean(cx.maitre2?.email));
 
   // Attestation maître apprentissage
   setCheck(form, "Case #C3#A0 cocher 6", true);
 
   // ---------- PAGE 2 — CONTRAT ----------
   // Type de contrat (11 = contrat d'apprentissage initial par défaut)
-  setText(form, "Zone de texte 8_71", "11");
+  setText(form, "Zone de texte 8_71", clean(cx.typeContrat) || "11");
 
   // Date de conclusion = 7 jours avant le début d'exécution du contrat de l'apprenti
   const dateDebut = s.dateDebutFormation || f.dateDebut;
   const dateFin = s.dateFinFormation || f.dateFin;
-  const dateConclusion = dateDebut ? (() => {
+  const dateConclusion = cx.dateConclusion || (dateDebut ? (() => {
     const d = new Date(dateDebut);
     d.setDate(d.getDate() - 7);
     return d.toISOString().slice(0, 10);
@@ -282,9 +283,10 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_20", ddM);
   setText(form, "Zone de texte 21_21", ddA);
 
-  setText(form, "Zone de texte 21_22", ddJ);
-  setText(form, "Zone de texte 21_23", ddM);
-  setText(form, "Zone de texte 21_24", ddA);
+  const [exJ, exM, exA] = cx.dateDebutExecution ? splitDate(cx.dateDebutExecution) : [ddJ, ddM, ddA];
+  setText(form, "Zone de texte 21_22", exJ);
+  setText(form, "Zone de texte 21_23", exM);
+  setText(form, "Zone de texte 21_24", exA);
 
   // Date fin contrat
   const [dfJ, dfM, dfA] = splitDate(dateFin);
@@ -293,12 +295,12 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_12", dfA);
 
   // Durée hebdo : 35h
-  setText(form, "Zone de texte 8_68", "35");
-  setText(form, "Zone de texte 8_69", "00");
+  setText(form, "Zone de texte 8_68", clean(cx.dureeHebdoHeures) || "35");
+  setText(form, "Zone de texte 8_69", clean(cx.dureeHebdoMinutes) || "00");
 
   // Travail machines dangereuses : Non
-  setCheck(form, "Case #C3#A0 cocher 5_13", false); // Oui
-  setCheck(form, "Case #C3#A0 cocher 5_14", true); // Non
+  setCheck(form, "Case #C3#A0 cocher 5_13", cx.machinesDangereuses === true); // Oui
+  setCheck(form, "Case #C3#A0 cocher 5_14", cx.machinesDangereuses !== true); // Non
 
   // ---------- PAGE 2 — FORMATION ----------
   setCheck(form, "Case #C3#A0 cocher 5_11", false); // CFA entreprise Oui
@@ -309,7 +311,7 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
-  setText(form, "Zone de texte 8_75", ""); // Code diplôme
+  setText(form, "Zone de texte 8_75", clean(cx.codeDiplome)); // Code diplôme
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
@@ -341,16 +343,16 @@ export async function genCerfaApprentissagePdf(
   // dont heures de formation à distance : total si distanciel, 0 si présentiel
   const modalites = (f.modalites || "").toLowerCase();
   const estDistanciel = /distanc|e-?learning|foad|en ligne|visio/.test(modalites);
-  setText(form, "Zone de texte 8_102", estDistanciel ? dureeHeures || "0" : "0");
+  setText(form, "Zone de texte 8_102", clean(cx.heuresDistance) || (estDistanciel ? dureeHeures || "0" : "0"));
 
 
   // Attestation pièces justificatives
   setCheck(form, "Case #C3#A0 cocher 8", true);
 
   // Numéro contrat précédent (vide pour un nouveau contrat type 11)
-  setText(form, "Zone de texte 8_55", "");
+  setText(form, "Zone de texte 8_55", clean(cx.numeroContratPrecedent));
   // Fait à (champ correct = 8_90)
-  setText(form, "Zone de texte 8_90", clean(o.ville));
+  setText(form, "Zone de texte 8_90", clean(cx.lieuSignature || o.ville));
 
   // ---------- RÉMUNÉRATION (1ère année — ligne du HAUT y=669) ----------
   // Barème selon âge apprenti à la date de début du contrat.

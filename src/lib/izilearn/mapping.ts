@@ -3,7 +3,7 @@
  * (OrganismeInfo / FormationInfo / StagiaireInfo). Champ absent côté IZILearn =
  * champ vide ici : rien n'est emprunté à une formation ou un organisme d'exemple.
  */
-import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import type { CerfaComplement, FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { IzApprenant, IzPayload } from "./types";
 
 const t = (v: unknown) => String(v ?? "").trim();
@@ -95,11 +95,97 @@ export function versFormation(p: IzPayload): FormationInfo {
   };
 }
 
+type Obj = Record<string, unknown>;
+const norm = (k: string) => k.toLowerCase().replace(/[^a-z0-9]/g, "");
+/** Première valeur non vide parmi des alias de clés (insensible à la casse / tirets). */
+function pick(o: unknown, ...alias: string[]): string {
+  if (!o || typeof o !== "object") return "";
+  const idx = new Map(Object.entries(o as Obj).map(([k, v]) => [norm(k), v]));
+  for (const a of alias) {
+    const v = idx.get(norm(a));
+    if (v !== undefined && v !== null && typeof v !== "object" && t(v)) return t(v);
+  }
+  return "";
+}
+const sub = (o: unknown, ...alias: string[]): Obj | undefined => {
+  if (!o || typeof o !== "object") return undefined;
+  const idx = new Map(Object.entries(o as Obj).map(([k, v]) => [norm(k), v]));
+  for (const a of alias) { const v = idx.get(norm(a)); if (v && typeof v === "object") return v as Obj; }
+  return undefined;
+};
+const bool = (v: string): boolean | undefined => /^(oui|true|1|yes|o)$/i.test(v) ? true : /^(non|false|0|no|n)$/i.test(v) ? false : undefined;
+const isoDate = (v: string) => { const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? `${m[3]}-${m[2]}-${m[1]}` : v; };
+
+/** Tous les champs CERFA réellement transmis par IZILearn (apprenant, entreprise, contrat). */
+export function cerfaDepuisIzilearn(a: IzApprenant): { complement: CerfaComplement; nir: string; nationalite: string; departementNaissance: string; communeNaissance: string; diplome: string; dateNaissanceResponsable: string } {
+  const e = a.entreprise || undefined;
+  const c = sub(a, "cerfa", "contrat", "contratApprentissage") || {};
+  const src = [c, a, e];
+  const p = (...k: string[]) => { for (const o of src) { const v = pick(o, ...k); if (v) return v; } return ""; };
+  const pe = (...k: string[]) => pick(c, ...k) || pick(e, ...k);
+  const rep = sub(c, "representantLegal") || sub(a, "representantLegal", "responsableLegal");
+  const m1 = sub(c, "maitreApprentissage", "maitre", "tuteur") || sub(e, "maitreApprentissage", "maitre", "tuteur");
+  const m2 = sub(c, "maitreApprentissage2", "maitre2", "tuteur2");
+  const pub = pe("employeurPublic", "public");
+  const sportif = p("sportifHautNiveau", "sportif");
+  const mach = p("machinesDangereuses", "travauxDangereux");
+  const complement: CerfaComplement = {
+    employeurPublic: pub ? bool(pub) : /public/i.test(pe("secteur", "typeEmployeurLibelle")) || undefined,
+    typeEmployeur: pe("typeEmployeur", "codeTypeEmployeur"),
+    employeurSpecifique: pe("employeurSpecifique"),
+    codeApe: pe("codeApe", "ape", "codeNaf", "naf", "apeNaf"),
+    effectif: pe("effectif", "effectifTotal", "effectifSalarie", "nbSalaries"),
+    idcc: pe("idcc", "codeIdcc", "conventionCollective", "ccn"),
+    telephoneEmployeur: pe("telephone", "tel", "telephoneEmployeur"),
+    complementAdresseEmployeur: pe("complementAdresse", "adresseComplement"),
+    nomNaissance: p("nomNaissance", "nomDeNaissance"),
+    complementAdresse: pick(c, "complementAdresseApprenti") || pick(a, "complementAdresse"),
+    regimeSocial: p("regimeSocial"),
+    sportifHautNiveau: sportif ? bool(sportif) : undefined,
+    situationAvant: p("situationAvant", "situationAvantContrat"),
+    dernierDiplomePrepare: p("dernierDiplomePrepare", "diplomePrepare"),
+    derniereClasse: p("derniereClasse", "derniereAnnee"),
+    diplomePlusEleve: p("diplomePlusEleve", "diplomeLePlusEleve", "niveauDiplome"),
+    representantLegal: rep ? { nom: pick(rep, "nom", "nomPrenom"), numero: pick(rep, "numero"), voie: pick(rep, "voie", "adresse"), complement: pick(rep, "complement"), codePostal: pick(rep, "codePostal", "cp"), commune: pick(rep, "commune", "ville"), email: pick(rep, "email", "courriel") } : undefined,
+    maitreEmploi: pick(m1, "emploi", "poste", "fonction") || pe("emploiMaitre", "posteRepresentant", "fonctionRepresentant"),
+    maitre2: m2 ? { nom: pick(m2, "nom"), prenom: pick(m2, "prenom"), dateNaissance: isoDate(pick(m2, "dateNaissance")), email: pick(m2, "email") } : undefined,
+    typeContrat: pick(c, "typeContrat", "codeTypeContrat"),
+    typeDerogation: pick(c, "typeDerogation", "derogation"),
+    numeroContratPrecedent: pick(c, "numeroContratPrecedent"),
+    dateConclusion: isoDate(pick(c, "dateConclusion", "dateSignature")),
+    dateDebutExecution: isoDate(pick(c, "dateDebutExecution", "dateDebut")),
+    dureeHebdoHeures: pick(c, "dureeHebdo", "dureeHebdoHeures", "heuresHebdo"),
+    dureeHebdoMinutes: pick(c, "dureeHebdoMinutes"),
+    salaireBrutMensuel: pick(c, "salaireBrut", "salaireBrutMensuel", "salaire", "remuneration"),
+    machinesDangereuses: mach ? bool(mach) : undefined,
+    codeDiplome: pick(c, "codeDiplome"),
+    heuresDistance: pick(c, "heuresDistance", "heuresFOAD"),
+    lieuSignature: pick(c, "lieuSignature", "faitA"),
+  };
+  return {
+    complement,
+    nir: p("nir", "numeroSecuriteSociale", "numeroSecu", "secu", "numeroSS"),
+    nationalite: p("nationalite"),
+    departementNaissance: p("departementNaissance", "deptNaissance"),
+    communeNaissance: p("communeNaissance", "lieuNaissance", "villeNaissance"),
+    diplome: p("dernierDiplome", "diplome", "diplomeObtenu"),
+    dateNaissanceResponsable: isoDate(pick(m1, "dateNaissance") || pe("dateNaissanceRepresentant", "dateNaissanceMaitre")),
+  };
+}
+
 export function versStagiaire(a: IzApprenant, p: IzPayload): StagiaireInfo {
   const civ = /^(mme|madame)/i.test(t(a.civilite)) ? "Mme" : /^(m\.?|monsieur|mr)$/i.test(t(a.civilite)) ? "M." : "";
   const adr = t(a.adresse);
   const cp = adr.match(/\b(\d{5})\s+([^,\n]+)$/);
+  const cf = cerfaDepuisIzilearn(a);
   return {
+    nir: cf.nir || undefined,
+    nationalite: cf.nationalite || undefined,
+    departementNaissance: cf.departementNaissance || undefined,
+    communeNaissance: cf.communeNaissance || undefined,
+    diplome: cf.diplome || undefined,
+    dateNaissanceResponsable: cf.dateNaissanceResponsable || undefined,
+    cerfa: cf.complement,
     civilite: civ,
     nom: t(a.nom),
     prenom: t(a.prenom),
