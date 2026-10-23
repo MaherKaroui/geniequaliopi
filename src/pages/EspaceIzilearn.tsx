@@ -78,7 +78,13 @@ export default function EspaceIzilearn() {
   const [categories, setCategories] = useState<Set<CategorieKey>>(new Set(CATEGORIES.map((c) => c.key)));
   const [apercuId, setApercuId] = useState<string | null>(null);
   const [signatureTarget, setSignatureTarget] = useState<{ index: number; role: SignatureRole } | null>(null);
-  const [signatures, setSignatures] = useState<LearnerSignatures>({});
+  const [signatures, setSignatures] = useState<LearnerSignatures>(() => {
+    try { const v = JSON.parse(localStorage.getItem("izilearn-signatures") || "{}"); return v && typeof v === "object" ? v : {}; } catch { return {}; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("izilearn-signatures", JSON.stringify(signatures)); }
+    catch { toast.error("Signature non sauvegardée : espace du navigateur plein"); }
+  }, [signatures]);
   const [travail, setTravail] = useState<{ label: string; fait: number; total: number } | null>(null);
 
   const cx = useMemo(() => (payload ? contexteAvecSignatures(contexte(payload, dateMaj), signatures) : null), [payload, signatures, dateMaj]);
