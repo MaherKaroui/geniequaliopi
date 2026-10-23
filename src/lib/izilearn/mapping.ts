@@ -4,6 +4,7 @@
  * champ vide ici : rien n'est emprunté à une formation ou un organisme d'exemple.
  */
 import { nomPlateforme } from "./plateforme";
+import { isLilateFormation, lilateLangue } from "@/lib/lilateHumanized";
 import type { CerfaComplement, FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { IzApprenant, IzPayload } from "./types";
 
@@ -67,6 +68,22 @@ function programmeTexte(p: IzPayload): string {
   }).join("\n");
 }
 
+/**
+ * Code RS/RNCP de la formation : celui transmis, sinon celui écrit dans l'intitulé,
+ * sinon, pour les parcours LILATE (CRM LMS), la certification RS correspondante
+ * (FLE → RS6916 ; anglais → RS7314, ou RS6118 pour une session antérieure au 24/10/2025).
+ */
+export function codeCertificationLms(code: string, intitule: string, dateDebut?: string): string {
+  const c = code.replace(/\s+/g, "").toUpperCase();
+  if (/^(RS|RNCP)\d+$/.test(c)) return c;
+  const m = intitule.toUpperCase().match(/\b(RS|RNCP)\s*(\d{3,6})\b/);
+  if (m) return `${m[1]}${m[2]}`;
+  if (!isLilateFormation(intitule, c)) return c;
+  if (lilateLangue(intitule, c) === "fle") return "RS6916";
+  const d = isoDate(dateDebut || "");
+  return /^\d{4}-\d{2}-\d{2}/.test(d) && d < "2025-10-24" ? "RS6118" : "RS7314";
+}
+
 export function versFormation(p: IzPayload): FormationInfo {
   const f = p.formation;
   const s = p.session;
@@ -90,7 +107,7 @@ export function versFormation(p: IzPayload): FormationInfo {
     lieu: t(s.lieu) || (distanciel ? "À distance (classe virtuelle)" : ""),
     nombreParticipants: String(p.apprenants.length || ""),
     formateur: t(s.formateur),
-    codeRNCP: t(f.codeCertification) || undefined,
+    codeRNCP: codeCertificationLms(t(f.codeCertification), t(f.intitule), t(s.dateDebut)) || undefined,
     rythmeAlternance: " ",
     typeAction: f.typeAction,
   };
