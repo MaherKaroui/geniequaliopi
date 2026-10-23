@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Reprendre les champs AcroForm IZILearn en priorité dans le CERFA, protéger le cadre OPCO et corriger les cases ; vérifier le PDF généré.
+- [x] Reprendre les champs AcroForm IZILearn en priorité dans le CERFA, protéger le cadre OPCO et corriger les cases ; 52 tests réussis, téléchargement IZILearn vérifié sur un payload de contrôle (NIR, Saint-Denis, sexe M), session réelle non vérifiée ; non publié.
 - [x] Corriger le positionnement IZILearn : 40 copies proposées avec sélections QCM et réponses ouvertes distinctes, résultats enregistrés prioritaires et repli si questions ouvertes absentes ; 40 tests réussis, aperçu rempli vérifié sur session de contrôle, session réelle non vérifiée ; non publié.
 
 - [x] Harmoniser les mails QCM et annonces J-1 des 14 missions CFA avec les captures Gmail/Outlook des autres mails Qualiopi, dans les aperçus, téléchargements et ZIP ; 13 tests réussis, deux aperçus et téléchargements PNG contrôlés dans un dossier CFA connecté, ZIP MAIL de 32 fichiers vérifié avec toutes les missions en PNG. Aucune erreur, non publié.
