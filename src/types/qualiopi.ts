@@ -112,6 +112,42 @@ export interface StagiaireInfo {
   experiences?: ExperienceDeclaree[];
   /** Motivation et projet exprimés par le candidat VAE (entretien de faisabilité). */
   projetVAE?: string;
+  /** Champs CERFA 10103 transmis explicitement (ex. IZILearn) ; vide = case laissée vide. */
+  cerfa?: CerfaComplement;
+}
+
+export interface CerfaComplement {
+  employeurPublic?: boolean;
+  typeEmployeur?: string;
+  employeurSpecifique?: string;
+  codeApe?: string;
+  effectif?: string;
+  idcc?: string;
+  telephoneEmployeur?: string;
+  complementAdresseEmployeur?: string;
+  nomNaissance?: string;
+  complementAdresse?: string;
+  regimeSocial?: string;
+  sportifHautNiveau?: boolean;
+  situationAvant?: string;
+  dernierDiplomePrepare?: string;
+  derniereClasse?: string;
+  diplomePlusEleve?: string;
+  representantLegal?: { nom?: string; numero?: string; voie?: string; complement?: string; codePostal?: string; commune?: string; email?: string };
+  maitreEmploi?: string;
+  maitre2?: { nom?: string; prenom?: string; dateNaissance?: string; email?: string };
+  typeContrat?: string;
+  typeDerogation?: string;
+  numeroContratPrecedent?: string;
+  dateConclusion?: string;
+  dateDebutExecution?: string;
+  dureeHebdoHeures?: string;
+  dureeHebdoMinutes?: string;
+  salaireBrutMensuel?: string;
+  machinesDangereuses?: boolean;
+  codeDiplome?: string;
+  heuresDistance?: string;
+  lieuSignature?: string;
 }
 
 export interface ExperienceDeclaree {
