@@ -8584,7 +8584,7 @@ interface ReleveBesoin { question?: string; reponse?: string | null }
 /** Réponse exploitable : non vide et pas un placeholder (« Non renseigné », « - »…). */
 const reponseSubstantielle = (v?: string | null) => {
   const t = (v ?? "").trim();
-  return t.length >= 2 && !/^(non renseign|n\s*\/\s*a|néant|[-–—.]+)$/i.test(t);
+  return t.length >= 2 && !/^(non renseign|n\s*\/\s*a|néant\b|[-–—.\s]+$)/i.test(t);
 };
 
 /**
