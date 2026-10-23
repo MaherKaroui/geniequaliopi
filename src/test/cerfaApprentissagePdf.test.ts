@@ -1,5 +1,5 @@
-// @vitest-environment node
 import { readFileSync } from "node:fs";
+import { Blob as NodeBlob } from "node:buffer";
 import { PDFDocument } from "pdf-lib";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
@@ -20,6 +20,7 @@ async function generated(s: StagiaireInfo = base) {
 }
 
 beforeEach(() => {
+  vi.stubGlobal("Blob", NodeBlob);
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
     if (url !== "/pdfs/cerfa/cerfa_10103-14.pdf") throw new Error("Unexpected fetch");
     return { ok: true, arrayBuffer: async () => Uint8Array.from(template).buffer };
