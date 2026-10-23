@@ -31,7 +31,11 @@ export interface Ctx {
 
 const BR = "\u0000BR\u0000";
 export const esc = (v: unknown) => String(v ?? "")
-  .replace(/(?:&lt;|<)\s*br\s*\/?\s*(?:&gt;|>)/gi, BR)
+  .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">").replace(/&nbsp;/gi, " ")
+  .replace(/<\s*br\s*\/?\s*>|<\/\s*(?:p|div|li|h[1-6]|tr)\s*>/gi, BR)
+  .replace(/<\s*li[^>]*>/gi, "• ")
+  .replace(/<\/?[a-z][^<>]*>/gi, "")
+  .replace(/^(?:\u0000BR\u0000|\s)+|(?:\u0000BR\u0000|\s)+$/g, "")
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").split(BR).join("<br>");
 
 const nl2br = (v: unknown) => esc(v).replace(/\n/g, "<br>");
