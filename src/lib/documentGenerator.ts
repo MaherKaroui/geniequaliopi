@@ -8604,7 +8604,7 @@ function appliquerRelevesBesoins(answers: Record<string, string>, releves: Relev
 
 const MAPPING_BESOINS_APPRENANT: Array<{ cle: string; motif: RegExp }> = [
   { cle: "diplome", motif: /dipl[oô]me|titre/ },
-  { cle: "objectif", motif: /objectif (professionnel|personnel)|objectif .*atteindre/ },
+  { cle: "objectif", motif: /objectif/ },
   { cle: "budget", motif: /budget|financement|cpf|opco|p[oô]le emploi/ },
   { cle: "projetPro", motif: /contribuera|contribution|r[ée]alisation de votre projet/ },
   { cle: "handicap", motif: /handicap/ },
