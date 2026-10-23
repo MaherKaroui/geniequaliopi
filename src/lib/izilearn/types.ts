@@ -103,7 +103,7 @@ export interface IzApprenant {
   poste?: string;
   /** Reusable signature supplied explicitly by the learner, not attendance evidence. */
   signatureUrl?: string;
-  entreprise?: { nom: string; siret?: string; adresse?: string; representant?: string; email?: string } | null;
+  entreprise?: { nom: string; siret?: string; adresse?: string; representant?: string; email?: string; telephone?: string; codeApe?: string; effectif?: string; idcc?: string } | null;
   financeur?: string;
   statut: string;
   heuresPrevues?: number | null;

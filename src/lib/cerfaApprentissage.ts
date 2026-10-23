@@ -72,12 +72,60 @@ function ageAt(birthIso: string | undefined, refIso: string | undefined): number
   return age;
 }
 
-/** Tarif (% du SMIC) selon l'âge de l'apprenti — barème légal 2024 */
-function tarifApprenti(age: number): { y1: number; y2: number } {
-  if (age < 18) return { y1: 27, y2: 39 };
-  if (age < 21) return { y1: 43, y2: 51 };
-  if (age < 26) return { y1: 53, y2: 61 };
-  return { y1: 100, y2: 100 }; // 26+ : 100% SMIC
+/**
+ * Barème légal (art. D6222-26 C. trav.) : % du SMIC selon la tranche d'âge et l'année d'exécution du contrat.
+ * La 4e année éventuelle reprend le taux de 3e année. À partir de 21 ans, le salaire minimum conventionnel
+ * (SMC) s'applique s'il est plus favorable : l'employeur le précise dans les données du contrat.
+ */
+const BAREME: [number, [number, number, number]][] = [
+  [18, [27, 39, 55]],
+  [21, [43, 51, 67]],
+  [26, [53, 61, 78]],
+  [Infinity, [100, 100, 100]],
+];
+export function tauxApprenti(age: number, annee: number): number {
+  const ligne = BAREME.find(([max]) => age < max)![1];
+  return ligne[Math.min(Math.max(annee, 1), 3) - 1];
+}
+
+/** Dates ISO (AAAA-MM-JJ) manipulées en UTC pour éviter tout décalage de fuseau. */
+const isoUtc = (iso: string) => { const [y, m, d] = iso.slice(0, 10).split("-").map(Number); return Date.UTC(y, m - 1, d); };
+const versIso = (t: number) => new Date(t).toISOString().slice(0, 10);
+const plusJours = (iso: string, n: number) => versIso(isoUtc(iso) + n * 86400000);
+const plusAns = (iso: string, n: number) => {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  const t = new Date(Date.UTC(y + n, m - 1, d));
+  if (t.getUTCMonth() !== m - 1) t.setUTCDate(0); // 29 février → 28 février
+  return versIso(t.getTime());
+};
+
+export type PeriodeRemuneration = { debut: string; fin: string; taux: number; age: number };
+/**
+ * Grille de rémunération du contrat : une ligne par année d'exécution (4 au plus), chacune découpée en
+ * deux périodes au plus quand l'apprenti change de tranche d'âge (18, 21 ou 26 ans) en cours d'année.
+ * Le nouveau taux s'applique le 1er jour du mois qui suit l'anniversaire.
+ */
+export function grilleRemuneration(naissance: string, debut: string, fin: string): PeriodeRemuneration[][] {
+  if (!/^\d{4}-\d{2}-\d{2}/.test(naissance) || !/^\d{4}-\d{2}-\d{2}/.test(debut) || !/^\d{4}-\d{2}-\d{2}/.test(fin)) return [];
+  if (isoUtc(fin) < isoUtc(debut)) return [];
+  const changements = [18, 21, 26].map((a) => {
+    const [y, m] = plusAns(naissance, a).split("-").map(Number);
+    return versIso(Date.UTC(y, m, 1)); // 1er jour du mois suivant l'anniversaire
+  });
+  const grille: PeriodeRemuneration[][] = [];
+  for (let k = 0; k < 4; k++) {
+    const d = plusAns(debut, k);
+    if (isoUtc(d) > isoUtc(fin)) break;
+    const finAnnee = plusJours(plusAns(debut, k + 1), -1);
+    const f = isoUtc(finAnnee) < isoUtc(fin) ? finAnnee : fin;
+    const coupure = changements.find((c) => isoUtc(c) > isoUtc(d) && isoUtc(c) <= isoUtc(f));
+    const bornes = coupure ? [[d, plusJours(coupure, -1)], [coupure, f]] : [[d, f]];
+    grille.push(bornes.map(([du, au]) => {
+      const age = ageAt(naissance, du) ?? 0;
+      return { debut: du, fin: au, taux: tauxApprenti(age, k + 1), age };
+    }));
+  }
+  return grille;
 }
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
@@ -133,10 +181,51 @@ function clean(s: string | undefined | null): string {
 }
 
 /**
- * SMIC mensuel brut (35 h) utilisé pour la rémunération minimale de l'apprenti.
- * Valeur en vigueur au 1er novembre 2024 : à actualiser à chaque revalorisation.
+ * SMIC mensuel brut (35 h, 151,67 h) par date d'entrée en vigueur — à compléter à chaque revalorisation.
+ * 1er janvier 2026 : 12,02 €/h (décret du 17/12/2025) ; 1er juin 2026 : 12,31 €/h (revalorisation
+ * automatique de 2,41 %, arrêté du 22/05/2026).
  */
-export const SMIC_BRUT_MENSUEL_REFERENCE = { montant: 1801.80, enVigueurDepuis: "2024-11-01" };
+export const SMIC_BRUT_MENSUEL: { depuis: string; horaire: number; mensuel: number }[] = [
+  { depuis: "2024-11-01", horaire: 11.88, mensuel: 1801.80 },
+  { depuis: "2026-01-01", horaire: 12.02, mensuel: 1823.03 },
+  { depuis: "2026-06-01", horaire: 12.31, mensuel: 1867.02 },
+];
+/** SMIC mensuel brut en vigueur à une date (AAAA-MM-JJ) ; le plus récent si la date est absente. */
+export function smicMensuelAu(iso?: string): number {
+  const ok = iso && /^\d{4}-\d{2}-\d{2}/.test(iso) ? iso.slice(0, 10) : "9999-12-31";
+  return [...SMIC_BRUT_MENSUEL].reverse().find((v) => v.depuis <= ok)?.mensuel ?? SMIC_BRUT_MENSUEL[0].mensuel;
+}
+/** Valeur la plus récente (compatibilité). */
+export const SMIC_BRUT_MENSUEL_REFERENCE = {
+  montant: SMIC_BRUT_MENSUEL[SMIC_BRUT_MENSUEL.length - 1].mensuel,
+  enVigueurDepuis: SMIC_BRUT_MENSUEL[SMIC_BRUT_MENSUEL.length - 1].depuis,
+};
+
+/** Champs de la grille de rémunération : [du J, M, A, au J, M, A, %, base] × 2 périodes, pour les 4 années. */
+const GRILLE_CHAMPS: [string[], string[]][] = [
+  [["21_81", "21_82", "21_83", "21_84", "21_85", "21_86", "8_95", "8_96"], ["21_87", "21_88", "21_89", "21_90", "21_91", "21_92", "8_97", "8_98"]],
+  [["21_37", "21_38", "21_39", "21_40", "21_41", "21_42", "8_56", "8_57"], ["21_43", "21_44", "21_45", "21_46", "21_47", "21_48", "8_58", "8_59"]],
+  [["21_49", "21_50", "21_51", "21_52", "21_53", "21_54", "8_60", "8_61"], ["21_55", "21_56", "21_57", "21_58", "21_59", "21_60", "8_62", "8_63"]],
+  [["21_61", "21_62", "21_63", "21_64", "21_65", "21_66", "8_64", "8_65"], ["21_67", "21_68", "21_69", "21_70", "21_71", "21_72", "8_66", "8_67"]],
+].map((ligne) => ligne.map((p) => p.map((n) => `Zone de texte ${n}`))) as [string[], string[]][];
+const CHAMPS_GRILLE = new Set(GRILLE_CHAMPS.flat(2));
+const CHAMPS_SALAIRE = new Set(["Zone de texte 8_72", "Zone de texte 21_73"]);
+
+/** Date AAAA-MM-JJ lue dans trois cases JJ / MM / AAAA des champs transmis. */
+function dateChamps(c: Record<string, string | boolean>, j: string, m: string, a: string): string {
+  const v = (n: string) => String(c[`Zone de texte ${n}`] ?? "").trim();
+  const [d, mo, y] = [v(j), v(m), v(a)];
+  return /^\d{1,2}$/.test(d) && /^\d{1,2}$/.test(mo) && /^\d{4}$/.test(y) ? `${y}-${mo.padStart(2, "0")}-${d.padStart(2, "0")}` : "";
+}
+const nombre = (v: unknown) => { const n = Number(String(v ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
+
+/** Code nationalité CERFA (1 française, 2 UE, 3 hors UE) à partir d'un code ou d'un libellé. */
+const UE = /allemand|autrichien|belge|bulgare|chypriote|croate|danois|espagnol|estonien|finlandais|grec|hongrois|irlandais|italien|letton|lituanien|luxembourgeois|maltais|neerlandais|polonais|portugais|roumain|slovaque|slovene|suedois|tcheque/;
+function codeNationalite(v: string | undefined): string {
+  const n = (v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  if (!n || /^[123]$/.test(n)) return n;
+  return /franc/.test(n) ? "1" : UE.test(n) ? "2" : "3";
+}
 
 export async function genCerfaApprentissagePdf(
   o: OrganismeInfo,
@@ -149,6 +238,7 @@ export async function genCerfaApprentissagePdf(
   const bytes = await res.arrayBuffer();
   const pdf = await PDFDocument.load(bytes);
   const form = pdf.getForm();
+  const champs = s.cerfaChamps || {};
 
   // ---------- PAGE 1 — EMPLOYEUR ----------
   // Employeur privé coché par défaut
@@ -192,12 +282,16 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_9", dnA);
 
   // Sexe
-  const isM = (s.civilite || "").toUpperCase().startsWith("M.") || (s.civilite || "").toUpperCase() === "M";
+  const civ = (s.civilite || "").toUpperCase();
+  const nir = clean(s.nir).replace(/\s/g, "");
+  const isM = civ ? civ.startsWith("M.") || civ === "M" : nir.startsWith("1");
   setCheck(form, "Case #C3#A0 cocher 3", isM); // M
   setCheck(form, "Case #C3#A0 cocher 4", !isM); // F
 
-  setText(form, "Zone de texte 8_18", clean(s.nir)); // NIR
-  setText(form, "Zone de texte 8_26", clean(s.departementNaissance)); // Département naissance
+  setText(form, "Zone de texte 8_18", nir); // NIR
+  // Département de naissance : saisi, sinon déduit du NIR (99 = né à l'étranger)
+  const deptNir = /^[12]\d{4}(97|98)\d/.test(nir) ? nir.slice(5, 8) : /^[12]\d{4}(\d{2}|2A|2B)/i.test(nir) ? nir.slice(5, 7).toUpperCase() : "";
+  setText(form, "Zone de texte 8_26", clean(s.departementNaissance) || deptNir); // Département naissance
 
   // Adresse apprenti
   const adrAp = splitAdresse(s.adresse);
@@ -205,10 +299,11 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_20", adrAp.voie);
   setText(form, "Zone de texte 8_27", clean(s.communeNaissance)); // Commune de naissance
   setText(form, "Zone de texte 8_21", clean(cx.complementAdresse)); // Complément adresse apprenti
-  setText(form, "Zone de texte 8_33", clean(s.nationalite)); // Nationalité
+  setText(form, "Zone de texte 8_33", codeNationalite(clean(s.nationalite))); // Nationalité (1, 2 ou 3)
   setText(form, "Zone de texte 8_34", clean(cx.regimeSocial)); // Régime social
-  setText(form, "Zone de texte 8_22", clean(s.codePostal)); // Code postal apprenti
-  setText(form, "Zone de texte 8_23", clean(s.commune)); // Commune apprenti
+  const cpvAp = splitCpVille(s.adresse);
+  setText(form, "Zone de texte 8_22", clean(s.codePostal) || cpvAp.cp); // Code postal apprenti
+  setText(form, "Zone de texte 8_23", clean(s.commune) || cpvAp.ville); // Commune apprenti
   setText(form, "Zone de texte 8_24", clean(s.telephone)); // Téléphone apprenti
   setText(form, "Zone de texte 8_25", clean(s.email)); // Courriel apprenti
 
@@ -362,40 +457,43 @@ export async function genCerfaApprentissagePdf(
   // Fait à (champ correct = 8_90)
   setText(form, "Zone de texte 8_90", clean(cx.lieuSignature || o.ville));
 
-  // ---------- RÉMUNÉRATION (1ère année — ligne du HAUT y=669) ----------
-  // Barème selon âge apprenti à la date de début du contrat.
-  // Le tableau CERFA compte 4 lignes (1ère→4ème année, de haut en bas : y=669, 655, 641, 627).
-  // On remplit la 1ère année (côté gauche : période unique du début→fin contrat).
-  const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
-  const tarif = tarifApprenti(age);
-  const SMIC_BRUT_MENSUEL = SMIC_BRUT_MENSUEL_REFERENCE.montant;
-  const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
-  const salaireSaisi = Number(String(cx.salaireBrutMensuel || "").replace(/[^\d,.]/g, "").replace(",", "."));
-  const [montantEuros, montantCents] = (salaireSaisi > 0 ? salaireSaisi : montantTarif).toFixed(2).split(".");
-  // Salaire brut mensuel à l'embauche (euros , centimes)
+  // ---------- RÉMUNÉRATION ----------
+  // Grille légale calculée sur les dates du contrat (celles transmises en priorité) et l'âge de l'apprenti :
+  // 4 années au plus, 2 périodes par année quand l'apprenti change de tranche d'âge.
+  const naissance = dateChamps(champs, "21_7", "21_8", "21_9") || s.dateNaissance || "";
+  const debutContrat = dateChamps(champs, "21_19", "21_20", "21_21") || cx.dateDebutExecution || dateDebut || "";
+  const finContrat = dateChamps(champs, "21_10", "21_11", "21_12") || dateFin || "";
+  const grille = naissance ? grilleRemuneration(naissance, debutContrat, finContrat) : [];
+  if (!grille.length && debutContrat && finContrat) {
+    // date de naissance inconnue : 1 seule période, taux d'un apprenti de 18 à 20 ans (à vérifier)
+    grille.push([{ debut: debutContrat, fin: finContrat, taux: tauxApprenti(20, 1), age: 20 }]);
+  }
+  GRILLE_CHAMPS.forEach((ligne, i) => ligne.forEach((noms, j) => {
+    const per = grille[i]?.[j];
+    // un taux contractuel supérieur au minimum légal (ou basé sur le SMC) est conservé
+    const tauxContrat = nombre(champs[noms[6]]);
+    const baseContrat = String(champs[noms[7]] ?? "").trim();
+    const [dJ, dM, dA] = splitDate(per?.debut);
+    const [fJ, fM, fA] = splitDate(per?.fin);
+    const valeurs = per
+      ? [dJ, dM, dA, fJ, fM, fA, String(Math.max(per.taux, tauxContrat)), baseContrat || "SMIC"]
+      : ["", "", "", "", "", "", "", ""];
+    noms.forEach((n, k) => setText(form, n, valeurs[k]));
+  }));
+
+  // Salaire brut mensuel à l'embauche = % de la 1re période × SMIC en vigueur au début du contrat
+  // (ou le salaire convenu s'il est plus élevé).
+  const premiere = grille[0]?.[0];
+  const tauxEmbauche = premiere ? Math.max(premiere.taux, nombre(champs["Zone de texte 8_95"])) : 0;
+  const salaireLegal = Math.round(smicMensuelAu(debutContrat) * tauxEmbauche) / 100;
+  const salaireContrat = Math.max(
+    nombre(cx.salaireBrutMensuel),
+    nombre(champs["Zone de texte 8_72"]) + nombre(champs["Zone de texte 21_73"]) / 100,
+  );
+  const salaire = Math.max(salaireLegal, salaireContrat);
+  const [montantEuros, montantCents] = salaire > 0 ? salaire.toFixed(2).split(".") : ["", ""];
   setText(form, "Zone de texte 8_72", montantEuros);
   setText(form, "Zone de texte 21_73", montantCents);
-
-  // 1ère année — case de gauche (du/au + % + SMIC/SMC)
-  setText(form, "Zone de texte 21_81", ddJ);
-  setText(form, "Zone de texte 21_82", ddM);
-  setText(form, "Zone de texte 21_83", ddA);
-  setText(form, "Zone de texte 21_84", dfJ);
-  setText(form, "Zone de texte 21_85", dfM);
-  setText(form, "Zone de texte 21_86", dfA);
-  setText(form, "Zone de texte 8_95", String(tarif.y1));
-  setText(form, "Zone de texte 8_96", "SMIC");
-
-  // Case de droite (2e période 1ère année) — laissée vide
-  setText(form, "Zone de texte 21_87", "");
-  setText(form, "Zone de texte 21_88", "");
-  setText(form, "Zone de texte 21_89", "");
-  setText(form, "Zone de texte 21_90", "");
-  setText(form, "Zone de texte 21_91", "");
-  setText(form, "Zone de texte 21_92", "");
-  setText(form, "Zone de texte 8_97", "");
-  setText(form, "Zone de texte 8_98", "");
-  // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
 
   // ---------- CADRE RÉSERVÉ ORGANISME EN CHARGE DU DÉPÔT (bas page 2) ----------
   // Toujours laissé VIDE : rempli par l'organisme dépositaire (OPCO).
@@ -406,8 +504,11 @@ export async function genCerfaApprentissagePdf(
 
   // Les champs exacts du contrat priment sur tous les préremplissages,
   // sauf le cadre réservé à l'OPCO, qui ne peut jamais être renseigné ici.
-  for (const [nom, valeur] of Object.entries(s.cerfaChamps || {})) {
+  // La grille de rémunération et le salaire, déjà calculés au minimum légal (en tenant compte des
+  // valeurs du contrat), ne sont pas réécrits.
+  for (const [nom, valeur] of Object.entries(champs)) {
     if (/^Zone de texte (?:8_(?:91|92|93|94)|21_(?:31|32|33|34|35|36))$/.test(nom)) continue;
+    if (CHAMPS_GRILLE.has(nom) || CHAMPS_SALAIRE.has(nom)) continue;
     if (typeof valeur === "string") setText(form, nom, clean(valeur));
     else if (typeof valeur === "boolean") setCheck(form, nom, valeur);
   }
