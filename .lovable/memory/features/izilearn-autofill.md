@@ -9,6 +9,6 @@ Les documents de l'espace IZILearn se remplissent automatiquement comme la gén�
 
 2. **Relevés de temps de connexion** : mêmes sept colonnes Qualiopi (`connectionDayTable`). Connexions réellement relevées prioritaires ; jours passés sans relevé remplis avec les horaires réalistes de `buildRealisticConnectionDay` (seed déterministe par stagiaire/jour, statut « Présent(e) ») ; jours futurs « — / ⏳ À venir ». Récapitulatif `connectionSummary` avec total, taux et statut comme Qualiopi.
 
-3. Les réponses et résultats importés (besoins, positionnement, bilans, examen final) restent prioritaires ; les contenus futurs ou non échus restent vierges.
+3. Les réponses et résultats importés (besoins, positionnement, bilans, examen final) restent prioritaires ; les contenus futurs ou non échus restent vierges. **Évaluation des besoins** : toujours le document Qualiopi complet (`trame_eval_besoins_combine`) ; les réponses réellement enregistrées dans IZILearn remplacent les réponses générées question par question (`appliquerRelevesBesoins`), les placeholders (« Non renseigné », vide) n'écrasent jamais le remplissage.
 
 Helpers : `buildRealisticConnectionDay`, `isFrLongDayPast`, `getDayModalite` (exportés de `documentGenerator.ts`), `plannedSessionDay` dans `src/lib/izilearn/trames.ts`.

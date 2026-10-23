@@ -117,9 +117,15 @@ export function planPieces(cx: Contexte): Piece[] {
     const par = (categorie: CategorieKey, titre: string, fichier: string, source: Source, rendre: () => string, extra: { id?: string; mail?: MailModele } = {}) =>
       out.push({ id: `${categorie}_${i}${extra.id ? `_${extra.id}` : ""}`, categorie, titre: `${titre} — ${nom}`, apprenantIdx: i, source, fichier: `${fichier}_${suffixe}`, rendre, mail: extra.mail });
 
+    // Toujours le document Qualiopi complet ; les réponses réellement enregistrées
+    // dans IZILearn remplacent les réponses générées question par question.
     const besoins = hasRecordedResponses(a.besoins) || hasRecordedResponses(a.besoinsEntreprise);
     par("besoins", "Évaluation des besoins", "EVALUATION_DES_BESOINS", besoins ? "izilearn" : "document",
-      besoins ? () => T.evaluationBesoins(c).html : gen(`besoins_${i}`, "trame_eval_besoins_combine", { stagiaireIdx: i }));
+      gen(`besoins_${i}`, "trame_eval_besoins_combine", {
+        stagiaireIdx: i,
+        reponsesApprenant: a.besoins?.reponses,
+        reponsesEntreprise: a.besoinsEntreprise?.reponses,
+      }));
     const positionnement = (a.positionnement || []).some(hasRecordedQuiz);
     par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", positionnement ? "izilearn" : "document",
       () => T.testPositionnement(c).html);
