@@ -662,7 +662,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const nomOF = c.o.nom || "Classe virtuelle";
-  let h = connectionIntro(`${nomOF} / Google Meet`);
+  let h = connectionIntro(`${esc(nomOF)} / Google Meet`);
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
   for (const sl of c.p.creneaux) {
