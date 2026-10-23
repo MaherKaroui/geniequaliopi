@@ -189,7 +189,7 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
-  const presetBlank = params?.vierge === true ? presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis) : null;
+  const presetBlank = /besoins/.test(template) && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
   // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
   const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
