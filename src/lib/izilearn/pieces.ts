@@ -18,7 +18,7 @@ import { definirPlateforme, marque } from "./plateforme";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
-  | "cerfa" | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "mails";
+  | "cerfa" | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "certificat" | "mails";
 
 export interface Categorie { key: CategorieKey; label: string; dossier: string; aide: string }
 
@@ -39,6 +39,7 @@ export const CATEGORIES: Categorie[] = [
   { key: "connexion", label: "Temps de connexion", dossier: "11_Temps_de_connexion", aide: "Connexions Meet et e-learning relevées par IZILearn (formation à distance)." },
   { key: "bilan_chaud", label: "Bilan à chaud", dossier: "12_Bilan_a_chaud", aide: "Questionnaire de fin de formation." },
   { key: "bilan_froid", label: "Bilan à froid", dossier: "13_Bilan_a_froid", aide: "Enquête à 3 mois." },
+  { key: "certificat", label: "Certificat de réalisation", dossier: "13_Certificat_de_realisation", aide: "Certificat de réalisation de l'action, comme dans Qualiopi." },
   { key: "mails", label: "Mails", dossier: "14_Mails", aide: "Mêmes scénarios que la partie Qualiopi, en modèles à envoyer avec leur date prévue." },
 ];
 
@@ -166,6 +167,8 @@ export function planPieces(cx: Contexte): Piece[] {
       chaud || !termine ? () => T.bilanChaud(c).html : gen(`bilan_chaud_${i}`, "bilan_chaud_stagiaire", { stagiaireIdx: i }));
     par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", froid ? "izilearn" : suiviEchu ? "document" : "trame",
       froid || !suiviEchu ? () => T.bilanFroid(c).html : gen(`bilan_froid_${i}`, "bilan_froid_stagiaire", { stagiaireIdx: i }));
+    const tc = p.formation.typeAction === "apprentissage" ? "certificat_realisation_cfa" : p.formation.typeAction === "vae" ? "vae_certificat_realisation" : "certificat_realisation_stagiaire";
+    par("certificat", "Certificat de réalisation", "CERTIFICAT_DE_REALISATION", "document", gen(`certificat_${i}`, tc, { stagiaireIdx: i, fi: 0 }));
 
     mailsModeles(o, f, s).forEach((m, k) => {
       const stamp = `${m.dateEnvoi.getFullYear()}-${String(m.dateEnvoi.getMonth() + 1).padStart(2, "0")}-${String(m.dateEnvoi.getDate()).padStart(2, "0")}`;
