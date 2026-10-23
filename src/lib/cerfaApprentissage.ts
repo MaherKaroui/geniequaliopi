@@ -214,10 +214,16 @@ export async function genCerfaApprentissagePdf(
 
   // Sportif haut niveau = Non ; RQTH = valeur saisie pour l'apprenti
   const rqth = (s.rqth || "").toLowerCase() === "oui";
-  setCheck(form, "Case #C3#A0 cocher 5_3", cx.sportifHautNiveau === true); // sportif Oui
-  setCheck(form, "Case #C3#A0 cocher 5_4", cx.sportifHautNiveau !== true); // sportif Non
-  setCheck(form, "Case #C3#A0 cocher 5_5", rqth); // RQTH Oui
-  setCheck(form, "Case #C3#A0 cocher 5_6", !rqth); // RQTH Non
+  setCheck(form, "Case #C3#A0 cocher 5", cx.sportifHautNiveau === true); // sportif Oui
+  setCheck(form, "Case #C3#A0 cocher 5_2", cx.sportifHautNiveau !== true); // sportif Non
+  setCheck(form, "Case #C3#A0 cocher 5_3", rqth); // RQTH Oui
+  setCheck(form, "Case #C3#A0 cocher 5_4", !rqth); // RQTH Non
+  setCheck(form, "Case #C3#A0 cocher 5_5", false); // Équivalence jeunes RQTH Oui
+  setCheck(form, "Case #C3#A0 cocher 5_6", true); // Équivalence jeunes RQTH Non
+  setCheck(form, "Case #C3#A0 cocher 5_7", false); // Extension BOE Oui
+  setCheck(form, "Case #C3#A0 cocher 5_8", true); // Extension BOE Non
+  setCheck(form, "Case #C3#A0 cocher 5_9", false); // Projet création/reprise Oui
+  setCheck(form, "Case #C3#A0 cocher 5_10", true); // Projet création/reprise Non
 
   // Représentant légal : obligatoire pour un apprenti mineur, laissé vide si majeur
   // (aucune donnée du représentant n'est saisie dans le dossier : à compléter à la main).
@@ -307,7 +313,9 @@ export async function genCerfaApprentissagePdf(
   setCheck(form, "Case #C3#A0 cocher 5_12", true); // CFA entreprise Non
 
   // Diplôme/titre visé
-  setText(form, "Zone de texte 8_77", clean(f.codeRNCP || ""));
+  // Nomenclature du diplôme/titre (ex. 58), distincte du RNCP en 8_76.
+  // La valeur contractuelle IZILearn est appliquée ci-dessous si elle est fournie.
+  setText(form, "Zone de texte 8_77", "");
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
@@ -395,6 +403,14 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_92", "");
   setText(form, "Zone de texte 8_93", "");
   setText(form, "Zone de texte 8_94", "");
+
+  // Les champs exacts du contrat priment sur tous les préremplissages,
+  // sauf le cadre réservé à l'OPCO, qui ne peut jamais être renseigné ici.
+  for (const [nom, valeur] of Object.entries(s.cerfaChamps || {})) {
+    if (/^Zone de texte (?:8_(?:91|92|93|94)|21_(?:31|32|33|34|35|36))$/.test(nom)) continue;
+    if (typeof valeur === "string") setText(form, nom, clean(valeur));
+    else if (typeof valeur === "boolean") setCheck(form, nom, valeur);
+  }
 
   pdf.getForm().updateFieldAppearances();
 

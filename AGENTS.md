@@ -1,5 +1,6 @@
 # Architecture rules
 
+- IZILearn preserves exact AcroForm contract values through its learner adapter and applies them last in the shared CERFA generator, excluding OPCO-reserved fields; this keeps contract data authoritative without changing other documents.
 - CFA mission QCM and J-1 announcement mails expose structured MailAuto builders and share the catalog mail resolver with standard mails for every capture/export path; this prevents separate Gmail shells and preserves mission scheduling.
 - The shared captureMail boundary applies Gmail's Ctrl+E state idempotently and removes the editor toolbar from the disposable iframe before measuring/rendering; Gmail hidden/export CSS also excludes it from layout, preventing full-height captures from rendering a translated black bar across Qualiopi and IZILearn.
 

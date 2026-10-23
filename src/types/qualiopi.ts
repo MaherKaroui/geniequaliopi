@@ -114,6 +114,8 @@ export interface StagiaireInfo {
   projetVAE?: string;
   /** Champs CERFA 10103 transmis explicitement (ex. IZILearn) ; vide = case laissée vide. */
   cerfa?: CerfaComplement;
+  /** Valeurs du contrat transmises avec les noms exacts des champs du PDF officiel. */
+  cerfaChamps?: Record<string, string | boolean>;
 }
 
 export interface CerfaComplement {
