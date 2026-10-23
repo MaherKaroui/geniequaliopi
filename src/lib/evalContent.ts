@@ -19,6 +19,7 @@ import { IAP21_EXERCICES_COMPLETS, IAP21_QCM_DEBUT, IAP21_QCM_FIN } from "./iaPr
 import { isIAP21Formation, getIAP21AutoAnswers, IAP21_QUESTIONS_OUVERTES } from "./iaPro21hHumanized";
 import { MSP21_EXERCICES_COMPLETS, MSP21_QCM_DEBUT, MSP21_QCM_FIN, MSP21_QCM_COMPETENCES } from "./msp21Preset";
 import { isMSP21Formation, getMSP21AutoAnswers, MSP21_QUESTIONS_OUVERTES } from "./msp21Humanized";
+import { isLilateFormation, lilateLangue, getLilateAutoAnswers } from "./lilateHumanized";
 import { ARH41366_EXERCICES_COMPLETS, ARH41366_QCM_DEBUT, ARH41366_QCM_FIN, ARH41366_QCM_COMPETENCES } from "./arh41366Preset";
 import { isARH41366Formation, getARH41366AutoAnswers, ARH41366_QUESTIONS_OUVERTES } from "./arh41366Humanized";
 import { GSC35_EXERCICES_COMPLETS, GSC35_QCM_DEBUT, GSC35_QCM_FIN } from "./gererCentre35hPreset";
@@ -2709,6 +2710,15 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoGsc.reponses, autoGsc.scores);
+  }
+
+  // LILATE anglais / FLE : copie construite item par item à partir du corrigé, selon le niveau CECRL du stagiaire.
+  if (isLilateFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoLil = getLilateAutoAnswers(
+      questions, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.civilite, isDebut, stagiaireIndex,
+      lilateLangue(formationInfo?.intitule, formationInfo?.codeRNCP),
+    );
+    return toAnswers(autoLil.reponses, autoLil.scores);
   }
 
   // Maquillage semi-permanent (RS6459) : moteur humanisé (une copie différente par stagiaire).

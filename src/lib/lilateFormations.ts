@@ -36,4 +36,15 @@ function formation(d: Raw, langue: "anglais" | "français", test: string): Forma
 }
 
 export const FORMATION_LILATE_EN = formation(lilateEn, "anglais", "Test d'aptitude à travailler en anglais – LILATE");
+/**
+ * RS6118 : fiche inactive depuis le 24/10/2025 (échéance d'enregistrement), remplacée par RS7314.
+ * À n'utiliser que pour les dossiers de sessions antérieures à cette date.
+ */
+const rs6118 = formation({ ...lilateEn, code: "RS6118" }, "anglais", "Test d'aptitude à travailler en anglais – LILATE");
+export const FORMATION_LILATE_EN_RS6118: FormationInfo = {
+  ...rs6118,
+  intitule: "Test d’aptitude à travailler en anglais – LILATE (RS6118)",
+  methodesEvaluation: `${rs6118.methodesEvaluation} Certification RS6118 (LINGUEO) enregistrée le 24/10/2022 et inactive depuis le 24/10/2025, remplacée par RS7314 : réservée aux sessions antérieures au 24/10/2025.`,
+};
+
 export const FORMATION_LILATE_FLE = formation(lilateFle as Raw, "français", "Test d'aptitude à travailler en français langue étrangère – LILATE");

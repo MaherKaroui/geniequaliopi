@@ -6,11 +6,17 @@ import lilateFle from '@/data/tpPresets/lilate-fle.json';
  * Parcours LILATE de CRM LMS (anglais RS7314, FLE RS6916, certificateur LINGUEO) :
  * QCM, exercices, corrigés et support de cours repris des leçons du LMS
  * (scripts/build-lilate-presets.mjs). L'organisme prépare au test, LINGUEO le délivre.
+ * RS6118 (même test anglais) est inactive depuis le 24/10/2025, remplacée par RS7314 :
+ * même contenu, réservée aux dossiers de sessions antérieures à cette date.
  */
 type Raw = typeof lilateEn;
+/** Intitulés officiels France Compétences (fiches RS7314, RS6118, RS6916). */
+export const LILATE_RS6118_TITRE = 'Test d’aptitude à travailler en anglais – LILATE (RS6118)';
+const RS6118: Raw = { ...lilateEn, titre: LILATE_RS6118_TITRE, code: 'RS6118' };
 const DEFS: [string, Raw, string[]][] = [
-  ['lilate-en', lilateEn, ['Anglais professionnel — LILATE', 'LILATE Anglais', 'Anglais LILATE', 'Anglais professionnel LILATE', 'Préparation au test LILATE Anglais', 'Anglais professionnel — préparation au test LILATE', 'Test d’aptitude à travailler en anglais – LILATE']],
-  ['lilate-fle', lilateFle as Raw, ['Français langue étrangère — LILATE', 'LILATE FLE', 'FLE LILATE', 'Français LILATE', 'Français professionnel LILATE', 'Préparation au test LILATE FLE', 'Français professionnel (FLE) — préparation au test LILATE', 'Test d’aptitude à travailler en français langue étrangère – LILATE']],
+  ['lilate-en', lilateEn, ['RS7314 - Test d’aptitude à travailler en anglais - LILATE', 'Anglais professionnel — LILATE', 'LILATE Anglais', 'Anglais LILATE', 'Anglais professionnel LILATE', 'Préparation au test LILATE Anglais', 'Anglais professionnel — préparation au test LILATE', 'Test d’aptitude à travailler en anglais – LILATE']],
+  ['lilate-en-rs6118', RS6118, ['RS6118 - Test d’aptitude à travailler en anglais - LILATE', 'RS6118 - Test d’aptitude à travailler en anglais', 'Test d’aptitude à travailler en anglais (RS6118)', 'LILATE Anglais RS6118']],
+  ['lilate-fle', lilateFle as Raw, ['RS6916 - Test d’aptitude à travailler en français langue étrangère - LILATE', 'Français langue étrangère — LILATE', 'LILATE FLE', 'FLE LILATE', 'Français LILATE', 'Français professionnel LILATE', 'Préparation au test LILATE FLE', 'Français professionnel (FLE) — préparation au test LILATE', 'Test d’aptitude à travailler en français langue étrangère – LILATE']],
 ];
 const norm = (v: string) => v.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 

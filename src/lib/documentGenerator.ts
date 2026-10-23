@@ -42,6 +42,7 @@ import { parseObjectifsCompetences, objectifsPedagogiquesHtml, competencesDevelo
 import { isTVTEFormation, getTVTEBesoin, getTVTEEvalBesoins, tvteBonnesQcmDebut, tvteReponsesQcmDebut } from "./ventesEnergie35hHumanized";
 import { isIAP21Formation, getIAP21Besoin, getIAP21EvalBesoins, iap21BonnesQcmDebut, iap21ReponsesQcmDebut } from "./iaPro21hHumanized";
 import { isMSP21Formation, getMSP21Besoin, getMSP21EvalBesoins, msp21BonnesQcmDebut, msp21ReponsesQcmDebut } from "./msp21Humanized";
+import { isLilateFormation, getLilateBesoin, getLilateEvalBesoins, lilateBonnesQcmDebut, lilateReponsesQcmDebut } from "./lilateHumanized";
 import { isARH41366Formation, getARH41366Besoin, getARH41366EvalBesoins, arh41366BonnesQcmDebut, arh41366ReponsesQcmDebut } from "./arh41366Humanized";
 import { isGSC35Formation, getGSC35Besoin, getGSC35EvalBesoins, gsc35BonnesQcmDebut, gsc35ReponsesQcmDebut } from "./gererCentre35hHumanized";
 import { getARH41366ExerciceCFA } from "./arh41366Preset";
@@ -1516,7 +1517,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Summary table
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
@@ -1527,7 +1528,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
@@ -2016,6 +2017,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getTVTEBesoin(s.nom, s.prenom, s.civilite, i)
         : isIAP21Formation(f.intitule, f.codeRNCP)
         ? getIAP21Besoin(s.nom, s.prenom, s.civilite, i)
+        : isLilateFormation(f.intitule, f.codeRNCP)
+        ? getLilateBesoin(f.intitule, f.codeRNCP, s.nom, s.prenom, s.civilite, i)
         : isMSP21Formation(f.intitule, f.codeRNCP)
         ? getMSP21Besoin(s.nom, s.prenom, s.civilite, i)
         : isARH41366Formation(f.intitule, f.codeRNCP)
@@ -3110,7 +3113,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
   // Summary
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const practicalScore = sc[1];
@@ -4054,7 +4057,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // Individual results
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
   stagiaires.forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
 
@@ -8769,6 +8772,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   if (f && isIAP21Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getIAP21EvalBesoins(s, false).disponibilites;
   }
+  if (f && isLilateFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getLilateEvalBesoins(s, false, undefined, f.intitule, f.codeRNCP).disponibilites;
+  }
   if (f && isMSP21Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getMSP21EvalBesoins(s, false).disponibilites;
   }
@@ -8906,6 +8912,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Titre Professionnel Assistant Ressources Humaines (TP ARH) – RNCP41366 ===
   if (isARH41366Formation(f.intitule, f.codeRNCP)) {
     return getARH41366EvalBesoins(s, hasEntreprise, idx);
+  }
+
+  // === Early return : LILATE anglais (RS7314 / RS6118) et FLE (RS6916) ===
+  if (isLilateFormation(f.intitule, f.codeRNCP)) {
+    return getLilateEvalBesoins(s, hasEntreprise, idx, f.intitule, f.codeRNCP);
   }
 
   // === Early return : Techniques de maquillage semi-permanent (RS6459) – 21 h ===
@@ -12126,6 +12137,8 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
         ? tvteBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : isIAP21Formation(f.intitule, f.codeRNCP)
         ? iap21BonnesQcmDebut(questions.length, si, s.nom, s.prenom)
+        : isLilateFormation(f.intitule, f.codeRNCP)
+        ? lilateBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : isMSP21Formation(f.intitule, f.codeRNCP)
         ? msp21BonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : isARH41366Formation(f.intitule, f.codeRNCP)
@@ -15387,6 +15400,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }
   if (mode === "debut" && isIAP21Formation(f.intitule, f.codeRNCP)) {
     targetCorrect = iap21BonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
+  }
+  if (mode === "debut" && isLilateFormation(f.intitule, f.codeRNCP)) {
+    targetCorrect = lilateBonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
   }
   if (mode === "debut" && isMSP21Formation(f.intitule, f.codeRNCP)) {
     targetCorrect = msp21BonnesQcmDebut(qcm.length, si, s.nom, s.prenom);

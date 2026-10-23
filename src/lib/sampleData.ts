@@ -202,8 +202,8 @@ export { FORMATION_ARH41366, seedARH41366AICaches } from "./arh41366Preset";
 import { FORMATION_GSC35 } from "./gererCentre35hPreset";
 export { FORMATION_GSC35, seedGSC35AICaches } from "./gererCentre35hPreset";
 
-import { FORMATION_LILATE_EN, FORMATION_LILATE_FLE } from "./lilateFormations";
-export { FORMATION_LILATE_EN, FORMATION_LILATE_FLE } from "./lilateFormations";
+import { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 } from "./lilateFormations";
+export { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 } from "./lilateFormations";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -1155,6 +1155,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   // Ajouts en fin de liste : les index existants (sélecteurs) restent inchangés.
   FORMATION_LILATE_EN,
   FORMATION_LILATE_FLE,
+  // RS6118 inactive depuis le 24/10/2025 (remplacée par RS7314) : sessions antérieures uniquement.
+  FORMATION_LILATE_EN_RS6118,
 ];
 export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Excel Professionnel": [5, 4, 5, 5, 4, 5, 4, 5],

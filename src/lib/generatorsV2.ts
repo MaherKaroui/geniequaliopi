@@ -36,6 +36,7 @@ import { pickWM14ExerciceAnswer, isWM14Formation, wm14NoteExercice } from "./web
 import { pickTVTEExerciceAnswer, isTVTEFormation, tvteNoteExercice } from "./ventesEnergie35hHumanized";
 import { pickIAP21ExerciceAnswer, isIAP21Formation, iap21NoteExercice } from "./iaPro21hHumanized";
 import { pickMSP21ExerciceAnswer, isMSP21Formation, msp21NoteExercice } from "./msp21Humanized";
+import { pickLilateExerciceAnswer, isLilateFormation, lilateNoteExercice } from "./lilateHumanized";
 import { pickARH41366ExerciceAnswer, isARH41366Formation, arh41366NoteExercice } from "./arh41366Humanized";
 import { pickGSC35ExerciceAnswer, isGSC35Formation, gsc35NoteExercice } from "./gererCentre35hHumanized";
 
@@ -1179,6 +1180,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, tvteNoteExercice(stagiaireIdx, ei, true))
         : isIAP21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, iap21NoteExercice(stagiaireIdx, ei, true))
+        : isLilateFormation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, lilateNoteExercice(stagiaireIdx, ei, true))
         : isMSP21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, msp21NoteExercice(stagiaireIdx, ei, true))
         : isARH41366Formation(f.intitule, f.codeRNCP)
@@ -1247,6 +1250,8 @@ D) Drive faster to finish the ride.`,
       ? tvteNoteExercice(stagiaireIdx, ei, false)
       : isIAP21Formation(f.intitule, f.codeRNCP)
       ? iap21NoteExercice(stagiaireIdx, ei, false)
+      : isLilateFormation(f.intitule, f.codeRNCP)
+      ? lilateNoteExercice(stagiaireIdx, ei, false)
       : isMSP21Formation(f.intitule, f.codeRNCP)
       ? msp21NoteExercice(stagiaireIdx, ei, false)
       : isARH41366Formation(f.intitule, f.codeRNCP)
@@ -1306,6 +1311,7 @@ D) Drive faster to finish the ride.`,
       || pickWM14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickTVTEExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickIAP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickLilateExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickMSP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickGSC35ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
