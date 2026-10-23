@@ -16,7 +16,7 @@ const base: StagiaireInfo = { civilite: "Mme", nom: "TEST", prenom: "Camille",
 
 async function generated(s: StagiaireInfo = base) {
   const blob = await genCerfaApprentissagePdf(o, f, s);
-  return (await PDFDocument.load(await blob.arrayBuffer())).getForm();
+  return (await PDFDocument.load(new Uint8Array(await blob.arrayBuffer()))).getForm();
 }
 
 beforeEach(() => {
