@@ -661,8 +661,9 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
       ? new Date(debut.getTime() + x.secondes * 1000).toISOString() : null);
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
-  let h = connectionIntro("IZILearn / Google Meet");
-  h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> IZILearn / Google Meet</p>`;
+  const nomOF = c.o.nom || "Classe virtuelle";
+  let h = connectionIntro(`${nomOF} / Google Meet`);
+  h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
   for (const sl of c.p.creneaux) {
     const jour = d(sl.debut);
@@ -687,7 +688,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     if (connexions.length) {
       // Connexions réellement relevées par IZILearn : prioritaires, jamais remplacées.
       cells = [
-        [...new Set(connexions.map((x) => x.source === "meet" ? "Google Meet" : "IZILearn"))].join(" / "),
+        [...new Set(connexions.map((x) => x.source === "meet" ? "Google Meet" : nomOF))].join(" / "),
         heure(matin[0]?.debut), heure(derniereFin(matin)),
         heure(apresMidi[0]?.debut), heure(derniereFin(apresMidi)),
         duree(connexions.reduce((n, x) => n + (x.secondes || 0), 0)),
@@ -700,7 +701,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
       // Jour passé sans relevé : remplissage automatique identique à Qualiopi.
       const gen = buildRealisticConnectionDay(seedStag + renderedDays * 13, hpd);
       totalMinutes += gen.dureeTotalMin;
-      cells = ["IZILearn / Google Meet", gen.connMatin, gen.deconnMidi, gen.connApMidi, gen.deconnSoir, `${Math.floor(gen.dureeTotalMin / 60)}h${String(gen.dureeTotalMin % 60).padStart(2, "0")}min`, "Présent(e)"];
+      cells = [nomOF, gen.connMatin, gen.deconnMidi, gen.connApMidi, gen.deconnSoir, `${Math.floor(gen.dureeTotalMin / 60)}h${String(gen.dureeTotalMin % 60).padStart(2, "0")}min`, "Présent(e)"];
     }
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
