@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { getFormationPreset, presetEvalPack } from '@/lib/formationPresets/registry';
+import { getFormationPreset, presetEvalPack, presetContentPack } from '@/lib/formationPresets/registry';
+import { hasExactDedicatedContent } from '@/lib/formationPresets/catalog';
+import { SAMPLE_FORMATIONS } from '@/lib/sampleData';
 import { getTPBesoin } from '@/lib/formationPresets/builtinTP';
 import { answersForQCM, studentAnswerFromCorrection } from '@/lib/aiEvalPack';
 
@@ -8,6 +10,8 @@ const F = [
   ['TP Exploitant en transport routier de marchandises', 'RNCP40992'],
   ['TP Gestionnaire comptable et fiscal', 'RNCP37949'],
   ['TP Gestionnaire de paie', 'RNCP37948'],
+  ['TP Comptable assistant', 'RNCP37121'],
+  ['TP Secrétaire comptable', 'RNCP37123'],
 ];
 const people = Array.from({ length: 40 }, (_, i) => ({ nom: `NOM${i}`, prenom: `P${i}` }) as any);
 
@@ -29,5 +33,19 @@ describe('Titres professionnels transport / comptabilité / paie', () => {
     for (const q of [...pack.qcmDebut, ...pack.qcmFin]) { expect(q.options).toHaveLength(4); expect(q.correctIndex).toBeGreaterThanOrEqual(0); expect(q.correctIndex).toBeLessThan(4); }
     const score = (m: 'debut' | 'fin', qs: typeof pack.qcmDebut) => people.reduce((n, s, i) => n + answersForQCM(qs, i, s, m).filter((a, k) => a === qs[k].correctIndex).length, 0);
     expect(score('debut', pack.qcmDebut)).toBeLessThan(score('fin', pack.qcmFin));
+  });
+  it.each([['TP Comptable assistant', 'RNCP37121'], ['TP Secrétaire comptable', 'RNCP37123']])('%s : support de cours de plus de 60 pages', (t, c) => {
+    const pack = presetContentPack({ intitule: t, codeRNCP: c })!;
+    expect(pack.chapters.length).toBeGreaterThanOrEqual(15);
+    const html = pack.chapters.flatMap(ch => ch.sections.map(s => s.contentHtml)).join('');
+    expect(html.length).toBeGreaterThan(500_000);
+    expect(html).not.toMatch(/<script|<img/i);
+  });
+  it('catalogue : les titres professionnels sont proposés et reconnus', () => {
+    for (const t of ['TP Exploitant en transport routier de marchandises', 'TP Gestionnaire comptable et fiscal', 'TP Gestionnaire de paie', 'TP Comptable assistant', 'TP Secrétaire comptable']) {
+      const f = SAMPLE_FORMATIONS.find(x => x.intitule === t)!;
+      expect(f, t).toBeTruthy();
+      expect(hasExactDedicatedContent(f)).toBe(true);
+    }
   });
 });

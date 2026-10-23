@@ -1,0 +1,1607 @@
+{
+ "competences": [
+  "Présenter des documents professionnels courants à l’aide d’outils numériques.",
+  "Organiser son environnement de travail et son classement au quotidien.",
+  "Rechercher et transmettre des informations usuelles par écrit.",
+  "Assurer l’accueil d’une structure au quotidien.",
+  "Assurer la gestion administrative et comptable des clients.",
+  "Assurer la gestion administrative et comptable des fournisseurs.",
+  "Assurer la gestion administrative et comptable des opérations de trésorerie.",
+  "Assurer la gestion administrative, comptable et fiscale de la déclaration de TVA.",
+  "Assurer la gestion des variables et paramètres de paie.",
+  "Présenter et transmettre des tableaux de bord."
+ ],
+ "besoinsList": [
+  "Gagner en aisance sur le traitement de texte et le tableur pour produire des documents professionnels.",
+  "Mettre en place un classement physique et numérique fiable et partagé.",
+  "Rédiger des courriels, courriers et comptes rendus clairs et sans erreur.",
+  "Améliorer la qualité de l’accueil physique et téléphonique, y compris dans les situations délicates.",
+  "Sécuriser l’établissement des factures et le suivi des règlements clients.",
+  "Contrôler les factures fournisseurs avant leur enregistrement et leur paiement.",
+  "Maîtriser le rapprochement bancaire et le suivi quotidien de la trésorerie.",
+  "Comprendre les mécanismes de la TVA et préparer la déclaration périodique.",
+  "Collecter et contrôler les éléments variables de paie avant transmission.",
+  "Construire et commenter des tableaux de bord simples à partir des données comptables."
+ ],
+ "syntheseHtml": "• Point de conformité : le RNCP37123 (titre professionnel Secrétaire comptable, niveau 4, Ministère du Travail, fiche active jusqu’au 01/03/2028) comprend 3 CCP et 10 compétences professionnelles officielles, reprises dans la liste des compétences sans ajout de déclinaison pédagogique.<br>• CCP 1 — Assurer les travaux administratifs de secrétariat au quotidien : présenter des documents professionnels courants à l’aide d’outils numériques, organiser son environnement de travail et son classement, rechercher et transmettre des informations usuelles par écrit, assurer l’accueil d’une structure.<br>• CCP 2 — Assurer les opérations comptables au quotidien : gestion administrative et comptable des clients, des fournisseurs et des opérations de trésorerie (facturation, contrôle des pièces, enregistrements, lettrage, relances, rapprochement bancaire).<br>• CCP 3 — Préparer les opérations comptables périodiques : préparer la déclaration de TVA, les variables et paramètres de paie et les tableaux de bord.<br>• Parcours de 712 heures : positionnement initial, apports progressifs, mises en situation de secrétariat et de comptabilité, contrôle intermédiaire et évaluation finale interne ; ces évaluations préparent aux épreuves sans se substituer aux modalités officielles de certification ni en garantir le résultat.",
+ "adaptationsHtml": "• Proposer une remise à niveau ciblée en expression écrite, calcul commercial (pourcentages, HT/TTC) et bureautique avant les cas comptables.<br>• Fournir des modèles (lettre, compte rendu, facture, état de rapprochement, tableau de TVA, fiche de variables de paie) puis retirer progressivement les aides.<br>• Alterner démonstrations, jeux de rôle d’accueil, entraînements guidés et mises en situation autonomes sur traitement de texte, tableur et logiciel comptable.<br>• Adapter supports et rythme aux besoins repérés : documents accessibles, consignes segmentées, temps majoré, pauses et aménagements individualisés en lien avec le référent handicap.<br>• Organiser des retours individualisés sur les erreurs, avec exercices de remédiation et justification orale des choix, en préparation aux entretiens prévus par le référentiel.",
+ "qcmDebut": [
+  {
+   "question": "Que signifie l’abréviation HT sur une facture ?",
+   "options": [
+    "Hors trésorerie",
+    "Hors taxes",
+    "Horaire total",
+    "Haut de tableau"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Quel document accompagne normalement la marchandise lors de sa livraison ?",
+   "options": [
+    "Le bulletin de paie",
+    "Le relevé bancaire",
+    "La déclaration de TVA",
+    "Le bon de livraison"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Dans le plan comptable général, quel compte enregistre les opérations avec la banque ?",
+   "options": [
+    "512",
+    "411",
+    "401",
+    "607"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Un client qui n’a pas encore payé sa facture représente pour l’entreprise :",
+   "options": [
+    "Une dette",
+    "Une charge",
+    "Une créance",
+    "Un capital"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Où se place la formule de politesse dans une lettre professionnelle ?",
+   "options": [
+    "Dans l’objet",
+    "Avant la formule d’appel",
+    "À la fin, avant la signature",
+    "Dans l’en-tête"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "À quoi sert principalement un agenda partagé dans un service ?",
+   "options": [
+    "Coordonner les rendez-vous et disponibilités de l’équipe",
+    "Calculer la TVA",
+    "Archiver les factures",
+    "Établir les bulletins de paie"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Combien représente 20 % de 150 € ?",
+   "options": [
+    "20 €",
+    "15 €",
+    "180 €",
+    "30 €"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "À qui le bulletin de paie est-il remis ?",
+   "options": [
+    "Au client",
+    "Au salarié",
+    "Au fournisseur",
+    "À la banque"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Un classement chronologique range les documents selon :",
+   "options": [
+    "Leur date",
+    "Le nom de leur auteur",
+    "Leur couleur",
+    "Leur nombre de pages"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Comment décrocher le téléphone de façon professionnelle ?",
+   "options": [
+    "Dire simplement « Allô ? »",
+    "Demander immédiatement le numéro de l’appelant",
+    "Annoncer le nom de la structure, se présenter et proposer son aide",
+    "Attendre que l’appelant parle en premier"
+   ],
+   "correctIndex": 2
+  }
+ ],
+ "qcmFin": [
+  {
+   "question": "Une facture comporte 24 articles à 35 € HT, une remise de 5 %, un escompte de 2 % et la TVA à 20 %. Quel est le net à payer ?",
+   "options": [
+    "957,60 €",
+    "938,45 €",
+    "1 008,00 €",
+    "782,04 €"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Le relevé bancaire présente un solde créditeur de 7 450 €. Un chèque émis de 1 250 € n’est pas encore débité, une remise de chèques de 600 € n’est pas encore créditée et 30 € de frais bancaires ne sont pas comptabilisés. Quel est le solde rapproché ?",
+   "options": [
+    "7 450 €",
+    "6 830 €",
+    "8 100 €",
+    "6 800 €"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "TVA collectée 12 400 €, TVA déductible sur biens et services 5 300 €, sur immobilisations 2 600 €, crédit antérieur 1 100 €. Quelle TVA reste à payer ?",
+   "options": [
+    "4 500 €",
+    "7 100 €",
+    "5 600 €",
+    "3 400 €"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Un prestataire de services, sans option pour les débits, facture 14 400 € TTC et encaisse 9 600 € TTC dans le mois (TVA 20 %). Quelle TVA collectée est exigible pour le mois ?",
+   "options": [
+    "2 400 €",
+    "1 600 €",
+    "1 920 €",
+    "2 880 €"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Salaire de base 2 400 €, taux horaire retenu 16 €, 3 heures supplémentaires majorées à 25 % et 7 heures d’absence non rémunérée retenues au taux horaire. Quel est le salaire brut ?",
+   "options": [
+    "2 460 €",
+    "2 288 €",
+    "2 348 €",
+    "2 412 €"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Un article acheté 80 € HT est revendu 120 € HT. Quel est son taux de marge (calculé sur le coût d’achat) ?",
+   "options": [
+    "50 %",
+    "33,33 %",
+    "40 %",
+    "150 %"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Quelle écriture enregistre un avoir client de 300 € HT pour rabais, TVA 20 % ?",
+   "options": [
+    "Débit 411 : 360 € ; crédit 709 : 300 € ; crédit 44571 : 60 €",
+    "Débit 709 : 300 € ; débit 44571 : 60 € ; crédit 411 : 360 €",
+    "Débit 709 : 360 € ; crédit 411 : 360 €",
+    "Débit 609 : 300 € ; débit 44566 : 60 € ; crédit 401 : 360 €"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Après deux relances amiables restées sans effet sur une facture échue, quelle étape suit généralement ?",
+   "options": [
+    "L’annulation de la facture",
+    "L’émission d’une nouvelle facture identique",
+    "La suppression du compte client",
+    "Une mise en demeure par lettre recommandée avec accusé de réception"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Dans un compte rendu de réunion, comment présenter au mieux une décision prise ?",
+   "options": [
+    "Indiquer la décision, la personne responsable et l’échéance",
+    "Citer mot à mot la discussion ayant précédé la décision",
+    "Donner l’avis personnel du rédacteur sur la décision",
+    "La mentionner uniquement dans le courriel d’envoi"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Les créances clients fin de trimestre s’élèvent à 36 000 € TTC pour un chiffre d’affaires annuel de 432 000 € TTC. Sur une année de 360 jours, quel est le délai moyen de paiement des clients ?",
+   "options": [
+    "36 jours",
+    "12 jours",
+    "30 jours",
+    "25 jours"
+   ],
+   "correctIndex": 2
+  }
+ ],
+ "qcmCompetences": [
+  {
+   "competence": "Présenter des documents professionnels courants à l’aide d’outils numériques.",
+   "questions": [
+    {
+     "question": "Dans un traitement de texte, quel outil garantit une présentation homogène des titres d’un long document ?",
+     "options": [
+      "La mise en gras manuelle de chaque titre",
+      "L’ajout d’espaces avant chaque titre",
+      "Les styles de titres",
+      "Le changement de police paragraphe par paragraphe"
+     ],
+     "correctIndex": 2,
+     "explication": "Les styles appliquent une mise en forme identique et permettent de générer une table des matières automatique."
+    },
+    {
+     "question": "Quelle fonction permet d’adresser une même lettre personnalisée à 200 clients ?",
+     "options": [
+      "Le publipostage à partir d’une source de données",
+      "Le suivi des modifications",
+      "La copie manuelle de la lettre pour chaque client",
+      "L’insertion d’un tableau croisé dynamique"
+     ],
+     "correctIndex": 0,
+     "explication": "Le publipostage fusionne un document type avec une liste de destinataires et leurs données."
+    },
+    {
+     "question": "Dans un tableur, quelle formule calcule le total des cellules B2 à B10 ?",
+     "options": [
+      "=B2+B10",
+      "=MOYENNE(B2:B10)",
+      "=NB(B2:B10)",
+      "=SOMME(B2:B10)"
+     ],
+     "correctIndex": 3,
+     "explication": "SOMME additionne toute la plage ; B2+B10 n’additionne que deux cellules."
+    },
+    {
+     "question": "Pour conserver la référence au taux situé en C1 lors de la recopie d’une formule, on écrit :",
+     "options": [
+      "C1",
+      "$C$1",
+      "\"C1\"",
+      "#C1"
+     ],
+     "correctIndex": 1,
+     "explication": "Les signes $ rendent la référence absolue en ligne et en colonne."
+    },
+    {
+     "question": "Dans une lettre commerciale, où figure normalement la ligne « Objet » ?",
+     "options": [
+      "Avant la formule d’appel",
+      "Après la signature",
+      "Uniquement dans le pied de page",
+      "Après la formule de politesse"
+     ],
+     "correctIndex": 0,
+     "explication": "L’objet annonce le sujet avant que le corps de la lettre ne commence."
+    },
+    {
+     "question": "Avant de diffuser un document à l’extérieur, quel format permet de figer sa mise en page ?",
+     "options": [
+      "Le fichier modifiable d’origine, sans protection",
+      "Une capture d’écran collée dans le courriel",
+      "Le PDF",
+      "Un fichier texte brut"
+     ],
+     "correctIndex": 2,
+     "explication": "Le PDF conserve la présentation quel que soit le logiciel du destinataire."
+    },
+    {
+     "question": "Dans un tableur, la formule =B2*(1+20%) avec B2 = 250 renvoie :",
+     "options": [
+      "270",
+      "300",
+      "250,20",
+      "50"
+     ],
+     "correctIndex": 1,
+     "explication": "250 × 1,20 = 300."
+    },
+    {
+     "question": "Un tableau s’étend sur trois pages. Quelle option facilite sa lecture ?",
+     "options": [
+      "Recopier manuellement l’en-tête sur chaque page",
+      "Réduire la police jusqu’à tout faire tenir sur une page",
+      "Supprimer les bordures du tableau",
+      "Répéter la ligne d’en-tête en haut de chaque page"
+     ],
+     "correctIndex": 3,
+     "explication": "L’option de répétition maintient l’en-tête même si le tableau est modifié."
+    },
+    {
+     "question": "Quelle pratique améliore l’accessibilité d’un document ?",
+     "options": [
+      "Transmettre une information uniquement par la couleur",
+      "Insérer le texte sous forme d’image",
+      "Utiliser des tableaux pour la seule mise en page",
+      "Utiliser des titres structurés et un contraste suffisant"
+     ],
+     "correctIndex": 3,
+     "explication": "Une structure balisée et un bon contraste facilitent la lecture, y compris avec des aides techniques."
+    },
+    {
+     "question": "Quel est l’intérêt d’un modèle de document (gabarit) dans un service ?",
+     "options": [
+      "Empêcher toute saisie dans le document",
+      "Harmoniser la présentation et gagner du temps",
+      "Remplacer la relecture",
+      "Réduire la taille des fichiers à zéro"
+     ],
+     "correctIndex": 1,
+     "explication": "Le modèle reprend la charte et les éléments fixes ; la relecture reste indispensable."
+    }
+   ]
+  },
+  {
+   "competence": "Organiser son environnement de travail et son classement au quotidien.",
+   "questions": [
+    {
+     "question": "Quel mode de classement convient à des dossiers clients identifiés par leur nom ?",
+     "options": [
+      "Chronologique",
+      "Géographique",
+      "Alphabétique",
+      "Par couleur de chemise"
+     ],
+     "correctIndex": 2,
+     "explication": "Le classement alphabétique suit la clé de recherche naturelle : le nom du client."
+    },
+    {
+     "question": "Selon la matrice d’Eisenhower, une tâche urgente et importante doit être :",
+     "options": [
+      "Traitée en priorité",
+      "Reportée à la semaine suivante",
+      "Abandonnée",
+      "Déléguée sans suivi"
+     ],
+     "correctIndex": 0,
+     "explication": "Urgente et importante, elle passe avant les autres tâches."
+    },
+    {
+     "question": "Quel est l’intérêt principal d’une règle commune de nommage des fichiers ?",
+     "options": [
+      "Réduire la taille des fichiers",
+      "Retrouver rapidement les fichiers et éviter les doublons",
+      "Empêcher toute modification",
+      "Remplacer les sauvegardes"
+     ],
+     "correctIndex": 1,
+     "explication": "Un nommage homogène rend la recherche et le tri fiables pour toute l’équipe."
+    },
+    {
+     "question": "Quel nom de fichier permet un tri chronologique automatique ?",
+     "options": [
+      "15-03-2026_Facture_Durand",
+      "Facture Durand mars",
+      "Durand_15mars",
+      "2026-03-15_Facture_Durand"
+     ],
+     "correctIndex": 3,
+     "explication": "Le format année-mois-jour se trie dans l’ordre chronologique."
+    },
+    {
+     "question": "Avant de détruire des archives comptables, que faut-il vérifier ?",
+     "options": [
+      "Les durées de conservation applicables et la procédure interne de destruction",
+      "Uniquement la place disponible dans le local",
+      "L’avis du client concerné",
+      "Que les documents aient plus d’un an"
+     ],
+     "correctIndex": 0,
+     "explication": "Les durées dépendent de la nature des documents et doivent être vérifiées avant toute destruction."
+    },
+    {
+     "question": "Quel outil convient pour suivre les échéances récurrentes d’un service ?",
+     "options": [
+      "Des notes adhésives sur l’écran",
+      "La mémoire de chaque collaborateur",
+      "Un agenda partagé avec rappels",
+      "Un courriel annuel récapitulatif"
+     ],
+     "correctIndex": 2,
+     "explication": "L’agenda partagé centralise les échéances et déclenche des rappels visibles par tous."
+    },
+    {
+     "question": "Des dossiers consultés tous les jours relèvent de quel type d’archives ?",
+     "options": [
+      "Les archives définitives",
+      "Les archives historiques",
+      "Les archives courantes",
+      "Les archives intermédiaires"
+     ],
+     "correctIndex": 2,
+     "explication": "Les archives courantes sont celles utilisées pour le traitement quotidien."
+    },
+    {
+     "question": "Quelle pratique protège le mieux des fichiers partagés contre la perte ?",
+     "options": [
+      "Des sauvegardes régulières sur un support distinct, avec test de restauration",
+      "Une copie sur le bureau de son poste",
+      "L’envoi des fichiers par courriel à soi-même",
+      "L’impression systématique des documents"
+     ],
+     "correctIndex": 0,
+     "explication": "Une sauvegarde n’est fiable que si elle est régulière, séparée et restaurable."
+    },
+    {
+     "question": "Un courrier reçu au service doit d’abord être :",
+     "options": [
+      "Classé sans enregistrement",
+      "Détruit après lecture",
+      "Transmis sans laisser de trace",
+      "Enregistré avec sa date d’arrivée, son expéditeur et son destinataire"
+     ],
+     "correctIndex": 3,
+     "explication": "L’enregistrement assure la traçabilité et le suivi du traitement."
+    },
+    {
+     "question": "Un dossier partagé contient des données personnelles de salariés. Quelle mesure prendre ?",
+     "options": [
+      "Le rendre accessible à toute l’entreprise",
+      "Restreindre l’accès aux seules personnes habilitées",
+      "L’envoyer par courriel à tous les services",
+      "Imprimer les données et les afficher"
+     ],
+     "correctIndex": 1,
+     "explication": "La protection des données personnelles impose de limiter l’accès au besoin d’en connaître."
+    }
+   ]
+  },
+  {
+   "competence": "Rechercher et transmettre des informations usuelles par écrit.",
+   "questions": [
+    {
+     "question": "Quelle source est la plus fiable pour une information réglementaire ?",
+     "options": [
+      "Le site officiel de l’administration concernée, à jour",
+      "Un forum de discussion entre professionnels, très fréquenté et souvent cité",
+      "Une publication sur un réseau social",
+      "Un blog anonyme ancien"
+     ],
+     "correctIndex": 0,
+     "explication": "Les sources officielles et datées permettent de vérifier l’information en vigueur."
+    },
+    {
+     "question": "Quel ton adopter pour répondre par écrit à un client mécontent ?",
+     "options": [
+      "Familier et chaleureux, pour détendre l’échange et rassurer le client sur la relation",
+      "Défensif pour protéger l’entreprise",
+      "Courtois et factuel, avec une solution et un délai",
+      "Bref, sans réponse sur le fond"
+     ],
+     "correctIndex": 2,
+     "explication": "Une réponse professionnelle reconnaît le problème et propose une suite concrète."
+    },
+    {
+     "question": "À quoi sert le champ « Cci » d’un courriel ?",
+     "options": [
+      "Envoyer une copie du message à son responsable pour qu’il suive l’échange",
+      "Masquer l’adresse de ce destinataire aux autres destinataires",
+      "Chiffrer le message",
+      "Demander un accusé de lecture"
+     ],
+     "correctIndex": 1,
+     "explication": "Les destinataires en copie cachée ne sont pas visibles des autres."
+    },
+    {
+     "question": "Une note de service s’adresse principalement :",
+     "options": [
+      "Aux clients et partenaires, pour leur annoncer une information commerciale importante",
+      "Aux fournisseurs",
+      "À l’administration fiscale",
+      "Au personnel interne, pour transmettre une information ou une consigne"
+     ],
+     "correctIndex": 3,
+     "explication": "La note de service est un écrit de communication interne."
+    },
+    {
+     "question": "Quel élément est indispensable dans un courriel professionnel ?",
+     "options": [
+      "Une mise en forme colorée pour attirer l’attention du destinataire",
+      "Des émoticônes",
+      "Une police originale",
+      "Un objet explicite"
+     ],
+     "correctIndex": 3,
+     "explication": "L’objet permet au destinataire d’identifier et de classer le message."
+    },
+    {
+     "question": "Comment transmettre un fichier volumineux et confidentiel à un partenaire ?",
+     "options": [
+      "Par une messagerie personnelle",
+      "Par l’espace de partage sécurisé de l’entreprise, avec accès restreint",
+      "Sur une clé USB laissée à l’accueil",
+      "En le découpant en plusieurs courriels non protégés"
+     ],
+     "correctIndex": 1,
+     "explication": "Le partage sécurisé contrôle l’accès et évite la diffusion non maîtrisée."
+    },
+    {
+     "question": "Que doit contenir un message téléphonique transmis par écrit ?",
+     "options": [
+      "Le seul prénom de l’appelant",
+      "Uniquement le numéro de téléphone",
+      "La date, l’heure, l’identité et les coordonnées de l’appelant, l’objet et la suite à donner",
+      "Le ressenti de la personne qui a répondu"
+     ],
+     "correctIndex": 2,
+     "explication": "Ces éléments permettent au destinataire de rappeler et de traiter la demande."
+    },
+    {
+     "question": "Quelle fonction de tableur retrouve les informations d’un client à partir de son code ?",
+     "options": [
+      "RECHERCHEV (ou RECHERCHEX)",
+      "SOMME",
+      "CONCATENER",
+      "ARRONDI"
+     ],
+     "correctIndex": 0,
+     "explication": "Les fonctions de recherche renvoient une valeur associée à une clé dans un tableau."
+    },
+    {
+     "question": "Réaliser une synthèse documentaire consiste à :",
+     "options": [
+      "Copier l’intégralité des documents",
+      "Sélectionner, hiérarchiser et reformuler les informations essentielles",
+      "Donner uniquement son opinion",
+      "Lister les titres des documents"
+     ],
+     "correctIndex": 1,
+     "explication": "La synthèse restitue l’essentiel de façon structurée et objective."
+    },
+    {
+     "question": "Avant d’envoyer un courriel important, que faut-il vérifier en priorité ?",
+     "options": [
+      "Uniquement la couleur de la signature",
+      "Le nombre de mots",
+      "L’heure d’envoi seulement",
+      "Les destinataires, les pièces jointes, l’orthographe et l’exactitude des chiffres"
+     ],
+     "correctIndex": 3,
+     "explication": "Une erreur de destinataire ou de chiffre peut avoir des conséquences importantes."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer l’accueil d’une structure au quotidien.",
+   "questions": [
+    {
+     "question": "Quel est le premier geste lors de l’accueil physique d’un visiteur ?",
+     "options": [
+      "Saluer, se présenter et identifier sa demande",
+      "Lui demander d’attendre en salle sans explication, le temps de terminer sa tâche",
+      "Continuer sa tâche en cours",
+      "Lui remettre directement un badge"
+     ],
+     "correctIndex": 0,
+     "explication": "L’accueil commence par un contact courtois et l’identification du besoin."
+    },
+    {
+     "question": "Le collaborateur attendu par un visiteur a quinze minutes de retard. Que faire ?",
+     "options": [
+      "Lui proposer de revenir un autre jour pour ne pas le faire attendre inutilement",
+      "Ne rien dire au visiteur",
+      "Informer le visiteur du délai, l’installer et prévenir le collaborateur",
+      "Annuler le rendez-vous"
+     ],
+     "correctIndex": 2,
+     "explication": "Informer et installer le visiteur préserve l’image de la structure."
+    },
+    {
+     "question": "Un appel arrive pour un collaborateur absent. Quelle réponse est adaptée ?",
+     "options": [
+      "Donner son numéro de portable personnel",
+      "Indiquer précisément le motif de son absence",
+      "Proposer de prendre un message ou un rappel, sans divulguer d’informations personnelles",
+      "Raccrocher en demandant de rappeler plus tard"
+     ],
+     "correctIndex": 2,
+     "explication": "La confidentialité impose de ne pas communiquer d’éléments personnels."
+    },
+    {
+     "question": "À quoi sert la reformulation lors d’un accueil ?",
+     "options": [
+      "Vérifier la bonne compréhension de la demande",
+      "Allonger l’échange",
+      "Montrer à l’interlocuteur que l’on maîtrise mieux le sujet que lui",
+      "Éviter de répondre"
+     ],
+     "correctIndex": 0,
+     "explication": "Reformuler permet de s’assurer d’avoir compris avant d’orienter."
+    },
+    {
+     "question": "Face à un visiteur agressif, quelle attitude adopter ?",
+     "options": [
+      "Hausser le ton pour reprendre le contrôle",
+      "Ignorer le visiteur",
+      "Promettre tout ce qu’il demande",
+      "Rester calme, écouter, reformuler et solliciter un responsable si nécessaire"
+     ],
+     "correctIndex": 3,
+     "explication": "Le calme et l’écoute désamorcent la tension ; l’escalade se fait selon la procédure."
+    },
+    {
+     "question": "Filtrer un appel consiste à :",
+     "options": [
+      "Refuser tous les appels",
+      "Identifier l’appelant et l’objet de l’appel avant de le transférer",
+      "Transférer directement tous les appels pour ne jamais faire attendre l’appelant",
+      "Enregistrer l’appel sans prévenir"
+     ],
+     "correctIndex": 1,
+     "explication": "Le filtrage oriente l’appel vers le bon interlocuteur, au bon moment."
+    },
+    {
+     "question": "Quel est l’intérêt d’un registre des visiteurs ?",
+     "options": [
+      "Assurer la traçabilité et la sécurité des accès",
+      "Mesurer la satisfaction des visiteurs et remplacer l’agenda partagé du service",
+      "Remplacer l’agenda",
+      "Calculer les heures de travail"
+     ],
+     "correctIndex": 0,
+     "explication": "Le registre permet de savoir qui est présent dans les locaux."
+    },
+    {
+     "question": "Comment accueillir une personne en situation de handicap ?",
+     "options": [
+      "Appliquer le même accueil sans adaptation",
+      "S’adresser uniquement à son accompagnateur",
+      "Lui demander ses besoins et adapter l’orientation, l’accompagnement ou la communication",
+      "Lui demander de revenir plus tard"
+     ],
+     "correctIndex": 2,
+     "explication": "L’adaptation se construit à partir des besoins exprimés par la personne."
+    },
+    {
+     "question": "Comment mettre correctement un appel en attente ?",
+     "options": [
+      "Le mettre en attente sans prévenir, puis reprendre la ligne dès que possible pour lui répondre",
+      "Demander l’accord de l’appelant, indiquer la durée probable et revenir vers lui régulièrement",
+      "Le laisser en attente jusqu’à ce qu’il raccroche",
+      "Poser le combiné sur le bureau"
+     ],
+     "correctIndex": 1,
+     "explication": "L’appelant doit savoir pourquoi et combien de temps il attend."
+    },
+    {
+     "question": "Quelle règle de confidentialité s’applique à l’accueil ?",
+     "options": [
+      "Laisser l’agenda ouvert pour renseigner les visiteurs",
+      "Communiquer les plannings à tout appelant",
+      "Afficher la liste des absences",
+      "Ne laisser aucun document visible et ne pas communiquer d’informations sur les collaborateurs"
+     ],
+     "correctIndex": 3,
+     "explication": "L’accueil est un point d’accès : documents et informations doivent être protégés."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer la gestion administrative et comptable des clients.",
+   "questions": [
+    {
+     "question": "Une facture comporte 10 articles à 45 € HT, une remise de 10 % et la TVA à 20 %. Quel est le montant TTC ?",
+     "options": [
+      "540,00 €",
+      "405,00 €",
+      "495,00 €",
+      "486,00 €"
+     ],
+     "correctIndex": 3,
+     "explication": "450 − 45 = 405 € HT ; TVA 81 € ; TTC 486 €."
+    },
+    {
+     "question": "Quelle écriture enregistre une vente de marchandises à crédit ?",
+     "options": [
+      "Débit 401 ; crédit 707",
+      "Débit 411 ; crédit 707 et crédit 44571",
+      "Débit 512 ; crédit 411",
+      "Débit 607 ; crédit 411"
+     ],
+     "correctIndex": 1,
+     "explication": "Le client devient débiteur ; la vente et la TVA collectée sont créditées."
+    },
+    {
+     "question": "À quoi sert un avoir émis pour un client ?",
+     "options": [
+      "Relancer un client en retard",
+      "Facturer un acompte",
+      "Annuler ou réduire une facture déjà émise",
+      "Remplacer le devis"
+     ],
+     "correctIndex": 2,
+     "explication": "L’avoir corrige une facture sans la supprimer."
+    },
+    {
+     "question": "Un escompte de 2 % pour paiement comptant est accordé sur un net commercial de 1 000 € HT. Quel est l’escompte HT ?",
+     "options": [
+      "20 €",
+      "200 €",
+      "2 €",
+      "24 €"
+     ],
+     "correctIndex": 0,
+     "explication": "1 000 × 2 % = 20 €."
+    },
+    {
+     "question": "À quoi sert une balance âgée clients ?",
+     "options": [
+      "Calculer la TVA déductible",
+      "Repérer les créances échues et leur ancienneté pour organiser les relances",
+      "Établir les bulletins de paie",
+      "Évaluer les immobilisations"
+     ],
+     "correctIndex": 1,
+     "explication": "Elle classe les soldes par ancienneté d’échéance."
+    },
+    {
+     "question": "Quel contenu convient à une première relance de paiement ?",
+     "options": [
+      "Une menace de poursuites immédiates",
+      "Une demande de paiement sans référence de facture",
+      "Un message adressé au fournisseur",
+      "Un rappel courtois de la facture, du montant et de l’échéance dépassée"
+     ],
+     "correctIndex": 3,
+     "explication": "La première relance reste amiable et précise."
+    },
+    {
+     "question": "Quelle écriture enregistre l’encaissement par virement d’un client de 1 200 € ?",
+     "options": [
+      "Débit 512 ; crédit 411",
+      "Débit 411 ; crédit 512",
+      "Débit 401 ; crédit 512",
+      "Débit 512 ; crédit 707"
+     ],
+     "correctIndex": 0,
+     "explication": "La banque augmente et la créance client diminue."
+    },
+    {
+     "question": "Le lettrage d’un compte client consiste à :",
+     "options": [
+      "Écrire une lettre au client",
+      "Classer les clients par ordre alphabétique",
+      "Rapprocher les factures et les règlements qui se correspondent",
+      "Supprimer les écritures anciennes"
+     ],
+     "correctIndex": 2,
+     "explication": "Le lettrage fait apparaître les factures restant à encaisser."
+    },
+    {
+     "question": "Quelle mention doit figurer sur une facture entre professionnels ?",
+     "options": [
+      "Le RIB du client",
+      "La signature du client",
+      "Un numéro unique fondé sur une séquence chronologique et continue",
+      "La photo du produit"
+     ],
+     "correctIndex": 2,
+     "explication": "La numérotation unique et continue est une mention obligatoire."
+    },
+    {
+     "question": "Un client a été facturé 8 400 € TTC, a réglé 6 000 € et bénéficié d’un avoir de 600 € TTC. Quel est son solde ?",
+     "options": [
+      "1 800 € débiteur",
+      "2 400 € débiteur",
+      "3 000 € débiteur",
+      "1 200 € créditeur"
+     ],
+     "correctIndex": 0,
+     "explication": "8 400 − 6 000 − 600 = 1 800 € restant dû."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer la gestion administrative et comptable des fournisseurs.",
+   "questions": [
+    {
+     "question": "Quelle écriture enregistre une facture d’achat de marchandises ?",
+     "options": [
+      "Débit 401 ; crédit 607 et crédit 44566",
+      "Débit 411 ; crédit 707",
+      "Débit 607 ; crédit 512 et crédit 44571",
+      "Débit 607 et débit 44566 ; crédit 401"
+     ],
+     "correctIndex": 3,
+     "explication": "L’achat et la TVA déductible sont débités ; la dette fournisseur est créditée."
+    },
+    {
+     "question": "Quel contrôle effectuer avant d’enregistrer une facture fournisseur ?",
+     "options": [
+      "Vérifier uniquement le total TTC",
+      "Rapprocher le bon de commande, le bon de livraison et la facture",
+      "Contrôler seulement le logo du fournisseur",
+      "Payer d’abord puis contrôler"
+     ],
+     "correctIndex": 1,
+     "explication": "Le rapprochement des trois documents détecte les écarts de quantités et de prix."
+    },
+    {
+     "question": "Facture fournisseur de 2 000 € HT avec remise de 5 % et TVA à 20 %. Quel est le montant TTC ?",
+     "options": [
+      "2 280 €",
+      "2 400 €",
+      "2 160 €",
+      "1 900 €"
+     ],
+     "correctIndex": 0,
+     "explication": "2 000 − 100 = 1 900 € HT ; TVA 380 € ; TTC 2 280 €."
+    },
+    {
+     "question": "Quelle écriture enregistre un avoir reçu d’un fournisseur pour rabais sur marchandises ?",
+     "options": [
+      "Débit 609 ; crédit 401",
+      "Débit 411 ; crédit 709",
+      "Débit 401 ; crédit 609 et crédit 44566",
+      "Débit 401 ; crédit 512"
+     ],
+     "correctIndex": 2,
+     "explication": "L’avoir réduit la dette, l’achat net et la TVA déductible."
+    },
+    {
+     "question": "À quoi sert un échéancier fournisseurs ?",
+     "options": [
+      "Calculer les salaires",
+      "Planifier les règlements selon les dates d’échéance",
+      "Établir les factures de vente",
+      "Classer les fournisseurs par ville"
+     ],
+     "correctIndex": 1,
+     "explication": "Il permet de payer à bonne date et d’anticiper la trésorerie."
+    },
+    {
+     "question": "La livraison reçue est incomplète par rapport à la facture. Que faire ?",
+     "options": [
+      "Payer la totalité sans réserve",
+      "Détruire la facture",
+      "Modifier soi-même le montant de la facture",
+      "Signaler l’écart au fournisseur et demander un avoir avant de régler le montant contesté"
+     ],
+     "correctIndex": 3,
+     "explication": "Une facture ne se corrige pas à la main : l’écart est réglé par un avoir."
+    },
+    {
+     "question": "Quelle écriture enregistre le règlement par virement d’un fournisseur de 3 600 € ?",
+     "options": [
+      "Débit 512 ; crédit 401",
+      "Débit 607 ; crédit 512",
+      "Débit 401 ; crédit 607",
+      "Débit 401 ; crédit 512"
+     ],
+     "correctIndex": 3,
+     "explication": "La dette fournisseur diminue et la banque diminue."
+    },
+    {
+     "question": "Une facture fournisseur arrive une seconde fois par courriel. Que vérifier ?",
+     "options": [
+      "Rien, il suffit de la saisir",
+      "Qu’elle n’est pas déjà enregistrée (numéro, date, montant)",
+      "Uniquement l’adresse de l’expéditeur",
+      "Le nombre de pages"
+     ],
+     "correctIndex": 1,
+     "explication": "Ce contrôle évite une double charge et une double déduction de TVA."
+    },
+    {
+     "question": "Un compte fournisseur présentant un solde créditeur indique :",
+     "options": [
+      "Une créance sur ce fournisseur",
+      "Une erreur de saisie certaine",
+      "Une dette envers ce fournisseur",
+      "Une trésorerie positive"
+     ],
+     "correctIndex": 2,
+     "explication": "Les comptes fournisseurs ont normalement un solde créditeur."
+    },
+    {
+     "question": "Où trouver le délai de paiement convenu avec un fournisseur ?",
+     "options": [
+      "Dans ses conditions générales de vente, le contrat et sur la facture",
+      "Dans le bulletin de paie",
+      "Dans le relevé bancaire",
+      "Dans le registre des visiteurs"
+     ],
+     "correctIndex": 0,
+     "explication": "Le délai convenu figure dans les documents commerciaux et sur la facture."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer la gestion administrative et comptable des opérations de trésorerie.",
+   "questions": [
+    {
+     "question": "Le compte 512 présente un solde débiteur de 5 200 €. Un virement client de 300 € figure sur le relevé mais n’est pas comptabilisé ; un chèque émis de 800 € n’est pas encore débité. Quel est le solde comptable corrigé ?",
+     "options": [
+      "5 200 €",
+      "5 500 €",
+      "6 300 €",
+      "4 700 €"
+     ],
+     "correctIndex": 1,
+     "explication": "Seul le virement non comptabilisé se régularise en comptabilité : 5 200 + 300 = 5 500 €."
+    },
+    {
+     "question": "Des frais bancaires figurent sur le relevé mais pas en comptabilité. Quelle écriture passer ?",
+     "options": [
+      "Débit 512 ; crédit 627",
+      "Débit 401 ; crédit 512",
+      "Aucune écriture",
+      "Débit 627 ; crédit 512"
+     ],
+     "correctIndex": 3,
+     "explication": "Les frais de services bancaires sont une charge qui diminue la banque."
+    },
+    {
+     "question": "Quelle règle s’applique au compte caisse ?",
+     "options": [
+      "Son solde ne peut jamais être créditeur",
+      "Son solde est toujours nul",
+      "Il peut être à découvert",
+      "Il n’est jamais contrôlé"
+     ],
+     "correctIndex": 0,
+     "explication": "On ne peut pas sortir plus d’espèces qu’il n’y en a dans la caisse."
+    },
+    {
+     "question": "Trésorerie initiale 4 000 €, encaissements 12 000 €, décaissements 15 500 €. Quelle est la trésorerie finale ?",
+     "options": [
+      "−500 €",
+      "31 500 €",
+      "500 €",
+      "7 500 €"
+     ],
+     "correctIndex": 2,
+     "explication": "4 000 + 12 000 − 15 500 = 500 €."
+    },
+    {
+     "question": "Quel document accompagne une remise de chèques à la banque ?",
+     "options": [
+      "Le bon de livraison",
+      "Le bulletin de paie",
+      "Un bordereau de remise listant les chèques",
+      "La facture d’achat"
+     ],
+     "correctIndex": 2,
+     "explication": "Le bordereau récapitule les chèques remis et leur total."
+    },
+    {
+     "question": "Que faut-il pour prélever un client par prélèvement SEPA ?",
+     "options": [
+      "Un mandat signé par le débiteur",
+      "Un simple appel téléphonique",
+      "Le numéro SIRET du client seulement",
+      "Une facture d’avoir"
+     ],
+     "correctIndex": 0,
+     "explication": "Le mandat autorise le créancier à prélever le compte du débiteur."
+    },
+    {
+     "question": "Le comptage de la caisse révèle un écart avec le solde comptable. Que faire d’abord ?",
+     "options": [
+      "Ajuster la caisse avec ses propres fonds",
+      "Ignorer l’écart",
+      "Modifier les écritures passées sans justificatif",
+      "Rechercher l’origine de l’écart et le documenter avant toute régularisation"
+     ],
+     "correctIndex": 3,
+     "explication": "Une régularisation doit être justifiée et validée."
+    },
+    {
+     "question": "Quel compte sert de passage pour un retrait d’espèces de la banque vers la caisse ?",
+     "options": [
+      "401 Fournisseurs",
+      "580 Virements internes",
+      "411 Clients",
+      "706 Prestations de services"
+     ],
+     "correctIndex": 1,
+     "explication": "Le compte 580 évite le double enregistrement entre journaux de banque et de caisse."
+    },
+    {
+     "question": "Pourquoi suivre la trésorerie au quotidien ?",
+     "options": [
+      "Anticiper les découverts et planifier les paiements",
+      "Calculer le résultat fiscal",
+      "Établir les fiches de poste",
+      "Remplacer le rapprochement bancaire"
+     ],
+     "correctIndex": 0,
+     "explication": "Le suivi quotidien évite les incidents de paiement et les agios."
+    },
+    {
+     "question": "À quelle fréquence réaliser le rapprochement bancaire ?",
+     "options": [
+      "Une fois tous les cinq ans",
+      "Seulement en cas de contrôle",
+      "Régulièrement, au moins à chaque relevé",
+      "Jamais si la banque ne signale rien"
+     ],
+     "correctIndex": 2,
+     "explication": "Un rapprochement fréquent détecte rapidement les erreurs et oublis."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer la gestion administrative, comptable et fiscale de la déclaration de TVA.",
+   "questions": [
+    {
+     "question": "Une vente de 1 800 € TTC est soumise à la TVA à 20 %. Quel est le montant de TVA ?",
+     "options": [
+      "360 €",
+      "300 €",
+      "1 500 €",
+      "240 €"
+     ],
+     "correctIndex": 1,
+     "explication": "1 800 / 1,20 = 1 500 € HT ; TVA = 300 €."
+    },
+    {
+     "question": "TVA collectée 5 600 €, TVA déductible sur biens et services 2 100 €, sur immobilisations 900 €. Quelle TVA est à payer ?",
+     "options": [
+      "3 500 €",
+      "4 700 €",
+      "8 600 €",
+      "2 600 €"
+     ],
+     "correctIndex": 3,
+     "explication": "5 600 − 2 100 − 900 = 2 600 €."
+    },
+    {
+     "question": "Un crédit de TVA apparaît lorsque :",
+     "options": [
+      "La TVA collectée dépasse la TVA déductible",
+      "Le chiffre d’affaires augmente",
+      "Aucune facture n’est émise",
+      "La TVA déductible dépasse la TVA collectée"
+     ],
+     "correctIndex": 3,
+     "explication": "L’excédent de TVA déductible constitue un crédit reportable ou remboursable selon les règles."
+    },
+    {
+     "question": "Pour une livraison de biens, quand la TVA devient-elle normalement exigible ?",
+     "options": [
+      "Au paiement du client dans tous les cas",
+      "À la livraison",
+      "À la clôture de l’exercice",
+      "À la signature du devis"
+     ],
+     "correctIndex": 1,
+     "explication": "Pour les livraisons de biens, le fait générateur et l’exigibilité interviennent en principe à la livraison."
+    },
+    {
+     "question": "Quel compte enregistre la TVA déductible sur une facture de fournitures de bureau ?",
+     "options": [
+      "44571",
+      "44551",
+      "44566",
+      "44562"
+     ],
+     "correctIndex": 2,
+     "explication": "44566 : TVA déductible sur autres biens et services ; 44562 concerne les immobilisations."
+    },
+    {
+     "question": "Quelle écriture solde les comptes de TVA lorsque la TVA est à payer ?",
+     "options": [
+      "Débit 44571 ; crédit 44566 et crédit 44551",
+      "Débit 44551 ; crédit 44571",
+      "Débit 44566 ; crédit 44571",
+      "Débit 512 ; crédit 44571"
+     ],
+     "correctIndex": 0,
+     "explication": "La TVA collectée est soldée par la déductible ; la différence est portée en TVA à décaisser."
+    },
+    {
+     "question": "Quelle pièce est nécessaire pour déduire la TVA sur un achat ?",
+     "options": [
+      "Un bon de commande",
+      "Une facture conforme mentionnant la TVA",
+      "Un devis signé",
+      "Un relevé bancaire"
+     ],
+     "correctIndex": 1,
+     "explication": "Le droit à déduction suppose notamment la détention d’une facture régulière."
+    },
+    {
+     "question": "Le chiffre d’affaires HT au taux de 20 % est de 42 000 € et le compte 44571 présente 8 000 €. Quel écart faut-il analyser ?",
+     "options": [
+      "8 400 €",
+      "0 €",
+      "840 €",
+      "400 €"
+     ],
+     "correctIndex": 3,
+     "explication": "TVA attendue : 42 000 × 20 % = 8 400 € ; écart de 400 € à justifier."
+    },
+    {
+     "question": "Sous le régime réel normal, quelle déclaration périodique de TVA est déposée ?",
+     "options": [
+      "La déclaration CA3",
+      "La déclaration CA12",
+      "La DSN",
+      "La liasse 2065"
+     ],
+     "correctIndex": 0,
+     "explication": "Le régime réel normal donne lieu à des déclarations CA3, en principe mensuelles."
+    },
+    {
+     "question": "Une facture d’achat s’élève à 600 € TTC, TVA 20 %. Quel est son montant HT ?",
+     "options": [
+      "480 €",
+      "720 €",
+      "500 €",
+      "580 €"
+     ],
+     "correctIndex": 2,
+     "explication": "600 / 1,20 = 500 €."
+    }
+   ]
+  },
+  {
+   "competence": "Assurer la gestion des variables et paramètres de paie.",
+   "questions": [
+    {
+     "question": "Quel élément constitue une variable de paie du mois ?",
+     "options": [
+      "Le numéro SIRET",
+      "L’adresse de l’entreprise",
+      "Les heures supplémentaires réalisées dans le mois",
+      "Le code APE"
+     ],
+     "correctIndex": 2,
+     "explication": "Les variables changent d’un mois à l’autre : heures, absences, primes."
+    },
+    {
+     "question": "Un salaire de base de 2 400 € correspond à 151,67 heures. Quel est le taux horaire arrondi au centime ?",
+     "options": [
+      "15,82 €",
+      "16,00 €",
+      "15,00 €",
+      "17,14 €"
+     ],
+     "correctIndex": 0,
+     "explication": "2 400 / 151,67 ≈ 15,82 €."
+    },
+    {
+     "question": "Taux horaire de 16 €, 4 heures supplémentaires majorées à 25 % dans le cas proposé. Quel montant ajouter au brut ?",
+     "options": [
+      "64 €",
+      "16 €",
+      "100 €",
+      "80 €"
+     ],
+     "correctIndex": 3,
+     "explication": "4 × 16 × 1,25 = 80 €."
+    },
+    {
+     "question": "Une absence injustifiée non rémunérée doit être :",
+     "options": [
+      "Ignorée",
+      "Transmise au gestionnaire de paie avec ses dates et justificatifs éventuels",
+      "Compensée par une prime",
+      "Notée uniquement dans l’agenda"
+     ],
+     "correctIndex": 1,
+     "explication": "Sans transmission, le bulletin serait erroné."
+    },
+    {
+     "question": "Quel élément relève des paramètres de paie, et non des variables ?",
+     "options": [
+      "Les taux de cotisation applicables",
+      "Les heures supplémentaires du mois",
+      "Les jours d’absence du mois",
+      "La prime exceptionnelle du mois"
+     ],
+     "correctIndex": 0,
+     "explication": "Les paramètres (taux, plafonds, règles conventionnelles) s’appliquent à toutes les paies."
+    },
+    {
+     "question": "Salaire de base 2 000 €, heures supplémentaires 150 €, prime 100 €. Quel est le brut ?",
+     "options": [
+      "2 150 €",
+      "2 100 €",
+      "2 250 €",
+      "2 400 €"
+     ],
+     "correctIndex": 2,
+     "explication": "2 000 + 150 + 100 = 2 250 €."
+    },
+    {
+     "question": "Comment transmettre les variables de paie ?",
+     "options": [
+      "Par affichage en salle de pause",
+      "Par un canal sécurisé, aux seules personnes habilitées",
+      "Par un courriel à tout le service",
+      "Sur une feuille laissée à l’accueil"
+     ],
+     "correctIndex": 1,
+     "explication": "Les données de paie sont personnelles et confidentielles."
+    },
+    {
+     "question": "Pourquoi consulter la convention collective applicable ?",
+     "options": [
+      "Pour calculer la TVA",
+      "Pour établir les factures",
+      "Pour classer les archives",
+      "Pour connaître certaines règles de classification, primes ou majorations"
+     ],
+     "correctIndex": 3,
+     "explication": "La convention collective peut prévoir des règles plus favorables que la loi."
+    },
+    {
+     "question": "Quelle déclaration transmet chaque mois les données sociales issues de la paie ?",
+     "options": [
+      "La CA3",
+      "La liasse fiscale",
+      "La DEB",
+      "La DSN"
+     ],
+     "correctIndex": 3,
+     "explication": "La déclaration sociale nominative est produite à partir de la paie."
+    },
+    {
+     "question": "Quel contrôle faire avant de transmettre les variables ?",
+     "options": [
+      "Vérifier uniquement l’orthographe des noms",
+      "Rapprocher les relevés d’heures et d’absences validés par le responsable",
+      "Recopier les variables du mois précédent",
+      "Attendre la réclamation du salarié"
+     ],
+     "correctIndex": 1,
+     "explication": "Les variables doivent être exactes, complètes et validées."
+    }
+   ]
+  },
+  {
+   "competence": "Présenter et transmettre des tableaux de bord.",
+   "questions": [
+    {
+     "question": "Le chiffre d’affaires passe de 80 000 € à 92 000 €. Quel est le taux de variation ?",
+     "options": [
+      "+12 %",
+      "+13 %",
+      "+15 %",
+      "+87 %"
+     ],
+     "correctIndex": 2,
+     "explication": "(92 000 − 80 000) / 80 000 = 15 %."
+    },
+    {
+     "question": "Quel indicateur aide à suivre le recouvrement des créances ?",
+     "options": [
+      "Le montant des créances échues et le délai moyen de paiement clients",
+      "Le nombre de visiteurs",
+      "Le taux de TVA",
+      "Le nombre de salariés"
+     ],
+     "correctIndex": 0,
+     "explication": "Ces indicateurs mesurent les retards et le risque d’impayés."
+    },
+    {
+     "question": "Quel graphique représente le mieux l’évolution mensuelle du chiffre d’affaires ?",
+     "options": [
+      "Un graphique en secteurs",
+      "Une courbe",
+      "Un nuage de mots",
+      "Un organigramme"
+     ],
+     "correctIndex": 1,
+     "explication": "La courbe montre une évolution dans le temps."
+    },
+    {
+     "question": "Ventes réelles 18 500 € pour un budget de 20 000 €. Quel est l’écart (réel − budget) ?",
+     "options": [
+      "1 500 €, favorable",
+      "−1 500 €, favorable",
+      "38 500 €, défavorable",
+      "−1 500 €, défavorable"
+     ],
+     "correctIndex": 3,
+     "explication": "Des ventes inférieures au budget constituent un écart défavorable."
+    },
+    {
+     "question": "Ventes 50 000 € HT, coût d’achat des marchandises vendues 32 000 € HT. Quel est le taux de marque ?",
+     "options": [
+      "36 %",
+      "56,25 %",
+      "18 %",
+      "64 %"
+     ],
+     "correctIndex": 0,
+     "explication": "Marge 18 000 € ; taux de marque = 18 000 / 50 000 = 36 %."
+    },
+    {
+     "question": "Quelle qualité attend-on d’un tableau de bord ?",
+     "options": [
+      "Le plus grand nombre possible de chiffres",
+      "Une mise à jour annuelle seulement",
+      "Peu d’indicateurs pertinents, actualisés et accompagnés de seuils d’alerte",
+      "Des données sans source"
+     ],
+     "correctIndex": 2,
+     "explication": "Un tableau de bord sert à décider vite : il doit rester lisible et fiable."
+    },
+    {
+     "question": "À quoi sert un tableau croisé dynamique ?",
+     "options": [
+      "Rédiger un courrier",
+      "Saisir des écritures comptables",
+      "Synthétiser des données par catégories (client, mois, produit)",
+      "Envoyer des courriels"
+     ],
+     "correctIndex": 2,
+     "explication": "Il regroupe et totalise automatiquement les données d’une base."
+    },
+    {
+     "question": "À quoi sert la mise en forme conditionnelle dans un tableau de bord ?",
+     "options": [
+      "Signaler automatiquement les valeurs hors seuil",
+      "Protéger le fichier par mot de passe",
+      "Trier les feuilles",
+      "Imprimer en couleur"
+     ],
+     "correctIndex": 0,
+     "explication": "Elle met en évidence les alertes sans traitement manuel."
+    },
+    {
+     "question": "Avant de diffuser un tableau de bord, que faut-il vérifier ?",
+     "options": [
+      "Uniquement les couleurs",
+      "Le nombre de graphiques",
+      "La police utilisée",
+      "La cohérence des données avec la comptabilité et la période couverte"
+     ],
+     "correctIndex": 3,
+     "explication": "Des données non rapprochées conduisent à de mauvaises décisions."
+    },
+    {
+     "question": "Chiffre d’affaires 24 000 € pour 300 commandes. Quel est le panier moyen ?",
+     "options": [
+      "72 €",
+      "80 €",
+      "300 €",
+      "8 €"
+     ],
+     "correctIndex": 1,
+     "explication": "24 000 / 300 = 80 €."
+    }
+   ]
+  }
+ ],
+ "questionsOuvertesDebut": [
+  {
+   "question": "Quelles sont, selon vous, les principales missions d’un ou d’une secrétaire comptable ?",
+   "reponseAttendue": "Le ou la secrétaire comptable assure les travaux administratifs courants : documents, classement, courriers et accueil. Il ou elle enregistre les opérations comptables quotidiennes avec les clients, les fournisseurs et la banque. Il ou elle prépare aussi des éléments périodiques comme la TVA, les variables de paie et des tableaux de bord."
+  },
+  {
+   "question": "Quelle différence faites-vous entre un montant HT et un montant TTC ?",
+   "reponseAttendue": "Le montant HT est le prix hors taxes, sans la TVA. Le montant TTC correspond au montant HT augmenté de la TVA. Avec un taux de 20 %, on obtient le TTC en multipliant le HT par 1,20."
+  },
+  {
+   "question": "Comment organisez-vous votre travail lorsque plusieurs demandes arrivent en même temps ?",
+   "reponseAttendue": "Je recense les demandes et j’identifie leur urgence et leur importance. Je traite d’abord ce qui est urgent et important, puis je planifie le reste dans mon agenda. J’informe les personnes concernées des délais et je demande un arbitrage en cas de conflit de priorités."
+  },
+  {
+   "question": "Quels éléments doivent figurer dans un courriel professionnel ?",
+   "reponseAttendue": "Un courriel professionnel comporte un objet explicite et une formule d’appel adaptée. Le message est court, structuré et précise l’action attendue. Il se termine par une formule de politesse et une signature complète, après relecture des destinataires et des pièces jointes."
+  },
+  {
+   "question": "Pourquoi un bon classement est-il important dans un service administratif ?",
+   "reponseAttendue": "Un bon classement permet de retrouver rapidement un document. Il évite les pertes, les doublons et les erreurs de version. Il facilite le travail en équipe et la continuité du service en cas d’absence."
+  },
+  {
+   "question": "Comment accueillez-vous un visiteur qui se présente sans rendez-vous ?",
+   "reponseAttendue": "Je le salue, je me présente et je lui demande l’objet de sa visite. Je vérifie la disponibilité de l’interlocuteur concerné sans divulguer d’informations internes. Je lui propose d’attendre, de prendre un message ou de fixer un rendez-vous."
+  },
+  {
+   "question": "Qu’est-ce qu’une facture et à quoi sert-elle ?",
+   "reponseAttendue": "La facture est le document qui constate une vente ou une prestation et son prix. Elle sert de pièce justificative en comptabilité pour le vendeur comme pour l’acheteur. Elle permet aussi de réclamer le paiement et de calculer la TVA."
+  },
+  {
+   "question": "Pourquoi rapprocher le relevé bancaire de la comptabilité ?",
+   "reponseAttendue": "Les opérations ne sont pas toujours enregistrées au même moment par la banque et par l’entreprise. Le rapprochement explique les écarts entre les deux soldes. Il permet de détecter des oublis, des erreurs ou des opérations anormales."
+  },
+  {
+   "question": "Qu’est-ce que la TVA pour une entreprise ?",
+   "reponseAttendue": "La TVA est un impôt sur la consommation que l’entreprise collecte sur ses ventes. Elle peut récupérer la TVA payée sur ses achats lorsque les conditions sont remplies. La différence est reversée à l’administration ou constitue un crédit."
+  },
+  {
+   "question": "Quelles informations faut-il transmettre pour établir les bulletins de paie ?",
+   "reponseAttendue": "Il faut transmettre les heures réalisées, notamment les heures supplémentaires, et les absences du mois. Il faut aussi signaler les primes, les entrées et sorties de salariés et les changements de situation. Ces éléments doivent être vérifiés et validés avant transmission."
+  }
+ ],
+ "questionsOuvertesFin": [
+  {
+   "question": "Décrivez votre démarche pour rédiger et diffuser le compte rendu d’une réunion d’équipe.",
+   "reponseAttendue": "Je reprends l’ordre du jour et mes notes pour structurer le compte rendu par points traités. Pour chaque point, je résume les échanges de façon objective et j’indique les décisions, les responsables et les échéances. J’ajoute la date, les participants, les absents et la date de la prochaine réunion. Je fais valider le document par l’animateur avant de le diffuser et de le classer selon la règle de nommage du service."
+  },
+  {
+   "question": "Comment organisez-vous le classement physique et numérique des pièces comptables d’une petite entreprise ?",
+   "reponseAttendue": "Je distingue les pièces par nature : ventes, achats, banque, caisse, paie et déclarations. Je classe chaque catégorie par exercice puis par ordre chronologique ou numérique, avec une arborescence numérique identique. J’applique une règle de nommage datée et je limite les droits d’accès aux données sensibles. Je prévois des sauvegardes régulières et je vérifie les durées de conservation avant tout archivage ou destruction."
+  },
+  {
+   "question": "Un client conteste une facture par téléphone. Comment traitez-vous sa demande ?",
+   "reponseAttendue": "J’écoute le client sans l’interrompre et je reformule sa réclamation. Je recherche la facture, le bon de commande et le bon de livraison pour vérifier les faits. Si l’erreur est confirmée, je fais établir un avoir ; sinon, j’explique la facturation avec les justificatifs. Je confirme la réponse par écrit et je note le suivi dans le dossier client."
+  },
+  {
+   "question": "Comment organisez-vous le suivi et la relance des créances clients ?",
+   "reponseAttendue": "J’édite régulièrement la balance âgée après avoir lettré les comptes clients. Je relance d’abord de façon amiable, par courriel ou téléphone, en rappelant la facture, le montant et l’échéance. En l’absence de règlement, j’adresse une relance plus ferme puis je propose au responsable une mise en demeure. Je trace chaque action et j’informe le responsable des risques d’impayés."
+  },
+  {
+   "question": "Quels contrôles effectuez-vous avant d’enregistrer et de payer une facture fournisseur ?",
+   "reponseAttendue": "Je vérifie que la facture n’est pas déjà enregistrée et qu’elle comporte les mentions attendues. Je la rapproche du bon de commande et du bon de livraison pour contrôler quantités, prix et remises. Je vérifie les calculs, le taux de TVA et l’échéance avant de l’enregistrer. Je ne la mets en paiement qu’après validation et je demande un avoir en cas d’écart."
+  },
+  {
+   "question": "Présentez la démarche d’un rapprochement bancaire et les suites à donner.",
+   "reponseAttendue": "Je pointe les opérations du relevé avec celles du compte 512 sur la même période. Je liste les opérations non pointées de chaque côté et je calcule les deux soldes corrigés, qui doivent être égaux. J’enregistre en comptabilité les opérations connues seulement de la banque, comme les frais ou les virements reçus. Je surveille les opérations en attente côté banque, comme les chèques non encaissés, et je documente l’état de rapprochement."
+  },
+  {
+   "question": "Comment préparez-vous une déclaration de TVA mensuelle ?",
+   "reponseAttendue": "Je vérifie que toutes les ventes et tous les achats de la période sont enregistrés et justifiés. Je calcule la TVA collectée exigible et la TVA déductible en distinguant biens et services et immobilisations. J’impute l’éventuel crédit antérieur et je rapproche les montants des comptes de TVA. Je soumets la déclaration au responsable pour validation avant la date limite, puis je passe l’écriture de liquidation."
+  },
+  {
+   "question": "Comment collectez-vous et contrôlez-vous les variables de paie avant leur transmission ?",
+   "reponseAttendue": "Je recueille les relevés d’heures, les absences, les congés et les primes auprès des responsables, à date fixe. Je vérifie leur cohérence avec le planning, les justificatifs et les règles applicables, notamment la convention collective. Je signale les anomalies et je fais valider les éléments par le responsable. Je transmets ensuite les variables par un canal sécurisé et je conserve une trace de l’envoi."
+  },
+  {
+   "question": "Quels indicateurs proposeriez-vous dans un tableau de bord mensuel pour une petite entreprise commerciale ?",
+   "reponseAttendue": "Je retiendrais le chiffre d’affaires du mois comparé au budget et au même mois de l’année précédente. J’ajouterais la marge commerciale, le délai moyen de paiement des clients et le montant des créances échues. Je suivrais aussi la trésorerie disponible et les échéances à venir. Chaque indicateur aurait une source, une fréquence de mise à jour et un seuil d’alerte."
+  },
+  {
+   "question": "Vous constatez un écart important dans un tableau de bord. Comment le commentez-vous ?",
+   "reponseAttendue": "Je vérifie d’abord que les données sont complètes et correspondent à la bonne période. Je quantifie l’écart en valeur et en pourcentage, puis je recherche ses causes avec les personnes concernées. Je distingue ce qui est ponctuel de ce qui est durable. Je rédige un commentaire factuel avec des pistes d’action et je le transmets au responsable."
+  }
+ ],
+ "exercices": [
+  {
+   "titre": "Rédiger une lettre de relance client",
+   "consigne": "Vous êtes secrétaire comptable chez Bureautik SARL. La facture n° F2026-118 du 15 septembre, d’un montant de 1 440 € TTC et payable au 15 octobre, adressée à la société Martin Équipements, n’est toujours pas réglée au 25 octobre. Une première relance par courriel est restée sans réponse. Rédigez une lettre de seconde relance prête à être signée par la responsable administrative, Mme Leroy.",
+   "reponseAttendue": "La lettre comporte l’en-tête de Bureautik, les coordonnées du destinataire, le lieu et la date, des références (facture F2026-118) et un objet explicite tel que « Seconde relance – facture F2026-118 ». Elle débute par une formule d’appel (« Madame, Monsieur, »), rappelle la première relance, la date de facture, le montant de 1 440 € TTC et l’échéance du 15 octobre. Elle demande le règlement sous un délai précis (par exemple huit jours), indique les moyens de paiement et invite à signaler toute contestation ou tout règlement déjà effectué. Elle se termine par une formule de politesse, le nom et la fonction de Mme Leroy, sans menace disproportionnée. La présentation est aérée, sans faute, et la lettre est enregistrée selon la règle de nommage du service.",
+   "points": 10
+  },
+  {
+   "titre": "Rédiger un compte rendu de réunion",
+   "consigne": "À partir des notes suivantes, rédigez le compte rendu de la réunion de service du 7 octobre (9 h–10 h, salle B). Présents : M. Dupuis (gérant), Mme Leroy, M. Ali, vous-même ; absente excusée : Mme Bernard. Notes : « Nouveau logiciel de facturation en novembre – formation le 4/11 par l’éditeur – Ali référent. Retards de paiement clients en hausse – Leroy prépare liste des créances > 30 jours pour le 14/10. Archives 2019 à trier – vérifier durées de conservation avant destruction – vous, avant fin novembre. Prochaine réunion le 4/11 à 9 h. »",
+   "reponseAttendue": "Le compte rendu indique le titre, la date, l’horaire, le lieu, les présents et l’absente excusée, ainsi que le rédacteur. Il est structuré en trois points : changement de logiciel de facturation (mise en service en novembre, formation le 4 novembre assurée par l’éditeur, M. Ali référent), suivi des retards de paiement (Mme Leroy transmet la liste des créances de plus de 30 jours le 14 octobre) et tri des archives 2019 (vérification préalable des durées de conservation, réalisation par le rédacteur avant fin novembre). Les phrases sont rédigées à la troisième personne, au présent ou au passé, de façon neutre, sans reprendre le style télégraphique des notes. Un tableau récapitulatif « Action – Responsable – Échéance » facilite le suivi. Le document mentionne la prochaine réunion du 4 novembre à 9 h et est diffusé après validation de M. Dupuis.",
+   "points": 10
+  },
+  {
+   "titre": "Gérer l’accueil et l’agenda",
+   "consigne": "Lundi à 10 h, alors que vous êtes au téléphone avec un fournisseur, un livreur se présente avec un colis et un candidat arrive pour un entretien de 10 h avec M. Dupuis, encore en réunion jusqu’à 10 h 15. Par ailleurs, Mme Leroy vous demande de fixer cette semaine une réunion d’une heure entre elle, M. Dupuis et M. Ali. Agendas : M. Dupuis est disponible mardi 14 h–17 h et jeudi 9 h–12 h ; M. Ali est absent mardi et disponible jeudi 10 h–12 h ; Mme Leroy est occupée jeudi 10 h–11 h. Décrivez la gestion de l’accueil puis proposez un créneau de réunion justifié et le message de confirmation.",
+   "reponseAttendue": "Je signale au fournisseur que je dois m’interrompre brièvement, avec son accord, ou je lui propose de le rappeler à une heure précise. J’accueille le candidat, je l’informe que M. Dupuis le recevra vers 10 h 15, je l’installe et je préviens M. Dupuis de son arrivée ; je fais signer la réception du colis après contrôle de l’état apparent et du destinataire, ou je l’oriente selon la procédure. Pour la réunion, mardi est exclu car M. Ali est absent ; jeudi 10 h–11 h est exclu car Mme Leroy est occupée ; le seul créneau commun d’une heure est jeudi 11 h–12 h. J’envoie une invitation par l’agenda partagé avec un objet clair, la date, l’horaire, le lieu ou le lien, l’ordre du jour et une demande de confirmation. Je reporte le rendez-vous dans les agendas et je rappelle le fournisseur comme convenu.",
+   "points": 10
+  },
+  {
+   "titre": "Organiser un classement numérique",
+   "consigne": "Le dossier partagé du service contient en vrac : « facture durand.pdf », « Fact 2026 03 Martin.pdf », « releve banque mars.pdf », « bulletins mars.zip », « CR reunion.docx », « CA3 mars.pdf ». Proposez une arborescence, une règle de nommage, renommez les six fichiers et indiquez les règles d’accès et de sauvegarde à appliquer.",
+   "reponseAttendue": "Je propose une arborescence par année puis par domaine : 2026 / 01_Ventes, 02_Achats, 03_Banque, 04_Paie, 05_Fiscal, 06_Administratif, avec éventuellement un sous-dossier par mois. La règle de nommage est AAAA-MM-JJ_Type_Tiers ou AAAA-MM_Type, sans espaces ni caractères spéciaux. Exemple de renommage, sous réserve de vérifier la date réelle de chaque pièce et le sens (achat ou vente) de la facture Durand : 02_Achats/2026-03-xx_Facture_Durand.pdf ; 01_Ventes/2026-03-xx_Facture_Martin.pdf ; 03_Banque/2026-03_Releve_Banque.pdf ; 04_Paie/2026-03_Bulletins.zip ; 05_Fiscal/2026-03_CA3.pdf ; 06_Administratif/2026-xx-xx_CR_Reunion.docx. Le dossier Paie est réservé aux personnes habilitées car il contient des données personnelles. Les sauvegardes sont régulières, sur un support distinct, avec un test de restauration, et les durées de conservation sont vérifiées avant toute suppression.",
+   "points": 10
+  },
+  {
+   "titre": "Établir et enregistrer une facture client",
+   "consigne": "La société Bureautik vend à la société Martin Équipements : 12 articles A à 25 € HT, 8 articles B à 40 € HT et 5 articles C à 36 € HT. Elle accorde une remise de 10 % sur le total brut et facture 30 € HT de frais de port. Tous les montants sont soumis à la TVA à 20 %. Calculez la facture, présentez son écriture comptable et citez trois contrôles avant envoi.",
+   "reponseAttendue": "Le montant brut est de 300 + 320 + 180 = 800 € HT. La remise de 10 % est de 80 €, soit un net commercial de 720 € HT. Avec les frais de port, la base taxable atteint 750 € HT, la TVA 150 € et le net à payer 900 € TTC. L’écriture débite le compte 411 Martin Équipements de 900 € et crédite le compte 707 de 720 €, le compte 7085 Ports et frais accessoires facturés de 30 € et le compte 44571 de 150 €. Avant envoi, je contrôle les quantités et prix avec le bon de commande et le bon de livraison, les calculs, et la présence des mentions obligatoires dont le numéro de facture et l’échéance.",
+   "points": 10
+  },
+  {
+   "titre": "Contrôler une facture fournisseur",
+   "consigne": "Bureautik a commandé 50 cartouches à 18 € HT. Le bon de livraison signé indique 46 cartouches reçues. La facture du fournisseur Encre+ porte sur 50 cartouches à 18 € HT, TVA 20 %. Analysez l’écart, indiquez la démarche, les écritures de la facture et de l’avoir obtenu, puis le montant à payer.",
+   "reponseAttendue": "La facture s’élève à 50 × 18 = 900 € HT, 180 € de TVA et 1 080 € TTC, alors que seules 46 cartouches ont été livrées, soit 828 € HT. L’écart porte sur 4 cartouches : 72 € HT, 14,40 € de TVA et 86,40 € TTC. Je signale l’écart au fournisseur avec le bon de livraison et je demande un avoir, sans modifier la facture à la main, en bloquant le paiement de la partie contestée. La facture est enregistrée au débit du 607 pour 900 € et du 44566 pour 180 €, au crédit du 401 Encre+ pour 1 080 € ; l’avoir est enregistré au débit du 401 pour 86,40 €, au crédit du 607 pour 72 € et du 44566 pour 14,40 €. Le montant à payer est de 1 080 − 86,40 = 993,60 €, ce qui correspond bien à 828 € HT et 165,60 € de TVA.",
+   "points": 10
+  },
+  {
+   "titre": "Réaliser un rapprochement bancaire",
+   "consigne": "Au 31 mars, le compte 512 de Bureautik présente un solde débiteur de 3 420 € et le relevé bancaire un solde créditeur de 4 185 €. Après pointage : un chèque émis n° 2045 de 640 € n’apparaît pas sur le relevé ; une remise de chèques de 280 € du 31 mars n’est pas encore créditée ; le relevé comporte un prélèvement d’assurance de 96 € (sans TVA), des frais bancaires de 18 € et un virement du client Martin de 519 €, non comptabilisés. Établissez l’état de rapprochement et les écritures de régularisation.",
+   "reponseAttendue": "Côté banque, le solde corrigé est de 4 185 − 640 + 280 = 3 825 €. Côté comptabilité, le solde corrigé est de 3 420 + 519 − 96 − 18 = 3 825 €, ce qui confirme l’égalité des deux soldes. J’enregistre le virement au débit du 512 et au crédit du 411 Martin pour 519 €. J’enregistre l’assurance au débit du 616 et au crédit du 512 pour 96 €, et les frais au débit du 627 et au crédit du 512 pour 18 €. Je surveille au mois suivant le débit du chèque n° 2045 et le crédit de la remise de 280 €, et je conserve l’état de rapprochement signé.",
+   "points": 10
+  },
+  {
+   "titre": "Préparer la déclaration de TVA mensuelle",
+   "consigne": "Pour le mois d’avril, Bureautik (régime réel normal) a réalisé des ventes de marchandises livrées pour 38 500 € HT. Elle a reçu et enregistré des achats de marchandises pour 16 000 € HT, des frais généraux pour 4 500 € HT et un ordinateur (immobilisation) pour 6 000 € HT, avec des factures conformes. Tous les montants sont au taux de 20 % et les conditions de déduction sont remplies. Un crédit de TVA de 800 € est reporté de mars. Calculez la TVA due et passez l’écriture de liquidation.",
+   "reponseAttendue": "La TVA collectée est de 38 500 × 20 % = 7 700 €. La TVA déductible sur autres biens et services est de (16 000 + 4 500) × 20 % = 4 100 € et celle sur immobilisations de 6 000 × 20 % = 1 200 €. La TVA nette avant crédit est de 7 700 − 4 100 − 1 200 = 2 400 € et, après imputation du crédit de 800 €, la TVA à décaisser est de 1 600 €. L’écriture débite le 44571 de 7 700 € et crédite le 44566 de 4 100 €, le 44562 de 1 200 €, le 44567 de 800 € et le 44551 de 1 600 €, total équilibré à 7 700 €. Avant validation, je rapproche les bases des journaux et des comptes, je vérifie le report du crédit et je respecte la date limite de dépôt.",
+   "points": 10
+  },
+  {
+   "titre": "Préparer les variables de paie",
+   "consigne": "Préparez le récapitulatif des éléments de brut d’avril pour trois salariés. Mme Aubert : salaire de base 2 200 €, taux horaire retenu 14,50 €, 6 heures supplémentaires majorées à 25 % dans le cas proposé, prime d’objectif de 120 €. M. Bel : salaire de base 2 600 €, taux horaire retenu 17,14 €, 14 heures d’absence non rémunérée retenues au taux horaire. Mme Colin : salaire de base 1 900 €, prime d’ancienneté prévue par l’accord applicable au taux de 3 % du salaire de base. Calculez chaque brut et le total, puis indiquez les contrôles et le mode de transmission.",
+   "reponseAttendue": "Pour Mme Aubert, les heures supplémentaires représentent 6 × 14,50 × 1,25 = 108,75 € ; son brut est de 2 200 + 108,75 + 120 = 2 428,75 €. Pour M. Bel, la retenue d’absence est de 14 × 17,14 = 239,96 € ; son brut est de 2 600 − 239,96 = 2 360,04 €. Pour Mme Colin, la prime d’ancienneté est de 1 900 × 3 % = 57 € ; son brut est de 1 957 €. Le total des éléments de brut est de 6 745,79 €. Je vérifie les relevés d’heures et d’absences validés, les justificatifs et la règle de la prime, je fais valider le récapitulatif par le responsable et je le transmets au gestionnaire de paie par un canal sécurisé.",
+   "points": 10
+  },
+  {
+   "titre": "Construire un tableau de bord trimestriel",
+   "consigne": "Les ventes HT de Bureautik sont de 42 000 € en janvier, 38 000 € en février et 46 000 € en mars, pour un budget de 40 000 € par mois. Les créances clients s’élèvent à 50 400 € TTC fin mars et le chiffre d’affaires TTC du trimestre (TVA 20 %) est de 151 200 €. Construisez le tableau de bord : écarts mensuels et trimestriels, variation de mars par rapport à février, délai moyen de paiement clients sur 90 jours, puis rédigez un commentaire.",
+   "reponseAttendue": "Les écarts sur budget sont de +2 000 € en janvier, −2 000 € en février et +6 000 € en mars ; sur le trimestre, les ventes atteignent 126 000 € pour un budget de 120 000 €, soit un écart favorable de +6 000 € (+5 %). La variation de mars par rapport à février est de (46 000 − 38 000) / 38 000 ≈ +21,05 %. Le délai moyen de paiement clients est de 50 400 / 151 200 × 90 = 30 jours. Le tableau présente pour chaque mois le réel, le budget, l’écart en valeur et en pourcentage, avec une mise en forme conditionnelle des écarts défavorables et une courbe d’évolution. Le commentaire souligne une activité supérieure au budget malgré le recul de février, dont la cause est à rechercher, et recommande de surveiller le délai clients au regard des délais convenus.",
+   "points": 10
+  }
+ ],
+ "exerciceIntermediaire": {
+  "titre": "Contrôle intermédiaire : secrétariat, facturation et trésorerie",
+  "contexte": "Vous travaillez chez Papeterie Lumière. Le client Atelier Rivet commande 40 ramettes à 4,50 € HT et 10 classeurs à 6 € HT ; une remise de 5 % est accordée sur le total, TVA 20 %. Le client règle la facture par virement. Au 30 juin, le compte 512 présente un solde débiteur de 1 978,40 € et le relevé bancaire un solde créditeur de 2 400 €. Sur le relevé figurent le virement d’Atelier Rivet et 12 € de frais bancaires non comptabilisés ; un chèque émis de 160 € n’est pas encore débité. Par ailleurs, le gérant vous demande de confirmer par courriel à M. Rivet un rendez-vous le jeudi 3 juillet à 14 h dans les locaux. Le barème total est de 20 points.",
+  "questions": [
+   {
+    "question": "Calculez la facture d’Atelier Rivet et proposez son écriture comptable.",
+    "reponseAttendue": "Le total brut est de 40 × 4,50 + 10 × 6 = 180 + 60 = 240 € HT ; la remise de 5 % est de 12 €, soit 228 € HT. La TVA est de 45,60 € et le net à payer de 273,60 € TTC. L’écriture débite le 411 Atelier Rivet de 273,60 € et crédite le 707 de 228 € et le 44571 de 45,60 €. Barème : calcul HT 2 points, TVA et TTC 1 point, écriture 2 points.",
+    "points": 5
+   },
+   {
+    "question": "Enregistrez le règlement du client et expliquez le lettrage.",
+    "reponseAttendue": "L’écriture débite le 512 et crédite le 411 Atelier Rivet pour 273,60 €. Le lettrage associe la facture et le règlement par une même lettre, ce qui fait apparaître un solde client nul pour cette facture. Il permet de repérer immédiatement les factures restant dues. Barème : écriture 3 points, explication du lettrage 2 points.",
+    "points": 5
+   },
+   {
+    "question": "Établissez l’état de rapprochement bancaire au 30 juin.",
+    "reponseAttendue": "Côté banque, le solde corrigé est de 2 400 − 160 = 2 240 €. Côté comptabilité, il est de 1 978,40 + 273,60 − 12 = 2 240 €, ce qui confirme l’égalité. Les frais sont enregistrés au débit du 627 et au crédit du 512 pour 12 € ; le chèque de 160 € sera surveillé sur le prochain relevé. Barème : solde banque 1 point, solde comptable 2 points, écriture des frais et suivi 2 points.",
+    "points": 5
+   },
+   {
+    "question": "Rédigez le courriel de confirmation du rendez-vous adressé à M. Rivet.",
+    "reponseAttendue": "Le courriel comporte un objet explicite, par exemple « Confirmation de rendez-vous – jeudi 3 juillet à 14 h ». Il commence par « Monsieur, », confirme la date, l’heure, l’adresse des locaux et l’interlocuteur, et propose un contact en cas d’empêchement. Il se termine par une formule de politesse et une signature complète, sans faute, après vérification du destinataire et inscription dans l’agenda. Barème : objet et formule d’appel 1 point, informations exactes et complètes 2 points, ton et formule finale 1 point, correction de la langue 1 point.",
+    "points": 5
+   }
+  ]
+ },
+ "evaluationFinale": {
+  "titre": "Évaluation finale interne — 4 exercices, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores",
+  "exercices": [
+   {
+    "titre": "Organiser une réunion et la convocation",
+    "consigne": "Le gérant de la société Lumière souhaite réunir les trois commerciaux et la comptable pendant deux heures la semaine prochaine pour présenter les résultats du semestre. Les créneaux communs disponibles dans l’agenda partagé sont mardi 9 h–11 h et jeudi 14 h–16 h ; la salle de réunion est réservée jeudi après-midi. Choisissez le créneau, rédigez la convocation par courriel et indiquez trois actions logistiques.",
+    "reponseAttendue": "Le seul créneau compatible avec la disponibilité de la salle est mardi 9 h–11 h. La convocation comporte un objet clair, la date, l’horaire, le lieu, l’ordre du jour (résultats du semestre, échanges, actions), les documents à préparer et une demande de confirmation. Elle est envoyée par l’agenda partagé avec une invitation et signée au nom du gérant. Les actions logistiques comprennent la réservation de la salle, la préparation du matériel de projection et des supports, et la relance des personnes n’ayant pas répondu. Barème : choix justifié du créneau 1 point, convocation complète 2 points, qualité rédactionnelle 1 point, logistique 1 point.",
+    "points": 5
+   },
+   {
+    "titre": "Traiter une facture fournisseur et son règlement",
+    "consigne": "La société Lumière reçoit une facture du fournisseur Papyrus de 4 500 € HT, avec une remise de 4 % et la TVA à 20 %, payable à 30 jours. Les quantités et prix sont conformes au bon de commande et au bon de livraison. Calculez la facture, passez l’écriture d’achat de marchandises et celle du règlement par virement à l’échéance, puis indiquez un contrôle de trésorerie préalable au paiement.",
+    "reponseAttendue": "La remise est de 4 500 × 4 % = 180 €, soit un net de 4 320 € HT. La TVA est de 864 € et le montant TTC de 5 184 €. L’écriture d’achat débite le 607 de 4 320 € et le 44566 de 864 €, et crédite le 401 Papyrus de 5 184 €. Le règlement débite le 401 et crédite le 512 de 5 184 € à l’échéance. Avant paiement, je vérifie dans le prévisionnel de trésorerie que le solde bancaire disponible couvre le décaissement. Barème : calcul 2 points, écriture d’achat 1 point, règlement 1 point, contrôle de trésorerie 1 point.",
+    "points": 5
+   },
+   {
+    "titre": "Préparer la déclaration de TVA",
+    "consigne": "Pour le mois de mai, la société Lumière a facturé des ventes de marchandises livrées pour 66 000 € HT et émis des avoirs pour 2 000 € HT. La TVA déductible justifiée s’élève à 5 900 € sur biens et services et à 1 500 € sur immobilisations, sans crédit antérieur. Tous les montants sont au taux de 20 %. Calculez la TVA à décaisser, passez l’écriture de liquidation et citez un contrôle.",
+    "reponseAttendue": "La base des ventes nette des avoirs est de 66 000 − 2 000 = 64 000 € HT, soit une TVA collectée de 12 800 €. La TVA à décaisser est de 12 800 − 5 900 − 1 500 = 5 400 €. L’écriture débite le 44571 de 12 800 € et crédite le 44566 de 5 900 €, le 44562 de 1 500 € et le 44551 de 5 400 €. Je rapproche la TVA collectée calculée du solde du compte 44571 et je vérifie que les avoirs ont bien réduit la TVA collectée. Barème : base nette 1 point, TVA à décaisser 2 points, écriture 1 point, contrôle 1 point.",
+    "points": 5
+   },
+   {
+    "titre": "Préparer une variable de paie et un indicateur de suivi",
+    "consigne": "Un salarié a un salaire de base de 2 500 €, un taux horaire retenu de 16,48 €, 5 heures supplémentaires majorées à 25 % dans le cas proposé et une prime de 150 €. Calculez son salaire brut. La masse salariale brute du trimestre est ensuite de 7 900 €, 8 200 € et 8 400 €, pour un budget de 8 000 € par mois. Calculez l’écart trimestriel en valeur et en pourcentage, et rédigez un commentaire.",
+    "reponseAttendue": "Les heures supplémentaires représentent 5 × 16,48 × 1,25 = 103 € et le salaire brut s’élève à 2 500 + 103 + 150 = 2 753 €. La masse salariale du trimestre est de 24 500 € pour un budget de 24 000 €, soit un écart défavorable de 500 €, environ +2,08 %. L’écart provient des mois de février et mars, à analyser (heures supplémentaires, primes, embauches). Le commentaire est factuel, propose de suivre les heures supplémentaires et rappelle que les données doivent être rapprochées de la paie validée. Barème : brut 2 points, écart en valeur et pourcentage 2 points, commentaire 1 point.",
+    "points": 5
+   }
+  ],
+  "grille": [
+   {
+    "critere": "Qualité des écrits professionnels (courrier, courriel, compte rendu, convocation) : 0 = absent ; 1 = inexploitable ; 2 = compréhensible mais incomplet ; 3 = clair et structuré ; 4 = clair, complet, sans faute et adapté au destinataire.",
+    "points": 4
+   },
+   {
+    "critere": "Organisation, accueil et priorisation : 0 = absente ; 1 = choix inadaptés ; 2 = organisation partielle ; 3 = organisation cohérente ; 4 = organisation cohérente, justifiée et respectueuse de la confidentialité.",
+    "points": 4
+   },
+   {
+    "critere": "Exactitude des calculs commerciaux, de TVA et de paie : 0 = absent ; 1 = erreurs majeures ; 2 = résultats partiellement fiables ; 3 = calculs globalement corrects ; 4 = calculs exacts et vérifiés.",
+    "points": 4
+   },
+   {
+    "critere": "Enregistrements comptables et contrôles (pièces, lettrage, rapprochement) : 0 = absents ; 1 = comptes erronés ; 2 = écritures partielles ; 3 = écritures correctes ; 4 = écritures correctes, équilibrées et contrôles documentés.",
+    "points": 4
+   },
+   {
+    "critere": "Analyse et présentation des indicateurs : 0 = absente ; 1 = indicateurs erronés ; 2 = calculs sans commentaire ; 3 = indicateurs corrects et commentés ; 4 = indicateurs exacts, commentaire factuel et pistes d’action.",
+    "points": 4
+   }
+  ]
+ }
+}

@@ -1,0 +1,1491 @@
+{
+  "competences": [
+    "Assurer la gestion administrative et comptable des clients.",
+    "Assurer la gestion administrative et comptable des fournisseurs.",
+    "Assurer la gestion administrative et comptable des opérations de trésorerie.",
+    "Assurer la gestion administrative, comptable et fiscale de la déclaration de TVA.",
+    "Assurer la gestion des variables et paramètres de paie.",
+    "Présenter et transmettre des tableaux de bord.",
+    "Traiter les immobilisations et les valeurs mobilières de placement.",
+    "Traiter les stocks, créances et dettes d’exploitation.",
+    "Traiter les emprunts et l’affectation du résultat."
+  ],
+  "besoinsList": [
+    "Enregistrer sans erreur les factures et avoirs clients et fournisseurs.",
+    "Fiabiliser le suivi des échéances, des relances et du lettrage des comptes de tiers.",
+    "Réaliser et justifier un rapprochement bancaire.",
+    "Comprendre la TVA collectée, la TVA déductible et leur exigibilité.",
+    "Collecter et contrôler les éléments variables de paie.",
+    "Construire et commenter un tableau de bord d’activité simple.",
+    "Calculer les amortissements et traiter la cession d’une immobilisation.",
+    "Rattacher les charges et produits à l’exercice lors des travaux d’inventaire.",
+    "Lire un tableau d’emprunt et comptabiliser l’affectation du résultat.",
+    "Organiser le classement des pièces et les contrôles dans le logiciel comptable."
+  ],
+  "syntheseHtml": "• Point de conformité : le RNCP37121 (titre professionnel Comptable assistant, niveau 4, Ministère du Travail, enregistrement actif jusqu’au 01/03/2028) comprend 3 CCP et 9 compétences professionnelles officielles ; les 9 entrées de competences reprennent ces compétences sans en ajouter.<br>• CCP 1 — Assurer les opérations comptables au quotidien : gestion administrative et comptable des clients, des fournisseurs et des opérations de trésorerie ; évaluation officielle par mise en situation professionnelle de 2 h et entretien technique de 15 min.<br>• CCP 2 — Préparer les opérations comptables périodiques : déclaration de TVA, variables et paramètres de paie, tableaux de bord ; mise en situation professionnelle de 1 h 30 et entretien technique de 15 min.<br>• CCP 3 — Participer aux opérations comptables de fin d’exercice : immobilisations et valeurs mobilières de placement, stocks, créances et dettes d’exploitation, emprunts et affectation du résultat ; mise en situation professionnelle de 1 h 30 et entretien technique de 15 min.<br>• Parcours de 744 h : positionnement initial, entraînements chiffrés progressifs, contrôle intermédiaire et évaluation finale interne ; ces évaluations préparent aux épreuves mais ne remplacent pas les modalités officielles et ne préjugent pas de la décision du jury.",
+  "adaptationsHtml": "• Prévoir une remise à niveau en calcul commercial (pourcentages, HT/TTC, prorata) et en logique du débit-crédit avant les premiers cas.<br>• Travailler sur des pièces réalistes (factures, relevés bancaires, bulletins, tableaux d’emprunt) et des fiches méthode retirées progressivement.<br>• Alterner saisie guidée dans le logiciel comptable, exercices sur tableur et mises en situation autonomes chronométrées.<br>• Adapter supports et rythme aux besoins repérés : consignes découpées, documents accessibles, temps majoré et pauses si nécessaire.<br>• Assurer un retour individualisé après chaque cas, avec exercices de remédiation et entraînement à l’entretien technique.",
+  "qcmDebut": [
+    {
+      "question": "Dans quelle classe du plan comptable général se trouvent les comptes clients et fournisseurs ?",
+      "options": [
+        "La classe 4",
+        "La classe 2",
+        "La classe 6",
+        "La classe 7"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Une vente de 1 000 € HT est soumise à la TVA à 20 %. Quel est son montant TTC ?",
+      "options": [
+        "1 020 €",
+        "1 250 €",
+        "1 200 €",
+        "1 100 €"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quel compte enregistre habituellement les achats de marchandises ?",
+      "options": [
+        "Le compte 707",
+        "Le compte 607",
+        "Le compte 401",
+        "Le compte 512"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Que signifie lettrer un compte client ?",
+      "options": [
+        "Envoyer un courrier de relance au client",
+        "Calculer la TVA due sur le mois",
+        "Clôturer définitivement le compte du client",
+        "Rapprocher les factures et les règlements qui se compensent"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Le compte 512 correspond à :",
+      "options": [
+        "La caisse",
+        "La banque",
+        "Les clients",
+        "Le capital"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Que donne le salaire brut diminué des cotisations salariales ?",
+      "options": [
+        "Le salaire net avant impôt sur le revenu",
+        "Le coût total supporté par l’employeur",
+        "Le salaire de base du contrat",
+        "Le montant des cotisations patronales"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Que traduit l’amortissement d’une immobilisation ?",
+      "options": [
+        "Le remboursement d’un emprunt bancaire",
+        "Une hausse de la valeur du bien",
+        "Le paiement du fournisseur du bien",
+        "La consommation de sa valeur sur sa durée d’utilisation"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "À quoi sert principalement un tableau de bord ?",
+      "options": [
+        "Remplacer les comptes annuels",
+        "Déposer la déclaration de TVA",
+        "Suivre quelques indicateurs clés pour piloter l’activité",
+        "Saisir les écritures du journal"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Qui décide de l’affectation du bénéfice d’une société ?",
+      "options": [
+        "Les associés, lors de l’approbation des comptes",
+        "Le comptable assistant, seul",
+        "La banque de l’entreprise",
+        "Le principal client"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Une facture fournisseur s’élève à 600 € TTC avec une TVA à 20 %. Quelle est la TVA déductible ?",
+      "options": [
+        "120 €",
+        "100 €",
+        "80 €",
+        "500 €"
+      ],
+      "correctIndex": 1
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Une vente de 5 000 € HT bénéficie d’une remise de 10 % puis d’une seconde remise de 2 % sur le net, TVA à 20 %. Quel est le montant TTC ?",
+      "options": [
+        "5 280 €",
+        "5 292 €",
+        "5 400 €",
+        "4 410 €"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Le relevé bancaire présente un solde créditeur de 8 400 €. Un chèque émis de 1 200 € n’est pas encore débité et un virement client de 500 € n’est pas comptabilisé. Quel était le solde débiteur du compte 512 avant régularisation ?",
+      "options": [
+        "7 200 €",
+        "8 400 €",
+        "7 700 €",
+        "6 700 €"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "TVA collectée 9 600 €, TVA déductible sur biens et services 3 100 €, sur immobilisations 1 500 €, crédit antérieur 800 €. Quelle TVA reste à décaisser ?",
+      "options": [
+        "5 000 €",
+        "5 700 €",
+        "4 200 €",
+        "6 500 €"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Une machine de 30 000 € HT, TVA récupérable, est mise en service le 1er juillet N et amortie linéairement sur 5 ans. Quelle est la dotation de N pour un exercice calendaire ?",
+      "options": [
+        "3 000 €",
+        "6 000 €",
+        "1 500 €",
+        "2 500 €"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Une machine acquise 20 000 €, amortie à hauteur de 14 000 €, est cédée 5 000 € HT. Quel est le résultat de cession ?",
+      "options": [
+        "Une plus-value de 5 000 €",
+        "Une plus-value de 1 000 €",
+        "Une moins-value de 1 000 €",
+        "Une moins-value de 6 000 €"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Une créance de 6 000 € TTC (TVA 20 %) présente un risque de perte estimé à 40 %. Quelle dépréciation faut-il constater ?",
+      "options": [
+        "2 400 €",
+        "2 000 €",
+        "3 000 €",
+        "1 000 €"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Un emprunt de 60 000 € est remboursable par amortissements constants sur 5 ans au taux de 4 %. Quelle est la première annuité ?",
+      "options": [
+        "14 400 €",
+        "12 000 €",
+        "12 480 €",
+        "2 400 €"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Un emprunt souscrit le 1er octobre N génère 3 600 € d’intérêts annuels payables le 30 septembre N+1. Quels intérêts courus constater au 31 décembre N ?",
+      "options": [
+        "3 600 €",
+        "2 700 €",
+        "300 €",
+        "900 €"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Salaire de base 2 100 €, 4 heures supplémentaires majorées de 25 % sur un taux horaire de référence de 15 € fixé par le cas. Quel est le salaire brut ?",
+      "options": [
+        "2 160 €",
+        "2 175 €",
+        "2 115 €",
+        "2 250 €"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Bénéfice 40 000 €, report à nouveau créditeur 2 000 €, dotation à la réserve légale fixée par le cas à 2 000 €, dividendes 25 000 €. Combien est porté aux autres réserves si tout le solde y est affecté ?",
+      "options": [
+        "13 000 €",
+        "17 000 €",
+        "15 000 €",
+        "38 000 €"
+      ],
+      "correctIndex": 2
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Assurer la gestion administrative et comptable des clients.",
+      "questions": [
+        {
+          "question": "Une facture de vente de 2 400 € HT avec TVA à 20 % est émise. Quelle écriture est correcte ?",
+          "options": [
+            "Débit 707 : 2 400 € ; débit 44571 : 480 € ; crédit 411 : 2 880 €",
+            "Débit 411 : 2 400 € ; crédit 707 : 2 400 €",
+            "Débit 411 : 2 880 € ; crédit 707 : 2 400 € ; crédit 44571 : 480 €",
+            "Débit 411 : 2 880 € ; crédit 707 : 2 880 €"
+          ],
+          "correctIndex": 2,
+          "explication": "Le client doit le TTC (2 880 €), la vente est créditée pour le HT et la TVA collectée pour 2 400 × 20 % = 480 €."
+        },
+        {
+          "question": "Un avoir de 300 € HT, TVA à 20 %, est accordé à un client. De combien diminue sa créance ?",
+          "options": [
+            "360 €",
+            "300 €",
+            "60 €",
+            "240 €"
+          ],
+          "correctIndex": 0,
+          "explication": "L’avoir annule la vente et la TVA correspondante : 300 + 60 = 360 € TTC."
+        },
+        {
+          "question": "Créances clients 36 000 € TTC, chiffre d’affaires annuel 432 000 € TTC, année de 360 jours. Quel est le délai moyen de paiement des clients ?",
+          "options": [
+            "12 jours",
+            "45 jours",
+            "60 jours",
+            "30 jours"
+          ],
+          "correctIndex": 3,
+          "explication": "36 000 / 432 000 × 360 = 30 jours."
+        },
+        {
+          "question": "À quoi sert une balance âgée clients ?",
+          "options": [
+            "Calculer la TVA collectée du mois",
+            "Classer les créances selon leur ancienneté par rapport à l’échéance",
+            "Présenter le chiffre d’affaires par produit",
+            "Lister les fournisseurs à payer"
+          ],
+          "correctIndex": 1,
+          "explication": "Elle repère les retards de paiement et oriente les relances et les éventuelles dépréciations."
+        },
+        {
+          "question": "Un client règle sa facture par virement. Quelle écriture constate l’encaissement ?",
+          "options": [
+            "Débit 411, crédit 512",
+            "Débit 512, crédit 707",
+            "Débit 707, crédit 411",
+            "Débit 512, crédit 411"
+          ],
+          "correctIndex": 3,
+          "explication": "La banque augmente (débit 512) et la créance client est soldée (crédit 411)."
+        },
+        {
+          "question": "Une vente de 2 000 € HT bénéficie d’une remise de 5 % sur facture, TVA à 20 %. Quel est le montant TTC facturé ?",
+          "options": [
+            "2 400 €",
+            "2 300 €",
+            "2 280 €",
+            "2 160 €"
+          ],
+          "correctIndex": 2,
+          "explication": "Net HT 2 000 × 0,95 = 1 900 € ; TTC 1 900 × 1,2 = 2 280 €."
+        },
+        {
+          "question": "Un client retourne des marchandises déjà facturées. Quel document faut-il établir ?",
+          "options": [
+            "Un bon de commande",
+            "Une facture d’avoir",
+            "Un devis rectifié",
+            "Un relevé bancaire"
+          ],
+          "correctIndex": 1,
+          "explication": "L’avoir est la pièce qui réduit ou annule une facture émise."
+        },
+        {
+          "question": "Une facture client est échue depuis quelques jours. Quelle est la première action adaptée ?",
+          "options": [
+            "Une relance amiable écrite ou téléphonique",
+            "Une procédure judiciaire immédiate",
+            "L’annulation de la facture",
+            "Le passage direct de la créance en perte"
+          ],
+          "correctIndex": 0,
+          "explication": "La relance suit une gradation : d’abord amiable, puis plus formelle si le retard persiste."
+        },
+        {
+          "question": "Une créance devient douteuse. Vers quel compte est-elle transférée ?",
+          "options": [
+            "Le compte 419",
+            "Le compte 401",
+            "Le compte 416",
+            "Le compte 486"
+          ],
+          "correctIndex": 2,
+          "explication": "Le compte 416 « Clients douteux ou litigieux » isole les créances à risque."
+        },
+        {
+          "question": "Un client verse un acompte avant la facturation de sa commande. Quel compte est crédité ?",
+          "options": [
+            "Le compte 4091",
+            "Le compte 411",
+            "Le compte 706",
+            "Le compte 4191"
+          ],
+          "correctIndex": 3,
+          "explication": "Le compte 4191 enregistre les avances et acomptes reçus des clients sur commandes."
+        }
+      ]
+    },
+    {
+      "competence": "Assurer la gestion administrative et comptable des fournisseurs.",
+      "questions": [
+        {
+          "question": "Une facture d’achat de marchandises de 1 500 € HT, TVA à 20 %, est reçue. Quelle écriture est correcte ?",
+          "options": [
+            "Débit 401 : 1 800 € ; crédit 607 : 1 500 € ; crédit 44566 : 300 €",
+            "Débit 607 : 1 800 € ; crédit 401 : 1 800 €",
+            "Débit 607 : 1 500 € ; débit 44571 : 300 € ; crédit 401 : 1 800 €",
+            "Débit 607 : 1 500 € ; débit 44566 : 300 € ; crédit 401 : 1 800 €"
+          ],
+          "correctIndex": 3,
+          "explication": "L’achat est débité pour le HT, la TVA déductible au 44566 et la dette fournisseur pour le TTC."
+        },
+        {
+          "question": "Avant de comptabiliser une facture fournisseur, avec quels documents la rapproche-t-on en priorité ?",
+          "options": [
+            "Le bulletin de paie et le contrat de travail",
+            "Le bon de commande et le bon de livraison",
+            "Le bilan et le compte de résultat",
+            "Le relevé bancaire du mois précédent"
+          ],
+          "correctIndex": 1,
+          "explication": "Ce rapprochement vérifie que ce qui est facturé a été commandé et reçu."
+        },
+        {
+          "question": "Un fournisseur adresse un avoir de 200 € HT au titre d’un rabais pour défaut de qualité, TVA à 20 %. Quelle écriture est correcte ?",
+          "options": [
+            "Débit 401 : 240 € ; crédit 6097 : 200 € ; crédit 44566 : 40 €",
+            "Débit 6097 : 200 € ; débit 44566 : 40 € ; crédit 401 : 240 €",
+            "Débit 401 : 200 € ; crédit 607 : 200 €",
+            "Débit 401 : 240 € ; crédit 707 : 240 €"
+          ],
+          "correctIndex": 0,
+          "explication": "L’avoir réduit la dette (débit 401), constate le rabais obtenu (6097) et régularise la TVA déductible."
+        },
+        {
+          "question": "À quoi sert un échéancier fournisseurs ?",
+          "options": [
+            "Calculer les amortissements",
+            "Classer les clients par chiffre d’affaires",
+            "Planifier les paiements selon leurs dates d’échéance",
+            "Établir les bulletins de paie"
+          ],
+          "correctIndex": 2,
+          "explication": "Il évite les retards de paiement et alimente les prévisions de trésorerie."
+        },
+        {
+          "question": "Une facture de 3 000 € HT comporte une remise de 5 %, TVA à 20 %. Quel est le montant TTC ?",
+          "options": [
+            "3 420 €",
+            "3 600 €",
+            "3 450 €",
+            "3 240 €"
+          ],
+          "correctIndex": 0,
+          "explication": "Net HT 2 850 € ; TVA 570 € ; TTC 3 420 €."
+        },
+        {
+          "question": "Un fournisseur est payé par virement. Quelle écriture est passée ?",
+          "options": [
+            "Débit 512, crédit 401",
+            "Débit 607, crédit 512",
+            "Débit 401, crédit 607",
+            "Débit 401, crédit 512"
+          ],
+          "correctIndex": 3,
+          "explication": "La dette fournisseur est soldée et la banque diminue."
+        },
+        {
+          "question": "Un ordinateur de 1 200 € HT est acheté pour l’entreprise. Sur quel compte est enregistrée la TVA déductible ?",
+          "options": [
+            "Le compte 44566",
+            "Le compte 44571",
+            "Le compte 44562",
+            "Le compte 4458"
+          ],
+          "correctIndex": 2,
+          "explication": "La TVA sur immobilisations est suivie au compte 44562."
+        },
+        {
+          "question": "Dettes fournisseurs 24 000 € TTC, achats annuels 216 000 € TTC, année de 360 jours. Quel est le délai moyen de paiement des fournisseurs ?",
+          "options": [
+            "9 jours",
+            "40 jours",
+            "30 jours",
+            "90 jours"
+          ],
+          "correctIndex": 1,
+          "explication": "24 000 / 216 000 × 360 = 40 jours."
+        },
+        {
+          "question": "Comment éviter de payer deux fois la même facture fournisseur ?",
+          "options": [
+            "Payer toutes les factures dès réception",
+            "Supprimer les factures après paiement",
+            "Ne saisir que les factures supérieures à un montant donné",
+            "Contrôler numéro, date et montant avant paiement et lettrer le compte"
+          ],
+          "correctIndex": 3,
+          "explication": "Le contrôle des doublons et le lettrage sécurisent les règlements."
+        },
+        {
+          "question": "Un acompte est versé à un fournisseur avant livraison. Quel compte est débité ?",
+          "options": [
+            "Le compte 4091",
+            "Le compte 4191",
+            "Le compte 401",
+            "Le compte 467"
+          ],
+          "correctIndex": 0,
+          "explication": "Le compte 4091 enregistre les avances et acomptes versés aux fournisseurs."
+        }
+      ]
+    },
+    {
+      "competence": "Assurer la gestion administrative et comptable des opérations de trésorerie.",
+      "questions": [
+        {
+          "question": "Compte 512 : 5 230 € débiteur ; relevé : 5 000 € créditeur ; frais bancaires de 30 € non comptabilisés ; remise de chèques de 200 € non créditée par la banque. Quel est le solde rapproché ?",
+          "options": [
+            "5 200 €",
+            "5 000 €",
+            "5 230 €",
+            "5 260 €"
+          ],
+          "correctIndex": 0,
+          "explication": "Côté banque : 5 000 + 200 = 5 200 € ; côté entreprise : 5 230 − 30 = 5 200 €."
+        },
+        {
+          "question": "Des frais de tenue de compte de 30 €, sans TVA dans le cas, apparaissent sur le relevé. Quelle écriture passer ?",
+          "options": [
+            "Débit 512, crédit 627",
+            "Débit 627, crédit 411",
+            "Débit 627, crédit 512",
+            "Débit 401, crédit 512"
+          ],
+          "correctIndex": 2,
+          "explication": "Le compte 627 enregistre les services bancaires ; la banque diminue."
+        },
+        {
+          "question": "Des chèques clients sont remis en banque mais pas encore crédités. Quel compte peut les suivre ?",
+          "options": [
+            "Le compte 5121",
+            "Le compte 5112",
+            "Le compte 53",
+            "Le compte 4191"
+          ],
+          "correctIndex": 1,
+          "explication": "Le compte 5112 « Chèques à encaisser » suit les remises en attente."
+        },
+        {
+          "question": "Le compte caisse présente un solde créditeur. Que faut-il en conclure ?",
+          "options": [
+            "La caisse a été bien tenue",
+            "La banque doit de l’argent à l’entreprise",
+            "Il faut constater un produit",
+            "Il s’agit d’une anomalie à rechercher"
+          ],
+          "correctIndex": 3,
+          "explication": "Une caisse ne peut pas contenir moins que zéro : une erreur ou un oubli de saisie existe."
+        },
+        {
+          "question": "Trésorerie initiale 4 000 €, encaissements 25 000 €, décaissements 27 500 €. Quelle est la trésorerie finale ?",
+          "options": [
+            "−1 500 €",
+            "1 500 €",
+            "6 500 €",
+            "2 500 €"
+          ],
+          "correctIndex": 1,
+          "explication": "4 000 + 25 000 − 27 500 = 1 500 €."
+        },
+        {
+          "question": "Des espèces sont versées de la caisse à la banque. Quel compte de liaison est utilisé ?",
+          "options": [
+            "Le compte 58",
+            "Le compte 467",
+            "Le compte 471",
+            "Le compte 411"
+          ],
+          "correctIndex": 0,
+          "explication": "Le compte 58 « Virements internes » évite le double enregistrement entre journaux."
+        },
+        {
+          "question": "Un relevé bancaire présente un solde créditeur. Que signifie-t-il pour l’entreprise ?",
+          "options": [
+            "L’entreprise est à découvert",
+            "L’entreprise doit des agios",
+            "La banque a fait une erreur",
+            "Le compte bancaire de l’entreprise est positif"
+          ],
+          "correctIndex": 3,
+          "explication": "Le relevé est tenu du point de vue de la banque : un solde créditeur est une dette de la banque envers l’entreprise."
+        },
+        {
+          "question": "Un encaissement par carte de 2 000 € supporte une commission de 1,5 %. Quel est le montant de la commission ?",
+          "options": [
+            "15 €",
+            "300 €",
+            "30 €",
+            "1 970 €"
+          ],
+          "correctIndex": 2,
+          "explication": "2 000 × 1,5 % = 30 € ; la banque crédite 1 970 €."
+        },
+        {
+          "question": "Dans un budget de trésorerie, comment inscrit-on les ventes ?",
+          "options": [
+            "En TTC, au mois de leur encaissement",
+            "En HT, au mois de la facture",
+            "En HT, au mois de la commande",
+            "En TTC, au mois de la livraison"
+          ],
+          "correctIndex": 0,
+          "explication": "Le budget de trésorerie suit les flux réels d’argent, donc les montants TTC encaissés."
+        },
+        {
+          "question": "Un prélèvement d’assurance de 85 € figure au relevé mais pas dans la comptabilité. Que faire ?",
+          "options": [
+            "Demander à la banque de l’annuler",
+            "L’enregistrer au journal de banque après contrôle de la pièce",
+            "L’ignorer jusqu’à la clôture",
+            "Le corriger sur le relevé bancaire"
+          ],
+          "correctIndex": 1,
+          "explication": "L’écart provient de l’entreprise : il faut comptabiliser l’opération justifiée."
+        }
+      ]
+    },
+    {
+      "competence": "Assurer la gestion administrative, comptable et fiscale de la déclaration de TVA.",
+      "questions": [
+        {
+          "question": "Des ventes de 45 000 € HT sont taxées à 20 %. Quelle est la TVA collectée ?",
+          "options": [
+            "7 500 €",
+            "9 000 €",
+            "9 900 €",
+            "4 500 €"
+          ],
+          "correctIndex": 1,
+          "explication": "45 000 × 20 % = 9 000 €."
+        },
+        {
+          "question": "Quelle TVA est incluse dans un montant de 7 200 € TTC au taux de 20 % ?",
+          "options": [
+            "1 440 €",
+            "1 000 €",
+            "6 000 €",
+            "1 200 €"
+          ],
+          "correctIndex": 3,
+          "explication": "7 200 × 20/120 = 1 200 €."
+        },
+        {
+          "question": "Pour des prestations de services, sans option pour les débits, quand la TVA devient-elle exigible ?",
+          "options": [
+            "À la signature de la commande",
+            "À l’émission de la facture",
+            "À l’encaissement du prix",
+            "À la clôture de l’exercice"
+          ],
+          "correctIndex": 2,
+          "explication": "Sans option pour les débits, la TVA sur prestations est exigible lors de l’encaissement."
+        },
+        {
+          "question": "TVA collectée 12 000 €, déductible sur biens et services 4 500 €, sur immobilisations 2 000 €. Quelle TVA est due ?",
+          "options": [
+            "5 500 €",
+            "7 500 €",
+            "10 000 €",
+            "6 500 €"
+          ],
+          "correctIndex": 0,
+          "explication": "12 000 − 4 500 − 2 000 = 5 500 €."
+        },
+        {
+          "question": "TVA collectée 3 000 €, TVA déductible 4 200 €. Quelle est la situation ?",
+          "options": [
+            "Une TVA à payer de 1 200 €",
+            "Une TVA à payer de 7 200 €",
+            "Un crédit de TVA de 1 200 €",
+            "Un crédit de TVA de 7 200 €"
+          ],
+          "correctIndex": 2,
+          "explication": "La déductible dépasse la collectée : 4 200 − 3 000 = 1 200 € de crédit."
+        },
+        {
+          "question": "Lors de la liquidation de la TVA, le solde à payer est porté au crédit de quel compte ?",
+          "options": [
+            "Le compte 44566",
+            "Le compte 44551",
+            "Le compte 44567",
+            "Le compte 44571"
+          ],
+          "correctIndex": 1,
+          "explication": "Le compte 44551 « TVA à décaisser » enregistre la dette envers l’État."
+        },
+        {
+          "question": "Laquelle de ces conditions est requise pour déduire la TVA sur un achat ?",
+          "options": [
+            "Disposer d’une facture conforme mentionnant la TVA",
+            "Avoir payé l’achat en espèces",
+            "Que le fournisseur soit aussi client",
+            "Que l’achat dépasse un montant minimum"
+          ],
+          "correctIndex": 0,
+          "explication": "Le droit à déduction suppose notamment une facture régulière et une dépense engagée pour l’activité taxable."
+        },
+        {
+          "question": "Pour une acquisition intracommunautaire de biens par une entreprise française assujettie, comment est traitée la TVA ?",
+          "options": [
+            "Le fournisseur étranger facture la TVA française",
+            "Aucune TVA n’est jamais déclarée",
+            "La TVA est payée en douane par le transporteur",
+            "L’acquéreur déclare la TVA due et la déduit selon ses droits"
+          ],
+          "correctIndex": 3,
+          "explication": "Le mécanisme d’autoliquidation fait déclarer la TVA par l’acquéreur, qui la déduit dans les conditions habituelles."
+        },
+        {
+          "question": "CA HT du mois 30 000 €, entièrement taxé à 20 %, TVA collectée comptabilisée 5 400 €. Quelle conclusion tirer ?",
+          "options": [
+            "La déclaration peut être déposée sans contrôle",
+            "Un écart de 600 € est à justifier avant la déclaration",
+            "La TVA due est de 5 400 € sans vérification",
+            "Il faut ajouter 5 400 € au CA"
+          ],
+          "correctIndex": 1,
+          "explication": "Le contrôle de cohérence donne 30 000 × 20 % = 6 000 € ; l’écart de 600 € doit être expliqué."
+        },
+        {
+          "question": "Des prestations sont facturées 24 000 € TTC et encaissées 18 000 € TTC, sans option pour les débits, TVA à 20 %. Quelle TVA collectée est exigible ?",
+          "options": [
+            "4 000 €",
+            "3 600 €",
+            "3 000 €",
+            "4 800 €"
+          ],
+          "correctIndex": 2,
+          "explication": "TVA exigible sur les encaissements : 18 000 × 20/120 = 3 000 €."
+        }
+      ]
+    },
+    {
+      "competence": "Assurer la gestion des variables et paramètres de paie.",
+      "questions": [
+        {
+          "question": "Lequel de ces éléments est un élément variable de paie ?",
+          "options": [
+            "La raison sociale de l’employeur",
+            "Le numéro SIRET de l’établissement",
+            "Les heures supplémentaires réalisées dans le mois",
+            "Le code APE de l’entreprise"
+          ],
+          "correctIndex": 2,
+          "explication": "Les variables changent chaque mois : heures, absences, primes, frais."
+        },
+        {
+          "question": "Salaire mensuel 2 200 €, 2 jours d’absence non rémunérée, retenue calculée dans le cas sur 22 jours ouvrés du mois. Quelle retenue appliquer ?",
+          "options": [
+            "200 €",
+            "110 €",
+            "400 €",
+            "220 €"
+          ],
+          "correctIndex": 0,
+          "explication": "2 200 / 22 × 2 = 200 €."
+        },
+        {
+          "question": "Taux horaire 14 €, 6 heures supplémentaires majorées de 25 %. Quel est leur montant ?",
+          "options": [
+            "84 €",
+            "21 €",
+            "126 €",
+            "105 €"
+          ],
+          "correctIndex": 3,
+          "explication": "6 × 14 × 1,25 = 105 €."
+        },
+        {
+          "question": "Salaire de base 2 000 € et prime d’ancienneté de 3 % du salaire de base. Quel est le brut ?",
+          "options": [
+            "2 006 €",
+            "2 060 €",
+            "2 600 €",
+            "1 940 €"
+          ],
+          "correctIndex": 1,
+          "explication": "Prime : 2 000 × 3 % = 60 € ; brut 2 060 €."
+        },
+        {
+          "question": "Brut 2 500 €, cotisations salariales du cas 550 €. Quel est le net avant impôt sur le revenu ?",
+          "options": [
+            "3 050 €",
+            "2 500 €",
+            "1 450 €",
+            "1 950 €"
+          ],
+          "correctIndex": 3,
+          "explication": "2 500 − 550 = 1 950 €."
+        },
+        {
+          "question": "Brut 2 500 €, cotisations patronales du cas 1 000 €. Quel est le coût employeur ?",
+          "options": [
+            "1 500 €",
+            "2 500 €",
+            "3 500 €",
+            "1 950 €"
+          ],
+          "correctIndex": 2,
+          "explication": "Coût employeur = brut + cotisations patronales = 3 500 €."
+        },
+        {
+          "question": "Quel compte est débité du salaire brut lors de la comptabilisation de la paie ?",
+          "options": [
+            "Le compte 421",
+            "Le compte 641",
+            "Le compte 645",
+            "Le compte 431"
+          ],
+          "correctIndex": 1,
+          "explication": "Le 641 enregistre les rémunérations du personnel ; le 645 les charges sociales patronales."
+        },
+        {
+          "question": "Sur quel compte est crédité le net à payer aux salariés ?",
+          "options": [
+            "Le compte 421",
+            "Le compte 641",
+            "Le compte 512",
+            "Le compte 425"
+          ],
+          "correctIndex": 0,
+          "explication": "Le compte 421 « Personnel – rémunérations dues » constate la dette envers les salariés."
+        },
+        {
+          "question": "Quelle pratique sécurise les paramètres de paie (taux, plafonds) ?",
+          "options": [
+            "Reprendre les taux de l’année précédente",
+            "Les mémoriser une fois pour toutes",
+            "Les vérifier dans les sources officielles ou un logiciel à jour",
+            "Les demander oralement aux salariés"
+          ],
+          "correctIndex": 2,
+          "explication": "Les paramètres évoluent : ils doivent être contrôlés à chaque changement réglementaire."
+        },
+        {
+          "question": "Comment traiter les éléments variables transmis par les responsables de service ?",
+          "options": [
+            "Les saisir sans contrôle pour gagner du temps",
+            "Les diffuser à toute l’équipe",
+            "Les détruire après la saisie",
+            "Les contrôler, les dater et les conserver avec justificatifs en accès restreint"
+          ],
+          "correctIndex": 3,
+          "explication": "Les données de paie sont personnelles et doivent rester traçables et confidentielles."
+        }
+      ]
+    },
+    {
+      "competence": "Présenter et transmettre des tableaux de bord.",
+      "questions": [
+        {
+          "question": "Ventes HT 50 000 €, coût d’achat des marchandises vendues 30 000 €. Quel est le taux de marque ?",
+          "options": [
+            "66,67 %",
+            "60 %",
+            "20 %",
+            "40 %"
+          ],
+          "correctIndex": 3,
+          "explication": "Marge 20 000 € ; taux de marque = 20 000 / 50 000 = 40 %."
+        },
+        {
+          "question": "Le chiffre d’affaires passe de 80 000 € à 92 000 €. Quelle est sa variation ?",
+          "options": [
+            "+12 %",
+            "+15 %",
+            "+13 %",
+            "+115 %"
+          ],
+          "correctIndex": 1,
+          "explication": "(92 000 − 80 000) / 80 000 = 15 %."
+        },
+        {
+          "question": "Quelle qualité doit avoir un indicateur de tableau de bord ?",
+          "options": [
+            "Être mesurable, relié à un objectif et mis à jour régulièrement",
+            "Être le plus détaillé possible",
+            "Être calculé une fois par an seulement",
+            "Reprendre toutes les lignes de la balance"
+          ],
+          "correctIndex": 0,
+          "explication": "Un indicateur utile est simple, fiable, régulier et rattaché à une décision."
+        },
+        {
+          "question": "Ventes prévues 40 000 €, ventes réalisées 36 000 €. Comment qualifier l’écart ?",
+          "options": [
+            "Favorable de 4 000 €",
+            "Défavorable de 10 000 €",
+            "Défavorable de 4 000 €, soit −10 %",
+            "Défavorable de 11,1 % par rapport à la prévision"
+          ],
+          "correctIndex": 2,
+          "explication": "Écart = 36 000 − 40 000 = −4 000 €, rapporté à la prévision : −10 %."
+        },
+        {
+          "question": "Quel graphique convient pour montrer l’évolution mensuelle du chiffre d’affaires ?",
+          "options": [
+            "Une courbe ou un histogramme mois par mois",
+            "Un seul diagramme circulaire annuel",
+            "Le tableau des immobilisations",
+            "La balance générale imprimée"
+          ],
+          "correctIndex": 0,
+          "explication": "Une représentation chronologique montre la tendance et la saisonnalité."
+        },
+        {
+          "question": "Chiffre d’affaires 18 000 € pour 450 commandes. Quel est le panier moyen ?",
+          "options": [
+            "25 €",
+            "45 €",
+            "400 €",
+            "40 €"
+          ],
+          "correctIndex": 3,
+          "explication": "18 000 / 450 = 40 €."
+        },
+        {
+          "question": "Avant de transmettre un tableau de bord au dirigeant, que faut-il ajouter ?",
+          "options": [
+            "La totalité des écritures du mois",
+            "Les mots de passe du logiciel",
+            "Un commentaire des écarts significatifs, la période et la source des données",
+            "Aucune explication, les chiffres suffisent"
+          ],
+          "correctIndex": 2,
+          "explication": "La transmission doit permettre une lecture rapide et une décision éclairée."
+        },
+        {
+          "question": "Le délai clients passe de 35 à 52 jours pour un objectif de 45 jours. Quel signal afficher ?",
+          "options": [
+            "Un indicateur satisfaisant",
+            "Une alerte : objectif dépassé de 7 jours",
+            "Une amélioration de 17 jours",
+            "Aucun signal, l’objectif est atteint"
+          ],
+          "correctIndex": 1,
+          "explication": "52 − 45 = 7 jours au-delà de l’objectif : le seuil d’alerte est franchi."
+        },
+        {
+          "question": "Charges de personnel 42 000 €, chiffre d’affaires 210 000 €. Quel est leur poids dans le chiffre d’affaires ?",
+          "options": [
+            "5 %",
+            "42 %",
+            "25 %",
+            "20 %"
+          ],
+          "correctIndex": 3,
+          "explication": "42 000 / 210 000 = 20 %."
+        },
+        {
+          "question": "Comment fiabiliser les chiffres d’un tableau de bord ?",
+          "options": [
+            "Les rapprocher de la balance et des journaux du logiciel",
+            "Les arrondir au millier supérieur",
+            "Les estimer à partir du mois précédent",
+            "Les faire valider par un client"
+          ],
+          "correctIndex": 0,
+          "explication": "Le rapprochement avec la comptabilité garantit la cohérence des données diffusées."
+        }
+      ]
+    },
+    {
+      "competence": "Traiter les immobilisations et les valeurs mobilières de placement.",
+      "questions": [
+        {
+          "question": "Prix d’achat 10 000 € HT, transport 400 € HT, installation 600 € HT, TVA récupérable. Quel est le coût d’acquisition ?",
+          "options": [
+            "11 000 €",
+            "13 200 €",
+            "10 000 €",
+            "10 400 €"
+          ],
+          "correctIndex": 0,
+          "explication": "Les frais nécessaires à la mise en état d’utilisation s’ajoutent au prix : 10 000 + 400 + 600 = 11 000 €."
+        },
+        {
+          "question": "Une immobilisation de 18 000 € est amortie linéairement sur 6 ans, sans valeur résiduelle. Quelle est l’annuité ?",
+          "options": [
+            "6 000 €",
+            "1 800 €",
+            "3 000 €",
+            "2 000 €"
+          ],
+          "correctIndex": 2,
+          "explication": "18 000 / 6 = 3 000 €."
+        },
+        {
+          "question": "Un bien de 12 000 € HT mis en service le 1er septembre N est amorti linéairement sur 4 ans. Quelle est la dotation de N (exercice calendaire) ?",
+          "options": [
+            "3 000 €",
+            "1 000 €",
+            "750 €",
+            "2 000 €"
+          ],
+          "correctIndex": 1,
+          "explication": "Annuité 3 000 € × 4/12 = 1 000 €."
+        },
+        {
+          "question": "Coût d’acquisition 25 000 €, amortissements cumulés 15 000 €. Quelle est la valeur nette comptable ?",
+          "options": [
+            "40 000 €",
+            "15 000 €",
+            "25 000 €",
+            "10 000 €"
+          ],
+          "correctIndex": 3,
+          "explication": "VNC = 25 000 − 15 000 = 10 000 €."
+        },
+        {
+          "question": "Quelle écriture constate la dotation aux amortissements d’un matériel ?",
+          "options": [
+            "Débit 2815, crédit 6811",
+            "Débit 6811, crédit 2815",
+            "Débit 215, crédit 6811",
+            "Débit 6811, crédit 512"
+          ],
+          "correctIndex": 1,
+          "explication": "La dotation est une charge (6811) et l’amortissement cumulé est crédité au 28."
+        },
+        {
+          "question": "Lors d’une cession d’immobilisation, sur quel compte est crédité le prix de cession HT ?",
+          "options": [
+            "Le compte 775",
+            "Le compte 707",
+            "Le compte 675",
+            "Le compte 2815"
+          ],
+          "correctIndex": 0,
+          "explication": "Le 775 « Produits des cessions d’éléments d’actif » enregistre le prix de vente."
+        },
+        {
+          "question": "Lors de la sortie du bien cédé, sur quel compte est débitée sa valeur nette comptable ?",
+          "options": [
+            "Le compte 775",
+            "Le compte 6811",
+            "Le compte 215",
+            "Le compte 675"
+          ],
+          "correctIndex": 3,
+          "explication": "Le 675 « Valeurs comptables des éléments d’actif cédés » reçoit la VNC."
+        },
+        {
+          "question": "Une entreprise achète des actions pour placer un excédent de trésorerie à court terme. Où les enregistre-t-elle ?",
+          "options": [
+            "Au compte 261 (titres de participation)",
+            "Au compte 271 (titres immobilisés)",
+            "Au compte 503 (valeurs mobilières de placement)",
+            "Au compte 512 (banque)"
+          ],
+          "correctIndex": 2,
+          "explication": "Des titres acquis pour un placement temporaire sont des VMP (classe 50)."
+        },
+        {
+          "question": "100 VMP achetées 45 € l’unité valent 40 € au 31 décembre. Quelle dépréciation constater ?",
+          "options": [
+            "500 €",
+            "4 000 €",
+            "450 €",
+            "0 €"
+          ],
+          "correctIndex": 0,
+          "explication": "(45 − 40) × 100 = 500 €."
+        },
+        {
+          "question": "100 VMP achetées 45 € l’unité sont revendues 52 € l’unité, sans frais. Quel est le résultat de cession ?",
+          "options": [
+            "Un gain de 5 200 €",
+            "Un gain de 700 €",
+            "Une perte de 700 €",
+            "Un gain de 4 500 €"
+          ],
+          "correctIndex": 1,
+          "explication": "(52 − 45) × 100 = 700 € de produit net sur cession."
+        }
+      ]
+    },
+    {
+      "competence": "Traiter les stocks, créances et dettes d’exploitation.",
+      "questions": [
+        {
+          "question": "Achats de marchandises 50 000 €, stock initial 8 000 €, stock final 11 000 €. Quel est le coût d’achat des marchandises vendues ?",
+          "options": [
+            "53 000 €",
+            "47 000 €",
+            "50 000 €",
+            "69 000 €"
+          ],
+          "correctIndex": 1,
+          "explication": "50 000 + 8 000 − 11 000 = 47 000 €."
+        },
+        {
+          "question": "Un lot en stock coûte 6 000 € et sa valeur actuelle est de 4 800 €. Quelle dépréciation constater ?",
+          "options": [
+            "4 800 €",
+            "6 000 €",
+            "10 800 €",
+            "1 200 €"
+          ],
+          "correctIndex": 3,
+          "explication": "La dépréciation couvre l’écart : 6 000 − 4 800 = 1 200 €."
+        },
+        {
+          "question": "Créance douteuse de 3 600 € TTC (TVA 20 %), perte probable de 50 %. Quelle dépréciation constater ?",
+          "options": [
+            "1 800 €",
+            "3 000 €",
+            "1 500 €",
+            "3 600 €"
+          ],
+          "correctIndex": 2,
+          "explication": "Base HT 3 000 € × 50 % = 1 500 €."
+        },
+        {
+          "question": "Sur quel compte est enregistrée la perte HT sur une créance devenue irrécouvrable ?",
+          "options": [
+            "Le compte 654",
+            "Le compte 681",
+            "Le compte 491",
+            "Le compte 416"
+          ],
+          "correctIndex": 0,
+          "explication": "Le 654 « Pertes sur créances irrécouvrables » constate la perte définitive."
+        },
+        {
+          "question": "Une prestation consommée en décembre N sera facturée en janvier N+1. Quel compte est crédité au 31 décembre N ?",
+          "options": [
+            "Le compte 4181",
+            "Le compte 486",
+            "Le compte 4081",
+            "Le compte 487"
+          ],
+          "correctIndex": 2,
+          "explication": "Le 4081 « Fournisseurs – factures non parvenues » rattache la charge à N."
+        },
+        {
+          "question": "Des marchandises livrées en décembre N seront facturées au client en janvier N+1. Quel compte est débité ?",
+          "options": [
+            "Le compte 4081",
+            "Le compte 4181",
+            "Le compte 487",
+            "Le compte 416"
+          ],
+          "correctIndex": 1,
+          "explication": "Le 4181 « Clients – factures à établir » rattache le produit à N."
+        },
+        {
+          "question": "Un abonnement annuel de 7 200 €, sans TVA, payé et comptabilisé le 1er octobre N couvre douze mois. Quelle charge constatée d’avance au 31 décembre N ?",
+          "options": [
+            "5 400 €",
+            "1 800 €",
+            "7 200 €",
+            "3 600 €"
+          ],
+          "correctIndex": 0,
+          "explication": "9 mois concernent N+1 : 7 200 × 9/12 = 5 400 €."
+        },
+        {
+          "question": "Un contrat de maintenance de 6 000 € HT facturé au client couvre du 1er novembre N au 31 octobre N+1. Quel produit constaté d’avance au 31 décembre N ?",
+          "options": [
+            "1 000 €",
+            "6 000 €",
+            "500 €",
+            "5 000 €"
+          ],
+          "correctIndex": 3,
+          "explication": "10 mois concernent N+1 : 6 000 × 10/12 = 5 000 €."
+        },
+        {
+          "question": "Une dépréciation de stock de 2 000 € existait ; le besoin à la clôture n’est plus que de 1 200 €. Que faut-il comptabiliser ?",
+          "options": [
+            "Une dotation de 1 200 €",
+            "Une reprise de 800 €",
+            "Une dotation de 800 €",
+            "Une reprise de 2 000 €"
+          ],
+          "correctIndex": 1,
+          "explication": "L’excédent de dépréciation devenu inutile est repris : 2 000 − 1 200 = 800 €."
+        },
+        {
+          "question": "Entrées en stock : 100 unités à 10 € puis 300 unités à 12 €. Quel est le coût unitaire moyen pondéré ?",
+          "options": [
+            "11,00 €",
+            "12,00 €",
+            "11,50 €",
+            "10,50 €"
+          ],
+          "correctIndex": 2,
+          "explication": "(1 000 + 3 600) / 400 = 11,50 €."
+        }
+      ]
+    },
+    {
+      "competence": "Traiter les emprunts et l’affectation du résultat.",
+      "questions": [
+        {
+          "question": "Un emprunt de 50 000 € est versé sur le compte bancaire. Quelle écriture passer ?",
+          "options": [
+            "Débit 164, crédit 512",
+            "Débit 512, crédit 761",
+            "Débit 512, crédit 164",
+            "Débit 661, crédit 164"
+          ],
+          "correctIndex": 2,
+          "explication": "La banque augmente et la dette financière est créée au 164."
+        },
+        {
+          "question": "Une échéance comprend 10 000 € de capital et 1 800 € d’intérêts. Sur quel compte sont débités les intérêts ?",
+          "options": [
+            "Le compte 6611",
+            "Le compte 164",
+            "Le compte 627",
+            "Le compte 1688"
+          ],
+          "correctIndex": 0,
+          "explication": "Les intérêts sont une charge financière (6611) ; le capital réduit la dette (164)."
+        },
+        {
+          "question": "Emprunt de 40 000 € à amortissements constants sur 4 ans, taux 5 %. Quelle est la deuxième annuité ?",
+          "options": [
+            "12 000 €",
+            "11 000 €",
+            "1 500 €",
+            "11 500 €"
+          ],
+          "correctIndex": 3,
+          "explication": "Capital restant 30 000 € : intérêts 1 500 € + amortissement 10 000 € = 11 500 €."
+        },
+        {
+          "question": "Emprunt souscrit le 1er juillet N, intérêts annuels de 2 400 € payables le 30 juin N+1. Quels intérêts courus au 31 décembre N ?",
+          "options": [
+            "2 400 €",
+            "1 200 €",
+            "600 €",
+            "200 €"
+          ],
+          "correctIndex": 1,
+          "explication": "6 mois sur 12 : 2 400 × 6/12 = 1 200 €."
+        },
+        {
+          "question": "Sur quel compte sont crédités les intérêts courus sur emprunt à la clôture ?",
+          "options": [
+            "Le compte 4081",
+            "Le compte 486",
+            "Le compte 164",
+            "Le compte 1688"
+          ],
+          "correctIndex": 3,
+          "explication": "Le 1688 « Intérêts courus » rattache la dette d’intérêts à l’emprunt."
+        },
+        {
+          "question": "Emprunt de 40 000 € remboursé par amortissements constants sur 4 ans. Quel capital reste dû après 2 échéances ?",
+          "options": [
+            "30 000 €",
+            "10 000 €",
+            "20 000 €",
+            "40 000 €"
+          ],
+          "correctIndex": 2,
+          "explication": "Amortissement annuel 10 000 € : 40 000 − 2 × 10 000 = 20 000 €."
+        },
+        {
+          "question": "Bénéfice 30 000 €, réserve légale fixée par le cas à 1 500 €, dividendes 20 000 €, solde en report à nouveau. Quel est le report à nouveau ?",
+          "options": [
+            "10 000 €",
+            "8 500 €",
+            "28 500 €",
+            "30 000 €"
+          ],
+          "correctIndex": 1,
+          "explication": "30 000 − 1 500 − 20 000 = 8 500 €."
+        },
+        {
+          "question": "Lors de l’affectation du résultat, sur quel compte sont crédités les dividendes à verser ?",
+          "options": [
+            "Le compte 457",
+            "Le compte 120",
+            "Le compte 1061",
+            "Le compte 110"
+          ],
+          "correctIndex": 0,
+          "explication": "Le 457 « Associés – dividendes à payer » constate la dette envers les associés."
+        },
+        {
+          "question": "Une perte de 5 000 € est reportée sur les exercices suivants. Vers quel compte est-elle transférée ?",
+          "options": [
+            "Le compte 110",
+            "Le compte 457",
+            "Le compte 119",
+            "Le compte 1061"
+          ],
+          "correctIndex": 2,
+          "explication": "Le 119 « Report à nouveau (solde débiteur) » enregistre la perte reportée."
+        },
+        {
+          "question": "Quelle proposition décrit un emprunt remboursable par annuités constantes ?",
+          "options": [
+            "Le capital remboursé est identique chaque année",
+            "Les intérêts sont identiques chaque année",
+            "Seuls les intérêts sont payés jusqu’au terme",
+            "Le montant payé est identique chaque année, la part d’intérêts diminuant"
+          ],
+          "correctIndex": 3,
+          "explication": "L’annuité est fixe ; les intérêts baissent et l’amortissement du capital augmente."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Décrivez le circuit d’une facture client, de son émission à son encaissement.",
+      "reponseAttendue": "La facture est établie à partir du bon de livraison et des conditions de vente, puis contrôlée. Elle est enregistrée au journal des ventes en débitant le client et en créditant la vente et la TVA collectée. Le règlement est ensuite enregistré en banque, puis lettré avec la facture dans le compte client."
+    },
+    {
+      "question": "À quoi sert un rapprochement bancaire ?",
+      "reponseAttendue": "Il compare le compte banque de l’entreprise avec le relevé de la banque. Il explique les écarts, comme les chèques non encaissés ou les frais non comptabilisés. Il permet de corriger les oublis dans la comptabilité et de fiabiliser le solde de trésorerie."
+    },
+    {
+      "question": "Expliquez la différence entre TVA collectée et TVA déductible.",
+      "reponseAttendue": "La TVA collectée est facturée aux clients sur les ventes et doit être reversée à l’État. La TVA déductible est payée aux fournisseurs sur les achats et peut être récupérée sous conditions. La différence entre les deux donne la TVA à payer ou un crédit de TVA."
+    },
+    {
+      "question": "Quels contrôles réalisez-vous avant de payer une facture fournisseur ?",
+      "reponseAttendue": "Je vérifie que la facture correspond à une commande et à une livraison réelles. Je contrôle les quantités, les prix, les remises, la TVA et les mentions obligatoires. Je vérifie aussi qu’elle n’a pas déjà été payée et qu’elle est validée par la personne habilitée."
+    },
+    {
+      "question": "Qu’est-ce qu’un élément variable de paie ? Donnez des exemples.",
+      "reponseAttendue": "C’est une information qui change d’un mois à l’autre et modifie le bulletin. Les heures supplémentaires, les absences, les primes ponctuelles ou les congés en sont des exemples. Ces éléments doivent être collectés, justifiés et contrôlés avant le calcul de la paie."
+    },
+    {
+      "question": "À quoi sert un tableau de bord dans une petite entreprise ?",
+      "reponseAttendue": "Il présente quelques indicateurs clés, comme le chiffre d’affaires, la marge ou la trésorerie. Il compare les résultats aux objectifs pour repérer rapidement les écarts. Il aide le dirigeant à prendre des décisions et à réagir à temps."
+    },
+    {
+      "question": "Quelle différence faites-vous entre une immobilisation et une charge ?",
+      "reponseAttendue": "Une immobilisation est un bien durable utilisé sur plusieurs exercices, comme une machine ou un véhicule. Elle est inscrite à l’actif puis amortie. Une charge est consommée dans l’exercice, comme une fourniture ou un loyer, et diminue directement le résultat."
+    },
+    {
+      "question": "Pourquoi une entreprise amortit-elle ses immobilisations ?",
+      "reponseAttendue": "L’amortissement répartit le coût d’un bien sur sa durée d’utilisation. Il traduit la consommation de sa valeur dans le temps. Il permet un résultat plus juste chaque année et une valeur nette réaliste au bilan."
+    },
+    {
+      "question": "Comment se décompose l’échéance d’un emprunt ?",
+      "reponseAttendue": "Une échéance comprend une part de capital remboursé et une part d’intérêts. Le capital diminue la dette envers la banque. Les intérêts sont une charge financière de l’exercice."
+    },
+    {
+      "question": "Pourquoi faut-il rattacher les charges et les produits au bon exercice ?",
+      "reponseAttendue": "Le résultat doit refléter l’activité réelle de la période. Une charge consommée en N doit être comptée en N, même si la facture arrive plus tard. À l’inverse, une charge payée d’avance pour N+1 doit être retirée du résultat de N."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Présentez votre démarche de suivi d’un portefeuille clients, de l’échéance jusqu’au traitement d’un client douteux.",
+      "reponseAttendue": "J’édite une balance âgée pour repérer les factures échues et je lettre les règlements reçus. Je relance d’abord à l’amiable, par courriel ou téléphone, puis par une relance écrite plus formelle en traçant chaque contact. Si un litige ou un risque de non-paiement apparaît, je transfère la créance au compte 416. À la clôture, j’évalue le risque et je propose une dépréciation calculée sur le montant HT. Je signale les situations bloquées au responsable pour décider d’un recours."
+    },
+    {
+      "question": "Expliquez la méthode complète d’un rapprochement bancaire et les suites à donner.",
+      "reponseAttendue": "Je pointe les opérations du relevé avec celles du compte 512 sur la période. Je classe les écarts : opérations connues de la banque mais pas de l’entreprise, comme les frais ou les prélèvements, et opérations de l’entreprise pas encore passées en banque, comme les chèques émis. Je calcule les deux soldes rectifiés, qui doivent être égaux. Je comptabilise ensuite les opérations manquantes à partir des justificatifs. Je surveille les écarts anciens et je conserve l’état de rapprochement daté."
+    },
+    {
+      "question": "Comment préparez-vous et contrôlez-vous la déclaration de TVA mensuelle ?",
+      "reponseAttendue": "Je vérifie que toutes les ventes et achats du mois sont saisis et que les régimes d’exigibilité sont respectés. Je rapproche la TVA collectée du chiffre d’affaires par taux et la TVA déductible des factures conformes. J’isole la TVA sur immobilisations et je reprends l’éventuel crédit antérieur. Je calcule la TVA due ou le crédit, je passe l’écriture de liquidation et je soumets la déclaration à validation avant l’échéance. Je conserve le dossier de calcul pour justifier les montants."
+    },
+    {
+      "question": "Comment collectez-vous et contrôlez-vous les variables de paie avant leur transmission ?",
+      "reponseAttendue": "Je prépare un calendrier de collecte et un tableau unique des variables par salarié. Je recueille les heures, absences, primes et frais auprès des responsables avec leurs justificatifs. Je contrôle la cohérence avec les plannings, les contrats et les règles internes. Je vérifie que les paramètres utilisés sont à jour. Je transmets les éléments validés de façon sécurisée et je garde une trace datée de chaque modification."
+    },
+    {
+      "question": "Comment construisez-vous et transmettez-vous un tableau de bord mensuel au dirigeant ?",
+      "reponseAttendue": "Je choisis avec lui quelques indicateurs liés à ses objectifs, comme le chiffre d’affaires, la marge, le délai clients et la trésorerie. J’extrais les données du logiciel et je les rapproche de la balance. Je calcule les écarts par rapport au budget et au mois précédent. J’ajoute des graphiques simples et des seuils d’alerte. Je rédige un commentaire court sur les écarts significatifs et je transmets le tableau à date fixe."
+    },
+    {
+      "question": "Décrivez le traitement comptable complet d’une cession d’immobilisation.",
+      "reponseAttendue": "Je calcule la dotation complémentaire jusqu’à la date de cession, au prorata du temps. J’enregistre le prix de cession HT au crédit du 775 et la TVA éventuelle. Je sors le bien de l’actif : les amortissements cumulés sont débités, la valeur d’origine créditée et la VNC débitée au 675. Le résultat de cession correspond à la différence entre le prix et la VNC. Je mets à jour le tableau des immobilisations et je conserve l’acte de cession."
+    },
+    {
+      "question": "Comment participez-vous à l’inventaire des stocks et à leur évaluation à la clôture ?",
+      "reponseAttendue": "Je prépare l’inventaire physique avec des feuilles de comptage et une procédure de coupure des entrées et sorties. Je valorise les quantités au coût d’acquisition, par exemple au coût moyen pondéré. Je compare ce coût à la valeur actuelle pour repérer les articles abîmés ou démodés. Je propose les dépréciations nécessaires et j’enregistre la variation de stock. Je rapproche enfin le stock comptable de l’inventaire et j’explique les écarts."
+    },
+    {
+      "question": "Quelles régularisations de créances et de dettes d’exploitation réalisez-vous à la clôture ?",
+      "reponseAttendue": "Je recense les livraisons reçues sans facture pour constater des factures non parvenues au 4081. J’identifie les ventes livrées non facturées pour les factures à établir au 4181. Je calcule au prorata les charges et produits constatés d’avance. Je vérifie les avoirs à recevoir ou à établir et les créances douteuses. Chaque régularisation est documentée et contrepassée à l’ouverture de l’exercice suivant si nécessaire."
+    },
+    {
+      "question": "Comment traitez-vous un emprunt bancaire de la souscription à la clôture ?",
+      "reponseAttendue": "J’enregistre les fonds reçus au débit du 512 et au crédit du 164. J’établis ou je contrôle le tableau d’amortissement fourni par la banque. À chaque échéance, je sépare le capital, débité au 164, des intérêts, débités au 6611. À la clôture, je calcule les intérêts courus non échus au prorata et je les crédite au 1688. Je rapproche enfin le capital restant dû du tableau d’amortissement."
+    },
+    {
+      "question": "Expliquez les étapes et l’écriture de l’affectation du résultat.",
+      "reponseAttendue": "Après l’approbation des comptes, je reprends la décision des associés. Je détermine le bénéfice distribuable en tenant compte du report à nouveau et des réserves à doter. Je débite le compte de résultat et, s’il y a lieu, le report à nouveau créditeur. Je crédite les réserves, les dividendes à payer au 457 et le nouveau report à nouveau. Je vérifie que le total affecté est égal aux sommes disponibles."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Facturer un client et suivre son règlement",
+      "consigne": "L’entreprise Orion vend des marchandises pour 8 000 € HT avec une remise de 5 %. Elle facture en plus 150 € HT de frais de port. La TVA est de 20 % sur l’ensemble. Le client règle la facture par virement 30 jours plus tard. Établissez la facture, passez l’écriture de vente puis celle du règlement et indiquez le contrôle final à réaliser.",
+      "reponseAttendue": "Le net commercial est de 8 000 × 0,95 = 7 600 €. La base HT totale est de 7 600 + 150 = 7 750 €, la TVA de 1 550 € et le TTC de 9 300 €. L’écriture de vente débite le 411 de 9 300 € et crédite le 707 de 7 600 €, le 7085 de 150 € et le 44571 de 1 550 €. Le règlement débite le 512 et crédite le 411 de 9 300 €. Il faut ensuite lettrer la facture et le règlement pour solder le compte client.",
+      "points": 10
+    },
+    {
+      "titre": "Traiter une facture et un avoir fournisseur",
+      "consigne": "L’entreprise Orion reçoit une facture de marchandises de 4 200 € HT avec une remise de 10 %, TVA à 20 %. Une partie de la livraison présente un défaut de qualité et le fournisseur accorde un rabais par avoir de 300 € HT. Calculez la facture, l’avoir et le solde à payer, puis passez les écritures.",
+      "reponseAttendue": "Le net HT est de 4 200 × 0,9 = 3 780 €, la TVA de 756 € et le TTC de 4 536 €. L’écriture débite le 607 de 3 780 € et le 44566 de 756 €, et crédite le 401 de 4 536 €. L’avoir représente 300 € HT, 60 € de TVA et 360 € TTC : il débite le 401 de 360 € et crédite le 6097 de 300 € et le 44566 de 60 €. Le solde à payer est de 4 536 − 360 = 4 176 €. Le paiement débite le 401 et crédite le 512 de 4 176 €, puis le compte est lettré.",
+      "points": 10
+    },
+    {
+      "titre": "Établir un rapprochement bancaire",
+      "consigne": "Au 31 mars, le compte 512 présente un solde débiteur de 12 450 € et le relevé un solde créditeur de 11 980 €. Un chèque émis de 820 € n’est pas encore débité. Une remise de chèques de 1 150 € n’est pas encore créditée. Le relevé fait apparaître 45 € de frais bancaires, un prélèvement d’assurance de 185 € et un virement client de 90 €, non comptabilisés. On considère ces frais et l’assurance sans TVA. Établissez l’état de rapprochement et passez les écritures.",
+      "reponseAttendue": "Côté banque, le solde rectifié est de 11 980 − 820 + 1 150 = 12 310 €. Côté entreprise, il est de 12 450 − 45 − 185 + 90 = 12 310 €. Les deux soldes concordent. Il faut débiter le 627 de 45 € et le 616 de 185 € par le crédit du 512, puis débiter le 512 de 90 € par le crédit du 411. L’état de rapprochement est daté et conservé avec le relevé.",
+      "points": 10
+    },
+    {
+      "titre": "Construire un budget de trésorerie trimestriel",
+      "consigne": "La trésorerie au 1er janvier est de 6 000 €. Les ventes HT prévues sont de 20 000 € en janvier, 25 000 € en février et 30 000 € en mars, TVA à 20 %. Les clients paient 50 % au comptant et 50 % le mois suivant. Les ventes TTC de décembre s’élevaient à 18 000 €. Les décaissements TTC prévus sont de 24 000 €, 26 000 € et 28 000 €. Établissez le budget et commentez.",
+      "reponseAttendue": "Les ventes TTC sont de 24 000 €, 30 000 € et 36 000 €. Les encaissements sont de 12 000 + 9 000 = 21 000 € en janvier, 15 000 + 12 000 = 27 000 € en février et 18 000 + 15 000 = 33 000 € en mars. La trésorerie de fin de mois est de 6 000 + 21 000 − 24 000 = 3 000 €, puis 3 000 + 27 000 − 26 000 = 4 000 €, puis 4 000 + 33 000 − 28 000 = 9 000 €. Janvier est le mois le plus tendu. Il faut surveiller les encaissements et éventuellement décaler une dépense.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer et liquider la TVA du mois",
+      "consigne": "En juin, une entreprise vend 60 000 € HT de marchandises taxées à 20 %. Elle encaisse 14 400 € TTC de prestations taxées à 20 %, sans option pour les débits. La TVA déductible est de 6 800 € sur les biens et services et de 3 000 € sur une immobilisation de 15 000 € HT. Le crédit antérieur est de 1 100 €. Calculez la TVA due et passez l’écriture de liquidation.",
+      "reponseAttendue": "La TVA collectée est de 12 000 € sur les marchandises et de 14 400 × 20/120 = 2 400 € sur les prestations, soit 14 400 €. La TVA due est de 14 400 − 6 800 − 3 000 − 1 100 = 3 500 €. L’écriture débite le 44571 de 14 400 €. Elle crédite le 44566 de 6 800 €, le 44562 de 3 000 €, le 44567 de 1 100 € et le 44551 de 3 500 €. Les totaux sont équilibrés et le dossier de calcul est conservé.",
+      "points": 10
+    },
+    {
+      "titre": "Calculer les éléments variables d’un bulletin",
+      "consigne": "Une salariée a un salaire de base de 2 310 €. Le taux horaire de référence retenu dans le cas est de 15,20 €. En mai, elle a fait 8 heures supplémentaires majorées de 25 % et reçu une prime de 120 €. Elle a eu 1 jour d’absence non rémunérée, retenu pour 1/21 du salaire de base. Les cotisations salariales du cas sont de 22 % et les patronales de 40 % du brut. Le prélèvement à la source est hors champ. Calculez le brut, le net avant impôt et le coût employeur, puis passez l’écriture.",
+      "reponseAttendue": "Les heures supplémentaires valent 8 × 15,20 × 1,25 = 152 € et la retenue 2 310 / 21 = 110 €. Le brut est de 2 310 + 152 + 120 − 110 = 2 472 €. Les cotisations salariales sont de 543,84 € et le net avant impôt de 1 928,16 €. Les cotisations patronales sont de 988,80 €, soit un coût employeur de 3 460,80 €. On débite le 641 de 2 472 €, on crédite les organismes sociaux de 543,84 € et le 421 de 1 928,16 €. On débite aussi le 645 de 988,80 € par le crédit des organismes sociaux.",
+      "points": 10
+    },
+    {
+      "titre": "Présenter un tableau de bord trimestriel",
+      "consigne": "Pour le trimestre, le chiffre d’affaires HT réalisé est de 138 000 € pour un budget de 150 000 €. La marge commerciale réalisée est de 55 200 € pour une prévision de 63 000 €. Le délai clients est de 48 jours pour un objectif de 40 jours. La trésorerie de fin de trimestre est de 9 500 €. Calculez les écarts et le taux de marque, puis rédigez le commentaire à transmettre.",
+      "reponseAttendue": "L’écart de chiffre d’affaires est de 138 000 − 150 000 = −12 000 €, soit −8 % du budget. L’écart de marge est de −7 800 €. Le taux de marque réalisé est de 55 200 / 138 000 = 40 %, contre 63 000 / 150 000 = 42 % prévu. Le délai clients dépasse l’objectif de 8 jours et justifie une alerte. Le commentaire signale la baisse des ventes et de la marge, propose un renforcement des relances et rappelle que la trésorerie reste positive.",
+      "points": 10
+    },
+    {
+      "titre": "Amortir et céder une immobilisation, évaluer des VMP",
+      "consigne": "Une machine est mise en service le 1er avril N pour 42 000 € HT, plus 3 000 € HT d’installation, TVA récupérable. Elle est amortie linéairement sur 5 ans, exercice calendaire. Elle est cédée le 30 septembre N+2 pour 26 000 € HT. Par ailleurs, 200 actions de placement achetées 30 € valent 27 € au 31 décembre N+2. Calculez les dotations, le résultat de cession et la dépréciation des titres.",
+      "reponseAttendue": "Le coût d’acquisition est de 45 000 € et l’annuité de 9 000 €. La dotation est de 6 750 € en N, 9 000 € en N+1 et 6 750 € en N+2 jusqu’à la cession. Les amortissements cumulés sont de 22 500 €, d’où une VNC de 22 500 €. Le résultat de cession est de 26 000 − 22 500 = 3 500 € de plus-value. Le prix est crédité au 775 et la VNC débitée au 675. La dépréciation des titres est de 200 × 3 = 600 €, au débit du 6866 et au crédit du 590.",
+      "points": 10
+    },
+    {
+      "titre": "Réaliser les travaux d’inventaire d’exploitation",
+      "consigne": "Au 31 décembre N, le stock initial de marchandises est de 14 000 € et le stock final de 18 500 €. Un lot du stock final coûte 2 500 € et vaut 1 700 €. Le client Dubois doit 4 800 € TTC (TVA 20 %) et la perte est estimée à 25 %. L’électricité de décembre, 600 € HT, sera facturée en janvier. Une assurance annuelle de 3 600 €, sans TVA, payée le 1er mars N a été mise en charge. Passez les écritures et calculez l’incidence des régularisations hors variation de stock.",
+      "reponseAttendue": "On annule le stock initial (débit 6037, crédit 37 de 14 000 €) et on constate le stock final (débit 37, crédit 6037 de 18 500 €). La dépréciation du lot est de 800 €. La créance passe au 416 pour 4 800 € et sa dépréciation est de 4 000 × 25 % = 1 000 €. L’électricité donne une facture non parvenue : débit charge 600 €, débit 44586 de 120 €, crédit 4081 de 720 €. La charge constatée d’avance est de 3 600 × 2/12 = 600 € au débit du 486. Hors variation de stock, l’incidence est de −800 − 1 000 − 600 + 600 = −1 800 €.",
+      "points": 10
+    },
+    {
+      "titre": "Suivre un emprunt et affecter le résultat",
+      "consigne": "Le 1er octobre N, une société emprunte 80 000 € remboursables par amortissements constants sur 4 ans, au taux de 4 %, échéances le 30 septembre. Le bénéfice N est de 48 000 € et le report à nouveau créditeur de 1 000 €. Les associés décident une réserve légale de 2 400 € (montant du cas), 30 000 € de dividendes et le solde en autres réserves. Établissez le tableau d’emprunt, les intérêts courus au 31 décembre N et l’écriture d’affectation.",
+      "reponseAttendue": "Les annuités sont de 20 000 + 3 200 = 23 200 €, puis 22 400 €, 21 600 € et 20 800 €, sur des capitaux restants de 80 000, 60 000, 40 000 et 20 000 €. Les intérêts courus au 31 décembre N sont de 3 200 × 3/12 = 800 €, au débit du 6611 et au crédit du 1688. Le montant à affecter est de 48 000 + 1 000 = 49 000 €. Les autres réserves reçoivent 49 000 − 2 400 − 30 000 = 16 600 €. On débite le 120 de 48 000 € et le 110 de 1 000 €, puis on crédite le 1061 de 2 400 €, le 457 de 30 000 € et le 1068 de 16 600 €.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : opérations courantes, TVA et paie",
+    "contexte": "L’entreprise Lumen clôture son mois de mars. Elle vend des marchandises pour 18 000 € HT, TVA à 20 %. Elle reçoit une facture fournisseur de 7 500 € HT, TVA à 20 %, et dispose de 300 € de TVA déductible sur frais divers. Il n’existe pas de crédit antérieur. Le compte 512 présente un solde débiteur de 9 340 € et le relevé un solde créditeur de 9 900 €. Un chèque émis de 620 € n’est pas débité et 60 € de frais bancaires, sans TVA, ne sont pas comptabilisés. Un salarié a un brut de base de 2 000 € et a fait 5 heures supplémentaires à 25 % sur un taux horaire de référence de 14 € fixé par le cas. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Passez l’écriture de la vente du mois.",
+        "reponseAttendue": "Le client est débité de 21 600 € TTC au 411. Le 707 est crédité de 18 000 € et le 44571 de 3 600 €. Barème : montants 3 points, comptes 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Établissez le rapprochement bancaire et l’écriture de régularisation.",
+        "reponseAttendue": "Côté banque : 9 900 − 620 = 9 280 €. Côté entreprise : 9 340 − 60 = 9 280 €. Les frais sont enregistrés au débit du 627 et au crédit du 512 pour 60 €. Barème : soldes rectifiés 3 points, écriture 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Calculez la TVA à payer pour mars et citez un contrôle.",
+        "reponseAttendue": "La TVA déductible sur l’achat est de 1 500 €. La TVA due est de 3 600 − 1 500 − 300 = 1 800 €. Il faut par exemple vérifier que la TVA collectée correspond à 20 % du chiffre d’affaires HT du mois. Barème : calcul 3 points, contrôle 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Calculez les heures supplémentaires et le salaire brut du salarié.",
+        "reponseAttendue": "Les heures supplémentaires valent 5 × 14 × 1,25 = 87,50 €. Le brut est de 2 087,50 €. Il faut contrôler le nombre d’heures avec le relevé validé par le responsable. Barème : heures supplémentaires 2 points, brut 2 points, contrôle 1 point.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 3 CCP, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores",
+    "exercices": [
+      {
+        "titre": "Traiter un achat et suivre la trésorerie",
+        "consigne": "L’entreprise Vega reçoit une facture de 2 500 € HT avec une remise de 4 %, TVA à 20 %. Elle la paie par virement le même mois. Un client lui règle 1 800 € par virement. La trésorerie initiale est de 3 500 €. Calculez la facture, passez les écritures et déterminez la trésorerie finale.",
+        "reponseAttendue": "Le net HT est de 2 400 €, la TVA de 480 € et le TTC de 2 880 €. L’achat débite le 607 de 2 400 € et le 44566 de 480 € par le crédit du 401 de 2 880 €. Le paiement débite le 401 et crédite le 512 de 2 880 € ; l’encaissement débite le 512 et crédite le 411 de 1 800 €. La trésorerie finale est de 3 500 − 2 880 + 1 800 = 2 420 €. Barème : facture 2 points, écritures 2 points, trésorerie 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Déclarer la TVA et préparer une paie",
+        "consigne": "Une entreprise de services, sans option pour les débits, facture 30 000 € TTC et encaisse 21 600 € TTC de prestations taxées à 20 %. Sa TVA déductible est de 1 450 € et son crédit antérieur de 250 €. Un salarié a un salaire de base de 2 150 €, une prime de 100 €, une retenue d’absence de 90 € et 4 heures supplémentaires à 25 % sur un taux de 14,50 € fixé par le cas. Calculez la TVA due et le brut.",
+        "reponseAttendue": "La TVA exigible est de 21 600 × 20/120 = 3 600 €. La TVA due est de 3 600 − 1 450 − 250 = 1 900 €. Les heures supplémentaires valent 4 × 14,50 × 1,25 = 72,50 €. Le brut est de 2 150 + 100 − 90 + 72,50 = 2 232,50 €. Barème : exigibilité et TVA due 3 points, brut 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Réaliser des travaux d’inventaire",
+        "consigne": "Un ordinateur de 2 400 € HT est mis en service le 1er juillet N et amorti linéairement sur 3 ans. Un lot de stock coûte 3 000 € et vaut 2 400 €. Une créance de 2 400 € TTC (TVA 20 %) présente une perte probable de 50 %. Calculez les dotations, la VNC de l’ordinateur au 31 décembre N et l’incidence totale sur le résultat.",
+        "reponseAttendue": "L’annuité est de 800 € et la dotation N de 800 × 6/12 = 400 €, d’où une VNC de 2 000 €. La dépréciation du stock est de 600 €. La dépréciation de la créance est de 2 000 × 50 % = 1 000 €, après transfert au 416. L’incidence totale est une charge de 400 + 600 + 1 000 = 2 000 €. Barème : amortissement et VNC 2 points, stock 1 point, créance 1 point, incidence 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Traiter un emprunt et affecter le résultat",
+        "consigne": "Un emprunt de 30 000 € est souscrit le 1er avril N, remboursable par amortissements constants sur 3 ans au taux de 6 %, échéances au 31 mars. Le bénéfice N est de 20 000 €. Les associés décident une réserve légale de 1 000 € (montant du cas), 12 000 € de dividendes et le solde en report à nouveau. Calculez la première échéance, les intérêts courus au 31 décembre N et l’affectation.",
+        "reponseAttendue": "Les intérêts de la première année sont de 1 800 € et la première échéance de 10 000 + 1 800 = 11 800 €. Les intérêts courus au 31 décembre N sont de 1 800 × 9/12 = 1 350 €, au débit du 6611 et au crédit du 1688. Le report à nouveau est de 20 000 − 1 000 − 12 000 = 7 000 €. On débite le 120 de 20 000 € et on crédite le 1061 de 1 000 €, le 457 de 12 000 € et le 110 de 7 000 €. Barème : échéance 1 point, intérêts courus 2 points, affectation 2 points.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Exactitude des calculs (HT/TTC, TVA, paie, prorata, amortissements) : 0 = absent ; 1 = erreurs majeures ; 2 = résultats partiellement fiables ; 3 = calculs globalement corrects ; 4 = calculs exacts et vérifiés.",
+        "points": 4
+      },
+      {
+        "critere": "Justesse des écritures et des comptes utilisés : 0 = absent ; 1 = confusions majeures ; 2 = écritures partiellement justes ; 3 = écritures correctes ; 4 = écritures correctes, équilibrées et justifiées.",
+        "points": 4
+      },
+      {
+        "critere": "Application des règles de rattachement et d’exigibilité : 0 = absente ; 1 = règles ignorées ; 2 = application partielle ; 3 = application correcte ; 4 = application correcte et expliquée.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité des contrôles et de la traçabilité des pièces : 0 = aucun contrôle ; 1 = contrôles inadaptés ; 2 = contrôles incomplets ; 3 = contrôles pertinents ; 4 = contrôles pertinents et documentés.",
+        "points": 4
+      },
+      {
+        "critere": "Clarté de la restitution et des commentaires transmis : 0 = inexploitable ; 1 = peu compréhensible ; 2 = compréhensible mais incomplète ; 3 = claire et structurée ; 4 = synthétique, précise et directement exploitable.",
+        "points": 4
+      }
+    ]
+  }
+}

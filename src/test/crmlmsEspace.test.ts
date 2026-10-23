@@ -29,7 +29,8 @@ describe("Espace CRM LMS", () => {
   it("nomme CRM LMS dans les pièces, jamais IZILearn", () => {
     const pieces = planPieces(contexte(payload("crmlms")));
     const connexion = pieces.find((x) => x.categorie === "connexion");
-    expect(connexion?.rendre()).toContain("CRM LMS");
+    // Le relevé de connexion porte le nom de l'organisme (plateforme de l'OF).
+    expect(connexion?.rendre()).toContain("ORGANISME TEST");
     for (const p of pieces.filter((x) => !x.pdf)) expect(p.rendre()).not.toContain("IZILearn");
   });
 
@@ -42,8 +43,8 @@ describe("Espace CRM LMS", () => {
     expect(support?.rendre()).toContain("Mon projet professionnel en anglais");
   });
 
-  it("garde IZILearn pour les sessions IZILearn", () => {
+  it("sessions IZILearn : relevé de connexion au nom de l'organisme", () => {
     const connexion = planPieces(contexte(payload("izilearn"))).find((x) => x.categorie === "connexion");
-    expect(connexion?.rendre()).toContain("IZILearn / Google Meet");
+    expect(connexion?.rendre()).toContain("ORGANISME TEST / Google Meet");
   });
 });

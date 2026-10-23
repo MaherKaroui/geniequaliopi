@@ -204,6 +204,8 @@ export { FORMATION_GSC35, seedGSC35AICaches } from "./gererCentre35hPreset";
 
 import { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 } from "./lilateFormations";
 export { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 } from "./lilateFormations";
+import { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, FORMATION_TP_SC } from "./tpFormations";
+export { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, FORMATION_TP_SC } from "./tpFormations";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -1157,6 +1159,12 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_LILATE_FLE,
   // RS6118 inactive depuis le 24/10/2025 (remplacée par RS7314) : sessions antérieures uniquement.
   FORMATION_LILATE_EN_RS6118,
+  // Titres professionnels comptabilité / paie / transport (contenu : presets intégrés builtinTP).
+  FORMATION_TP_ETRM,
+  FORMATION_TP_GCF,
+  FORMATION_TP_GP,
+  FORMATION_TP_CA,
+  FORMATION_TP_SC,
 ];
 export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Excel Professionnel": [5, 4, 5, 5, 4, 5, 4, 5],
