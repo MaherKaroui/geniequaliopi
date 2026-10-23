@@ -25,7 +25,9 @@ const normalize = (s: string) =>
  * l'intitulé ou le code contient « 41366 ». L'ancien exemple ARH (RNCP35030) n'est pas concerné.
  */
 export function isARH41366Formation(intitule?: string, code?: string): boolean {
-  return /41366/.test(intitule || "") || /41366/.test(code || "");
+  if (/41366/.test(intitule || "") || /41366/.test(code || "")) return true;
+  // Intitulé seul, tel que l'envoient IZILearn / CRM LMS : « TP Assistant ressources humaines »
+  return /^(TP\b[\s-]*|TITRE PROFESSIONNEL\s+)?ASSISTANT\s+RESSOURCES\s+HUMAINES$/.test(normalize(intitule || "").replace(/\s+/g, " "));
 }
 
 /** Empreinte déterministe et bien répartie à partir du nom + prénom. */

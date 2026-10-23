@@ -10,16 +10,28 @@ import chSec from '@/data/tpPresets/chapters/sec.json';
 import chOcq from '@/data/tpPresets/chapters/ocq.json';
 import chOcp from '@/data/tpPresets/chapters/ocp.json';
 import chFin from '@/data/tpPresets/chapters/fin.json';
+import chGotrmA from '@/data/tpPresets/chapters/gotrm-a.json';
+import chGotrmB from '@/data/tpPresets/chapters/gotrm-b.json';
+import chGotrmC from '@/data/tpPresets/chapters/gotrm-c.json';
+import chEtrmA from '@/data/tpPresets/chapters/etrm-a.json';
+import chEtrmB from '@/data/tpPresets/chapters/etrm-b.json';
+import chEtrmC from '@/data/tpPresets/chapters/etrm-c.json';
+import chGcfA from '@/data/tpPresets/chapters/gcf-a.json';
+import chGcfB from '@/data/tpPresets/chapters/gcf-b.json';
+import chGcfC from '@/data/tpPresets/chapters/gcf-c.json';
+import chGpA from '@/data/tpPresets/chapters/gp-a.json';
+import chGpB from '@/data/tpPresets/chapters/gp-b.json';
+import chGpC from '@/data/tpPresets/chapters/gp-c.json';
 
 /** Contenus intégrés des titres professionnels transport / comptabilité / paie (questions, corrigés, besoins). */
 type Raw = Record<string, any>;
 type Chapter = { title: string; description: string; imageQuery: string; sections: { title: string; contentHtml: string }[] };
-// Support de cours par CCP : les blocs communs aux deux titres (opérations courantes, périodiques) sont partagés.
+// Support de cours par CCP (≥ 15 chapitres par titre) : les blocs communs à CA et SC (opérations courantes, périodiques) sont partagés.
 const DEFS: [string, string, string, number, Raw, Chapter[]?][] = [
-  ['tp-gotrm', 'TP Gestionnaire des opérations de transport routier de marchandises', 'RNCP40990', 744, gotrm],
-  ['tp-etrm', 'TP Exploitant en transport routier de marchandises', 'RNCP40992', 744, etrm],
-  ['tp-gcf', 'TP Gestionnaire comptable et fiscal', 'RNCP37949', 712, gcf],
-  ['tp-gp', 'TP Gestionnaire de paie', 'RNCP37948', 712, gp],
+  ['tp-gotrm', 'TP Gestionnaire des opérations de transport routier de marchandises', 'RNCP40990', 744, gotrm, [...chGotrmA, ...chGotrmB, ...chGotrmC] as Chapter[]],
+  ['tp-etrm', 'TP Exploitant en transport routier de marchandises', 'RNCP40992', 744, etrm, [...chEtrmA, ...chEtrmB, ...chEtrmC] as Chapter[]],
+  ['tp-gcf', 'TP Gestionnaire comptable et fiscal', 'RNCP37949', 712, gcf, [...chGcfA, ...chGcfB, ...chGcfC] as Chapter[]],
+  ['tp-gp', 'TP Gestionnaire de paie', 'RNCP37948', 712, gp, [...chGpA, ...chGpB, ...chGpC] as Chapter[]],
   ['tp-ca', 'TP Comptable assistant', 'RNCP37121', 744, ca, [...chOcq, ...chOcp, ...chFin] as Chapter[]],
   ['tp-sc', 'TP Secrétaire comptable', 'RNCP37123', 712, sc, [...chSec, ...chOcq, ...chOcp] as Chapter[]],
 ];

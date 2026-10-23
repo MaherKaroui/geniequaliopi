@@ -3,6 +3,8 @@ import { getFormationPreset, presetEvalPack, presetContentPack } from '@/lib/for
 import { hasExactDedicatedContent } from '@/lib/formationPresets/catalog';
 import { SAMPLE_FORMATIONS } from '@/lib/sampleData';
 import { getTPBesoin } from '@/lib/formationPresets/builtinTP';
+import { getCourseChapters } from '@/lib/courseContent';
+import { isARH41366Formation } from '@/lib/arh41366Humanized';
 import { answersForQCM, studentAnswerFromCorrection } from '@/lib/aiEvalPack';
 
 const F = [
@@ -34,12 +36,20 @@ describe('Titres professionnels transport / comptabilité / paie', () => {
     const score = (m: 'debut' | 'fin', qs: typeof pack.qcmDebut) => people.reduce((n, s, i) => n + answersForQCM(qs, i, s, m).filter((a, k) => a === qs[k].correctIndex).length, 0);
     expect(score('debut', pack.qcmDebut)).toBeLessThan(score('fin', pack.qcmFin));
   });
-  it.each([['TP Comptable assistant', 'RNCP37121'], ['TP Secrétaire comptable', 'RNCP37123']])('%s : support de cours de plus de 60 pages', (t, c) => {
+  it.each(F)('%s : support de cours de plus de 60 pages', (t, c) => {
     const pack = presetContentPack({ intitule: t, codeRNCP: c })!;
     expect(pack.chapters.length).toBeGreaterThanOrEqual(15);
     const html = pack.chapters.flatMap(ch => ch.sections.map(s => s.contentHtml)).join('');
     expect(html.length).toBeGreaterThan(500_000);
     expect(html).not.toMatch(/<script|<img/i);
+    expect(getCourseChapters(t).length).toBe(pack.chapters.length);
+  });
+  it.each(['TP Assistant ressources humaines', 'Assistant ressources humaines', 'TP - Assistant ressources humaines'])('%s : support RNCP41366 existant', (t) => {
+    expect(isARH41366Formation(t)).toBe(true);
+    expect(getCourseChapters(t).flatMap(c => c.sections.map(s => s.content)).join('').length).toBeGreaterThan(500_000);
+  });
+  it('« Assistant ressources humaines et paie » : pas confondu avec le titre RNCP41366', () => {
+    expect(isARH41366Formation('Assistant ressources humaines et paie')).toBe(false);
   });
   it('catalogue : les titres professionnels sont proposés et reconnus', () => {
     for (const t of ['TP Exploitant en transport routier de marchandises', 'TP Gestionnaire comptable et fiscal', 'TP Gestionnaire de paie', 'TP Comptable assistant', 'TP Secrétaire comptable']) {
