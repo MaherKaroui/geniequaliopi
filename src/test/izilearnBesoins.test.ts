@@ -92,7 +92,9 @@ describe("IZILearn — évaluation des besoins remplie comme Qualiopi", () => {
       },
     });
     const html = renduBesoins(p)?.rendre() || "";
-    // La cellule de réponse ne contient pas le placeholder (l'en-tête peut mentionner un code RNCP non renseigné).
-    expect(html).not.toContain("<td>Non renseigné</td>");
+    // La réponse à la question diplôme n'est pas le placeholder : la réponse générée est conservée.
+    const m = html.match(/dernier diplôme[\s\S]{0,300}?<td>([^<]*)<\/td>/);
+    expect(m?.[1]?.trim().length).toBeGreaterThan(5);
+    expect(m?.[1]).not.toBe("Non renseigné");
   });
 });
