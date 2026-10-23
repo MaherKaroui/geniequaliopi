@@ -763,7 +763,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "trame_eval_besoins_combine": {
       const si = params?.stagiaireIdx ?? 0;
       const isCFAOrg = Array.isArray(o.typesActions) && o.typesActions.includes('apprentissage');
-      return genTrameEvalBesoinsCombine(o, f, stagiaires, si, !!params?.isCFA || isCFAOrg);
+      return genTrameEvalBesoinsCombine(o, f, stagiaires, si, !!params?.isCFA || isCFAOrg, {
+        apprenant: params?.reponsesApprenant as ReleveBesoin[] | undefined,
+        entreprise: params?.reponsesEntreprise as ReleveBesoin[] | undefined,
+      });
     }
     case "deroule_pedagogique_detaille": return genDeroulePedagogiqueDetaille(o, f);
     case "contrat_formation_pro": return genContratFormationPro_V2(o, f, stagiaires);
