@@ -206,6 +206,8 @@ import { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 }
 export { FORMATION_LILATE_EN, FORMATION_LILATE_FLE, FORMATION_LILATE_EN_RS6118 } from "./lilateFormations";
 import { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, FORMATION_TP_SC } from "./tpFormations";
 export { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, FORMATION_TP_SC } from "./tpFormations";
+import { FIPU_FORMATIONS } from "./fipuFormations";
+export { FIPU_FORMATIONS } from "./fipuFormations";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -1165,6 +1167,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_TP_GP,
   FORMATION_TP_CA,
   FORMATION_TP_SC,
+  // Prévention INRS (TMS Pros, PRAP) proposée dans les dossiers FIPU d'IZILearn.
+  ...FIPU_FORMATIONS,
 ];
 export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Excel Professionnel": [5, 4, 5, 5, 4, 5, 4, 5],

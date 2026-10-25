@@ -1,0 +1,795 @@
+{
+  "competences": [
+    "Se situer en tant qu’acteur de prévention des risques liés à l’activité physique dans son entreprise.",
+    "Observer et analyser sa situation de travail en s’appuyant sur le fonctionnement du corps humain afin d’identifier les atteintes à la santé encourues.",
+    "Participer à la maîtrise du risque en proposant à son encadrement des améliorations d’ordre technique, organisationnel ou humain."
+  ],
+  "besoinsList": [
+    "Comprendre les enjeux humains, sociaux et économiques des risques liés à l’activité physique (accidents, TMS, lombalgies).",
+    "Connaître les acteurs internes et externes de la prévention et le rôle d’acteur PRAP dans l’entreprise.",
+    "Situer les obligations de l’employeur et du salarié (principes généraux de prévention, manutention manuelle de charges).",
+    "Comprendre le fonctionnement du corps humain : squelette, colonne vertébrale, muscles, tendons et articulations.",
+    "Repérer les sollicitations du corps dans sa propre situation de travail et les atteintes à la santé possibles.",
+    "Observer et décrire une situation de travail réelle en distinguant travail prescrit et travail réel.",
+    "Identifier les déterminants d’une situation de travail (individu, tâche, matériel, environnement, organisation).",
+    "Rechercher des pistes d’amélioration techniques, organisationnelles et humaines en respectant les principes généraux de prévention.",
+    "Formuler et transmettre une proposition d’amélioration argumentée à son encadrement.",
+    "Appliquer les principes de sécurité physique et d’économie d’effort lors des manutentions qui ne peuvent pas être évitées."
+  ],
+  "syntheseHtml": "• Cadre : formation-action d’acteur PRAP IBC (industrie, BTP, commerce et activités de bureau), conforme au dispositif INRS référencé PRAP-IBC 003 et à son document de référence ; durée de 14 h, soit 2 jours en présentiel, idéalement non consécutifs ou complétés par un travail d’observation au poste.<br>• Compétence 1 — Se situer en tant qu’acteur de prévention : enjeux des risques liés à l’activité physique, acteurs de la prévention, place de l’acteur PRAP dans la démarche de prévention de l’entreprise, obligations issues des principes généraux de prévention (article L4121-2 du Code du travail) et des règles relatives à la manutention manuelle de charges (articles R4541-1 et suivants).<br>• Compétence 2 — Observer et analyser sa situation de travail : notions d’anatomie et de physiologie (colonne vertébrale, disques, muscles, tendons), mécanismes d’apparition des TMS et des lombalgies, description de l’activité réelle, repérage des déterminants et des sollicitations, identification des atteintes à la santé encourues.<br>• Compétence 3 — Participer à la maîtrise du risque : recherche de pistes d’amélioration selon la hiérarchie des principes généraux de prévention, priorité aux solutions techniques et organisationnelles, application des principes de sécurité physique et d’économie d’effort lorsque la manutention ne peut être supprimée, remontée formalisée des propositions à l’encadrement.<br>• Évaluation : positionnement initial, évaluations formatives, contrôle intermédiaire et évaluation certificative conforme à la grille INRS ; le certificat d’acteur PRAP IBC n’est délivré que par un organisme habilité, il est valable 24 mois et maintenu par un stage de maintien et d’actualisation des compétences (MAC) de 7 h.",
+  "adaptationsHtml": "• Partir des situations de travail réelles des participants (photos, vidéos, descriptions de postes recueillies avant la session) pour ancrer chaque apport.<br>• Alterner apports courts, manipulations du squelette et des modèles anatomiques, études de cas en sous-groupes et observation au poste ou sur plateau technique.<br>• Proposer des fiches d’observation simplifiées et un vocabulaire illustré pour les participants peu à l’aise avec l’écrit ou la langue française.<br>• Adapter les exercices pratiques aux restrictions médicales ou au handicap signalés : les gestes peuvent être observés et commentés sans être réalisés.<br>• Prévoir des pauses régulières, un rythme ajusté et un retour individualisé après chaque mise en situation, avec remédiation avant l’épreuve certificative.",
+  "qcmDebut": [
+    {
+      "question": "Que signifie le sigle PRAP ?",
+      "options": [
+        "Prévention des risques liés à l’activité physique",
+        "Protection rapprochée des agents de production",
+        "Programme de réduction des accidents professionnels",
+        "Plan de remise en activité physique"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Que recouvre le sigle IBC dans « PRAP IBC » ?",
+      "options": [
+        "Industrie, bureautique, comptabilité",
+        "Inspection, bâtiment, contrôle",
+        "Industrie, BTP, commerce et activités de bureau",
+        "Infirmerie, brancardage, crèche"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Que désigne le sigle TMS ?",
+      "options": [
+        "Temps de maintien en sécurité",
+        "Troubles musculosquelettiques",
+        "Tâches de manutention simples",
+        "Tableau des maladies spécifiques"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quelle partie du corps est la plus souvent touchée par les lombalgies ?",
+      "options": [
+        "La nuque",
+        "Le poignet",
+        "Le genou",
+        "Le bas du dos"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Qui porte la responsabilité première de la santé et de la sécurité des salariés dans l’entreprise ?",
+      "options": [
+        "Le médecin du travail",
+        "L’employeur",
+        "Le salarié le plus ancien",
+        "L’inspection du travail"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Face à une manutention pénible, quelle est la première question à se poser ?",
+      "options": [
+        "Peut-on supprimer ou éviter cette manutention ?",
+        "Faut-il porter une ceinture lombaire ?",
+        "Faut-il porter plus vite pour se fatiguer moins longtemps ?",
+        "Qui est le plus fort de l’équipe ?"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Où sont recensés les risques identifiés dans chaque unité de travail de l’entreprise ?",
+      "options": [
+        "Dans le registre du personnel",
+        "Dans le contrat de travail",
+        "Dans le règlement intérieur uniquement",
+        "Dans le document unique d’évaluation des risques professionnels"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Le travail réellement effectué par un salarié correspond-il toujours aux consignes écrites ?",
+      "options": [
+        "Oui, toujours, sinon il s’agit d’une faute",
+        "Oui, dès que la procédure est affichée",
+        "Non, le travail réel s’écarte souvent du travail prescrit pour faire face aux aléas",
+        "Non, mais cela ne concerne que les intérimaires"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Une activité de bureau peut-elle exposer à des risques liés à l’activité physique ?",
+      "options": [
+        "Oui, notamment par les postures prolongées et les gestes répétitifs",
+        "Non, seul le port de charges est concerné",
+        "Non, le travail assis protège le dos",
+        "Oui, mais uniquement en cas de chute"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "À qui l’acteur PRAP transmet-il en priorité ses propositions d’amélioration ?",
+      "options": [
+        "À un fournisseur de matériel",
+        "À son encadrement",
+        "Directement à l’inspection du travail",
+        "À ses collègues uniquement, oralement"
+      ],
+      "correctIndex": 1
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Selon l’article L4121-2 du Code du travail, quel principe général de prévention vient en premier ?",
+      "options": [
+        "Donner les instructions appropriées aux travailleurs",
+        "Fournir des équipements de protection individuelle",
+        "Éviter les risques",
+        "Évaluer les risques qui ne peuvent pas être évités"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Lorsque la manutention manuelle ne peut pas être évitée, que prévoient les articles R4541-1 et suivants du Code du travail ?",
+      "options": [
+        "L’employeur évalue les risques, organise les postes pour les réduire et forme les travailleurs aux gestes et postures",
+        "Le salarié choisit librement sa méthode et assume seul le risque",
+        "L’employeur doit seulement afficher les poids maximaux",
+        "Seul le médecin du travail est tenu d’agir"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quelle limite fixe l’article R4541-9 du Code du travail pour les femmes ?",
+      "options": [
+        "Aucune limite particulière",
+        "15 kg portés et 30 kg à la brouette",
+        "55 kg portés sans avis médical",
+        "25 kg portés et 40 kg transportés à la brouette, brouette comprise"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel élément du disque intervertébral est soumis à une pression accrue et peut migrer lorsque le dos est fléchi en charge ?",
+      "options": [
+        "Le ligament jaune",
+        "Le noyau",
+        "L’apophyse épineuse",
+        "Le canal rachidien"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Parmi ces propositions, laquelle constitue une mesure de protection collective prioritaire par rapport à une protection individuelle ?",
+      "options": [
+        "Fournir des gants anti-coupure",
+        "Demander de faire plus attention",
+        "Installer une table élévatrice à hauteur variable au poste de conditionnement",
+        "Distribuer une ceinture lombaire"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Dans l’analyse d’une situation de travail, qu’appelle-t-on un déterminant ?",
+      "options": [
+        "La sanction prévue en cas d’accident",
+        "Le geste précis réalisé par le salarié",
+        "La conséquence médicale d’une exposition",
+        "Un élément de la situation (organisation, matériel, environnement, individu) qui explique l’activité et les sollicitations observées"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel facteur aggrave le risque de TMS du membre supérieur ?",
+      "options": [
+        "La combinaison de gestes répétitifs, d’efforts et de postures articulaires extrêmes sans temps de récupération",
+        "Le travail en équipe",
+        "La rotation régulière des tâches",
+        "L’utilisation d’outils adaptés à la main"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Lorsque la manutention ne peut être supprimée, quel principe de sécurité physique et d’économie d’effort est correct ?",
+      "options": [
+        "Garder les jambes tendues pour économiser les cuisses",
+        "Rapprocher la charge du corps et éviter les torsions du tronc",
+        "Soulever en tournant le buste pour gagner du temps",
+        "Porter la charge à bout de bras pour mieux voir devant soi"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quelle est la durée de validité du certificat d’acteur PRAP IBC ?",
+      "options": [
+        "12 mois",
+        "36 mois",
+        "Il est valable à vie",
+        "24 mois, avec un MAC de 7 h pour le maintenir"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle proposition d’amélioration est la mieux formulée pour être transmise à l’encadrement ?",
+      "options": [
+        "« Le poste est nul, il faut tout changer. »",
+        "« Il faudrait que les collègues fassent des efforts. »",
+        "Une description du problème observé, de ses déterminants, des atteintes possibles et d’une ou plusieurs pistes concrètes avec leurs avantages et limites",
+        "Une simple liste de matériels trouvés sur internet"
+      ],
+      "correctIndex": 2
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Se situer en tant qu’acteur de prévention des risques liés à l’activité physique dans son entreprise.",
+      "questions": [
+        {
+          "question": "Quel est le rôle principal d’un acteur PRAP IBC ?",
+          "options": [
+            "Remplacer le service de santé au travail",
+            "Observer sa situation de travail, en analyser les risques et proposer des améliorations à son encadrement",
+            "Sanctionner les collègues qui ne respectent pas les consignes",
+            "Réaliser lui-même les travaux d’aménagement des postes"
+          ],
+          "correctIndex": 1,
+          "explication": "L’acteur PRAP est un salarié qui contribue à la démarche de prévention : il observe, analyse et propose. Il ne se substitue ni à l’employeur ni aux préventeurs."
+        },
+        {
+          "question": "Combien de principes généraux de prévention l’article L4121-2 du Code du travail énumère-t-il ?",
+          "options": [
+            "Trois",
+            "Cinq",
+            "Douze",
+            "Neuf"
+          ],
+          "correctIndex": 3,
+          "explication": "L’article L4121-2 liste neuf principes, d’« éviter les risques » à « donner les instructions appropriées aux travailleurs »."
+        },
+        {
+          "question": "Quelle obligation pèse sur le salarié selon l’article L4122-1 du Code du travail ?",
+          "options": [
+            "Prendre soin, en fonction de sa formation et selon ses possibilités, de sa santé et de sa sécurité ainsi que de celles des autres personnes concernées par ses actes",
+            "Financer ses propres équipements de protection",
+            "Rédiger le document unique",
+            "Aucune, seule l’entreprise est concernée"
+          ],
+          "correctIndex": 0,
+          "explication": "Le salarié a une obligation de prudence envers lui-même et autrui, sans que cela ne réduise la responsabilité de l’employeur."
+        },
+        {
+          "question": "Parmi ces acteurs, lequel est externe à l’entreprise et intervient en prévention des risques professionnels ?",
+          "options": [
+            "Le CSE",
+            "Le responsable de production",
+            "La Carsat (caisse régionale de l’Assurance maladie - Risques professionnels)",
+            "Le salarié désigné compétent en prévention"
+          ],
+          "correctIndex": 2,
+          "explication": "La Carsat, comme le service de prévention et de santé au travail ou l’inspection du travail, est un acteur externe ; le CSE et le salarié désigné sont internes."
+        },
+        {
+          "question": "Quels enjeux justifient la prévention des risques liés à l’activité physique ?",
+          "options": [
+            "Des enjeux humains, sociaux, économiques et réglementaires",
+            "Uniquement des enjeux esthétiques",
+            "Uniquement des enjeux sportifs",
+            "Aucun enjeu dans le secteur tertiaire"
+          ],
+          "correctIndex": 0,
+          "explication": "Les accidents et maladies liés à l’activité physique entraînent souffrances, inaptitudes, absences, désorganisation et coûts ; ils engagent aussi la responsabilité de l’employeur."
+        },
+        {
+          "question": "Quel document l’employeur doit-il tenir à jour pour formaliser l’évaluation des risques ?",
+          "options": [
+            "Le registre unique du personnel",
+            "Le document unique d’évaluation des risques professionnels (DUERP)",
+            "La fiche de paie",
+            "Le livret d’accueil"
+          ],
+          "correctIndex": 1,
+          "explication": "Le DUERP recense les risques par unité de travail ; les observations de l’acteur PRAP peuvent contribuer à son actualisation."
+        },
+        {
+          "question": "Que signifie intégrer la formation PRAP dans une démarche de prévention ?",
+          "options": [
+            "Former un maximum de salariés sans autre action",
+            "Remplacer l’aménagement des postes par des cours de gestes et postures",
+            "Inscrire la formation dans un projet porté par la direction, avec un circuit de remontée et de traitement des propositions",
+            "Réserver la formation aux nouveaux embauchés"
+          ],
+          "correctIndex": 2,
+          "explication": "Une formation isolée a peu d’effet : il faut un engagement de la direction, un pilotage et un suivi des propositions des acteurs PRAP."
+        },
+        {
+          "question": "Que faire si l’acteur PRAP constate un risque qu’il ne peut pas traiter seul ?",
+          "options": [
+            "Ne rien dire pour ne pas gêner",
+            "Modifier lui-même la machine",
+            "Attendre l’accident pour agir",
+            "Le signaler à son encadrement selon le circuit prévu dans l’entreprise"
+          ],
+          "correctIndex": 3,
+          "explication": "L’acteur PRAP alerte et propose ; la décision et la mise en œuvre relèvent de l’encadrement et de l’employeur."
+        },
+        {
+          "question": "Quelle maladie professionnelle du régime général concerne les affections périarticulaires (épaule, coude, poignet, genou) ?",
+          "options": [
+            "Le tableau n° 98",
+            "Le tableau n° 57",
+            "Le tableau n° 97",
+            "Le tableau n° 30"
+          ],
+          "correctIndex": 1,
+          "explication": "Le tableau 57 vise les affections périarticulaires provoquées par certains gestes et postures ; le tableau 98 concerne le rachis lombaire et la manutention de charges lourdes."
+        },
+        {
+          "question": "Qui délivre le certificat d’acteur PRAP IBC ?",
+          "options": [
+            "N’importe quel formateur, même non certifié",
+            "L’employeur lui-même",
+            "Un organisme de formation habilité, à l’issue d’une évaluation certificative réalisée par un formateur certifié",
+            "Le médecin du travail"
+          ],
+          "correctIndex": 2,
+          "explication": "Seul un organisme habilité dans le dispositif INRS peut délivrer le certificat ; un organisme non habilité ne peut délivrer qu’une attestation de formation."
+        }
+      ]
+    },
+    {
+      "competence": "Observer et analyser sa situation de travail en s’appuyant sur le fonctionnement du corps humain afin d’identifier les atteintes à la santé encourues.",
+      "questions": [
+        {
+          "question": "Combien de vertèbres lombaires compte la colonne vertébrale ?",
+          "options": [
+            "Sept",
+            "Douze",
+            "Trois",
+            "Cinq"
+          ],
+          "correctIndex": 3,
+          "explication": "La colonne comprend sept vertèbres cervicales, douze dorsales et cinq lombaires, puis le sacrum et le coccyx."
+        },
+        {
+          "question": "Quel est le rôle du disque intervertébral ?",
+          "options": [
+            "Amortir les contraintes et permettre la mobilité entre deux vertèbres",
+            "Produire les globules rouges",
+            "Relier le muscle à l’os",
+            "Protéger la moelle épinière par l’avant uniquement"
+          ],
+          "correctIndex": 0,
+          "explication": "Le disque, formé d’un anneau fibreux et d’un noyau, joue un rôle d’amortisseur et de rotule ; les flexions répétées en charge l’abîment."
+        },
+        {
+          "question": "Quelle structure relie un muscle à un os ?",
+          "options": [
+            "Le ligament",
+            "Le cartilage",
+            "Le tendon",
+            "Le nerf"
+          ],
+          "correctIndex": 2,
+          "explication": "Le tendon transmet la force du muscle à l’os ; il peut s’enflammer (tendinite) en cas de sollicitations répétées. Le ligament relie deux os."
+        },
+        {
+          "question": "Dans la description d’une situation de travail, que doit-on observer en priorité ?",
+          "options": [
+            "Ce que dit la fiche de poste uniquement",
+            "Ce que fait réellement l’opérateur, avec quoi, où, quand et dans quelles conditions",
+            "Le comportement des collègues pendant les pauses",
+            "Les opinions de l’opérateur sur la direction"
+          ],
+          "correctIndex": 1,
+          "explication": "L’observation porte sur l’activité réelle et ses conditions, afin d’identifier les sollicitations et leurs déterminants."
+        },
+        {
+          "question": "Un caissier scanne des articles en effectuant de nombreuses rotations du poignet et de l’épaule. Quelle atteinte est la plus probable ?",
+          "options": [
+            "Une entorse de la cheville",
+            "Une lombalgie aiguë par chute",
+            "Une brûlure",
+            "Un TMS du membre supérieur, comme une tendinopathie de l’épaule"
+          ],
+          "correctIndex": 3,
+          "explication": "La répétition et les amplitudes articulaires importantes, sans récupération suffisante, favorisent les TMS du membre supérieur."
+        },
+        {
+          "question": "Pourquoi les postures dos fléchi en charge sont-elles particulièrement à risque ?",
+          "options": [
+            "Parce qu’elles augmentent fortement les contraintes sur les disques lombaires",
+            "Parce qu’elles fatiguent uniquement les yeux",
+            "Parce qu’elles réduisent la pression sur les vertèbres",
+            "Parce qu’elles sollicitent seulement les genoux"
+          ],
+          "correctIndex": 0,
+          "explication": "Plus la charge est éloignée et le dos fléchi, plus le bras de levier augmente et plus les contraintes sur le rachis lombaire sont élevées."
+        },
+        {
+          "question": "Quel facteur relève de l’environnement de la situation de travail ?",
+          "options": [
+            "La cadence imposée",
+            "L’âge du salarié",
+            "Un sol glissant et un éclairage insuffisant",
+            "Le nombre de commandes à préparer"
+          ],
+          "correctIndex": 2,
+          "explication": "Le sol, l’éclairage, le bruit, la température ou l’encombrement sont des déterminants liés à l’environnement ; la cadence et les commandes relèvent de l’organisation."
+        },
+        {
+          "question": "Qu’est-ce qu’une sollicitation dite « statique » ?",
+          "options": [
+            "Un geste rapide et répété",
+            "Un maintien prolongé d’une posture ou d’un effort sans mouvement",
+            "Un déplacement à pied",
+            "Une manutention à deux personnes"
+          ],
+          "correctIndex": 1,
+          "explication": "Le maintien prolongé (bras levés, tête penchée sur un écran) réduit la circulation sanguine dans les muscles et favorise la fatigue et les douleurs."
+        },
+        {
+          "question": "Les signes précoces d’un TMS sont :",
+          "options": [
+            "Toujours absents avant l’arrêt de travail",
+            "Uniquement des fractures",
+            "Une fièvre élevée",
+            "Des douleurs, raideurs, fourmillements ou une gêne qui apparaissent pendant ou après le travail"
+          ],
+          "correctIndex": 3,
+          "explication": "Ces signaux d’alerte doivent être pris au sérieux et signalés, car les TMS s’installent progressivement."
+        },
+        {
+          "question": "Pourquoi l’acteur PRAP s’appuie-t-il sur le fonctionnement du corps humain pour analyser son poste ?",
+          "options": [
+            "Pour poser un diagnostic médical",
+            "Pour relier les sollicitations observées aux atteintes à la santé possibles et argumenter ses propositions",
+            "Pour choisir un traitement",
+            "Pour évaluer la force des collègues"
+          ],
+          "correctIndex": 1,
+          "explication": "L’acteur PRAP ne fait pas de diagnostic : il comprend les mécanismes pour identifier les risques et justifier les améliorations."
+        }
+      ]
+    },
+    {
+      "competence": "Participer à la maîtrise du risque en proposant à son encadrement des améliorations d’ordre technique, organisationnel ou humain.",
+      "questions": [
+        {
+          "question": "Laquelle de ces pistes est d’ordre organisationnel ?",
+          "options": [
+            "Installer un transpalette électrique",
+            "Fournir des gants adaptés",
+            "Mettre en place une rotation des tâches et revoir les horaires de livraison",
+            "Remplacer un outil par un modèle plus léger"
+          ],
+          "correctIndex": 2,
+          "explication": "L’organisation concerne la répartition des tâches, les horaires, les flux, les effectifs ; le transpalette et l’outil plus léger sont techniques."
+        },
+        {
+          "question": "Dans quel ordre faut-il rechercher les solutions de prévention ?",
+          "options": [
+            "Formation, puis équipements individuels, puis suppression du risque",
+            "Supprimer le risque, le réduire à la source, protéger collectivement, puis individuellement, et informer et former",
+            "Équipements individuels d’abord, car ils sont rapides",
+            "L’ordre n’a pas d’importance"
+          ],
+          "correctIndex": 1,
+          "explication": "C’est la logique des principes généraux de prévention : la protection collective prime sur la protection individuelle, et les consignes viennent en complément."
+        },
+        {
+          "question": "Un magasinier soulève des cartons posés au sol. Quelle amélioration technique agit à la source ?",
+          "options": [
+            "Lui demander de plier les genoux",
+            "Lui fournir une ceinture lombaire",
+            "Afficher une consigne",
+            "Faire livrer et stocker les cartons sur palette à hauteur de prise, par exemple sur un support élévateur"
+          ],
+          "correctIndex": 3,
+          "explication": "Supprimer la prise au sol réduit la flexion du dos pour tous ; la technique de geste ne vient qu’en complément."
+        },
+        {
+          "question": "Que dit l’article R4541-3 du Code du travail ?",
+          "options": [
+            "L’employeur prend les mesures d’organisation appropriées ou utilise les moyens adaptés, notamment mécaniques, pour éviter le recours à la manutention manuelle",
+            "Le salarié doit refuser toute manutention",
+            "Les manutentions sont interdites dans le commerce",
+            "La formation gestes et postures suffit à remplir les obligations"
+          ],
+          "correctIndex": 0,
+          "explication": "Le Code du travail impose d’abord d’éviter la manutention manuelle ; la formation intervient lorsque la manutention demeure."
+        },
+        {
+          "question": "Quel est l’intérêt d’associer l’opérateur à la recherche de solutions ?",
+          "options": [
+            "Aucun, il n’est pas expert",
+            "Il connaît le travail réel et ses contraintes, ce qui rend la solution plus pertinente et mieux acceptée",
+            "Il pourra être tenu responsable en cas d’échec",
+            "Cela permet d’éviter de consulter le CSE"
+          ],
+          "correctIndex": 1,
+          "explication": "Les solutions conçues sans les utilisateurs sont souvent contournées ; la participation favorise leur efficacité."
+        },
+        {
+          "question": "Lorsque la manutention ne peut être évitée, quel principe d’économie d’effort faut-il appliquer ?",
+          "options": [
+            "Assurer une prise sûre, un appui stable, garder la charge près du corps et utiliser la force des jambes",
+            "Garder les pieds joints",
+            "Saisir la charge du bout des doigts",
+            "Bloquer la respiration pendant tout le trajet"
+          ],
+          "correctIndex": 0,
+          "explication": "Ces principes de sécurité physique et d’économie d’effort limitent les contraintes, sans remplacer l’amélioration du poste."
+        },
+        {
+          "question": "Quelle piste relève du domaine humain ?",
+          "options": [
+            "Changer le revêtement de sol",
+            "Modifier le planning des livraisons",
+            "Acheter un chariot",
+            "Former les nouveaux arrivants au poste et favoriser l’entraide pour les charges lourdes ou encombrantes"
+          ],
+          "correctIndex": 3,
+          "explication": "Le domaine humain recouvre les compétences, la formation, l’accueil, la coopération ; il complète les mesures techniques et organisationnelles."
+        },
+        {
+          "question": "Que doit contenir une proposition d’amélioration transmise à l’encadrement ?",
+          "options": [
+            "Uniquement le prix du matériel",
+            "Une critique des collègues",
+            "La situation observée, les risques identifiés, la ou les pistes proposées, leurs avantages et limites",
+            "Une demande d’augmentation"
+          ],
+          "correctIndex": 2,
+          "explication": "Une proposition structurée et factuelle facilite la décision et le suivi par l’encadrement."
+        },
+        {
+          "question": "Pourquoi faut-il vérifier qu’une solution ne crée pas de nouveau risque ?",
+          "options": [
+            "Parce qu’un aménagement peut déplacer le risque, par exemple vers un risque de collision ou de coincement",
+            "Ce n’est pas nécessaire",
+            "Parce que la loi interdit toute modification",
+            "Pour retarder la décision"
+          ],
+          "correctIndex": 0,
+          "explication": "Toute modification doit être évaluée : une solution qui déplace le risque n’est pas une amélioration."
+        },
+        {
+          "question": "Après la mise en place d’une amélioration, que faut-il faire ?",
+          "options": [
+            "Considérer le sujet clos définitivement",
+            "Retirer la solution au bout d’une semaine",
+            "Ne plus en parler",
+            "Suivre son utilisation réelle, recueillir l’avis des opérateurs et ajuster si nécessaire"
+          ],
+          "correctIndex": 3,
+          "explication": "Le suivi permet de vérifier l’efficacité de la solution et de l’adapter ; il alimente la démarche d’amélioration continue."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Décrivez votre poste de travail et les principales tâches que vous réalisez dans une journée.",
+      "reponseAttendue": "Le participant présente son métier, son lieu de travail et les tâches réalisées dans une journée type. Il précise les objets manipulés, les postures adoptées, les déplacements et les outils utilisés. Il mentionne si possible les variations selon les périodes, les aléas et les contraintes de temps. Cette description sert de point de départ à l’observation qui sera approfondie pendant la formation."
+    },
+    {
+      "question": "Selon vous, quelles tâches de votre poste sollicitent le plus votre corps ? Pourquoi ?",
+      "reponseAttendue": "Le participant identifie une ou plusieurs tâches physiquement exigeantes, par exemple le port de cartons, le travail bras levés ou le travail prolongé sur écran. Il explique ce qui les rend pénibles : poids, répétition, posture, durée, manque d’espace ou cadence. Il peut évoquer les zones du corps qui fatiguent ou deviennent douloureuses. L’objectif est de faire émerger sa perception du risque avant les apports."
+    },
+    {
+      "question": "Avez-vous déjà ressenti des douleurs ou une gêne liées à votre travail ? Dans quelles circonstances ?",
+      "reponseAttendue": "Le participant peut décrire, s’il le souhaite, des douleurs de dos, d’épaule, de poignet ou de nuque, ainsi que le moment où elles apparaissent. Il relie ces gênes à des situations précises : fin de journée, pic d’activité, matériel défectueux. Il n’est pas demandé de diagnostic médical. Cette question permet de montrer que ces signaux sont des alertes à prendre au sérieux et à signaler."
+    },
+    {
+      "question": "Qui, dans votre entreprise, s’occupe de la santé et de la sécurité au travail ?",
+      "reponseAttendue": "Le participant cite les acteurs qu’il connaît : direction, encadrement, CSE ou représentants du personnel, salarié désigné compétent, animateur sécurité, médecin du travail ou service de prévention et de santé au travail. Il peut aussi citer la Carsat ou l’inspection du travail comme acteurs externes. Les réponses incomplètes sont normales en début de formation et seront enrichies."
+    },
+    {
+      "question": "Qu’est-ce qu’un accident du travail et qu’est-ce qu’une maladie professionnelle, selon vous ?",
+      "reponseAttendue": "L’accident du travail est un événement soudain survenu par le fait ou à l’occasion du travail et provoquant une lésion, comme un lumbago en soulevant une charge. La maladie professionnelle résulte d’une exposition plus ou moins prolongée à un risque, comme les TMS liés à des gestes répétitifs. Le participant peut ne pas connaître les tableaux de maladies professionnelles, qui seront présentés ensuite."
+    },
+    {
+      "question": "Que faites-vous aujourd’hui lorsque vous devez déplacer une charge lourde ou encombrante ?",
+      "reponseAttendue": "Le participant décrit ses habitudes : demande d’aide à un collègue, utilisation d’un chariot ou d’un transpalette, fractionnement de la charge, ou au contraire port seul et rapide. Il peut évoquer les raisons de ses choix, comme le manque de matériel ou le temps. Cette réponse permet de repérer les écarts entre bonnes pratiques et contraintes réelles."
+    },
+    {
+      "question": "Pensez-vous que votre façon de travailler correspond exactement à ce qui est prévu par les consignes ? Donnez un exemple.",
+      "reponseAttendue": "Le participant constate souvent que le travail réel diffère du travail prescrit, par exemple parce que le matériel prévu est indisponible ou que les délais imposent des raccourcis. Il donne un exemple concret. Ces écarts ne sont pas des fautes mais des indices sur les contraintes du poste. Ils seront exploités lors de l’analyse de la situation de travail."
+    },
+    {
+      "question": "Quelles améliorations simples aimeriez-vous voir à votre poste ?",
+      "reponseAttendue": "Le participant propose une ou plusieurs idées : changer la hauteur d’un plan de travail, disposer d’une aide à la manutention, réorganiser le stockage ou revoir le planning. Il peut ne pas savoir les argumenter à ce stade. La formation l’aidera à les relier aux risques identifiés et à les présenter à son encadrement de manière structurée."
+    },
+    {
+      "question": "Qu’attendez-vous de cette formation ?",
+      "reponseAttendue": "Le participant exprime ses attentes : mieux comprendre les douleurs, savoir mieux porter, faire évoluer son poste, être reconnu comme relais de prévention. Le formateur recadre si nécessaire : la formation PRAP ne se limite pas aux gestes et postures, elle vise à observer, analyser et proposer des améliorations. Les attentes sont reprises lors du bilan de fin de formation."
+    },
+    {
+      "question": "Selon vous, la prévention des risques est-elle l’affaire de l’employeur seul ou de tous ?",
+      "reponseAttendue": "Le participant donne son avis. La réponse attendue reconnaît que l’employeur a l’obligation principale d’assurer la sécurité et de protéger la santé des travailleurs, mais que chacun y contribue. Le salarié doit prendre soin de sa santé et de celle des autres selon sa formation et ses possibilités. L’acteur PRAP joue un rôle de relais en observant et en proposant."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Expliquez votre rôle d’acteur PRAP IBC et ses limites dans votre entreprise.",
+      "reponseAttendue": "L’acteur PRAP observe sa situation de travail, identifie les sollicitations et les risques d’atteinte à la santé, puis propose des pistes d’amélioration à son encadrement. Il applique les principes de sécurité physique et d’économie d’effort lorsque la manutention ne peut être évitée. Il ne décide pas seul des modifications, ne réalise pas de diagnostic médical et ne remplace ni l’employeur ni les préventeurs. Son action s’inscrit dans la démarche de prévention de l’entreprise."
+    },
+    {
+      "question": "Citez au moins cinq des neuf principes généraux de prévention et expliquez leur logique.",
+      "reponseAttendue": "L’article L4121-2 prévoit notamment d’éviter les risques, d’évaluer ceux qui ne peuvent être évités, de combattre les risques à la source, d’adapter le travail à l’homme, de tenir compte de l’évolution de la technique, de remplacer ce qui est dangereux par ce qui l’est moins, de planifier la prévention, de donner la priorité aux protections collectives et de donner les instructions appropriées aux travailleurs. La logique est hiérarchique : on cherche d’abord à supprimer le risque, puis à le réduire, la formation et les consignes venant en complément."
+    },
+    {
+      "question": "Décrivez la structure de la colonne vertébrale et expliquez pourquoi le bas du dos est particulièrement exposé.",
+      "reponseAttendue": "La colonne comprend sept vertèbres cervicales, douze dorsales et cinq lombaires, puis le sacrum et le coccyx, avec des disques intervertébraux entre les vertèbres mobiles. Le rachis lombaire supporte le poids du haut du corps et des charges manipulées. Lorsque le dos est fléchi et la charge éloignée, les contraintes sur les disques augmentent fortement. Les flexions et torsions répétées en charge favorisent l’usure discale, les lombalgies et les hernies."
+    },
+    {
+      "question": "Qu’est-ce qu’un TMS et quels facteurs en favorisent l’apparition ?",
+      "reponseAttendue": "Les troubles musculosquelettiques sont des atteintes des muscles, tendons, nerfs et articulations, comme la tendinopathie de l’épaule ou le syndrome du canal carpien. Ils sont favorisés par la répétition des gestes, les efforts, les postures articulaires extrêmes, le travail statique, les vibrations et le froid. Les facteurs organisationnels et psychosociaux, comme la pression temporelle ou le manque de marges de manœuvre, jouent aussi un rôle. Ils s’installent progressivement et peuvent devenir invalidants."
+    },
+    {
+      "question": "Comment observez-vous et décrivez-vous une situation de travail ?",
+      "reponseAttendue": "Je décris d’abord le poste, les tâches et l’activité réelle de l’opérateur : ce qu’il fait, avec quels outils, sur quels objets, dans quel environnement et selon quelle organisation. Je repère ensuite les sollicitations du corps, leur fréquence et leur durée. J’identifie les déterminants qui expliquent ces sollicitations, liés à l’individu, à la tâche, au matériel, à l’environnement et à l’organisation. J’échange avec l’opérateur pour comprendre les écarts avec le travail prescrit."
+    },
+    {
+      "question": "Que prévoit le Code du travail en matière de manutention manuelle de charges ?",
+      "reponseAttendue": "Les articles R4541-1 et suivants imposent à l’employeur d’éviter le recours à la manutention manuelle par des mesures d’organisation ou des moyens adaptés, notamment mécaniques. Lorsque la manutention ne peut être évitée, il évalue les risques, organise les postes pour les réduire et fait bénéficier les travailleurs d’une formation adéquate, notamment aux gestes et postures. L’article R4541-9 fixe des limites de poids, notamment 25 kg portés pour les femmes et 40 kg transportés à la brouette, brouette comprise."
+    },
+    {
+      "question": "Donnez un exemple de piste d’amélioration pour chacun des trois domaines : technique, organisationnel et humain.",
+      "reponseAttendue": "Sur le plan technique, on peut installer une table à hauteur variable ou un chariot à fond remontant pour supprimer les prises au sol. Sur le plan organisationnel, on peut revoir le plan de stockage pour placer les produits lourds à hauteur de taille, étaler les livraisons ou organiser une rotation des tâches. Sur le plan humain, on peut former les nouveaux arrivants, encourager l’entraide et mieux informer sur les poids des colis. Les solutions techniques et organisationnelles sont recherchées en priorité."
+    },
+    {
+      "question": "Quels sont les principes de sécurité physique et d’économie d’effort lors d’une manutention inévitable ?",
+      "reponseAttendue": "Il faut d’abord évaluer la charge et préparer le trajet en dégageant les obstacles. On se place près de la charge, pieds écartés pour un appui stable, et on assure une prise sûre. On garde le dos dans sa rectitude naturelle, on utilise la force des jambes et on rapproche la charge du corps. On évite les torsions du tronc en déplaçant les pieds et on utilise si possible l’élan de la charge. Ces principes complètent l’aménagement du poste sans le remplacer."
+    },
+    {
+      "question": "Comment présentez-vous une proposition d’amélioration à votre encadrement ?",
+      "reponseAttendue": "Je présente une note courte ou une fiche de remontée qui décrit la situation de travail, le problème observé et ses déterminants. J’indique les atteintes à la santé encourues et, si possible, la fréquence d’exposition. Je propose une ou plusieurs pistes avec leurs avantages, leurs limites et les personnes à associer. Je demande un retour et je participe au suivi de la mise en place."
+    },
+    {
+      "question": "Comment maintenez-vous vos compétences d’acteur PRAP après la formation ?",
+      "reponseAttendue": "Je continue d’observer ma situation de travail et de faire remonter les difficultés, notamment lors de changements de matériel ou d’organisation. Je participe aux réunions ou groupes de travail prévention lorsque l’entreprise en organise. Le certificat d’acteur PRAP IBC est valable 24 mois. Pour le prolonger, je dois suivre un stage de maintien et d’actualisation des compétences de 7 h auprès d’un organisme habilité."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Préparation de commandes en entrepôt logistique",
+      "consigne": "Chez Logistra, une préparatrice de commandes prélève des packs d’eau de 9 kg stockés au niveau le plus bas des racks, à environ 10 cm du sol, et les dépose sur une palette elle-même posée au sol. Elle réalise une centaine de prélèvements par heure en fin de semaine. Décrivez la situation, identifiez les sollicitations et les atteintes possibles, puis proposez des pistes d’amélioration hiérarchisées.",
+      "reponseAttendue": "La tâche impose des flexions répétées et profondes du tronc pour saisir et déposer les packs, avec une charge éloignée du corps et une cadence élevée en fin de semaine. Les sollicitations portent surtout sur le rachis lombaire, mais aussi sur les épaules et les genoux. Les atteintes possibles sont la lombalgie aiguë, l’usure discale et, à terme, une lombalgie chronique ; une salariée ne peut en outre porter plus de 25 kg, ce qui n’est pas dépassé ici mais la répétition reste le facteur dominant. Les déterminants sont le plan de stockage, la hauteur de la palette et la cadence. En priorité, il faut supprimer les prises basses : stocker les produits lourds entre la hauteur des genoux et celle des épaules et surélever la palette de réception grâce à un support élévateur ou un gerbeur. Sur le plan organisationnel, il faut lisser l’activité de fin de semaine et alterner les zones de prélèvement. Enfin, la salariée applique les principes d’économie d’effort pour les manutentions qui subsistent, et la proposition est transmise à l’encadrement avec photos et estimation des fréquences.",
+      "points": 10
+    },
+    {
+      "titre": "Travail sur écran dans un service comptable",
+      "consigne": "Chez Comptalia, un comptable travaille 7 h par jour sur un ordinateur portable posé sur un bureau trop haut, avec un deuxième écran placé sur le côté. Il se plaint de douleurs à la nuque et au poignet droit en fin de journée. Analysez la situation et proposez des améliorations aux plans technique, organisationnel et humain.",
+      "reponseAttendue": "La situation combine une posture statique prolongée, une rotation de la tête vers l’écran latéral, une flexion de la nuque vers l’écran du portable et des épaules relevées à cause du bureau trop haut. Le poignet est en extension sur le clavier du portable, avec un usage intensif de la souris. Les atteintes possibles sont des cervicalgies, des tendinopathies et un syndrome du canal carpien. Sur le plan technique, il faut ajouter un clavier et une souris séparés, surélever le portable ou le connecter à un écran principal placé face à l’utilisateur, régler le siège et éventuellement le bureau, et ajouter un repose-pieds si nécessaire. Sur le plan organisationnel, on prévoit des pauses ou alternances de tâches régulières. Sur le plan humain, on informe sur les réglages du poste. La proposition est remise à l’encadrement, qui peut solliciter le service de prévention et de santé au travail.",
+      "points": 10
+    },
+    {
+      "titre": "Mise en rayon dans un supermarché",
+      "consigne": "Au supermarché Fraîcheval, un employé libre-service met en rayon des bouteilles de lait en saisissant des cartons de 6 kg sur un rolls et en les plaçant sur les étagères hautes, bras au-dessus des épaules, et sur les étagères basses, à genoux. Le rolls est souvent garé loin du rayon faute de place dans l’allée. Décrivez les sollicitations, les déterminants et proposez des pistes.",
+      "reponseAttendue": "Les sollicitations combinent travail bras levés au-dessus des épaules, flexions du tronc ou position à genoux pour les étagères basses, et déplacements répétés entre le rolls et le rayon avec la charge. Les atteintes possibles concernent les épaules (tendinopathies), le dos (lombalgies) et les genoux. Les déterminants sont la hauteur des étagères, l’implantation des produits, le manque d’espace dans l’allée et les horaires de mise en rayon, souvent pendant l’ouverture au public. Sur le plan technique, on peut utiliser un rolls à fond remontant ou un chariot de mise en rayon, et un marchepied stable pour les niveaux hauts. Sur le plan organisationnel, on place les produits lourds et à forte rotation aux niveaux intermédiaires, on réalise la mise en rayon avant l’ouverture et on prévoit un emplacement pour le rolls. Sur le plan humain, on sensibilise l’équipe et on organise l’alternance des tâches. La proposition est transmise au manager de rayon.",
+      "points": 10
+    },
+    {
+      "titre": "Pose de plaques de plâtre sur un chantier",
+      "consigne": "L’entreprise Batimur pose des plaques de plâtre de grand format, d’environ 25 kg chacune, au deuxième étage d’un bâtiment sans ascenseur. Deux plaquistes montent les plaques par l’escalier, puis les fixent au plafond en les maintenant bras levés pendant le vissage. Analysez la situation et proposez des améliorations en respectant les principes généraux de prévention.",
+      "reponseAttendue": "La situation comporte le port de charges lourdes et encombrantes dans l’escalier, avec un risque de chute et de lombalgie, puis un travail bras levés prolongé en effort statique lors du maintien des plaques au plafond, très sollicitant pour les épaules et la nuque. Les déterminants sont l’absence de moyen d’approvisionnement en hauteur, le format des plaques, la préparation du chantier et les délais. En priorité, il faut éviter le port dans l’escalier en prévoyant dès la préparation du chantier une livraison à l’étage par un moyen mécanique, comme un monte-matériaux ou une grue de livraison. Pour la pose au plafond, on utilise un lève-plaque qui maintient la plaque en position et supprime l’effort statique. Sur le plan organisationnel, on planifie l’approvisionnement et les quantités par étage. Sur le plan humain, on forme à l’usage du lève-plaque et on organise le travail en binôme. La proposition est remontée au chef de chantier en amont du prochain chantier.",
+      "points": 10
+    },
+    {
+      "titre": "Poste de montage sur une ligne industrielle",
+      "consigne": "Chez Mécanor, une opératrice assemble des connecteurs sur un poste fixe. Elle insère à la main des clips qui demandent un effort de pouce important, environ 1 200 fois par heure, sur un plan de travail situé à hauteur de ses hanches alors que la tâche demande de la précision. Elle signale des fourmillements dans la main la nuit. Analysez et proposez des améliorations.",
+      "reponseAttendue": "La tâche combine une forte répétitivité, un effort de pince avec le pouce et une posture contraignante : le plan de travail trop bas impose une flexion de la nuque et du tronc pour une tâche de précision. Les fourmillements nocturnes sont un signal d’alerte compatible avec un syndrome du canal carpien, que seul le médecin du travail peut évaluer ; l’opératrice doit être orientée vers le service de prévention et de santé au travail. Les déterminants sont la conception du clip et de l’outillage, la hauteur du poste, la cadence et l’absence d’alternance. Sur le plan technique, on peut installer un outil d’insertion ou une presse manuelle supprimant l’effort du pouce, et régler le plan de travail à une hauteur adaptée au travail de précision. Sur le plan organisationnel, on met en place une rotation avec des postes moins sollicitants et des micro-pauses. Sur le plan humain, on encourage le signalement précoce des douleurs. La proposition, avec ses observations chiffrées, est transmise au responsable de ligne.",
+      "points": 10
+    },
+    {
+      "titre": "Accueil et mise sous pli dans un service administratif",
+      "consigne": "Chez Admissa, une assistante d’accueil reçoit chaque matin les colis et ramettes de papier livrés au rez-de-chaussée, puis les monte à la main au premier étage, où se trouve la reprographie. Elle réalise ensuite deux heures de mise sous pli debout sur une table basse. Identifiez les risques et formulez une proposition écrite à son encadrement.",
+      "reponseAttendue": "La situation expose à des manutentions répétées de charges non négligeables, notamment les cartons de ramettes, dans l’escalier, avec un risque de chute et de lombalgie. La mise sous pli prolongée sur une table basse impose une flexion du tronc et de la nuque et une station debout prolongée. Les déterminants sont le lieu de livraison, l’absence de moyen de transport des colis, l’emplacement de la reprographie et le mobilier. La proposition écrite décrit la situation, les risques, puis les pistes : faire livrer directement au premier étage ou utiliser l’ascenseur avec un chariot, commander les ramettes par plus petits conditionnements, rapprocher le stockage de la reprographie, et fournir une table à hauteur adaptée ou un siège assis-debout pour la mise sous pli. Elle propose aussi d’alterner la mise sous pli avec d’autres tâches. Elle se termine par une demande de rendez-vous pour en discuter et suivre la mise en œuvre.",
+      "points": 10
+    },
+    {
+      "titre": "Déchargement d’un camion de livraison",
+      "consigne": "Le dépôt Distrinord reçoit chaque matin un camion de sacs de granulés de 25 kg en vrac, sans palette. Deux manutentionnaires déchargent les sacs à la main depuis le hayon et les empilent dans le dépôt. L’un d’eux a eu un lumbago le mois dernier. Analysez la situation au regard du Code du travail et proposez des améliorations.",
+      "reponseAttendue": "La manutention manuelle de sacs de 25 kg en grand nombre, avec prises basses dans le camion, torsions et empilement en hauteur, expose fortement au risque de lombalgie, comme l’a montré l’accident du mois dernier. Les articles R4541-1 et suivants imposent d’abord d’éviter la manutention manuelle par l’organisation ou des moyens mécaniques. La piste prioritaire est donc organisationnelle et technique : demander au fournisseur une livraison palettisée et filmée, décharger au transpalette ou au chariot élévateur par un conducteur autorisé, et stocker directement les palettes. Si une manutention résiduelle demeure, il faut limiter les hauteurs de prise et de dépose, utiliser un diable ou un convoyeur, et appliquer les principes d’économie d’effort. Le lumbago doit être déclaré comme accident du travail et l’analyse alimente la mise à jour du document unique. La proposition est transmise au responsable du dépôt avec ces éléments.",
+      "points": 10
+    },
+    {
+      "titre": "Nettoyage de bureaux en horaires décalés",
+      "consigne": "La société Netéclat assure le nettoyage de bureaux tôt le matin. Une agente vide une quarantaine de corbeilles, passe l’aspirateur dorsal et monte les sacs-poubelles pleins jusqu’au local situé au sous-sol par un escalier étroit. Elle travaille seule et dispose d’un temps imparti serré. Décrivez la situation et proposez des pistes d’amélioration.",
+      "reponseAttendue": "Les sollicitations sont nombreuses : flexions répétées pour vider les corbeilles basses, port de l’aspirateur dorsal, gestes répétitifs de balayage, port de sacs dans un escalier étroit. Les atteintes possibles concernent le dos, les épaules et le poignet, avec un risque de chute dans l’escalier et un risque lié au travail isolé. Les déterminants sont l’organisation du travail en horaires décalés, le temps imparti, l’implantation du local à déchets, le matériel et l’absence d’aide. Sur le plan technique, on peut utiliser un chariot de ménage avec collecteur, des corbeilles surélevées ou à sac amovible, un aspirateur plus léger et un monte-charge ou un accès de plain-pied au local. Sur le plan organisationnel, il faut revoir le temps imparti avec le client, prévoir un dispositif d’alerte pour le travail isolé et regrouper les déchets avant leur évacuation. Sur le plan humain, on forme à l’utilisation du matériel. La proposition est transmise au chef d’équipe, qui peut en discuter avec le client.",
+      "points": 10
+    },
+    {
+      "titre": "Manutention de fûts dans un atelier de production",
+      "consigne": "Chez Chimiflex, un opérateur déplace des fûts de produit de 60 kg en les faisant rouler sur le sol, puis les bascule à la main pour les vider dans une cuve dont le bord est à 1,20 m. Analysez la situation et justifiez vos propositions à partir des principes généraux de prévention.",
+      "reponseAttendue": "Le basculement manuel d’un fût de 60 kg jusqu’à une hauteur de 1,20 m impose des efforts très importants, des postures extrêmes et un risque de chute de la charge, d’écrasement des pieds et de projection de produit. Le roulage au sol expose à des efforts de poussée et au coincement des mains. Ces efforts dépassent ce qui est acceptable pour une manutention habituelle ; l’article R4541-9 réserve d’ailleurs le port habituel au-delà de 55 kg aux travailleurs reconnus aptes par le médecin du travail. En appliquant les principes généraux de prévention, il faut d’abord éviter le risque : remplacer le transvasement manuel par une pompe de transfert ou un raccordement direct. À défaut, il faut combattre le risque à la source avec un gerbeur ou un retourneur de fût et un chariot porte-fût, ce qui donne la priorité à la protection collective. Les EPI adaptés au produit restent nécessaires en complément, et l’opérateur est formé à l’usage des équipements. La proposition est transmise au responsable de production avec l’évaluation des risques.",
+      "points": 10
+    },
+    {
+      "titre": "Réorganisation d’un poste de caisse",
+      "consigne": "Dans la jardinerie Verdoré, les caissières soulèvent les sacs de terreau de 40 litres pour les scanner, car le tapis n’atteint pas le lecteur. Pendant les week-ends de printemps, les files d’attente sont longues. Une caissière vous demande, en tant qu’acteur PRAP, de l’aider à formuler une proposition. Rédigez la proposition à l’encadrement.",
+      "reponseAttendue": "La proposition commence par la description : lors du passage en caisse, les caissières soulèvent des sacs lourds de terreau avec rotation du tronc pour les présenter au lecteur, à une fréquence élevée les week-ends de printemps. Elle indique les risques : lombalgies, TMS des épaules et des poignets, fatigue accrue. Elle identifie les déterminants : conception du poste de caisse, absence de lecteur portatif, affluence saisonnière. Elle propose des pistes : équiper les caisses d’une douchette portative permettant de scanner le sac dans le chariot, demander au client de laisser les produits lourds dans le chariot, ouvrir une caisse dédiée aux produits volumineux et renforcer l’effectif aux pics d’activité. Elle précise les avantages, les limites et le coût approximatif à étudier. Elle demande un retour de l’encadrement et propose de tester la solution sur une caisse avant généralisation.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : se situer comme acteur PRAP et analyser une situation de travail",
+    "contexte": "L’entreprise Embalis fabrique des emballages en carton. Au poste de palettisation en fin de ligne, un opérateur prélève des paquets de cartons pliés d’environ 12 kg sur un convoyeur situé à hauteur de taille et les empile sur une palette posée au sol, jusqu’à une hauteur de 1,60 m. Il effectue environ 300 paquets par poste, en tournant le tronc entre le convoyeur et la palette. L’éclairage est faible en fin de ligne et le sol est encombré de feuillards. L’opérateur se plaint de douleurs lombaires en fin de semaine. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Situez votre rôle d’acteur PRAP face à cette situation et citez deux acteurs de la prévention à mobiliser.",
+        "reponseAttendue": "En tant qu’acteur PRAP, j’observe la situation, j’analyse les risques et je propose des pistes à mon encadrement, sans décider seul des modifications. Je peux mobiliser l’encadrement et la direction, qui décident, le CSE, le salarié désigné compétent en prévention et le service de prévention et de santé au travail pour les douleurs signalées. Barème : rôle et limites 3 points, acteurs pertinents 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Décrivez l’activité réelle et les sollicitations du corps.",
+        "reponseAttendue": "L’opérateur saisit des paquets sur le convoyeur, effectue une rotation du tronc et les dépose sur la palette à des hauteurs variables, du sol jusqu’à 1,60 m. Il réalise des flexions profondes pour les premières couches et travaille bras levés pour les dernières. La répétition, de l’ordre de 300 fois par poste, et les torsions sollicitent fortement le rachis lombaire et les épaules. Barème : description de l’activité 2 points, sollicitations 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Identifiez les atteintes à la santé encourues en vous appuyant sur le fonctionnement du corps humain.",
+        "reponseAttendue": "Les flexions et torsions en charge augmentent les contraintes sur les disques lombaires et favorisent lombalgies, usure discale et hernie. Le travail bras levés expose à des tendinopathies de l’épaule. Les douleurs de fin de semaine sont un signal d’alerte à signaler. Le sol encombré et l’éclairage faible ajoutent un risque de chute. Barème : mécanisme lombaire 2 points, épaules 1 point, signal d’alerte et chute 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Repérez les déterminants de la situation en les classant.",
+        "reponseAttendue": "Matériel : palette posée au sol, absence de table élévatrice ou de palettiseur. Organisation : cadence, nombre de paquets, absence de rotation. Environnement : éclairage faible, sol encombré de feuillards. Tâche : poids et format des paquets, hauteur d’empilement. Individu : fatigue et douleurs existantes. Barème : au moins quatre déterminants correctement classés 5 points.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 3 compétences, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores ; l’épreuve certificative suit la grille INRS",
+    "exercices": [
+      {
+        "titre": "Se situer comme acteur PRAP",
+        "consigne": "Vous êtes acteur PRAP chez Quincalor, négoce de matériaux. Votre responsable vous demande pourquoi l’entreprise vous a formé et ce qu’elle peut attendre de vous. Expliquez les enjeux de la prévention des risques liés à l’activité physique, votre rôle, vos limites et le cadre réglementaire qui s’applique.",
+        "reponseAttendue": "Les risques liés à l’activité physique sont à l’origine de nombreux accidents du travail et maladies professionnelles, notamment lombalgies et TMS, avec des enjeux humains, sociaux, économiques et juridiques. L’employeur doit appliquer les principes généraux de prévention de l’article L4121-2, en commençant par éviter les risques, et les articles R4541-1 et suivants pour la manutention manuelle. Mon rôle est d’observer ma situation de travail, d’identifier les risques et de proposer des améliorations à l’encadrement, qui décide. Je ne remplace ni l’employeur ni les préventeurs. Barème : enjeux 1 point, cadre réglementaire 2 points, rôle et limites 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Analyser une situation de travail",
+        "consigne": "Chez Quincalor, un vendeur charge dans le coffre des clients des sacs de ciment de 35 kg pris sur une palette posée au sol, en se penchant au-dessus du coffre. Décrivez l’activité, les sollicitations, les atteintes encourues et les déterminants.",
+        "reponseAttendue": "Le vendeur prend chaque sac au sol avec une flexion du tronc, le transporte puis le dépose dans le coffre en se penchant en avant, la charge éloignée du corps. Les contraintes sur le rachis lombaire sont très élevées et exposent à lombalgie et hernie discale ; les épaules et les genoux sont aussi sollicités. Les déterminants sont le poids des sacs, la palette au sol, la hauteur et la profondeur des coffres, l’absence de moyen de manutention et l’organisation du service client. Barème : activité 1 point, sollicitations et atteintes 2 points, déterminants 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Proposer des améliorations",
+        "consigne": "Pour la situation précédente, proposez des pistes techniques, organisationnelles et humaines, hiérarchisées selon les principes généraux de prévention.",
+        "reponseAttendue": "En priorité, éviter le port : proposer des sacs de plus faible poids, la livraison des quantités importantes, ou un chargement par chariot élévateur sur palette pour les véhicules adaptés. Techniquement, surélever la palette à hauteur de prise et utiliser un chariot ou un diable pour amener les sacs au véhicule. Sur le plan organisationnel, prévoir une zone de chargement dédiée et un renfort aux heures d’affluence. Sur le plan humain, informer les clients et appliquer les principes d’économie d’effort pour les manutentions résiduelles. Barème : hiérarchie respectée 2 points, pistes pertinentes dans les trois domaines 3 points.",
+        "points": 5
+      },
+      {
+        "titre": "Rédiger une remontée à l’encadrement",
+        "consigne": "Rédigez la fiche de proposition que vous remettez à votre responsable pour la situation du chargement des sacs de ciment.",
+        "reponseAttendue": "La fiche indique la date, le poste et l’observation réalisée, puis décrit la situation et sa fréquence. Elle énonce les risques encourus et les déterminants identifiés. Elle présente deux ou trois pistes avec leurs avantages, leurs limites et les points à étudier, comme le coût ou la faisabilité. Elle propose d’associer les vendeurs concernés, demande une réponse et un suivi, et suggère d’intégrer le risque au document unique. Barème : structure et clarté 2 points, argumentation 2 points, demande de suivi 1 point.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Compréhension du rôle d’acteur PRAP et du cadre de prévention : 0 = absente ; 1 = confusions majeures ; 2 = compréhension partielle ; 3 = rôle et cadre correctement situés ; 4 = rôle, limites et principes généraux de prévention précisément expliqués.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’observation et de la description de l’activité réelle : 0 = absente ; 1 = description vague ; 2 = description incomplète ; 3 = description fidèle ; 4 = description précise, chiffrée et distinguant travail prescrit et réel.",
+        "points": 4
+      },
+      {
+        "critere": "Identification des sollicitations et des atteintes à la santé à partir du fonctionnement du corps : 0 = absente ; 1 = erronée ; 2 = partielle ; 3 = correcte ; 4 = correcte et argumentée par les mécanismes anatomiques et physiologiques.",
+        "points": 4
+      },
+      {
+        "critere": "Pertinence et hiérarchisation des pistes d’amélioration : 0 = aucune piste ; 1 = pistes uniquement individuelles ; 2 = pistes partielles ; 3 = pistes pertinentes dans plusieurs domaines ; 4 = pistes pertinentes, hiérarchisées et réalistes.",
+        "points": 4
+      },
+      {
+        "critere": "Clarté de la remontée à l’encadrement : 0 = inexploitable ; 1 = peu compréhensible ; 2 = compréhensible mais incomplète ; 3 = claire et structurée ; 4 = synthétique, argumentée et directement exploitable.",
+        "points": 4
+      }
+    ]
+  }
+}

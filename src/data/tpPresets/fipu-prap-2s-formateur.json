@@ -1,0 +1,795 @@
+{
+  "competences": [
+    "Élaborer et animer un projet de formation-action PRAP intégré à une démarche de prévention de l’établissement.",
+    "Observer et analyser les risques liés à l’activité physique d’une situation de travail pour proposer des pistes d’amélioration et suivre leur mise en place.",
+    "Organiser, animer et évaluer une formation-action des salariés intégrant l’accompagnement de la mobilité de la personne aidée (ALM)."
+  ],
+  "besoinsList": [
+    "Maîtriser les fondamentaux de la prévention des risques professionnels (acquis par l’autoformation @01001) et les mobiliser auprès d’une direction.",
+    "Conduire l’étude préalable d’un établissement : sinistralité, DUERP, organisation, matériel, attentes de la direction.",
+    "Construire avec la direction un projet de formation-action PRAP intégré à la démarche de prévention et doté d’un comité de pilotage.",
+    "Observer et analyser une situation de travail réelle à l’aide d’une méthode structurée (description, sollicitations, déterminants).",
+    "Hiérarchiser des pistes d’amélioration techniques, organisationnelles et humaines et accompagner leur suivi.",
+    "Transmettre des connaissances d’anatomie, de physiologie et de pathologies (TMS, lombalgies) adaptées à un public non spécialiste.",
+    "Maîtriser l’ALM et les aides techniques pour en faire la démonstration et en guider l’apprentissage.",
+    "Concevoir un déroulé pédagogique de formation d’acteurs PRAP 2S de 28 h conforme au référentiel INRS.",
+    "Animer un groupe d’adultes en formation-action : méthodes actives, mises en situation, gestion de la dynamique de groupe.",
+    "Organiser et conduire les épreuves certificatives des acteurs et assurer la traçabilité des résultats."
+  ],
+  "syntheseHtml": "• Le parcours forme des formateurs PRAP 2S (prévention des risques liés à l’activité physique, secteur sanitaire et social) selon le programme INRS PRAP-2S 003 : 98 h, soit 14 jours en présentiel répartis en plusieurs sessions, avec 3 jours d’intersession consacrés à un travail de terrain dans un établissement.<br>• Prérequis : avoir suivi l’autoformation INRS @01001 « Acquérir des bases en prévention des risques professionnels » et en présenter l’attestation à l’entrée en formation.<br>• Le référentiel comporte 3 compétences : C1 — Élaborer et animer un projet de formation-action PRAP intégré à une démarche de prévention de l’établissement ; C2 — Observer et analyser les risques liés à l’activité physique d’une situation de travail pour proposer des pistes d’amélioration et suivre leur mise en place ; C3 — Organiser, animer et évaluer une formation-action des salariés intégrant l’accompagnement de la mobilité de la personne aidée (ALM).<br>• Le parcours alterne apports, analyses de situations réelles, conception de déroulés, micro-animations filmées et entraînements à l’ALM ; l’intersession permet de conduire l’étude préalable et l’analyse d’une situation de travail dans un établissement, restituées au retour.<br>• Le certificat de formateur PRAP 2S est délivré, après réussite des épreuves certificatives, uniquement par un organisme habilité par le réseau Assurance Maladie – Risques professionnels / INRS ; il est valable 36 mois et prolongé par un maintien et actualisation des compétences de formateur. Le formateur intervient au sein d’un organisme ou d’un établissement habilité pour délivrer des certificats d’acteur.<br>• Les évaluations internes du parcours préparent aux épreuves certificatives mais ne les remplacent pas.",
+  "adaptationsHtml": "• Vérifier à l’entrée l’attestation @01001 et positionner chaque participant sur ses acquis en prévention, en pédagogie et en ALM (soignant, ergonome, kinésithérapeute, cadre).<br>• Proposer des apports complémentaires ciblés : bases d’andragogie pour les profils soignants, pratique ALM pour les profils non soignants.<br>• Organiser l’intersession dans un établissement réel avec un tuteur interne et une grille de recueil, et anticiper les autorisations d’observation.<br>• Multiplier les micro-animations filmées avec retours structurés par les pairs et le formateur, et retirer progressivement les supports d’aide.<br>• Adapter rythme, supports et pratique physique aux besoins signalés (restrictions médicales, handicap, accessibilité) et prévoir une remédiation individualisée avant les épreuves.",
+  "qcmDebut": [
+    {
+      "question": "Quel est l’intitulé de l’autoformation INRS exigée en prérequis ?",
+      "options": [
+        "@02002 — Manager la sécurité",
+        "Sauveteur secouriste du travail",
+        "@01001 — Acquérir des bases en prévention des risques professionnels",
+        "Certificat d’acteur PRAP IBC"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quelle est la durée de la formation de formateur PRAP 2S ?",
+      "options": [
+        "98 h, soit 14 jours en présentiel",
+        "28 h, soit 4 jours",
+        "35 h, soit 5 jours",
+        "21 h, soit 3 jours"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Que signifie ALM ?",
+      "options": [
+        "Aide à la locomotion médicalisée",
+        "Analyse des liens musculaires",
+        "Atelier de levage manuel",
+        "Accompagnement de la mobilité de la personne aidée"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle est la durée de validité du certificat de formateur PRAP 2S ?",
+      "options": [
+        "12 mois",
+        "36 mois",
+        "24 mois",
+        "Illimitée"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Une formation-action se caractérise par :",
+      "options": [
+        "Un cours magistral sur l’anatomie",
+        "Un apprentissage relié à l’analyse et à l’amélioration des situations réelles de travail",
+        "Une démonstration de gestes à reproduire",
+        "Un e-learning sans pratique"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Qui porte la responsabilité de la démarche de prévention dans l’établissement ?",
+      "options": [
+        "Le formateur PRAP",
+        "Les acteurs PRAP formés",
+        "Le fournisseur de matériel",
+        "La direction (l’employeur)"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle est la durée de la formation des acteurs PRAP 2S que le formateur animera ?",
+      "options": [
+        "28 h",
+        "7 h",
+        "14 h",
+        "98 h"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Lequel est un principe général de prévention ?",
+      "options": [
+        "Donner la priorité aux équipements individuels",
+        "Former après l’accident",
+        "Donner la priorité aux mesures de protection collective",
+        "Adapter l’homme au poste"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Que désigne le DUERP ?",
+      "options": [
+        "Le dossier unique d’entrée du résident",
+        "Le document d’urgence des établissements recevant du public",
+        "Le diplôme universitaire d’ergonomie",
+        "Le document unique d’évaluation des risques professionnels"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Les TMS représentent quelle part des maladies professionnelles reconnues ?",
+      "options": [
+        "Près de 9 sur 10",
+        "Environ 1 sur 4",
+        "Environ la moitié",
+        "Moins de 10 %"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Lors de l’étude préalable, quel élément est indispensable avant de s’engager dans un projet de formation-action ?",
+      "options": [
+        "L’achat préalable de lève-personnes",
+        "La liste des salariés les plus souvent absents",
+        "L’engagement formalisé de la direction et la mise en place d’un pilotage du projet",
+        "Un devis de mobilier"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Le comité de pilotage d’un projet PRAP réunit généralement :",
+      "options": [
+        "La direction, l’encadrement, des représentants du personnel, le service de prévention et de santé au travail et le formateur",
+        "Uniquement les acteurs formés",
+        "Les familles des résidents",
+        "Les fournisseurs"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Pourquoi les situations de travail analysées en formation d’acteurs doivent-elles être réelles ?",
+      "options": [
+        "Parce que les vidéos sont interdites",
+        "Pour évaluer la vitesse d’exécution",
+        "Pour désigner les salariés en faute",
+        "Parce que les pistes d’amélioration doivent pouvoir être proposées et suivies dans l’établissement"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel taux de participants par formateur est fixé pour une session d’acteurs PRAP 2S ?",
+      "options": [
+        "20 participants",
+        "10 participants au plus",
+        "30 participants",
+        "Sans limite"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Une évaluation formative en formation d’acteurs sert à :",
+      "options": [
+        "Délivrer le certificat",
+        "Réguler l’apprentissage en cours de formation par des retours",
+        "Classer les participants",
+        "Sanctionner l’absence"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Lors d’une démonstration ALM, le formateur doit d’abord :",
+      "options": [
+        "Réaliser le transfert le plus rapide possible",
+        "Montrer la prise sous les aisselles",
+        "Laisser chacun improviser",
+        "Faire évaluer par le groupe les capacités de la personne aidée"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Lequel est un indicateur pertinent du suivi d’un projet PRAP ?",
+      "options": [
+        "Le nombre de pistes d’amélioration mises en œuvre et l’évolution des arrêts liés aux manutentions",
+        "Le nombre de photocopies distribuées",
+        "La satisfaction sur le repas",
+        "La durée du trajet des participants"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Le certificat d’acteur PRAP 2S délivré à l’issue de la formation est valable :",
+      "options": [
+        "36 mois",
+        "12 mois",
+        "24 mois",
+        "Sans limite"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "L’intersession de la formation de formateurs sert principalement à :",
+      "options": [
+        "Prendre des congés",
+        "Passer les épreuves de secourisme",
+        "Acheter du matériel pédagogique",
+        "Réaliser dans un établissement l’étude préalable et l’analyse d’une situation de travail à restituer"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle consigne pédagogique favorise l’apprentissage de l’ALM ?",
+      "options": [
+        "Alterner démonstration commentée, pratique en trinôme (soignant, personne aidée, observateur) et analyse",
+        "Projeter une vidéo puis passer au thème suivant",
+        "Faire pratiquer uniquement le formateur",
+        "Évaluer sans pratique préalable"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Élaborer et animer un projet de formation-action PRAP intégré à une démarche de prévention de l’établissement.",
+      "questions": [
+        {
+          "question": "La première étape d’un projet de formation-action PRAP est :",
+          "options": [
+            "L’animation de la formation des acteurs",
+            "La certification des acteurs",
+            "L’étude préalable de l’établissement et de ses attentes",
+            "L’achat de matériel"
+          ],
+          "correctIndex": 2,
+          "explication": "L’étude préalable (sinistralité, DUERP, organisation, matériel) permet de vérifier les conditions de réussite et de construire le projet."
+        },
+        {
+          "question": "Pourquoi la direction doit-elle s’engager avant la formation ?",
+          "options": [
+            "Pour que les propositions des acteurs soient examinées et que des moyens soient alloués",
+            "Pour financer uniquement les repas",
+            "Parce que la direction doit être certifiée",
+            "Pour choisir les dates seulement"
+          ],
+          "correctIndex": 0,
+          "explication": "Sans engagement, les acteurs formés ne peuvent pas faire aboutir leurs propositions : le projet perd son sens."
+        },
+        {
+          "question": "Quel document permet de croiser les risques connus et le projet PRAP ?",
+          "options": [
+            "Le livret d’accueil",
+            "Le projet de soins individuel",
+            "Le règlement de fonctionnement",
+            "Le DUERP"
+          ],
+          "correctIndex": 3,
+          "explication": "Le document unique recense les risques ; le projet PRAP s’y articule et alimente sa mise à jour."
+        },
+        {
+          "question": "Quels indicateurs de sinistralité recueillir lors de l’étude préalable ?",
+          "options": [
+            "Taux d’occupation des chambres",
+            "Accidents du travail, maladies professionnelles, jours d’arrêt et restrictions d’aptitude",
+            "Prix de journée",
+            "Nombre de visites des familles"
+          ],
+          "correctIndex": 1,
+          "explication": "Ces indicateurs objectivent l’enjeu et serviront de référence pour le suivi."
+        },
+        {
+          "question": "Le choix des futurs acteurs PRAP doit privilégier :",
+          "options": [
+            "Uniquement les salariés en arrêt",
+            "Des volontaires représentatifs des services et des métiers concernés",
+            "Uniquement les cadres",
+            "Les salariés désignés par tirage au sort sans information"
+          ],
+          "correctIndex": 1,
+          "explication": "La représentativité permet de couvrir les situations de travail et de diffuser la démarche."
+        },
+        {
+          "question": "Qu’est-ce qu’un cahier des charges du projet PRAP ?",
+          "options": [
+            "La liste des chambres",
+            "Le planning des congés",
+            "Le contrat de travail des acteurs",
+            "Un document qui précise objectifs, public, calendrier, moyens, pilotage et indicateurs"
+          ],
+          "correctIndex": 3,
+          "explication": "Il formalise l’accord entre la direction et le formateur et guide le suivi."
+        },
+        {
+          "question": "Après la formation des acteurs, le formateur :",
+          "options": [
+            "Accompagne avec le comité de pilotage le traitement et le suivi des propositions",
+            "N’intervient plus",
+            "Décide seul des investissements",
+            "Remplace l’encadrement"
+          ],
+          "correctIndex": 0,
+          "explication": "Le projet se poursuit au-delà de la session : examen des pistes, mise en œuvre, évaluation."
+        },
+        {
+          "question": "Quel acteur interne peut appuyer le projet sur les questions de santé ?",
+          "options": [
+            "Le service comptable",
+            "La cuisine",
+            "Le service de prévention et de santé au travail (médecin, infirmier, ergonome)",
+            "Le service animation"
+          ],
+          "correctIndex": 2,
+          "explication": "Le SPST apporte une expertise sur les atteintes à la santé et les aptitudes."
+        },
+        {
+          "question": "Présenter le projet au CSE permet :",
+          "options": [
+            "D’obtenir le certificat de formateur",
+            "De se dispenser de l’accord de la direction",
+            "De fixer le salaire des acteurs",
+            "D’informer et d’associer les représentants du personnel à la démarche"
+          ],
+          "correctIndex": 3,
+          "explication": "L’association des représentants du personnel renforce la légitimité et l’appropriation du projet."
+        },
+        {
+          "question": "Un projet PRAP est « intégré » à la démarche de prévention quand :",
+          "options": [
+            "Il s’articule avec le DUERP, le plan d’actions et les instances de l’établissement",
+            "Il a lieu dans les locaux de l’établissement",
+            "Il dure plus de 28 h",
+            "Il est financé par l’établissement"
+          ],
+          "correctIndex": 0,
+          "explication": "L’intégration garantit la cohérence et la pérennité des actions."
+        }
+      ]
+    },
+    {
+      "competence": "Observer et analyser les risques liés à l’activité physique d’une situation de travail pour proposer des pistes d’amélioration et suivre leur mise en place.",
+      "questions": [
+        {
+          "question": "Dans la méthode d’analyse, les déterminants sont :",
+          "options": [
+            "Les douleurs ressenties",
+            "Les noms des salariés",
+            "Les éléments qui expliquent pourquoi le salarié travaille de cette façon (matériel, organisation, personne, environnement)",
+            "Les sanctions possibles"
+          ],
+          "correctIndex": 2,
+          "explication": "Agir sur les déterminants permet de supprimer ou réduire la cause du risque."
+        },
+        {
+          "question": "Pour observer une situation de travail réelle, le formateur :",
+          "options": [
+            "Obtient l’accord de l’encadrement et des personnes, observe et questionne le salarié sur son activité",
+            "Filme sans prévenir",
+            "Se fie uniquement à la fiche de poste",
+            "Demande au salarié de mimer la tâche en salle"
+          ],
+          "correctIndex": 0,
+          "explication": "L’observation in situ, complétée par l’entretien, révèle le travail réel."
+        },
+        {
+          "question": "Un rehaussement de résident répété 15 fois par matinée relève d’un facteur :",
+          "options": [
+            "Environnemental",
+            "Psychosocial uniquement",
+            "De vibration",
+            "De répétitivité"
+          ],
+          "correctIndex": 3,
+          "explication": "La fréquence fait partie des facteurs biomécaniques avec la force, la posture et la durée."
+        },
+        {
+          "question": "Quelle piste combat le risque à la source pour des transferts de résidents dépendants ?",
+          "options": [
+            "Des ceintures lombaires",
+            "Des lève-personnes sur rail au plafond dans les chambres",
+            "Une affiche de rappel des gestes",
+            "Un échauffement le matin"
+          ],
+          "correctIndex": 1,
+          "explication": "Le rail supprime le portage et l’attente du matériel mobile."
+        },
+        {
+          "question": "Une piste mise en place a créé un nouveau risque. Que fait-on ?",
+          "options": [
+            "On abandonne toute démarche",
+            "On l’analyse dans le suivi et on ajuste la solution",
+            "On l’ignore",
+            "On sanctionne le salarié"
+          ],
+          "correctIndex": 1,
+          "explication": "Le suivi fait partie de la démarche : toute solution doit être évaluée."
+        },
+        {
+          "question": "Pour hiérarchiser les pistes, on tient compte :",
+          "options": [
+            "Uniquement de leur coût",
+            "De l’avis d’un seul salarié",
+            "De leur nouveauté",
+            "De leur efficacité sur le risque, de leur faisabilité, de leur coût et de leur délai"
+          ],
+          "correctIndex": 3,
+          "explication": "La hiérarchisation éclaire la décision de la direction."
+        },
+        {
+          "question": "Les contraintes temporelles et l’absence de soutien entre collègues sont des facteurs :",
+          "options": [
+            "Psychosociaux et organisationnels",
+            "Biomécaniques uniquement",
+            "Environnementaux",
+            "Sans lien avec les TMS"
+          ],
+          "correctIndex": 0,
+          "explication": "Ils augmentent la tension musculaire et réduisent les marges de manœuvre."
+        },
+        {
+          "question": "L’analyse d’une situation de travail doit aboutir à :",
+          "options": [
+            "Un classement des salariés",
+            "Une sanction",
+            "Des pistes d’amélioration argumentées transmises à l’encadrement",
+            "Un simple constat"
+          ],
+          "correctIndex": 2,
+          "explication": "L’analyse n’a de sens que si elle débouche sur des propositions suivies."
+        },
+        {
+          "question": "Dans l’analyse d’une aide à domicile, un déterminant spécifique est :",
+          "options": [
+            "Le nombre de lits de l’étage",
+            "Le planning de la blanchisserie",
+            "Le parking du personnel",
+            "L’aménagement du logement, qui dépend de la personne et de sa famille"
+          ],
+          "correctIndex": 3,
+          "explication": "Au domicile, les pistes passent par la structure, la famille et des intervenants comme l’ergothérapeute."
+        },
+        {
+          "question": "Quel outil aide à suivre les pistes d’amélioration ?",
+          "options": [
+            "Un plan d’actions daté avec responsables et indicateurs",
+            "Un tableau d’affichage décoratif",
+            "Le registre des visiteurs",
+            "La liste des menus"
+          ],
+          "correctIndex": 0,
+          "explication": "Le plan d’actions formalise qui fait quoi, quand et comment on mesure l’effet."
+        }
+      ]
+    },
+    {
+      "competence": "Organiser, animer et évaluer une formation-action des salariés intégrant l’accompagnement de la mobilité de la personne aidée (ALM).",
+      "questions": [
+        {
+          "question": "Un objectif pédagogique opérationnel s’exprime par :",
+          "options": [
+            "Un thème général",
+            "Le titre du module",
+            "Un verbe d’action observable, des conditions et un critère de réussite",
+            "Une intention du formateur"
+          ],
+          "correctIndex": 2,
+          "explication": "Exemple : « choisir l’aide technique adaptée à partir d’une évaluation des capacités, sans erreur ». "
+        },
+        {
+          "question": "Pour une session d’acteurs PRAP 2S, le formateur prévoit :",
+          "options": [
+            "28 h avec alternance apports, analyses de situations réelles, ateliers ALM et épreuves certificatives",
+            "7 h de démonstration de gestes",
+            "Un e-learning seul",
+            "Uniquement des cours d’anatomie"
+          ],
+          "correctIndex": 0,
+          "explication": "Le déroulé respecte la durée et les contenus du référentiel acteur."
+        },
+        {
+          "question": "La pratique en trinôme lors des ateliers ALM comprend :",
+          "options": [
+            "Trois soignants qui portent",
+            "Un formateur et deux spectateurs",
+            "Un mannequin et deux formateurs",
+            "Un soignant, une personne aidée et un observateur qui donne un retour"
+          ],
+          "correctIndex": 3,
+          "explication": "Chaque rôle apprend : l’observateur s’exerce à l’analyse, la personne aidée ressent l’accompagnement."
+        },
+        {
+          "question": "Un participant présente une restriction médicale de port de charges. Le formateur :",
+          "options": [
+            "L’exclut de la formation",
+            "Adapte sa participation (observateur, personne aidée, guidance) sans mise en charge",
+            "L’oblige à pratiquer",
+            "L’ignore"
+          ],
+          "correctIndex": 1,
+          "explication": "L’adaptation permet l’apprentissage tout en respectant la santé du participant."
+        },
+        {
+          "question": "Les épreuves certificatives des acteurs évaluent notamment :",
+          "options": [
+            "La connaissance par cœur des vertèbres",
+            "L’analyse d’une situation de travail et la mise en œuvre de l’ALM",
+            "La vitesse d’un transfert",
+            "La rédaction d’un mémoire"
+          ],
+          "correctIndex": 1,
+          "explication": "Les épreuves portent sur les compétences du référentiel, en situation."
+        },
+        {
+          "question": "Un retour efficace après une mise en situation est :",
+          "options": [
+            "Général et vague",
+            "Centré sur la personnalité",
+            "Uniquement négatif",
+            "Factuel, centré sur le comportement observé, avec une piste de progrès"
+          ],
+          "correctIndex": 3,
+          "explication": "Le retour structuré (ce qui a été fait, effet, amélioration) aide à progresser."
+        },
+        {
+          "question": "Pour animer les apports d’anatomie auprès de soignants, le formateur privilégie :",
+          "options": [
+            "Des supports concrets (colonne articulée, schémas) reliés aux situations vécues",
+            "La lecture d’un traité médical",
+            "Une liste de termes latins",
+            "Une projection sans échange"
+          ],
+          "correctIndex": 0,
+          "explication": "Relier le fonctionnement du corps aux gestes du quotidien rend le contenu utile."
+        },
+        {
+          "question": "Lorsqu’un participant conteste l’intérêt du lève-personne « qui fait perdre du temps », le formateur :",
+          "options": [
+            "Lui donne tort sans explication",
+            "Évite le sujet",
+            "Fait analyser au groupe le temps réel, les risques et les conditions d’usage (rangement, recharge)",
+            "L’exclut du groupe"
+          ],
+          "correctIndex": 2,
+          "explication": "L’objection devient matière à analyse des déterminants organisationnels."
+        },
+        {
+          "question": "À l’issue de la formation des acteurs, la traçabilité des résultats comprend :",
+          "options": [
+            "Un simple courriel",
+            "Une feuille volante",
+            "Rien de particulier",
+            "L’enregistrement des résultats et la délivrance des certificats via l’organisme habilité"
+          ],
+          "correctIndex": 3,
+          "explication": "Seul l’organisme ou l’établissement habilité délivre les certificats d’acteur, enregistrés dans l’outil de gestion du dispositif."
+        },
+        {
+          "question": "Une évaluation à froid de la formation d’acteurs sert à :",
+          "options": [
+            "Mesurer, quelques mois après, l’application des acquis et les pistes mises en œuvre",
+            "Délivrer le certificat",
+            "Évaluer la qualité du repas",
+            "Remplacer les épreuves certificatives"
+          ],
+          "correctIndex": 0,
+          "explication": "Elle relie formation et effets dans l’établissement, et alimente le comité de pilotage."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Présentez votre parcours et votre expérience de la prévention et de la formation.",
+      "reponseAttendue": "Le participant décrit son métier (aide-soignant, infirmier, kinésithérapeute, ergothérapeute, cadre, ergonome), son expérience des manutentions de personnes, ses éventuelles expériences d’animation ou de tutorat et sa place future dans le dispositif (formateur interne d’un établissement ou formateur d’un organisme). Le formateur repère les points forts et les besoins (pédagogie, ALM, prévention)."
+    },
+    {
+      "question": "Qu’avez-vous retenu de l’autoformation @01001 ?",
+      "reponseAttendue": "Les notions de danger, risque, dommage ; les enjeux humains, financiers et juridiques ; les principes généraux de prévention ; les acteurs internes et externes ; l’évaluation des risques et le DUERP. Le participant illustre au moins un principe dans le secteur sanitaire et social."
+    },
+    {
+      "question": "Comment définiriez-vous une démarche de prévention dans un établissement ?",
+      "reponseAttendue": "C’est une démarche structurée, portée par la direction, qui associe les salariés et les instances : évaluer les risques, définir un plan d’actions priorisé selon les principes généraux de prévention, mettre en œuvre, suivre et réajuster. La formation n’en est qu’un levier."
+    },
+    {
+      "question": "Selon vous, pourquoi une formation « gestes et postures » seule ne suffit-elle pas ?",
+      "reponseAttendue": "Elle fait reposer la prévention sur le seul comportement individuel, sans agir sur le matériel, l’organisation ou l’environnement. Les gestes appris sont souvent abandonnés face aux contraintes réelles. La formation-action PRAP vise au contraire à analyser les situations réelles et à transformer le travail."
+    },
+    {
+      "question": "Quelles difficultés anticipez-vous pour animer un groupe d’adultes ?",
+      "reponseAttendue": "Hétérogénéité des niveaux, résistances au changement, scepticisme (« on n’a pas le temps »), restrictions physiques, gestion des temps de parole, lien entre théorie et terrain. Le participant propose des pistes : partir du vécu, méthodes actives, cadre clair."
+    },
+    {
+      "question": "Comment évaluez-vous aujourd’hui les capacités d’une personne avant un transfert ?",
+      "reponseAttendue": "Réponse de positionnement : observation de la compréhension, de la tenue assise et debout, de la force des jambes, de la douleur, de l’environnement. Le formateur repère si l’évaluation est systématique et si elle guide le choix de l’aide technique."
+    },
+    {
+      "question": "Citez les aides techniques que vous connaissez et leurs indications.",
+      "reponseAttendue": "Lit à hauteur variable (tous les soins au lit), drap de glisse (rehaussements, translations), planche de transfert (transfert assis), guidon de transfert (personne qui se lève mais ne marche pas, avec bonne participation), verticalisateur (personne qui tient debout avec appui), lève-personne mobile ou sur rail (personne non participante), ceinture de marche."
+    },
+    {
+      "question": "Quels acteurs associeriez-vous à un projet PRAP dans un EHPAD ?",
+      "reponseAttendue": "Direction, cadre de santé ou IDEC, médecin coordonnateur, CSE, service de prévention et de santé au travail, référent sécurité, salariés volontaires, éventuellement ergothérapeute et service prévention de la Carsat pour le conseil et les aides."
+    },
+    {
+      "question": "Que signifie pour vous « évaluer une formation » ?",
+      "reponseAttendue": "Mesurer l’atteinte des objectifs à différents niveaux : satisfaction, acquis (QCM, mises en situation), transfert sur le terrain (pratiques observées), effets dans l’établissement (pistes mises en œuvre, sinistralité). Distinguer évaluation diagnostique, formative et certificative."
+    },
+    {
+      "question": "Qu’attendez-vous de cette formation de formateurs ?",
+      "reponseAttendue": "Le participant exprime ses attentes (savoir construire et animer une session d’acteurs, conduire une étude préalable, maîtriser l’ALM, obtenir le certificat). Le formateur relie ces attentes aux 3 compétences et aux exigences des épreuves certificatives."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Décrivez les étapes d’un projet de formation-action PRAP dans un établissement.",
+      "reponseAttendue": "1) Premier contact et présentation du dispositif à la direction. 2) Étude préalable : sinistralité, DUERP, organisation, matériel, attentes, conditions de réussite. 3) Formalisation du projet : objectifs, public, calendrier, moyens, comité de pilotage, indicateurs (cahier des charges). 4) Information des salariés et des instances (CSE). 5) Formation des acteurs avec analyse de situations réelles et ALM. 6) Remontée des pistes d’amélioration au comité de pilotage. 7) Mise en œuvre et suivi du plan d’actions. 8) Évaluation du projet et pérennisation (MAC des acteurs, nouvelles sessions)."
+    },
+    {
+      "question": "Comment convaincre une direction réticente d’engager un projet PRAP ?",
+      "reponseAttendue": "S’appuyer sur ses données : accidents, arrêts, restrictions, turn-over, coût des remplacements ; rappeler l’obligation de sécurité et les principes généraux de prévention ; montrer les bénéfices sur la qualité des soins et l’attractivité ; présenter un projet réaliste et intégré au DUERP ; mentionner les appuis possibles (service prévention de la Carsat, aides financières pour certains équipements). Insister sur la nécessité d’un pilotage et de moyens pour traiter les propositions."
+    },
+    {
+      "question": "Expliquez la méthode d’analyse d’une situation de travail que vous enseignerez.",
+      "reponseAttendue": "Décrire la situation réelle (tâche, personne aidée, matériel, environnement, organisation, temps). Repérer les sollicitations (postures, efforts, répétitivité, durée) et les atteintes possibles en s’appuyant sur le fonctionnement du corps humain. Rechercher les déterminants. Formuler des pistes techniques, organisationnelles et humaines, les hiérarchiser selon les principes généraux de prévention, les transmettre et les suivre."
+    },
+    {
+      "question": "Comment organisez-vous une session d’acteurs PRAP 2S de 28 h ?",
+      "reponseAttendue": "Préparation avec l’établissement (participants, situations à analyser, salle, matériel ALM : lit, fauteuil, lève-personne, verticalisateur, drap de glisse). Déroulé : accueil et attentes ; enjeux et acteurs ; anatomie, physiologie, pathologies ; méthode d’analyse appliquée aux situations des participants ; intersession avec observation dans le service ; pistes d’amélioration ; ateliers ALM progressifs ; épreuves certificatives ; bilan et transmission au comité de pilotage. Groupe de 10 participants au plus."
+    },
+    {
+      "question": "Comment animez-vous un atelier ALM ?",
+      "reponseAttendue": "Présenter la situation et faire évaluer les capacités de la personne aidée ; démonstration commentée du déplacement naturel ; pratique en trinôme avec rotation des rôles ; retour de l’observateur et du formateur ; variation des cas (capacités différentes, aides techniques) ; synthèse des principes (solliciter, ne pas porter, économie d’effort). Sécuriser : matériel vérifié, échauffement, respect des restrictions."
+    },
+    {
+      "question": "Quelles méthodes pédagogiques privilégiez-vous et pourquoi ?",
+      "reponseAttendue": "Méthodes actives et expérientielles : partir du vécu des participants, études de cas réels, observation sur le terrain, mises en situation, travaux en sous-groupes, démonstrations suivies de pratique. Les adultes apprennent quand le contenu répond à leurs problèmes concrets ; la formation-action relie apprentissage et transformation du travail."
+    },
+    {
+      "question": "Comment conduisez-vous les épreuves certificatives des acteurs ?",
+      "reponseAttendue": "Informer les participants dès le début des modalités et des critères ; organiser les épreuves conformément au référentiel (analyse d’une situation de travail, propositions, mise en œuvre de l’ALM) ; utiliser les grilles prévues ; garantir équité et conditions matérielles ; communiquer les résultats ; enregistrer les résultats et faire délivrer les certificats par l’organisme ou l’établissement habilité ; prévoir l’accompagnement de ceux qui n’ont pas réussi."
+    },
+    {
+      "question": "Quels indicateurs proposez-vous pour évaluer le projet PRAP ?",
+      "reponseAttendue": "Indicateurs de moyens (nombre d’acteurs formés, matériel acquis), de résultats (pistes proposées, mises en œuvre, délai de traitement), d’effets (utilisation des aides techniques, douleurs déclarées, accidents et arrêts liés aux manutentions, restrictions d’aptitude) et de pérennité (MAC réalisés, intégration au DUERP)."
+    },
+    {
+      "question": "Comment gérez-vous un participant qui conteste l’ALM (« on a toujours fait comme ça ») ?",
+      "reponseAttendue": "Accueillir l’objection sans la disqualifier, faire expliciter son expérience, lui faire ressentir en rôle de personne aidée la différence entre prise axillaire et accompagnement, faire analyser par le groupe les risques et les déterminants, l’associer à une démonstration. S’appuyer sur des faits (lésions d’épaule, lombalgies) et sur les bénéfices pour la personne aidée."
+    },
+    {
+      "question": "Quelles sont les conditions de validité de votre certificat de formateur ?",
+      "reponseAttendue": "Le certificat de formateur PRAP 2S est délivré après réussite des épreuves certificatives par un organisme habilité par le réseau Assurance Maladie – Risques professionnels / INRS, avec le prérequis @01001. Il est valable 36 mois et doit être prolongé par un maintien et actualisation des compétences de formateur avant l’échéance. Le formateur exerce au sein d’une structure habilitée pour délivrer les certificats d’acteur."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Conduire l’étude préalable d’un EHPAD",
+      "consigne": "La directrice de l’EHPAD fictif Les Hortensias (80 lits, 65 salariés) vous contacte : 9 accidents du travail liés aux manutentions l’an dernier, 2 inaptitudes, 3 lève-personnes peu utilisés. Elle souhaite « former tout le monde aux gestes et postures en une journée ». Préparez l’étude préalable : données à recueillir, personnes à rencontrer et réponse à sa demande.",
+      "reponseAttendue": "Données : accidents du travail et maladies professionnelles sur 3 ans (nature, service, circonstances), jours d’arrêt, restrictions et inaptitudes, DUERP et plan d’actions, organisation des équipes et plannings, inventaire et état du matériel (lits, lève-personnes, verticalisateurs, draps de glisse), profil de dépendance des résidents. Personnes : directrice, cadre de santé ou IDEC, médecin coordonnateur, représentants du CSE, service de prévention et de santé au travail, quelques soignants de jour et de nuit, lingerie. Réponse : expliquer qu’une journée « gestes et postures » ne traite pas les causes (matériel inutilisé, organisation) ; proposer un projet de formation-action PRAP 2S avec comité de pilotage, formation de 28 h d’un groupe d’acteurs représentatif (10 au plus), analyse de situations réelles et ALM, traitement des pistes, indicateurs. Formaliser l’engagement de la direction dans un cahier des charges. Barème : données 3, personnes 2, argumentation 3, formalisation 2.",
+      "points": 10
+    },
+    {
+      "titre": "Rédiger le cahier des charges du projet",
+      "consigne": "Suite à l’étude préalable aux Hortensias, rédigez les rubriques du cahier des charges du projet PRAP et leur contenu.",
+      "reponseAttendue": "Contexte et enjeux (sinistralité, matériel peu utilisé, inaptitudes). Objectifs : réduire les accidents liés aux manutentions, développer l’usage des aides techniques, rendre les salariés acteurs. Public : 10 soignants volontaires de jour et de nuit, tous services, plus une lingère. Calendrier : 4 jours répartis sur 6 semaines avec intersession, puis points de suivi à 3 et 6 mois. Moyens : salle, chambre de simulation, matériel ALM, temps de remplacement des participants, budget pour les pistes. Pilotage : comité réunissant direction, cadre, médecin coordonnateur, CSE, SPST, formateur, avec 3 réunions dans l’année. Circuit des propositions : fiche d’amélioration, examen en comité, réponse argumentée. Indicateurs : pistes proposées et réalisées, utilisation du matériel, accidents. Pérennisation : MAC des acteurs à 24 mois, intégration au DUERP. Barème : 1 point par rubrique pertinente, 2 points de cohérence.",
+      "points": 10
+    },
+    {
+      "titre": "Analyser une situation de travail en service de médecine",
+      "consigne": "Au centre hospitalier fictif de Valmont, en médecine gériatrique, une infirmière et une aide-soignante réalisent la toilette d’un patient de 110 kg, peu participant, dans un lit électrique dont la télécommande est cassée depuis trois semaines. Elles travaillent penchées, réalisent quatre rehaussements par soin et terminent en retard. Analysez la situation comme vous l’enseignerez.",
+      "reponseAttendue": "Description : soin quotidien, patient lourd et peu participant, binôme, lit bloqué en position basse, rehaussements multiples, contrainte temporelle. Sollicitations : flexion prolongée, efforts de traction, répétition, torsions. Atteintes possibles : lombalgies, hernies discales, tendinopathies d’épaule ; pour le patient, frottements cutanés et risque d’escarre. Déterminants : matériel (télécommande cassée, absence de drap de glisse), organisation (délai de réparation, circuit de signalement inefficace, charge de soins), personne (poids, faible participation), compétences. Pistes : réparation immédiate et stock de télécommandes, drap de glisse et lève-personne pour le repositionnement (technique) ; circuit de maintenance avec délai garanti, planification des soins lourds (organisationnel) ; formation ALM et rappel du signalement (humain). Suivi : vérifier la réparation sous 48 h et l’usage du matériel. Barème : description 2, sollicitations et atteintes 2, déterminants 3, pistes et suivi 3.",
+      "points": 10
+    },
+    {
+      "titre": "Hiérarchiser et suivre les pistes d’amélioration",
+      "consigne": "Les acteurs PRAP des Hortensias ont remonté 12 pistes, dont : rails de plafond dans 10 chambres, draps de glisse, réorganisation des toilettes, rehausseurs de chaises en salle à manger, formation des intérimaires, chariot de linge à fond remontant. Le budget de l’année est limité. Expliquez comment vous aidez le comité de pilotage à hiérarchiser et à suivre ces pistes.",
+      "reponseAttendue": "Construire un tableau : risque traité, situations et salariés concernés, efficacité attendue selon les principes généraux de prévention (suppression à la source prioritaire), coût, délai, faisabilité. Exemple de hiérarchie : à court terme et à faible coût, draps de glisse, formation des intérimaires, réorganisation des toilettes ; à moyen terme, chariot à fond remontant ; à plus long terme, rails de plafond pour les chambres des résidents les plus dépendants, avec recherche d’aides financières de la Carsat si l’établissement y est éligible. Plan d’actions daté avec responsables et indicateurs. Communication des décisions aux acteurs, y compris des pistes refusées avec leur motif, pour maintenir l’engagement. Points de suivi à 3 et 6 mois. Barème : critères 3, hiérarchie argumentée 3, plan d’actions 2, communication 2.",
+      "points": 10
+    },
+    {
+      "titre": "Concevoir le déroulé d’une session d’acteurs PRAP 2S",
+      "consigne": "Construisez le déroulé de la formation d’acteurs PRAP 2S de 28 h pour 10 soignants des Hortensias, en indiquant pour chaque séquence les objectifs, méthodes et durées.",
+      "reponseAttendue": "Jour 1 (7 h) : accueil, attentes et règles, présentation du projet de l’établissement ; enjeux et acteurs de la prévention (méthode interrogative, données de l’établissement) ; fonctionnement du corps humain et atteintes (colonne articulée, schémas). Jour 2 (7 h) : méthode d’observation et d’analyse sur vidéos puis observation de situations réelles dans les services ; facteurs de risque et déterminants. Intersession : chaque acteur analyse une situation de son service. Jour 3 (7 h) : restitution des analyses, pistes d’amélioration, hiérarchisation et rédaction des fiches ; début ALM (évaluation des capacités, déplacements naturels au lit). Jour 4 (7 h) : ALM, assis-debout, transferts, aides techniques en trinômes ; épreuves certificatives ; bilan, évaluation à chaud et transmission des pistes au comité. Méthodes actives, alternance théorie et pratique, retours individualisés. Barème : respect durée et contenus 4, méthodes 3, cohérence et progression 3.",
+      "points": 10
+    },
+    {
+      "titre": "Animer une démonstration de transfert avec verticalisateur",
+      "consigne": "En atelier, vous devez faire apprendre aux acteurs le transfert lit-fauteuil avec verticalisateur d’une personne qui tient debout avec appui sans pouvoir marcher. Décrivez votre animation.",
+      "reponseAttendue": "Introduction : présenter le cas et faire évaluer par le groupe les capacités (compréhension, tenue de tête et de tronc, appui sur les jambes, douleur) et justifier le choix du verticalisateur. Vérification collective du matériel : charge maximale, batterie, sangle de taille adaptée, freins. Démonstration commentée lente : explication à la personne, positionnement du fauteuil, installation de la sangle, pieds sur la plateforme, mise debout progressive en sollicitant la personne, déplacement, descente au fond du fauteuil, retrait de la sangle. Pratique en trinômes avec rotation des rôles, l’observateur utilisant une grille. Retour factuel par l’observateur puis le formateur. Variante : personne qui fatigue ou hésite. Synthèse : critères d’indication et de contre-indication. Sécurité : participants avec restrictions en rôle d’observateur. Barème : évaluation et choix 2, matériel 2, démonstration 2, pratique et retours 3, synthèse 1.",
+      "points": 10
+    },
+    {
+      "titre": "Gérer une dynamique de groupe difficile",
+      "consigne": "Pendant la session aux Hortensias, deux aides-soignantes de nuit déclarent : « De toute façon la direction ne fera rien, on est deux pour 40 résidents. » Le groupe se démobilise. Comment réagissez-vous ?",
+      "reponseAttendue": "Accueillir la parole sans la nier : la contrainte d’effectif est réelle et constitue un déterminant organisationnel légitime. Faire analyser au groupe une situation de nuit concrète, identifier les déterminants (effectif, rangement du matériel, absence de lit réglable) et rechercher des pistes accessibles même avec un effectif réduit (lève-personne à chaque étage, recharge organisée, plan de soins adapté). Rappeler l’existence du comité de pilotage et l’engagement de la direction formalisé dans le cahier des charges ; proposer que la piste « effectif de nuit » soit remontée avec des données. Si possible, inviter un membre de la direction à la restitution. Valoriser les contributions. Barème : écoute 2, recadrage sur l’analyse 3, pistes 3, lien au pilotage 2.",
+      "points": 10
+    },
+    {
+      "titre": "Adapter la formation à l’aide à domicile",
+      "consigne": "Le service d’aide à domicile fictif Domi’Sens (45 intervenants) souhaite un projet PRAP. Les intervenantes travaillent seules, chez des personnes dont le logement et le matériel varient. Quelles adaptations prévoyez-vous dans le projet et dans la formation ?",
+      "reponseAttendue": "Projet : étude préalable spécifique (accidents de trajet, chutes, manutentions au domicile, absence de matériel), association des responsables de secteur, circuit de remontée vers la structure qui contacte bénéficiaire, famille, médecin traitant ou ergothérapeute et financeurs d’aménagements. Formation : analyse de situations à domicile à partir de photos et de récits, observation accompagnée de quelques interventions avec accord des bénéficiaires, pistes spécifiques (lit médicalisé, rehausseur, barres d’appui, siège de douche, planche de bain, adaptation du plan d’aide et des durées). ALM centrée sur le travail seul : évaluation systématique des capacités, sollicitation de la personne, aides simples (drap de glisse, guidon), savoir refuser une manutention dangereuse et alerter. Suivi : fiche de signalement simplifiée et retour à l’intervenante. Barème : projet 4, contenus 3, ALM 2, suivi 1.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer et conduire les épreuves certificatives des acteurs",
+      "consigne": "Vous animez la dernière journée de la session des Hortensias. Organisez les épreuves certificatives et le traitement des résultats, y compris pour une participante qui n’atteint pas les critères en ALM.",
+      "reponseAttendue": "Préparation : informer dès le premier jour des épreuves et des critères ; préparer les grilles du référentiel, les cas et le matériel. Déroulement : épreuve d’analyse d’une situation de travail (présentation de l’analyse réalisée en intersession, pistes proposées, questionnement) et épreuve de mise en œuvre de l’ALM sur un cas avec aide technique ; conditions identiques pour tous, temps prévu, observation avec grille. Résultats : communication individuelle argumentée. Participante non certifiée : retour précis sur les critères non atteints, plan de progression, possibilité de repasser l’épreuve selon les modalités du dispositif. Traçabilité : enregistrement des résultats et délivrance des certificats d’acteur par la structure habilitée, valables 24 mois ; transmission de la synthèse anonymisée des pistes au comité. Barème : préparation 2, conduite 3, cas d’échec 3, traçabilité 2.",
+      "points": 10
+    },
+    {
+      "titre": "Évaluer le projet un an après",
+      "consigne": "Un an après la session des Hortensias, la directrice vous demande un bilan. 7 pistes sur 12 ont été réalisées, les accidents liés aux manutentions sont passés de 9 à 5, mais deux acteurs ont quitté l’établissement et le lève-personne du 1er étage est de nouveau peu utilisé. Construisez le bilan et vos recommandations.",
+      "reponseAttendue": "Bilan quantitatif : 7 pistes réalisées sur 12, baisse des accidents de 9 à 5 (prudence sur l’interprétation : effectifs, résidents et autres actions ont pu évoluer), utilisation du matériel. Bilan qualitatif : entretiens avec acteurs et encadrement, observation de quelques soins, analyse des causes de non-utilisation du lève-personne au 1er étage (rangement, recharge, nouveaux salariés non formés). Recommandations : former de nouveaux acteurs pour remplacer les départs et couvrir tous les services, intégrer l’ALM au parcours d’accueil des nouveaux arrivants, réactiver le circuit matériel (référent, recharge), programmer les MAC des acteurs avant l’échéance de 24 mois, poursuivre les 5 pistes restantes avec un calendrier, mettre à jour le DUERP et maintenir le comité de pilotage. Présentation écrite au comité. Barème : bilan quantitatif 2, qualitatif 3, recommandations 4, présentation 1.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : étude préalable et analyse d’une situation de travail (retour d’intersession)",
+    "contexte": "Pendant l’intersession, vous êtes intervenu à la maison d’accueil spécialisée fictive Le Phare (40 résidents polyhandicapés, 55 salariés). La direction évoque 6 accidents liés aux manutentions sur un an. Vous avez observé la toilette au lit d’un résident de 70 kg, non participant, réalisée par une seule aide médico-psychologique, lit à hauteur variable, sans lève-personne dans la chambre ; le lève-personne mobile du service est partagé entre 12 chambres. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Présentez les éléments de l’étude préalable recueillis ou à recueillir.",
+        "reponseAttendue": "Sinistralité détaillée (accidents, arrêts, maladies professionnelles), DUERP, organisation des équipes, inventaire du matériel, profil des résidents, attentes de la direction et conditions de réussite (pilotage, moyens, engagement). Barème : données 3 points, conditions de réussite 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Décrivez la situation observée et les sollicitations.",
+        "reponseAttendue": "Soin quotidien d’un résident non participant, réalisé seul, retournements et rehaussements sans aide, matériel partagé. Sollicitations : efforts de traction et de retournement, flexion, torsion, répétition sur la matinée. Barème : description 2 points, sollicitations 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Identifiez les déterminants et les atteintes possibles.",
+        "reponseAttendue": "Déterminants : matériel insuffisant (un lève-personne pour 12 chambres), organisation (soin seul), personne (non participante), compétences. Atteintes : lombalgies, tendinopathies d’épaule pour l’AMP ; douleurs et lésions cutanées pour le résident. Barème : déterminants 3 points, atteintes 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Proposez des pistes hiérarchisées et la suite du projet.",
+        "reponseAttendue": "Priorité aux pistes à la source : rails de lève-personne dans les chambres des résidents non participants, draps de glisse ; organisation des soins lourds en binôme ; formation ALM. Suite : présentation à la direction, cahier des charges, comité de pilotage, formation d’acteurs. Barème : pistes 3 points, suite 2 points.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 3 compétences de formateur PRAP 2S, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores",
+    "exercices": [
+      {
+        "titre": "Construire un projet de formation-action",
+        "consigne": "Le foyer d’accueil médicalisé fictif Les Coteaux souhaite former 10 acteurs PRAP 2S. Présentez les étapes du projet et les conditions de réussite que vous posez à la direction.",
+        "reponseAttendue": "Étapes : contact, étude préalable, cahier des charges, information des salariés et du CSE, formation des acteurs, traitement des pistes en comité, suivi et évaluation, pérennisation. Conditions : engagement écrit de la direction, comité de pilotage, temps et remplacements, moyens pour les pistes, articulation avec le DUERP. Barème : étapes 3 points, conditions 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Analyser une situation et proposer des pistes",
+        "consigne": "Aux Coteaux, la douche des résidents se fait sur un chariot-douche à hauteur fixe dans une salle de bain étroite ; les soignants travaillent penchés 20 minutes par douche. Analysez et proposez.",
+        "reponseAttendue": "Sollicitations : flexion prolongée, torsion, environnement humide. Atteintes : lombalgies, cervicalgies. Déterminants : chariot à hauteur fixe, salle étroite, durée. Pistes : chariot-douche à hauteur variable et réaménagement (technique), planification et binôme (organisationnel), formation (humain), avec hiérarchisation et suivi. Barème : analyse 3 points, pistes et suivi 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Concevoir une séquence pédagogique ALM",
+        "consigne": "Concevez une séquence de 1 h 30 sur le passage assis-debout pour des acteurs PRAP 2S : objectifs, méthodes, déroulé et évaluation.",
+        "reponseAttendue": "Objectif opérationnel : accompagner un passage assis-debout en sollicitant les capacités de la personne, sans la porter. Déroulé : rappel du mouvement naturel, démonstration commentée, pratique en trinôme avec rotation, variantes selon les capacités, synthèse. Évaluation formative par grille d’observation. Barème : objectif 1 point, déroulé et méthodes 3 points, évaluation 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Évaluer la formation et le projet",
+        "consigne": "Proposez le dispositif d’évaluation de la session d’acteurs et du projet aux Coteaux, ainsi que la traçabilité des certificats.",
+        "reponseAttendue": "Évaluations : diagnostique, formative, certificative selon le référentiel, satisfaction à chaud, évaluation à froid à 3-6 mois. Indicateurs de projet : pistes réalisées, utilisation du matériel, sinistralité. Traçabilité : résultats enregistrés, certificats d’acteur valables 24 mois délivrés par la structure habilitée, MAC planifiés. Barème : évaluations 2 points, indicateurs 2 points, traçabilité 1 point.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Conduite du projet de formation-action (étude préalable, engagement de la direction, pilotage, intégration au DUERP) : 0 = absente ; 1 = confusions majeures ; 2 = partielle ; 3 = correcte ; 4 = complète et adaptée à l’établissement.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’analyse de situation de travail (travail réel, sollicitations, atteintes, déterminants) : 0 = absente ; 1 = superficielle ; 2 = incomplète ; 3 = pertinente ; 4 = pertinente, structurée et argumentée.",
+        "points": 4
+      },
+      {
+        "critere": "Pertinence et suivi des pistes d’amélioration (nature, hiérarchisation, plan d’actions, indicateurs) : 0 = aucune ; 1 = inadaptées ; 2 = partielles ; 3 = adaptées ; 4 = adaptées, hiérarchisées et suivies.",
+        "points": 4
+      },
+      {
+        "critere": "Ingénierie et animation pédagogiques (objectifs, méthodes actives, ALM, gestion du groupe) : 0 = inadaptées ; 1 = faibles ; 2 = partielles ; 3 = adaptées ; 4 = adaptées, progressives et sécurisées.",
+        "points": 4
+      },
+      {
+        "critere": "Évaluation et traçabilité (épreuves certificatives, retours, certificats, évaluation du projet) : 0 = absentes ; 1 = inadaptées ; 2 = incomplètes ; 3 = conformes ; 4 = conformes et exploitées pour l’amélioration.",
+        "points": 4
+      }
+    ]
+  }
+}

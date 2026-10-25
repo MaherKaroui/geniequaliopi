@@ -1,0 +1,911 @@
+{
+  "competences": [
+    "Se situer en tant qu’acteur de prévention des risques liés à l’activité physique dans son établissement.",
+    "Observer et analyser sa situation de travail en s’appuyant sur le fonctionnement du corps humain afin d’identifier les atteintes à la santé encourues.",
+    "Participer à la maîtrise du risque en proposant à son encadrement des améliorations d’ordre technique, organisationnel ou humain.",
+    "Accompagner la mobilité de la personne aidée en prenant soin de l’autre et de soi (ALM)."
+  ],
+  "besoinsList": [
+    "Comprendre les enjeux humains, réglementaires et économiques des TMS et lombalgies dans le secteur sanitaire et social.",
+    "Identifier les acteurs internes et externes de la prévention de son établissement et le circuit de remontée des propositions.",
+    "Connaître le fonctionnement de la colonne vertébrale, des articulations, des muscles et des tendons.",
+    "Repérer les facteurs de risque biomécaniques, psychosociaux, organisationnels et environnementaux de sa situation de travail.",
+    "Décrire et analyser une situation de travail réelle à l’aide d’une grille d’observation.",
+    "Formuler des pistes d’amélioration techniques, organisationnelles et humaines argumentées et hiérarchisées.",
+    "Évaluer les capacités de la personne aidée avant tout déplacement.",
+    "Accompagner les déplacements naturels de la personne (rehaussement, retournement, assis-debout, transferts) sans la porter.",
+    "Choisir et utiliser les aides techniques adaptées : lit à hauteur variable, drap de glisse, verticalisateur, lève-personne.",
+    "Appliquer au quotidien les principes de sécurité physique et d’économie d’effort pour préserver sa santé."
+  ],
+  "syntheseHtml": "• Le parcours forme des acteurs PRAP 2S (prévention des risques liés à l’activité physique, secteur sanitaire et social) selon le dispositif et le programme INRS PRAP-2S 004 « Devenir acteur PRAP 2S » : 28 h réparties sur 4 jours en présentiel, groupe de 10 participants au plus.<br>• Le référentiel INRS comporte 4 compétences : C1 — Se situer en tant qu’acteur de prévention des risques liés à l’activité physique dans son établissement ; C2 — Observer et analyser sa situation de travail en s’appuyant sur le fonctionnement du corps humain afin d’identifier les atteintes à la santé encourues ; C3 — Participer à la maîtrise du risque en proposant à son encadrement des améliorations d’ordre technique, organisationnel ou humain ; C4 — Accompagner la mobilité de la personne aidée en prenant soin de l’autre et de soi (ALM).<br>• Le parcours alterne apports (enjeux, acteurs, anatomie et physiologie, facteurs de risque), observation et analyse de situations de travail réelles des participants, élaboration de pistes d’amélioration et ateliers pratiques ALM avec les aides techniques de l’établissement ; un travail d’intersession porte sur l’analyse d’une situation du service.<br>• Le certificat d’acteur PRAP 2S est délivré, après réussite des épreuves certificatives prévues par le référentiel, uniquement par un organisme de formation ou un établissement habilité par le réseau Assurance Maladie – Risques professionnels / INRS ; il est valable 24 mois et prolongé par un stage de maintien et d’actualisation des compétences (MAC) de 14 h.<br>• Les évaluations internes du parcours (positionnement, QCM, contrôle intermédiaire, évaluation finale) préparent aux épreuves certificatives mais ne les remplacent pas.",
+  "adaptationsHtml": "• Recueillir en amont les situations de travail réelles des participants (service, type de résidents ou de patients, aides techniques disponibles) pour construire les cas pratiques.<br>• Adapter les ateliers ALM aux restrictions médicales signalées : rôle d’observateur, de « personne aidée » ou d’opérateur selon les capacités, sans jamais imposer de mise en charge.<br>• Utiliser des supports visuels (squelette, colonne vertébrale articulée, vidéos, photos de postes) et des consignes découpées pour les publics peu à l’aise avec l’écrit.<br>• Faire pratiquer chacun sur le matériel réel de son établissement (lit, fauteuil, lève-personne, drap de glisse) et filmer, avec accord, pour l’auto-analyse.<br>• Assurer un retour individualisé après chaque mise en situation et organiser une remédiation ciblée avant les épreuves certificatives ; aménager le rythme, les pauses et l’accessibilité des locaux pour les personnes en situation de handicap.",
+  "qcmDebut": [
+    {
+      "question": "Que signifie le sigle TMS ?",
+      "options": [
+        "Troubles moteurs spécifiques",
+        "Traumatismes musculaires sévères",
+        "Troubles musculosquelettiques",
+        "Tensions musculaires saisonnières"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Que signifie PRAP ?",
+      "options": [
+        "Prévention des risques liés à l’activité physique",
+        "Protection rapprochée des agents physiques",
+        "Programme de rééducation des affections professionnelles",
+        "Plan régional d’aide à la personne"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quelle partie du corps est la plus souvent touchée par les lombalgies ?",
+      "options": [
+        "La nuque",
+        "Le genou",
+        "Le poignet",
+        "Le bas du dos (région lombaire)"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Combien de vertèbres lombaires compte habituellement la colonne vertébrale ?",
+      "options": [
+        "7",
+        "5",
+        "12",
+        "3"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quel document recense les risques professionnels de l’établissement ?",
+      "options": [
+        "Le règlement intérieur",
+        "Le document unique d’évaluation des risques professionnels (DUERP)",
+        "Le livret d’accueil du résident",
+        "Le projet d’établissement"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Dans l’approche ALM, que doit faire en priorité le soignant avant de déplacer une personne ?",
+      "options": [
+        "La soulever rapidement pour limiter la durée d’effort",
+        "Appeler systématiquement un collègue pour la porter à deux",
+        "Utiliser d’office le lève-personne",
+        "Évaluer et solliciter les capacités de la personne aidée"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Lequel de ces éléments est une aide technique au transfert ?",
+      "options": [
+        "Le drap de glisse",
+        "Le chariot de soins",
+        "Le bracelet d’identification",
+        "Le tensiomètre"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Qui est responsable de la santé et de la sécurité des salariés dans l’établissement ?",
+      "options": [
+        "Le médecin du travail",
+        "Le salarié lui-même uniquement",
+        "L’employeur",
+        "L’assureur de l’établissement"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Parmi ces facteurs, lequel augmente le risque de TMS ?",
+      "options": [
+        "Une pause régulière",
+        "Un lit réglé à bonne hauteur",
+        "Une charge rapprochée du corps",
+        "La répétition de gestes avec des postures contraignantes"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle est la durée de la formation d’acteur PRAP 2S ?",
+      "options": [
+        "28 heures (4 jours)",
+        "7 heures (1 jour)",
+        "14 heures (2 jours)",
+        "98 heures (14 jours)"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Parmi ces mesures, laquelle applique le principe général de prévention « combattre les risques à la source » ?",
+      "options": [
+        "Distribuer des ceintures lombaires aux soignants",
+        "Rappeler par affiche de « bien se tenir »",
+        "Installer un lève-personne sur rail dans les chambres des résidents dépendants",
+        "Recruter des soignants plus robustes"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Un disque intervertébral soumis à une flexion du tronc avec charge voit son noyau :",
+      "options": [
+        "Se déplacer vers l’arrière, vers la moelle et les racines nerveuses",
+        "Se déplacer vers l’avant, sans conséquence",
+        "Rester parfaitement immobile",
+        "Se vider instantanément"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Dans une analyse de situation de travail, quel élément relève des déterminants « organisation » ?",
+      "options": [
+        "La hauteur fixe du lit",
+        "Le poids de la personne aidée",
+        "Le revêtement de sol glissant",
+        "Le nombre de toilettes à réaliser avant le petit-déjeuner"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Une proposition « former les nouveaux arrivants à l’utilisation du verticalisateur » est une piste d’amélioration d’ordre :",
+      "options": [
+        "Technique",
+        "Humain",
+        "Organisationnel",
+        "Architectural"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Une résidente tient debout avec appui mais ne peut pas faire quelques pas. Pour un transfert lit-fauteuil, l’aide la plus adaptée est généralement :",
+      "options": [
+        "Un lève-personne à sangle complète obligatoirement",
+        "Un verticalisateur, si elle a une bonne tenue de tête et de tronc et un appui sur les jambes",
+        "Un portage à deux soignants",
+        "Une simple canne"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Que vérifie-t-on en premier avant d’utiliser un lève-personne ?",
+      "options": [
+        "La couleur de la sangle",
+        "Que la personne est assise au bord du lit",
+        "Que le lit est en position la plus basse",
+        "La charge maximale, l’état et la taille de la sangle adaptée à la personne"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Le certificat d’acteur PRAP 2S est valable :",
+      "options": [
+        "24 mois, prolongé par un MAC de 14 h",
+        "Sans limite de durée",
+        "12 mois, prolongé par un MAC de 7 h",
+        "36 mois, prolongé par une nouvelle formation complète"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Lors d’un rehaussement au lit dans l’approche ALM, on cherche à :",
+      "options": [
+        "Tirer la personne par les aisselles",
+        "Soulever la personne à deux sous les cuisses et le dos",
+        "Utiliser le mouvement naturel de la personne et réduire les frottements (drap de glisse, lit à plat, hauteur adaptée)",
+        "Laisser la personne glisser seule"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Une sollicitation importante de faible durée provoque surtout :",
+      "options": [
+        "Une lésion définitive dans tous les cas",
+        "Aucun effet sur l’organisme",
+        "Une maladie professionnelle reconnue d’emblée",
+        "Une fatigue réversible si la récupération est suffisante"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "À qui l’acteur PRAP 2S transmet-il en priorité ses propositions d’amélioration ?",
+      "options": [
+        "À son encadrement, selon le circuit défini dans l’établissement",
+        "Directement au fournisseur de matériel",
+        "À l’inspection du travail",
+        "Aux familles des résidents"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Se situer en tant qu’acteur de prévention des risques liés à l’activité physique dans son établissement.",
+      "questions": [
+        {
+          "question": "Quel pourcentage approximatif des maladies professionnelles reconnues en France représentent les TMS ?",
+          "options": [
+            "Environ 1 sur 10",
+            "Environ la moitié",
+            "Près de 9 sur 10",
+            "Moins de 5 %"
+          ],
+          "correctIndex": 2,
+          "explication": "Les TMS représentent régulièrement près de 87 % des maladies professionnelles reconnues au régime général : c’est le premier problème de santé au travail."
+        },
+        {
+          "question": "Quel secteur figure parmi les plus touchés par les accidents du travail liés aux manutentions ?",
+          "options": [
+            "L’aide et le soin à la personne (EHPAD, aide à domicile, hôpital)",
+            "La banque",
+            "L’édition de logiciels",
+            "L’enseignement supérieur"
+          ],
+          "correctIndex": 0,
+          "explication": "Les métiers de l’aide et du soin cumulent manutentions de personnes, postures contraignantes et contraintes de temps : leur sinistralité est supérieure à la moyenne."
+        },
+        {
+          "question": "Lequel est un principe général de prévention du Code du travail ?",
+          "options": [
+            "Adapter l’homme au travail",
+            "Privilégier les protections individuelles",
+            "Former après l’accident",
+            "Adapter le travail à l’homme"
+          ],
+          "correctIndex": 3,
+          "explication": "L’article L. 4121-2 du Code du travail cite notamment « adapter le travail à l’homme » et donne la priorité aux protections collectives."
+        },
+        {
+          "question": "Quel acteur externe accompagne les établissements dans la prévention et peut proposer des aides financières ?",
+          "options": [
+            "La préfecture",
+            "La Carsat (ou CRAMIF, CGSS)",
+            "La caisse d’allocations familiales",
+            "Le tribunal judiciaire"
+          ],
+          "correctIndex": 1,
+          "explication": "Le service prévention de la Carsat conseille les établissements et gère des aides financières destinées aux PME, par exemple pour l’achat d’aides techniques."
+        },
+        {
+          "question": "Quel est le rôle principal de l’acteur PRAP 2S ?",
+          "options": [
+            "Remplacer l’employeur dans l’évaluation des risques",
+            "Être force de proposition pour améliorer sa situation de travail et celle de ses collègues",
+            "Sanctionner les collègues qui prennent des risques",
+            "Réaliser les visites médicales"
+          ],
+          "correctIndex": 1,
+          "explication": "L’acteur PRAP observe, analyse et propose ; les décisions restent du ressort de l’encadrement et de l’employeur."
+        },
+        {
+          "question": "Qui doit être informé en priorité d’un risque repéré par l’acteur PRAP dans le service ?",
+          "options": [
+            "Le fournisseur des lits",
+            "Une famille de résident",
+            "Personne tant qu’il n’y a pas d’accident",
+            "Son responsable hiérarchique (cadre de santé, IDEC, responsable de secteur)"
+          ],
+          "correctIndex": 3,
+          "explication": "Le circuit de remontée passe par l’encadrement qui peut associer la direction, le CSE et le service de prévention et de santé au travail."
+        },
+        {
+          "question": "Quel coût indirect d’un accident du travail est souvent sous-estimé dans un EHPAD ?",
+          "options": [
+            "Le remplacement du salarié absent et la désorganisation du service",
+            "Le prix du papier du certificat médical",
+            "La consommation électrique",
+            "Le loyer du bâtiment"
+          ],
+          "correctIndex": 0,
+          "explication": "Remplacements, heures supplémentaires, intérim, baisse de qualité des soins : les coûts indirects dépassent souvent les coûts directs."
+        },
+        {
+          "question": "Le DUERP doit être :",
+          "options": [
+            "Rédigé une fois à la création de l’établissement",
+            "Tenu par le médecin du travail",
+            "Mis à jour au moins chaque année dans les établissements d’au moins 11 salariés et lors de tout changement important",
+            "Remplacé par le certificat PRAP"
+          ],
+          "correctIndex": 2,
+          "explication": "Le document unique est actualisé au moins annuellement (établissements de 11 salariés et plus), lors de décisions d’aménagement importantes ou après information nouvelle sur un risque."
+        },
+        {
+          "question": "Quel organisme a conçu le dispositif et les référentiels de formation PRAP ?",
+          "options": [
+            "Le ministère de la Culture",
+            "Les fabricants de lève-personnes",
+            "Chaque EHPAD pour son propre compte",
+            "L’INRS avec le réseau Assurance Maladie – Risques professionnels"
+          ],
+          "correctIndex": 3,
+          "explication": "L’INRS et l’Assurance Maladie – Risques professionnels définissent les référentiels et habilitent les organismes qui délivrent les certificats."
+        },
+        {
+          "question": "Une démarche de prévention durable dans l’établissement repose sur :",
+          "options": [
+            "L’engagement de la direction, la participation des salariés et un suivi des actions",
+            "La seule formation des soignants",
+            "L’achat de matériel sans formation",
+            "Un affichage de consignes"
+          ],
+          "correctIndex": 0,
+          "explication": "La formation PRAP s’inscrit dans un projet d’établissement : sans pilotage et sans suivi, les propositions des acteurs restent lettre morte."
+        }
+      ]
+    },
+    {
+      "competence": "Observer et analyser sa situation de travail en s’appuyant sur le fonctionnement du corps humain afin d’identifier les atteintes à la santé encourues.",
+      "questions": [
+        {
+          "question": "Combien de vertèbres cervicales compte la colonne vertébrale ?",
+          "options": [
+            "5",
+            "12",
+            "7",
+            "4"
+          ],
+          "correctIndex": 2,
+          "explication": "La colonne compte 7 cervicales, 12 dorsales (thoraciques), 5 lombaires, puis le sacrum et le coccyx."
+        },
+        {
+          "question": "Quel est le rôle du disque intervertébral ?",
+          "options": [
+            "Amortir les contraintes et permettre la mobilité entre deux vertèbres",
+            "Produire les globules rouges",
+            "Relier le muscle à l’os",
+            "Protéger le cerveau"
+          ],
+          "correctIndex": 0,
+          "explication": "Le disque, formé d’un anneau fibreux et d’un noyau, répartit les pressions et autorise les mouvements."
+        },
+        {
+          "question": "Quelle structure relie un muscle à un os ?",
+          "options": [
+            "Le ligament",
+            "Le cartilage",
+            "Le disque",
+            "Le tendon"
+          ],
+          "correctIndex": 3,
+          "explication": "Le tendon transmet la force du muscle à l’os ; le ligament relie deux os entre eux."
+        },
+        {
+          "question": "Une hernie discale correspond à :",
+          "options": [
+            "Une fracture de vertèbre",
+            "La sortie d’une partie du noyau du disque à travers l’anneau fissuré",
+            "Une inflammation de la peau",
+            "Une contracture passagère"
+          ],
+          "correctIndex": 1,
+          "explication": "La hernie peut comprimer une racine nerveuse, d’où une sciatique ou une cruralgie."
+        },
+        {
+          "question": "Quelle posture augmente le plus la pression sur les disques lombaires ?",
+          "options": [
+            "Debout, dos droit, charge contre le corps",
+            "Le tronc penché en avant avec une charge éloignée du corps",
+            "Allongé sur le dos",
+            "Assis contre un dossier adapté"
+          ],
+          "correctIndex": 1,
+          "explication": "Plus la charge et le tronc sont loin de l’axe du corps, plus le bras de levier et la pression discale augmentent."
+        },
+        {
+          "question": "Lequel est un facteur de risque psychosocial ?",
+          "options": [
+            "Un sol glissant",
+            "Un lit sans hauteur variable",
+            "Le poids de la personne aidée",
+            "Le manque de temps et les interruptions fréquentes pendant les soins"
+          ],
+          "correctIndex": 3,
+          "explication": "Les facteurs psychosociaux (pression temporelle, manque de reconnaissance, conflits) augmentent les tensions musculaires et le risque de TMS."
+        },
+        {
+          "question": "Le syndrome du canal carpien touche :",
+          "options": [
+            "Le poignet, par compression du nerf médian",
+            "L’épaule, par usure de la coiffe des rotateurs",
+            "Le genou, par atteinte du ménisque",
+            "Le coude, par atteinte des tendons épicondyliens"
+          ],
+          "correctIndex": 0,
+          "explication": "Les gestes répétés et en force du poignet (essorage, port de bassines) favorisent ce TMS."
+        },
+        {
+          "question": "Dans l’observation d’une situation de travail, on décrit d’abord :",
+          "options": [
+            "Uniquement la fiche de poste",
+            "Les causes supposées de l’accident",
+            "Ce que fait réellement le professionnel (travail réel), et non seulement ce qui est prescrit",
+            "Les solutions envisagées"
+          ],
+          "correctIndex": 2,
+          "explication": "L’écart entre travail prescrit et travail réel révèle souvent les contraintes et les déterminants du risque."
+        },
+        {
+          "question": "La température froide et les vibrations sont des facteurs de risque :",
+          "options": [
+            "Psychosociaux",
+            "Individuels uniquement",
+            "Sans effet sur les TMS",
+            "Environnementaux"
+          ],
+          "correctIndex": 3,
+          "explication": "Le froid réduit la dextérité et augmente la force nécessaire ; les vibrations agressent les tissus."
+        },
+        {
+          "question": "Quel enchaînement décrit l’apparition d’un TMS ?",
+          "options": [
+            "Sollicitations répétées, récupération insuffisante, fatigue puis douleur et lésion",
+            "Lésion immédiate puis récupération",
+            "Douleur sans sollicitation préalable",
+            "Fatigue suivie d’une guérison spontanée systématique"
+          ],
+          "correctIndex": 0,
+          "explication": "Le TMS s’installe progressivement quand l’organisme ne récupère pas entre les sollicitations ; la douleur est un signal d’alerte."
+        }
+      ]
+    },
+    {
+      "competence": "Participer à la maîtrise du risque en proposant à son encadrement des améliorations d’ordre technique, organisationnel ou humain.",
+      "questions": [
+        {
+          "question": "L’installation de rails de lève-personne au plafond est une amélioration d’ordre :",
+          "options": [
+            "Humain",
+            "Organisationnel",
+            "Technique",
+            "Réglementaire"
+          ],
+          "correctIndex": 2,
+          "explication": "Elle modifie le matériel et l’environnement de travail : c’est une piste technique."
+        },
+        {
+          "question": "Réorganiser le planning des toilettes pour étaler les soins lourds sur la matinée est une piste :",
+          "options": [
+            "Organisationnelle",
+            "Technique",
+            "Humaine",
+            "Individuelle"
+          ],
+          "correctIndex": 0,
+          "explication": "Elle agit sur la répartition des tâches et des temps, donc sur l’organisation."
+        },
+        {
+          "question": "Pour hiérarchiser les pistes d’amélioration, on privilégie celles qui :",
+          "options": [
+            "Ne coûtent rien même si elles sont peu efficaces",
+            "Reposent uniquement sur la vigilance individuelle",
+            "Sont les plus faciles à afficher",
+            "Suppriment ou réduisent le risque à la source et sont collectives"
+          ],
+          "correctIndex": 3,
+          "explication": "Les principes généraux de prévention donnent la priorité à la suppression du risque et à la protection collective."
+        },
+        {
+          "question": "Une proposition d’amélioration bien formulée précise :",
+          "options": [
+            "Seulement le nom du fournisseur",
+            "Le problème observé, la solution, les bénéfices attendus, le coût estimé et les personnes concernées",
+            "Le nom du collègue fautif",
+            "Une simple plainte"
+          ],
+          "correctIndex": 1,
+          "explication": "Une proposition argumentée et chiffrée facilite la décision de l’encadrement."
+        },
+        {
+          "question": "Après la mise en place d’une amélioration, l’acteur PRAP :",
+          "options": [
+            "N’a plus rien à faire",
+            "Participe au suivi pour vérifier son efficacité et repérer d’éventuels nouveaux risques",
+            "Doit la retirer au bout d’un mois",
+            "Rédige seul le DUERP"
+          ],
+          "correctIndex": 1,
+          "explication": "Toute solution peut générer des effets secondaires ; le suivi permet de la corriger."
+        },
+        {
+          "question": "Organiser une formation des intérimaires au maniement des aides techniques est une piste :",
+          "options": [
+            "Technique",
+            "Architecturale",
+            "Financière",
+            "Humaine"
+          ],
+          "correctIndex": 3,
+          "explication": "Les pistes humaines concernent les compétences, l’information et la formation."
+        },
+        {
+          "question": "Quel interlocuteur peut aider à chiffrer et justifier l’achat de lits à hauteur variable ?",
+          "options": [
+            "L’encadrement avec la direction, en lien avec le service prévention de la Carsat",
+            "Les familles des résidents",
+            "Le pharmacien de ville",
+            "Personne, l’acteur PRAP décide seul"
+          ],
+          "correctIndex": 0,
+          "explication": "Les dispositifs d’aide de l’Assurance Maladie – Risques professionnels peuvent cofinancer certains équipements dans les petites structures."
+        },
+        {
+          "question": "Un soignant propose d’« être plus prudent ». Pourquoi cette proposition est-elle insuffisante ?",
+          "options": [
+            "Elle est trop coûteuse",
+            "Elle est illégale",
+            "Elle ne modifie aucun déterminant de la situation et repose sur la seule vigilance",
+            "Elle est trop technique"
+          ],
+          "correctIndex": 2,
+          "explication": "Une piste efficace agit sur le matériel, l’organisation ou les compétences, pas seulement sur l’attention."
+        },
+        {
+          "question": "Dans une aide à domicile, la salle de bain est exiguë. Quelle piste est la plus pertinente ?",
+          "options": [
+            "Laisser l’intervenante se débrouiller",
+            "Supprimer toutes les toilettes",
+            "Porter la personne jusqu’à la baignoire",
+            "Proposer, via la structure, une évaluation par un ergothérapeute pour un aménagement (siège de douche, barres d’appui)"
+          ],
+          "correctIndex": 3,
+          "explication": "Au domicile, la structure peut solliciter l’entourage, un ergothérapeute et les financements d’aménagement."
+        },
+        {
+          "question": "Pourquoi associer les collègues à l’élaboration des pistes ?",
+          "options": [
+            "Pour tenir compte du travail réel de chacun et favoriser l’appropriation des solutions",
+            "Pour partager la responsabilité d’un accident",
+            "Parce que l’encadrement l’interdit",
+            "Pour réduire le temps de travail"
+          ],
+          "correctIndex": 0,
+          "explication": "Une solution construite avec les utilisateurs est mieux acceptée et plus durable."
+        }
+      ]
+    },
+    {
+      "competence": "Accompagner la mobilité de la personne aidée en prenant soin de l’autre et de soi (ALM).",
+      "questions": [
+        {
+          "question": "Quel est l’objectif de l’approche ALM ?",
+          "options": [
+            "Déplacer la personne le plus vite possible",
+            "Porter la personne sans matériel",
+            "Accompagner la personne aidée en mobilisant ses capacités, en préservant sa santé et celle du soignant",
+            "Remplacer les soignants par des machines"
+          ],
+          "correctIndex": 2,
+          "explication": "L’ALM associe autonomie et dignité de la personne aidée et prévention des atteintes du soignant."
+        },
+        {
+          "question": "Avant tout déplacement, l’évaluation des capacités porte notamment sur :",
+          "options": [
+            "La compréhension, la tenue de tête et de tronc, l’appui sur les jambes, la douleur",
+            "Le régime alimentaire",
+            "Les goûts musicaux",
+            "Le nombre de visites reçues"
+          ],
+          "correctIndex": 0,
+          "explication": "Ces éléments orientent le choix entre accompagnement manuel et aide technique."
+        },
+        {
+          "question": "Une personne ne participe pas et ne tient pas assise. Pour le transfert lit-fauteuil, on utilise :",
+          "options": [
+            "Un verticalisateur",
+            "Un portage à deux",
+            "Un guidon de transfert",
+            "Un lève-personne avec sangle adaptée"
+          ],
+          "correctIndex": 3,
+          "explication": "Le verticalisateur exige une participation et un appui ; sans eux, le lève-personne s’impose."
+        },
+        {
+          "question": "Pour un retournement au lit, on règle le lit :",
+          "options": [
+            "Au plus bas",
+            "À plat et à une hauteur proche de la hanche du soignant",
+            "Proclive maximal",
+            "Sans importance"
+          ],
+          "correctIndex": 1,
+          "explication": "Une hauteur adaptée évite la flexion du tronc ; le lit à plat facilite le mouvement."
+        },
+        {
+          "question": "Le drap de glisse sert à :",
+          "options": [
+            "Soulever la personne",
+            "Réduire les frottements lors des rehaussements et translations au lit",
+            "Remplacer le drap de lit",
+            "Attacher la personne au lit"
+          ],
+          "correctIndex": 1,
+          "explication": "En réduisant le frottement, il diminue fortement l’effort et protège la peau de la personne."
+        },
+        {
+          "question": "Pour accompagner un passage assis-debout, le soignant :",
+          "options": [
+            "La tire par les bras",
+            "La soulève sous les aisselles",
+            "La fait se lever d’un seul coup sans prévenir",
+            "Laisse la personne avancer le buste et pousser sur ses jambes, en guidant le mouvement"
+          ],
+          "correctIndex": 3,
+          "explication": "Le mouvement naturel du lever passe par l’avancée du buste au-dessus des pieds."
+        },
+        {
+          "question": "Pourquoi ne faut-il pas saisir la personne sous les aisselles ?",
+          "options": [
+            "Cela expose l’épaule de la personne à des lésions et contraint le dos du soignant",
+            "C’est trop lent",
+            "C’est réservé aux kinésithérapeutes",
+            "Cela salit les vêtements"
+          ],
+          "correctIndex": 0,
+          "explication": "La prise axillaire est traumatisante pour l’épaule de la personne aidée et place le soignant en effort de portage."
+        },
+        {
+          "question": "Lequel est un principe de sécurité physique et d’économie d’effort ?",
+          "options": [
+            "Garder les jambes tendues",
+            "Travailler en torsion du tronc",
+            "Rapprocher la charge, élargir la base d’appui et utiliser les jambes plutôt que le dos",
+            "Éloigner la charge du corps"
+          ],
+          "correctIndex": 2,
+          "explication": "Ces principes réduisent le bras de levier et répartissent l’effort sur les grands groupes musculaires."
+        },
+        {
+          "question": "Une personne désorientée refuse le lève-personne. Que faire ?",
+          "options": [
+            "L’installer de force",
+            "La porter à deux",
+            "Renoncer définitivement à tout transfert",
+            "Différer si possible, expliquer, rassurer et rechercher l’accord ou une alternative, sans forcer"
+          ],
+          "correctIndex": 3,
+          "explication": "Prendre soin de l’autre implique la communication et le respect du refus, tout en recherchant une solution sûre."
+        },
+        {
+          "question": "Avant d’utiliser un verticalisateur, on vérifie :",
+          "options": [
+            "Que la personne tient sa tête et son tronc, a un appui sur les jambes et comprend la consigne",
+            "Que la personne pèse moins de 50 kg",
+            "Qu’elle a pris son repas",
+            "Qu’elle est en pyjama"
+          ],
+          "correctIndex": 0,
+          "explication": "Le verticalisateur suppose une participation active ; sinon le risque de chute est élevé."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Décrivez une situation de votre travail qui vous fatigue physiquement.",
+      "reponseAttendue": "Le participant décrit une situation concrète : par exemple les toilettes du matin en EHPAD, avec des lits bas, des résidents dépendants, une contrainte de temps avant le petit-déjeuner. Il précise les gestes réalisés (penché en avant, rehaussements répétés), la fréquence et les douleurs ressenties (lombaires, épaules). L’attendu est une description factuelle du travail réel, sans jugement."
+    },
+    {
+      "question": "Que signifie pour vous « prévenir un risque » ?",
+      "reponseAttendue": "Prévenir, c’est agir avant l’accident ou la maladie : supprimer le danger quand c’est possible, sinon réduire l’exposition par des mesures techniques, organisationnelles et humaines. Le participant doit distinguer prévention (en amont) et réparation (après l’accident) et citer un exemple, comme l’usage d’un drap de glisse plutôt que tirer la personne."
+    },
+    {
+      "question": "Citez les personnes ou services à qui vous pouvez signaler une difficulté de travail.",
+      "reponseAttendue": "Le responsable hiérarchique (cadre de santé, IDEC, responsable de secteur), la direction, les représentants du personnel au CSE, le service de prévention et de santé au travail (médecin, infirmier, ergonome), éventuellement un salarié désigné compétent en prévention. À l’extérieur, la Carsat conseille l’établissement."
+    },
+    {
+      "question": "Quelles douleurs peuvent apparaître chez les soignants et pourquoi ?",
+      "reponseAttendue": "Lombalgies, douleurs de l’épaule (tendinopathies de la coiffe des rotateurs), du poignet (canal carpien), du cou et des genoux. Elles résultent de manutentions de personnes, de postures penchées ou en torsion, de gestes répétitifs, de la pression temporelle et d’une récupération insuffisante."
+    },
+    {
+      "question": "Comment déplacez-vous aujourd’hui une personne du lit au fauteuil ?",
+      "reponseAttendue": "Réponse de positionnement : le participant décrit sa pratique réelle (prise sous les aisselles, aide d’un collègue, verticalisateur…). Le formateur repère les pratiques à risque comme le portage et la prise axillaire, ainsi que les bonnes pratiques déjà acquises, comme l’évaluation des capacités ou l’usage d’aides techniques."
+    },
+    {
+      "question": "Quelles aides techniques connaissez-vous et lesquelles utilisez-vous ?",
+      "reponseAttendue": "Lit à hauteur variable, drap ou planche de glisse, disque de transfert, guidon de transfert, verticalisateur, lève-personne mobile ou sur rail, ceinture de marche, rehausseur, fauteuil roulant à accoudoirs amovibles. Le participant précise lesquelles sont disponibles dans son service et les freins à leur utilisation (temps, rangement, méconnaissance)."
+    },
+    {
+      "question": "Pourquoi les accidents du travail sont-ils fréquents dans le secteur sanitaire et social ?",
+      "reponseAttendue": "Le secteur combine manutentions fréquentes de personnes dépendantes, postures contraignantes, travail en sous-effectif, rythmes et horaires décalés, interruptions, charge émotionnelle et environnements parfois inadaptés (domicile). Les chutes de plain-pied et les manutentions constituent les premières causes."
+    },
+    {
+      "question": "Que savez-vous de la colonne vertébrale ?",
+      "reponseAttendue": "Elle est constituée de vertèbres empilées (cervicales, dorsales, lombaires, sacrum, coccyx) séparées par des disques intervertébraux. Elle soutient le corps, protège la moelle épinière et permet les mouvements. Les muscles et ligaments la stabilisent. Les attentes sont modestes en début de formation."
+    },
+    {
+      "question": "Qu’attendez-vous de cette formation ?",
+      "reponseAttendue": "Le participant exprime ses attentes : réduire ses douleurs, apprendre à mieux déplacer les personnes, mieux utiliser le matériel, savoir faire remonter les problèmes. Le formateur relie ces attentes aux 4 compétences du référentiel et précise ce que la formation n’est pas (une simple formation aux « gestes et postures »)."
+    },
+    {
+      "question": "Comment la personne aidée peut-elle participer à son déplacement ?",
+      "reponseAttendue": "En comprenant la consigne, en avançant le buste, en poussant sur ses jambes et ses bras, en se tournant seule avec guidance, en tenant une barre ou un guidon. Le soignant doit d’abord évaluer ses capacités, lui expliquer le mouvement et lui laisser le temps de le réaliser, ce qui préserve son autonomie."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Expliquez votre rôle d’acteur PRAP 2S dans votre établissement.",
+      "reponseAttendue": "L’acteur PRAP 2S observe et analyse sa situation de travail, identifie les risques liés à l’activité physique et les atteintes à la santé possibles, puis propose à son encadrement des améliorations techniques, organisationnelles ou humaines. Il applique l’ALM et les principes de sécurité physique et d’économie d’effort, participe au suivi des actions et relaie la démarche auprès de ses collègues. Il n’est ni décideur ni responsable de la sécurité : l’employeur reste responsable."
+    },
+    {
+      "question": "Citez au moins cinq des neuf principes généraux de prévention et illustrez-en deux.",
+      "reponseAttendue": "Éviter les risques ; évaluer ceux qui ne peuvent être évités ; combattre les risques à la source ; adapter le travail à l’homme ; tenir compte de l’évolution de la technique ; remplacer ce qui est dangereux par ce qui l’est moins ; planifier la prévention ; prendre des mesures de protection collective en leur donnant la priorité ; donner les instructions appropriées. Exemples : installer des rails de lève-personne (combattre à la source) ; adapter la hauteur du lit au soignant (adapter le travail à l’homme)."
+    },
+    {
+      "question": "Décrivez le mécanisme d’une lombalgie liée à une manutention de personne.",
+      "reponseAttendue": "Lors d’une flexion du tronc avec charge éloignée, le bras de levier augmente la pression sur les disques lombaires, en particulier à l’avant ; le noyau migre vers l’arrière. Répétées sans récupération, ces contraintes fissurent l’anneau fibreux, d’où douleur, voire hernie comprimant une racine nerveuse (sciatique). Les muscles du dos se fatiguent et se contractent. Les torsions et les mouvements brusques, comme une personne qui se laisse tomber, aggravent le risque."
+    },
+    {
+      "question": "Présentez les étapes de l’analyse d’une situation de travail.",
+      "reponseAttendue": "1) Décrire la situation réelle : tâche, personne aidée, matériel, environnement, organisation, durée et fréquence. 2) Repérer les sollicitations du corps et les atteintes possibles. 3) Identifier les déterminants (pourquoi le soignant adopte cette posture : lit bas, manque de temps, matériel absent). 4) Hiérarchiser les risques. 5) Rechercher des pistes d’amélioration sur chaque déterminant. 6) Les transmettre à l’encadrement puis suivre leur mise en œuvre."
+    },
+    {
+      "question": "Quelle différence faites-vous entre danger, situation dangereuse et dommage ?",
+      "reponseAttendue": "Le danger est la propriété intrinsèque capable de causer un dommage (une charge lourde, un sol mouillé). La situation dangereuse est l’exposition d’une personne au danger (soignante qui rehausse seule une résidente de 90 kg). L’événement déclencheur (la résidente se raidit) transforme la situation en dommage (lombalgie aiguë). La prévention agit sur chaque maillon."
+    },
+    {
+      "question": "Comment choisir entre accompagnement manuel, verticalisateur et lève-personne ?",
+      "reponseAttendue": "Le choix découle de l’évaluation des capacités : si la personne comprend, tient tête et tronc et peut se mettre debout avec un appui, un accompagnement manuel avec guidance ou un guidon de transfert suffit. Si elle tient debout avec un appui mais sans pouvoir marcher, on utilise le verticalisateur. Si elle ne participe pas, ne tient pas assise ou ne porte pas son poids, on utilise le lève-personne. On réévalue à chaque soin, car l’état varie (fatigue, douleur, traitement)."
+    },
+    {
+      "question": "Rédigez une proposition d’amélioration pour un problème de votre service.",
+      "reponseAttendue": "Exemple : « Constat : au 2e étage, les 6 résidents GIR 1-2 sont rehaussés plusieurs fois par jour sans drap de glisse ; deux arrêts pour lombalgie en un an. Proposition : doter chaque chambre d’un drap de glisse et former l’équipe à son usage (pistes technique et humaine). Bénéfices : réduction de l’effort, moins de frottements cutanés. Coût estimé : environ 6 draps et 1 h de formation. Suivi : retour d’expérience à 1 mois. » La proposition est factuelle, argumentée et suivie."
+    },
+    {
+      "question": "Expliquez comment préserver votre santé lors d’un soin au lit.",
+      "reponseAttendue": "Régler le lit à une hauteur proche de la hanche, se placer face au mouvement, rapprocher la personne, élargir la base d’appui, fléchir les jambes plutôt que le dos, éviter les torsions en déplaçant les pieds, utiliser le drap de glisse, solliciter la personne et demander de l’aide ou une aide technique quand l’évaluation l’exige. Organiser son matériel avant le soin évite les postures prolongées."
+    },
+    {
+      "question": "Pourquoi la participation de la personne aidée est-elle essentielle ?",
+      "reponseAttendue": "Elle maintient son autonomie, sa dignité et ses capacités motrices (prévention de la grabatisation), réduit l’effort du soignant et le risque de chute, et améliore la qualité de la relation. Ne pas solliciter la personne la rend dépendante, ce qui augmente à terme la charge physique du soignant. C’est le sens de « prendre soin de l’autre et de soi »."
+    },
+    {
+      "question": "Quelles sont les conditions de validité de votre certificat d’acteur PRAP 2S ?",
+      "reponseAttendue": "Le certificat est délivré après réussite des épreuves certificatives, par un organisme ou un établissement habilité par le réseau Assurance Maladie – Risques professionnels / INRS. Il est valable 24 mois. Pour le prolonger, l’acteur suit un MAC (maintien et actualisation des compétences) de 14 h avant l’échéance ; à défaut, il doit refaire la formation initiale."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Toilette au lit en EHPAD : analyser la situation",
+      "consigne": "À l’EHPAD Les Glycines, Nadia, aide-soignante, réalise chaque matin seule 8 toilettes entre 7 h et 9 h 30. La chambre 12 accueille Mme R., 82 ans, 78 kg, hémiplégique droite, qui comprend les consignes. Le lit est à hauteur variable mais Nadia ne le monte pas « pour gagner du temps ». Elle se penche longuement, se tourne pour attraper le linge posé sur le fauteuil et tire Mme R. vers la tête du lit en la prenant sous les bras. Décrivez les risques, les atteintes possibles et les déterminants.",
+      "reponseAttendue": "Risques : flexion prolongée du tronc due au lit trop bas, torsion pour attraper le linge mal placé, effort de traction lors du rehaussement par prise axillaire. Atteintes possibles chez Nadia : lombalgie, hernie discale, douleurs d’épaule et de nuque ; chez Mme R. : lésion de l’épaule hémiplégique, douleurs, frottements cutanés favorisant les escarres. Déterminants : organisation (8 toilettes en 2 h 30, pression temporelle qui fait négliger le réglage du lit), matériel (absence de drap de glisse, préparation du linge inadaptée), compétences (méconnaissance de l’ALM), personne (hémiplégie, poids). Il faut relever que la contrainte de temps est la cause de la non-utilisation du réglage : ce n’est pas une faute individuelle mais un déterminant organisationnel. Barème : risques 3 points, atteintes 3 points, déterminants 4 points.",
+      "points": 10
+    },
+    {
+      "titre": "Rehaussement au lit avec drap de glisse",
+      "consigne": "Au centre hospitalier fictif de Valmont, M. T., 70 ans, 85 kg, opéré de la hanche, a glissé vers le pied du lit. Il comprend, peut plier la jambe valide et pousser légèrement. Un drap de glisse est disponible. Décrivez étape par étape un rehaussement conforme à l’ALM.",
+      "reponseAttendue": "1) Évaluer : M. T. comprend, peut pousser avec la jambe valide ; vérifier la douleur et les consignes post-opératoires (pas d’adduction ni de rotation de la hanche opérée). 2) Expliquer le mouvement et obtenir son accord. 3) Préparer : lit à plat, freins serrés, hauteur proche de la hanche du soignant, oreiller contre la tête de lit pour la protéger. 4) Installer le drap de glisse sous la personne par un léger retournement guidé ou par enroulement, en respectant les précautions de hanche. 5) Faire plier la jambe valide, pied à plat ; à son signal, M. T. pousse sur son talon pendant que le soignant, en fente avant, accompagne par transfert de poids du corps, sans tirer avec le dos. 6) Retirer le drap de glisse (il ne doit pas rester sous la personne), réinstaller confortablement, remettre le lit en position basse. 7) Tracer et transmettre. Barème : évaluation 2, préparation 2, mouvement 4, fin de soin 2.",
+      "points": 10
+    },
+    {
+      "titre": "Choisir l’aide technique pour un transfert lit-fauteuil",
+      "consigne": "À l’EHPAD Le Clos fleuri, trois résidents doivent passer du lit au fauteuil : Mme A. se lève avec un appui et marche quelques pas avec déambulateur ; M. B. tient debout en se tenant mais ne peut pas déplacer ses pieds ; Mme C., en fin de vie, ne tient pas assise et ne répond pas aux consignes. Choisissez pour chacun l’accompagnement ou l’aide technique et justifiez.",
+      "reponseAttendue": "Mme A. : accompagnement manuel avec guidance verbale et éventuellement guidon de transfert ou ceinture de marche ; elle est capable de se lever et de faire quelques pas, la solliciter préserve son autonomie. M. B. : verticalisateur, car il a une tenue de tête et de tronc et un appui sur les jambes mais ne peut pas pivoter ou marcher ; on vérifie sa compréhension et sa douleur, puis la taille de la sangle. Mme C. : lève-personne avec sangle complète de taille adaptée, à deux si le protocole l’exige ; on interroge aussi la pertinence du lever au regard de son confort. Pour tous : vérifier charge maximale, état du matériel, freins, et réévaluer à chaque soin car les capacités varient. Barème : 3 points par résident, 1 point pour la réévaluation.",
+      "points": 10
+    },
+    {
+      "titre": "Aide à domicile : salle de bain exiguë",
+      "consigne": "Sophie, auxiliaire de vie au service d’aide à domicile fictif Domi’Sens, aide M. L., 88 ans, à prendre sa douche dans une baignoire. La salle de bain mesure 3 m², sans barre d’appui. M. L. enjambe difficilement le rebord en s’appuyant sur l’épaule de Sophie. Analysez la situation et proposez des pistes d’amélioration en précisant leur nature et le circuit de transmission.",
+      "reponseAttendue": "Analyse : M. L. s’appuie sur Sophie, ce qui crée un risque de chute pour les deux, une sollicitation brutale de l’épaule et du dos de Sophie, une posture contrainte dans un espace exigu. Déterminants : aménagement du logement (baignoire, absence de barres), matériel absent (siège ou planche de bain), organisation (intervention seule, durée courte). Pistes techniques : planche ou siège de bain pivotant, barres d’appui, tapis antidérapant, à terme remplacement par une douche de plain-pied. Pistes organisationnelles : évaluation par un ergothérapeute, adaptation du plan d’aide (toilette au lavabo assise certains jours), temps d’intervention suffisant. Pistes humaines : formation de Sophie à l’ALM, information de la famille. Transmission : Sophie remonte la situation à la responsable de secteur par écrit, qui contacte la famille et les financeurs possibles des aménagements ; un suivi est prévu à la visite suivante. Barème : analyse 4, pistes 4, circuit 2.",
+      "points": 10
+    },
+    {
+      "titre": "Passage assis-debout accompagné",
+      "consigne": "En unité de soins de suite de la clinique fictive Saint-Aubin, Mme D., 76 ans, se lève difficilement de son fauteuil. Elle comprend bien et a de la force dans les jambes mais « attend qu’on la tire ». Décrivez votre accompagnement ALM.",
+      "reponseAttendue": "1) Évaluer : compréhension, appui sur les jambes, douleur, chaussage adapté, fauteuil freiné. 2) Expliquer que l’on va s’appuyer sur ses capacités. 3) Faire avancer les fesses au bord de l’assise par petits déplacements latéraux alternés, pieds à plat légèrement en arrière des genoux. 4) Lui demander de pencher le buste vers l’avant, « le nez au-dessus des orteils », mains sur les accoudoirs. 5) Se placer sur le côté, légèrement en arrière, une main guide au niveau du bassin ou du dos, sans tirer les bras ni prendre sous les aisselles. 6) Au signal, elle pousse sur les jambes et les accoudoirs ; le soignant accompagne le mouvement par transfert de poids. 7) Vérifier l’équilibre debout avant la marche. Valoriser sa réussite pour renforcer sa participation. Barème : évaluation 2, installation 3, mouvement 3, sécurité 2.",
+      "points": 10
+    },
+    {
+      "titre": "Formuler une proposition d’amélioration à l’encadrement",
+      "consigne": "À l’EHPAD Les Glycines, les deux lève-personnes de l’étage sont rangés dans un local au rez-de-chaussée, la batterie de l’un est souvent déchargée et l’équipe de nuit (2 soignants pour 40 résidents) ne les utilise presque jamais. Deux arrêts pour lombalgie ont eu lieu en six mois. Rédigez la proposition que vous transmettez à la cadre de santé.",
+      "reponseAttendue": "Proposition structurée : Constat factuel (matériel rangé loin, batterie déchargée, non-utilisation la nuit, 2 arrêts pour lombalgie en 6 mois). Analyse des déterminants : organisation du rangement et de la recharge, effectif de nuit, habitude. Propositions hiérarchisées : 1) Technique : ranger un lève-personne à chaque étage dans un local avec prise pour recharge permanente, envisager à terme des rails au plafond dans les chambres des résidents les plus dépendants. 2) Organisationnelle : désigner un référent matériel par équipe et une check-list de recharge à la relève, intégrer l’aide technique dans le plan de soins de chaque résident. 3) Humaine : rappel de formation à l’utilisation pour l’équipe de nuit. Bénéfices attendus, coût estimé, échéance, indicateur de suivi (utilisation, arrêts). Ton constructif, sans désigner de coupable. Barème : constat 2, analyse 2, propositions 4, suivi 2.",
+      "points": 10
+    },
+    {
+      "titre": "Retournement au lit pour soins d’escarre",
+      "consigne": "À l’hôpital fictif de Valmont, M. G., 90 kg, peu participant mais qui comprend, doit être tourné sur le côté pour un soin de sacrum. Le lit est électrique. Vous êtes deux soignants. Décrivez l’organisation et le geste.",
+      "reponseAttendue": "Évaluation : compréhension, capacité à plier les jambes ou à tenir la barrière, douleur. Préparation : matériel de soin prêt et à portée, lit à plat et monté à hauteur de hanche, freins serrés, barrière relevée côté où il se tourne. Guidance : tourner la tête vers le côté, plier la jambe opposée, mettre le bras opposé en travers du corps ; on peut d’abord le décaler vers le côté opposé avec le drap de glisse pour qu’il reste au centre après le retournement. Le soignant côté retournement accueille, l’autre guide par l’épaule et le genou en transfert de poids, sans tirer. Maintenir la position par un coussin de calage pendant le soin, puis réinstaller. Communication continue. Barème : évaluation 2, préparation 3, geste 3, calage et fin 2.",
+      "points": 10
+    },
+    {
+      "titre": "Analyser les risques au poste de lingerie",
+      "consigne": "Dans la blanchisserie interne de l’EHPAD Le Clos fleuri, Karim charge et décharge 6 machines par jour. Le linge mouillé est sorti du tambour bas (hauteur 50 cm) à bout de bras, puis porté en bac de 15 kg jusqu’au séchoir à 6 m. Il plie ensuite le linge 2 h sur une table à 70 cm. Analysez les sollicitations, atteintes possibles et pistes.",
+      "reponseAttendue": "Sollicitations : flexion et torsion du tronc pour vider un tambour bas, charge éloignée du corps, portage répété de bacs de 15 kg, travail prolongé sur une table trop basse pour un homme de taille moyenne. Atteintes possibles : lombalgies, hernie discale, douleurs d’épaule et de poignets, cervicalgies. Déterminants : hauteur des machines, absence de chariot, implantation des équipements, table non réglable, absence de rotation de tâches. Pistes techniques : socles pour surélever les machines, chariot à fond remontant, table de pliage réglable en hauteur, rapprochement des équipements. Organisationnelles : alternance pliage et autres tâches, micro-pauses. Humaines : principes d’économie d’effort. Hiérarchiser : surélévation et chariot, qui suppriment le portage et la flexion, en priorité. Barème : sollicitations 3, atteintes 2, déterminants 2, pistes 3.",
+      "points": 10
+    },
+    {
+      "titre": "Refus d’aide technique et prise en compte de la personne",
+      "consigne": "Mme F., 85 ans, atteinte de troubles cognitifs, s’agite à la vue du lève-personne et crie. Votre collègue propose « on la prend à deux sous les bras, ce sera plus rapide ». Que faites-vous et pourquoi ?",
+      "reponseAttendue": "Refuser le portage à deux : il expose les deux soignants au risque de lombalgie et Mme F. à des lésions d’épaule et à la peur. Démarche : s’arrêter, se présenter, expliquer calmement, rassurer, montrer le matériel, chercher la cause de l’agitation (douleur, peur, moment de la journée). Différer le soin si possible et revenir plus tard ou avec un soignant qu’elle connaît. Réévaluer ses capacités : peut-elle participer à un verticalisateur ou à un transfert accompagné ? Transmettre l’information à l’équipe et à l’encadrement pour adapter le projet de soins (moment, intervenant, matériel, approche relationnelle). Respecter la personne, c’est aussi préserver le soignant : la pression temporelle ne justifie pas le portage. Barème : refus argumenté 2, communication 3, réévaluation 3, transmission 2.",
+      "points": 10
+    },
+    {
+      "titre": "Suivre une amélioration mise en place",
+      "consigne": "Suite à votre proposition, l’EHPAD Les Glycines a acheté des draps de glisse pour l’unité protégée. Trois mois plus tard, la cadre vous demande un retour. Les draps sont utilisés le matin mais pas l’après-midi, et deux ont été perdus à la blanchisserie. Comment organisez-vous le suivi et quelles corrections proposez-vous ?",
+      "reponseAttendue": "Recueillir les faits : interroger les équipes du matin et de l’après-midi, compter les draps, observer quelques soins. Analyser : l’après-midi, le personnel est réduit et les intérimaires ne connaissent pas l’outil ; les draps partent au linge sale car ils ne sont pas identifiés. Proposer des corrections : identification et rangement dédié dans chaque chambre (technique), circuit de lavage spécifique avec la lingerie (organisationnel), formation flash de 15 minutes pour les équipes d’après-midi et les intérimaires, mention dans le livret d’accueil (humain). Définir des indicateurs : nombre de draps disponibles, utilisation déclarée, douleurs signalées. Restituer à la cadre par écrit et fixer une nouvelle date de point. Le suivi fait partie intégrante de la démarche de prévention. Barème : recueil 3, analyse 2, corrections 3, indicateurs et restitution 2.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : analyse d’une situation de travail et premières pistes",
+    "contexte": "À la résidence fictive Les Tilleuls (EHPAD de 60 lits), Julie, aide-soignante de 45 ans, travaille en poste du matin. Elle accompagne M. V., 80 ans, 95 kg, qui se lève avec difficulté et tient debout en s’agrippant. Le transfert lit-fauteuil se fait habituellement en le prenant sous les bras, seule, car le verticalisateur de l’étage est souvent indisponible. Julie se plaint de douleurs lombaires et d’épaule depuis trois mois. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Décrivez la situation de travail et identifiez les sollicitations du corps de Julie.",
+        "reponseAttendue": "Transfert d’une personne de 95 kg, quotidien, réalisé seule, avec prise axillaire. Sollicitations : effort de soulèvement et de traction, flexion du tronc, charge éloignée, risque de torsion lors du pivot, à-coups si M. V. se laisse tomber. Barème : description 2 points, sollicitations 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Expliquez les atteintes à la santé possibles pour Julie et pour M. V.",
+        "reponseAttendue": "Julie : lombalgie, lésion discale voire hernie, tendinopathie de l’épaule ; ses douleurs actuelles sont un signal d’alerte. M. V. : lésion d’épaule par la prise axillaire, chute, peur, perte d’autonomie. Barème : Julie 3 points, M. V. 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Identifiez les déterminants de cette situation.",
+        "reponseAttendue": "Matériel : verticalisateur unique et indisponible. Organisation : travail seule, pression temporelle, partage du matériel. Personne : poids et capacités partielles. Compétences : absence de pratique ALM. Barème : 4 familles à 1 point, cohérence 1 point.",
+        "points": 5
+      },
+      {
+        "question": "Proposez trois pistes d’amélioration de nature différente et la conduite à tenir immédiate.",
+        "reponseAttendue": "Technique : second verticalisateur ou planification de son usage, guidon de transfert à évaluer. Organisationnelle : réservation du matériel dans le plan de soins, binôme pour ce transfert. Humaine : formation ALM, réévaluation régulière des capacités de M. V. Conduite immédiate : ne plus réaliser de prise axillaire, signaler la situation et les douleurs à la cadre et au service de prévention et de santé au travail. Barème : 1 point par piste, conduite à tenir 2 points.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 4 compétences PRAP 2S, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores",
+    "exercices": [
+      {
+        "titre": "Se situer comme acteur de prévention",
+        "consigne": "Vous êtes nouvellement formé acteur PRAP 2S au centre hospitalier fictif de Valmont. Présentez à un collègue les enjeux de la prévention des risques liés à l’activité physique, les acteurs de la prévention de l’établissement et votre rôle.",
+        "reponseAttendue": "Enjeux humains (douleurs, handicap, inaptitude), sociaux (absentéisme, turn-over, qualité des soins), économiques (coûts directs et indirects) et réglementaires (obligation de sécurité de l’employeur, principes généraux de prévention, DUERP). Acteurs internes : direction, encadrement, CSE, service de prévention et de santé au travail, salarié désigné compétent ; externes : Carsat, INRS, inspection du travail. Rôle : observer, analyser, proposer, relayer, appliquer l’ALM, participer au suivi. Barème : enjeux 2 points, acteurs 2 points, rôle 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Analyser une situation de travail",
+        "consigne": "Au service d’aide à domicile fictif Domi’Sens, une auxiliaire réalise le change d’une personne alitée dans un lit médicalisé non réglé, placé contre le mur, dans une chambre encombrée. Analysez les sollicitations, les atteintes possibles et les déterminants.",
+        "reponseAttendue": "Sollicitations : flexion prolongée, torsion, accès d’un seul côté, efforts de retournement. Atteintes : lombalgie, douleurs d’épaule et de nuque. Déterminants : lit non réglé et contre le mur, encombrement, intervention seule, méconnaissance du réglage. Barème : sollicitations 2 points, atteintes 1 point, déterminants 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Proposer des améliorations",
+        "consigne": "Pour la situation précédente, proposez des pistes hiérarchisées et décrivez leur transmission et leur suivi.",
+        "reponseAttendue": "Technique : décoller le lit du mur avec l’accord de la personne et de la famille, ranger l’espace, utiliser un drap de glisse. Organisationnelle : visite d’évaluation par la responsable de secteur ou un ergothérapeute, adaptation de la durée d’intervention. Humaine : formation au réglage du lit et à l’ALM. Priorité aux pistes qui suppriment la posture penchée. Transmission écrite à la responsable de secteur, suivi à la visite suivante. Barème : pistes 3 points, hiérarchisation 1 point, transmission et suivi 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Accompagner la mobilité de la personne aidée",
+        "consigne": "Mme H., 79 ans, peut tenir assise au bord du lit, comprend les consignes et tient debout avec un appui sans pouvoir marcher. Décrivez l’évaluation, le choix de l’aide et le déroulement du transfert vers le fauteuil roulant.",
+        "reponseAttendue": "Évaluation : compréhension, tenue de tête et de tronc, appui sur les jambes, douleur. Choix : verticalisateur (ou, selon l’évaluation, guidon de transfert), sangle de taille adaptée, matériel vérifié. Déroulement : explication, fauteuil freiné et positionné, installation de la sangle, pieds sur la plateforme, mise debout progressive en la laissant participer, déplacement, descente contrôlée au fond du fauteuil, retrait de la sangle, installation confortable. Barème : évaluation 1 point, choix justifié 2 points, déroulement 2 points.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Compréhension des enjeux et du rôle d’acteur PRAP : 0 = absente ; 1 = confusions majeures ; 2 = partielle ; 3 = correcte ; 4 = complète et reliée à l’établissement.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’analyse de la situation de travail (travail réel, sollicitations, atteintes, déterminants) : 0 = absente ; 1 = superficielle ; 2 = incomplète ; 3 = pertinente ; 4 = pertinente, structurée et argumentée.",
+        "points": 4
+      },
+      {
+        "critere": "Pertinence des pistes d’amélioration (technique, organisationnelle, humaine, hiérarchisation) : 0 = aucune ; 1 = inadaptées ; 2 = partielles ; 3 = adaptées ; 4 = adaptées, hiérarchisées et réalistes.",
+        "points": 4
+      },
+      {
+        "critere": "Mise en œuvre de l’ALM (évaluation des capacités, choix de l’aide, participation de la personne) : 0 = dangereuse ; 1 = inadaptée ; 2 = partielle ; 3 = correcte ; 4 = sûre, fluide et respectueuse de la personne.",
+        "points": 4
+      },
+      {
+        "critere": "Application des principes de sécurité physique et d’économie d’effort : 0 = absents ; 1 = rarement appliqués ; 2 = appliqués partiellement ; 3 = appliqués ; 4 = appliqués et expliqués.",
+        "points": 4
+      }
+    ]
+  }
+}

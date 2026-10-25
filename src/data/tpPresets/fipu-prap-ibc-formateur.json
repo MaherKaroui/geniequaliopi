@@ -1,0 +1,795 @@
+{
+  "competences": [
+    "Élaborer et animer un projet de formation-action PRAP intégré à une démarche de prévention de l’entreprise.",
+    "Observer et analyser les risques liés à l’activité physique d’une situation de travail pour proposer des pistes d’amélioration et suivre leur mise en place.",
+    "Organiser, animer et évaluer une formation-action des salariés à la prévention des risques liés à l’activité physique."
+  ],
+  "besoinsList": [
+    "Comprendre le dispositif PRAP de l’INRS et de l’Assurance maladie - Risques professionnels, ses documents de référence et le rôle du formateur certifié.",
+    "Analyser la demande d’une entreprise et vérifier les conditions de réussite d’un projet de formation-action PRAP.",
+    "Intégrer le projet de formation dans la démarche de prévention de l’entreprise et dans son évaluation des risques.",
+    "Mobiliser les principes généraux de prévention et le cadre réglementaire de la manutention manuelle de charges.",
+    "Maîtriser les notions d’anatomie et de physiologie nécessaires pour expliquer les atteintes à la santé.",
+    "Conduire l’observation et l’analyse d’une situation de travail réelle et accompagner les salariés dans cette démarche.",
+    "Construire un déroulé pédagogique de formation d’acteurs PRAP avec objectifs, méthodes, supports et évaluations.",
+    "Animer un groupe d’adultes en formation-action avec des méthodes actives et des mises en situation au poste.",
+    "Évaluer les acteurs PRAP selon les critères du référentiel et de la grille de certification.",
+    "Assurer le suivi des propositions d’amélioration et le bilan de l’action avec l’entreprise."
+  ],
+  "syntheseHtml": "• Cadre : formation de formateurs PRAP IBC (industrie, BTP, commerce et activités de bureau), conforme au dispositif INRS référencé PRAP-IBC 002 ; 70 h réparties en 10 jours sur 3 semaines non consécutives (3 + 3 + 4 jours), complétées par des travaux d’intersession en entreprise.<br>• Prérequis : avoir validé l’autoformation en ligne INRS @01001 « Acquérir des bases en prévention des risques professionnels » ou une formation équivalente aux bases de la prévention ; disposer de capacités relationnelles, d’animation et d’expression ; une expérience d’acteur PRAP est recommandée.<br>• Compétence 1 — Élaborer et animer un projet de formation-action : analyse de la demande, rencontre avec la direction, conditions de réussite, intégration dans la démarche de prévention et dans l’évaluation des risques, pilotage et suivi.<br>• Compétence 2 — Observer et analyser les risques : enjeux, cadre réglementaire (principes généraux de prévention de l’article L4121-2, articles R4541-1 et suivants du Code du travail), anatomie et physiologie, observation de l’activité réelle, déterminants, pistes d’amélioration et suivi de leur mise en place.<br>• Compétence 3 — Organiser, animer et évaluer une formation-action : ingénierie pédagogique, déroulé, méthodes actives, animation de groupe, évaluation formative et certificative des acteurs selon les documents de référence.<br>• Évaluation : épreuves certificatives réparties sur le parcours ; le certificat de formateur PRAP IBC est valable 36 mois et maintenu par un MAC de 21 h ; les acteurs ne peuvent être certifiés que dans le cadre d’un organisme habilité.",
+  "adaptationsHtml": "• Construire les intersessions à partir de l’entreprise de chaque stagiaire, ou d’une entreprise d’accueil fictive documentée pour les stagiaires d’organismes de formation.<br>• Alterner apports, études de cas, micro-animations filmées ou observées par les pairs, et analyses de séquences pédagogiques.<br>• Proposer des trames de dossier projet, de déroulé pédagogique et de fiche d’observation, retirées progressivement pour favoriser l’autonomie.<br>• Adapter le temps de préparation et les supports aux besoins signalés (handicap, langue, rythme) sans modifier les exigences de certification.<br>• Assurer un entretien individuel de retour après chaque semaine et après chaque intersession, avec un plan de progression écrit.",
+  "qcmDebut": [
+    {
+      "question": "Quelle est la finalité d’une formation PRAP ?",
+      "options": [
+        "Apprendre uniquement à bien porter les charges",
+        "Rendre les salariés acteurs de la prévention des risques liés à l’activité physique dans leur entreprise",
+        "Former des préventeurs institutionnels",
+        "Remplacer l’évaluation des risques de l’employeur"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Qu’appelle-t-on une formation-action ?",
+      "options": [
+        "Une formation exclusivement théorique",
+        "Une formation à distance sans formateur",
+        "Une formation sportive",
+        "Une formation qui s’appuie sur les situations de travail réelles des participants pour produire des propositions d’amélioration"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Qui conçoit les dispositifs et documents de référence PRAP ?",
+      "options": [
+        "L’INRS, avec le réseau de l’Assurance maladie - Risques professionnels",
+        "Chaque organisme de formation librement",
+        "L’inspection du travail",
+        "Les fabricants de matériel de manutention"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quel est l’adulte en formation, selon les principes de l’andragogie ?",
+      "options": [
+        "Un apprenant qui doit tout recevoir du formateur",
+        "Un apprenant qui ne peut pas apprendre de ses pairs",
+        "Un apprenant qui apprend mieux lorsque les contenus ont un sens pour sa pratique et s’appuient sur son expérience",
+        "Un apprenant qui préfère les longs exposés"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Qu’est-ce qu’un objectif pédagogique ?",
+      "options": [
+        "Un énoncé de ce que le participant sera capable de faire à l’issue d’une séquence",
+        "La liste des supports utilisés",
+        "Le planning de la salle",
+        "Le prix de la formation"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Dans l’entreprise, qui décide de la mise en œuvre des améliorations proposées par les acteurs PRAP ?",
+      "options": [
+        "Le formateur PRAP",
+        "Les acteurs PRAP eux-mêmes",
+        "Le fournisseur de matériel",
+        "L’employeur et l’encadrement"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle méthode pédagogique est la plus adaptée pour faire analyser une situation de travail ?",
+      "options": [
+        "La dictée",
+        "L’étude de cas ou l’observation au poste en sous-groupes",
+        "La lecture silencieuse d’un texte de loi",
+        "Le questionnaire à choix multiple seul"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Qu’est-ce qu’une évaluation formative ?",
+      "options": [
+        "Une évaluation qui sanctionne définitivement",
+        "Une évaluation réservée au financeur",
+        "Une évaluation en cours de formation destinée à repérer les acquis et à ajuster l’apprentissage",
+        "Une évaluation de satisfaction à chaud"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Le premier principe général de prévention consiste à :",
+      "options": [
+        "Fournir des EPI",
+        "Former les salariés",
+        "Afficher des consignes",
+        "Éviter les risques"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Pourquoi rencontrer la direction avant de lancer une formation PRAP ?",
+      "options": [
+        "Pour vérifier son engagement, ses attentes et sa capacité à traiter les propositions des futurs acteurs",
+        "Pour négocier uniquement le tarif",
+        "Ce n’est pas utile",
+        "Pour obtenir la liste des salariés à sanctionner"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Quelle condition est indispensable à la réussite d’un projet de formation-action PRAP ?",
+      "options": [
+        "Former tous les salariés en même temps",
+        "Utiliser uniquement des vidéos",
+        "L’engagement de la direction et l’existence d’un circuit de remontée et de traitement des propositions",
+        "L’achat préalable de matériel de manutention"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quelles sont la durée de validité du certificat de formateur PRAP IBC et la durée de son maintien et actualisation des compétences ?",
+      "options": [
+        "24 mois et 7 h",
+        "36 mois et 21 h",
+        "12 mois et 14 h",
+        "Validité illimitée"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Lorsque la manutention manuelle ne peut être évitée, l’article R4541-8 du Code du travail impose notamment à l’employeur :",
+      "options": [
+        "De faire bénéficier les travailleurs d’une formation adéquate à la sécurité relative à l’exécution de ces opérations, notamment aux gestes et postures",
+        "D’interdire toute manutention",
+        "De fournir systématiquement une ceinture lombaire",
+        "De confier les manutentions aux intérimaires"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Pendant la phase de préparation, quel élément le formateur recueille-t-il pour ancrer la formation dans le réel ?",
+      "options": [
+        "Les bulletins de paie des participants",
+        "Les résultats financiers de l’entreprise",
+        "Le règlement de la mutuelle",
+        "Les données de santé au travail disponibles, le document unique et des informations sur les situations de travail des futurs participants"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Un objectif pédagogique opérationnel bien formulé est :",
+      "options": [
+        "« Comprendre la prévention. »",
+        "« Connaître le dos. »",
+        "« À partir d’une vidéo de son poste, le participant identifie au moins trois déterminants et les classe par domaine. »",
+        "« Être sensibilisé aux TMS. »"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Selon les principes généraux de prévention, quelle mesure doit être privilégiée ?",
+      "options": [
+        "Une mesure de protection collective plutôt qu’une protection individuelle",
+        "Une consigne écrite plutôt qu’un aménagement",
+        "Une formation plutôt qu’une modification du poste",
+        "Un EPI plutôt qu’une modification de l’organisation"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Dans une évaluation certificative d’acteurs PRAP, le formateur doit :",
+      "options": [
+        "Certifier tous les participants présents",
+        "Évaluer chaque participant sur l’ensemble des compétences selon les critères de la grille de référence, et ne délivrer le certificat que si elles sont acquises",
+        "Se baser uniquement sur l’assiduité",
+        "Laisser l’employeur décider seul"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Pourquoi le formateur s’assure-t-il du suivi des propositions des acteurs après la formation ?",
+      "options": [
+        "Pour facturer une prestation supplémentaire",
+        "Parce que la loi l’impose au formateur seul",
+        "Pour contrôler les salariés",
+        "Parce qu’une formation-action n’a d’effet que si les propositions sont étudiées, décidées et mises en œuvre ou justifiées"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel prérequis conditionne l’entrée en formation de formateurs PRAP IBC ?",
+      "options": [
+        "Un diplôme de kinésithérapeute",
+        "L’autoformation INRS @01001 sur les bases de la prévention ou une formation équivalente",
+        "Le permis cariste",
+        "Trois ans d’expérience comme formateur SST"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Face à un participant qui conteste l’intérêt de la formation, l’attitude du formateur la plus adaptée est de :",
+      "options": [
+        "L’exclure de la session",
+        "L’ignorer pour avancer",
+        "Écouter ses objections, les relier à des situations réelles et l’impliquer dans l’analyse de son propre poste",
+        "Lui rappeler qu’il est obligé d’être là"
+      ],
+      "correctIndex": 2
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Élaborer et animer un projet de formation-action PRAP intégré à une démarche de prévention de l’entreprise.",
+      "questions": [
+        {
+          "question": "Quelle est la première étape d’un projet de formation-action PRAP ?",
+          "options": [
+            "L’analyse de la demande avec l’entreprise",
+            "La rédaction des QCM",
+            "La remise des certificats",
+            "La réservation du traiteur"
+          ],
+          "correctIndex": 0,
+          "explication": "L’analyse de la demande permet de comprendre le contexte, les attentes, les ressources et l’engagement de l’entreprise avant de concevoir l’action."
+        },
+        {
+          "question": "Que permet un comité de pilotage dans un projet PRAP ?",
+          "options": [
+            "De remplacer le formateur",
+            "D’éviter toute consultation des représentants du personnel",
+            "De suivre le projet, d’étudier les propositions des acteurs et de décider des suites",
+            "De noter les participants"
+          ],
+          "correctIndex": 2,
+          "explication": "Le pilotage, associant direction, encadrement, représentants du personnel et préventeurs, garantit le traitement des propositions."
+        },
+        {
+          "question": "Quels documents de l’entreprise sont utiles pour préparer le projet ?",
+          "options": [
+            "Le bilan comptable uniquement",
+            "Le catalogue commercial",
+            "Les contrats de prestation",
+            "Le document unique d’évaluation des risques, les données d’accidents du travail et de maladies professionnelles, les fiches de poste"
+          ],
+          "correctIndex": 3,
+          "explication": "Ces données permettent de repérer les situations à risque et de cibler les situations de travail à analyser pendant la formation."
+        },
+        {
+          "question": "Pourquoi intégrer le projet PRAP dans la démarche de prévention de l’entreprise ?",
+          "options": [
+            "Pour obtenir un label",
+            "Pour que les analyses des acteurs alimentent l’évaluation des risques et le plan d’actions",
+            "Pour remplacer le document unique",
+            "Pour réduire la durée de la formation"
+          ],
+          "correctIndex": 1,
+          "explication": "La formation-action n’est pas une fin en soi : elle s’articule avec l’évaluation des risques et la planification de la prévention."
+        },
+        {
+          "question": "Quel est l’enjeu de la sélection des participants à une formation d’acteurs PRAP ?",
+          "options": [
+            "Choisir uniquement les plus jeunes",
+            "Choisir les salariés absents la semaine suivante",
+            "Constituer un groupe dont les situations de travail sont représentatives et dont les participants sont volontaires et disponibles pour les observations",
+            "Choisir uniquement des cadres"
+          ],
+          "correctIndex": 2,
+          "explication": "Le groupe doit pouvoir travailler sur des situations réelles et relayer la prévention dans les différentes unités."
+        },
+        {
+          "question": "Que doit contenir la proposition de projet remise à l’entreprise ?",
+          "options": [
+            "Uniquement le tarif",
+            "Les objectifs, le public, l’organisation, les modalités d’évaluation, les conditions de réussite et le dispositif de suivi",
+            "La liste des salariés à risque",
+            "Un engagement de résultat sur les accidents"
+          ],
+          "correctIndex": 1,
+          "explication": "Une proposition complète formalise les engagements réciproques et prépare le pilotage."
+        },
+        {
+          "question": "Que faire si la direction refuse de s’engager à étudier les propositions des acteurs ?",
+          "options": [
+            "Expliquer les conditions de réussite et, à défaut d’engagement, alerter sur les limites d’une action réduite à des gestes et postures",
+            "Lancer la formation sans rien dire",
+            "Supprimer l’analyse des situations de travail",
+            "Promettre aux salariés des aménagements"
+          ],
+          "correctIndex": 0,
+          "explication": "Sans engagement de la direction, la formation-action perd son sens ; le formateur conseille et fait preuve de transparence."
+        },
+        {
+          "question": "Quel est le rôle du formateur PRAP vis-à-vis de l’entreprise ?",
+          "options": [
+            "Décider des investissements",
+            "Réaliser l’évaluation des risques à la place de l’employeur",
+            "Valider l’aptitude médicale des salariés",
+            "Accompagner l’entreprise dans le projet, former les acteurs et contribuer au suivi des actions"
+          ],
+          "correctIndex": 3,
+          "explication": "Le formateur conseille et accompagne ; l’employeur reste responsable de l’évaluation des risques et des décisions."
+        },
+        {
+          "question": "Quelle tâche est typique d’une intersession de la formation de formateurs ?",
+          "options": [
+            "Réaliser en entreprise l’analyse de la demande et l’étude de situations de travail pour préparer un projet",
+            "Prendre des congés",
+            "Passer le permis cariste",
+            "Rédiger un mémoire universitaire"
+          ],
+          "correctIndex": 0,
+          "explication": "Les intersessions permettent d’appliquer les apports sur le terrain et de préparer les épreuves."
+        },
+        {
+          "question": "Quel indicateur permet de juger les effets d’un projet PRAP à moyen terme ?",
+          "options": [
+            "Le nombre de pages du support",
+            "Le nombre de propositions étudiées et d’améliorations mises en œuvre, et l’évolution des situations à risque",
+            "La satisfaction à chaud uniquement",
+            "Le nombre de pauses pendant la formation"
+          ],
+          "correctIndex": 1,
+          "explication": "Les indicateurs de résultat portent sur les transformations des situations de travail, au-delà de la satisfaction."
+        }
+      ]
+    },
+    {
+      "competence": "Observer et analyser les risques liés à l’activité physique d’une situation de travail pour proposer des pistes d’amélioration et suivre leur mise en place.",
+      "questions": [
+        {
+          "question": "Que distingue-t-on lors de l’observation d’une situation de travail ?",
+          "options": [
+            "Le temps de pause et le temps de repas",
+            "Le salaire et les primes",
+            "Le travail prescrit et l’activité réelle",
+            "Le bon et le mauvais salarié"
+          ],
+          "correctIndex": 2,
+          "explication": "L’écart entre ce qui est demandé et ce qui est fait révèle les contraintes et les régulations de l’opérateur."
+        },
+        {
+          "question": "Quel article du Code du travail énonce les principes généraux de prévention ?",
+          "options": [
+            "L’article L4121-2",
+            "L’article R4541-9",
+            "L’article L1221-1",
+            "L’article R4323-1"
+          ],
+          "correctIndex": 0,
+          "explication": "L’article L4121-2 liste les neuf principes ; les articles R4541-1 et suivants traitent spécifiquement de la manutention manuelle."
+        },
+        {
+          "question": "Quel facteur relève des déterminants organisationnels ?",
+          "options": [
+            "L’éclairage de la zone",
+            "Les horaires, la cadence, la répartition des tâches et les effectifs",
+            "La hauteur du plan de travail",
+            "Le poids de la charge"
+          ],
+          "correctIndex": 1,
+          "explication": "L’organisation regroupe les choix relatifs au temps, aux flux et aux personnes ; la hauteur et le poids relèvent du matériel et de la tâche."
+        },
+        {
+          "question": "Que prévoit l’article R4541-9 du Code du travail pour le port habituel de charges supérieures à 55 kg ?",
+          "options": [
+            "Il est libre",
+            "Il est interdit dans tous les cas",
+            "Il est réservé aux salariés de plus de 30 ans",
+            "Il n’est possible que pour un travailleur reconnu apte par le médecin du travail, sans dépasser 105 kg"
+          ],
+          "correctIndex": 3,
+          "explication": "Ces limites ne valent pas recommandation : l’objectif reste d’éviter la manutention manuelle."
+        },
+        {
+          "question": "Que préconise la norme NF X35-109 ?",
+          "options": [
+            "Une méthode d’évaluation et des limites acceptables pour la manutention manuelle de charges",
+            "Le choix des chaussures de sécurité",
+            "Les règles de stockage des produits chimiques",
+            "La signalisation des issues de secours"
+          ],
+          "correctIndex": 0,
+          "explication": "La norme NF X35-109 fournit des repères pour évaluer le port, le poussé et le tiré de charges ; elle aide à objectiver le risque."
+        },
+        {
+          "question": "Pourquoi le formateur relie-t-il l’observation à l’anatomie et à la physiologie ?",
+          "options": [
+            "Pour établir un diagnostic médical",
+            "Pour remplacer le médecin du travail",
+            "Pour expliquer les mécanismes d’apparition des atteintes et argumenter les pistes",
+            "Pour faire peur aux participants"
+          ],
+          "correctIndex": 2,
+          "explication": "Comprendre pourquoi un geste est sollicitant donne du sens aux propositions et favorise leur acceptation."
+        },
+        {
+          "question": "Quel effet indésirable faut-il vérifier lors du choix d’une solution ?",
+          "options": [
+            "Son prix uniquement",
+            "Sa couleur",
+            "Sa marque",
+            "Le transfert du risque vers un autre opérateur ou un autre risque"
+          ],
+          "correctIndex": 3,
+          "explication": "Une solution doit être évaluée globalement, au besoin par un essai, avant généralisation."
+        },
+        {
+          "question": "Comment le formateur accompagne-t-il le suivi des améliorations ?",
+          "options": [
+            "Il décide à la place de la direction",
+            "Il aide à formaliser un plan d’actions avec responsables et échéances, et à faire le point lors de bilans",
+            "Il ne s’en occupe pas",
+            "Il remplace les acteurs PRAP"
+          ],
+          "correctIndex": 1,
+          "explication": "Le suivi formalisé transforme les propositions en actions et permet d’en mesurer l’efficacité."
+        },
+        {
+          "question": "Quel outil est utile pour objectiver une situation de travail avant et après amélioration ?",
+          "options": [
+            "Un sondage d’opinion sur la direction",
+            "Un organigramme",
+            "Une grille d’observation avec relevé des postures, fréquences, durées et efforts, complétée par la parole des opérateurs",
+            "Un tableau de bord commercial"
+          ],
+          "correctIndex": 2,
+          "explication": "La comparaison des relevés permet de vérifier si la solution a réellement réduit les sollicitations."
+        },
+        {
+          "question": "Pourquoi associer les opérateurs à l’analyse ?",
+          "options": [
+            "Parce qu’ils connaissent les variabilités et les contraintes réelles du travail",
+            "Pour les rendre responsables des accidents",
+            "Pour éviter de consulter le CSE",
+            "Pour réduire la durée d’observation à zéro"
+          ],
+          "correctIndex": 0,
+          "explication": "L’analyse participative améliore la qualité des pistes et leur appropriation."
+        }
+      ]
+    },
+    {
+      "competence": "Organiser, animer et évaluer une formation-action des salariés à la prévention des risques liés à l’activité physique.",
+      "questions": [
+        {
+          "question": "Quelle durée le dispositif INRS prévoit-il pour la formation initiale d’un acteur PRAP IBC ?",
+          "options": [
+            "7 h",
+            "35 h",
+            "70 h",
+            "14 h, soit 2 jours"
+          ],
+          "correctIndex": 3,
+          "explication": "La formation d’acteur PRAP IBC dure 14 h ; le MAC acteur dure 7 h tous les 24 mois."
+        },
+        {
+          "question": "Quelle méthode est la plus cohérente avec une formation-action ?",
+          "options": [
+            "Un exposé magistral de deux heures",
+            "Des études de situations de travail apportées par les participants, avec observation et recherche de pistes en sous-groupes",
+            "La lecture du Code du travail",
+            "Un film suivi d’aucun échange"
+          ],
+          "correctIndex": 1,
+          "explication": "Les méthodes actives et le travail sur le réel favorisent le transfert dans l’entreprise."
+        },
+        {
+          "question": "Comment structurer une séquence pédagogique ?",
+          "options": [
+            "Commencer par l’évaluation certificative",
+            "Improviser selon l’humeur du groupe",
+            "Partir d’un objectif, prévoir une accroche, une activité des participants, une synthèse et une vérification des acquis",
+            "Ne prévoir que des diaporamas"
+          ],
+          "correctIndex": 2,
+          "explication": "Cette structure donne du sens, rend les participants actifs et permet de contrôler l’atteinte de l’objectif."
+        },
+        {
+          "question": "Qu’est-ce qui distingue l’évaluation certificative de l’évaluation formative ?",
+          "options": [
+            "Elle conditionne la délivrance du certificat selon les critères du référentiel",
+            "Elle est facultative",
+            "Elle porte uniquement sur la satisfaction",
+            "Elle est réalisée par les participants entre eux"
+          ],
+          "correctIndex": 0,
+          "explication": "L’évaluation formative accompagne l’apprentissage ; la certificative atteste l’acquisition des compétences."
+        },
+        {
+          "question": "Comment gérer un participant qui monopolise la parole ?",
+          "options": [
+            "Le laisser parler jusqu’à la fin",
+            "Reformuler son apport, le remercier et distribuer la parole aux autres, par exemple par un tour de table",
+            "Le faire sortir",
+            "Arrêter la séance"
+          ],
+          "correctIndex": 1,
+          "explication": "Le formateur régule le groupe en valorisant les apports sans laisser un participant capter l’échange."
+        },
+        {
+          "question": "Pourquoi utiliser les situations de travail des participants comme supports ?",
+          "options": [
+            "Pour gagner du temps de préparation",
+            "Parce que c’est imposé par le règlement intérieur",
+            "Pour juger les participants",
+            "Pour que les apprentissages soient directement transférables et produisent des propositions utiles à l’entreprise"
+          ],
+          "correctIndex": 3,
+          "explication": "C’est le principe même de la formation-action : apprendre en analysant son propre travail."
+        },
+        {
+          "question": "Après la session, que transmet le formateur à l’entreprise ?",
+          "options": [
+            "Un bilan de l’action, les propositions des acteurs à étudier et les résultats d’évaluation",
+            "Les notes personnelles de chaque participant sur sa vie privée",
+            "Rien",
+            "Une facture uniquement"
+          ],
+          "correctIndex": 0,
+          "explication": "Le bilan permet à l’entreprise de traiter les propositions et de poursuivre la démarche."
+        },
+        {
+          "question": "Quel est l’intérêt d’une micro-animation filmée pendant la formation de formateurs ?",
+          "options": [
+            "Constituer une archive commerciale",
+            "Remplacer l’épreuve certificative",
+            "Permettre au futur formateur d’analyser sa posture, son discours et la gestion du groupe pour progresser",
+            "Éviter de préparer la séquence"
+          ],
+          "correctIndex": 2,
+          "explication": "L’auto-analyse et le retour des pairs sont des leviers puissants de développement des compétences d’animation."
+        },
+        {
+          "question": "Pour certifier des acteurs PRAP, le formateur doit :",
+          "options": [
+            "Disposer d’un certificat de formateur en cours de validité et intervenir pour un organisme habilité",
+            "Être simplement salarié de l’entreprise",
+            "Avoir suivi lui-même une formation d’acteur seulement",
+            "Avoir l’accord du CSE"
+          ],
+          "correctIndex": 0,
+          "explication": "La certification des acteurs relève d’organismes habilités et de formateurs certifiés à jour de leur MAC."
+        },
+        {
+          "question": "Quel élément de la logistique doit être vérifié avant une session d’acteurs PRAP ?",
+          "options": [
+            "La couleur des murs",
+            "La marque des stylos",
+            "La météo",
+            "L’accès possible aux situations de travail, une salle adaptée, le matériel pédagogique et la disponibilité des participants"
+          ],
+          "correctIndex": 3,
+          "explication": "La formation-action exige de pouvoir observer au poste et de disposer du matériel, comme le squelette ou les modèles anatomiques."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Présentez votre parcours et les raisons pour lesquelles vous souhaitez devenir formateur PRAP IBC.",
+      "reponseAttendue": "Le stagiaire présente son métier, son secteur et son expérience en prévention ou en formation. Il explique sa motivation : porter la prévention dans son entreprise, développer une offre de formation, ou évoluer vers une fonction de préventeur. Il précise s’il a déjà été acteur PRAP. Ces éléments permettent au formateur de personnaliser les intersessions."
+    },
+    {
+      "question": "Quelle expérience avez-vous de l’animation de groupes d’adultes ?",
+      "reponseAttendue": "Le stagiaire décrit ses expériences : réunions d’équipe, accueil de nouveaux arrivants, causeries sécurité, formations internes. Il identifie ce qui lui semble facile et ce qui le met en difficulté, par exemple la gestion des participants réticents. Le formateur s’en sert pour fixer des objectifs de progression individuels."
+    },
+    {
+      "question": "Que savez-vous de la démarche de prévention de votre entreprise ou de vos entreprises clientes ?",
+      "reponseAttendue": "Le stagiaire évoque le document unique, les acteurs internes, les actions déjà menées et les difficultés rencontrées. Il peut citer des indicateurs comme les accidents du travail ou les restrictions d’aptitude. L’objectif est de vérifier sa connaissance du contexte dans lequel s’inscrira le projet de formation-action."
+    },
+    {
+      "question": "Quels risques liés à l’activité physique rencontrez-vous dans votre secteur ?",
+      "reponseAttendue": "Le stagiaire cite des situations typiques : manutentions de colis, travail bras levés, gestes répétitifs, postures prolongées sur écran, port d’outils lourds. Il les relie à des atteintes possibles comme les lombalgies et les TMS. Les réponses permettent de constituer une banque de situations pour les exercices."
+    },
+    {
+      "question": "Quelle différence faites-vous entre une formation « gestes et postures » et une formation PRAP ?",
+      "reponseAttendue": "La formation gestes et postures se concentre souvent sur la technique individuelle de manutention. La formation PRAP vise à rendre le salarié capable d’observer et d’analyser sa situation de travail, d’identifier les risques et de proposer des améliorations techniques, organisationnelles et humaines. Les principes de sécurité physique et d’économie d’effort n’en sont qu’un élément complémentaire. Le stagiaire peut n’avoir qu’une idée partielle de cette différence en début de formation."
+    },
+    {
+      "question": "Comment définiriez-vous la prévention des risques professionnels ?",
+      "reponseAttendue": "La prévention regroupe l’ensemble des dispositions prises pour éviter ou réduire les risques pour la santé et la sécurité des travailleurs. Elle repose sur l’évaluation des risques et sur des mesures techniques, organisationnelles et humaines, en privilégiant la suppression du risque et la protection collective. Le stagiaire peut citer les principes généraux de prévention s’il les connaît."
+    },
+    {
+      "question": "Qu’avez-vous retenu de l’autoformation @01001 réalisée en prérequis ?",
+      "reponseAttendue": "Le stagiaire évoque les notions de base : danger, risque, dommage, accident du travail et maladie professionnelle, acteurs de la prévention, principes généraux de prévention et évaluation des risques. Il signale les points qu’il juge peu clairs. Le formateur s’assure que ces bases sont acquises avant les apports de la première semaine."
+    },
+    {
+      "question": "Selon vous, quelles conditions doivent être réunies pour qu’une formation produise des effets dans l’entreprise ?",
+      "reponseAttendue": "Le stagiaire peut citer l’engagement de la direction, l’implication de l’encadrement, l’adéquation entre la formation et les situations réelles, la possibilité de mettre en pratique et le suivi après la formation. Il peut aussi évoquer la disponibilité des participants et des moyens. Ces éléments seront repris dans l’apport sur les conditions de réussite d’un projet PRAP."
+    },
+    {
+      "question": "Comment évaluez-vous habituellement les acquis d’une formation ?",
+      "reponseAttendue": "Le stagiaire décrit ses pratiques : questionnaires, mises en situation, observation au poste, entretien, questionnaire de satisfaction. Il distingue ou non l’évaluation des acquis de l’évaluation de la satisfaction. Le formateur s’en sert pour introduire l’évaluation formative et certificative propre au dispositif PRAP."
+    },
+    {
+      "question": "Quelles appréhensions avez-vous à l’idée d’animer une formation d’acteurs PRAP ?",
+      "reponseAttendue": "Le stagiaire exprime ses craintes : manque de connaissances en anatomie, prise de parole, gestion d’un groupe réticent, légitimité face à des salariés expérimentés, relation avec la direction. Ces appréhensions sont normales. Elles sont prises en compte dans le plan de progression individuel et dans le choix des mises en situation."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Décrivez les étapes d’un projet de formation-action PRAP dans une entreprise.",
+      "reponseAttendue": "Le projet commence par l’analyse de la demande avec la direction, puis par la vérification des conditions de réussite et la constitution d’un pilotage. Le formateur recueille ensuite les données utiles : document unique, accidents et maladies professionnelles, situations de travail des futurs participants. Il conçoit et anime la formation des acteurs, qui analysent leurs situations et formulent des propositions. Celles-ci sont présentées à la direction, étudiées et intégrées au plan d’actions. Un bilan et un suivi permettent de mesurer les effets et de poursuivre la démarche."
+    },
+    {
+      "question": "Quelles sont les conditions de réussite d’un projet PRAP et comment les vérifier ?",
+      "reponseAttendue": "Les conditions principales sont l’engagement de la direction, l’implication de l’encadrement et des représentants du personnel, l’intégration dans la démarche de prévention, le choix de participants volontaires aux situations représentatives, et l’existence d’un circuit de traitement des propositions. Le formateur les vérifie lors de l’entretien préalable avec la direction, par la lecture des documents de prévention et par la formalisation d’engagements écrits. En l’absence de ces conditions, il conseille l’entreprise sur les préalables à réunir."
+    },
+    {
+      "question": "Expliquez comment vous intégrez les principes généraux de prévention dans votre animation.",
+      "reponseAttendue": "Je présente les neuf principes de l’article L4121-2 en insistant sur leur logique hiérarchique : éviter les risques, évaluer ceux qui ne peuvent être évités, les combattre à la source, adapter le travail à l’homme, puis privilégier la protection collective et donner des instructions appropriées. Lors de la recherche de pistes, je demande aux participants de classer leurs propositions selon cette hiérarchie. Je montre que les principes de sécurité physique et d’économie d’effort ne viennent qu’en complément lorsque la manutention ne peut être évitée."
+    },
+    {
+      "question": "Comment conduisez-vous l’observation d’une situation de travail avec un groupe d’acteurs ?",
+      "reponseAttendue": "Je prépare l’observation avec l’encadrement et l’opérateur, en expliquant son objectif. Les participants décrivent d’abord le poste, la tâche et l’activité réelle, puis relèvent les sollicitations, leur fréquence et leur durée à l’aide d’une grille. Ils échangent avec l’opérateur sur les variabilités et les difficultés. En salle, nous identifions les déterminants, relions les sollicitations aux atteintes possibles à partir du fonctionnement du corps, puis recherchons des pistes hiérarchisées."
+    },
+    {
+      "question": "Comment construisez-vous le déroulé pédagogique d’une formation d’acteurs PRAP IBC de 14 h ?",
+      "reponseAttendue": "Je pars des compétences du référentiel et je les décline en objectifs opérationnels. Le déroulé alterne des séquences sur la place de l’acteur PRAP et les enjeux, sur le fonctionnement du corps humain et les atteintes, sur l’observation et l’analyse de situations réelles, puis sur la recherche de pistes et les principes d’économie d’effort. Pour chaque séquence, je précise la durée, les méthodes, les supports et les modalités d’évaluation. Je prévois idéalement un intervalle entre les deux jours pour permettre l’observation au poste."
+    },
+    {
+      "question": "Quelles méthodes pédagogiques privilégiez-vous et pourquoi ?",
+      "reponseAttendue": "Je privilégie les méthodes actives : études de cas issues des postes des participants, observation au poste, travail en sous-groupes, manipulation du squelette et de modèles anatomiques, mises en situation pratiques. Ces méthodes répondent aux besoins des adultes, qui apprennent mieux en partant de leur expérience. Elles favorisent le transfert dans l’entreprise. Les apports descendants sont courts et toujours reliés à une situation concrète."
+    },
+    {
+      "question": "Comment évaluez-vous les acteurs PRAP pendant et à la fin de la formation ?",
+      "reponseAttendue": "Pendant la formation, j’utilise des évaluations formatives : questions, restitutions de sous-groupes, observation des mises en situation, pour ajuster mon animation. En fin de formation, je réalise l’évaluation certificative selon les critères de la grille de référence, sur l’ensemble des compétences, en m’appuyant notamment sur l’analyse d’une situation de travail et les propositions formulées. Le certificat n’est délivré que si les compétences sont acquises ; sinon, une attestation de suivi est remise avec des conseils de progression."
+    },
+    {
+      "question": "Comment gérez-vous un groupe hétérogène composé de salariés de l’atelier et de salariés de bureau ?",
+      "reponseAttendue": "Je valorise la diversité en montrant que les deux types de situations exposent à des risques liés à l’activité physique : manutention et gestes répétitifs pour l’un, postures statiques et travail sur écran pour l’autre. Je constitue des sous-groupes mixtes ou par type de situation selon l’objectif. Je veille à ce que chacun analyse sa propre situation. Je fais circuler la parole et j’adapte le vocabulaire et les supports."
+    },
+    {
+      "question": "Comment assurez-vous le suivi des propositions des acteurs après la formation ?",
+      "reponseAttendue": "À la fin de la session, les propositions sont formalisées dans des fiches et présentées à la direction ou au comité de pilotage. J’aide l’entreprise à les intégrer dans un plan d’actions avec des responsables et des échéances. Je propose un point de suivi à quelques mois pour faire le bilan des actions réalisées ou des raisons de leur report. Les résultats alimentent l’évaluation des risques et préparent le MAC des acteurs."
+    },
+    {
+      "question": "Quelles obligations devez-vous respecter pour maintenir votre certificat de formateur PRAP IBC ?",
+      "reponseAttendue": "Le certificat de formateur est valable 36 mois. Pour le prolonger, je dois suivre un stage de maintien et d’actualisation des compétences de 21 h avant son échéance. Je dois aussi respecter les documents de référence du dispositif et intervenir dans le cadre d’un organisme habilité pour certifier des acteurs. Je maintiens mes connaissances par la veille réglementaire et technique et par l’analyse de ma pratique."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Analyser la demande d’une entreprise",
+      "consigne": "Le directeur de Logimax, entrepôt de 80 salariés, vous appelle : « J’ai trois lombalgies en arrêt, je veux que vous formiez tout le monde aux gestes et postures la semaine prochaine. » Préparez l’entretien d’analyse de la demande : questions à poser, informations à recueillir et réponse argumentée à apporter.",
+      "reponseAttendue": "Le formateur reformule la demande et cherche à comprendre le problème réel : circonstances des lombalgies, postes concernés, évolution des accidents et des restrictions d’aptitude, actions déjà menées. Il demande le document unique, les données d’accidents du travail et l’avis du service de prévention et de santé au travail. Il interroge le directeur sur son engagement à étudier et financer des améliorations, sur l’implication de l’encadrement et du CSE. Il explique ensuite qu’une formation limitée aux gestes et postures a peu d’effet durable et que le Code du travail impose d’abord d’éviter la manutention manuelle. Il propose un projet de formation-action PRAP : formation d’un premier groupe d’acteurs volontaires représentant les zones de l’entrepôt, analyse de leurs situations, propositions présentées à un comité de pilotage et suivi. Il ajuste le calendrier pour permettre la préparation, sans partir la semaine suivante.",
+      "points": 10
+    },
+    {
+      "titre": "Rédiger la proposition de projet",
+      "consigne": "À la suite de l’entretien avec Logimax, rédigez les rubriques de la proposition de projet de formation-action PRAP IBC que vous remettrez à la direction.",
+      "reponseAttendue": "La proposition rappelle le contexte et la demande, puis fixe les objectifs : rendre des salariés acteurs de la prévention, analyser les situations à risque de l’entrepôt et proposer des améliorations. Elle décrit le public, avec un groupe d’acteurs volontaires couvrant la réception, la préparation et l’expédition, et l’organisation : formation de 14 h, idéalement en deux journées séparées pour permettre une observation au poste. Elle précise les modalités d’évaluation et de certification, les conditions de réussite et les engagements de la direction, notamment la mise en place d’un comité de pilotage et le traitement des propositions. Elle décrit enfin le dispositif de suivi, le bilan à quelques mois, les indicateurs et le calendrier prévisionnel.",
+      "points": 10
+    },
+    {
+      "titre": "Observer et analyser une situation pour préparer un cas pédagogique",
+      "consigne": "Lors d’une visite chez Imprimix, vous observez un conducteur de massicot qui saisit des piles de papier d’environ 10 kg posées sur une palette au sol, les place sur la table du massicot à hauteur de taille, puis les dépose coupées sur une seconde palette au sol. Analysez la situation et transformez-la en cas pédagogique pour les futurs acteurs.",
+      "reponseAttendue": "L’analyse montre des flexions répétées du tronc pour les prises et déposes au sol, des rotations entre palette et machine et un effort de maintien des piles. Les sollicitations portent sur le rachis lombaire, les épaules et les poignets, avec un risque de lombalgie et de TMS. Les déterminants sont la hauteur des palettes, l’implantation du poste, la taille des piles et la cadence. Les pistes prioritaires sont l’installation de tables élévatrices à niveau constant de part et d’autre du massicot, éventuellement un dispositif d’aide à la préhension, et l’organisation des flux. Pour le cas pédagogique, le formateur prépare une vidéo ou des photos, une description de la tâche, une grille d’observation et une consigne : décrire l’activité, identifier les sollicitations et les atteintes, classer les déterminants et proposer des pistes hiérarchisées. Il prépare aussi le corrigé et les questions de relance.",
+      "points": 10
+    },
+    {
+      "titre": "Construire le déroulé d’une session d’acteurs",
+      "consigne": "Construisez le déroulé de la formation d’acteurs PRAP IBC de 14 h pour Logimax, en indiquant pour chaque séquence l’objectif, la durée approximative, la méthode et l’évaluation.",
+      "reponseAttendue": "La première demi-journée porte sur l’accueil, les attentes et la place de l’acteur PRAP : enjeux, acteurs de la prévention, principes généraux de prévention, avec un brainstorming et une étude de chiffres de l’entreprise, évalués par des questions orales. La deuxième demi-journée traite du fonctionnement du corps humain et des atteintes, avec manipulation du squelette et analyse de gestes, évaluée par des schémas à légender. La troisième séquence est consacrée à l’observation au poste en sous-groupes, à l’aide de la grille, puis à l’analyse des déterminants en salle. La dernière demi-journée porte sur la recherche de pistes hiérarchisées, la rédaction des fiches de proposition, les principes de sécurité physique et d’économie d’effort en pratique, puis l’évaluation certificative selon la grille de référence et le bilan. Les durées sont ajustées pour totaliser 14 h, avec un intervalle conseillé entre les deux jours.",
+      "points": 10
+    },
+    {
+      "titre": "Animer une séquence sur le fonctionnement du corps",
+      "consigne": "Préparez une séquence de 45 minutes sur le rachis lombaire pour des magasiniers peu à l’aise avec l’écrit. Précisez l’objectif, l’accroche, les activités, la synthèse et la vérification des acquis.",
+      "reponseAttendue": "L’objectif opérationnel est que chaque participant explique, à partir d’un geste de son poste, pourquoi la flexion du dos en charge sollicite les disques lombaires. L’accroche part d’une question : « Où avez-vous mal en fin de semaine ? », avec repérage sur une silhouette. L’activité principale utilise le squelette et un modèle de disque : les participants manipulent, observent la colonne et constatent l’effet de la flexion sur le disque. Ils comparent ensuite deux photos de prises de colis de leur entrepôt et identifient la plus sollicitante. La synthèse est faite par le groupe avec un schéma simple. La vérification consiste à demander à chacun de montrer et d’expliquer oralement un geste à risque de son poste. Le formateur utilise un vocabulaire simple, des images et peu de texte.",
+      "points": 10
+    },
+    {
+      "titre": "Gérer une situation difficile en animation",
+      "consigne": "Lors d’une session chez Batiplus, un chef d’équipe déclare devant le groupe : « Tout ça c’est de la théorie, sur un chantier on n’a pas le temps. » Deux autres participants approuvent. Décrivez votre réaction et la manière dont vous exploitez cette intervention.",
+      "reponseAttendue": "Le formateur accueille l’objection sans se justifier ni la disqualifier, en reformulant : « Vous dites que la contrainte de temps rend difficile l’application des bonnes pratiques. » Il valorise l’expérience du chef d’équipe et en fait un objet de travail : la pression temporelle est un déterminant organisationnel de la situation. Il propose au groupe d’analyser un cas concret de chantier apporté par le participant, par exemple l’approvisionnement en matériaux, et de rechercher des pistes qui font gagner du temps et réduisent l’effort, comme la livraison à l’étage ou un matériel de levage. Il rappelle que la démarche vise précisément à transformer les situations, pas à ajouter des consignes. Il implique le chef d’équipe comme relais, puisque l’encadrement de proximité joue un rôle clé dans la mise en œuvre.",
+      "points": 10
+    },
+    {
+      "titre": "Réaliser une évaluation certificative",
+      "consigne": "À la fin d’une session d’acteurs chez Logimax, un participant a correctement décrit son poste et identifié les sollicitations, mais ne propose que « faire attention et bien plier les genoux ». Comment évaluez-vous ce participant et quelle suite donnez-vous ?",
+      "reponseAttendue": "Le formateur évalue chaque compétence selon les critères de la grille de référence. Les compétences d’observation et d’analyse sont acquises au vu de la description et des sollicitations identifiées. En revanche, la compétence relative à la proposition d’améliorations n’est pas démontrée : les pistes se limitent à une consigne de comportement et à la technique gestuelle, sans piste technique ou organisationnelle et sans hiérarchisation. Avant de conclure, il relance le participant par des questions ouvertes, par exemple sur la hauteur de prise ou l’organisation du stockage, pour vérifier s’il est capable de proposer d’autres pistes. Si la compétence reste non acquise, le certificat n’est pas délivré ; une attestation de suivi est remise, avec un retour expliquant les points à travailler et les possibilités de nouvelle évaluation selon les règles du dispositif.",
+      "points": 10
+    },
+    {
+      "titre": "Organiser le suivi des propositions",
+      "consigne": "Trois mois après la formation chez Logimax, sur douze propositions des acteurs, deux ont été mises en œuvre, trois sont à l’étude et sept n’ont reçu aucune réponse. Les acteurs se démobilisent. Que proposez-vous à la direction ?",
+      "reponseAttendue": "Le formateur sollicite une réunion du comité de pilotage pour faire le point sur chaque proposition. Il rappelle que l’absence de réponse démotive les acteurs et met en cause la crédibilité de la démarche. Il propose un tableau de suivi qui précise pour chaque proposition la décision, le responsable, l’échéance et, en cas de refus, la justification à communiquer aux acteurs. Il suggère de traiter rapidement des améliorations simples et peu coûteuses pour donner des signes visibles, et de planifier les autres dans le plan d’actions issu du document unique. Il recommande d’associer les acteurs à l’essai des solutions et de communiquer les résultats aux équipes. Un nouveau point est fixé à quelques mois, et les résultats seront repris lors du MAC des acteurs.",
+      "points": 10
+    },
+    {
+      "titre": "Adapter la formation à une activité de bureau",
+      "consigne": "Le cabinet Conseilia, 30 salariés travaillant principalement sur écran, souhaite une formation d’acteurs PRAP IBC. Expliquez comment vous adaptez les situations de travail, les supports et les pistes attendues, tout en respectant le référentiel.",
+      "reponseAttendue": "Le formateur conserve les trois compétences et le déroulé du référentiel, mais choisit des situations de bureau : travail prolongé sur écran, usage intensif de la souris, ordinateur portable, accueil, archivage et manipulation de cartons d’archives. Les apports sur le corps humain insistent sur la nuque, les épaules, les poignets et le dos en posture statique, ainsi que sur les TMS et la fatigue visuelle. L’observation se fait au poste réel, avec relevé des réglages du siège, de l’écran et des périphériques, et des durées de travail continu. Les pistes attendues sont techniques, comme l’écran face à l’utilisateur ou un clavier et une souris séparés, organisationnelles, comme l’alternance des tâches et des pauses, et humaines, comme l’information sur les réglages. L’évaluation certificative suit la même grille.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer le bilan de l’action pour l’entreprise",
+      "consigne": "Rédigez le plan du bilan que vous remettez à la direction de Logimax six mois après la formation, en précisant les indicateurs retenus.",
+      "reponseAttendue": "Le bilan rappelle les objectifs du projet, le déroulement de la formation et les résultats d’évaluation, avec le nombre d’acteurs certifiés. Il présente ensuite les situations analysées et les propositions formulées, puis leur état d’avancement : mises en œuvre, à l’étude, refusées avec justification. Les indicateurs comprennent le nombre de propositions traitées, les situations de travail transformées, l’évolution des sollicitations mesurées avant et après, l’avis des opérateurs, et, à plus long terme, l’évolution des accidents et maladies professionnelles liés à l’activité physique. Il identifie les freins et les leviers rencontrés. Il conclut par des recommandations : former un nouveau groupe, intégrer les résultats au document unique, prévoir le MAC des acteurs avant l’échéance de leurs certificats de 24 mois.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : préparer un projet de formation-action et analyser une situation",
+    "contexte": "La société Agrocolis, conditionneur de fruits et légumes de 120 salariés, sollicite une formation PRAP. Les restrictions d’aptitude pour douleurs d’épaules se multiplient sur la ligne de mise en barquette, où des opératrices remplissent des barquettes à cadence élevée et soulèvent des cagettes de 8 kg pour alimenter le tapis, posées sur des palettes au sol. La direction souhaite « que les opératrices apprennent à mieux se tenir ». Le CSE demande à être associé. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Analysez la demande et identifiez les points à clarifier avec la direction.",
+        "reponseAttendue": "La demande est formulée en termes de comportement individuel alors que les restrictions d’aptitude signalent un problème lié aux situations de travail. Il faut clarifier les données disponibles (restrictions, accidents, document unique, avis du service de prévention et de santé au travail), l’engagement de la direction à étudier des modifications, les moyens et le calendrier. Barème : reformulation critique 2 points, points à clarifier 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Listez les conditions de réussite du projet et le dispositif de pilotage proposé.",
+        "reponseAttendue": "Conditions : engagement de la direction, implication de l’encadrement de ligne, association du CSE, volontariat des participants, temps dédié à l’observation, circuit de traitement des propositions. Pilotage : comité réunissant direction, encadrement, CSE et, si possible, service de prévention et de santé au travail, avec réunions de lancement, de restitution et de suivi. Barème : conditions 3 points, pilotage 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Analysez la situation de mise en barquette et d’alimentation du tapis.",
+        "reponseAttendue": "Gestes répétitifs à cadence élevée des membres supérieurs, souvent bras écartés ou levés, et flexions du tronc pour prendre les cagettes au sol. Atteintes possibles : tendinopathies de l’épaule, TMS du poignet, lombalgies. Déterminants : hauteur du tapis et des palettes, cadence, absence de rotation, organisation de l’approvisionnement. Barème : sollicitations 2 points, atteintes 1 point, déterminants 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Proposez des pistes hiérarchisées et expliquez comment les acteurs seront amenés à les produire.",
+        "reponseAttendue": "Pistes : palettes surélevées ou alimentation automatique du tapis, réglage de la hauteur du poste et rapprochement des barquettes, rotation entre postes et ajustement de la cadence, information des opératrices. Les acteurs les produiront à partir de l’observation de leurs postes, en sous-groupes, en classant les pistes selon les principes généraux de prévention, puis en les présentant au comité. Barème : pistes hiérarchisées 3 points, démarche pédagogique 2 points.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 3 compétences, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores ; les épreuves certificatives suivent les documents de référence INRS",
+    "exercices": [
+      {
+        "titre": "Présenter un projet de formation-action",
+        "consigne": "Présentez au comité de direction de Menuisor, fabricant de menuiseries de 60 salariés, le projet de formation-action PRAP IBC que vous proposez, de l’analyse de la demande au bilan.",
+        "reponseAttendue": "La présentation reprend le contexte et les données de santé et sécurité, les objectifs, les étapes (analyse de la demande, préparation, formation des acteurs, restitution des propositions, plan d’actions, suivi, bilan), les conditions de réussite et les engagements attendus de la direction, le pilotage associant encadrement et représentants du personnel, ainsi que les indicateurs de suivi. Barème : étapes complètes 2 points, conditions de réussite 2 points, pilotage et indicateurs 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Analyser une situation de travail",
+        "consigne": "Chez Menuisor, deux opérateurs déplacent à la main des fenêtres vitrées d’environ 45 kg du poste de vitrage vers une zone de stockage, en les portant à bout de bras sur 15 mètres. Analysez la situation et proposez des pistes hiérarchisées.",
+        "reponseAttendue": "Port de charges lourdes et encombrantes à deux, charge éloignée du corps, déplacement sur 15 m, risques de lombalgie, de TMS des épaules, de coupure et d’écrasement en cas de chute. Déterminants : implantation des postes, absence de moyen de transport, format des produits, flux. Pistes : supprimer le port par un chariot porte-châssis ou un convoyeur, rapprocher le stockage du poste, organiser les flux, puis informer et former à l’usage du matériel. Barème : analyse 2 points, déterminants 1 point, pistes hiérarchisées 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Concevoir une séquence pédagogique",
+        "consigne": "Concevez une séquence d’une heure permettant aux futurs acteurs de Menuisor d’identifier les déterminants d’une situation de travail.",
+        "reponseAttendue": "Objectif opérationnel mesurable, accroche à partir d’une vidéo d’un poste de l’atelier, apport court sur les catégories de déterminants, travail en sous-groupes sur la situation filmée avec une grille, restitution croisée, synthèse par le formateur et vérification par un nouveau cas court traité individuellement. Durées, supports et rôle du formateur précisés. Barème : objectif 1 point, cohérence des méthodes 2 points, évaluation prévue 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Évaluer et rendre compte",
+        "consigne": "Expliquez comment vous évaluez les acteurs à l’issue de la session Menuisor et ce que vous transmettez à l’entreprise.",
+        "reponseAttendue": "Évaluations formatives en cours de session, puis évaluation certificative de chaque participant selon les critères de la grille de référence sur les trois compétences ; certificat délivré par l’organisme habilité si toutes les compétences sont acquises, attestation sinon avec conseils. Transmission d’un bilan de session, des fiches de propositions à étudier en comité, des résultats d’évaluation et des recommandations de suivi, dont le MAC des acteurs à 24 mois. Barème : évaluation 3 points, compte rendu 2 points.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Construction du projet de formation-action et intégration dans la démarche de prévention : 0 = absente ; 1 = projet réduit à une session ; 2 = projet partiel ; 3 = projet structuré ; 4 = projet structuré, piloté et intégré à l’évaluation des risques.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’analyse de la situation de travail : 0 = absente ; 1 = description vague ; 2 = analyse partielle ; 3 = analyse correcte des sollicitations et déterminants ; 4 = analyse précise, argumentée par le fonctionnement du corps.",
+        "points": 4
+      },
+      {
+        "critere": "Pertinence et hiérarchisation des pistes et de leur suivi : 0 = aucune ; 1 = pistes individuelles uniquement ; 2 = pistes partielles ; 3 = pistes hiérarchisées ; 4 = pistes hiérarchisées avec plan de suivi réaliste.",
+        "points": 4
+      },
+      {
+        "critere": "Cohérence de l’ingénierie pédagogique : 0 = absente ; 1 = séquence non structurée ; 2 = séquence partiellement cohérente ; 3 = objectifs, méthodes et évaluation cohérents ; 4 = séquence cohérente, active et adaptée au public.",
+        "points": 4
+      },
+      {
+        "critere": "Maîtrise de l’évaluation et du compte rendu : 0 = absente ; 1 = confusion entre satisfaction et acquis ; 2 = évaluation partielle ; 3 = évaluation formative et certificative correctes ; 4 = évaluation rigoureuse et compte rendu directement exploitable.",
+        "points": 4
+      }
+    ]
+  }
+}

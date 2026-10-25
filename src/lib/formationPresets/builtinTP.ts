@@ -22,6 +22,22 @@ import chGcfC from '@/data/tpPresets/chapters/gcf-c.json';
 import chGpA from '@/data/tpPresets/chapters/gp-a.json';
 import chGpB from '@/data/tpPresets/chapters/gp-b.json';
 import chGpC from '@/data/tpPresets/chapters/gp-c.json';
+import fTmsPr from '@/data/tpPresets/fipu-tms-pr.json';
+import fTmsCp from '@/data/tpPresets/fipu-tms-cp.json';
+import fTmsFormPr from '@/data/tpPresets/fipu-tms-form-pr.json';
+import fTmsFormCp from '@/data/tpPresets/fipu-tms-form-cp.json';
+import fPrapIbc from '@/data/tpPresets/fipu-prap-ibc.json';
+import fPrap2s from '@/data/tpPresets/fipu-prap-2s.json';
+import fPrapIbcForm from '@/data/tpPresets/fipu-prap-ibc-formateur.json';
+import fPrap2sForm from '@/data/tpPresets/fipu-prap-2s-formateur.json';
+import chTmsBase from '@/data/tpPresets/chapters/tms-base.json';
+import chTmsPr from '@/data/tpPresets/chapters/tms-pr.json';
+import chTmsCp from '@/data/tpPresets/chapters/tms-cp.json';
+import chTmsForm from '@/data/tpPresets/chapters/tms-form.json';
+import chPrapBase from '@/data/tpPresets/chapters/prap-base.json';
+import chPrapIbc from '@/data/tpPresets/chapters/prap-ibc.json';
+import chPrap2s from '@/data/tpPresets/chapters/prap-2s.json';
+import chPrapForm from '@/data/tpPresets/chapters/prap-form.json';
 
 /** Contenus intégrés des titres professionnels transport / comptabilité / paie (questions, corrigés, besoins). */
 type Raw = Record<string, any>;
@@ -34,6 +50,15 @@ const DEFS: [string, string, string, number, Raw, Chapter[]?][] = [
   ['tp-gp', 'TP Gestionnaire de paie', 'RNCP37948', 712, gp, [...chGpA, ...chGpB, ...chGpC] as Chapter[]],
   ['tp-ca', 'TP Comptable assistant', 'RNCP37121', 744, ca, [...chOcq, ...chOcp, ...chFin] as Chapter[]],
   ['tp-sc', 'TP Secrétaire comptable', 'RNCP37123', 712, sc, [...chSec, ...chOcq, ...chOcp] as Chapter[]],
+  // Formations de prévention INRS (dossiers FIPU d'IZILearn) : sans code RNCP / RS, blocs de chapitres partagés.
+  ['fipu-tms-pr', 'Devenir personne ressource du projet de prévention des TMS de l’entreprise', '', 42, fTmsPr, [...chTmsBase, ...chTmsPr] as Chapter[]],
+  ['fipu-tms-cp', 'Devenir chargé(e) de prévention des TMS de l’établissement', '', 28, fTmsCp, [...chTmsBase, ...chTmsCp] as Chapter[]],
+  ['fipu-tms-form-pr', 'Formation de formateurs « Devenir personne ressource du projet de prévention des TMS »', '', 88, fTmsFormPr, [...chTmsBase, ...chTmsPr, ...chTmsForm] as Chapter[]],
+  ['fipu-tms-form-cp', 'Formation de formateurs « Devenir chargé(e) de prévention des TMS »', '', 88, fTmsFormCp, [...chTmsBase, ...chTmsCp, ...chTmsForm] as Chapter[]],
+  ['fipu-prap-ibc', 'PRAP IBC — industrie, BTP, commerce et activités de bureau', '', 14, fPrapIbc, [...chPrapBase, ...chPrapIbc] as Chapter[]],
+  ['fipu-prap-2s', 'PRAP 2S — secteur sanitaire et social', '', 28, fPrap2s, [...chPrapBase, ...chPrap2s] as Chapter[]],
+  ['fipu-prap-ibc-form', 'Formation de formateurs PRAP IBC', '', 70, fPrapIbcForm, [...chPrapBase, ...chPrapIbc, ...chPrapForm] as Chapter[]],
+  ['fipu-prap-2s-form', 'Formation de formateurs PRAP 2S', '', 98, fPrap2sForm, [...chPrapBase, ...chPrap2s, ...chPrapForm] as Chapter[]],
 ];
 const norm = (v: string) => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
@@ -55,6 +80,11 @@ function build([id, intitule, code, h, d, chapters = []]: (typeof DEFS)[number],
 }
 /** Accepté avec ou sans préfixe « TP » / « Titre professionnel ». */
 export const BUILTIN_TP_PRESETS: FormationPreset[] = DEFS.flatMap(def => {
+  if (!def[0].startsWith('tp-')) {
+    // Prévention INRS : intitulé IZILearn, et forme courte « PRAP IBC » / « PRAP 2S » avant le tiret.
+    const court = def[1].split(' — ')[0];
+    return [...new Set([def[1], court, `Acteur ${court}`])].filter(t => t === def[1] || /^(Acteur )?PRAP/.test(t)).map(t => build(def, t));
+  }
   const bare = def[1].replace(/^TP\s+/, '');
   return [def[1], bare, `Titre professionnel ${bare}`].map(t => build(def, t));
 });

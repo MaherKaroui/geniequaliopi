@@ -1,0 +1,911 @@
+{
+  "competences": [
+    "Situer le dispositif de formation TMS Pros et le rôle du formateur certifié.",
+    "Concevoir et organiser le parcours de formation de la personne ressource (6 jours et intersessions).",
+    "Animer les séquences et accompagner sur site la conduite du projet de prévention des TMS.",
+    "Évaluer les acquis des personnes ressources et le déploiement de leur projet."
+  ],
+  "besoinsList": [
+    "Maîtriser le programme TMS Pros, ses 4 étapes et le document de référence du dispositif de formation.",
+    "Clarifier le rôle du formateur certifié au sein d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS.",
+    "Exploiter les lettres d’engagement pour préparer la session et alerter l’organisme de formation en cas de difficulté.",
+    "Construire un déroulé pédagogique de 6 jours (2 j + 2 j + 1 j en présentiel et 2 demi-journées en entreprise) articulé avec les intersessions.",
+    "Formuler des objectifs pédagogiques opérationnels et des indicateurs de réussite cohérents avec le référentiel de la personne ressource.",
+    "Transmettre une approche fondée sur l’analyse de l’activité réelle de travail, au-delà de la seule approche biomécanique.",
+    "Animer un groupe d’adultes hétérogène et réguler les résistances, objections et dérives de projet.",
+    "Conduire un appui intersession en entreprise en aidant à faire, sans faire à la place du stagiaire.",
+    "Évaluer les acquis des personnes ressources et l’avancée réelle de leur projet de prévention des TMS.",
+    "Se préparer aux épreuves certificatives de l’INRS (présentation d’intervention, étude de cas, séquence jury)."
+  ],
+  "syntheseHtml": "• Positionnement : ce parcours prépare et consolide la pratique des formateurs appelés à former des personnes ressources du projet de prévention des TMS dans le cadre du programme TMS Pros de l’Assurance Maladie – Risques professionnels. La formation de formateurs officielle « Devenir formateur de personne ressource du projet de prévention des TMS et de chargé de prévention des TMS » (code stage N11302) est dispensée exclusivement par l’INRS : 8,5 jours en présentiel en sessions non consécutives et environ 4 jours à distance. Le présent parcours ne s’y substitue pas.<br>• Certification : le réseau Prévention (INRS et Assurance Maladie – Risques professionnels) certifie les formateurs après le suivi de la formation INRS et la réussite aux épreuves certificatives : DC1 « Favoriser la mise en œuvre du dispositif de formation-action de personnes ressources » (présentation d’une intervention TMS de 20 minutes avec 15 minutes d’échange, puis étude de cas de 2 h sur la préparation d’un appui intersession) et DC2 « Concevoir, animer et évaluer une formation-action de personnes ressources » (conducteur pédagogique et animation d’une séquence de 20 minutes tirée au sort, suivie de 10 à 15 minutes de questions). Le formateur certifié exerce au sein d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS.<br>• Prérequis d’entrée en formation INRS : attestation de réussite de l’autoformation @01001 « Acquérir des bases en prévention des risques professionnels » (ou formation équivalente en Carsat/Cramif/CGSS) ; formation pédagogique ou au moins 2 ans de pratique régulière de la formation d’adultes, avec 8 jours de face à face par an minimum pour les formateurs d’organisme de formation ; connaissances en approche ergonomique des situations de travail, en conduite de projet de prévention et en démarche TMS ; au moins 2 ans d’interventions ergonomiques en entreprise en conseil externe dans le champ des TMS (hors approche individuelle).<br>• Formation cible animée par le futur formateur : « Devenir personne ressource du projet de prévention des TMS de l’établissement », 6 jours (42 h) dont 5 jours en présentiel (2 j + 2 j + 1 j) et 2 demi-journées d’accompagnement en entreprise pendant les intersessions ; 10 stagiaires maximum ; inscription subordonnée à une lettre d’engagement du chef d’établissement ; attestation de validation des acquis délivrée par la structure dispensatrice.<br>• 4 compétences travaillées : situer le dispositif et le rôle du formateur, concevoir le parcours de 6 jours, animer et accompagner sur site, évaluer les acquis et le déploiement du projet. Positionnement initial, contrôle intermédiaire et évaluation finale internes entraînent aux épreuves mais ne remplacent pas les épreuves certificatives de l’INRS et ne préjugent pas de l’avis du jury.",
+  "adaptationsHtml": "• Partir des interventions TMS déjà conduites par chaque formateur pour faire émerger les écarts avec l’approche attendue par le réseau Prévention (analyse de l’activité, approche globale du risque).<br>• Travailler sur des documents réalistes : lettres d’engagement, extraits de sinistralité, grilles de repérage, notes d’observation, plans d’actions, comptes rendus d’appui intersession.<br>• Alterner apports courts, études de cas, conception en binôme de conducteurs pédagogiques et animations filmées avec retour entre pairs.<br>• Adapter rythme et supports aux profils (ergonomes confirmés, formateurs issus de la prévention, consultants) : fiches de synthèse, consignes découpées, temps majoré si nécessaire.<br>• Prévoir un entraînement chronométré à chaque épreuve (présentation de 20 minutes, étude de cas de 2 h, séquence de 20 minutes) avec une grille oui / partiellement / non et un retour individualisé.",
+  "qcmDebut": [
+    {
+      "question": "Quel organisme a conçu et pilote le programme TMS Pros ?",
+      "options": [
+        "Le ministère de l’Éducation nationale",
+        "Les services de santé au travail uniquement",
+        "L’Assurance Maladie – Risques professionnels, avec l’INRS pour le dispositif de formation",
+        "Les organisations syndicales de branche"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Combien d’étapes compte la démarche proposée par TMS Pros ?",
+      "options": [
+        "4 étapes",
+        "2 étapes",
+        "6 étapes",
+        "8 étapes"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Qui dispense la formation de formateurs N11302 permettant d’être certifié ?",
+      "options": [
+        "Tout organisme de formation certifié",
+        "L’employeur de la future personne ressource",
+        "Le médecin du travail de l’entreprise",
+        "L’INRS"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quelle est la durée de la formation « Devenir personne ressource du projet de prévention des TMS » ?",
+      "options": [
+        "2 jours en présentiel",
+        "6 jours, dont 5 jours en présentiel et 2 demi-journées d’accompagnement en entreprise",
+        "10 jours entièrement à distance",
+        "3 jours de face à face sans intersession"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quel document conditionne l’inscription d’une personne ressource ?",
+      "options": [
+        "Un certificat médical d’aptitude",
+        "Une lettre d’engagement élaborée par le chef d’établissement",
+        "Un diplôme d’ergonome",
+        "Un simple bon de commande de l’entreprise"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quelles familles de facteurs de risque de TMS faut-il aborder ?",
+      "options": [
+        "Uniquement les gestes et postures",
+        "Uniquement l’âge et l’état de santé des salariés",
+        "Uniquement le bruit",
+        "Biomécaniques, psychosociaux et liés aux ambiances physiques, en lien avec leurs déterminants"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Que signifie le principe « aider à faire et ne pas faire à la place de » en intersession ?",
+      "options": [
+        "Aider le stagiaire et l’établissement à avancer sans réaliser le travail à leur place",
+        "Réaliser le diagnostic à la place du stagiaire pour gagner du temps",
+        "Contrôler la conformité réglementaire de l’établissement",
+        "Remplacer la personne ressource lorsqu’elle est absente"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Combien de stagiaires au maximum compte une session de personnes ressources ?",
+      "options": [
+        "4",
+        "20",
+        "10",
+        "25"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quel est le point incontournable de l’approche promue par le réseau Prévention ?",
+      "options": [
+        "La formation individuelle aux gestes et postures",
+        "L’achat d’équipements d’assistance",
+        "La sélection médicale des salariés à l’embauche",
+        "L’analyse de l’activité réelle de travail"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Qui délivre l’attestation de validation des acquis à la personne ressource ?",
+      "options": [
+        "L’inspection du travail",
+        "La structure dispensatrice, c’est-à-dire l’organisme de formation habilité",
+        "Le médecin du travail",
+        "Le comité social et économique"
+      ],
+      "correctIndex": 1
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Lors de l’épreuve technique (DC1), que doit présenter le candidat formateur ?",
+      "options": [
+        "Un QCM de 40 questions sur la réglementation",
+        "Une synthèse de 20 minutes (20 diapositives maximum) d’une intervention TMS de son choix, hors approche individuelle, puis 15 minutes d’échange avec le jury",
+        "Une séquence de formation de 2 heures sans échange",
+        "Un mémoire écrit de 50 pages remis un mois avant"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "L’étude de cas de 2 h (DC1) place le candidat en situation de :",
+      "options": [
+        "Rédiger le document unique de l’établissement",
+        "Réaliser un relevé de mesures d’ambiance physique",
+        "Chiffrer le coût d’un aménagement de poste",
+        "Préparer son premier appui intersession et les régulations à mettre en œuvre avec les acteurs"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "À la lecture des lettres d’engagement, le formateur constate qu’un établissement n’a désigné ni pilote ni périmètre. Que fait-il ?",
+      "options": [
+        "Il informe l’organisme de formation de la difficulté pour qu’une régulation ait lieu avant l’entrée en formation",
+        "Il ne dit rien et attend le premier jour",
+        "Il refuse le stagiaire le premier matin",
+        "Il réécrit lui-même la lettre d’engagement"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quel objectif pédagogique est formulé de manière univoque et évaluable ?",
+      "options": [
+        "Sensibiliser les stagiaires aux TMS",
+        "Comprendre l’ergonomie",
+        "À l’issue de la séquence, le stagiaire sera capable d’identifier au moins trois déterminants d’une situation observée à partir de ses notes",
+        "Présenter le programme TMS Pros"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Un stagiaire propose comme seule action une formation gestes et postures. Quelle est la meilleure réponse du formateur ?",
+      "options": [
+        "Le questionner sur les déterminants identifiés et l’amener à envisager des actions organisationnelles, techniques et humaines cohérentes avec le diagnostic",
+        "Valider la proposition, car elle est simple à mettre en œuvre",
+        "Refuser sèchement la proposition devant le groupe",
+        "Ajouter le port de ceintures lombaires"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quel indicateur de réussite est adapté à une séquence sur le repérage des situations à risque ?",
+      "options": [
+        "Les stagiaires ont apprécié la séquence",
+        "Le formateur a terminé à l’heure",
+        "Chaque sous-groupe hiérarchise au moins trois situations à partir de critères explicites et justifie son choix",
+        "Tous les stagiaires ont reçu le support"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Comment est organisée la séquence jury de l’épreuve DC2 ?",
+      "options": [
+        "Choisie librement le jour même et animée 1 heure",
+        "Présentée uniquement par écrit",
+        "Animée sans groupe, devant une caméra",
+        "Tirée au sort à la fin du premier module, animée 20 minutes devant un groupe et le jury, puis 10 à 15 minutes de questions"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quand le conducteur et les supports de la « séquence à blanc » doivent-ils être rendus ?",
+      "options": [
+        "Le jour de la certification",
+        "3 semaines avant le module 2",
+        "6 mois après la formation",
+        "Ils ne sont jamais demandés"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quelle différence existe entre repérage et diagnostic ?",
+      "options": [
+        "Ce sont deux synonymes",
+        "Le diagnostic porte toujours sur tout l’établissement avant le repérage",
+        "Le repérage hiérarchise les situations à risque pour choisir où agir ; le diagnostic analyse finement l’activité, les facteurs de risque et leurs déterminants sur la situation retenue",
+        "Le repérage est réservé au médecin du travail"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "À l’étape 4 de TMS Pros « Quels résultats ? », que fait l’établissement ?",
+      "options": [
+        "Il évalue la pertinence des actions menées et mesure ses avancées à l’aide d’indicateurs suivis dans le temps",
+        "Il compte uniquement le nombre de salariés formés",
+        "Il archive l’attestation de formation",
+        "Il supprime les indicateurs une fois le plan validé"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Situer le dispositif de formation TMS Pros et le rôle du formateur certifié.",
+      "questions": [
+        {
+          "question": "Qui certifie les formateurs de personnes ressources ?",
+          "options": [
+            "L’organisme de formation employeur du formateur",
+            "La DREETS de la région",
+            "Un organisme de normalisation",
+            "Le réseau Prévention (INRS et Assurance Maladie – Risques professionnels) après réussite aux épreuves certificatives"
+          ],
+          "correctIndex": 3,
+          "explication": "La certification est délivrée par le réseau Prévention après le suivi de la formation de formateurs INRS et la réussite aux épreuves certificatives."
+        },
+        {
+          "question": "Quelle est l’organisation de la formation de formateurs N11302 ?",
+          "options": [
+            "3 jours consécutifs en présentiel",
+            "8,5 jours en présentiel en sessions non consécutives et environ 4 jours à distance",
+            "15 jours consécutifs en présentiel",
+            "5 jours entièrement à distance"
+          ],
+          "correctIndex": 1,
+          "explication": "Le stage N11302 alterne 3 modules en présentiel non consécutifs (8,5 jours au total) et environ 4 jours de travail à distance, notamment la conception en intersession."
+        },
+        {
+          "question": "Quel volume minimal de face à face est exigé d’un formateur d’organisme de formation ?",
+          "options": [
+            "2 jours par an",
+            "20 jours par an",
+            "8 jours par an",
+            "Aucun volume minimal"
+          ],
+          "correctIndex": 2,
+          "explication": "Le dossier de candidature exige 2 ans de pratique de la formation d’adultes et, pour les formateurs d’OF, au moins 8 jours de face à face par an (actions d’au moins 1 jour)."
+        },
+        {
+          "question": "Quelle expérience d’intervention est exigée ?",
+          "options": [
+            "Au moins 2 ans d’interventions ergonomiques en entreprise en conseil externe dans le champ des TMS, hors approche individuelle",
+            "6 mois d’animation de formations gestes et postures",
+            "2 ans d’enseignement en lycée professionnel",
+            "5 ans de management d’équipe"
+          ],
+          "correctIndex": 0,
+          "explication": "Le formateur doit justifier de 2 ans d’interventions de type diagnostic ergonomique et appui à la mise en œuvre d’un plan d’actions, en conseil externe."
+        },
+        {
+          "question": "Quel est l’intitulé de l’autoformation @01001 ?",
+          "options": [
+            "Gestes et postures au travail",
+            "Sauveteur secouriste du travail",
+            "Prévention des risques liés à l’activité physique",
+            "Acquérir des bases en prévention des risques professionnels"
+          ],
+          "correctIndex": 3,
+          "explication": "L’autoformation gratuite @01001 de l’INRS porte sur les fondamentaux de la prévention ; elle est aussi un prérequis pour les personnes ressources."
+        },
+        {
+          "question": "Dans quel cadre le formateur certifié dispense-t-il la formation des personnes ressources ?",
+          "options": [
+            "Au sein d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS",
+            "En indépendant sans habilitation",
+            "Uniquement dans les locaux d’une Carsat",
+            "Uniquement en interne chez son employeur"
+          ],
+          "correctIndex": 0,
+          "explication": "La formation est assurée par un formateur certifié faisant partie d’un organisme de formation habilité ; la liste des organismes est publiée par l’INRS."
+        },
+        {
+          "question": "Que recouvre l’étape 2 de TMS Pros « Par quoi commencer ? » ?",
+          "options": [
+            "Faire le point sur les TMS dans l’entreprise",
+            "Identifier les situations de travail prioritaires et construire le projet de prévention en s’appuyant sur une personne ressource",
+            "Évaluer les résultats des actions",
+            "Analyser la situation la plus à risque et établir le plan d’actions"
+          ],
+          "correctIndex": 1,
+          "explication": "L’étape 1 fait le point sur les TMS, l’étape 2 identifie les situations prioritaires et construit le projet, l’étape 3 analyse et établit le plan d’actions, l’étape 4 évalue."
+        },
+        {
+          "question": "À quelle journée le chef d’établissement participe-t-il en amont ?",
+          "options": [
+            "Une formation de sauveteur secouriste du travail",
+            "Une formation Prap IBC",
+            "« Initier, piloter et manager son projet de prévention des TMS », organisée par les services prévention des caisses",
+            "Une réunion ordinaire du CSE"
+          ],
+          "correctIndex": 2,
+          "explication": "La lettre d’engagement est notamment élaborée à l’issue de cette journée, qui prépare le dirigeant à porter et piloter le projet."
+        },
+        {
+          "question": "Quelle différence entre personne ressource et chargé de prévention des TMS ?",
+          "options": [
+            "Il n’y a aucune différence",
+            "La personne ressource organise et anime le projet de prévention ; le chargé de prévention met en œuvre certaines étapes d’un projet piloté par le chef d’établissement, format proposé aux établissements de moins de 150 salariés",
+            "Le chargé de prévention forme les personnes ressources",
+            "La personne ressource n’a qu’un rôle administratif"
+          ],
+          "correctIndex": 1,
+          "explication": "Les deux formations sont parallèles ; le format chargé de prévention (4 jours) est destiné principalement aux établissements de moins de 150 salariés."
+        },
+        {
+          "question": "Qui compose le jury des épreuves certificatives ?",
+          "options": [
+            "Le seul responsable de l’organisme de formation",
+            "Les autres stagiaires de la session",
+            "L’inspection du travail",
+            "Des représentants de l’INRS et des Carsat"
+          ],
+          "correctIndex": 3,
+          "explication": "La grille d’évaluation prévoit un jury associant des membres de l’INRS et des Carsat, avec un responsable de la certification."
+        }
+      ]
+    },
+    {
+      "competence": "Concevoir et organiser le parcours de formation de la personne ressource (6 jours et intersessions).",
+      "questions": [
+        {
+          "question": "Comment sont répartis les 5 jours de présentiel de la formation de la personne ressource ?",
+          "options": [
+            "2 jours + 2 jours + 1 jour",
+            "5 jours consécutifs",
+            "1 jour par semaine pendant 5 semaines sans intersession",
+            "3 jours + 2 jours"
+          ],
+          "correctIndex": 0,
+          "explication": "Le programme prévoit 5 jours en présentiel découpés en 2 j + 2 j + 1 j, ce qui ménage deux intersessions de mise en œuvre."
+        },
+        {
+          "question": "Combien de temps d’accompagnement en entreprise est prévu ?",
+          "options": [
+            "2 jours complets avant la formation",
+            "Aucun accompagnement",
+            "2 demi-journées pendant les intersessions",
+            "Une semaine complète en fin de parcours"
+          ],
+          "correctIndex": 2,
+          "explication": "Les 6 jours (42 h) comprennent 5 jours en présentiel et 2 demi-journées d’accompagnement par le formateur en entreprise."
+        },
+        {
+          "question": "Quel est le volume horaire total de la formation ?",
+          "options": [
+            "28 heures",
+            "42 heures",
+            "35 heures",
+            "21 heures"
+          ],
+          "correctIndex": 1,
+          "explication": "6 jours à 7 heures, soit 42 heures, dont 2 demi-journées en entreprise."
+        },
+        {
+          "question": "Que doit contenir un conducteur pédagogique de qualité ?",
+          "options": [
+            "Les seuls titres des séquences",
+            "Uniquement les diapositives",
+            "La liste des participants",
+            "Objectifs, durées réalistes, méthodes, consignes (ce que fait le formateur, ce que font les stagiaires), supports et indicateurs de réussite"
+          ],
+          "correctIndex": 3,
+          "explication": "Ce sont les critères de l’épreuve DC2 : objectifs univoques, progression fluide, méthodes diversifiées, indicateurs de réussite ad hoc."
+        },
+        {
+          "question": "Quel est le rôle des intersessions ?",
+          "options": [
+            "Laisser un temps de repos sans travail demandé",
+            "Rattraper le retard de programme du formateur",
+            "Mettre en œuvre sur le terrain les étapes de la démarche (structuration du projet, repérage, observation, diagnostic) et produire les livrables attendus",
+            "Remplacer le présentiel"
+          ],
+          "correctIndex": 2,
+          "explication": "La formation-action repose sur l’alternance : les productions d’intersession sont reprises et analysées au module suivant."
+        },
+        {
+          "question": "Quel livrable est cohérent à l’issue de la première intersession ?",
+          "options": [
+            "Le plan d’actions totalement évalué",
+            "La structuration du projet (pilote, groupe de travail, périmètre, planning) et les premiers éléments de repérage",
+            "Le bilan des résultats à 3 ans",
+            "Aucun livrable"
+          ],
+          "correctIndex": 1,
+          "explication": "La progression suit la démarche : projet et repérage d’abord, diagnostic ensuite, puis pistes de transformation et plan d’actions."
+        },
+        {
+          "question": "Quelles méthodes pédagogiques sont prévues par le programme ?",
+          "options": [
+            "Lecture de diapositives uniquement",
+            "E-learning uniquement",
+            "Conférence magistrale uniquement",
+            "Exposés, études de cas issus de l’expérience des participants, mises en situation, accompagnement sur site et échanges"
+          ],
+          "correctIndex": 3,
+          "explication": "Le programme de la personne ressource liste ces méthodes actives, cohérentes avec une formation-action."
+        },
+        {
+          "question": "Une séquence sur les facteurs de risque doit aborder :",
+          "options": [
+            "Les facteurs biomécaniques, psychosociaux et d’ambiances physiques et leurs liens avec les déterminants, notamment organisationnels",
+            "Les seuls facteurs biomécaniques",
+            "Les facteurs génétiques",
+            "La seule sinistralité AT/MP"
+          ],
+          "correctIndex": 0,
+          "explication": "L’approche attendue est globale et multifactorielle, pas uniquement biomécanique."
+        },
+        {
+          "question": "Que fait le formateur des lettres d’engagement avant la session ?",
+          "options": [
+            "Il les consulte pour adapter la session et repérer les difficultés, qu’il signale à l’organisme de formation",
+            "Il les ignore",
+            "Il les diffuse à tout le groupe",
+            "Il les note comme un devoir"
+          ],
+          "correctIndex": 0,
+          "explication": "Le référentiel d’activité du formateur prévoit la consultation des lettres d’engagement et l’information de l’OF en cas de difficulté."
+        },
+        {
+          "question": "Quel principe de formation d’adultes guide la conception ?",
+          "options": [
+            "Faire mémoriser par cœur le document de référence",
+            "Éviter tout lien avec le terrain",
+            "Partir des situations vécues et faire produire les stagiaires sur leur propre établissement",
+            "Multiplier les tests de vitesse"
+          ],
+          "correctIndex": 2,
+          "explication": "Les adultes apprennent mieux lorsque la formation a du sens pour leur situation réelle ; c’est le principe même de la formation-action."
+        }
+      ]
+    },
+    {
+      "competence": "Animer les séquences et accompagner sur site la conduite du projet de prévention des TMS.",
+      "questions": [
+        {
+          "question": "Un stagiaire affirme : « Chez nous, les TMS, c’est l’âge des salariés. » Que fait le formateur ?",
+          "options": [
+            "Il l’ignore",
+            "Il accueille l’objection, la reformule, s’appuie sur des données et des observations et montre le caractère multifactoriel des TMS",
+            "Il le contredit publiquement",
+            "Il interrompt la séance"
+          ],
+          "correctIndex": 1,
+          "explication": "Réguler une objection, c’est la prendre en compte et la retravailler avec le groupe, sans disqualifier son auteur."
+        },
+        {
+          "question": "Lors de l’appui sur site, le stagiaire n’a pas réalisé ses observations. Quelle conduite adopter ?",
+          "options": [
+            "Analyser avec lui les freins, l’aider à planifier et à démarrer une observation, sans la faire à sa place, et en informer le pilote si besoin",
+            "Réaliser toutes les observations à sa place",
+            "Annuler l’appui",
+            "Le noter défavorablement sans échange"
+          ],
+          "correctIndex": 0,
+          "explication": "L’appui intersession aide à faire ; il ne se substitue pas au stagiaire et mobilise le pilote du projet."
+        },
+        {
+          "question": "Décrire finement l’activité de travail, c’est décrire :",
+          "options": [
+            "La fiche de poste",
+            "La procédure prescrite",
+            "L’organigramme",
+            "Comment les salariés s’y prennent physiquement et mentalement : régulations, compromis, stratégies opératoires"
+          ],
+          "correctIndex": 3,
+          "explication": "C’est un critère de l’épreuve technique : l’activité réelle diffère du travail prescrit."
+        },
+        {
+          "question": "Qu’entend-on par variabilité ?",
+          "options": [
+            "La couleur des locaux",
+            "Le nombre de pages du document unique",
+            "Les variations de produits, d’effectifs, de pannes ou d’aléas qui modifient les conditions de réalisation du travail",
+            "Le niveau de salaire"
+          ],
+          "correctIndex": 2,
+          "explication": "La variabilité et ses impacts potentiels font partie des critères attendus dans l’analyse d’une intervention."
+        },
+        {
+          "question": "Que sont les ressources des opérateurs ?",
+          "options": [
+            "Les primes",
+            "Les congés",
+            "L’ancienneté",
+            "Les marges de manœuvre, l’entraide, les outils et la possibilité réelle de les mobiliser pendant le travail"
+          ],
+          "correctIndex": 3,
+          "explication": "Identifier les ressources et la possibilité de les mobiliser est un critère explicite du référentiel."
+        },
+        {
+          "question": "Un participant monopolise la parole. Que fait le formateur ?",
+          "options": [
+            "Il le laisse parler",
+            "Il régule en distribuant la parole, en utilisant un tour de table ou un travail en sous-groupes",
+            "Il l’exclut",
+            "Il ne s’adresse plus qu’à lui"
+          ],
+          "correctIndex": 1,
+          "explication": "La gestion de l’animation inclut la régulation de l’expression du groupe."
+        },
+        {
+          "question": "Comment vérifier la compréhension du groupe ?",
+          "options": [
+            "Demander « Tout le monde a compris ? »",
+            "Ne rien vérifier",
+            "Faire reformuler, faire appliquer sur un cas et poser des questions ouvertes",
+            "Allonger l’exposé"
+          ],
+          "correctIndex": 2,
+          "explication": "Une vérification efficace s’appuie sur une production observable."
+        },
+        {
+          "question": "Que comporte un accompagnement sur site ?",
+          "options": [
+            "Rencontrer le stagiaire et le pilote, faire le point d’avancement, observer une situation et sécuriser la suite du projet",
+            "Auditer la conformité réglementaire",
+            "Réaliser une expertise payante",
+            "Vendre du matériel"
+          ],
+          "correctIndex": 0,
+          "explication": "L’appui intersession est un temps d’accompagnement du projet de l’établissement."
+        },
+        {
+          "question": "Les pistes de transformation proposées doivent être :",
+          "options": [
+            "Uniquement des équipements de protection",
+            "Uniquement des formations",
+            "Organisationnelles, techniques et humaines, cohérentes avec le diagnostic",
+            "Un changement de salariés"
+          ],
+          "correctIndex": 2,
+          "explication": "Le référentiel attend des actions cohérentes avec le diagnostic et couvrant plusieurs leviers."
+        },
+        {
+          "question": "La direction demande à la personne ressource un rapport sans groupe de travail. Que fait le formateur ?",
+          "options": [
+            "Il accepte",
+            "Il se retire",
+            "Il signale l’entreprise à l’inspection du travail",
+            "Il rappelle les engagements de la lettre et le principe d’une démarche participative, et organise une régulation avec le pilote, l’OF et si besoin le réseau Prévention"
+          ],
+          "correctIndex": 3,
+          "explication": "Définir les régulations avec les acteurs du dispositif est une compétence évaluée en DC1."
+        }
+      ]
+    },
+    {
+      "competence": "Évaluer les acquis des personnes ressources et le déploiement de leur projet.",
+      "questions": [
+        {
+          "question": "Que reçoit la personne ressource à l’issue de sa formation ?",
+          "options": [
+            "Un certificat de formateur",
+            "Un titre professionnel",
+            "Un diplôme d’ergonome",
+            "Une attestation de validation des acquis délivrée par la structure dispensatrice"
+          ],
+          "correctIndex": 3,
+          "explication": "Le programme officiel prévoit une attestation de validation des acquis par la structure dispensatrice."
+        },
+        {
+          "question": "Comment évaluer les acquis au plus près des situations réelles ?",
+          "options": [
+            "Par un QCM uniquement",
+            "Par un questionnaire de satisfaction",
+            "Sur les productions réelles de la personne ressource : repérage, diagnostic, plan d’actions de son établissement",
+            "Selon l’ancienneté du stagiaire"
+          ],
+          "correctIndex": 2,
+          "explication": "La formation-action permet d’évaluer les compétences sur les livrables du projet."
+        },
+        {
+          "question": "Quels indicateurs de veille suivre dans le temps ?",
+          "options": [
+            "Sinistralité, plaintes, absentéisme, rotation du personnel et avancée du plan d’actions",
+            "Le nombre de pauses",
+            "Le nombre de diapositives",
+            "Le seul chiffre d’affaires"
+          ],
+          "correctIndex": 0,
+          "explication": "La mise en place d’un suivi d’indicateurs de veille fait partie du contenu de la formation."
+        },
+        {
+          "question": "Quelle différence entre évaluation de la satisfaction et évaluation des acquis ?",
+          "options": [
+            "Ce sont des synonymes",
+            "La satisfaction mesure la perception ; l’évaluation des acquis vérifie l’atteinte des objectifs par des critères observables",
+            "Les acquis se mesurent par la présence",
+            "La satisfaction suffit"
+          ],
+          "correctIndex": 1,
+          "explication": "Ce sont deux niveaux distincts : une session appréciée peut ne pas avoir permis d’atteindre les objectifs."
+        },
+        {
+          "question": "Un stagiaire n’atteint pas un objectif. Que fait le formateur ?",
+          "options": [
+            "Il le formalise, propose une remédiation et informe l’OF selon les règles du dispositif",
+            "Il valide quand même",
+            "Il l’exclut sans explication",
+            "Il lui fait refaire toute la formation"
+          ],
+          "correctIndex": 0,
+          "explication": "L’évaluation doit rester honnête et outillée, avec une suite concrète."
+        },
+        {
+          "question": "Une grille d’évaluation utile comporte :",
+          "options": [
+            "Une note globale sans critère",
+            "Une impression générale",
+            "Des critères observables, des niveaux (oui / partiellement / non) et des commentaires",
+            "Aucune trace écrite"
+          ],
+          "correctIndex": 2,
+          "explication": "C’est le format des grilles du référentiel de certification des formateurs."
+        },
+        {
+          "question": "L’étape 4 de TMS Pros consiste à :",
+          "options": [
+            "Désigner la personne ressource",
+            "Évaluer la pertinence des actions et mesurer les avancées",
+            "Faire le point sur les TMS",
+            "Repérer les situations"
+          ],
+          "correctIndex": 1,
+          "explication": "L’étape 4 « Quels résultats ? » boucle la démarche."
+        },
+        {
+          "question": "Pour évaluer le déploiement du projet, le formateur vérifie :",
+          "options": [
+            "Le nombre d’heures passées",
+            "L’esthétique des supports",
+            "Le nombre de courriels",
+            "Les livrables : projet structuré, diagnostic, plan d’actions avec responsables et échéances, indicateurs"
+          ],
+          "correctIndex": 3,
+          "explication": "Le suivi de la production des livrables attendus figure dans le référentiel d’activité du formateur."
+        },
+        {
+          "question": "Quelles preuves conserver ?",
+          "options": [
+            "Aucune",
+            "Émargements, productions, grilles, comptes rendus d’appui intersession",
+            "Des échanges oraux seulement",
+            "Des données publiées en ligne"
+          ],
+          "correctIndex": 1,
+          "explication": "La traçabilité permet de justifier les acquis et le suivi auprès de l’OF."
+        },
+        {
+          "question": "À quoi sert le positionnement initial ?",
+          "options": [
+            "Repérer les acquis et les besoins pour adapter le parcours",
+            "Classer les stagiaires",
+            "Sélectionner les meilleurs",
+            "À rien"
+          ],
+          "correctIndex": 0,
+          "explication": "Le positionnement oriente les adaptations pédagogiques."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Présentez le programme TMS Pros et ses 4 étapes.",
+      "reponseAttendue": "TMS Pros est un programme de l’Assurance Maladie – Risques professionnels qui accompagne les établissements dans une démarche de prévention durable des troubles musculosquelettiques. Étape 1 « En quoi suis-je concerné ? » : l’établissement fait le point sur les TMS à partir de ses données (sinistralité, absentéisme, plaintes, restrictions d’aptitude). Étape 2 « Par quoi commencer ? » : il identifie les situations de travail prioritaires et construit son projet de prévention en s’appuyant sur une personne ressource interne ou externe. Étape 3 « Comment agir ? » : il analyse la situation la plus à risque et établit un plan d’actions concrètes. Étape 4 « Quels résultats ? » : il évalue la pertinence des actions menées et mesure ses avancées. À chaque étape, des méthodes et des outils sont mis à disposition, et la formation de la personne ressource outille l’établissement pour conduire ces étapes."
+    },
+    {
+      "question": "Quel est, selon vous, le rôle d’une personne ressource du projet de prévention des TMS ?",
+      "reponseAttendue": "La personne ressource est désignée par le chef d’établissement pour organiser et animer le projet de prévention des TMS et mettre en œuvre les étapes de la démarche. Elle élabore et anime le projet en concertation avec les acteurs (direction, encadrement, salariés, représentants du personnel, service de santé au travail), met en œuvre le repérage, l’analyse et l’évaluation des situations à risque, établit un diagnostic reliant les facteurs de risque et leurs déterminants, participe à la recherche de pistes de transformation et à la construction du plan d’actions, accompagne la mise en œuvre et le suivi des mesures et assure une veille dans le temps à l’aide d’indicateurs. Elle n’agit pas seule : le projet est porté et piloté par la direction."
+    },
+    {
+      "question": "Pourquoi l’inscription d’une personne ressource est-elle subordonnée à une lettre d’engagement ?",
+      "reponseAttendue": "La lettre d’engagement, élaborée par le chef d’établissement, notamment après la journée « Initier, piloter et manager son projet de prévention des TMS » organisée par les services prévention des caisses, garantit que la formation s’inscrit dans un projet réel et soutenu par la direction. Elle précise le projet global de prévention, le pilotage, le périmètre, les moyens et le temps donnés à la personne ressource. Sans cet engagement, la personne ressource risque de se retrouver seule, sans légitimité ni moyens, et la formation-action ne peut pas produire les livrables attendus pendant les intersessions. Pour le formateur, la lettre est aussi un outil de préparation : il la consulte et informe l’organisme de formation des difficultés repérées."
+    },
+    {
+      "question": "Quels sont les prérequis pour entrer dans la formation de formateurs N11302 de l’INRS ?",
+      "reponseAttendue": "Le candidat doit avoir réussi l’autoformation en ligne @01001 « Acquérir des bases en prévention des risques professionnels » de l’INRS, ou suivi la formation équivalente en Carsat, Cramif ou CGSS. Il doit justifier d’une formation pédagogique ou d’au moins 2 ans de pratique régulière de la formation d’adultes (hors enseignement), avec, pour les formateurs d’organisme de formation, au moins 8 jours de face à face par an. Il doit avoir des connaissances suffisantes en approche ergonomique des situations de travail, en conduite de projet de prévention et en démarche TMS, et justifier d’au moins 2 ans d’interventions ergonomiques en entreprise en conseil externe dans le champ des TMS, hors approche individuelle. Le dossier de candidature est instruit par une commission ; seuls les dossiers complets sont examinés."
+    },
+    {
+      "question": "Expliquez la différence entre travail prescrit et activité réelle.",
+      "reponseAttendue": "Le travail prescrit correspond à ce qui est demandé : procédures, consignes, cadences, objectifs, fiches de poste. L’activité réelle correspond à ce que les salariés font effectivement pour atteindre ces objectifs, compte tenu de la variabilité (produits, pannes, effectifs, aléas) et des ressources dont ils disposent. L’écart entre les deux n’est pas une faute : il révèle les régulations, compromis et stratégies opératoires mis en œuvre, physiquement et mentalement. En prévention des TMS, analyser l’activité réelle permet de comprendre pourquoi les sollicitations apparaissent et d’agir sur leurs déterminants, plutôt que de rappeler la consigne ou de culpabiliser les salariés."
+    },
+    {
+      "question": "Citez les grandes familles de facteurs de risque de TMS et donnez un exemple pour chacune.",
+      "reponseAttendue": "Les facteurs biomécaniques : répétitivité, efforts, postures contraignantes, travail statique, vibrations ; par exemple un geste de vissage répété plusieurs milliers de fois par jour. Les facteurs psychosociaux : forte pression temporelle, faibles marges de manœuvre, manque de soutien, reconnaissance insuffisante ; par exemple une cadence imposée par une machine sans possibilité de régulation. Les facteurs liés aux ambiances physiques : froid, éclairage, bruit, vibrations ; par exemple le travail en chambre froide qui augmente l’effort de préhension. Ces facteurs sont reliés à des déterminants, notamment organisationnels (organisation des flux, effectifs, conception des postes, politique de maintenance), sur lesquels portent les actions de prévention."
+    },
+    {
+      "question": "Qu’est-ce qu’une formation-action et pourquoi ce modèle est-il retenu pour les personnes ressources ?",
+      "reponseAttendue": "Une formation-action alterne des temps de formation en salle et des temps de mise en œuvre dans l’établissement sur un projet réel. Les apports sont immédiatement appliqués, les productions d’intersession sont reprises et analysées au module suivant et le formateur accompagne sur site. Ce modèle est retenu parce que la compétence visée, conduire un projet de prévention des TMS, ne s’acquiert qu’en situation : il faut mobiliser des acteurs, observer, analyser, construire un plan d’actions. Il permet aussi à l’établissement d’avancer concrètement dans la démarche TMS Pros pendant la formation."
+    },
+    {
+      "question": "Comment décririez-vous le rôle du formateur pendant l’intersession ?",
+      "reponseAttendue": "Pendant l’intersession, le formateur accompagne l’entreprise et le stagiaire en aidant à faire, sans faire à la place. Il suit la production des livrables, échange si besoin avec la personne ressource, prépare puis conduit les demi-journées d’appui sur site : point d’avancement avec le stagiaire et le pilote, repérage des freins, aide méthodologique sur l’observation ou le diagnostic, rappel des engagements, sécurisation des prochaines étapes. Il veille à ce que l’établissement reste acteur de son projet et que la personne ressource gagne en autonomie."
+    },
+    {
+      "question": "Quelles méthodes pédagogiques privilégieriez-vous avec un public de managers et de fonctionnels sécurité ?",
+      "reponseAttendue": "Il faut partir de leur expérience et de leur établissement : études de cas issus de leurs situations, mises en situation (animation d’une réunion projet, observation filmée), travaux en sous-groupes sur leurs données, échanges de pratiques, apports courts et ciblés. Les consignes doivent être précises (ce que fait le formateur, ce que font les stagiaires), les productions exploitées en grand groupe, et les outils TMS Pros manipulés sur des cas réels. On alterne les rythmes, on vérifie la compréhension par des productions observables et on relie chaque apport à une étape du projet à mener en intersession."
+    },
+    {
+      "question": "Que savez-vous de la certification des formateurs de personnes ressources ?",
+      "reponseAttendue": "La certification est délivrée par le réseau Prévention (INRS et Assurance Maladie – Risques professionnels) après le suivi de la formation de formateurs N11302, dispensée par l’INRS, et la réussite aux épreuves certificatives. Deux domaines de compétences sont évalués. DC1, favoriser la mise en œuvre du dispositif : présentation de 20 minutes d’une intervention TMS conduite par le candidat, avec 15 minutes d’échange, et étude de cas de 2 h sur la préparation d’un premier appui intersession. DC2, concevoir, animer et évaluer la formation-action : conducteur pédagogique et animation devant jury d’une séquence de 20 minutes tirée au sort, suivie de 10 à 15 minutes de questions. Le formateur certifié intervient ensuite au sein d’un organisme de formation habilité."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Comment exploitez-vous les lettres d’engagement reçues avant une session ?",
+      "reponseAttendue": "Je lis chaque lettre en vérifiant la cohérence entre le projet annoncé et les conditions de réussite : engagement explicite du chef d’établissement, pilote identifié, périmètre et premières situations envisagées, temps alloué à la personne ressource, constitution d’un groupe de travail, implication des représentants du personnel et du service de santé au travail, calendrier compatible avec les intersessions. J’en tire un profil de la session (secteurs, tailles, maturité en prévention) pour adapter mes exemples et mes sous-groupes. Lorsque je repère une difficulté (absence de temps dédié, projet réduit à l’achat d’équipements, personne ressource sans légitimité), j’en informe l’organisme de formation pour qu’une régulation soit menée avec l’établissement avant l’entrée en formation, plutôt que de découvrir le problème au premier appui."
+    },
+    {
+      "question": "Décrivez la progression d’ensemble que vous retenez pour les 6 jours de formation de la personne ressource.",
+      "reponseAttendue": "Module 1 (2 jours) : enjeux des TMS, programme TMS Pros et dispositif de formation ; atteintes à la santé et effets sur la performance ; facteurs de risque et déterminants ; méthodologie de projet ; construction du projet de l’établissement et préparation du repérage. Intersession 1 avec une demi-journée d’appui sur site : structuration du projet (pilote, groupe de travail, planning) et repérage des situations prioritaires. Module 2 (2 jours) : retour sur les productions, analyse et évaluation des situations de travail, observation de l’activité, entretiens, diagnostic reliant facteurs et déterminants. Intersession 2 avec la seconde demi-journée d’appui : réalisation du diagnostic sur la situation retenue. Module 3 (1 jour) : retour sur les diagnostics, pistes de transformation organisationnelles, techniques et humaines, construction du plan d’actions, indicateurs de suivi et de veille, évaluation des acquis et perspectives. Chaque étape produit un livrable repris au module suivant."
+    },
+    {
+      "question": "Rédigez deux objectifs pédagogiques et leurs indicateurs de réussite pour une séquence sur le diagnostic.",
+      "reponseAttendue": "Objectif 1 : à l’issue de la séquence, le stagiaire sera capable de décrire l’activité réelle d’un opérateur à partir d’une observation vidéo de 10 minutes, en distinguant ce qui est prescrit et ce qui est fait. Indicateur : la description mentionne au moins deux régulations ou stratégies opératoires et un écart au prescrit, formulés sans jugement. Objectif 2 : le stagiaire sera capable de relier au moins trois facteurs de risque observés à leurs déterminants. Indicateur : le tableau produit associe chaque facteur (biomécanique, psychosocial ou d’ambiance) à un déterminant vérifiable (organisation, conception, matériel, gestion des effectifs) et à une source (observation, entretien, données). Les verbes d’action, les conditions de réalisation et les critères permettent d’évaluer l’acquisition, ce qui répond aux critères de l’épreuve DC2."
+    },
+    {
+      "question": "Comment conduisez-vous une demi-journée d’appui intersession ?",
+      "reponseAttendue": "En amont, je fais le point avec la personne ressource sur l’avancement et les livrables, je prépare des questions et je confirme la présence du pilote ou d’un représentant de la direction. Sur place, je commence par un échange avec la personne ressource et le pilote sur ce qui a été réalisé, les difficultés et les décisions à prendre. Je visite si possible la situation de travail retenue et j’aide la personne ressource à affiner son observation ou son analyse en la laissant conduire. Je fais le lien avec les engagements de la lettre lorsque des moyens manquent. Je termine par une synthèse partagée : acquis, points à retravailler, prochaines étapes et échéances. Je trace l’appui dans un compte rendu transmis selon les règles de l’organisme de formation et je reprends ces éléments au module suivant."
+    },
+    {
+      "question": "Un groupe exprime que « l’ergonomie coûte cher et ne sert à rien ». Comment réagissez-vous en animation ?",
+      "reponseAttendue": "J’accueille la remarque sans la disqualifier et je la reformule pour vérifier ce qu’elle recouvre : expérience d’un investissement inutile, crainte de la charge de travail, scepticisme sur l’efficacité. Je la renvoie au groupe pour faire émerger d’autres expériences, puis j’apporte des éléments factuels : coûts directs et indirects des TMS (arrêts, remplacements, restrictions d’aptitude, qualité, rotation du personnel), exemples d’actions organisationnelles peu coûteuses issues d’un diagnostic, intérêt d’agir sur les déterminants plutôt que d’acheter du matériel sans analyse. Je termine par un engagement concret : identifier dans leur propre établissement une situation où une action simple a eu un effet. L’objection devient un support d’apprentissage."
+    },
+    {
+      "question": "Quels critères l’épreuve technique (DC1) permet-elle de vérifier dans la présentation de votre intervention ?",
+      "reponseAttendue": "Le jury attend que le candidat présente l’établissement, le travail de la demande (contexte, périmètre, orientation donnée au diagnostic) et le phasage de l’intervention avec ses principes méthodologiques (temporalités, étapes, aspects déontologiques). Il vérifie ensuite que l’intervention est organisée selon une conduite de projet, prend en compte la variabilité et ses impacts, identifie les ressources des opérateurs et leur possibilité de les mobiliser, décrit finement l’activité (régulations individuelles et collectives, compromis, stratégies opératoires), met en évidence les facteurs de risque dans une approche globale, décrit les effets sur la santé et la performance, identifie les déterminants et propose des actions organisationnelles, techniques et humaines cohérentes. Idéalement, le candidat montre comment il a accompagné l’établissement dans la construction du plan d’actions. La présentation dure 20 minutes, 20 diapositives au plus, suivie de 15 minutes d’échange en visioconférence."
+    },
+    {
+      "question": "Comment articulez-vous les outils TMS Pros au sein de la démarche enseignée ?",
+      "reponseAttendue": "Je présente les outils selon l’étape où ils interviennent et la question à laquelle ils répondent : outils de repérage pour faire le point et hiérarchiser les situations, outils d’analyse et de diagnostic pour comprendre l’activité et relier facteurs et déterminants, outils de suivi et d’évaluation pour mesurer les effets du plan d’actions et assurer la veille. Pour chacun, je précise l’intérêt, les limites et les conditions d’usage : un outil de repérage ne remplace pas l’observation, une grille ne dit rien des déterminants si elle n’est pas complétée par des entretiens. Les stagiaires les utilisent sur leurs propres données en intersession, et je vérifie qu’ils les enchaînent de manière cohérente plutôt qu’en remplissage formel."
+    },
+    {
+      "question": "Comment évaluez-vous qu’une personne ressource a atteint les objectifs de la formation ?",
+      "reponseAttendue": "Je m’appuie sur une grille construite à partir des objectifs pédagogiques et je l’alimente tout au long du parcours. Je vérifie les productions réelles : projet structuré avec pilote et groupe de travail, repérage argumenté, diagnostic reliant facteurs de risque et déterminants, pistes de transformation cohérentes, plan d’actions avec responsables, échéances et indicateurs de suivi. J’observe aussi les mises en situation (animation d’une réunion, restitution) et je croise avec les appuis sur site. Chaque critère est évalué en oui, partiellement ou non, avec un commentaire. L’attestation de validation des acquis délivrée par la structure dispensatrice reflète cette évaluation ; si un objectif n’est pas atteint, je le formalise et je propose une suite."
+    },
+    {
+      "question": "Quelles dérives de projet peuvent apparaître en intersession et comment les anticiper ?",
+      "reponseAttendue": "Dérives fréquentes : personne ressource privée de temps par la production, projet réduit à l’achat d’équipements, diagnostic fait par la personne ressource seule sans groupe de travail, direction absente, choix d’une situation sans enjeu pour éviter les conflits, confusion avec une démarche individuelle de gestes et postures. Pour les anticiper, je vérifie les engagements dès la lecture des lettres, je fais formaliser en fin de module un plan d’intersession daté et validé par le pilote, je maintiens un contact intermédiaire avec la personne ressource, j’associe le pilote à l’appui sur site et je prévois les régulations avec l’organisme de formation et, si nécessaire, le réseau Prévention. Ces éléments sont précisément ce qu’évalue l’étude de cas de 2 h de l’épreuve DC1."
+    },
+    {
+      "question": "Quelle posture déontologique adoptez-vous en tant que formateur accompagnant un établissement ?",
+      "reponseAttendue": "Je reste dans un rôle de formateur accompagnant : j’aide l’établissement et la personne ressource à faire, je ne fais pas à leur place et je ne me substitue pas à un consultant chargé d’une expertise. Je respecte la confidentialité des données de santé et des propos recueillis, je n’utilise pas les observations pour juger des salariés et je présente la démarche comme participative. Je veille à la cohérence avec les valeurs du réseau Prévention : approche par le travail, prévention collective, priorité aux déterminants. Je signale les difficultés à l’organisme de formation plutôt que de contourner les engagements, et je n’utilise pas mon intervention pour vendre d’autres prestations."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Analyser trois lettres d’engagement avant une session",
+      "consigne": "Vous animez une session de personnes ressources pour l’organisme de formation fictif Ergonova Conseil. Trois lettres arrivent. Logistique Varennes (230 salariés, entrepôt) : le directeur s’engage, désigne un pilote, prévoit un groupe de travail et 2 jours par mois pour la personne ressource. Laiterie du Bocage (180 salariés) : la lettre est signée par la responsable RH, ne cite aucun pilote et indique que « la personne ressource réalisera le projet en dehors de ses missions habituelles ». Imprimerie Castel (160 salariés) : la lettre annonce un projet limité à « l’achat de tables élévatrices pour l’atelier façonnage ». Analysez chaque lettre, identifiez les risques pour la formation-action et indiquez ce que vous faites.",
+      "reponseAttendue": "Logistique Varennes réunit les conditions de réussite : engagement du chef d’établissement, pilote, groupe de travail, temps dédié. Aucune action n’est nécessaire ; on peut noter ces éléments pour en faire un exemple. Laiterie du Bocage présente deux fragilités : la lettre n’est pas portée par le chef d’établissement et aucun pilote n’est nommé ; surtout, l’absence de temps dédié rend très probable l’échec des intersessions (pas de repérage, pas d’observation, pas de diagnostic). Imprimerie Castel réduit le projet à une solution technique décidée avant tout diagnostic : la démarche TMS Pros demande au contraire de repérer, d’analyser l’activité et d’agir sur les déterminants, l’équipement pouvant être une piste parmi d’autres. Dans ces deux cas, le formateur ne décide pas seul : conformément à son rôle, il informe l’organisme de formation des difficultés identifiées, avec une note factuelle, afin qu’une régulation ait lieu avec l’établissement avant l’entrée en formation (clarification du pilotage, du temps alloué et du périmètre du projet). Il prépare aussi des exemples et des questions pour le module 1 afin de travailler la notion de projet global. Barème : analyse des 3 lettres 4 points, identification des risques 3 points, action adaptée et respect du rôle 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Construire le déroulé macro des 6 jours",
+      "consigne": "Ergonova Conseil vous demande le déroulé macro d’une session de personnes ressources : 2 jours en mars, 2 jours en mai, 1 jour en juin, et deux demi-journées d’appui sur site. Proposez pour chaque module les objectifs, les contenus principaux et le livrable attendu à l’intersession suivante, puis placez les deux appuis sur site.",
+      "reponseAttendue": "Module 1 (2 jours, mars) : objectifs : situer les enjeux des TMS, le programme TMS Pros et le dispositif ; comprendre les atteintes à la santé et leurs effets sur la performance ; identifier les facteurs de risque et leurs déterminants ; structurer un projet. Contenus : sinistralité AT/MP, méthodologie de projet, acteurs, outils de repérage. Livrable de l’intersession 1 : projet structuré (pilote, groupe de travail, planning, communication) et repérage hiérarchisé des situations. Premier appui sur site en avril : point avec la personne ressource et le pilote sur la structuration et le choix de la situation. Module 2 (2 jours, mai) : retour sur les repérages ; analyse et évaluation des situations, observation de l’activité, entretiens, liens facteurs-déterminants, diagnostic. Livrable de l’intersession 2 : diagnostic de la situation prioritaire. Second appui en juin avant le module 3 : aide à la finalisation du diagnostic et à la préparation des pistes. Module 3 (1 jour, juin) : restitution des diagnostics, pistes de transformation organisationnelles, techniques et humaines, construction du plan d’actions, indicateurs de suivi et de veille, évaluation des acquis, perspectives pour pérenniser. Barème : cohérence de la progression 4 points, livrables 3 points, placement et rôle des appuis 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Formuler des objectifs et des indicateurs pour une séquence de repérage",
+      "consigne": "Un collègue a rédigé pour une séquence de 1 h 30 : « Objectif : sensibiliser au repérage des situations à risque. Évaluation : questionnaire de satisfaction. » Réécrivez deux objectifs pédagogiques opérationnels, la méthode et des indicateurs de réussite.",
+      "reponseAttendue": "La formulation initiale n’est pas évaluable : « sensibiliser » ne décrit pas un comportement observable et la satisfaction ne mesure pas les acquis. Objectif 1 : à l’issue de la séquence, le stagiaire sera capable de recenser, à partir des données de son établissement (sinistralité, restrictions d’aptitude, plaintes, absentéisme, rotation), les unités de travail concernées par les TMS. Objectif 2 : il sera capable de hiérarchiser au moins trois situations de travail à l’aide de critères explicites et de justifier le choix de la situation prioritaire. Méthode : court apport sur les sources de données et les critères, travail individuel sur les données apportées par chaque stagiaire, échanges en sous-groupes, restitution. Indicateurs : la liste mobilise au moins trois sources de données ; la hiérarchisation est argumentée par des critères énoncés ; le choix retenu est cohérent avec les données et faisable dans le cadre du projet. Barème : objectifs 4 points, méthode 2 points, indicateurs 4 points.",
+      "points": 10
+    },
+    {
+      "titre": "Concevoir le conducteur d’une séquence jury de 20 minutes",
+      "consigne": "Vous avez tiré au sort la séquence « Les facteurs de risque de TMS et leurs déterminants ». Construisez le conducteur des 20 minutes animées devant le jury et un groupe de 8 personnes : objectif, phases minutées, ce que fait le formateur, ce que font les stagiaires, supports, indicateur de réussite.",
+      "reponseAttendue": "Objectif : à l’issue de la séquence, les stagiaires seront capables de classer les facteurs de risque observés sur une situation filmée en trois familles et de relier chacun à au moins un déterminant. 0-3 min : le formateur annonce l’objectif et pose une question d’accroche (« Pourquoi deux opérateurs au même poste ne souffrent-ils pas de la même façon ? ») ; les stagiaires répondent. 3-7 min : diffusion d’une vidéo de 3 minutes sur un poste de conditionnement ; consigne écrite : noter ce qui sollicite l’opérateur. 7-13 min : sous-groupes de 4 ; chacun classe ses observations sur une affiche à trois colonnes (biomécaniques, psychosociaux, ambiances physiques) puis cherche le « pourquoi » de chaque facteur. 13-18 min : restitution croisée ; le formateur exploite les productions, complète, distingue facteur et déterminant et souligne les déterminants organisationnels. 18-20 min : synthèse par un stagiaire et vérification par une question individuelle. Supports : vidéo, consigne écrite, affiches, fiche de synthèse. Indicateur : chaque sous-groupe cite au moins un facteur de chaque famille et relie au moins trois facteurs à un déterminant pertinent. Le candidat doit pouvoir justifier ses choix pendant les 10 à 15 minutes de questions. Barème : objectif 2 points, minutage réaliste 2 points, consignes formateur-stagiaires 3 points, supports 1 point, indicateur 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer le premier appui intersession",
+      "consigne": "Conserverie Kerlann (210 salariés). Trois semaines après le module 1, la personne ressource, technicienne méthodes, vous écrit : la direction a réduit son temps dédié à cause d’un pic de production, le groupe de travail ne s’est pas réuni et le directeur lui demande de « proposer rapidement des solutions pour la ligne de parage ». Votre appui sur site est prévu dans dix jours. Indiquez les régulations à mener avant l’appui et le contenu de l’appui.",
+      "reponseAttendue": "Avant l’appui : échanger avec la personne ressource pour objectiver la situation (temps réellement disponible, ce qui a été fait, attentes de la direction) ; informer l’organisme de formation de la dérive et convenir avec lui de la régulation ; demander que le pilote ou le directeur soit présent à l’appui ; préparer un rappel des engagements de la lettre (temps dédié, groupe de travail) et des étapes de la démarche. Contenu de l’appui : temps d’échange avec la personne ressource puis avec le pilote et le directeur ; reconnaître la contrainte de production et proposer un calendrier réaliste ; expliquer que des solutions proposées sans repérage ni analyse risquent d’être inefficaces ou rejetées et que la ligne de parage peut être confirmée comme situation prioritaire par un repérage rapide sur données ; obtenir une décision sur une première réunion du groupe de travail et un créneau d’observation ; aider la personne ressource à préparer cette réunion sans la conduire à sa place. Fin de l’appui : synthèse écrite des engagements, échéances avant le module 2, compte rendu à l’organisme de formation. Ce cas correspond aux critères de l’étude de cas DC1 : actions pour que l’appui ait un réel intérêt, régulations en amont, explication du programme et des outils pour lever les résistances. Barème : régulations en amont 4 points, contenu de l’appui 4 points, posture et traçabilité 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Gérer une résistance en séance",
+      "consigne": "Au module 2, un stagiaire, responsable de production, déclare devant le groupe : « Chez nous, on a déjà acheté des tables élévatrices et des tapis anti-fatigue, et les plaintes continuent. Les salariés ne les utilisent pas. Le problème, c’est eux. » Deux autres participants approuvent. Décrivez votre gestion de la situation, étape par étape.",
+      "reponseAttendue": "1. Accueillir et reformuler : « Vous avez investi et vous n’avez pas obtenu l’effet attendu, c’est frustrant. » Le formateur ne contredit pas frontalement. 2. Ouvrir le questionnement au groupe : pourquoi un équipement n’est-il pas utilisé ? Les réponses font apparaître des hypothèses : temps de réglage incompatible avec la cadence, équipement inadapté à la variabilité des produits, encombrement, absence de consultation des opérateurs. 3. Relier à l’apport : l’équipement a été choisi sans analyse de l’activité ; la non-utilisation est une information sur le travail réel, pas une faute des salariés. 4. Transformer en exercice : le stagiaire est invité à observer en intersession l’usage réel des tables et à interroger deux opérateurs, avec une grille fournie. 5. Vérifier l’adhésion : demander au stagiaire ce qu’il retient et ce qu’il fera. 6. Le formateur reste respectueux, régule les approbations collectives et revient sur le principe d’une démarche participative. Barème : accueil de l’objection 2 points, exploitation par le groupe 3 points, apport notionnel 3 points, engagement concret 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Corriger une analyse d’activité produite par une personne ressource",
+      "consigne": "Une personne ressource de Distrilog Centre (entrepôt fictif, 260 salariés) vous remet ses notes : « Préparateur de commandes : soulève des colis de 5 à 25 kg, se penche dans les bas de palettes, fait 14 km par jour. Il ne respecte pas la consigne de pliage des jambes. Solution : formation gestes et postures. » Elle précise oralement que les commandes urgentes arrivent par vagues, que les références lourdes sont rangées au sol et que la prime dépend du nombre de lignes préparées. Rédigez votre retour formatif.",
+      "reponseAttendue": "Points positifs : les sollicitations biomécaniques sont décrites (charges, postures, distance). Points à retravailler : 1. L’analyse décrit le prescrit non respecté plutôt que l’activité réelle ; il faut décrire comment le préparateur s’y prend et pourquoi : il ne plie pas les jambes parce que la vitesse est valorisée par la prime et que les vagues d’urgences augmentent la pression temporelle. 2. Les facteurs psychosociaux (pression temporelle, rémunération liée au rendement) et la variabilité (vagues de commandes, poids variable des colis) sont absents. 3. Les déterminants ne sont pas identifiés : implantation des références lourdes au sol, organisation des vagues, système de prime, conception des emplacements. 4. Les ressources des opérateurs (entraide, matériel de manutention disponible, possibilité de s’organiser) ne sont pas interrogées. 5. La solution individuelle ne traite pas les causes ; des pistes cohérentes portent sur l’implantation (références lourdes à hauteur de prise), le lissage des vagues, la révision des critères de prime, l’équipement adapté, la formation venant en complément. Le retour se termine par une consigne : compléter l’observation par deux entretiens et un tableau facteurs-déterminants avant l’appui. Barème : repérage des manques 5 points, pistes cohérentes 3 points, posture formative 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Accompagner la construction du plan d’actions",
+      "consigne": "Blanchisserie Hélia (190 salariés) a réalisé le diagnostic du poste d’engagement du linge plat : gestes répétitifs bras levés, cadence de la machine non réglable, chaleur, rotations de postes supprimées depuis la baisse d’effectif, chariots trop lourds. La personne ressource présente un plan d’actions : « 1. Acheter une nouvelle machine. 2. Rappeler les règles de posture. » Aidez-la à construire un plan d’actions recevable.",
+      "reponseAttendue": "Le formateur aide la personne ressource à relier chaque action à un déterminant du diagnostic et à couvrir plusieurs leviers. Actions organisationnelles : rétablir une rotation entre postes à sollicitations différentes, revoir l’affectation des effectifs sur les créneaux de pointe, organiser des micro-pauses. Actions techniques : étudier avec le fournisseur le réglage de la vitesse et de la hauteur d’engagement, remplacer ou équiper les chariots (fond remontant), traiter la chaleur (extraction, ventilation, fontaines). Actions humaines : associer les opérateurs aux essais, former à la nouvelle organisation. L’achat d’une machine neuve n’est retenu qu’après étude et ne règle pas la rotation ni les chariots ; le rappel des postures n’agit sur aucun déterminant. Chaque action reçoit un responsable, une échéance, un budget estimé et un indicateur (plaintes, absentéisme sur l’unité, taux de rotation effectif, temps passé bras levés). Le plan est validé par la direction et présenté au groupe de travail. Le formateur pose des questions et propose une trame ; il ne rédige pas le plan. Barème : lien actions-déterminants 4 points, diversité des leviers 2 points, responsables, échéances et indicateurs 3 points, posture 1 point.",
+      "points": 10
+    },
+    {
+      "titre": "Évaluer les acquis d’une personne ressource",
+      "consigne": "En fin de module 3, vous évaluez M. Delorme (Menuiserie Arvel, 170 salariés). Son projet est structuré et son groupe de travail s’est réuni trois fois. Son diagnostic décrit bien les postures et les efforts mais n’identifie aucun déterminant organisationnel. Son plan d’actions comporte deux actions techniques avec responsables et échéances, sans indicateur. En mise en situation, il anime correctement une réunion de restitution. Construisez une grille courte, positionnez-le et indiquez la suite donnée.",
+      "reponseAttendue": "Grille (oui / partiellement / non avec commentaire), construite sur les objectifs du programme : 1. Élaborer et animer le projet en concertation : oui, projet structuré, groupe réuni trois fois, réunion de restitution bien animée. 2. Mettre en œuvre le repérage, l’analyse et l’évaluation : oui pour le repérage et la description biomécanique. 3. Établir un diagnostic reliant facteurs et déterminants : partiellement, aucun déterminant organisationnel ni facteur psychosocial. 4. Participer à la recherche d’axes de prévention et au plan d’actions : partiellement, actions uniquement techniques. 5. Assurer le suivi et la veille : non, aucun indicateur. Suite : retour individualisé argumenté ; consigne de remédiation (compléter le diagnostic par deux entretiens sur l’organisation et les délais, ajouter au moins une action organisationnelle et deux indicateurs) ; information de l’organisme de formation selon les règles du dispositif sur les objectifs non atteints et la remédiation proposée ; l’attestation de validation des acquis délivrée par la structure dispensatrice reflète fidèlement ces résultats. Barème : grille et critères 4 points, positionnement argumenté 3 points, suite et traçabilité 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer la présentation d’intervention de l’épreuve technique",
+      "consigne": "Une candidate à la certification, ergonome consultante, prépare sa présentation de 20 minutes. Elle compte présenter une intervention sur un abattoir fictif centrée sur un programme d’échauffement et de formation aux bons gestes, illustrée par 35 diapositives. Conseillez-la.",
+      "reponseAttendue": "Premier point : le choix de l’intervention. L’épreuve demande une intervention en prévention des TMS hors approche individuelle ; une intervention centrée sur l’échauffement et les bons gestes ne permettra pas de démontrer l’analyse de l’activité ni l’action sur les déterminants. Il faut choisir une intervention où elle a conduit un diagnostic ergonomique et accompagné un plan d’actions. Deuxième point : le format, 20 minutes et 20 diapositives au plus ; 35 diapositives sont hors cadre. Troisième point : la structure, alignée sur les critères : présentation de l’établissement ; travail de la demande (contexte, périmètre, orientation du diagnostic) ; phasage et principes méthodologiques (étapes, temporalités, déontologie) ; conduite de projet ; variabilité ; ressources des opérateurs ; description fine de l’activité (régulations, compromis, stratégies) ; facteurs de risque dans une approche globale ; effets sur la santé et la performance ; déterminants ; actions organisationnelles, techniques et humaines ; accompagnement du plan d’actions. Elle prépare les 15 minutes d’échange en identifiant les limites de son intervention, vérifie la connexion pour l’épreuve en visioconférence et prévoit d’envoyer son support au jury en fin de présentation. Barème : choix de l’intervention 3 points, format 2 points, structure alignée sur les critères 4 points, préparation de l’échange 1 point.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : dispositif, conception et préparation d’un appui",
+    "contexte": "Vous préparez pour l’organisme de formation fictif Ergonova Conseil une session de 8 personnes ressources. Parmi elles, Mme Roux, responsable QSE de Plastiform Est (205 salariés, injection plastique). Sa lettre d’engagement, signée du directeur, prévoit un pilote (le directeur industriel), un groupe de travail et une journée par semaine. Le module 1 a eu lieu : elle a identifié trois unités concernées (ébavurage, emballage, magasin). Trois semaines plus tard, elle vous signale que le groupe ne s’est réuni qu’une fois, que l’ébavurage a été choisi « parce que c’est là que les opérateurs se plaignent le plus » et qu’elle ne sait pas comment organiser l’observation. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Situez où en est Plastiform Est dans les 4 étapes de TMS Pros et dans le parcours de formation.",
+        "reponseAttendue": "L’établissement a fait le point sur ses TMS (étape 1) et est en étape 2 « Par quoi commencer ? » : il structure son projet et identifie la situation prioritaire. Dans le parcours, Mme Roux est en intersession 1 entre le module 1 (2 jours) et le module 2 (2 jours) ; le livrable attendu est un projet structuré et un repérage hiérarchisé. L’analyse et le plan d’actions relèvent de l’étape 3, travaillée au module 2 et en intersession 2. Barème : étape TMS Pros 2 points, position dans le parcours 2 points, livrable attendu 1 point.",
+        "points": 5
+      },
+      {
+        "question": "Le choix de l’ébavurage est-il suffisamment argumenté ? Que lui conseillez-vous ?",
+        "reponseAttendue": "Les plaintes sont un critère utile mais insuffisant. Il faut croiser plusieurs sources : sinistralité et maladies professionnelles, restrictions d’aptitude, absentéisme, rotation, avis du service de santé au travail et de l’encadrement, observations rapides, faisabilité de l’action. Le formateur lui conseille de compléter le repérage avec ces critères, de le présenter au groupe de travail et de faire valider le choix par le pilote, sans le faire à sa place. Barème : limites du critère unique 2 points, critères complémentaires 2 points, validation collective 1 point.",
+        "points": 5
+      },
+      {
+        "question": "Rédigez un objectif pédagogique et un indicateur de réussite pour la séquence « préparer et conduire une observation » du module 2.",
+        "reponseAttendue": "Objectif : à l’issue de la séquence, le stagiaire sera capable d’élaborer un plan d’observation d’une situation de travail précisant les questions à éclairer, les moments à observer compte tenu de la variabilité, les opérateurs associés, les modalités d’information des salariés et les supports de recueil. Indicateur : le plan produit comporte au moins trois questions d’analyse, deux moments contrastés (par exemple début et fin de poste, ou série courte et série longue), une modalité d’information des salariés et un support de prise de notes ; il est jugé applicable par le sous-groupe. Barème : objectif formulé avec un verbe d’action et des conditions 3 points, indicateur observable 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Préparez votre appui sur site : régulations en amont et déroulement.",
+        "reponseAttendue": "En amont : échange avec Mme Roux pour faire le point ; demande de présence du directeur industriel, pilote ; rappel des engagements de la lettre (groupe de travail, journée par semaine) ; information de l’organisme de formation si le temps dédié n’est pas respecté. Déroulement : point d’avancement avec Mme Roux et le pilote ; décision sur un calendrier de réunions du groupe ; consolidation du repérage ; visite de l’ébavurage pour l’aider à préparer son observation (questions, moments, information des opérateurs), sans conduire l’observation à sa place ; synthèse des engagements et échéances avant le module 2 ; compte rendu tracé. Barème : régulations 2 points, déroulement 2 points, posture « aider à faire » 1 point.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 4 compétences, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores ; elle prépare aux épreuves certificatives de l’INRS sans les remplacer",
+    "exercices": [
+      {
+        "titre": "Situer le dispositif et le rôle du formateur certifié",
+        "consigne": "Le directeur de l’organisme de formation fictif Formacare souhaite proposer la formation des personnes ressources dès le mois prochain avec un formateur ergonome expérimenté qui n’a pas suivi la formation INRS. Il pense aussi que « la personne ressource pourra faire le diagnostic toute seule, sans implication de la direction ». Rédigez une note de réponse.",
+        "reponseAttendue": "La formation des personnes ressources est assurée par un formateur certifié faisant partie d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS. La certification des formateurs est délivrée par le réseau Prévention après la formation de formateurs N11302, dispensée par l’INRS (8,5 jours en présentiel non consécutifs et environ 4 jours à distance), et la réussite aux épreuves certificatives ; l’expérience d’ergonome est un prérequis, non une équivalence. Sur le fond, la démarche TMS Pros repose sur un projet porté par le chef d’établissement, formalisé dans une lettre d’engagement, avec un pilotage et une démarche participative ; la personne ressource organise et anime le projet mais n’agit pas seule. Barème : cadre de l’habilitation et de la certification 3 points, rôle de la direction et de la personne ressource 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Concevoir le parcours de la personne ressource",
+        "consigne": "Proposez le calendrier d’une session de 6 jours (42 h) avec les livrables d’intersession et la place des deux demi-journées d’appui sur site.",
+        "reponseAttendue": "Module 1, 2 jours : enjeux, TMS Pros, facteurs de risque et déterminants, méthodologie de projet ; livrable : projet structuré et repérage hiérarchisé. Premier appui sur site en intersession 1. Module 2, 2 jours : analyse et évaluation des situations, observation de l’activité, diagnostic ; livrable : diagnostic de la situation prioritaire. Second appui en intersession 2. Module 3, 1 jour : pistes de transformation, plan d’actions, indicateurs de suivi et de veille, évaluation des acquis. Total : 5 jours en présentiel et 2 demi-journées, soit 6 jours. Barème : découpage 2 points, livrables 2 points, appuis 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Animer et accompagner",
+        "consigne": "Lors du second appui sur site chez Atelier Mécanique Pélissier (fictif, 175 salariés), la personne ressource vous demande de rédiger vous-même le diagnostic « parce que vous savez mieux faire » ; le pilote est absent. Que faites-vous ?",
+        "reponseAttendue": "Le formateur refuse de faire à la place tout en aidant à faire : il reprend avec la personne ressource ses notes d’observation et d’entretien, l’aide à construire le tableau facteurs-déterminants par des questions, lui fait formuler elle-même les conclusions et vérifie qu’elle sait les présenter. Il rappelle que le diagnostic doit être partagé avec le groupe de travail et validé par le pilote ; il organise un contact avec le pilote absent ou une restitution à date fixée et informe l’organisme de formation si l’absence de pilotage persiste. Il trace l’appui dans un compte rendu. Barème : posture 2 points, aide méthodologique 2 points, régulation avec le pilote 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Évaluer les acquis et le déploiement",
+        "consigne": "Définissez les critères permettant d’évaluer, en fin de formation, les acquis d’une personne ressource et le déploiement de son projet, et précisez le document délivré.",
+        "reponseAttendue": "Critères évalués en oui, partiellement ou non avec commentaire : projet structuré et animé en concertation ; repérage argumenté ; diagnostic reliant facteurs de risque (biomécaniques, psychosociaux, ambiances) et déterminants ; pistes de transformation organisationnelles, techniques et humaines cohérentes ; plan d’actions avec responsables, échéances et indicateurs ; dispositif de suivi et de veille. Ces critères s’appuient sur les productions réelles, les mises en situation et les comptes rendus d’appui. Une attestation de validation des acquis est délivrée par la structure dispensatrice ; les objectifs non atteints donnent lieu à une remédiation tracée. Barème : critères 3 points, sources de preuve 1 point, document délivré 1 point.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Maîtrise du cadre TMS Pros et du dispositif (étapes, acteurs, habilitation, certification) : 0 = absent ; 1 = confusions majeures ; 2 = cadre partiellement exact ; 3 = cadre exact ; 4 = cadre exact et mobilisé à bon escient.",
+        "points": 4
+      },
+      {
+        "critere": "Approche par l’activité de travail et approche globale du risque (facteurs, déterminants, variabilité, ressources) : 0 = absente ; 1 = approche individuelle ou uniquement biomécanique ; 2 = approche partielle ; 3 = approche globale ; 4 = approche globale et argumentée.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’ingénierie pédagogique (objectifs, progression, méthodes, indicateurs) : 0 = absente ; 1 = objectifs non évaluables ; 2 = ingénierie incomplète ; 3 = ingénierie cohérente ; 4 = ingénierie cohérente et adaptée au public adulte.",
+        "points": 4
+      },
+      {
+        "critere": "Posture d’accompagnement et régulations (aider à faire, place du pilote, information de l’OF) : 0 = absente ; 1 = substitution au stagiaire ; 2 = posture hésitante ; 3 = posture adaptée ; 4 = posture adaptée et régulations anticipées.",
+        "points": 4
+      },
+      {
+        "critere": "Évaluation et traçabilité (critères observables, remédiation, documents) : 0 = absente ; 1 = évaluation par la seule satisfaction ; 2 = critères partiels ; 3 = critères observables ; 4 = critères observables, remédiation et traces complètes.",
+        "points": 4
+      }
+    ]
+  }
+}

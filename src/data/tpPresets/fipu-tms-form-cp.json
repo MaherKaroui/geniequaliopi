@@ -1,0 +1,911 @@
+{
+  "competences": [
+    "Situer le dispositif de formation TMS Pros et le rôle du formateur certifié auprès des établissements de moins de 150 salariés.",
+    "Concevoir et organiser le parcours du chargé de prévention (4 jours et intersession).",
+    "Animer les séquences et accompagner sur site le déploiement de la démarche pilotée par le chef d’établissement.",
+    "Évaluer les acquis des chargés de prévention et le reporting TMS Pros."
+  ],
+  "besoinsList": [
+    "Distinguer le format chargé de prévention du format personne ressource et identifier les établissements concernés.",
+    "Comprendre le rôle central du chef d’établissement, qui construit et pilote le projet de prévention des TMS.",
+    "Exploiter les lettres d’engagement pour préparer la session et alerter l’organisme de formation en cas de difficulté.",
+    "Construire un parcours de 4 jours (3 jours de face à face et 2 demi-journées sur site) adapté aux petites structures.",
+    "Formuler des objectifs pédagogiques opérationnels et des indicateurs de réussite à partir des objectifs officiels du chargé de prévention.",
+    "Transmettre des outils de repérage et d’analyse simples, utilisables avec peu de temps et peu de moyens.",
+    "Animer un groupe de managers et de salariés polyvalents issus de très petites et moyennes structures.",
+    "Accompagner sur site le chargé de prévention et le chef d’établissement sans faire à leur place.",
+    "Évaluer les acquis du chargé de prévention et accompagner le reporting de la démarche TMS Pros.",
+    "Se préparer aux épreuves certificatives de l’INRS (présentation d’intervention, étude de cas, séquence jury)."
+  ],
+  "syntheseHtml": "• Positionnement : ce parcours prépare et consolide la pratique des formateurs appelés à former des chargés de prévention des TMS dans le cadre du programme TMS Pros de l’Assurance Maladie – Risques professionnels. La formation de formateurs officielle « Devenir formateur de personne ressource du projet de prévention des TMS et de chargé de prévention des TMS » (code stage N11302) est dispensée exclusivement par l’INRS : 8,5 jours en présentiel en sessions non consécutives et environ 4 jours à distance ; elle couvre les deux formats. Le présent parcours ne s’y substitue pas.<br>• Certification : le réseau Prévention (INRS et Assurance Maladie – Risques professionnels) certifie les formateurs après le suivi de la formation INRS et la réussite aux épreuves certificatives : DC1 (présentation d’une intervention TMS de 20 minutes avec 15 minutes d’échange, puis étude de cas de 2 h sur la préparation d’un appui intersession) et DC2 (conducteur pédagogique et animation d’une séquence de 20 minutes tirée au sort, suivie de 10 à 15 minutes de questions). Le formateur certifié exerce au sein d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS.<br>• Prérequis d’entrée en formation INRS : attestation de réussite de l’autoformation @01001 « Acquérir des bases en prévention des risques professionnels » (ou formation équivalente en Carsat/Cramif/CGSS) ; formation pédagogique ou au moins 2 ans de pratique régulière de la formation d’adultes, avec 8 jours de face à face par an minimum pour les formateurs d’organisme de formation ; connaissances en approche ergonomique, en conduite de projet de prévention et en démarche TMS ; au moins 2 ans d’interventions ergonomiques en entreprise en conseil externe dans le champ des TMS (hors approche individuelle).<br>• Formation cible animée par le futur formateur : « Devenir chargé de prévention des TMS de l’établissement », format parallèle à celui de la personne ressource, proposé aux établissements de moins de 150 salariés (et, cas particulier, pour épauler une personne ressource déjà formée en interne) ; 4 jours (28 h) dont 3 jours de face à face et 2 demi-journées d’accompagnement sur site ; 10 stagiaires maximum ; inscription subordonnée à une lettre d’engagement du chef d’établissement, qui construit et pilote le projet ; le chargé de prévention met en œuvre certaines étapes de la démarche ; contenu incluant le reporting TMS Pros ; attestation de validation des acquis délivrée par la structure dispensatrice.<br>• 4 compétences travaillées : situer le dispositif et le rôle du formateur, concevoir le parcours de 4 jours, animer et accompagner sur site, évaluer les acquis et le reporting. Positionnement initial, contrôle intermédiaire et évaluation finale internes entraînent aux épreuves mais ne remplacent pas les épreuves certificatives de l’INRS et ne préjugent pas de l’avis du jury.",
+  "adaptationsHtml": "• Partir des réalités des petites structures (polyvalence, absence de service prévention, temps contraint du dirigeant) pour calibrer exemples, outils et livrables.<br>• Travailler sur des documents réalistes : lettres d’engagement, données simples de sinistralité, outils de repérage, notes d’observation, fiches de pistes d’amélioration, tableau de suivi pour le reporting.<br>• Alterner apports courts, études de cas, conception en binôme de conducteurs pédagogiques et animations filmées avec retour entre pairs.<br>• Adapter rythme et supports aux profils des futurs formateurs (ergonomes, préventeurs, consultants) : fiches de synthèse, consignes découpées, temps majoré si nécessaire.<br>• Prévoir un entraînement chronométré à chaque épreuve (présentation de 20 minutes, étude de cas de 2 h, séquence de 20 minutes) avec une grille oui / partiellement / non et un retour individualisé.",
+  "qcmDebut": [
+    {
+      "question": "À quels établissements le format « chargé de prévention des TMS » est-il principalement destiné ?",
+      "options": [
+        "Aux établissements de moins de 150 salariés",
+        "Aux établissements de plus de 1 000 salariés",
+        "Uniquement aux établissements publics",
+        "Uniquement aux entreprises de travail temporaire"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quelle est la durée de la formation du chargé de prévention des TMS ?",
+      "options": [
+        "1 journée de sensibilisation",
+        "6 jours dont 5 en présentiel",
+        "4 jours (28 h), dont 3 jours de face à face et 2 demi-journées d’accompagnement sur site",
+        "10 jours à distance"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Qui construit et pilote le projet de prévention dans le format chargé de prévention ?",
+      "options": [
+        "Le formateur",
+        "Le chef d’établissement",
+        "Le médecin du travail",
+        "La Carsat"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Qui dispense la formation de formateurs N11302 ?",
+      "options": [
+        "Tout organisme de formation certifié",
+        "Le chef d’établissement",
+        "Le service de santé au travail",
+        "L’INRS"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel document conditionne l’inscription d’un chargé de prévention ?",
+      "options": [
+        "Un certificat médical d’aptitude",
+        "Un diplôme d’ergonomie",
+        "Une lettre d’engagement sur un projet global de prévention des TMS, élaborée par le chef d’établissement",
+        "Un contrat de prestation de conseil"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Combien de stagiaires au maximum compte une session de chargés de prévention ?",
+      "options": [
+        "5",
+        "10",
+        "15",
+        "30"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quel prérequis de connaissances est demandé au futur chargé de prévention ?",
+      "options": [
+        "Un master en ergonomie",
+        "Une habilitation électrique",
+        "Aucune connaissance",
+        "Des bases en prévention des risques professionnels, par exemple l’autoformation @01001"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Que signifie « reporting TMS Pros » dans le contenu de la formation ?",
+      "options": [
+        "Rendre compte de l’avancement de la démarche de prévention au fil des étapes du programme",
+        "Remplir la déclaration sociale nominative",
+        "Déclarer un accident du travail",
+        "Rédiger un rapport financier annuel"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quelles familles de facteurs de risque sont abordées ?",
+      "options": [
+        "Biomécaniques, psychosociaux et liés aux ambiances physiques, en lien avec les déterminants",
+        "Uniquement les postures",
+        "Uniquement les facteurs individuels",
+        "Uniquement le port de charges"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Qui délivre l’attestation de validation des acquis au chargé de prévention ?",
+      "options": [
+        "L’inspection du travail",
+        "Le chef d’établissement",
+        "La structure dispensatrice, organisme de formation habilité",
+        "Le médecin du travail"
+      ],
+      "correctIndex": 2
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Quelle mission distingue le chargé de prévention de la personne ressource ?",
+      "options": [
+        "Il construit seul et pilote l’ensemble du projet",
+        "Il met en œuvre de façon opérationnelle certaines étapes de la démarche dans un projet construit et piloté par le chef d’établissement",
+        "Il forme les personnes ressources",
+        "Il certifie l’établissement"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Dans quel cas particulier le format chargé de prévention peut-il être retenu hors du cas général ?",
+      "options": [
+        "Pour épauler une personne ressource déjà formée en interne dans le déploiement des étapes de la démarche",
+        "Pour remplacer la formation du chef d’établissement",
+        "Pour former un formateur",
+        "Pour obtenir une aide financière sans projet"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Un dirigeant de 40 salariés n’a pas participé à la journée « Initier, piloter et manager son projet de prévention des TMS » et sa lettre est très vague. Que fait le formateur ?",
+      "options": [
+        "Il ne dit rien",
+        "Il réécrit la lettre lui-même",
+        "Il exclut le stagiaire le premier jour",
+        "Il en informe l’organisme de formation pour qu’une régulation clarifie le projet et le pilotage avant l’entrée en formation"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel objectif pédagogique est conforme aux objectifs officiels du chargé de prévention ?",
+      "options": [
+        "Concevoir une machine conforme",
+        "Évaluer la conformité au code du travail",
+        "Identifier des perspectives pour ancrer la démarche de façon pérenne à l’issue de la formation",
+        "Réaliser une étude épidémiologique"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Lors de l’épreuve technique (DC1), le candidat formateur présente :",
+      "options": [
+        "Un programme d’échauffement",
+        "Un QCM réglementaire",
+        "Une séquence de 2 heures",
+        "Une intervention TMS de son choix hors approche individuelle, en 20 minutes et 20 diapositives au plus, suivie de 15 minutes d’échange"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Pour une structure de 25 salariés, quel livrable d’intersession est réaliste ?",
+      "options": [
+        "Un diagnostic exhaustif de tous les postes",
+        "Le repérage de la situation prioritaire et l’observation d’une situation de travail avec quelques entretiens",
+        "Une étude chiffrée sur cinq ans",
+        "Aucun livrable"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Lors de l’appui sur site, le dirigeant n’est pas disponible. Que fait le formateur ?",
+      "options": [
+        "Il annule l’appui",
+        "Il décide à la place du dirigeant",
+        "Il conduit l’appui avec le chargé de prévention et organise un temps d’échange, même court, avec le dirigeant pour qu’il valide les suites",
+        "Il valide seul le plan d’actions"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quel indicateur de réussite convient à une séquence sur les pistes de transformation ?",
+      "options": [
+        "Chaque stagiaire propose au moins une piste organisationnelle, une technique et une humaine reliées à un déterminant identifié",
+        "Le groupe a été attentif",
+        "Le support a été remis",
+        "La séquence a duré 1 heure"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Comment est organisée l’étude de cas de l’épreuve DC1 ?",
+      "options": [
+        "30 minutes à distance",
+        "Un écrit à rendre 6 mois plus tard",
+        "2 h en salle le dernier jour de la formation de formateurs, sans autre support que l’étude de cas et le document de référence",
+        "Un oral sans support de 10 minutes"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Pourquoi le reporting TMS Pros intéresse-t-il le formateur ?",
+      "options": [
+        "Il sert à noter le chef d’établissement",
+        "Il remplace l’évaluation des acquis",
+        "Il n’a aucun lien avec la formation",
+        "Il permet de vérifier que l’établissement avance dans les étapes et de préparer avec le chargé de prévention les éléments à transmettre"
+      ],
+      "correctIndex": 3
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Situer le dispositif de formation TMS Pros et le rôle du formateur certifié auprès des établissements de moins de 150 salariés.",
+      "questions": [
+        {
+          "question": "Quelle est la taille d’établissement visée en priorité par le format chargé de prévention ?",
+          "options": [
+            "Plus de 500 salariés",
+            "Moins de 11 salariés uniquement",
+            "Toutes tailles sans distinction",
+            "Moins de 150 salariés"
+          ],
+          "correctIndex": 3,
+          "explication": "Le programme officiel indique que ce format parallèle est proposé aux établissements de moins de 150 salariés."
+        },
+        {
+          "question": "Qui certifie les formateurs de chargés de prévention ?",
+          "options": [
+            "L’organisme de formation employeur",
+            "La chambre de commerce",
+            "Le réseau Prévention (INRS et Assurance Maladie – Risques professionnels), après la formation INRS et les épreuves certificatives",
+            "Le chef d’établissement"
+          ],
+          "correctIndex": 2,
+          "explication": "Une seule formation de formateurs, N11302, prépare aux deux formats ; la certification suit la réussite aux épreuves."
+        },
+        {
+          "question": "Dans quel cadre le formateur certifié intervient-il ?",
+          "options": [
+            "Au sein d’un organisme de formation habilité par l’Assurance Maladie – Risques professionnels et l’INRS",
+            "En indépendant sans habilitation",
+            "Uniquement dans une Carsat",
+            "Au sein de l’entreprise cliente comme salarié"
+          ],
+          "correctIndex": 0,
+          "explication": "Le programme précise que la formation est assurée par un formateur certifié faisant partie d’un organisme de formation habilité."
+        },
+        {
+          "question": "Quelle est l’organisation de la formation de formateurs N11302 ?",
+          "options": [
+            "4 jours consécutifs",
+            "8,5 jours en présentiel non consécutifs et environ 4 jours à distance",
+            "1 journée en ligne",
+            "15 jours en présentiel"
+          ],
+          "correctIndex": 1,
+          "explication": "Le stage N11302 alterne plusieurs modules en présentiel et un travail à distance, notamment en intersession."
+        },
+        {
+          "question": "Quel rôle tient le chef d’établissement ?",
+          "options": [
+            "Il construit et pilote le projet de prévention, formalise son engagement et s’appuie sur le chargé de prévention pour certaines étapes",
+            "Il délègue entièrement le projet",
+            "Il n’intervient pas",
+            "Il est formé à la place du chargé de prévention"
+          ],
+          "correctIndex": 0,
+          "explication": "Le format chargé de prévention repose sur un projet construit et piloté par le chef d’établissement."
+        },
+        {
+          "question": "Quelle journée le chef d’établissement suit-il en amont ?",
+          "options": [
+            "Une formation SST",
+            "Une formation à la conduite de chariots",
+            "« Initier, piloter et manager son projet de prévention des TMS », organisée par les services prévention des caisses",
+            "Une formation Prap"
+          ],
+          "correctIndex": 2,
+          "explication": "La lettre d’engagement est notamment élaborée à l’issue de cette journée."
+        },
+        {
+          "question": "Quel volume minimal de face à face est exigé d’un formateur d’organisme de formation candidat à N11302 ?",
+          "options": [
+            "1 jour par an",
+            "8 jours par an",
+            "30 jours par an",
+            "Aucun"
+          ],
+          "correctIndex": 1,
+          "explication": "Le dossier de candidature exige au moins 8 jours de face à face par an, en plus de 2 ans de pratique de la formation d’adultes."
+        },
+        {
+          "question": "Quelle étape de TMS Pros consiste à analyser la situation la plus à risque et à établir un plan d’actions ?",
+          "options": [
+            "L’étape 1",
+            "L’étape 2",
+            "L’étape 4",
+            "L’étape 3 « Comment agir ? »"
+          ],
+          "correctIndex": 3,
+          "explication": "Étape 1 : faire le point ; étape 2 : identifier les priorités et construire le projet ; étape 3 : analyser et agir ; étape 4 : évaluer."
+        },
+        {
+          "question": "Pourquoi un format spécifique pour les petites structures ?",
+          "options": [
+            "Parce que les TMS n’y existent pas",
+            "Parce que le dirigeant y est proche du terrain et peut piloter directement le projet, avec un chargé de prévention qui dispose de moins de temps qu’une personne ressource",
+            "Parce que la démarche y est facultative",
+            "Parce qu’aucun diagnostic n’y est nécessaire"
+          ],
+          "correctIndex": 1,
+          "explication": "Le format de 4 jours tient compte des contraintes de ces établissements tout en conservant les étapes structurantes."
+        },
+        {
+          "question": "Quelle expérience d’intervention est exigée du candidat formateur ?",
+          "options": [
+            "Au moins 2 ans d’interventions ergonomiques en conseil externe dans le champ des TMS, hors approche individuelle",
+            "Une expérience de vente d’équipements",
+            "1 an d’enseignement",
+            "Aucune expérience"
+          ],
+          "correctIndex": 0,
+          "explication": "Le prérequis 3 du dossier N11302 porte sur l’approche ergonomique, la conduite de projet et l’intervention TMS."
+        }
+      ]
+    },
+    {
+      "competence": "Concevoir et organiser le parcours du chargé de prévention (4 jours et intersession).",
+      "questions": [
+        {
+          "question": "Comment se compose la durée de la formation du chargé de prévention ?",
+          "options": [
+            "4 jours de face à face consécutifs",
+            "2 jours et 1 journée à distance",
+            "3 jours de face à face et 2 demi-journées d’accompagnement sur site, soit 4 jours",
+            "5 jours et 2 demi-journées"
+          ],
+          "correctIndex": 2,
+          "explication": "Le programme TMS 002 indique 4 jours (28 h) : 3 jours en face à face pédagogique et 2 demi-journées d’accompagnement sur site."
+        },
+        {
+          "question": "Quel est le volume horaire total ?",
+          "options": [
+            "28 heures",
+            "42 heures",
+            "14 heures",
+            "35 heures"
+          ],
+          "correctIndex": 0,
+          "explication": "4 jours de 7 heures."
+        },
+        {
+          "question": "Quel est le premier objectif pédagogique officiel ?",
+          "options": [
+            "Rédiger le document unique",
+            "Concevoir un poste de travail neuf",
+            "Former les salariés aux gestes et postures",
+            "Identifier le risque de TMS et les points structurants d’une action de prévention des TMS"
+          ],
+          "correctIndex": 3,
+          "explication": "Les quatre objectifs sont : identifier le risque et les points structurants ; déployer les étapes ; participer à la recherche de pistes ; identifier des perspectives pour ancrer la démarche."
+        },
+        {
+          "question": "Quel contenu est spécifique au programme du chargé de prévention ?",
+          "options": [
+            "La certification des formateurs",
+            "Le reporting TMS Pros",
+            "La réglementation incendie",
+            "La paie"
+          ],
+          "correctIndex": 1,
+          "explication": "Le contenu officiel se termine par le reporting TMS Pros."
+        },
+        {
+          "question": "Quel rôle joue l’intersession ?",
+          "options": [
+            "Laisser le stagiaire sans consigne",
+            "Mettre en œuvre dans l’établissement le repérage et l’analyse d’une situation, avec l’appui du formateur sur site",
+            "Rattraper le programme",
+            "Remplacer le face à face"
+          ],
+          "correctIndex": 1,
+          "explication": "L’intersession permet d’appliquer et de revenir sur les productions en salle."
+        },
+        {
+          "question": "Quelles méthodes pédagogiques prévoit le programme ?",
+          "options": [
+            "Lecture individuelle de documents",
+            "Tests chronométrés",
+            "Conférence unique",
+            "Exposés didactiques, mises en situation, échanges et retours d’expériences, accompagnement sur site"
+          ],
+          "correctIndex": 3,
+          "explication": "Ce sont les méthodes listées par le programme officiel du chargé de prévention."
+        },
+        {
+          "question": "Comment adapter les outils au public ?",
+          "options": [
+            "Choisir des outils de repérage et d’analyse simples, utilisables avec peu de temps et sur des données limitées",
+            "Imposer des méthodes de laboratoire",
+            "Supprimer toute analyse",
+            "Utiliser uniquement des logiciels payants"
+          ],
+          "correctIndex": 0,
+          "explication": "Le format vise des petites structures où le temps et les données sont limités."
+        },
+        {
+          "question": "Que doit préciser le conducteur d’une séquence ?",
+          "options": [
+            "Uniquement le titre",
+            "La liste de présence",
+            "Objectifs, phases minutées, consignes formateur et stagiaires, supports et indicateurs de réussite",
+            "Le prix de la formation"
+          ],
+          "correctIndex": 2,
+          "explication": "Ce sont les critères de l’épreuve DC2."
+        },
+        {
+          "question": "Comment exploiter les lettres d’engagement en conception ?",
+          "options": [
+            "Les ignorer",
+            "Les noter",
+            "Les rendre publiques",
+            "Les consulter pour connaître les projets, adapter exemples et sous-groupes, et signaler les difficultés à l’organisme de formation"
+          ],
+          "correctIndex": 3,
+          "explication": "Le référentiel d’activité du formateur prévoit cette consultation."
+        },
+        {
+          "question": "Quel contenu relie atteintes à la santé et performance ?",
+          "options": [
+            "Le seul coût des équipements",
+            "Les effets des TMS sur la santé des individus et sur la performance des entreprises",
+            "La fiscalité",
+            "Les horaires d’ouverture"
+          ],
+          "correctIndex": 1,
+          "explication": "Le contenu officiel traite des atteintes à la santé des individus et à la performance des entreprises."
+        }
+      ]
+    },
+    {
+      "competence": "Animer les séquences et accompagner sur site le déploiement de la démarche pilotée par le chef d’établissement.",
+      "questions": [
+        {
+          "question": "Le chargé de prévention se plaint de ne pas avoir de temps. Que fait le formateur ?",
+          "options": [
+            "Il fait le travail à sa place",
+            "Il l’aide à prioriser des tâches réalistes et organise avec le dirigeant un point sur le temps alloué prévu dans l’engagement",
+            "Il ignore la remarque",
+            "Il annule la formation"
+          ],
+          "correctIndex": 1,
+          "explication": "Aider à faire, sans faire à la place, et réguler avec le pilote du projet."
+        },
+        {
+          "question": "Comment animer avec des stagiaires venant de secteurs très différents ?",
+          "options": [
+            "Ne prendre qu’un exemple industriel",
+            "Éviter les échanges",
+            "Séparer chaque stagiaire",
+            "Constituer des sous-groupes mixtes, partir de leurs situations et exploiter la diversité dans les échanges"
+          ],
+          "correctIndex": 3,
+          "explication": "La diversité est une ressource pour la formation d’adultes."
+        },
+        {
+          "question": "Décrire l’activité réelle, c’est décrire :",
+          "options": [
+            "Comment le salarié s’y prend physiquement et mentalement pour faire face aux exigences et aux aléas",
+            "La fiche de poste",
+            "Le règlement intérieur",
+            "Le planning théorique"
+          ],
+          "correctIndex": 0,
+          "explication": "L’analyse de l’activité est au cœur de l’approche attendue."
+        },
+        {
+          "question": "Pendant l’appui sur site, que fait prioritairement le formateur ?",
+          "options": [
+            "Il audite la conformité",
+            "Il vend du matériel",
+            "Il fait le point avec le chargé de prévention et le dirigeant, aide à affiner l’analyse d’une situation et sécurise les suites",
+            "Il conduit seul l’analyse"
+          ],
+          "correctIndex": 2,
+          "explication": "L’appui accompagne le déploiement de la démarche pilotée par le chef d’établissement."
+        },
+        {
+          "question": "Un dirigeant veut se limiter à acheter un équipement vu sur un salon. Que fait le formateur ?",
+          "options": [
+            "Il rappelle l’intérêt d’analyser d’abord la situation et propose que l’équipement soit évalué comme une piste parmi d’autres, avec les salariés",
+            "Il approuve",
+            "Il refuse toute discussion",
+            "Il conseille un autre fournisseur"
+          ],
+          "correctIndex": 0,
+          "explication": "Les pistes de transformation découlent de l’analyse et des déterminants."
+        },
+        {
+          "question": "Que sont les déterminants d’une situation de travail ?",
+          "options": [
+            "Les maladies des salariés",
+            "Les sanctions disciplinaires",
+            "Les éléments de l’organisation, de la conception, des moyens ou des effectifs qui expliquent les sollicitations",
+            "La météo"
+          ],
+          "correctIndex": 2,
+          "explication": "Agir sur les déterminants permet de réduire durablement les facteurs de risque."
+        },
+        {
+          "question": "Comment vérifier la compréhension après un apport ?",
+          "options": [
+            "Demander s’il y a des questions",
+            "Passer à la suite",
+            "Relire les diapositives",
+            "Demander une application immédiate sur un cas et faire reformuler"
+          ],
+          "correctIndex": 3,
+          "explication": "La vérification repose sur une production observable."
+        },
+        {
+          "question": "Un stagiaire se montre silencieux. Que fait le formateur ?",
+          "options": [
+            "Il l’interroge sur une erreur devant tous",
+            "Il l’implique par une question ouverte ou un rôle en sous-groupe, sans le mettre en difficulté",
+            "Il l’ignore",
+            "Il le fait sortir"
+          ],
+          "correctIndex": 1,
+          "explication": "Mettre en place des conditions favorables à l’expression de chacun figure dans le référentiel d’activité."
+        },
+        {
+          "question": "Quelles pistes de transformation proposer dans une petite structure ?",
+          "options": [
+            "Uniquement des achats coûteux",
+            "Uniquement des consignes",
+            "Des pistes organisationnelles, techniques et humaines, réalistes et reliées au diagnostic",
+            "Aucune piste"
+          ],
+          "correctIndex": 2,
+          "explication": "Le chargé de prévention participe à la recherche de pistes visant l’amélioration des conditions de travail."
+        },
+        {
+          "question": "Le dirigeant demande au formateur de rédiger le plan d’actions. Que répond le formateur ?",
+          "options": [
+            "Il propose une trame et accompagne le dirigeant et le chargé de prévention pour qu’ils le construisent eux-mêmes",
+            "Il le rédige",
+            "Il refuse tout appui",
+            "Il le sous-traite"
+          ],
+          "correctIndex": 0,
+          "explication": "Le formateur aide à faire et ne fait pas à la place."
+        }
+      ]
+    },
+    {
+      "competence": "Évaluer les acquis des chargés de prévention et le reporting TMS Pros.",
+      "questions": [
+        {
+          "question": "Que reçoit le chargé de prévention en fin de formation ?",
+          "options": [
+            "Un certificat de formateur",
+            "Un diplôme",
+            "Une habilitation à former",
+            "Une attestation de validation des acquis délivrée par la structure dispensatrice"
+          ],
+          "correctIndex": 3,
+          "explication": "Le programme officiel prévoit cette attestation."
+        },
+        {
+          "question": "Comment évaluer les acquis de façon pertinente ?",
+          "options": [
+            "Par un questionnaire de satisfaction",
+            "Sur les productions réelles (repérage, analyse, pistes) et des mises en situation, avec une grille de critères observables",
+            "Par la seule présence",
+            "Par l’ancienneté"
+          ],
+          "correctIndex": 1,
+          "explication": "L’évaluation porte sur l’atteinte des objectifs."
+        },
+        {
+          "question": "Quels éléments un reporting TMS Pros doit-il permettre de suivre ?",
+          "options": [
+            "Le chiffre d’affaires",
+            "Les congés",
+            "Les étapes franchies, les situations traitées, les actions engagées et les indicateurs de suivi",
+            "Les notes de frais"
+          ],
+          "correctIndex": 2,
+          "explication": "Le reporting rend compte de l’avancement de la démarche."
+        },
+        {
+          "question": "Quel indicateur de suivi est adapté à une petite structure ?",
+          "options": [
+            "Un tableau simple : plaintes recueillies, arrêts liés aux TMS, avancement des actions",
+            "Un indicateur boursier",
+            "Le nombre de visiteurs du site web",
+            "Aucun indicateur"
+          ],
+          "correctIndex": 0,
+          "explication": "Les indicateurs doivent être simples et suivis dans le temps."
+        },
+        {
+          "question": "Un objectif n’est pas atteint. Que fait le formateur ?",
+          "options": [
+            "Il valide quand même",
+            "Il n’en parle pas",
+            "Il exclut le stagiaire",
+            "Il le formalise, propose une remédiation et en informe l’organisme de formation selon les règles du dispositif"
+          ],
+          "correctIndex": 3,
+          "explication": "L’attestation doit refléter fidèlement les acquis."
+        },
+        {
+          "question": "Quel format de grille est préconisé ?",
+          "options": [
+            "Oui / partiellement / non avec commentaire, par critère",
+            "Note unique",
+            "Impression générale",
+            "Aucun"
+          ],
+          "correctIndex": 0,
+          "explication": "C’est le format des grilles du référentiel de certification des formateurs."
+        },
+        {
+          "question": "Évaluer le déploiement, c’est vérifier :",
+          "options": [
+            "Le nombre de pages produites",
+            "Que l’établissement a franchi des étapes concrètes et que les suites sont décidées par le dirigeant",
+            "La qualité graphique",
+            "Le nombre d’appels"
+          ],
+          "correctIndex": 1,
+          "explication": "Le déploiement s’évalue sur des avancées réelles."
+        },
+        {
+          "question": "Pourquoi identifier des perspectives en fin de formation ?",
+          "options": [
+            "Pour clore définitivement la démarche",
+            "Pour vendre une prestation",
+            "Pour ancrer la démarche de façon pérenne après la formation",
+            "Pour remplacer l’évaluation"
+          ],
+          "correctIndex": 2,
+          "explication": "C’est le quatrième objectif officiel du chargé de prévention."
+        },
+        {
+          "question": "Quelles preuves conserver ?",
+          "options": [
+            "Aucune",
+            "Émargements, productions, grilles d’évaluation, comptes rendus d’appui sur site",
+            "Des souvenirs oraux",
+            "Des photos de salariés sans accord"
+          ],
+          "correctIndex": 1,
+          "explication": "La traçabilité justifie les acquis et le suivi."
+        },
+        {
+          "question": "À quoi sert l’évaluation de satisfaction ?",
+          "options": [
+            "À délivrer l’attestation",
+            "À certifier le formateur",
+            "À noter l’établissement",
+            "À recueillir la perception des stagiaires pour améliorer la session, sans valider les acquis"
+          ],
+          "correctIndex": 3,
+          "explication": "La satisfaction et les acquis sont deux niveaux distincts."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Présentez le format « chargé de prévention des TMS » et les établissements auxquels il s’adresse.",
+      "reponseAttendue": "Le format chargé de prévention des TMS est parallèle à celui de la personne ressource du projet de prévention des TMS. Il est proposé aux établissements de moins de 150 salariés et, cas particulier, aux établissements qui disposent déjà d’une personne ressource formée en interne et souhaitent l’épauler. Il s’adresse à toute personne (manager, fonctionnel sécurité, salarié polyvalent) appelée à exercer cette fonction. La formation dure 4 jours (28 h), dont 3 jours de face à face et 2 demi-journées d’accompagnement sur site, avec 10 stagiaires au maximum. Le chargé de prévention met en œuvre de façon opérationnelle certaines étapes de la démarche TMS dans un projet construit et piloté par le chef d’établissement."
+    },
+    {
+      "question": "Quelle place tient le chef d’établissement dans ce format ?",
+      "reponseAttendue": "Le chef d’établissement est le pilote du projet. Il participe en amont à la journée « Initier, piloter et manager son projet de prévention des TMS » organisée par les services prévention des caisses, élabore la lettre d’engagement sur un projet global de prévention des TMS, désigne le chargé de prévention et lui garantit la possibilité de dérouler les étapes de la démarche. Il décide des priorités, arbitre les moyens, valide les pistes et le plan d’actions et porte la démarche auprès des salariés. Dans une petite structure, il est souvent proche du terrain et peut décider vite, mais il dispose de peu de temps : le formateur doit l’associer aux moments clés, notamment lors des appuis sur site."
+    },
+    {
+      "question": "Que contient une lettre d’engagement et pourquoi le formateur la consulte-t-il ?",
+      "reponseAttendue": "La lettre d’engagement, rédigée par le chef d’établissement, décrit le projet global de prévention des TMS : motivations, premières situations envisagées, rôle du chef d’établissement comme pilote, désignation du chargé de prévention, temps et moyens alloués, modalités d’association des salariés et des représentants du personnel s’il y en a, calendrier. Le formateur la consulte avant la session pour connaître les projets, adapter ses exemples et ses sous-groupes et repérer les difficultés : lettre vague, absence de temps dédié, projet réduit à un achat. Dans ce cas, il informe l’organisme de formation pour qu’une régulation ait lieu avec l’établissement."
+    },
+    {
+      "question": "Citez les objectifs pédagogiques de la formation du chargé de prévention.",
+      "reponseAttendue": "Le programme officiel en retient quatre : identifier le risque de TMS et les points structurants d’une action de prévention des TMS ; déployer les étapes d’une démarche de prévention des TMS dans le cadre d’un projet piloté par le chef d’établissement ; participer à la recherche de pistes de solution visant l’amélioration des conditions de travail ; identifier des perspectives pour ancrer la démarche de façon pérenne à l’issue de la formation. Le formateur les décline en objectifs opérationnels de séquence, formulés avec des verbes d’action et assortis d’indicateurs de réussite."
+    },
+    {
+      "question": "Quels sont les contenus du programme du chargé de prévention ?",
+      "reponseAttendue": "Les contenus portent sur la prévention des TMS, ses enjeux généraux, le programme TMS Pros et le dispositif de formation ; les atteintes à la santé des individus et à la performance des entreprises ; les facteurs de risque biomécaniques, psychosociaux et d’ambiances physiques et leurs liens avec les déterminants, notamment organisationnels ; les éléments structurants d’une démarche de prévention des TMS ; le repérage, l’analyse et l’évaluation des situations de travail à risque, avec leurs aspects méthodologiques et leurs outils ; l’élaboration de pistes de transformation des situations de travail ; le reporting TMS Pros."
+    },
+    {
+      "question": "Pourquoi l’analyse de l’activité réelle est-elle importante même dans une petite structure ?",
+      "reponseAttendue": "Dans une petite structure, les salariés sont polyvalents, les situations varient beaucoup et les solutions sont souvent décidées rapidement. Sans analyse de l’activité, on risque d’acheter un équipement inadapté ou de rappeler des consignes qui ne tiennent pas compte des contraintes réelles. Observer comment le salarié s’y prend, physiquement et mentalement, face aux commandes urgentes, aux absences ou aux pannes, permet de comprendre les régulations et les compromis et d’identifier les déterminants sur lesquels agir. L’analyse peut être simple et ciblée sur une situation prioritaire, mais elle reste indispensable pour des pistes efficaces et acceptées."
+    },
+    {
+      "question": "Qu’entendez-vous par reporting TMS Pros ?",
+      "reponseAttendue": "Le reporting consiste à rendre compte de l’avancement de la démarche de prévention des TMS dans le cadre du programme : étapes franchies, situations repérées et analysées, actions décidées et réalisées, indicateurs de suivi. Il permet au chef d’établissement de suivre son projet et à l’Assurance Maladie – Risques professionnels de suivre la progression des établissements engagés. Le chargé de prévention prépare les éléments, le chef d’établissement les valide. En formation, le formateur explique les attendus et aide le chargé de prévention à constituer un tableau de suivi simple et à jour."
+    },
+    {
+      "question": "Quelles difficultés spécifiques rencontre un chargé de prévention dans un établissement de moins de 150 salariés ?",
+      "reponseAttendue": "Il exerce souvent cette mission en plus de son poste, avec peu de temps ; l’établissement n’a pas toujours de service prévention ni de représentants du personnel formés ; les données de sinistralité sont peu nombreuses ; le dirigeant est très sollicité ; les salariés sont polyvalents et les situations très variables ; les budgets sont contraints. Le formateur adapte en conséquence les outils, la taille des livrables et le calendrier, et aide à mobiliser les ressources externes : service de prévention et de santé au travail, services prévention de la caisse régionale, fournisseurs pour les essais."
+    },
+    {
+      "question": "Comment concevez-vous l’accompagnement sur site du formateur ?",
+      "reponseAttendue": "Les deux demi-journées d’accompagnement sur site permettent d’aider le chargé de prévention à appliquer la démarche dans l’établissement. Le formateur prépare l’appui avec lui, demande la présence du chef d’établissement au moins pour un temps d’échange, fait le point sur l’avancement, observe la situation retenue et aide à affiner l’analyse ou les pistes, sans faire à la place. Il rappelle les engagements si nécessaire et termine par une synthèse des décisions et des échéances, tracée dans un compte rendu."
+    },
+    {
+      "question": "Que savez-vous de la formation et de la certification des formateurs de chargés de prévention ?",
+      "reponseAttendue": "La même formation de formateurs prépare à la fois aux formats personne ressource et chargé de prévention : « Devenir formateur de personne ressource du projet de prévention des TMS et de chargé de prévention des TMS », code N11302, dispensée par l’INRS, avec 8,5 jours en présentiel en sessions non consécutives et environ 4 jours à distance. L’entrée est soumise à prérequis (autoformation @01001, 2 ans de formation d’adultes et 8 jours de face à face par an pour les formateurs d’OF, connaissances en ergonomie, conduite de projet et démarche TMS, 2 ans d’interventions ergonomiques en conseil externe). Le réseau Prévention certifie le formateur après réussite aux épreuves DC1 et DC2 ; il intervient ensuite dans un organisme de formation habilité."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Comment adaptez-vous votre ingénierie au format de 4 jours par rapport aux 6 jours de la personne ressource ?",
+      "reponseAttendue": "Le format de 4 jours (3 jours de face à face et 2 demi-journées sur site) impose de cibler l’essentiel : identifier le risque et les points structurants, déployer les étapes sous le pilotage du chef d’établissement, rechercher des pistes, ancrer la démarche. Je ne demande pas au chargé de prévention de construire et d’animer seul tout le projet : le pilotage relève du chef d’établissement. Je privilégie des outils simples de repérage et d’analyse, une seule situation prioritaire, des livrables courts (fiche de repérage, notes d’observation structurées, tableau facteurs-déterminants, fiche de pistes), et j’intègre le reporting TMS Pros. Les appuis sur site servent à sécuriser l’application et à associer le dirigeant aux décisions."
+    },
+    {
+      "question": "Proposez une organisation des 4 jours avec l’intersession.",
+      "reponseAttendue": "Exemple d’organisation à ajuster selon le document de référence : module 1 de 2 jours (enjeux des TMS, programme TMS Pros et dispositif, atteintes à la santé et effets sur la performance, facteurs de risque et déterminants, points structurants de la démarche, méthodes de repérage et d’observation, préparation du travail d’intersession). Intersession avec la première demi-journée d’appui sur site : repérage de la situation prioritaire validé par le dirigeant et observation de la situation. Seconde demi-journée d’appui : affiner l’analyse et préparer les pistes avec le dirigeant. Module 2 d’1 jour : retour sur les productions, élaboration de pistes de transformation organisationnelles, techniques et humaines, reporting TMS Pros, perspectives pour ancrer la démarche et évaluation des acquis. Le total fait 4 jours, soit 28 h."
+    },
+    {
+      "question": "Rédigez un objectif opérationnel et un indicateur de réussite pour l’objectif officiel « Participer à la recherche de pistes de solution ».",
+      "reponseAttendue": "Objectif opérationnel : à l’issue de la séquence, le stagiaire sera capable de proposer, pour la situation qu’il a analysée, au moins trois pistes de transformation relevant de leviers différents (organisationnel, technique, humain), chacune reliée à un déterminant identifié et accompagnée d’une condition de mise en œuvre. Indicateur de réussite : la fiche produite comporte au moins une piste par levier, chaque piste est justifiée par un déterminant cité dans l’analyse, et au moins une piste est réalisable à court terme avec les moyens de l’établissement. L’objectif emploie un verbe d’action, précise les conditions et permet une évaluation observable, conformément aux critères de l’épreuve DC2."
+    },
+    {
+      "question": "Comment associez-vous le chef d’établissement lors des appuis sur site ?",
+      "reponseAttendue": "Je demande sa présence dès la préparation de l’appui, en lui proposant un temps court et ciblé, par exemple 30 minutes, s’il ne peut pas rester toute la demi-journée. Pendant cet échange, le chargé de prévention présente lui-même l’avancement ; je reformule les décisions attendues : validation de la situation prioritaire, temps alloué, accès aux salariés, choix des pistes à approfondir. Je rappelle les engagements de la lettre lorsque c’est nécessaire, sans mettre le chargé de prévention en porte-à-faux. Les décisions sont notées dans le compte rendu. Si le dirigeant reste absent, j’en informe l’organisme de formation afin qu’une régulation soit organisée."
+    },
+    {
+      "question": "Un stagiaire, gérant d’une boulangerie de 12 salariés, est inscrit. Quelles questions vous posez-vous ?",
+      "reponseAttendue": "Je vérifie d’abord la cohérence de l’inscription avec le format et la lettre d’engagement : qui est le chef d’établissement et qui est le chargé de prévention, sachant qu’un gérant peut cumuler le pilotage et une partie de la mise en œuvre ? Le temps disponible pour l’intersession est-il réaliste ? Quelles situations sont envisagées (pétrissage, façonnage, enfournement, vente) ? Je prépare des exemples adaptés aux très petites structures et des outils légers. En cas de doute sur l’engagement ou la faisabilité, j’en informe l’organisme de formation, qui organise la régulation. Je ne refuse pas et je n’accepte pas seul : je respecte le cadre du dispositif."
+    },
+    {
+      "question": "Comment présentez-vous les éléments structurants d’une démarche de prévention des TMS ?",
+      "reponseAttendue": "Je présente les éléments structurants comme des conditions de réussite : engagement et pilotage par le chef d’établissement ; démarche participative associant les salariés, l’encadrement de proximité et, s’ils existent, les représentants du personnel ; appui des ressources externes (service de prévention et de santé au travail, caisse régionale) ; démarche par étapes (faire le point, prioriser, analyser, agir, évaluer) ; analyse de l’activité réelle et approche globale du risque ; actions sur les déterminants plutôt que sur les seuls comportements ; suivi dans le temps et reporting. Je les fais repérer par les stagiaires à partir d’un cas d’échec et d’un cas de réussite, puis ils évaluent leur propre établissement au regard de ces éléments."
+    },
+    {
+      "question": "Quels critères l’étude de cas de l’épreuve DC1 évalue-t-elle ?",
+      "reponseAttendue": "L’étude de cas de 2 h, réalisée en salle le dernier jour de la formation de formateurs avec le seul support de l’étude de cas et le document de référence, place le candidat en situation de préparer son premier appui intersession. Le jury vérifie qu’il identifie les principales actions à mettre en œuvre pour que le rendez-vous intersession ait un réel intérêt, qu’il propose des modalités de régulation en amont permettant d’anticiper les dérives décrites, et qu’il met en évidence les points saillants du programme TMS Pros, les points clés du dispositif et les précisions utiles sur les outils (intérêt, limites, articulation) pour lever les incompréhensions et les résistances et favoriser la mobilisation."
+    },
+    {
+      "question": "Comment évaluez-vous les acquis d’un chargé de prévention ?",
+      "reponseAttendue": "Je construis une grille à partir des quatre objectifs officiels. Pour chacun, je définis des critères observables et je les renseigne en oui, partiellement ou non avec commentaire : identification du risque et des points structurants (exercice sur cas), déploiement des étapes (fiche de repérage et analyse de la situation réelle), recherche de pistes (fiche de pistes reliées aux déterminants), perspectives pour ancrer la démarche (plan de suite validé avec le dirigeant). Je m’appuie sur les productions de l’intersession, les mises en situation en salle et les comptes rendus d’appui. L’attestation de validation des acquis délivrée par la structure dispensatrice reflète ces résultats ; tout objectif non atteint fait l’objet d’un retour et d’une remédiation."
+    },
+    {
+      "question": "Comment préparez-vous le chargé de prévention au reporting TMS Pros ?",
+      "reponseAttendue": "J’explique l’objectif du reporting : rendre compte de l’avancement de la démarche par étapes, au chef d’établissement et dans le cadre du programme. Je fais construire un tableau de suivi simple : étape en cours, situations repérées, situation analysée, pistes retenues, actions avec responsable et échéance, indicateurs (plaintes, arrêts liés aux TMS, avancement des actions), date de mise à jour. En fin de formation, chaque stagiaire complète son tableau avec ses données réelles et identifie qui valide et quand le mettre à jour. Je vérifie la cohérence entre le tableau et les productions de la formation, sans remplir moi-même les éléments à transmettre."
+    },
+    {
+      "question": "Quelles perspectives aidez-vous à formaliser pour ancrer la démarche après la formation ?",
+      "reponseAttendue": "En fin de formation, je fais formaliser par chaque chargé de prévention un plan de suite court et validé avec le chef d’établissement : mise en œuvre et suivi des actions décidées, prochaine situation à analyser, rythme de points avec le dirigeant, modalités d’association des salariés, intégration des résultats dans le document unique d’évaluation des risques, mise à jour du reporting TMS Pros, ressources externes à mobiliser. Je vérifie que ces perspectives sont datées, réalistes au regard du temps disponible et portées par le dirigeant. C’est la traduction concrète du quatrième objectif officiel : ancrer la démarche de façon pérenne."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Analyser deux lettres d’engagement de petites structures",
+      "consigne": "Vous animez pour l’organisme de formation fictif Prévactif Formation une session de chargés de prévention. Garage Morvan (35 salariés) : le gérant a suivi la journée « Initier, piloter et manager son projet de prévention des TMS », s’engage à piloter le projet, désigne le chef d’atelier comme chargé de prévention avec une demi-journée par semaine et cite l’atelier pneumatiques. EHPAD Les Tilleuls (95 salariés) : la lettre, signée par l’infirmière coordinatrice, indique que « la chargée de prévention mènera la démarche » ; le directeur n’apparaît pas et aucun temps n’est mentionné. Analysez et indiquez ce que vous faites.",
+      "reponseAttendue": "Garage Morvan réunit les conditions du format : établissement de moins de 150 salariés, dirigeant formé en amont et pilote du projet, chargé de prévention désigné avec du temps, première situation envisagée. Aucune action particulière n’est nécessaire, sinon préparer des exemples liés à l’atelier. EHPAD Les Tilleuls présente un écart majeur avec le format : le projet doit être construit et piloté par le chef d’établissement, or le directeur n’apparaît pas et la lettre confie la démarche à la chargée de prévention seule ; l’absence de temps alloué compromet l’intersession. Le formateur ne règle pas seul la situation : il informe l’organisme de formation de ces difficultés, par une note factuelle, pour qu’une régulation ait lieu avant la session (lettre signée du directeur, temps dédié, première situation envisagée, par exemple la toilette ou les transferts). Il prévoit en module 1 un temps sur le rôle du chef d’établissement. Barème : analyse des deux lettres 4 points, identification de l’écart au format 3 points, action conforme au rôle 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Construire le déroulé des 4 jours",
+      "consigne": "Prévactif Formation vous demande le déroulé d’une session de chargés de prévention : 3 jours de face à face et 2 demi-journées sur site. Proposez une organisation, les objectifs de chaque temps et les livrables.",
+      "reponseAttendue": "Exemple à ajuster selon le document de référence. Module 1 (2 jours) : objectifs : identifier le risque de TMS et les points structurants ; comprendre les atteintes à la santé et les effets sur la performance ; relier facteurs de risque et déterminants ; s’approprier une méthode simple de repérage et d’observation. Livrable d’intersession : repérage de la situation prioritaire, validé par le chef d’établissement, et notes d’observation. Appui sur site n° 1 : point avec le chargé de prévention et le dirigeant, aide à l’observation. Appui sur site n° 2 : approfondir l’analyse, préparer les pistes et la décision du dirigeant. Module 2 (1 jour) : retour sur les analyses, élaboration de pistes organisationnelles, techniques et humaines, reporting TMS Pros, perspectives pour ancrer la démarche, évaluation des acquis. Total : 3 jours et 2 demi-journées, soit 4 jours et 28 h. Barème : respect de la durée et du découpage 3 points, cohérence des objectifs avec le programme 4 points, livrables et appuis 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Rédiger des objectifs et des indicateurs pour la séquence « repérer »",
+      "consigne": "Un collègue propose : « Séquence de 2 h : présenter les outils de repérage. Évaluation : tour de table. » Réécrivez deux objectifs opérationnels, la méthode et les indicateurs de réussite, adaptés à des établissements de 20 à 140 salariés.",
+      "reponseAttendue": "« Présenter » décrit l’action du formateur, pas ce que le stagiaire saura faire ; le tour de table ne mesure pas les acquis. Objectif 1 : à l’issue de la séquence, le stagiaire sera capable de recenser, à partir des informations disponibles dans son établissement (arrêts, plaintes, restrictions d’aptitude, avis des salariés et de l’encadrement), les unités ou postes concernés par les TMS. Objectif 2 : il sera capable de choisir une situation prioritaire à l’aide d’au moins trois critères explicites et de rédiger l’argumentaire à présenter au chef d’établissement. Méthode : apport bref sur les sources de données utilisables dans une petite structure, travail individuel sur les données apportées, échanges en binômes, simulation de présentation au dirigeant. Indicateurs : au moins trois sources mobilisées ; trois critères énoncés et appliqués ; argumentaire de moins d’une page jugé convaincant par le binôme. Barème : objectifs 4 points, méthode 2 points, indicateurs 4 points.",
+      "points": 10
+    },
+    {
+      "titre": "Concevoir une séquence jury de 20 minutes",
+      "consigne": "Vous avez tiré au sort la séquence « Les éléments structurants d’une démarche de prévention des TMS ». Construisez le conducteur des 20 minutes animées devant le jury et un groupe de 8 personnes.",
+      "reponseAttendue": "Objectif : à l’issue de la séquence, les stagiaires seront capables d’identifier dans un cas au moins quatre éléments structurants manquants ou présents d’une démarche de prévention des TMS et de proposer une correction pour chaque manque. 0-3 min : annonce de l’objectif ; question d’accroche : « Une entreprise a acheté des sièges neufs et les plaintes continuent : pourquoi ? » 3-6 min : lecture d’un cas court de 15 lignes (menuiserie fictive : achat sans analyse, dirigeant absent, salariés non consultés, pas de suivi). 6-12 min : sous-groupes de 4 ; repérage des éléments manquants sur une grille (pilotage, participation, étapes, analyse de l’activité, action sur les déterminants, suivi et reporting). 12-17 min : restitution ; le formateur exploite les productions, complète et relie chaque élément aux étapes de TMS Pros. 17-20 min : synthèse par un stagiaire et question individuelle de vérification. Supports : cas imprimé, grille, tableau. Indicateur : chaque sous-groupe repère au moins quatre éléments et propose une correction pertinente pour chacun. Le candidat doit pouvoir justifier ses choix pendant les 10 à 15 minutes de questions. Barème : objectif 2 points, minutage 2 points, consignes 3 points, supports 1 point, indicateur 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer un appui sur site dans une PME agroalimentaire",
+      "consigne": "Biscuiterie Lannec (85 salariés). Après le module 1, la chargée de prévention, responsable qualité, vous écrit : le gérant lui demande d’étudier les cinq lignes de production « pour avoir une vue complète » avant de décider, elle n’a pas encore observé de situation et le prochain module est dans cinq semaines. Préparez votre appui sur site.",
+      "reponseAttendue": "Diagnostic de la situation : le périmètre demandé est irréaliste pour le format et le temps disponible, et la démarche prévoit de prioriser avant d’analyser. En amont : échanger avec la chargée de prévention sur les données disponibles ; demander la présence du gérant au moins 30 minutes ; informer l’organisme de formation si le temps alloué ne permet pas la mise en œuvre. Pendant l’appui : la chargée de prévention présente au gérant un repérage rapide des cinq lignes à partir de critères simples (plaintes, arrêts, avis des chefs d’équipe) ; le formateur aide à argumenter le choix d’une seule situation prioritaire, en expliquant que les autres seront traitées ensuite et que le reporting rendra compte de cette progression ; il obtient une décision du gérant ; il aide la chargée de prévention à préparer une observation (moments, salariés informés, grille de notes) sans la réaliser à sa place. Fin : synthèse des décisions et échéances avant le module 2, compte rendu à l’organisme de formation. Barème : analyse de la dérive 3 points, régulations en amont 2 points, déroulement de l’appui 3 points, posture et traçabilité 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Gérer une objection en séance",
+      "consigne": "Au module 1, une stagiaire, gérante d’une entreprise de nettoyage de 60 salariés, déclare : « Mes agents travaillent chez les clients, je ne maîtrise ni les locaux ni le matériel. La prévention des TMS, ce n’est pas pour nous. » Décrivez votre gestion de la situation.",
+      "reponseAttendue": "1. Accueillir et reformuler : la contrainte est réelle, l’activité se déroule chez des clients. 2. Ouvrir au groupe : qu’est-ce que l’entreprise maîtrise malgré tout ? Les réponses font apparaître des déterminants accessibles : organisation des plannings et des temps de trajet, choix du matériel et des produits fournis, taille des équipes, formation et accueil des nouveaux, contenu des contrats et des cahiers des charges négociés avec les clients, remontée des difficultés. 3. Apport : les déterminants sont multiples et certains relèvent de la relation avec les clients, ce qui peut devenir un axe de travail ; l’analyse de l’activité d’un agent sur un site type montre où agir. 4. Transformer en tâche d’intersession : choisir un site client représentatif, observer une prestation et lister les déterminants maîtrisables. 5. Vérifier l’adhésion par une question individuelle. Le formateur reste respectueux et ne minimise pas la contrainte. Barème : accueil 2 points, exploitation par le groupe 3 points, apport sur les déterminants 3 points, engagement concret 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Corriger une analyse de situation produite par un chargé de prévention",
+      "consigne": "Le chargé de prévention de Menuiserie Varin (48 salariés) remet : « Poste de ponçage : l’opérateur tient la ponceuse bras tendus 6 h par jour, vibrations. Il se plaint des épaules. Solution : rappel de la pause de 10 minutes. » À l’oral, il précise que les commandes urgentes arrivent souvent le vendredi, que la table de ponçage n’est pas réglable et que l’aspiration est souvent en panne. Rédigez votre retour formatif.",
+      "reponseAttendue": "Points positifs : la sollicitation biomécanique (bras tendus, durée, vibrations) et l’effet sur la santé (plaintes aux épaules) sont décrits. À retravailler : 1. L’activité réelle n’est pas décrite : comment l’opérateur s’y prend-il pour tenir les délais du vendredi ? Quelles postures adopte-t-il selon la taille des pièces ? 2. La variabilité (urgences, dimensions des pièces) et les facteurs psychosociaux (pression temporelle) sont absents ; l’ambiance physique (poussières liées aux pannes d’aspiration) n’est pas reliée. 3. Les déterminants ne sont pas identifiés : table non réglable, planification des commandes, maintenance de l’aspiration, choix de la ponceuse. 4. La piste proposée n’agit sur aucun déterminant. Pistes cohérentes : table réglable en hauteur ou support de pièces, ponceuse plus légère à faibles vibrations, plan de maintenance de l’aspiration, lissage des commandes urgentes, rotation sur d’autres tâches, information de l’opérateur sur les réglages. Consigne : compléter par une observation un vendredi et un entretien, construire le tableau facteurs-déterminants et présenter les pistes au gérant. Barème : repérage des manques 5 points, pistes cohérentes 3 points, posture formative 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Accompagner la recherche de pistes avec le chef d’établissement",
+      "consigne": "Transports Ribeyre (110 salariés). L’analyse du chargement des tournées de messagerie montre : manutention de colis jusqu’à 30 kg, hayons souvent en panne, plan de chargement non anticipé, départs groupés à 6 h, intérimaires peu formés. Le gérant veut « former les chauffeurs aux gestes et postures et c’est tout ». Lors de l’appui, comment aidez-vous le chargé de prévention et le gérant à élargir les pistes ?",
+      "reponseAttendue": "Le formateur fait présenter l’analyse par le chargé de prévention, puis questionne le gérant sur ce qui explique chaque sollicitation. Il aide à relier les pistes aux déterminants : pistes techniques (plan de maintenance préventive des hayons, diables et transpalettes adaptés, réorganisation du quai), organisationnelles (anticipation du plan de chargement, échelonnement des départs, information des clients sur les colis lourds, binôme pour les colis de plus de 25 kg), humaines (accueil et tutorat des intérimaires, formation aux nouveaux équipements et à l’organisation, en complément). Il explique que la formation gestes et postures seule n’agit pas sur les pannes de hayons ni sur l’organisation des départs. Le gérant choisit les pistes à mettre en œuvre en priorité ; le chargé de prévention les formalise avec un responsable, une échéance et un indicateur, et les intègre au reporting TMS Pros. Le formateur ne décide pas et ne rédige pas à leur place. Barème : lien pistes-déterminants 4 points, diversité des leviers 2 points, rôle du gérant 2 points, posture 2 points.",
+      "points": 10
+    },
+    {
+      "titre": "Évaluer les acquis d’une chargée de prévention",
+      "consigne": "En fin de formation, vous évaluez Mme Tessier (Pharmacie-parfumerie Dumont, 28 salariés). Elle a choisi avec la gérante la situation de mise en rayon et l’a observée. Son tableau facteurs-déterminants est correct. Elle propose deux pistes techniques pertinentes, aucune piste organisationnelle. Elle n’a pas de tableau de suivi et n’a pas formalisé de suites avec la gérante. Construisez la grille, positionnez-la et indiquez la suite.",
+      "reponseAttendue": "Grille sur les quatre objectifs officiels, en oui / partiellement / non avec commentaire. 1. Identifier le risque et les points structurants : oui, la situation est choisie avec la gérante et le risque est bien caractérisé. 2. Déployer les étapes dans un projet piloté par le chef d’établissement : oui, repérage et analyse réalisés et validés. 3. Participer à la recherche de pistes : partiellement, deux pistes techniques pertinentes mais aucun levier organisationnel alors que des déterminants organisationnels figurent dans son tableau. 4. Identifier des perspectives pour ancrer la démarche : non, aucun plan de suite ni tableau de reporting. Suite : retour individualisé ; remédiation ciblée (ajouter au moins une piste organisationnelle, construire avec la gérante un tableau de suivi et un plan de suite daté) ; information de l’organisme de formation selon les règles du dispositif ; l’attestation de validation des acquis délivrée par la structure dispensatrice reflète fidèlement ces résultats. Barème : grille 4 points, positionnement 3 points, suite et traçabilité 3 points.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer l’étude de cas certificative",
+      "consigne": "Un candidat à la certification vous demande comment se préparer à l’étude de cas de 2 h de l’épreuve DC1. Donnez-lui une méthode et appliquez-la au cas suivant : un chargé de prévention d’une scierie fictive de 70 salariés annonce, une semaine avant l’appui, que le gérant a décidé seul d’acheter un convoyeur et considère la démarche « terminée ».",
+      "reponseAttendue": "Méthode : lire le cas en repérant les acteurs, les engagements, la dérive et ce qui est en jeu pour l’appui ; lister les régulations possibles en amont ; définir le contenu de l’appui ; préciser les éléments du programme TMS Pros, du dispositif et des outils à expliciter pour lever les résistances ; rédiger de façon structurée, sans autre support que l’étude de cas et le document de référence. Application : en amont, échanger avec le chargé de prévention pour comprendre la décision, informer l’organisme de formation, demander la présence du gérant. Pendant l’appui : reconnaître l’initiative du gérant ; rappeler que la démarche suit des étapes (point sur les TMS, priorisation, analyse, actions, évaluation) et qu’un achat sans analyse peut déplacer le risque ; proposer d’analyser la situation avec le convoyeur prévu pour vérifier son adéquation et compléter par des pistes organisationnelles et humaines ; expliquer l’intérêt du suivi et du reporting ; obtenir une décision sur la suite. Fin : synthèse et compte rendu. Barème : méthode 3 points, régulations en amont 2 points, contenu de l’appui 3 points, mise en avant du programme et des outils 2 points.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : format, conception et appui sur site",
+    "contexte": "Vous préparez pour l’organisme de formation fictif Prévactif Formation une session de 9 chargés de prévention. Parmi eux, M. Garnier, chef d’équipe de Fromagerie des Causses (72 salariés). La lettre d’engagement, signée du directeur qui a suivi la journée dédiée aux dirigeants, cite l’atelier de retournement des fromages et prévoit une demi-journée par semaine. Après le module 1, M. Garnier vous indique qu’il a observé l’atelier une fois, que les salariés se plaignent des poignets et du froid, et que le directeur attend « une solution clé en main » lors de votre appui sur site. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Expliquez pourquoi Fromagerie des Causses relève du format chargé de prévention et précisez la répartition des rôles.",
+        "reponseAttendue": "L’établissement compte moins de 150 salariés ; le format chargé de prévention, parallèle à celui de la personne ressource, y est proposé. Le directeur construit et pilote le projet : il a suivi la journée « Initier, piloter et manager son projet de prévention des TMS » et signé la lettre d’engagement. M. Garnier met en œuvre de façon opérationnelle certaines étapes (repérage, analyse, recherche de pistes, reporting). Le formateur certifié, au sein d’un organisme de formation habilité, forme et accompagne sans faire à leur place. Barème : critère de format 2 points, rôles 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Identifiez les facteurs de risque possibles et les déterminants à explorer dans l’atelier de retournement.",
+        "reponseAttendue": "Facteurs biomécaniques : répétitivité du retournement, efforts de préhension, postures des poignets. Ambiance physique : froid et humidité de la cave, qui augmentent l’effort de préhension et réduisent la dextérité. Facteurs psychosociaux à vérifier : cadence, pression des volumes, marges de manœuvre. Déterminants à explorer : poids et format des fromages, hauteur des claies et des étagères, outils disponibles, organisation des rotations et des pauses, effectifs, équipements de protection contre le froid adaptés à la dextérité. Barème : facteurs 3 points, déterminants 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Rédigez l’objectif et l’indicateur de réussite de la séquence du module 2 consacrée aux pistes de transformation.",
+        "reponseAttendue": "Objectif : à l’issue de la séquence, le stagiaire sera capable de proposer pour sa situation analysée au moins trois pistes de transformation (organisationnelle, technique, humaine), chacune reliée à un déterminant identifié et assortie d’une condition de mise en œuvre réaliste. Indicateur : la fiche comporte une piste par levier, chaque piste cite son déterminant et au moins une piste est réalisable à court terme ; le binôme juge la fiche présentable au chef d’établissement. Barème : objectif 3 points, indicateur 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Préparez votre appui sur site face à l’attente d’une « solution clé en main ».",
+        "reponseAttendue": "En amont : échanger avec M. Garnier sur ses observations et préparer avec lui une présentation courte ; confirmer la présence du directeur. Pendant l’appui : M. Garnier présente ce qu’il a observé ; le formateur explique au directeur que des solutions efficaces découlent de l’analyse des déterminants et que la démarche prévoit de les construire avec les salariés ; il aide M. Garnier à compléter l’observation (moments contrastés, entretien avec deux opérateurs) et à préparer des premières pistes ; il obtient du directeur une décision sur le calendrier et le temps alloué. Fin : synthèse et compte rendu à l’organisme de formation. Le formateur ne livre pas de solution à leur place. Barème : régulations 2 points, déroulement 2 points, posture 1 point.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 4 compétences, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores ; elle prépare aux épreuves certificatives de l’INRS sans les remplacer",
+    "exercices": [
+      {
+        "titre": "Situer le format et le rôle du formateur certifié",
+        "consigne": "La gérante d’une entreprise fictive de logistique de 55 salariés demande à l’organisme de formation fictif Prévactif Formation « une formation TMS courte pour un de ses chefs de quai, qui s’occupera de tout ». Rédigez la réponse du formateur.",
+        "reponseAttendue": "Le formateur présente le format chargé de prévention : proposé aux établissements de moins de 150 salariés, 4 jours (28 h) dont 3 jours de face à face et 2 demi-journées d’accompagnement sur site, 10 stagiaires au maximum. Il précise que l’inscription suppose une lettre d’engagement sur un projet global de prévention des TMS, élaborée par la gérante, notamment après la journée « Initier, piloter et manager son projet de prévention des TMS » des services prévention des caisses, et que la gérante construit et pilote le projet : le chef de quai met en œuvre certaines étapes mais ne « s’occupe pas de tout ». Il rappelle que la formation est assurée par un formateur certifié par le réseau Prévention, après la formation de formateurs dispensée par l’INRS, au sein d’un organisme de formation habilité. Barème : format 2 points, rôle du chef d’établissement 2 points, cadre du formateur 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Concevoir le parcours",
+        "consigne": "Proposez une organisation des 4 jours avec les objectifs officiels, les livrables et la place des 2 demi-journées d’appui.",
+        "reponseAttendue": "Exemple : module 1 de 2 jours (identifier le risque de TMS et les points structurants, enjeux, TMS Pros, facteurs et déterminants, repérage et observation) ; intersession avec deux demi-journées d’appui sur site (repérage validé par le dirigeant, observation et analyse d’une situation) ; module 2 d’1 jour (pistes de transformation, reporting TMS Pros, perspectives pour ancrer la démarche, évaluation). Livrables : fiche de repérage, analyse facteurs-déterminants, fiche de pistes, tableau de suivi et plan de suite. Total 3 jours de face à face et 2 demi-journées, soit 4 jours. Barème : durée et découpage 2 points, objectifs 2 points, livrables 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Animer et accompagner sur site",
+        "consigne": "Lors de l’appui chez Imprimerie Fabre (fictive, 40 salariés), le gérant reste dans son bureau et demande au formateur de « faire le tour avec le chargé de prévention et de lui envoyer les conclusions ». Que faites-vous ?",
+        "reponseAttendue": "Le formateur conduit l’appui avec le chargé de prévention en l’aidant à mener lui-même l’observation et l’analyse, sans le faire à sa place. Il demande au gérant un temps d’échange court en fin d’appui pour que le chargé de prévention lui présente l’avancement et que le gérant prenne les décisions qui lui reviennent (situation prioritaire, temps alloué, pistes à approfondir). Il rappelle avec tact que le format repose sur un projet piloté par le chef d’établissement. Les conclusions sont celles de l’établissement, formalisées par le chargé de prévention ; le formateur trace l’appui et informe l’organisme de formation si l’absence de pilotage persiste. Barème : posture 2 points, implication du gérant 2 points, traçabilité 1 point.",
+        "points": 5
+      },
+      {
+        "titre": "Évaluer les acquis et le reporting",
+        "consigne": "Définissez les critères d’évaluation des acquis d’un chargé de prévention, le contenu minimal de son tableau de reporting et le document délivré en fin de formation.",
+        "reponseAttendue": "Critères en oui, partiellement ou non avec commentaire, construits sur les quatre objectifs officiels : identification du risque et des points structurants ; déploiement des étapes sous le pilotage du chef d’établissement (repérage, analyse) ; pistes organisationnelles, techniques et humaines reliées aux déterminants ; perspectives pour ancrer la démarche. Tableau de reporting minimal : étape en cours, situations repérées et analysées, pistes retenues, actions avec responsable et échéance, indicateurs de suivi, date de mise à jour et validation du dirigeant. Document : attestation de validation des acquis délivrée par la structure dispensatrice ; tout objectif non atteint donne lieu à une remédiation tracée. Barème : critères 2 points, reporting 2 points, document 1 point.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Maîtrise du cadre TMS Pros et du format chargé de prévention (public, durée, rôle du chef d’établissement, habilitation, certification) : 0 = absent ; 1 = confusions majeures ; 2 = cadre partiellement exact ; 3 = cadre exact ; 4 = cadre exact et mobilisé à bon escient.",
+        "points": 4
+      },
+      {
+        "critere": "Approche par l’activité et approche globale du risque adaptées aux petites structures : 0 = absente ; 1 = approche individuelle ou uniquement biomécanique ; 2 = approche partielle ; 3 = approche globale ; 4 = approche globale, réaliste et argumentée.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’ingénierie pédagogique (objectifs, progression sur 4 jours, méthodes, indicateurs) : 0 = absente ; 1 = objectifs non évaluables ; 2 = ingénierie incomplète ; 3 = ingénierie cohérente ; 4 = ingénierie cohérente et adaptée au public.",
+        "points": 4
+      },
+      {
+        "critere": "Posture d’accompagnement sur site et régulations (aider à faire, place du chef d’établissement, information de l’OF) : 0 = absente ; 1 = substitution au stagiaire ou au dirigeant ; 2 = posture hésitante ; 3 = posture adaptée ; 4 = posture adaptée et régulations anticipées.",
+        "points": 4
+      },
+      {
+        "critere": "Évaluation des acquis et reporting (critères observables, tableau de suivi, remédiation, traces) : 0 = absent ; 1 = évaluation par la seule satisfaction ; 2 = critères partiels ; 3 = critères observables et reporting structuré ; 4 = critères observables, reporting complet et remédiation tracée.",
+        "points": 4
+      }
+    ]
+  }
+}

@@ -1,0 +1,911 @@
+{
+  "competences": [
+    "Identifier le risque de TMS et les points structurants d’une action de prévention des TMS.",
+    "Déployer les étapes d’une démarche de prévention des TMS dans le cadre d’un projet piloté par le chef d’établissement.",
+    "Participer à la recherche de pistes de solution visant l’amélioration des conditions de travail.",
+    "Identifier des perspectives pour ancrer la démarche de façon pérenne."
+  ],
+  "besoinsList": [
+    "Connaître les TMS, leurs localisations, leurs mécanismes et leur reconnaissance en maladie professionnelle.",
+    "Mesurer les enjeux des TMS pour la santé des salariés et pour la performance d’un établissement de moins de 150 salariés.",
+    "Identifier les facteurs de risque biomécaniques, psychosociaux et d’ambiance physique et leurs déterminants.",
+    "Comprendre les points structurants d’une action de prévention : engagement de la direction, pilotage, participation, approche globale.",
+    "Situer son rôle de chargé de prévention dans un projet construit et piloté par le chef d’établissement.",
+    "Repérer les situations à risque à partir des données disponibles et des remontées du terrain.",
+    "Observer et évaluer une situation de travail avec des outils simples et adaptés.",
+    "Construire avec les opérateurs des pistes de transformation réalistes et conformes aux principes généraux de prévention.",
+    "Rendre compte de l’avancement au chef d’établissement et renseigner le suivi TMS Pros.",
+    "Identifier les leviers pour faire durer la démarche après la formation."
+  ],
+  "syntheseHtml": "• Référence : formation du dispositif Assurance Maladie – Risques professionnels / INRS « TMS 002 — Devenir chargé(e) de prévention des TMS de l’établissement », format parallèle à la formation de personne ressource proposé aux établissements de moins de 150 salariés et dispensé par un formateur certifié d’un organisme habilité ; les 4 entrées de competences reprennent les 4 objectifs pédagogiques officiels sans en ajouter.<br>• Public : toute personne (manager, fonctionnel sécurité…) appelée à exercer la fonction de chargé(e) de prévention des TMS de son établissement ; 10 stagiaires maximum par session.<br>• Prérequis : lettre d’engagement sur un projet global de prévention des TMS élaborée par le chef d’établissement, notamment à l’issue de la journée « Initier, piloter et manager son projet de prévention des TMS » ; attestation de réussite de l’autoformation @01001 « Acquérir des bases en prévention des risques professionnels » ou de la formation « Obtenir des compétences de base en prévention », ou expérience suffisante en prévention.<br>• Durée : 28 h, soit 3 jours en face à face pédagogique et 2 demi-journées d’accompagnement sur site par le formateur ; le chargé de prévention déroule les étapes opérationnelles de la démarche dans un projet construit et piloté par le chef d’établissement.<br>• Contenus : enjeux de la prévention des TMS, programme TMS Pros et dispositif de formation ; atteintes à la santé et à la performance (tableaux 57, 69, 79, 97 et 98 du régime général) ; facteurs de risque et déterminants ; éléments structurants d’une démarche ; repérage, analyse et évaluation des situations ; pistes de transformation ; reporting TMS Pros.<br>• Évaluation : positionnement initial, QCM par compétence, contrôle intermédiaire sur la situation de l’établissement, évaluation finale interne sur 20 ; une attestation de validation des acquis est délivrée par la structure dispensatrice à l’issue de la formation.",
+  "adaptationsHtml": "• Partir de la situation réelle de chaque établissement (taille, activité, données AT/MP disponibles) pour illustrer les apports dès le premier jour.<br>• Privilégier des outils simples, utilisables sans service méthodes : grilles d’observation, questionnaire de douleurs, fiches de recueil, tableau de suivi.<br>• Préparer pendant le face à face les travaux à réaliser sur site et les reprendre lors des deux demi-journées d’accompagnement.<br>• Adapter supports et rythme aux besoins repérés : vidéos de postes, exemples sectoriels, consignes découpées, documents accessibles, temps majoré si nécessaire.<br>• Donner un retour individualisé sur chaque production (repérage, observation, pistes de solution) avec des exercices de remédiation.",
+  "qcmDebut": [
+    {
+      "question": "Que désigne le sigle TMS ?",
+      "options": [
+        "Les troubles métaboliques du sommeil",
+        "Les traumatismes musculaires sportifs",
+        "Les troubles musculosquelettiques",
+        "Les troubles moteurs sensoriels"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Lequel de ces troubles est un TMS ?",
+      "options": [
+        "L’asthme",
+        "Le syndrome du canal carpien",
+        "L’eczéma",
+        "La surdité"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Les TMS apparaissent le plus souvent…",
+      "options": [
+        "Brutalement, à la suite d’une chute",
+        "Uniquement chez les personnes âgées",
+        "Seulement en dehors du travail",
+        "Progressivement, par sollicitations répétées dans la durée"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Qui doit assurer la sécurité et protéger la santé des travailleurs ?",
+      "options": [
+        "Le salarié le plus ancien",
+        "L’employeur",
+        "Le fournisseur des machines",
+        "La mairie"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Lequel de ces éléments est un facteur de risque de TMS ?",
+      "options": [
+        "Les efforts importants répétés",
+        "Le port d’une tenue de travail",
+        "La présence d’une salle de pause",
+        "Un contrat à durée indéterminée"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quel document recense les risques de l’établissement ?",
+      "options": [
+        "Le registre des entrées et sorties",
+        "Le livre de paie",
+        "Le Kbis",
+        "Le document unique d’évaluation des risques professionnels"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel programme de l’Assurance Maladie – Risques professionnels est dédié aux TMS ?",
+      "options": [
+        "Sécurité Pros",
+        "Santé Plus",
+        "TMS Pros",
+        "Prévention 2000"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Quelle zone du corps est concernée par la plupart des lombalgies ?",
+      "options": [
+        "Le bas du dos",
+        "La nuque",
+        "Le genou",
+        "Le poignet"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Que signifie « agir à la source » en prévention ?",
+      "options": [
+        "Rappeler les consignes de prudence",
+        "Supprimer ou réduire ce qui crée le risque dans la situation de travail",
+        "Indemniser les salariés malades",
+        "Changer de salarié au poste"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Qui peut aider l’établissement sur les questions de santé au travail ?",
+      "options": [
+        "Le service des impôts",
+        "La banque",
+        "L’expert-comptable",
+        "Le service de prévention et de santé au travail"
+      ],
+      "correctIndex": 3
+    }
+  ],
+  "qcmFin": [
+    {
+      "question": "Un préparateur de commandes déclare une hernie discale après des années de port de colis lourds. Quel tableau du régime général correspond ?",
+      "options": [
+        "Le tableau 57",
+        "Le tableau 69",
+        "Le tableau 98",
+        "Le tableau 79"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Une coiffeuse présente une tendinite de l’épaule liée aux bras levés. Quel tableau correspond ?",
+      "options": [
+        "Le tableau 57",
+        "Le tableau 97",
+        "Le tableau 98",
+        "Le tableau 79"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Dans le dispositif TMS 002, qui construit et pilote le projet de prévention ?",
+      "options": [
+        "Le chargé de prévention seul",
+        "Le chef d’établissement",
+        "Le CSE",
+        "Le médecin du travail"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Quel est le rôle du chargé de prévention des TMS ?",
+      "options": [
+        "Décider seul du budget de prévention",
+        "Contrôler la productivité des opérateurs",
+        "Remplacer le service de santé au travail",
+        "Mettre en œuvre de façon opérationnelle les étapes de la démarche dans le projet piloté par la direction"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Lequel n’est pas un point structurant d’une action de prévention des TMS ?",
+      "options": [
+        "L’engagement de la direction",
+        "La participation des salariés",
+        "La recherche d’un responsable individuel des douleurs",
+        "L’approche globale des facteurs de risque"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Un travail au froid avec gants épais augmente le risque de TMS car…",
+      "options": [
+        "Il réduit la dextérité et augmente la force de préhension",
+        "Il diminue la répétitivité",
+        "Il améliore la circulation sanguine",
+        "Il supprime les postures extrêmes"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "Quelle piste agit le plus à la source sur des sacs de 25 kg manutentionnés à la main ?",
+      "options": [
+        "Former au port de charges",
+        "Obtenir du fournisseur un conditionnement en sacs plus légers ou en vrac",
+        "Fournir des ceintures lombaires",
+        "Afficher les bonnes postures"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "Que recouvre le reporting TMS Pros ?",
+      "options": [
+        "Déclarer les accidents du travail",
+        "Transmettre les dossiers médicaux",
+        "Rendre compte de l’avancement de la démarche et des actions selon les étapes du programme",
+        "Calculer les cotisations"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "question": "Pourquoi tester une solution avec les opérateurs avant de la généraliser ?",
+      "options": [
+        "Pour retarder l’achat",
+        "Pour se protéger juridiquement",
+        "Parce que le fournisseur l’exige",
+        "Pour vérifier qu’elle réduit la contrainte, qu’elle est utilisable et qu’elle ne crée pas de report de risque"
+      ],
+      "correctIndex": 3
+    },
+    {
+      "question": "Quel levier favorise le plus l’ancrage de la démarche ?",
+      "options": [
+        "Clore le dossier après la formation",
+        "Intégrer la prévention des TMS dans les achats, les projets et le document unique",
+        "Confier toute la démarche à un prestataire",
+        "Attendre la prochaine maladie professionnelle"
+      ],
+      "correctIndex": 1
+    }
+  ],
+  "qcmCompetences": [
+    {
+      "competence": "Identifier le risque de TMS et les points structurants d’une action de prévention des TMS.",
+      "questions": [
+        {
+          "question": "Quels facteurs de risque relèvent de la biomécanique ?",
+          "options": [
+            "Pression temporelle et manque de soutien",
+            "Répétitivité, efforts, postures extrêmes et vibrations",
+            "Froid et éclairage",
+            "Âge et ancienneté"
+          ],
+          "correctIndex": 1,
+          "explication": "Les facteurs biomécaniques décrivent les sollicitations physiques imposées au corps."
+        },
+        {
+          "question": "Pourquoi dit-on que les TMS sont plurifactoriels ?",
+          "options": [
+            "Parce qu’ils ont toujours une cause unique",
+            "Parce qu’ils sont héréditaires",
+            "Parce qu’ils dépendent du seul salarié",
+            "Parce qu’ils résultent de la combinaison de facteurs biomécaniques, psychosociaux et d’ambiance"
+          ],
+          "correctIndex": 3,
+          "explication": "La combinaison des facteurs explique pourquoi une action isolée est souvent insuffisante."
+        },
+        {
+          "question": "Quel tableau concerne les lésions chroniques du ménisque ?",
+          "options": [
+            "Le tableau 57",
+            "Le tableau 79",
+            "Le tableau 69",
+            "Le tableau 98"
+          ],
+          "correctIndex": 1,
+          "explication": "Le tableau 79 vise les lésions chroniques du ménisque liées au travail en position accroupie ou agenouillée."
+        },
+        {
+          "question": "Quel tableau concerne les vibrations transmises par des outils tenus à la main ?",
+          "options": [
+            "Le tableau 69",
+            "Le tableau 97",
+            "Le tableau 79",
+            "Le tableau 98"
+          ],
+          "correctIndex": 0,
+          "explication": "Le tableau 69 vise les affections provoquées par les vibrations et chocs de certains outils et machines-outils."
+        },
+        {
+          "question": "Quel est le premier point structurant d’une action de prévention des TMS ?",
+          "options": [
+            "L’achat immédiat de matériel",
+            "La formation gestes et postures",
+            "La rédaction d’une note de service",
+            "L’engagement visible du chef d’établissement"
+          ],
+          "correctIndex": 3,
+          "explication": "Sans engagement de la direction, les moyens et la légitimité manquent à la démarche."
+        },
+        {
+          "question": "Pourquoi faire participer les salariés concernés ?",
+          "options": [
+            "Pour leur faire porter la responsabilité",
+            "Parce que c’est plus rapide",
+            "Ils connaissent le travail réel et conditionnent l’efficacité et l’acceptation des solutions",
+            "Pour éviter de consulter la direction"
+          ],
+          "correctIndex": 2,
+          "explication": "La participation enrichit l’analyse et favorise l’appropriation des solutions."
+        },
+        {
+          "question": "Quel coût indirect des TMS une petite entreprise subit-elle fortement ?",
+          "options": [
+            "La désorganisation et le remplacement d’un salarié expérimenté absent",
+            "La baisse de la TVA",
+            "L’augmentation du capital",
+            "La hausse du loyer"
+          ],
+          "correctIndex": 0,
+          "explication": "Dans une petite structure, l’absence d’un salarié qualifié pèse lourdement sur l’activité."
+        },
+        {
+          "question": "Une faible latitude pour organiser son travail est un facteur…",
+          "options": [
+            "Biomécanique",
+            "Psychosocial",
+            "D’ambiance physique",
+            "Individuel"
+          ],
+          "correctIndex": 1,
+          "explication": "La latitude décisionnelle fait partie des facteurs psychosociaux, qui augmentent le risque de TMS."
+        },
+        {
+          "question": "Qu’est-ce qu’un déterminant ?",
+          "options": [
+            "Le diagnostic médical",
+            "Le nom de la maladie",
+            "La sanction appliquée",
+            "Ce qui, dans l’organisation, la technique ou l’environnement, produit l’exposition"
+          ],
+          "correctIndex": 3,
+          "explication": "Identifier les déterminants permet d’agir sur les causes."
+        },
+        {
+          "question": "Pourquoi la prévention des TMS est-elle aussi un enjeu de performance ?",
+          "options": [
+            "Elle supprime toute obligation légale",
+            "Elle augmente automatiquement les prix",
+            "Elle réduit les absences, préserve les compétences et améliore souvent la qualité",
+            "Elle réduit le nombre de clients"
+          ],
+          "correctIndex": 2,
+          "explication": "Santé et performance sont liées : les situations moins contraignantes sont souvent plus efficaces."
+        }
+      ]
+    },
+    {
+      "competence": "Déployer les étapes d’une démarche de prévention des TMS dans le cadre d’un projet piloté par le chef d’établissement.",
+      "questions": [
+        {
+          "question": "Quelle est la première étape de TMS Pros ?",
+          "options": [
+            "En quoi suis-je concerné ? : faire le point sur les TMS de l’établissement",
+            "Comment agir ? : acheter du matériel",
+            "Quels résultats ? : évaluer les actions",
+            "Par quoi commencer ? : former tout le monde"
+          ],
+          "correctIndex": 0,
+          "explication": "La première étape consiste à faire l’état des lieux de la situation de l’établissement."
+        },
+        {
+          "question": "Que fait-on à l’étape « Par quoi commencer ? » ?",
+          "options": [
+            "Déclarer les maladies professionnelles",
+            "Évaluer les résultats",
+            "Clore la démarche",
+            "Identifier les situations de travail prioritaires et construire le projet de prévention"
+          ],
+          "correctIndex": 3,
+          "explication": "Cette étape cible les situations prioritaires et structure le projet."
+        },
+        {
+          "question": "Quelle source utiliser pour repérer les situations prioritaires ?",
+          "options": [
+            "Les ventes par produit",
+            "Le planning des congés",
+            "Les AT/MP, les arrêts, les restrictions et les plaintes des salariés",
+            "Les devis fournisseurs"
+          ],
+          "correctIndex": 2,
+          "explication": "Le croisement de ces données oriente le repérage."
+        },
+        {
+          "question": "Lors de l’observation d’un poste, que relever ?",
+          "options": [
+            "Les gestes, postures, efforts, fréquences, durées et aléas du travail réel",
+            "Uniquement le respect des horaires",
+            "Uniquement les tenues de travail",
+            "Uniquement la propreté"
+          ],
+          "correctIndex": 0,
+          "explication": "L’observation décrit le travail réel et ses variations."
+        },
+        {
+          "question": "Pourquoi expliquer l’objectif de l’observation aux opérateurs ?",
+          "options": [
+            "Parce que l’observation est facultative",
+            "Pour lever la crainte d’un contrôle et obtenir leur coopération",
+            "Pour leur demander de travailler plus vite",
+            "Pour choisir un responsable"
+          ],
+          "correctIndex": 1,
+          "explication": "La confiance conditionne la qualité des informations recueillies."
+        },
+        {
+          "question": "Quel outil aide à évaluer une manutention manuelle ?",
+          "options": [
+            "La norme ISO 9001",
+            "Le plan comptable",
+            "La convention collective",
+            "La norme NF X35-109"
+          ],
+          "correctIndex": 3,
+          "explication": "La NF X35-109 fournit des repères pour la manutention manuelle de charges."
+        },
+        {
+          "question": "À qui le chargé de prévention rend-il compte de l’avancement ?",
+          "options": [
+            "Au fournisseur",
+            "Au client principal",
+            "Au chef d’établissement qui pilote le projet",
+            "À personne"
+          ],
+          "correctIndex": 2,
+          "explication": "Le chargé de prévention agit dans le cadre du projet piloté par la direction."
+        },
+        {
+          "question": "Que faire après l’analyse d’une situation ?",
+          "options": [
+            "Restituer les constats aux opérateurs et au chef d’établissement",
+            "Garder les constats pour soi",
+            "Sanctionner les postures incorrectes",
+            "Acheter directement une solution"
+          ],
+          "correctIndex": 0,
+          "explication": "La restitution permet de valider l’analyse et de décider des suites."
+        },
+        {
+          "question": "Que permet de faire l’étape « Comment agir ? » ?",
+          "options": [
+            "Faire l’état des lieux initial",
+            "Analyser les situations prioritaires et mettre en œuvre un plan d’actions",
+            "Mesurer les résultats finaux",
+            "Rédiger la lettre d’engagement"
+          ],
+          "correctIndex": 1,
+          "explication": "C’est l’étape du diagnostic approfondi et de l’action."
+        },
+        {
+          "question": "Pourquoi renseigner le suivi TMS Pros ?",
+          "options": [
+            "Pour obtenir une baisse de TVA",
+            "Pour déclarer un accident",
+            "Pour rendre visible l’avancement de la démarche et faciliter l’accompagnement par la caisse régionale",
+            "Pour remplacer le document unique"
+          ],
+          "correctIndex": 2,
+          "explication": "Le reporting structure le suivi et permet l’appui des services prévention."
+        }
+      ]
+    },
+    {
+      "competence": "Participer à la recherche de pistes de solution visant l’amélioration des conditions de travail.",
+      "questions": [
+        {
+          "question": "Quelle mesure applique le principe « adapter le travail à l’homme » ?",
+          "options": [
+            "Un plan de travail réglable en hauteur",
+            "Une affiche sur les bonnes postures",
+            "Une prime de pénibilité",
+            "Un entretien annuel"
+          ],
+          "correctIndex": 0,
+          "explication": "Le poste réglable s’adapte à chaque opérateur plutôt que l’inverse."
+        },
+        {
+          "question": "Quelle mesure est une protection collective ?",
+          "options": [
+            "Une genouillère",
+            "Un aspirateur à charges ou un palan pour soulever les pièces",
+            "Des gants anti-vibration",
+            "Une ceinture lombaire"
+          ],
+          "correctIndex": 1,
+          "explication": "Les aides techniques intégrées à la situation sont des mesures collectives, prioritaires sur les équipements individuels."
+        },
+        {
+          "question": "Pourquoi associer les opérateurs à la recherche de solutions ?",
+          "options": [
+            "Pour réduire le coût à zéro",
+            "Pour éviter toute décision de la direction",
+            "Parce qu’ils doivent financer les solutions",
+            "Parce qu’ils savent ce qui est réaliste et utilisable dans leur travail"
+          ],
+          "correctIndex": 3,
+          "explication": "Les solutions co-construites sont mieux adaptées et mieux utilisées."
+        },
+        {
+          "question": "Qu’est-ce qu’un report de risque ?",
+          "options": [
+            "Un risque supprimé",
+            "Un délai de livraison",
+            "Une solution qui crée ou déplace une contrainte ailleurs",
+            "Une maladie reconnue"
+          ],
+          "correctIndex": 2,
+          "explication": "Par exemple, un outil plus léger mais qui oblige à une posture plus contraignante."
+        },
+        {
+          "question": "Laquelle de ces pistes agit sur l’organisation du travail ?",
+          "options": [
+            "Répartir les commandes lourdes sur la semaine",
+            "Acheter un chariot",
+            "Changer d’outil",
+            "Installer un tapis anti-fatigue"
+          ],
+          "correctIndex": 0,
+          "explication": "Le lissage de la charge réduit la pression temporelle et les pics d’effort."
+        },
+        {
+          "question": "Un opérateur se penche car les bacs sont posés au sol. Quelle piste privilégier ?",
+          "options": [
+            "Lui rappeler de plier les jambes",
+            "Mettre les bacs à hauteur sur un support ou un convoyeur",
+            "Lui fournir une genouillère",
+            "Réduire ses pauses"
+          ],
+          "correctIndex": 1,
+          "explication": "Supprimer la prise basse agit directement sur la posture."
+        },
+        {
+          "question": "Quel critère utiliser pour comparer des pistes ?",
+          "options": [
+            "Le nom du fournisseur",
+            "L’avis d’une seule personne",
+            "L’efficacité sur le risque, la faisabilité, le coût, le délai et l’acceptabilité",
+            "La couleur du matériel"
+          ],
+          "correctIndex": 2,
+          "explication": "Ces critères partagés permettent de proposer des priorités argumentées au chef d’établissement."
+        },
+        {
+          "question": "Une rotation entre deux postes sollicitant les poignets est-elle utile ?",
+          "options": [
+            "Oui, toujours",
+            "Oui, si elle est quotidienne",
+            "Oui, si elle est imposée",
+            "Non, elle sollicite les mêmes articulations et ne réduit pas l’exposition"
+          ],
+          "correctIndex": 3,
+          "explication": "Une rotation n’est utile que si les postes sollicitent des zones différentes, et en complément d’actions à la source."
+        },
+        {
+          "question": "Qui décide de la mise en œuvre des solutions proposées ?",
+          "options": [
+            "Le chargé de prévention seul",
+            "Le chef d’établissement, sur proposition argumentée du chargé de prévention",
+            "Le fournisseur",
+            "Les opérateurs seuls"
+          ],
+          "correctIndex": 1,
+          "explication": "Le chargé de prévention participe à la recherche de pistes ; la décision relève du pilote du projet."
+        },
+        {
+          "question": "Pourquoi chiffrer les pistes, même approximativement ?",
+          "options": [
+            "Pour permettre au chef d’établissement d’arbitrer et de planifier",
+            "Pour obtenir une remise",
+            "Parce que seules les solutions gratuites sont autorisées",
+            "Pour éviter de les présenter"
+          ],
+          "correctIndex": 0,
+          "explication": "Le chiffrage facilite la décision et l’intégration au budget."
+        }
+      ]
+    },
+    {
+      "competence": "Identifier des perspectives pour ancrer la démarche de façon pérenne.",
+      "questions": [
+        {
+          "question": "Qu’est-ce qu’ancrer la démarche de façon pérenne ?",
+          "options": [
+            "Terminer la démarche à la fin de la formation",
+            "Confier la démarche à un prestataire une fois par an",
+            "Faire en sorte que la prévention des TMS se poursuive dans le fonctionnement courant de l’établissement",
+            "Attendre la prochaine maladie professionnelle"
+          ],
+          "correctIndex": 2,
+          "explication": "La pérennité suppose d’intégrer la prévention aux pratiques habituelles."
+        },
+        {
+          "question": "Quel levier intègre la prévention dans les futurs choix ?",
+          "options": [
+            "Ajouter des critères ergonomiques dans les demandes d’achat de matériel",
+            "Choisir systématiquement le moins cher",
+            "Laisser le fournisseur décider",
+            "Acheter sans essai"
+          ],
+          "correctIndex": 0,
+          "explication": "Des critères ergonomiques à l’achat évitent de créer de nouvelles contraintes."
+        },
+        {
+          "question": "Où inscrire les actions de prévention des TMS ?",
+          "options": [
+            "Dans le règlement intérieur",
+            "Dans le document unique et son programme d’actions",
+            "Dans les statuts",
+            "Dans le livre de paie"
+          ],
+          "correctIndex": 1,
+          "explication": "Le document unique rend les actions traçables et suivies."
+        },
+        {
+          "question": "Quel indicateur simple suivre dans la durée ?",
+          "options": [
+            "Le nombre de clients",
+            "Le chiffre d’affaires",
+            "Les douleurs signalées par les salariés lors d’un recueil périodique",
+            "Le prix des matières"
+          ],
+          "correctIndex": 2,
+          "explication": "Les signaux précoces permettent d’agir avant l’apparition de pathologies."
+        },
+        {
+          "question": "Que faire lors de l’arrivée d’une nouvelle machine ?",
+          "options": [
+            "Attendre les plaintes",
+            "L’installer sans changer l’organisation",
+            "Former seulement le chef d’équipe",
+            "Analyser avec les opérateurs son effet sur les postures et les efforts avant et après installation"
+          ],
+          "correctIndex": 3,
+          "explication": "Tout changement peut créer ou supprimer des expositions."
+        },
+        {
+          "question": "Pourquoi former les nouveaux arrivants au poste ?",
+          "options": [
+            "Pour réduire leur salaire",
+            "Pour transmettre les savoir-faire de prudence et l’usage des aides",
+            "Pour éviter l’accueil",
+            "Parce que c’est une sanction"
+          ],
+          "correctIndex": 1,
+          "explication": "Les nouveaux arrivants, intérimaires compris, sont plus exposés faute de stratégies de préservation."
+        },
+        {
+          "question": "Comment entretenir la mobilisation après les premières actions ?",
+          "options": [
+            "Communiquer les résultats et faire un point régulier avec la direction et les salariés",
+            "Arrêter toute communication",
+            "Ne parler que des difficultés",
+            "Réserver l’information à la direction"
+          ],
+          "correctIndex": 0,
+          "explication": "Valoriser les résultats entretient l’engagement."
+        },
+        {
+          "question": "Quel acteur externe peut continuer à appuyer l’établissement ?",
+          "options": [
+            "La banque",
+            "Le commissaire aux comptes",
+            "Le service prévention de la caisse régionale et le service de prévention et de santé au travail",
+            "L’assureur automobile"
+          ],
+          "correctIndex": 2,
+          "explication": "Ces acteurs accompagnent durablement la prévention."
+        },
+        {
+          "question": "Quel signe doit alerter sur une perte d’efficacité ?",
+          "options": [
+            "Une baisse des douleurs déclarées",
+            "Un point de suivi tenu à la date prévue",
+            "Une aide utilisée régulièrement",
+            "Une aide à la manutention qui n’est plus utilisée"
+          ],
+          "correctIndex": 3,
+          "explication": "La non-utilisation signale un changement des conditions à réanalyser."
+        },
+        {
+          "question": "À quelle étape de TMS Pros correspond l’évaluation des actions ?",
+          "options": [
+            "Quels résultats ?",
+            "En quoi suis-je concerné ?",
+            "Par quoi commencer ?",
+            "Comment agir ?"
+          ],
+          "correctIndex": 0,
+          "explication": "La quatrième étape évalue la pertinence des actions et les progrès réalisés."
+        }
+      ]
+    }
+  ],
+  "questionsOuvertesDebut": [
+    {
+      "question": "Qu’est-ce qu’un TMS ? Donnez des exemples.",
+      "reponseAttendue": "Un TMS est une atteinte des muscles, tendons, nerfs ou articulations, liée à des sollicitations répétées ou excessives. Exemples : syndrome du canal carpien, tendinopathie de l’épaule, épicondylite au coude, lombalgie, lésion du ménisque. Il se manifeste par des douleurs, une raideur, une perte de force ou des fourmillements, d’abord pendant le travail puis de façon permanente."
+    },
+    {
+      "question": "Quels postes de votre établissement vous semblent exposés aux TMS et pourquoi ?",
+      "reponseAttendue": "Une réponse attendue cite des postes précis et des sollicitations observables : gestes répétitifs, manutention de charges, postures penchées ou bras levés, travail au froid, outils vibrants, cadence élevée. Elle s’appuie si possible sur des faits : plaintes, arrêts, restrictions, difficultés de recrutement ou départs fréquents sur ces postes."
+    },
+    {
+      "question": "Quelles conséquences les TMS peuvent-ils avoir pour un salarié et pour l’établissement ?",
+      "reponseAttendue": "Pour le salarié : douleurs, arrêts parfois longs, limitation des capacités, risque d’inaptitude et de perte d’emploi, retentissement sur la vie personnelle. Pour l’établissement : absences et remplacements difficiles, perte de compétences, désorganisation, baisse de qualité, coût des cotisations AT/MP, image dégradée et difficultés à recruter, particulièrement sensibles dans une structure de moins de 150 salariés."
+    },
+    {
+      "question": "Comment imaginez-vous votre rôle de chargé(e) de prévention des TMS ?",
+      "reponseAttendue": "Le chargé de prévention met en œuvre les étapes opérationnelles de la démarche dans un projet construit et piloté par le chef d’établissement : repérage des situations, observation et analyse, recherche de pistes avec les salariés, suivi des actions et compte rendu. Il n’est pas seul responsable de la prévention, qui reste une obligation de l’employeur, ni chargé de contrôler les salariés."
+    },
+    {
+      "question": "Quelles sont, selon vous, les causes des TMS ?",
+      "reponseAttendue": "Les causes sont multiples : sollicitations physiques (gestes répétés, efforts, postures, vibrations), facteurs psychosociaux (urgence, manque d’autonomie ou de soutien), ambiances (froid, éclairage), elles-mêmes liées à l’organisation, aux équipements, aux produits et aux postes de travail. Les caractéristiques individuelles interviennent, mais la prévention porte sur la situation de travail."
+    },
+    {
+      "question": "Que savez-vous du programme TMS Pros ?",
+      "reponseAttendue": "TMS Pros est un programme de l’Assurance Maladie – Risques professionnels qui accompagne les entreprises en quatre étapes : en quoi suis-je concerné, par quoi commencer, comment agir, quels résultats. Il propose des outils en ligne, l’appui des services prévention des caisses régionales et s’appuie sur une personne formée dans l’établissement ou à l’extérieur."
+    },
+    {
+      "question": "Quelles informations utiles à la prévention des TMS existent déjà dans votre établissement ?",
+      "reponseAttendue": "Le document unique, les déclarations d’accidents du travail et de maladies professionnelles, les arrêts de travail, les restrictions d’aptitude transmises par le SPST, la fiche d’entreprise, les départs et difficultés de recrutement par poste, les remontées des salariés et de l’encadrement, les données d’activité comme les volumes ou les pics."
+    },
+    {
+      "question": "Pourquoi une formation gestes et postures ne suffit-elle pas à prévenir les TMS ?",
+      "reponseAttendue": "Elle ne change pas la situation qui impose les gestes : hauteur du poste, poids des charges, cadence, outils. Les salariés ne peuvent pas appliquer les consignes si le travail ne le permet pas. La prévention efficace agit d’abord à la source et collectivement, conformément aux principes généraux de prévention ; la formation vient en complément."
+    },
+    {
+      "question": "Qui pourriez-vous associer à la démarche dans votre établissement ?",
+      "reponseAttendue": "Le chef d’établissement qui pilote, l’encadrement de proximité, les salariés des postes concernés, les représentants du personnel s’ils existent, les personnes chargées de la maintenance ou des achats ; à l’extérieur, le service de prévention et de santé au travail et le service prévention de la caisse régionale."
+    },
+    {
+      "question": "Qu’attendez-vous de cette formation ?",
+      "reponseAttendue": "Une réponse attendue exprime des besoins concrets : comprendre les TMS et leurs causes, savoir repérer et observer les situations à risque, disposer d’outils simples, savoir proposer des pistes réalistes avec les salariés, savoir rendre compte au chef d’établissement et faire durer la démarche. Elle situe aussi les difficultés anticipées : temps disponible, adhésion, moyens limités."
+    }
+  ],
+  "questionsOuvertesFin": [
+    {
+      "question": "Expliquez les mécanismes d’apparition des TMS et les facteurs de risque à repérer.",
+      "reponseAttendue": "Les TMS apparaissent lorsque les sollicitations dépassent durablement les capacités de récupération des tissus. Les facteurs biomécaniques (répétitivité, efforts, postures extrêmes, travail statique, vibrations) sont amplifiés par les facteurs psychosociaux (pression temporelle, faible autonomie, manque de soutien ou de reconnaissance), qui augmentent les tensions musculaires et réduisent les marges de régulation, et par les ambiances physiques comme le froid. Ces facteurs sont produits par des déterminants : conception des postes, organisation, outils, produits. Il faut repérer à la fois les facteurs et ce qui les produit."
+    },
+    {
+      "question": "Quels sont les points structurants d’une action de prévention des TMS ?",
+      "reponseAttendue": "L’engagement visible du chef d’établissement formalisé dans une lettre d’engagement ; un pilotage clair avec des objectifs, des moyens et un calendrier ; un chargé de prévention formé disposant de temps ; la participation des salariés et de l’encadrement ; une approche globale qui traite les facteurs biomécaniques, psychosociaux et organisationnels ; l’analyse du travail réel ; des actions à la source ; le suivi et l’évaluation ; l’appui des acteurs externes (SPST, caisse régionale)."
+    },
+    {
+      "question": "Décrivez les étapes de la démarche TMS Pros et ce que vous faites à chacune.",
+      "reponseAttendue": "En quoi suis-je concerné ? : je rassemble les données (AT/MP, arrêts, restrictions, plaintes) pour faire le point. Par quoi commencer ? : je propose au chef d’établissement les situations prioritaires et nous structurons le projet. Comment agir ? : j’observe et j’analyse les situations retenues avec les opérateurs, je restitue, je participe à la recherche de pistes et au suivi du plan d’actions décidé. Quels résultats ? : j’évalue les actions avec des indicateurs et je renseigne le suivi TMS Pros."
+    },
+    {
+      "question": "Comment conduisez-vous l’observation d’une situation de travail ?",
+      "reponseAttendue": "J’informe l’encadrement et les opérateurs de l’objectif, qui n’est pas un contrôle. J’observe plusieurs cycles et moments, y compris les pics et les aléas, en relevant gestes, postures, efforts, fréquences, durées, outils, hauteurs et ambiances ; je filme si les opérateurs l’acceptent. J’utilise un outil adapté, par exemple la NF X35-109 pour la manutention. J’interroge les opérateurs sur leurs difficultés et leurs astuces, puis je leur restitue mes constats pour les valider avant de les présenter au chef d’établissement."
+    },
+    {
+      "question": "Comment rendez-vous compte au chef d’établissement de votre travail ?",
+      "reponseAttendue": "Je présente à intervalles fixés une synthèse claire : situations analysées, constats principaux reliant facteurs et déterminants, pistes proposées avec leur efficacité attendue, leur coût et leur délai, état d’avancement des actions décidées et indicateurs. Je signale les difficultés et les décisions attendues. Je renseigne le suivi TMS Pros en cohérence avec ces points d’étape."
+    },
+    {
+      "question": "Comment participez-vous à la recherche de pistes de solution ?",
+      "reponseAttendue": "Je réunis les opérateurs concernés et leur encadrant autour des constats validés. Nous cherchons des pistes pour chaque déterminant : technique (hauteur, aides à la manutention, outils), organisationnel (répartition de la charge, ordonnancement, effectifs), humain (formation au poste, accueil). Je vérifie leur conformité aux principes généraux de prévention et l’absence de report de risque, je les compare selon l’efficacité, la faisabilité, le coût et l’acceptabilité, je propose des essais et je présente les priorités au chef d’établissement qui décide."
+    },
+    {
+      "question": "Donnez des exemples de pistes à la source et de pistes complémentaires.",
+      "reponseAttendue": "Pistes à la source : réduire le poids des charges avec le fournisseur, mettre les charges à hauteur avec une table élévatrice ou un convoyeur, choisir un outil moins vibrant, rendre le poste réglable, lisser les commandes, corriger les défauts de pièces qui imposent de forcer. Pistes complémentaires : rotation entre postes sollicitant des zones différentes, formation au poste et à l’usage des aides, équipements individuels comme des gants adaptés au froid. Les secondes ne remplacent pas les premières."
+    },
+    {
+      "question": "Comment évaluez-vous l’efficacité d’une action ?",
+      "reponseAttendue": "Après une période d’utilisation, je retourne observer avec le même outil qu’avant pour comparer les contraintes, j’interroge les opérateurs sur l’usage et les éventuelles nouvelles difficultés, je vérifie l’utilisation réelle des équipements et je suis l’évolution des douleurs déclarées, des arrêts et des restrictions. Si l’effet est insuffisant, je reprends l’analyse avec le chef d’établissement pour ajuster."
+    },
+    {
+      "question": "Quelles perspectives proposez-vous pour ancrer la démarche après la formation ?",
+      "reponseAttendue": "Inscrire les actions et les situations analysées dans le document unique ; ajouter des critères ergonomiques dans les achats et les projets de modification ; analyser chaque nouveau poste ou nouvelle organisation avec les opérateurs ; mettre en place un recueil périodique des douleurs et quelques indicateurs suivis avec la direction ; former l’encadrement et les nouveaux arrivants ; communiquer les résultats ; garder le lien avec le SPST et la caisse régionale ; étendre progressivement la démarche à d’autres situations."
+    },
+    {
+      "question": "Quelles difficultés pouvez-vous rencontrer dans un établissement de moins de 150 salariés et comment y répondre ?",
+      "reponseAttendue": "Le temps disponible est limité, les compétences techniques internes peu nombreuses, les budgets serrés et la démarche peut dépendre d’une seule personne. J’y réponds en m’appuyant sur l’engagement écrit du chef d’établissement, en ciblant d’abord une ou deux situations prioritaires, en privilégiant des actions simples et organisationnelles, en mobilisant les acteurs externes et les dispositifs d’aide de l’Assurance Maladie – Risques professionnels, et en associant les salariés pour partager la démarche."
+    }
+  ],
+  "exercices": [
+    {
+      "titre": "Repérer le risque de TMS dans une petite entreprise",
+      "consigne": "La Boulangerie industrielle Fornelli (fictive, 48 salariés) constate trois arrêts longs pour douleurs d’épaule au façonnage et des départs fréquents au poste d’ensachage. La gérante, Mme Fornelli, vous nomme chargé(e) de prévention. Indiquez les données à rassembler, les premiers constats possibles et la proposition à lui faire pour démarrer.",
+      "reponseAttendue": "Je rassemble les déclarations d’AT/MP et les arrêts sur trois ans par poste, les restrictions d’aptitude, les départs et la part d’intérimaires, le document unique, l’avis collectif du SPST, et je fais un recueil simple des douleurs par zone auprès des salariés. Je visite les postes avec les chefs d’équipe. Constats possibles : au façonnage, gestes répétés bras levés et efforts de préhension sur la pâte ; à l’ensachage, cadence élevée et turn-over qui peut masquer des douleurs. Proposition à la gérante : faire du façonnage la situation prioritaire, puis l’ensachage ; confirmer son engagement et le temps qui m’est alloué ; informer les salariés ; prévoir un point d’étape mensuel ; renseigner la première étape TMS Pros « En quoi suis-je concerné ? ».",
+      "points": 10
+    },
+    {
+      "titre": "Distinguer facteurs de risque et déterminants",
+      "consigne": "Chez Garage Delaunay (fictif, 26 salariés), un mécanicien travaille sous les véhicules, bras levés, avec des clés à chocs, et se plaint de l’épaule et de fourmillements dans les mains. Le pont élévateur est ancien et ne monte pas assez haut pour les utilitaires. Les rendez-vous sont groupés le lundi matin. Classez les facteurs de risque et leurs déterminants et indiquez les tableaux de maladies professionnelles concernés.",
+      "reponseAttendue": "Facteurs biomécaniques : bras levés au-dessus des épaules, vibrations et chocs transmis aux mains par les clés à chocs, efforts de serrage. Facteur psychosocial : pression temporelle le lundi matin. Déterminants : pont élévateur inadapté aux utilitaires (technique), choix et entretien des outils vibrants (technique), organisation des rendez-vous concentrés sur le lundi (organisationnel). Tableaux : 57 pour les affections de l’épaule, 69 pour les troubles liés aux vibrations des outils tenus à la main. Le diagnostic montre qu’agir sur le pont, les outils et la planification réduit l’exposition à la source.",
+      "points": 10
+    },
+    {
+      "titre": "Préparer et conduire une observation",
+      "consigne": "À la Laverie industrielle Boréale (fictive, 60 salariés), le poste de chargement des machines impose de sortir à la main du linge mouillé (jusqu’à 15 kg par brassée) depuis le fond des tambours, environ 200 fois par poste. Décrivez votre préparation, les conditions de l’observation et ce que vous relevez.",
+      "reponseAttendue": "Préparation : informer la responsable d’exploitation et les opérateurs de l’objectif, choisir des moments représentatifs (début de poste, pic de volume, fin de journée), préparer une grille d’observation et demander l’accord pour filmer. Pendant l’observation : plusieurs cycles complets, relevé du poids et de la fréquence des brassées, de la profondeur de prise dans le tambour, de la flexion et de la torsion du tronc, des distances jusqu’au chariot, de la hauteur de dépose, des aléas (linge emmêlé, chariot mal placé), de l’ambiance (chaleur, humidité). Évaluation avec la NF X35-109 : environ 200 × 15 kg = 3 t par poste avec prises en flexion profonde, contrainte forte pour le dos. Entretiens avec les opérateurs sur leurs astuces et douleurs, puis restitution pour validation.",
+      "points": 10
+    },
+    {
+      "titre": "Restituer une analyse au chef d’établissement",
+      "consigne": "Reprenez l’analyse de la Laverie Boréale. Le directeur vous accorde 15 minutes. Rédigez le contenu de votre restitution : constats, liens avec les déterminants, propositions et décisions attendues.",
+      "reponseAttendue": "Constats : manutention de 3 t par poste en flexion profonde et torsion, dans la chaleur et l’humidité ; deux opérateurs sur quatre signalent des douleurs lombaires. Déterminants : machines à chargement frontal bas sans dispositif de basculement, chariots non réglables, organisation qui concentre les volumes sur la matinée. Propositions : chariots à fond remontant à ressort pour supprimer les prises basses en sortie, essai d’un dispositif d’aide au déchargement, lissage des volumes sur la journée, formation au poste en complément. Pour chaque proposition : effet attendu, coût estimé, délai. Décisions attendues : validation des essais, budget, calendrier et point de suivi. Je propose d’en informer les salariés et de l’inscrire au document unique.",
+      "points": 10
+    },
+    {
+      "titre": "Co-construire des pistes de solution avec les salariés",
+      "consigne": "Aux Serres de la Vallée Marne (fictives, 38 salariés, maraîchage sous abri), le rempotage se fait debout devant une table basse de 70 cm, avec des pots pris dans des caisses au sol, plusieurs milliers de gestes par jour en période de pointe. Expliquez comment vous animez la recherche de pistes et proposez une liste hiérarchisée.",
+      "reponseAttendue": "J’anime une réunion courte avec les salariés du rempotage et leur responsable, en partant des constats validés : flexion du dos liée à la table basse, prises au sol, répétitivité élevée en pointe. Chacun propose des idées, que nous classons par déterminant. Liste hiérarchisée : 1. table réglable ou rehaussée à hauteur des coudes, peu coûteuse et efficace sur la posture ; 2. caisses posées sur des supports à hauteur ou en distributeur incliné, suppression des prises au sol ; 3. organisation de la pointe : renfort saisonnier anticipé, alternance avec des tâches sollicitant d’autres zones ; 4. étude d’une rempoteuse semi-automatique pour réduire la répétitivité, plus coûteuse, à étudier pour la saison suivante ; 5. tapis anti-fatigue et formation au poste en complément. Chaque piste est testée, chiffrée et présentée au chef d’établissement pour décision.",
+      "points": 10
+    },
+    {
+      "titre": "Identifier un report de risque",
+      "consigne": "À l’Imprimerie Castagné (fictive, 54 salariés), pour réduire les manutentions, un convoyeur a été installé en sortie de massicot. Depuis, l’opérateur se plaint de l’épaule droite car il doit tendre le bras loin devant lui pour récupérer les liasses au bout du convoyeur, à 1,40 m de haut. Analysez la situation et proposez des corrections.",
+      "reponseAttendue": "Le convoyeur a réduit la manutention au sol mais il a créé un report de risque : la zone de prise est trop éloignée et trop haute, d’où une flexion et une abduction de l’épaule avec bras tendu, sollicitations visées par le tableau 57. Le déterminant est une conception de l’installation faite sans analyse préalable avec l’opérateur. Corrections : abaisser la sortie du convoyeur à hauteur des coudes et rapprocher la zone de prise, ajouter une butée qui amène les liasses à portée, prévoir une table tampon réglable. Leçon pour la suite : associer l’opérateur aux choix techniques et tester avant installation définitive.",
+      "points": 10
+    },
+    {
+      "titre": "Renseigner le suivi de la démarche",
+      "consigne": "Six mois après le début de la démarche chez Menuiserie Rousseau & Fils (fictive, 70 salariés), vous devez faire le point pour la gérante et pour le suivi TMS Pros. Deux situations ont été analysées (débit de panneaux, montage), trois actions décidées : table élévatrice au débit (réalisée), aspirateur à panneaux (commandé), réorganisation des séries au montage (non commencée). Rédigez le point d’avancement.",
+      "reponseAttendue": "Étape « En quoi suis-je concerné ? » : réalisée, avec l’état des lieux des AT/MP, des arrêts et des douleurs. Étape « Par quoi commencer ? » : réalisée, deux situations prioritaires retenues, débit et montage. Étape « Comment agir ? » : en cours ; table élévatrice installée au débit et en cours d’évaluation (observation de suivi prévue le mois prochain avec le même outil) ; aspirateur à panneaux commandé, livraison prévue, essai à organiser avec les opérateurs ; réorganisation des séries au montage non commencée, cause : surcharge de commandes, proposition de la lancer au prochain creux d’activité avec un responsable désigné. Étape « Quels résultats ? » : à venir, indicateurs prévus : contraintes avant/après, douleurs déclarées, utilisation des aides, arrêts. Décisions demandées à la gérante : date de lancement au montage et validation des indicateurs. Le suivi TMS Pros est mis à jour avec ces éléments.",
+      "points": 10
+    },
+    {
+      "titre": "Évaluer une action et l’ajuster",
+      "consigne": "À la Charcuterie Les Monts d’Ardon (fictive, 92 salariés), des couteaux à manche ergonomique et un affûtage quotidien ont été mis en place au désossage il y a trois mois. Les opérateurs disent que les couteaux sont bien, mais ils ont encore mal au poignet en fin de semaine, quand la cadence augmente pour les commandes du week-end. Évaluez et proposez des ajustements.",
+      "reponseAttendue": "L’action technique est utile : un couteau bien affûté et adapté à la main réduit l’effort de coupe. Mais l’évaluation montre qu’elle ne traite pas tous les déterminants : la hausse de cadence en fin de semaine augmente la répétitivité et la pression temporelle, et le froid de l’atelier augmente la force de préhension. Je compare les observations avant et après, je recueille les douleurs par jour de la semaine et je vérifie que l’affûtage est vraiment quotidien. Ajustements proposés au chef d’établissement : lisser la production des commandes du week-end sur la semaine, renfort aux pics, pauses de récupération, gants adaptés au froid qui ne réduisent pas la dextérité, maintien de l’affûtage avec un responsable désigné. Nouvelle évaluation prévue à trois mois.",
+      "points": 10
+    },
+    {
+      "titre": "Ancrer la démarche dans le fonctionnement de l’entreprise",
+      "consigne": "La société Transports Alvérac (fictive, 115 salariés) a conduit avec succès une première action sur le déchargement des colis. La direction craint que « tout s’arrête » après votre formation. Proposez un plan d’ancrage de la démarche sur un an.",
+      "reponseAttendue": "Mise à jour du document unique avec les situations analysées, les actions et les indicateurs. Intégration de critères ergonomiques dans les achats : hayons, transpalettes électriques, aménagement des caisses de véhicules. Analyse systématique avec les salariés de tout nouveau véhicule, nouvel entrepôt ou nouvelle organisation des tournées. Recueil annuel des douleurs et suivi de quelques indicateurs (arrêts liés aux lombalgies, utilisation des aides, restrictions d’aptitude) revus tous les trimestres avec la direction. Formation des chefs de quai et accueil des nouveaux chauffeurs et intérimaires sur l’usage des aides. Communication des résultats au personnel. Extension à une nouvelle situation par semestre, par exemple le chargement en entrepôt. Lien maintenu avec le SPST et la caisse régionale, et mise à jour du suivi TMS Pros.",
+      "points": 10
+    },
+    {
+      "titre": "Relier les maladies professionnelles aux situations de travail",
+      "consigne": "La responsable RH des Ateliers Sauvaire (fictifs, 80 salariés, second œuvre du bâtiment) vous transmet : un poseur de sols atteint d’une lésion du ménisque ; un plaquiste atteint d’une hernie discale après des années de port de plaques de plâtre ; un conducteur de chariot tout-terrain atteint d’une lombosciatique ; un perceur utilisant un perforateur atteint de troubles vasculaires des doigts ; une peintre atteinte d’une tendinopathie de l’épaule. Indiquez le tableau du régime général et une piste de prévention à la source pour chacun.",
+      "reponseAttendue": "Poseur de sols : tableau 79, lésions chroniques du ménisque liées au travail agenouillé ou accroupi ; piste : outils à long manche et préparation au maximum debout, genouillères en complément. Plaquiste : tableau 98, rachis lombaire et manutention manuelle de charges lourdes ; piste : lève-plaques, plaques allégées ou plus petites, approvisionnement mécanisé à l’étage. Conducteur de chariot : tableau 97, rachis lombaire et vibrations transmises au corps entier ; piste : engins et sièges à suspension adaptés, entretien des pistes de chantier, limitation des durées. Perceur : tableau 69, vibrations des outils tenus à la main ; piste : perforateurs à faibles vibrations, maintenance, supports de perçage, limitation du temps d’usage. Peintre : tableau 57, affections périarticulaires de l’épaule ; piste : rallonges de manche, échafaudages roulants à bonne hauteur, pulvérisation selon les chantiers. La reconnaissance suppose que les conditions du tableau soient réunies ; à défaut, le comité régional de reconnaissance des maladies professionnelles peut être saisi.",
+      "points": 10
+    }
+  ],
+  "exerciceIntermediaire": {
+    "titre": "Contrôle intermédiaire : identifier le risque et déployer les premières étapes",
+    "contexte": "La société Embal’Ouest (fictive, fabrication d’emballages, 64 salariés) s’engage dans TMS Pros. Sur trois ans : 2 maladies professionnelles au titre du tableau 57 au poste de mise en carton et 3 arrêts pour lombalgie au quai d’expédition. Le gérant a suivi la journée d’initiation et vous confie la mission de chargé(e) de prévention, 4 heures par semaine. Au poste de mise en carton, une opératrice plie et remplit 900 cartons par poste, sur une table fixe trop haute pour elle, avec une cadence fixée par la machine amont. Le barème total est de 20 points.",
+    "questions": [
+      {
+        "question": "Citez les points structurants à vérifier avant de démarrer et votre positionnement par rapport au gérant.",
+        "reponseAttendue": "Points structurants : engagement écrit du gérant, objectifs et moyens, temps dédié reconnu, information des salariés, participation des opérateurs, approche globale, appui du SPST et de la caisse régionale. Positionnement : le gérant construit et pilote le projet et décide ; je déploie les étapes opérationnelles et je lui rends compte selon des points d’étape fixés. Barème : points structurants 3 points, positionnement 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Indiquez les deux premières étapes TMS Pros et ce que vous faites concrètement à chacune.",
+        "reponseAttendue": "« En quoi suis-je concerné ? » : rassembler AT/MP, arrêts, restrictions, départs, document unique, avis du SPST et recueil des douleurs. « Par quoi commencer ? » : proposer au gérant la mise en carton comme situation prioritaire (2 MP tableau 57) puis le quai d’expédition, et organiser le projet avec lui (calendrier, points d’étape, information du personnel). Barème : étape 1 2 points, étape 2 3 points.",
+        "points": 5
+      },
+      {
+        "question": "Identifiez les facteurs de risque et les déterminants au poste de mise en carton.",
+        "reponseAttendue": "Facteurs biomécaniques : répétitivité (900 cartons et plusieurs gestes par carton), épaules surélevées par la table trop haute, efforts de pliage. Facteur psychosocial : cadence imposée sans marge de manœuvre. Déterminants : table fixe non réglable (technique), cadence de la machine amont sans stock tampon (organisationnel), éventuellement qualité ou rigidité du carton (produit). Barème : facteurs 3 points, déterminants 2 points.",
+        "points": 5
+      },
+      {
+        "question": "Proposez trois pistes de solution hiérarchisées pour ce poste.",
+        "reponseAttendue": "1. Table réglable en hauteur ou réglée pour l’opératrice : supprime l’élévation des épaules à la source, coût modéré. 2. Stock tampon ou réglage de la cadence amont pour redonner une marge de manœuvre. 3. Étude de cartons prédécoupés plus faciles à plier ou d’un dispositif de mise en forme, puis rotation avec un poste sollicitant d’autres zones en complément. Chaque piste est testée avec l’opératrice et chiffrée pour décision du gérant. Barème : pertinence 3 points, hiérarchie et justification 2 points.",
+        "points": 5
+      }
+    ]
+  },
+  "evaluationFinale": {
+    "titre": "Évaluation finale interne — 4 exercices couvrant les 4 compétences du chargé de prévention des TMS, note sur 20 ; grille analytique sur 20 utilisée en lecture complémentaire, sans addition des deux scores",
+    "exercices": [
+      {
+        "titre": "Identifier le risque et les points structurants",
+        "consigne": "Le Traiteur Valmont (fictif, 57 salariés) connaît des plaintes de poignet en cuisine froide et une maladie professionnelle reconnue au titre du tableau 57. Le dirigeant veut « acheter des gants et passer à autre chose ». Identifiez le risque et présentez les points structurants à lui rappeler.",
+        "reponseAttendue": "Risque : TMS des membres supérieurs liés à la répétitivité des gestes de découpe et de garnissage, aux efforts de préhension amplifiés par le froid et à la pression temporelle des livraisons. Points structurants : engagement du dirigeant formalisé, pilotage et moyens, participation des salariés, analyse du travail réel, approche globale des facteurs, actions à la source avant les équipements individuels, suivi et évaluation. Les gants peuvent compléter mais ne traitent pas les déterminants. Barème : identification du risque 2 points, points structurants 3 points.",
+        "points": 5
+      },
+      {
+        "titre": "Déployer les étapes de la démarche",
+        "consigne": "Décrivez comment vous déployez les étapes de la démarche TMS Pros au Traiteur Valmont, en précisant votre rôle et celui du dirigeant.",
+        "reponseAttendue": "« En quoi suis-je concerné ? » : état des lieux des données et recueil des douleurs. « Par quoi commencer ? » : proposition de la cuisine froide comme situation prioritaire, validation par le dirigeant, information des salariés. « Comment agir ? » : observation du travail réel sur plusieurs moments, outils adaptés, entretiens, restitution aux salariés puis au dirigeant, pistes et plan d’actions décidé par lui. « Quels résultats ? » : évaluation et reporting. Le dirigeant pilote et décide ; le chargé de prévention déploie et rend compte. Barème : étapes 3 points, répartition des rôles 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Proposer des pistes de solution",
+        "consigne": "L’observation montre : planches de découpe sur des plans de travail de 85 cm pour des salariés de tailles variées, couteaux mal affûtés, commandes du vendredi préparées le matin même, température de 4 °C. Proposez des pistes de solution hiérarchisées et argumentées.",
+        "reponseAttendue": "1. Plans de travail réglables ou réhausses adaptées à chaque salarié : action à la source sur les postures. 2. Organisation de l’affûtage régulier avec un responsable : réduction immédiate de l’effort. 3. Anticipation de la préparation des commandes du vendredi et lissage de la charge : réduction de la pression temporelle. 4. Gants adaptés au froid préservant la dextérité et pauses de récupération en complément. Chaque piste est testée avec les salariés, chiffrée et présentée au dirigeant. Barème : pertinence et conformité aux principes de prévention 3 points, hiérarchie et argumentation 2 points.",
+        "points": 5
+      },
+      {
+        "titre": "Ancrer la démarche",
+        "consigne": "Proposez les perspectives pour que la démarche se poursuive au Traiteur Valmont après votre formation.",
+        "reponseAttendue": "Mise à jour du document unique ; critères ergonomiques dans les achats d’équipements de cuisine ; analyse de toute nouvelle organisation ou nouveau poste avec les salariés ; recueil périodique des douleurs et indicateurs simples suivis avec le dirigeant (arrêts, plaintes, utilisation des aménagements) ; formation au poste des nouveaux arrivants ; communication des résultats ; extension à une nouvelle situation ; maintien du lien avec le SPST et la caisse régionale et mise à jour du suivi TMS Pros. Barème : intégration au fonctionnement 3 points, suivi et indicateurs 2 points.",
+        "points": 5
+      }
+    ],
+    "grille": [
+      {
+        "critere": "Identification du risque de TMS (localisations, facteurs, tableaux de maladies professionnelles) : 0 = absente ; 1 = confusions majeures ; 2 = identification partielle ; 3 = identification correcte ; 4 = identification complète et argumentée.",
+        "points": 4
+      },
+      {
+        "critere": "Maîtrise des étapes de la démarche et du rôle du chargé de prévention dans le projet piloté par la direction : 0 = absente ; 1 = étapes confuses ; 2 = étapes partielles ; 3 = étapes correctes ; 4 = étapes complètes et rôles clairement articulés.",
+        "points": 4
+      },
+      {
+        "critere": "Qualité de l’observation et de l’analyse du travail réel : 0 = absente ; 1 = analyse superficielle ; 2 = analyse partielle ; 3 = analyse correcte ; 4 = analyse complète, outillée et validée avec les salariés.",
+        "points": 4
+      },
+      {
+        "critere": "Pertinence des pistes de solution au regard des principes généraux de prévention : 0 = absente ; 1 = mesures individuelles seules ; 2 = pistes partiellement à la source ; 3 = pistes à la source hiérarchisées ; 4 = pistes à la source, chiffrées, testées et sans report de risque.",
+        "points": 4
+      },
+      {
+        "critere": "Perspectives d’ancrage et de suivi dans la durée : 0 = absentes ; 1 = vagues ; 2 = incomplètes ; 3 = pertinentes ; 4 = concrètes, planifiées et intégrées au fonctionnement de l’établissement.",
+        "points": 4
+      }
+    ]
+  }
+}
