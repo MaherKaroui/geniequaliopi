@@ -172,7 +172,9 @@ export function planPieces(cx: Contexte): Piece[] {
     par("bilan_froid", "Bilan à froid", "BILAN_A_FROID", froid ? "izilearn" : suiviEchu ? "document" : "trame",
       froid || !suiviEchu ? () => T.bilanFroid(c).html : gen(`bilan_froid_${i}`, "bilan_froid_stagiaire", { stagiaireIdx: i }));
     const tc = p.formation.typeAction === "apprentissage" ? "certificat_realisation_cfa" : p.formation.typeAction === "vae" ? "vae_certificat_realisation" : "certificat_realisation_stagiaire";
-    par("certificat", "Certificat de réalisation", "CERTIFICAT_DE_REALISATION", "document", gen(`certificat_${i}`, tc, { stagiaireIdx: i, fi: 0 }));
+    // Format A4 portrait standard (le gabarit Qualiopi impose un grand format 280x430).
+    const certif = gen(`certificat_${i}`, tc, { stagiaireIdx: i, fi: 0 });
+    par("certificat", "Certificat de réalisation", "CERTIFICAT_DE_REALISATION", "document", () => certif().replace(/<meta\s+name=["']pdf-page-size["'][^>]*>/gi, ""));
 
     mailsModeles(o, f, s).forEach((m, k) => {
       const stamp = `${m.dateEnvoi.getFullYear()}-${String(m.dateEnvoi.getMonth() + 1).padStart(2, "0")}-${String(m.dateEnvoi.getDate()).padStart(2, "0")}`;
