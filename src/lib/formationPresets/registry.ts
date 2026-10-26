@@ -5,6 +5,7 @@ import type { AIEvalPack } from '@/lib/aiEvalPack';
 import type { AIVeillePack } from '@/lib/aiVeillePack';
 import { BUILTIN_TP_PRESETS } from './builtinTP';
 import { BUILTIN_LILATE_PRESETS } from './builtinLilate';
+import { BUILTIN_ORIENTA_PRESETS } from './builtinOrienta';
 
 export interface PresetPlan {
  formation: Partial<FormationInfo>;
@@ -47,7 +48,7 @@ export function setIzilearnContentOverride(title: string, pack: AIContentPack | 
 }
 export function getFormationPreset(f: Pick<FormationInfo, 'intitule'> & { codeRNCP?: string }): FormationPreset | null {
  const code = normaliseCode(f.codeRNCP); const title = normaliseTitle(f.intitule);
- const all = [...entries.values(), ...BUILTIN_TP_PRESETS, ...BUILTIN_LILATE_PRESETS].filter(p => p.statut !== 'generation' && p.data.evaluations && p.data.plan);
+ const all = [...entries.values(), ...BUILTIN_TP_PRESETS, ...BUILTIN_LILATE_PRESETS, ...BUILTIN_ORIENTA_PRESETS].filter(p => p.statut !== 'generation' && p.data.evaluations && p.data.plan);
  // Resolve by explicit code first; title-only consumers get aliases from loadFormationPreset.
  const rank = (a: FormationPreset, b: FormationPreset) => Number(b.statut === 'valide') - Number(a.statut === 'valide') || (b.updated_at ?? '').localeCompare(a.updated_at ?? '');
  return (code ? all.filter(p => normaliseCode(p.code_rncp) === code).sort(rank)[0] : undefined) ?? all.filter(p => p.intitule_normalise === title).sort(rank)[0] ?? null;

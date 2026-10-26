@@ -1,0 +1,1111 @@
+{
+ "id": "vtest-b1",
+ "titre": "VTest Business English (RS6905) — Parcours B1 — 21 h",
+ "heures": 21,
+ "niveau": "B1",
+ "aliases": [
+  "VTest Business English – 4 Skills (RS6905) — Parcours B1 — 21 h",
+  "Anglais professionnel VTest — Parcours B1 — 21 h",
+  "Parcours B1 — 21 h (VTest RS6905)"
+ ],
+ "programme": {
+  "code": "B1-21H",
+  "level": "B1",
+  "title": "Parcours B1 — 21 h",
+  "subtitle": "Communiquer dans des situations professionnelles courantes",
+  "hours": 21,
+  "sync_hours": 3,
+  "async_hours": 18,
+  "public_target": "Salariés, demandeurs d'emploi, indépendants devant utiliser l'anglais dans des situations professionnelles courantes (accueil, administration, logistique, services, qualité, assistanat).",
+  "prerequisites": "Niveau A2 minimum à l'entrée, vérifié par le test de positionnement de la plateforme (prérequis de validation de la fiche RS6905). Ordinateur ou tablette avec micro et casque, connexion internet stable.",
+  "objectives": [
+   "Se présenter et décrire son poste, son entreprise et ses missions à l'oral en 45 à 90 secondes de façon structurée (C3).",
+   "Comprendre les informations générales et au moins deux détails précis d'une conversation professionnelle courante (C1).",
+   "Identifier l'objet, la demande, l'échéance et le ton d'un email ou d'un document professionnel courant (C2).",
+   "Participer à une réunion simple : donner son avis, demander une précision, reformuler (C1, C3).",
+   "Rédiger en 30 minutes un email ou un compte rendu structuré d'au moins 150 mots (C4)."
+  ],
+  "modalities": "Formation ouverte et à distance (FOAD) : e-learning asynchrone sur la plateforme (leçons, audio, exercices auto-corrigés, studio oral, atelier d'écriture) et classes virtuelles synchrones avec le formateur.",
+  "accompaniment": "Formateur référent joignable par la messagerie de la plateforme (réponse sous 48 h ouvrées), rendez-vous individuels réservables dans l'agenda, assistance technique par messagerie (catégorie « support technique »).",
+  "means": "Plateforme LMS accessible 24 h/24, ressources audio et PDF téléchargeables, formateur anglophone qualifié (CV et compétences tenus à jour dans la plateforme).",
+  "evaluation": "Positionnement d'entrée ; exercices auto-corrigés et productions corrigées par le formateur ; quiz de fin de module (seuil 70 %) ; simulation d'entraînement aux 4 compétences ; évaluation finale interne ; questionnaires de satisfaction à chaud et à froid. Passage de la certification VTest sur la plateforme officielle d'ExAssess.",
+  "accessibility": "Formation accessible aux personnes en situation de handicap : demande d'aménagement confidentielle dès la candidature, analysée par le référent handicap (police agrandie, contrastes, temps majorés en entraînement, sous-titres et transcriptions). Les aménagements de l'examen officiel relèvent du certificateur.",
+  "modules": [
+   {
+    "code": "B1-M1",
+    "titre": "Se présenter et décrire son activité",
+    "heures": 3,
+    "competences": [
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de se présenter à l'oral en 45 à 60 secondes en citant au moins son poste, son service et deux responsabilités.",
+     "À l'issue du module, l'apprenant est capable de décrire son entreprise (secteur, taille, clients, outils) en 60 à 90 secondes avec au moins trois informations chiffrées ou concrètes.",
+     "À l'issue du module, l'apprenant est capable de poser au moins quatre questions correctement formées pour faire connaissance avec un interlocuteur et de restituer sa présentation à la 3e personne.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un email de présentation d'au moins 150 mots comportant objet, salutation, présentation, objet de la prise de contact, proposition de suite et formule finale."
+    ]
+   },
+   {
+    "code": "B1-M2",
+    "titre": "Comprendre des conversations professionnelles",
+    "heures": 4,
+    "competences": [
+     "C1"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier la consigne ou l'information principale d'une annonce professionnelle de 10 à 20 secondes (au moins 3 réponses justes sur 4).",
+     "À l'issue du module, l'apprenant est capable de noter sans erreur un nom épelé, un numéro de téléphone, une date et une référence entendus dans un appel ou un message vocal.",
+     "À l'issue du module, l'apprenant est capable d'identifier le lieu, le problème et l'action suivante dans un dialogue court entre collègues.",
+     "À l'issue du module, l'apprenant est capable de repérer l'information générale et au moins deux détails précis d'une réunion ou d'un briefing de 1 à 3 minutes."
+    ]
+   },
+   {
+    "code": "B1-M3",
+    "titre": "Lire des emails et documents professionnels",
+    "heures": 4,
+    "competences": [
+     "C2"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier l'objet, la demande, l'échéance et le ton d'un email professionnel de 120 à 300 mots en répondant correctement à au moins 70 % des questions.",
+     "À l'issue du module, l'apprenant est capable de repérer dans une note de service, un mémo ou un avis la mesure annoncée, les personnes concernées et les actions attendues.",
+     "À l'issue du module, l'apprenant est capable d'extraire d'une offre, d'un bon de commande, d'une brochure ou de conditions de vente les prix, délais, conditions et exceptions pertinents.",
+     "À l'issue du module, l'apprenant est capable de distinguer dans un article ou un compte rendu les faits, les arguments et le point de vue de l'auteur.",
+     "À l'issue du module, l'apprenant est capable de choisir entre lecture globale (skimming) et recherche ciblée (scanning) pour répondre à des questions dans un temps limité."
+    ]
+   },
+   {
+    "code": "B1-M4",
+    "titre": "Participer à des échanges et réunions simples",
+    "heures": 4,
+    "competences": [
+     "C1",
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier l'objectif, les points de l'ordre du jour et les décisions d'une réunion enregistrée de 1 à 2 minutes en répondant correctement à au moins 70 % des questions.",
+     "À l'issue du module, l'apprenant est capable d'exprimer en 45 à 90 secondes une opinion structurée (position + 2 raisons) et un désaccord poli assorti d'une proposition alternative.",
+     "À l'issue du module, l'apprenant est capable de poser au moins deux questions de clarification et de reformuler correctement une consigne reçue à l'oral.",
+     "À l'issue du module, l'apprenant est capable d'ouvrir et de conduire un point d'équipe de 5 minutes en annonçant l'objectif, le déroulé en étapes et les attendus de chaque participant."
+    ]
+   },
+   {
+    "code": "B1-M5",
+    "titre": "Rédiger des emails et comptes rendus",
+    "heures": 4,
+    "competences": [
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un email professionnel de 150 mots minimum comportant objet, salutation, raison du message, demande ou réponse structurée, action attendue avec échéance et formule finale adaptée au destinataire.",
+     "À l'issue du module, l'apprenant est capable d'utiliser au moins six mots de liaison différents (addition, contraste, cause, conséquence, séquence, conclusion) correctement ponctués dans un texte de 150 mots.",
+     "À l'issue du module, l'apprenant est capable de rédiger un document préparatoire à une réunion présentant objectifs, points de l'ordre du jour avec responsable et durée, préparation demandée et résultats attendus.",
+     "À l'issue du module, l'apprenant est capable de rédiger un compte rendu ou un retour d'expérience distinguant faits, décisions et actions (qui, quoi, quand) avec les temps du passé appropriés."
+    ]
+   },
+   {
+    "code": "B1-M6",
+    "titre": "Entraînement aux 4 compétences et bilan",
+    "heures": 2,
+    "competences": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de répondre en temps limité à des questions sur des énoncés, dialogues courts et longs, monologues et messages, en repérant le message général et au moins deux détails précis.",
+     "À l'issue du module, l'apprenant est capable d'identifier l'objet, la demande, l'échéance et la position de l'auteur dans un email, une note et un article (au moins 7 questions sur 9).",
+     "À l'issue du module, l'apprenant est capable de lire à voix haute trois textes, de répéter six énoncés et de répondre à deux questions ouvertes en utilisant au moins 80 % du temps de parole prévu.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un email structuré de 150 mots minimum, puis de formuler trois objectifs de préparation à partir de son autoévaluation."
+    ]
+   }
+  ]
+ },
+ "competences": [
+  "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel.",
+  "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel.",
+  "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel.",
+  "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel."
+ ],
+ "besoinsList": [
+  "Situer son niveau d'anglais et viser le niveau B1 au VTest.",
+  "Présenter son activité et son entreprise de façon structurée.",
+  "Comprendre des conversations professionnelles courantes au téléphone et en réunion.",
+  "Lire et exploiter des emails et documents professionnels.",
+  "Participer à un point d'équipe et répondre à une objection simple.",
+  "Traiter un message vocal pour un collègue absent.",
+  "Rédiger des emails et comptes rendus de 150 mots.",
+  "Gagner en fluidité et en précision grammaticale à l'oral.",
+  "Enrichir son vocabulaire professionnel par secteur.",
+  "S'entraîner aux épreuves du VTest en temps limité."
+ ],
+ "syntheseHtml": "• Parcours B1 (21 h) préparant au VTest Business English – 4 Skills (RS6905, Répertoire spécifique, certificateur EXASSESS, enregistrement du 28/11/2024 au 28/11/2027) ; le test est passé en ligne sur la plateforme VTest, l'organisme assure la préparation.<br>• Les 4 compétences du référentiel sont travaillées : C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais ; C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais ; C3 — S'exprimer et communiquer à l'oral en anglais ; C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées.<br>• 6 modules (29 leçons) : cours, langue clé, vocabulaire, dialogues, exercices auto-corrigés, studio oral et atelier d'écriture corrigés par le formateur, quiz de validation à 70 %.<br>• Le niveau A2 du CECRL est le minimum requis pour valider la certification : le test de positionnement d'entrée oriente vers le parcours adapté.",
+ "adaptationsHtml": "• Niveau de départ fixé par le test de positionnement ; le parcours peut être complété par les leçons du niveau inférieur ou supérieur.<br>• Rythme libre en e-learning, réécoute des audios et reprise des exercices ; classes virtuelles pour l'oral.<br>• Transcriptions et traductions disponibles pour chaque dialogue.<br>• Situation de handicap : le référent handicap étudie les aménagements (police agrandie, contrastes, temps majorés en entraînement, sous-titres) ; les aménagements de l'examen officiel relèvent du certificateur.<br>• Les sujets d'expression orale et écrite peuvent être rapprochés du poste du stagiaire.",
+ "qcmDebut": [
+  {
+   "question": "Transcription de l'écoute : « Adam: Priya, the client from Halden Engineering just emailed. They can't come on Tuesday because their flight was cancelled. / Priya: That's a shame. We'd prepared the factory tour. Did they suggest another date? / Adam: They proposed Thursday afternoon, but you're at the trade fair then, aren't you? / Priya: Yes, until Thursday evening. Could you ask if Friday morning works? I'd really like to be there. / Adam: Sure. I'll also check whether the meeting room is free. » — Why can't the client come on Tuesday?",
+   "options": [
+    "Their flight was cancelled",
+    "The factory is closed",
+    "Priya is on holiday",
+    "The meeting room is booked"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (email) : « From: Rachel Moore, Office Manager To: Kim Tanaka Subject: Your first day – Monday 6 May Dear Kim, We're delighted that you're joining Tidewell Insurance as a Claims Assistant. I'm writing to give you some information about your first day. Please arrive at 9:15 rather than 9:00, as the security team need to take your photo for your ID badge first. Ask for me at reception on the ground floor. In the morning, you'll have an introduction to our systems with Liam from IT. After lunch, you'll meet your manager, Gary Holt, who'll explain your main responsibilities. You don't need to bring a laptop, but please bring your passport or ID card so that we can complete your file. I look forward to meeting you. Best regards, Rachel » — Why should Kim arrive at 9:15?",
+   "options": [
+    "Reception opens at 9:15",
+    "Gary Holt is busy with meetings until then",
+    "The IT introduction starts at 9:15",
+    "Security need to take her badge photo"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement le courriel : « Hi Sophie, I'm writing to let you know that the delivery _____ yet. The supplier says it should arrive by Friday. If it doesn't, we'll need to find another solution, because the client is expecting the goods next week. I'll keep you updated. Best, Omar »",
+   "options": [
+    "hasn't arrived",
+    "didn't arrive",
+    "doesn't arrive",
+    "isn't arrived"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Finance Officer: Just a reminder that from next Monday, all expense claims must be submitted through the new online portal. Paper forms will no longer be accepted, and claims older than sixty days won't be reimbursed. » — What is changing next Monday?",
+   "options": [
+    "Expense claims will be paid faster",
+    "The reimbursement limit will increase",
+    "Claims must be approved by a manager",
+    "Expense claims must be made online"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (article) : « Cycle to Work Scheme Now Open Following requests from many employees, Ardent Pharma is launching a cycle to work scheme this spring. Under the scheme, the company buys a bicycle and safety equipment for you, up to a value of £1,500, and you pay it back in monthly amounts taken from your salary over twelve months. Because the payments are made before tax, the total cost to you is usually 25 to 35 percent lower than buying the bike yourself. New showers and secure bike storage have also been installed in the basement of Building C. To join, complete the online form on the HR portal before 31 March. Places are limited to 80 employees this year, so early applications are recommended. » — Why has the company introduced the scheme?",
+   "options": [
+    "To reduce car park costs",
+    "Because many employees asked for it",
+    "Because of a new law",
+    "To win an environmental award this year"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement le courriel : « Hi Sophie, I'm writing to let you know that the delivery hasn't arrived yet. The supplier says it _____ by Friday. If it doesn't, we'll need to find another solution, because the client is expecting the goods next week. I'll keep you updated. Best, Omar »",
+   "options": [
+    "should arriving",
+    "must to arrive",
+    "would arrived",
+    "should arrive"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Transcription de l'écoute : « Nadia: Have you had a chance to compare the two quotes for the new laptops? / Chris: Yes. Corvex is about eight percent cheaper, but their warranty only covers one year. Altamira offers three years, including on-site repairs. / Nadia: Hmm. Given how often the sales team travels, the repair cover matters more than the price. / Chris: I agree. Shall I ask Altamira whether they'd match part of the price difference? / Nadia: Good idea. And copy in Marco from Finance. He'll need to sign it off. » — What is the main advantage of the Corvex quote?",
+   "options": [
+    "Its lower price",
+    "Its longer warranty",
+    "On-site repairs",
+    "Faster delivery"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (email) : « From: Martin Feld, Purchasing Manager, Corlan Hotels To: customer.service@pureline-linen.example Subject: Order 58321 – incorrect delivery Dear Sir or Madam, I am writing about our order no. 58321, which was delivered to our Lyon hotel on 3 September. We ordered 200 white king-size sheets, but we received 200 double sheets, which do not fit our beds. In addition, 15 of the towels in the same delivery were stained. This is the second time this year that we have had a problem with a delivery, and it is causing us serious difficulties, as a large conference group is arriving on 12 September. I would therefore be grateful if you could send the correct sheets and replace the damaged towels before 10 September. Please also arrange for the wrong items to be collected at your expense. If this is not possible, I will have no choice but to cancel the order and look for another supplier. Yours faithfully, Martin Feld » — What was wrong with the sheets?",
+   "options": [
+    "They were stained",
+    "They were the wrong size",
+    "They arrived late",
+    "They were the wrong colour"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement le courriel : « Hi Sophie, I'm writing to let you know that the delivery hasn't arrived yet. The supplier says it should arrive by Friday. If it doesn't, we'll need to find another solution, _____ the client is expecting the goods next week. I'll keep you updated. Best, Omar »",
+   "options": [
+    "although",
+    "so",
+    "because",
+    "unless"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Transcription de l'écoute : « Jamie Hart: Hello Ms Okafor, this is Jamie Hart from Lakeside Conference Centre. I'm calling about your booking for the sales training on the fourteenth. Unfortunately, the projector in the Garden Suite has broken, and the replacement won't arrive in time. / Jamie Hart: We can move your group to the Riverside Room, which is slightly bigger and has a built-in screen, at no extra cost. / Jamie Hart: The only difference is that lunch would be served in the main restaurant rather than in the room. If that's acceptable, could you confirm by email before Wednesday? Otherwise, I'll call you on Thursday to discuss other options. » — What is the problem with the booking?",
+   "options": [
+    "A piece of equipment is broken",
+    "The room is double-booked",
+    "The training date has changed",
+    "The centre is closing for repairs"
+   ],
+   "correctIndex": 0
+  }
+ ],
+ "qcmFin": [
+  {
+   "question": "Transcription de l'écoute : « Manager: Just a quick reminder: tomorrow's training session on the new booking system has been moved from Room 4 to the main conference room, because more people have registered than expected. » — Why has the training session been moved?",
+   "options": [
+    "The booking system is not working",
+    "Room 4 is being repaired",
+    "The session has been postponed",
+    "More people have signed up than planned"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (memo) : « To: All warehouse staff From: Health and Safety Team From Monday, safety shoes must be worn in all areas of the warehouse, including the packing zone, which was previously exempt. New shoes can be collected from the stores on Thursday or Friday between 8:00 and 10:00. Please bring your staff card. » — What is new in this memo?",
+   "options": [
+    "Staff must collect new uniforms from the stores on Thursday",
+    "Safety shoes are now required in the packing zone",
+    "The stores will open on Monday",
+    "Staff cards must be renewed before Monday"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez l'expression qui permet de prolonger une réponse orale en introduisant une limite : « Video calls save a lot of time. _____, some meetings work better face-to-face. »",
+   "options": [
+    "For example",
+    "As a result",
+    "However",
+    "First"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez la forme correcte : « I look forward to _____ the results of the trial. »",
+   "options": [
+    "receiving",
+    "receive",
+    "received",
+    "be receiving"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Receptionist: Mr Duval called to say his train is delayed. He'll be about forty minutes late, so he suggests starting the meeting without him and covering the budget item when he arrives. » — What does Mr Duval suggest?",
+   "options": [
+    "Starting the meeting without him",
+    "Cancelling the meeting",
+    "Discussing the budget first",
+    "Moving the meeting to the next day"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (email) : « From: Lucy Tan To: Marco Rossi Subject: Supplier visit Hi Marco, The supplier visit planned for Tuesday has been confirmed, but their sales director can only stay until 11:30. Could you move your presentation to the beginning of the morning, so she can see it before she leaves? Thanks, Lucy » — What does Lucy ask Marco to do?",
+   "options": [
+    "Cancel the supplier visit",
+    "Meet the sales director after 11:30",
+    "Present earlier in the morning",
+    "Send his presentation to the sales director by email"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez le mot de liaison adapté : « _____ the training was short, the participants learned a lot. »",
+   "options": [
+    "Despite",
+    "However",
+    "Although",
+    "Because of"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Transcription de l'écoute : « Receptionist: Good morning, everyone. Room 2A is closed today for cleaning, so the team meeting is in Room 4B at ten o'clock. » — Where is the team meeting today?",
+   "options": [
+    "In Room 2A",
+    "In Room 4B",
+    "In the cafeteria",
+    "At reception"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (article) : « Many small firms are now replacing printed catalogues with online ones. According to retail consultant Mark Ellery, this saves money, but he believes printed catalogues still have a role: 'For older customers and for trade fairs, a well-designed paper catalogue remains one of the most effective sales tools.' » — What is Mark Ellery's opinion?",
+   "options": [
+    "Paper catalogues are too expensive for small firms",
+    "Online catalogues are always more effective",
+    "Paper catalogues are still useful in some situations",
+    "Trade fairs are no longer useful"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement le courriel : « Hi Sophie, I'm writing to let you know that the delivery hasn't arrived yet. The supplier says it should arrive by Friday. If it doesn't, we'll need to find another solution, because the client is expecting the goods next week. I'll keep you _____. Best, Omar »",
+   "options": [
+    "update",
+    "updated",
+    "updating",
+    "to update"
+   ],
+   "correctIndex": 1
+  }
+ ],
+ "qcmCompetences": [
+  {
+   "competence": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Transcription de l'écoute : « Imani Brooks: Morning, everyone. This will only take five minutes. From next Monday, all incoming post will be opened and scanned by the mail room, and you'll receive it electronically instead of on paper. / Imani Brooks: The aim is to stop letters getting lost between floors, which happened three times last month. / Imani Brooks: So, what do I need from you? Please check the shared mailbox twice a day, once in the morning and once after lunch, and move each letter to the right case folder. / Imani Brooks: Original documents will be kept in the mail room for three months, so you don't need to print anything. If you have questions, send them to me by Friday. » — What does Imani ask the team to do?",
+     "options": [
+      "Print every scanned letter",
+      "Keep original documents for three months",
+      "Check the shared mailbox twice a day",
+      "Send her a report every Friday"
+     ],
+     "correctIndex": 2,
+     "explication": "« Please check the shared mailbox twice a day ». Les originaux sont conservés par le service courrier, pas par l'équipe, et il n'est pas nécessaire d'imprimer."
+    },
+    {
+     "question": "Transcription de l'écoute : « Project coordinator: Hi Mr Adams, thanks for joining. I'd like to give you an update on the installation of your new heating system. / Client: Thanks. Is everything on schedule? We need the offices to be warm before the staff move in. / Project coordinator: Mostly, yes. But one of the parts we ordered from Germany is delayed by about ten days. / Client: Sorry, did you say ten days or two days? / Project coordinator: Ten, I'm afraid. One-zero. / Client: So what you're saying is that the system won't be ready for the move on the first of November? / Project coordinator: Not completely. But we can install temporary electric heaters on the ground floor, where most of your staff will work, at no extra cost. / Client: OK, that sounds reasonable. Could you send me the new timetable in writing? / Project coordinator: Of course. You'll have it by tomorrow morning. » — What is the problem with the project?",
+     "options": [
+      "The client wants to change the heating system.",
+      "A part will arrive about ten days late.",
+      "The staff have already moved in.",
+      "The installation will cost more than planned."
+     ],
+     "correctIndex": 1,
+     "explication": "« one of the parts… is delayed by about ten days », confirmé par « Ten… One-zero ». « two days » est la mauvaise compréhension que le client vérifie."
+    },
+    {
+     "question": "Transcription de l'écoute : « Sven Lindgren: OK, everyone, let's make this quick. We have a customer audit next Thursday, and the purpose of this briefing is to make sure we're ready for it. / Sven Lindgren: I'll do three things. First, I'll remind you which areas the auditor will visit. Then, I'll show you the new checklist. And finally, I'll explain what I need from each of you. / Sven Lindgren: So, here's what I expect. Each of you is responsible for your own area. Please use the checklist to check it, and send me photos of anything that needs fixing by Wednesday at noon. / Sven Lindgren: You won't need to work overtime for this, and you won't need to meet the auditor unless she asks you a question directly. Any questions, ask me after the briefing. Thanks. » — What is each team member expected to do?",
+     "options": [
+      "Work extra hours before Thursday's audit",
+      "Check their area and send photos of problems",
+      "Meet the auditor on Thursday morning",
+      "Write a report on the new checklist by Wednesday"
+     ],
+     "correctIndex": 1,
+     "explication": "« Please use the checklist to check it, and send me photos… by Wednesday at noon ». Rencontrer l'auditrice n'est nécessaire que si elle pose une question directe."
+    },
+    {
+     "question": "Transcription de l'écoute : « Kenji Watanabe: Hi, I'm Kenji. I look after our key accounts in the Asia region, so I travel to Singapore quite often. » — What is Kenji's job mainly about?",
+     "options": [
+      "Recruiting staff in Asia",
+      "Organising business trips",
+      "Managing important customers",
+      "Running the Singapore office"
+     ],
+     "correctIndex": 2,
+     "explication": "« look after our key accounts » = suivre les clients importants. Il voyage souvent, mais l'organisation de voyages n'est pas son métier."
+    },
+    {
+     "question": "Transcription de l'écoute : « Helen Visser: Our head office is in Leeds, but most of our sixty engineers work on customer sites across the north of England. » — Where do most of the engineers work?",
+     "options": [
+      "On customer sites",
+      "At the head office in Leeds",
+      "In a factory near Leeds",
+      "In the south of England"
+     ],
+     "correctIndex": 0,
+     "explication": "« most of our sixty engineers work on customer sites ». Leeds est le siège, où travaillent peu d'ingénieurs."
+    },
+    {
+     "question": "Transcription de l'écoute : « Building manager: Please note that the car park will be closed on Saturday for cleaning. Staff working at the weekend can park at the sports centre next door. » — Where should weekend staff park on Saturday?",
+     "options": [
+      "In the usual car park",
+      "In the street",
+      "At the station",
+      "At the sports centre"
+     ],
+     "correctIndex": 3,
+     "explication": "« Staff working at the weekend can park at the sports centre next door. » Le parking habituel est fermé pour nettoyage."
+    },
+    {
+     "question": "Transcription de l'écoute : « Team leader: When a customer returns a product, check the receipt first. You don't need to call a manager unless the product is more than thirty days old. » — When should staff call a manager?",
+     "options": [
+      "If the product is older than 30 days",
+      "For every returned product",
+      "If the customer has lost their receipt",
+      "If the product was bought today"
+     ],
+     "correctIndex": 0,
+     "explication": "« You don't need to call a manager unless the product is more than thirty days old » : uniquement au-delà de 30 jours. « unless » = sauf si."
+    },
+    {
+     "question": "Transcription de l'écoute : « Supplier: Hello, it's Peter from Lumen Paper. Your order will arrive on Thursday instead of Tuesday, because our truck needs repairs. Sorry for the inconvenience. » — What is Peter calling about?",
+     "options": [
+      "A problem with an invoice",
+      "A cancelled order",
+      "A change of delivery day",
+      "A new product"
+     ],
+     "correctIndex": 2,
+     "explication": "La livraison passe de mardi à jeudi : c'est un changement de jour. La commande n'est pas annulée."
+    },
+    {
+     "question": "Transcription de l'écoute : « Receptionist: Good morning, Mr Lee. Your meeting with Ms Clark has been moved to room 406, on the fourth floor. She'll join you there in about ten minutes. » — What has changed?",
+     "options": [
+      "The time of the meeting",
+      "The room of the meeting",
+      "The person Mr Lee will meet",
+      "The date of the meeting"
+     ],
+     "correctIndex": 1,
+     "explication": "« has been moved to room 406 » : seule la salle change. Les « ten minutes » indiquent le délai avant l'arrivée de Ms Clark, pas un nouvel horaire."
+    },
+    {
+     "question": "Transcription de l'écoute : « Sales manager: We sold fifteen machines in March, which is good, but we'd planned fifty, so we really need to work harder this spring. » — How many machines did they sell in March?",
+     "options": [
+      "15",
+      "50",
+      "35",
+      "5"
+     ],
+     "correctIndex": 0,
+     "explication": "« We sold fifteen machines » : accent sur la seconde syllabe (fif-TEEN). 50 était l'objectif prévu."
+    }
+   ]
+  },
+  {
+   "competence": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez les consignes de lecture stratégique avec le mot correct (vocabulaire vu en classe virtuelle) : « Before answering, _____ the document to understand the main topic. Then read the questions and scan the text for specific information. Remember that a second language may be an advantage but not essential. In the email, sessions take place in Ashford unless otherwise stated. Places are allocated in order of reply. »",
+     "options": [
+      "scan",
+      "skim",
+      "spell",
+      "sign"
+     ],
+     "correctIndex": 1,
+     "explication": "Pour comprendre le thème général, on fait une lecture globale : « skim »."
+    },
+    {
+     "question": "Document (email) : « From: Sofia Lindgren To: Digital Project Team Subject: Preparation – project review, Tuesday 9 April Dear all, Our mid-project review of the new customer portal will take place on Tuesday 9 April from 10:00 to 11:30 in Meeting Room 3 (a video link will be sent to remote participants). Objectives The aim of this meeting is to check progress against the plan, agree on how to deal with the delay on the payment module and confirm the date of the user tests. Agenda 1. Progress since the kick-off – Raj (15 min) 2. Payment module: options to recover the delay – Karen (30 min) 3. User tests: dates and volunteers – Sofia (20 min) 4. Budget update – Tom (15 min) 5. AOB (10 min) Expected outcomes By the end of the meeting, we should have a decision on the payment module and a confirmed test date. Preparation Please read Karen's two-page note on the payment module before Tuesday and come with your questions. If you cannot attend, let me know by Friday so that we can send you the minutes. Best regards, Sofia » — What must participants do before the meeting?",
+     "options": [
+      "Read a note about the payment module",
+      "Send their questions to Karen by Friday",
+      "Volunteer for the user tests",
+      "Prepare a budget update"
+     ],
+     "correctIndex": 0,
+     "explication": "« Please read Karen's two-page note … before Tuesday ». Le piège « Send their questions by Friday » mélange deux informations : les questions sont à apporter en réunion, et le vendredi concerne seulement les absents."
+    },
+    {
+     "question": "Document (email) : « From: Daniel Okafor <d.okafor@brentfield-eng.example> To: Events Team, Harbourline Hotel Subject: Group booking request – 14–16 May Dear Events Team, I am writing on behalf of Brentfield Engineering to ask about accommodation and a meeting room for our regional sales conference. We expect 22 participants, who will arrive on the evening of 14 May and leave after lunch on 16 May. We would need 22 single rooms for two nights, a meeting room for 25 people on 15 May from 9 am to 5 pm, and lunch for the group on both days. A projector and a flipchart would also be essential. Could you please send us a quotation, including your cancellation policy, by Friday 4 April? Our finance department needs to approve the budget before the end of next week, so we cannot wait longer than this. If you have any questions about our requirements, please contact my assistant, Leila Moreau, on 01632 960 418, as I will be travelling until Wednesday. Kind regards, Daniel Okafor Sales Operations Manager » — What is the main purpose of the email?",
+     "options": [
+      "To confirm a booking that has already been made",
+      "To ask for a price for rooms and a meeting space",
+      "To complain about a previous conference at the hotel",
+      "To cancel a group reservation"
+     ],
+     "correctIndex": 1,
+     "explication": "« I am writing… to ask about accommodation and a meeting room » puis « Could you please send us a quotation » : il s'agit d'une demande de devis. L'option 0 est tentante car l'email est très détaillé, mais rien n'est encore réservé."
+    },
+    {
+     "question": "Document (email) : « From: Daniel Okafor <d.okafor@brentfield-eng.example> To: Events Team, Harbourline Hotel Subject: Group booking request – 14–16 May Dear Events Team, I am writing on behalf of Brentfield Engineering to ask about accommodation and a meeting room for our regional sales conference. We expect 22 participants, who will arrive on the evening of 14 May and leave after lunch on 16 May. We would need 22 single rooms for two nights, a meeting room for 25 people on 15 May from 9 am to 5 pm, and lunch for the group on both days. A projector and a flipchart would also be essential. Could you please send us a quotation, including your cancellation policy, by Friday 4 April? Our finance department needs to approve the budget before the end of next week, so we cannot wait longer than this. If you have any questions about our requirements, please contact my assistant, Leila Moreau, on 01632 960 418, as I will be travelling until Wednesday. Kind regards, Daniel Okafor Sales Operations Manager » — By when should the hotel send its reply?",
+     "options": [
+      "By the end of next week",
+      "By 14 May",
+      "By Friday 4 April",
+      "By Wednesday"
+     ],
+     "correctIndex": 2,
+     "explication": "La demande est suivie de « by Friday 4 April » : c'est l'échéance. « The end of next week » est la date à laquelle le service financier doit valider le budget, pas le délai de réponse de l'hôtel."
+    },
+    {
+     "question": "Document (email) : « From: Daniel Okafor <d.okafor@brentfield-eng.example> To: Events Team, Harbourline Hotel Subject: Group booking request – 14–16 May Dear Events Team, I am writing on behalf of Brentfield Engineering to ask about accommodation and a meeting room for our regional sales conference. We expect 22 participants, who will arrive on the evening of 14 May and leave after lunch on 16 May. We would need 22 single rooms for two nights, a meeting room for 25 people on 15 May from 9 am to 5 pm, and lunch for the group on both days. A projector and a flipchart would also be essential. Could you please send us a quotation, including your cancellation policy, by Friday 4 April? Our finance department needs to approve the budget before the end of next week, so we cannot wait longer than this. If you have any questions about our requirements, please contact my assistant, Leila Moreau, on 01632 960 418, as I will be travelling until Wednesday. Kind regards, Daniel Okafor Sales Operations Manager » — Why should the hotel contact Leila Moreau?",
+     "options": [
+      "Mr Okafor is travelling until Wednesday",
+      "She is in charge of the finance department",
+      "She will organise the sales conference",
+      "She made a similar booking last year"
+     ],
+     "correctIndex": 0,
+     "explication": "« Please contact my assistant… as I will be travelling until Wednesday » : M. Okafor sera en déplacement. L'option 1 est fausse : le service financier est cité, mais Leila Moreau est son assistante."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Corvane Quality Laboratories From: Helen Brooks, Quality & Safety Manager Date: 2 October Subject: New visitor procedure from 14 October From Monday 14 October, all visitors to the laboratory building must be registered in advance using the online form on the intranet. Visitors who are not on the list will not be allowed past reception. Please complete the form at least 24 hours before the visit. Reception staff will then print a temporary badge, which visitors must wear at all times and return when they leave. Visitors must also be accompanied by a member of staff in all testing areas. This change follows our recent external audit, which recommended stricter control of access to sensitive areas. It will also help us know exactly who is in the building in case of an emergency evacuation. Contractors who already hold a yearly access card are not affected by this procedure. If you have any questions, please contact me on extension 214. » — What is the main purpose of the memo?",
+     "options": [
+      "To announce a change in how visitors are admitted",
+      "To invite staff to an external audit",
+      "To introduce the new reception team",
+      "To report on a recent evacuation"
+     ],
+     "correctIndex": 0,
+     "explication": "L'objet et le premier paragraphe annoncent une nouvelle procédure d'accueil des visiteurs. L'audit (option 1) est la raison du changement, pas l'objet du mémo."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Corvane Quality Laboratories From: Helen Brooks, Quality & Safety Manager Date: 2 October Subject: New visitor procedure from 14 October From Monday 14 October, all visitors to the laboratory building must be registered in advance using the online form on the intranet. Visitors who are not on the list will not be allowed past reception. Please complete the form at least 24 hours before the visit. Reception staff will then print a temporary badge, which visitors must wear at all times and return when they leave. Visitors must also be accompanied by a member of staff in all testing areas. This change follows our recent external audit, which recommended stricter control of access to sensitive areas. It will also help us know exactly who is in the building in case of an emergency evacuation. Contractors who already hold a yearly access card are not affected by this procedure. If you have any questions, please contact me on extension 214. » — What must staff do before a visit?",
+     "options": [
+      "Collect a temporary badge from reception",
+      "Send an email to Helen Brooks",
+      "Book a room in the testing area",
+      "Register the visitor online in advance"
+     ],
+     "correctIndex": 3,
+     "explication": "« Please complete the form at least 24 hours before the visit ». Le badge (option 0) est imprimé par l'accueil, ce n'est pas une action du personnel avant la visite."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Corvane Quality Laboratories From: Helen Brooks, Quality & Safety Manager Date: 2 October Subject: New visitor procedure from 14 October From Monday 14 October, all visitors to the laboratory building must be registered in advance using the online form on the intranet. Visitors who are not on the list will not be allowed past reception. Please complete the form at least 24 hours before the visit. Reception staff will then print a temporary badge, which visitors must wear at all times and return when they leave. Visitors must also be accompanied by a member of staff in all testing areas. This change follows our recent external audit, which recommended stricter control of access to sensitive areas. It will also help us know exactly who is in the building in case of an emergency evacuation. Contractors who already hold a yearly access card are not affected by this procedure. If you have any questions, please contact me on extension 214. » — Who does NOT have to follow the new procedure?",
+     "options": [
+      "Visitors going into testing areas",
+      "Contractors with a yearly access card",
+      "New members of staff",
+      "External auditors"
+     ],
+     "correctIndex": 1,
+     "explication": "« Contractors who already hold a yearly access card are not affected » : « not affected » signale l'exception. Les auditeurs sont mentionnés, mais seulement comme origine du changement."
+    },
+    {
+     "question": "Document (terms and conditions) : « Northgate Uniforms – Terms and conditions of sale (extract) 4. Orders. Orders can be placed online, by email or by telephone. An order is only confirmed when the customer receives an order confirmation by email. 5. Delivery. Standard delivery takes 5 to 7 working days. Embroidered items (with a company logo) require an additional 10 working days. Delivery is free for orders over £250 excluding VAT; otherwise, a charge of £12.50 applies. 6. Returns. Unworn items in their original packaging may be returned within 30 days of delivery for a full refund. Embroidered or personalised items cannot be returned unless they are faulty. 7. Faulty goods. If an item is faulty, the customer must inform Northgate Uniforms within 14 days of delivery and send photographs of the fault. We will replace the item or refund the price, at our choice. 8. Payment. New business customers must pay at the time of ordering. Customers with an approved credit account have 30 days to pay. » — The hotel receives the shirts in perfect condition but no longer wants them. What can it do?",
+     "options": [
+      "Return them within 30 days for a full refund",
+      "Return them within 14 days with photographs",
+      "Ask for them to be replaced free of charge",
+      "Nothing: it cannot return them"
+     ],
+     "correctIndex": 3,
+     "explication": "Les articles brodés « cannot be returned unless they are faulty ». Les chemises ne sont pas défectueuses, donc aucun retour n'est possible. L'option 0 vaut pour les articles non personnalisés."
+    },
+    {
+     "question": "Complétez les consignes de lecture stratégique avec le mot correct (vocabulaire vu en classe virtuelle) : « Before answering, skim the document to understand the main topic. Then read the questions and _____ the text for specific information. Remember that a second language may be an advantage but not essential. In the email, sessions take place in Ashford unless otherwise stated. Places are allocated in order of reply. »",
+     "options": [
+      "skim",
+      "scan",
+      "score",
+      "scroll"
+     ],
+     "correctIndex": 1,
+     "explication": "Pour chercher une information précise, on balaie le texte : « scan »."
+    }
+   ]
+  },
+  {
+   "competence": "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Préparez vos questions d'interview : choisissez le mot qui convient dans chaque liste : « 1. What does your job involve? 2. How long have you worked there? 3. Who do you _____ to? 4. Are you in charge of a team? 5. What are you working on at the moment? »",
+     "options": [
+      "report",
+      "depend",
+      "refer",
+      "answer"
+     ],
+     "correctIndex": 0,
+     "explication": "On dit « report to » pour le supérieur hiérarchique. « depend » se construit avec « on », et « answer to » existe mais est beaucoup plus rare et plus formel dans ce contexte."
+    },
+    {
+     "question": "Choisissez la forme correcte : « I _____ for Northbay Logistics since 2022. »",
+     "options": [
+      "work",
+      "am working",
+      "have worked",
+      "worked"
+     ],
+     "correctIndex": 2,
+     "explication": "« since » + situation toujours vraie : present perfect. « I work here since » est un calque du français."
+    },
+    {
+     "question": "Choisissez la préposition correcte : « She is responsible _____ training new receptionists. »",
+     "options": [
+      "for",
+      "of",
+      "to",
+      "about"
+     ],
+     "correctIndex": 0,
+     "explication": "On dit « responsible for » + -ing. « responsible of » est une erreur fréquente des francophones."
+    },
+    {
+     "question": "Choisissez le verbe qui convient : « I _____ to the plant manager, Mr Hassan. »",
+     "options": [
+      "depend",
+      "inform",
+      "lead",
+      "report"
+     ],
+     "correctIndex": 3,
+     "explication": "« report to someone » = dépendre hiérarchiquement de quelqu'un. « depend » demanderait « on » et n'exprime pas le lien hiérarchique."
+    },
+    {
+     "question": "Choisissez la forme correcte : « At the moment, our team _____ a new booking system. »",
+     "options": [
+      "tests",
+      "is testing",
+      "has tested",
+      "tested"
+     ],
+     "correctIndex": 1,
+     "explication": "« At the moment » indique une action en cours : présent continu. « has tested » présenterait l'action comme terminée."
+    },
+    {
+     "question": "Choisissez la forme correcte : « The company _____ in 1998 by two engineers. »",
+     "options": [
+      "founded",
+      "has founded",
+      "was founded",
+      "is founded"
+     ],
+     "correctIndex": 2,
+     "explication": "L'entreprise subit l'action et la date est passée : passif au prétérit « was founded ». « founded » seul voudrait dire que l'entreprise a fondé quelque chose."
+    },
+    {
+     "question": "Complétez les phrases d'opinion avec le mot correct : « A: I _____ with you completely. B: I'm not sure that's the best solution. C: From my point of view, it's too expensive. D: You may be right, but we need more data first. »",
+     "options": [
+      "accept",
+      "agree",
+      "approve",
+      "admit"
+     ],
+     "correctIndex": 1,
+     "explication": "« I agree with you » = je suis d'accord avec vous. « accept » ne se construit pas avec « with »."
+    },
+    {
+     "question": "Complétez les phrases d'opinion avec le mot correct : « A: I agree with you completely. B: I'm not _____ that's the best solution. C: From my point of view, it's too expensive. D: You may be right, but we need more data first. »",
+     "options": [
+      "surely",
+      "safe",
+      "sure",
+      "sured"
+     ],
+     "correctIndex": 2,
+     "explication": "« I'm not sure (that)… » = je ne suis pas sûr que… « surely » est un adverbe."
+    },
+    {
+     "question": "Complétez les phrases d'opinion avec le mot correct : « A: I agree with you completely. B: I'm not sure that's the best solution. C: From my _____ of view, it's too expensive. D: You may be right, but we need more data first. »",
+     "options": [
+      "side",
+      "point",
+      "place",
+      "part"
+     ],
+     "correctIndex": 1,
+     "explication": "Expression figée : « from my point of view » = de mon point de vue."
+    },
+    {
+     "question": "Complétez les phrases d'opinion avec le mot correct : « A: I agree with you completely. B: I'm not sure that's the best solution. C: From my point of view, it's too expensive. D: You may be _____, but we need more data first. »",
+     "options": [
+      "true",
+      "reason",
+      "right",
+      "correct about"
+     ],
+     "correctIndex": 2,
+     "explication": "« You may be right » = vous avez peut-être raison. On ne dit pas « you are true » (calque de « c'est vrai »)."
+    }
+   ]
+  },
+  {
+   "competence": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. For example, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly _____ the new ticketing tool, which sorts requests automatically. Although the results are positive, phone waiting times are still too long. This is partly because two team members were on leave during the busiest week. We have therefore decided to recruit a temporary assistant for the summer. Overall, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "because",
+      "despite",
+      "due to",
+      "so"
+     ],
+     "correctIndex": 2,
+     "explication": "« due to » + nom (the new ticketing tool) exprime la cause. « because » doit être suivi d'un sujet et d'un verbe, ou de « because of »."
+    },
+    {
+     "question": "Document (email (learner draft)) : « Learner draft – task: reply to a customer who complained about a late delivery (150 words minimum) Hi, I received your email. The delivery was late. The truck had a problem. The truck arrived on Tuesday. We are sorry. We will give you a discount. The discount is 10%. Send me your order number. Thanks Ryan » — Which version of sentences 2 to 4 is the most cohesive?",
+     "options": [
+      "The delivery was late. The truck had a problem and the truck arrived on Tuesday.",
+      "Although the delivery was late, the truck had a problem on Tuesday.",
+      "The delivery was late because our truck broke down, so it only arrived on Tuesday.",
+      "The delivery was late, however the truck had a problem, so arrived on Tuesday."
+     ],
+     "correctIndex": 2,
+     "explication": "« because » donne la cause, « so » la conséquence, et « it » évite la répétition de « the truck ». La version avec « Although » crée un contraste illogique, et la dernière utilise « however » après une virgule sans sujet ensuite."
+    },
+    {
+     "question": "Choisissez le mot de liaison adapté : « _____ the heavy traffic, the delivery arrived on time. »",
+     "options": [
+      "Despite",
+      "Although",
+      "However",
+      "Even"
+     ],
+     "correctIndex": 0,
+     "explication": "« the heavy traffic » est un groupe nominal : il faut « Despite ». « Although » exigerait un sujet et un verbe (Although the traffic was heavy)."
+    },
+    {
+     "question": "Choisissez le verbe introducteur correct pour un compte rendu : « At the meeting, Mr Chen _____ that the marketing budget should be reduced. »",
+     "options": [
+      "agreed to",
+      "suggested",
+      "told",
+      "asked to"
+     ],
+     "correctIndex": 1,
+     "explication": "« suggest that + sujet + should/verbe » est correct. « told » exige un complément de personne (told us that) et « agreed to » est suivi d'une base verbale."
+    },
+    {
+     "question": "Complétez cet email de relance en choisissant la formule correcte dans chaque liste : « Subject: Follow-up: delivery schedule for order 4471 Dear Mr Lindqvist, I am just _____ up on my email of 2 October regarding the delivery schedule for order 4471. I wonder if you have had a chance to check the dates with your warehouse. Our production team needs the parts by 20 October at the latest, so I would be grateful if you could confirm the schedule this week. I look forward to hearing from you. Kind regards, Amira Haddad »",
+     "options": [
+      "writing",
+      "looking",
+      "following",
+      "coming"
+     ],
+     "correctIndex": 2,
+     "explication": "L'expression figée est « to follow up on something » : I am just following up on my email… « writing up » signifierait rédiger au propre."
+    },
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. _____, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly due to the new ticketing tool, which sorts requests automatically. Although the results are positive, phone waiting times are still too long. This is partly because two team members were on leave during the busiest week. We have therefore decided to recruit a temporary assistant for the summer. Overall, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "However",
+      "For example",
+      "Although",
+      "Therefore"
+     ],
+     "correctIndex": 1,
+     "explication": "La phrase illustre l'amélioration annoncée avec un chiffre : c'est un exemple. « However » introduirait une opposition qui n'existe pas ici."
+    },
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. For example, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly due to the new ticketing tool, which sorts requests automatically. _____ the results are positive, phone waiting times are still too long. This is partly because two team members were on leave during the busiest week. We have therefore decided to recruit a temporary assistant for the summer. Overall, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "Despite",
+      "However",
+      "In addition",
+      "Although"
+     ],
+     "correctIndex": 3,
+     "explication": "« Although » + proposition complète (the results are positive) exprime le contraste. « Despite » serait suivi d'un nom : Despite the positive results."
+    },
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. For example, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly due to the new ticketing tool, which sorts requests automatically. Although the results are positive, phone waiting times are still too long. _____ two team members were on leave during the busiest week. We have therefore decided to recruit a temporary assistant for the summer. Overall, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "As a result,",
+      "This is partly because",
+      "In contrast,",
+      "Despite this,"
+     ],
+     "correctIndex": 1,
+     "explication": "La phrase explique la cause des longues attentes au téléphone. « As a result » présenterait l'absence des collègues comme une conséquence, ce qui inverse la logique."
+    },
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. For example, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly due to the new ticketing tool, which sorts requests automatically. Although the results are positive, phone waiting times are still too long. This is partly because two team members were on leave during the busiest week. We have _____ decided to recruit a temporary assistant for the summer. Overall, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "however",
+      "although",
+      "therefore",
+      "moreover"
+     ],
+     "correctIndex": 2,
+     "explication": "Le recrutement est la conséquence du problème : « We have therefore decided ». « moreover » ajouterait une idée sans lien de conséquence."
+    },
+    {
+     "question": "Complétez ce point mensuel avec le mot de liaison qui correspond à la relation logique entre les idées : « Monthly update – Customer service team Response times improved in May. For example, the team answered 92% of emails within 24 hours, compared with 81% in April. This progress is mainly due to the new ticketing tool, which sorts requests automatically. Although the results are positive, phone waiting times are still too long. This is partly because two team members were on leave during the busiest week. We have therefore decided to recruit a temporary assistant for the summer. _____, the team is on the right track, but we need to keep an eye on the phone line. »",
+     "options": [
+      "Firstly",
+      "Overall",
+      "For instance",
+      "Whereas"
+     ],
+     "correctIndex": 1,
+     "explication": "La dernière phrase fait le bilan : « Overall » (dans l'ensemble). « Firstly » ouvre une énumération, il ne conclut pas."
+    }
+   ]
+  }
+ ],
+ "questionsOuvertesDebut": [
+  {
+   "question": "Describe a problem you had at work. What happened, what did you do to solve it, and what did you learn from it?",
+   "reponseAttendue": "Last year, I was responsible for organising a training day for twenty new employees. Two days before the event, the trainer called me to say she was ill and couldn't come. At first I panicked, because the programme was already printed and everyone had booked the day. So I contacted two experienced colleagues, and they agreed to run the morning session. Then I asked the training company to send a replacement for the afternoon, and they found someone the same day. In the end, the feedback was very positive. What I learned is that you should always have a plan B, so now I keep a list of internal colleagues who can step in at short notice."
+  },
+  {
+   "question": "Your team is moving to a new office next month. Write an email to your colleagues to explain the move. Include: the date and the new address, what they need to do before the move, and what will be different in the new office. (Rappel : écrivez un courriel structuré à vos collègues, au moins 150 mots, en traitant les trois points demandés.)",
+   "reponseAttendue": "Subject: Our move to the new office on 14 November\n\nHi everyone,\n\nAs you know, our team is moving to a new office next month. I'd like to give you some practical information so that the move goes smoothly.\n\nThe move will take place on Friday 14 November. From Monday 17 November, we will work at 25 Harbour Street, on the fourth floor. The building is a ten-minute walk from Central Station, and there is a car park behind it.\n\nBefore the move, please do three things. First, clear your desk and put your personal items in the boxes that Facilities will deliver on 10 November. Second, label every box with your name and team. Finally, save all your files on the shared drive, because our computers will be reset.\n\nThere will also be some changes in the new office. We will not have fixed desks any more, so you will need to book a desk using the new app. However, there will be four meeting rooms instead of one, and a much bigger kitchen.\n\nIf you have any questions, please let me know.\n\nBest regards,\nClaire"
+  },
+  {
+   "question": "Please introduce yourself. Tell us your name, what you do, where you work and what you do on a typical working day.",
+   "reponseAttendue": "Hello, my name is Karim Benali. I'm a sales assistant at Delta Home, a company that sells kitchen equipment. I work in our office in Lille. On a typical day, I start at half past eight. First, I read my emails and answer questions from customers. Then I prepare quotes and send them to our clients. In the afternoon, I often call customers to check their orders. I like my job because I speak to a lot of different people."
+  },
+  {
+   "question": "Some companies are asking employees to return to the office full-time, while others are keeping remote work. What is your opinion on remote work? Give reasons and examples to support your view.",
+   "reponseAttendue": "In my view, a hybrid model is clearly the most effective option, although I don't think there's a single answer for every company. On the one hand, remote work has real advantages. People save time on commuting, and for tasks that need concentration, such as writing a report or analysing data, working from home is often more productive. In my previous job, our team actually completed projects faster after we introduced two remote days a week. On the other hand, full-time remote work has hidden costs. New employees learn a lot simply by listening to experienced colleagues, and that's much harder over video calls. Creativity also suffers: many good ideas come from informal conversations that never happen online. That said, forcing everyone back to the office five days a week sends a message of mistrust and may push talented people to leave. So I'd argue that the best approach is to agree on shared office days for collaboration and leave the rest flexible. What matters is not where people work, but whether the organisation of work is clear and fair."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — New date of the induction day:",
+   "reponseAttendue": "9 May / 9th May / May 9 / May 9th / the ninth of May / ninth of May / 9/5 / 09/05. « It's now on the ninth of May, not the second » : le 9 mai remplace le 2 mai."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Start time:",
+   "reponseAttendue": "8:30 / 8.30 / 08:30 / 8h30 / half past eight / 8:30 am / 8.30 am. « Half past eight » = 8 h 30."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Name of the room:",
+   "reponseAttendue": "Atlas / Atlas Room / the Atlas Room / atlas. La salle s'appelle « the Atlas Room », au troisième étage."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Order number:",
+   "reponseAttendue": "4729 / 4 7 2 9 / 4-7-2-9. Le numéro est épelé chiffre par chiffre : four, seven, two, nine = 4729."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Delivery day:",
+   "reponseAttendue": "Tuesday / tuesday / on Tuesday. « We'll deliver it on Tuesday » : la livraison a lieu mardi."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Sam's extension number:",
+   "reponseAttendue": "315 / 3 1 5 / three one five. « Extension three one five » = poste 315."
+  }
+ ],
+ "questionsOuvertesFin": [
+  {
+   "question": "Your manager wants to replace the weekly team meeting with a short written update sent by email. Do you agree with this idea? Give your opinion and at least two reasons.",
+   "reponseAttendue": "In my view, a written update is useful, but it can't completely replace the weekly meeting. First, when we meet, we can solve problems immediately. If someone has a question about a client or a delivery, we answer it in two minutes, instead of sending ten emails. Also, the meeting is important for team spirit. New colleagues can ask questions and get to know the team. On the other hand, I agree that some meetings are too long. So I would suggest a compromise: a short email update on Monday, and a twenty-minute meeting on Thursday only for the important topics."
+  },
+  {
+   "question": "In a team meeting, a colleague proposes closing the reception desk of your medical centre from 12 to 1 pm every day so that all receptionists can have lunch together. You disagree. Politely explain why and suggest an alternative.",
+   "reponseAttendue": "I see your point, and I agree that we all need a proper lunch break. However, I'm afraid I don't think closing the desk is the best solution. Many patients come at lunchtime because they work in the morning, and some of them arrive for appointments at half past twelve. If the desk is closed, they will have to wait outside, and we may receive complaints. What if we organised staggered breaks instead? For example, two receptionists could have lunch from twelve to half past twelve, and the other two from half past twelve to one. That way, the desk stays open and everyone still gets a break."
+  },
+  {
+   "question": "In a meeting, your hotel manager says: 'We need to improve the check-in process before the summer, so I'd like a few ideas from the reception team soon.' The instruction is not clear to you. Ask at least two questions to clarify it, then rephrase what you have understood.",
+   "reponseAttendue": "Sorry, could I ask a couple of questions to make sure I understand? First, what do you mean by 'soon'? Do you need our ideas this week, or before the end of the month? And how would you like to receive them: by email, or should we present them at the next meeting? Also, is there a budget for new equipment, like a check-in tablet, or should our ideas be free of cost? So, if I understand correctly, you want each receptionist to suggest a few ideas to make check-in faster before the summer, and you'd like them by a date we'll agree on today. Is that right?"
+  },
+  {
+   "question": "You are the supervisor of the reception team at a medical centre. Tomorrow, a new online appointment booking system starts. Open a short team briefing: state the objective, explain how the briefing will be organised (two or three steps) and say clearly what you expect from each team member.",
+   "reponseAttendue": "Good morning, everyone, and thanks for coming. This briefing will take about ten minutes. As you know, our new online booking system starts tomorrow, so the purpose of this briefing is to make sure we are all ready on day one. First, I'll show you the three main screens of the system. Then, Amina will explain what to say to patients who still want to book by phone. Finally, we'll organise the first week. Now, my expectations. By the end of today, I need each of you to log in once and check that your password works. Tomorrow, Amina and Joe will start at eight to help patients at the self-service screen, and the others will start at the usual time. If a patient has a problem, please note it in the shared file, and we'll review all the problems together on Friday. Any questions? OK, let's wrap up. Thanks, everyone."
+  },
+  {
+   "question": "You are chairing a 15-minute meeting at Lindenbrook Logistics about reducing late deliveries. Open the meeting (aim, agenda, timing), invite one colleague to present an idea, react briefly, and then close the meeting by summarising the decision, who is responsible and the next date.",
+   "reponseAttendue": "Good morning, everyone, and thanks for joining. Let's get started, because we only have fifteen minutes. The aim of this meeting is to agree on one simple action to reduce late deliveries, which went up by nine per cent this quarter. There are three items on the agenda. First, Amira will present her idea. Then, we'll discuss it together. Finally, we'll decide who does what. Amira, would you like to start? … Thank you, Amira. So, if I understand correctly, you suggest loading the trucks thirty minutes earlier. Tom, what do you think? … That's a fair point about the staff. What if we only tested it on the two longest routes? … Good, I think we agree. Let's sum up. We'll test earlier loading on two routes for two weeks, starting next Monday. Tom will collect the delivery times every Friday, and Amira will find volunteers in the loading team. We'll review the results on the fourteenth. Does anyone have any other business? No? Then thank you all for your time."
+  },
+  {
+   "question": "You work for Oakridge Supplies. Reply to Priya Raman's email (exercise 1). Thank her for her request, confirm that the chairs and tables are available in grey but that the reception desks only exist in white or light oak, give the usual delivery time (three weeks) and the installation cost (£450, included in the attached quotation), and ask for the address of the new clinic and a contact person on site. Write at least 150 words. — Rappel : répondez à tous les points dans l'ordre de la demande et terminez par l'action attendue.",
+   "reponseAttendue": "Subject: RE: Request for quotation – waiting room furniture\n\nDear Ms Raman,\n\nThank you for your email of 4 March and for your interest in Oakridge Supplies. I am pleased to send you our quotation for the furniture for your new clinic in Leeds.\n\nFirst, I can confirm that the chairs and the low tables in our Harbour range are available in grey. However, the reception desks are only available in white or light oak at the moment. Could you let me know which colour you would prefer?\n\nDelivery usually takes three weeks from the date of your order, so the furniture would arrive well before your opening in June. Our team can also install everything on the day of delivery. Installation costs £450 and is included in the attached quotation.\n\nIn order to plan the delivery, could you please send me the full address of the new clinic and the name of a contact person on site?\n\nIf you have any questions, I would be happy to discuss the quotation by phone this week.\n\nI look forward to hearing from you.\n\nKind regards,\nMarcus Bell\nSales Adviser, Oakridge Supplies"
+  },
+  {
+   "question": "You are a project coordinator at Corvan Engineering. The installation of a new production line at your client's site, Delmont Packaging, will be two weeks late because a supplier delivered faulty parts. Write an email to your client contact, Ms Grant, to explain the delay and its causes, describe the consequences, and propose two solutions. Ask her to choose one by Friday. Use at least six different linking words. Write at least 150 words. — Rappel : un paragraphe par idée (annonce, cause, conséquence, solutions, demande).",
+   "reponseAttendue": "Subject: Installation of the new production line – revised schedule\n\nDear Ms Grant,\n\nI am writing to inform you that the installation of your new production line will be delayed by two weeks. I am very sorry for the inconvenience this will cause.\n\nThe main reason for the delay is a problem with one of our suppliers. Last week, it delivered a batch of control panels which did not pass our quality tests. As a result, we had to return them and order new ones. The replacement parts will arrive on 12 November, so our engineers can start the installation on 15 November instead of 1 November.\n\nWe understand that this delay may affect your production plans. For this reason, we would like to propose two solutions. Firstly, our team could work on Saturdays in order to finish the testing phase faster. Secondly, we could lend you one of our mobile packaging units until the new line is ready. However, the second option would need some space in your warehouse.\n\nCould you let me know which option you prefer by Friday?\n\nKind regards,\nJulien Moreau\nProject Coordinator, Corvan Engineering"
+  },
+  {
+   "question": "You are the office manager at Pellow & Hart, an architecture firm of 35 people. The firm is moving to new offices in three weeks. Write a preparatory email for a planning meeting with the team leaders. Include the practical details (date, time, place), the objectives of the meeting, an agenda of four or five items with a person responsible and a duration for each, what participants must prepare, and the expected outcomes. Write at least 150 words. — Rappel : objectifs avec verbes d'action, agenda en groupes nominaux, attendus précis.",
+   "reponseAttendue": "Subject: Planning meeting – office move, Thursday 14 March\n\nDear team leaders,\n\nAs you know, we are moving to our new offices on Harbour Street on 5 April. To make sure the move goes smoothly, I would like to invite you to a planning meeting on Thursday 14 March from 2:00 to 3:30 pm in the large meeting room.\n\nObjectives\nThe aim of the meeting is to agree on the timetable for the move, to decide who will be responsible for each task and to identify possible risks for our clients.\n\nAgenda\n1. Timetable for the move and key dates – Laura (20 min)\n2. Packing and IT equipment – Kevin (25 min)\n3. Seating plan in the new offices – all (20 min)\n4. Communication with clients – Ahmed (15 min)\n5. Any other business (10 min)\n\nPreparation\nBefore the meeting, please check with your team which documents can be archived and which equipment must be moved first. In addition, please read the seating plan attached to this email.\n\nExpected outcomes\nBy the end of the meeting, we should have a complete action plan with names and deadlines.\n\nPlease confirm your attendance by Tuesday.\n\nBest regards,\nClaire Benson\nOffice Manager"
+  },
+  {
+   "question": "You work for Tidewell Outdoor, a company that sells camping equipment. Last week, your company took part in a trade fair in Munich for the first time. Write a short lessons-learned report for your manager, Mr Hollis. Explain what went well (with figures), what did not go so well and why, and give at least two recommendations for next year. Write at least 150 words. — Rappel : prétérit pour les faits, present perfect pour le bilan actuel, ton factuel et constructif.",
+   "reponseAttendue": "Subject: Lessons learned – Outdoor Trade Fair, Munich\n\nDear Mr Hollis,\n\nAs requested, here is a short review of our first participation in the Outdoor Trade Fair in Munich last week.\n\nWhat went well\nOur stand was in a good location near the main entrance, so we had a lot of visitors. In total, we collected 140 contacts, including 25 potential distributors. In addition, the demonstration of our new lightweight tent attracted a lot of attention, and we have already received three requests for samples.\n\nWhat did not go so well\nHowever, we did not bring enough brochures and we ran out on the second day. Moreover, only two members of our team spoke German, which made some conversations difficult. Finally, the stand was booked late, so it cost 20% more than the standard price.\n\nRecommendations\nNext year, I suggest that we book the stand before the end of December in order to get the early-booking price. We should also print at least 1,000 brochures and include one German-speaking sales representative in the team.\n\nI would be happy to discuss these points at our next team meeting.\n\nBest regards,\nEva Lindholm\nMarketing Assistant"
+  },
+  {
+   "question": "Describe a tool or a piece of software that you use at work or in your studies. Explain what you use it for and why it is useful.",
+   "reponseAttendue": "The tool I use most at work is a shared online calendar. I work as a planner in a logistics company, so I use it every day to organise deliveries and meetings. The main reason it's useful is that everyone in the team can see the same information in real time. For example, when a driver is delayed, I just move the delivery in the calendar, and the warehouse team sees the change immediately. Before, we used emails and phone calls, and information was often lost. Another advantage is that I can set reminders, so I don't forget important deadlines. However, it only works if everyone updates it regularly. So, overall, it saves us a lot of time and reduces mistakes."
+  }
+ ],
+ "exercices": [
+  {
+   "titre": "Expression orale — B1-M1-L1-I4 (B1.1)",
+   "consigne": "Please introduce yourself. What is your job, and what are your main responsibilities?\nPréparation 30 s, réponse orale de 60 s.\nCritères : Donne son nom, son entreprise (ou son secteur) et son poste. ; Cite au moins deux responsabilités avec des verbes précis (in charge of, deal with, look after…). ; Emploie le present perfect avec for/since pour l'ancienneté. ; Parle de façon fluide pendant au moins 45 secondes, sans longues pauses..",
+   "reponseAttendue": "Hello, I'm Karim Benali. I work for Greenfield Facility Services, a cleaning and maintenance company near Marseille. I'm a site supervisor in the operations department, and I've been in this position for almost three years. I'm in charge of a team of fifteen people who clean offices and shops. Every morning, I check the schedules and I deal with any problems, for example when someone is ill. I also look after two important customers, a bank and a shopping centre, so I visit their sites every week. At the moment, I'm working on a new quality checklist for my team. I really like my job because every day is different.",
+   "points": 10
+  },
+  {
+   "titre": "Email — B1-M1-L4-I3 (B1.2)",
+   "consigne": "You have just started a new job as purchasing assistant at Kestrel Office Supplies, a company that sells office furniture to businesses. Write an email to Mr David Okafor, sales manager at Lumen Paper Ltd, your new paper supplier. Introduce yourself and your role, explain that you will be his main contact for orders, mention your first order (reference KOS-2281, needed by 20 May), and suggest a short phone call next week. Write at least 150 words.\n\nRappel : présentez-vous, expliquez votre rôle, mentionnez la commande et sa date, proposez un appel avec deux créneaux, puis concluez poliment.\n150 mots minimum, en 30 minutes.\nCritères : Respect de la consigne : les quatre informations demandées sont présentes (présentation, rôle, commande KOS-2281 et date, proposition d'appel). ; Structure : objet, salutation, paragraphes distincts, formule finale et signature. ; Cohérence et cohésion : au moins trois mots de liaison pertinents. ; Contrôle grammatical : temps corrects (present perfect, futur avec will), prépositions, -ing après look forward to. ; Vocabulaire professionnel adapté et registre poli sans contractions. ; Longueur : au moins 150 mots..",
+   "reponseAttendue": "Subject: Introduction – new purchasing assistant at Kestrel Office Supplies\n\nDear Mr Okafor,\n\nI am writing to introduce myself. My name is Nadia Cherif and I have recently joined Kestrel Office Supplies as a purchasing assistant in our Nantes office. I work in a team of four people, and I report to our purchasing manager, Claire Fontaine.\n\nFrom now on, I will be your main contact for all our paper orders. I will also deal with any questions about invoices and deliveries, so please do not hesitate to contact me directly.\n\nI am pleased to confirm that we have placed our first order with Lumen Paper. The reference is KOS-2281, and we need the goods by 20 May at the latest, as we are preparing a large delivery for one of our customers.\n\nIn addition, I would like to arrange a short phone call next week to discuss our future needs and your delivery process. Would Tuesday morning or Thursday afternoon suit you?\n\nI look forward to working with you.\n\nKind regards,\n\nNadia Cherif\nPurchasing Assistant, Kestrel Office Supplies\n+33 2 40 00 00 00",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M1-L2-I4 (B1.2)",
+   "consigne": "Describe the company or organisation you work for. What does it do, how big is it, who are its customers, and what tools do you use in your job?\nPréparation 30 s, réponse orale de 90 s.\nCritères : Présente l'activité, la taille, la localisation et les clients (4 informations au minimum). ; Cite au moins deux outils de travail et leur usage (to + verbe). ; Organise le propos avec des connecteurs (first, also, mainly, so, because). ; Prononce correctement les chiffres et parle au moins 60 secondes..",
+   "reponseAttendue": "I work for Swiftline Couriers, a delivery company based in Lille. We were founded in 2015 and we now employ about 180 people, mostly drivers and warehouse staff. We deliver parcels for online shops, so our main customers are small and medium e-commerce businesses in the north of France and in Belgium. Every day, we deliver around six thousand parcels. I work in customer service, and I use two main tools. First, our tracking software, to see where each parcel is in real time. Second, a CRM, to record every call and email from our customers. We also use a chat tool to talk to the drivers quickly when there's a problem. What makes us different is our evening delivery service: customers can receive their parcel until nine p.m., which is very popular.",
+   "points": 10
+  },
+  {
+   "titre": "Email — B1-M5-L1-I3 (B1.1)",
+   "consigne": "You work for Oakridge Supplies. Reply to Priya Raman's email (exercise 1). Thank her for her request, confirm that the chairs and tables are available in grey but that the reception desks only exist in white or light oak, give the usual delivery time (three weeks) and the installation cost (£450, included in the attached quotation), and ask for the address of the new clinic and a contact person on site. Write at least 150 words. — Rappel : répondez à tous les points dans l'ordre de la demande et terminez par l'action attendue.\n150 mots minimum, en 30 minutes.\nCritères : Respect du sujet : tous les points de la consigne sont traités (couleurs, délai, installation, adresse, contact). ; Structure : objet, salutation, raison, corps en paragraphes, action attendue, formule finale. ; Registre neutre-formel cohérent (pas de contractions ni d'abréviations familières). ; Cohésion : mots de liaison variés (first, however, so, also…). ; Contrôle grammatical : présent simple, formules de demande polie, prépositions de temps. ; Au moins 150 mots, rédigés dans le temps imparti..",
+   "reponseAttendue": "Subject: RE: Request for quotation – waiting room furniture\n\nDear Ms Raman,\n\nThank you for your email of 4 March and for your interest in Oakridge Supplies. I am pleased to send you our quotation for the furniture for your new clinic in Leeds.\n\nFirst, I can confirm that the chairs and the low tables in our Harbour range are available in grey. However, the reception desks are only available in white or light oak at the moment. Could you let me know which colour you would prefer?\n\nDelivery usually takes three weeks from the date of your order, so the furniture would arrive well before your opening in June. Our team can also install everything on the day of delivery. Installation costs £450 and is included in the attached quotation.\n\nIn order to plan the delivery, could you please send me the full address of the new clinic and the name of a contact person on site?\n\nIf you have any questions, I would be happy to discuss the quotation by phone this week.\n\nI look forward to hearing from you.\n\nKind regards,\nMarcus Bell\nSales Adviser, Oakridge Supplies",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M1-L3-I3 (B1.2)",
+   "consigne": "Introduce the person you have just interviewed: their name, company, job, main responsibilities, how long they have been there, and one interesting fact about them.\nPréparation 60 s, réponse orale de 90 s.\nCritères : Donne au moins cinq informations exactes sur la personne interviewée. ; Emploie correctement la 3e personne (-s, has, his/her). ; Structure la présentation : ouverture, informations professionnelles, fait marquant, clôture. ; Parle de façon fluide en regardant la caméra, sans lire de phrases complètes..",
+   "reponseAttendue": "I'd like to introduce Nadia Cherif. Nadia works for Kestrel Office Supplies, a company that sells office furniture and equipment to businesses. She's a customer service adviser and she's based in the Nantes office. She has been with the company since 2021. Her job involves answering calls and emails from customers, and she also deals with returns when a product is damaged. She reports to the customer service manager, Mr Garnier. At the moment, she's helping to test a new online chat on the company's website, so she's quite busy. And something interesting about Nadia: before working in customer service, she was a professional basketball player for three years! Thank you, Nadia. Over to you.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M4-L2-I3 (B1.1)",
+   "consigne": "Your manager wants to replace the weekly team meeting with a short written update sent by email. Do you agree with this idea? Give your opinion and at least two reasons.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Position annoncée dès la première phrase (I think / In my view…). ; Au moins deux raisons distinctes, reliées par des connecteurs (first, also, because, so). ; Conclusion qui reprend la position ou propose un compromis. ; Discours fluide, sans longues pauses ni répétitions, pendant au moins 45 secondes. ; Vocabulaire de la réunion et de l'opinion utilisé correctement (I agree, meeting, update…)..",
+   "reponseAttendue": "In my view, a written update is useful, but it can't completely replace the weekly meeting. First, when we meet, we can solve problems immediately. If someone has a question about a client or a delivery, we answer it in two minutes, instead of sending ten emails. Also, the meeting is important for team spirit. New colleagues can ask questions and get to know the team. On the other hand, I agree that some meetings are too long. So I would suggest a compromise: a short email update on Monday, and a twenty-minute meeting on Thursday only for the important topics.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M4-L2-I4 (B1.1)",
+   "consigne": "In a team meeting, a colleague proposes closing the reception desk of your medical centre from 12 to 1 pm every day so that all receptionists can have lunch together. You disagree. Politely explain why and suggest an alternative.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Désaccord introduit par un adoucisseur (I see your point, but… / I'm afraid I don't quite agree). ; Au moins une raison concrète liée au service ou aux usagers. ; Une alternative claire formulée avec What if…? / How about…? / Maybe we could… ; Ton poli et constructif, sans formule brusque (No / You're wrong). ; Discours fluide d'au moins 45 secondes..",
+   "reponseAttendue": "I see your point, and I agree that we all need a proper lunch break. However, I'm afraid I don't think closing the desk is the best solution. Many patients come at lunchtime because they work in the morning, and some of them arrive for appointments at half past twelve. If the desk is closed, they will have to wait outside, and we may receive complaints. What if we organised staggered breaks instead? For example, two receptionists could have lunch from twelve to half past twelve, and the other two from half past twelve to one. That way, the desk stays open and everyone still gets a break.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M4-L3-I4 (B1.2)",
+   "consigne": "In a meeting, your hotel manager says: 'We need to improve the check-in process before the summer, so I'd like a few ideas from the reception team soon.' The instruction is not clear to you. Ask at least two questions to clarify it, then rephrase what you have understood.\nPréparation 20 s, réponse orale de 45 s.\nCritères : Au moins deux questions de clarification précises (délai, format, nombre d'idées, sens d'un mot). ; Formules polies d'introduction (Sorry, could I ask… / What do you mean by…?). ; Une reformulation finale avec So, if I understand correctly / Just to make sure… ; Intonation montante sur les questions de vérification. ; Discours fluide d'au moins 40 secondes..",
+   "reponseAttendue": "Sorry, could I ask a couple of questions to make sure I understand? First, what do you mean by 'soon'? Do you need our ideas this week, or before the end of the month? And how would you like to receive them: by email, or should we present them at the next meeting? Also, is there a budget for new equipment, like a check-in tablet, or should our ideas be free of cost? So, if I understand correctly, you want each receptionist to suggest a few ideas to make check-in faster before the summer, and you'd like them by a date we'll agree on today. Is that right?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M4-L4-I4 (B1.2)",
+   "consigne": "You are the supervisor of the reception team at a medical centre. Tomorrow, a new online appointment booking system starts. Open a short team briefing: state the objective, explain how the briefing will be organised (two or three steps) and say clearly what you expect from each team member.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Accueil et durée annoncés (This briefing will take…). ; Objectif formulé en une phrase claire avec un verbe d'action. ; Déroulé en 2 ou 3 étapes avec marqueurs d'ordre (First, Then, Finally). ; Au moins deux attendus précis indiquant qui, quoi et quand. ; Clôture : invitation aux questions et prochaine étape. ; Discours fluide et structuré pendant au moins 75 secondes..",
+   "reponseAttendue": "Good morning, everyone, and thanks for coming. This briefing will take about ten minutes. As you know, our new online booking system starts tomorrow, so the purpose of this briefing is to make sure we are all ready on day one. First, I'll show you the three main screens of the system. Then, Amina will explain what to say to patients who still want to book by phone. Finally, we'll organise the first week. Now, my expectations. By the end of today, I need each of you to log in once and check that your password works. Tomorrow, Amina and Joe will start at eight to help patients at the self-service screen, and the others will start at the usual time. If a patient has a problem, please note it in the shared file, and we'll review all the problems together on Friday. Any questions? OK, let's wrap up. Thanks, everyone.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B1-M4-L5-I2 (B1.2)",
+   "consigne": "You are chairing a 15-minute meeting at Lindenbrook Logistics about reducing late deliveries. Open the meeting (aim, agenda, timing), invite one colleague to present an idea, react briefly, and then close the meeting by summarising the decision, who is responsible and the next date.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Ouverture complète : accueil, objectif, ordre du jour, durée. ; Distribution explicite de la parole à un participant nommé. ; Réaction polie à l'idée (accord, accord partiel ou demande de précision). ; Résumé final : décision + responsable + échéance. ; Discours structuré, fluide et adapté au rôle d'animateur pendant au moins 90 secondes..",
+   "reponseAttendue": "Good morning, everyone, and thanks for joining. Let's get started, because we only have fifteen minutes. The aim of this meeting is to agree on one simple action to reduce late deliveries, which went up by nine per cent this quarter. There are three items on the agenda. First, Amira will present her idea. Then, we'll discuss it together. Finally, we'll decide who does what. Amira, would you like to start? … Thank you, Amira. So, if I understand correctly, you suggest loading the trucks thirty minutes earlier. Tom, what do you think? … That's a fair point about the staff. What if we only tested it on the two longest routes? … Good, I think we agree. Let's sum up. We'll test earlier loading on two routes for two weeks, starting next Monday. Tom will collect the delivery times every Friday, and Amira will find volunteers in the loading team. We'll review the results on the fourteenth. Does anyone have any other business? No? Then thank you all for your time.",
+   "points": 10
+  }
+ ],
+ "exerciceIntermediaire": {
+  "titre": "Évaluation intermédiaire — 4 productions notées sur 20",
+  "contexte": "Évaluation à mi-parcours (modules B1-M2 à B1-M4) : productions orales et écrites corrigées par le formateur avec les critères de chaque sujet.",
+  "questions": [
+   {
+    "question": "C1 — Compréhension orale (B1.1) — Écoutez l'enregistrement (transcription réservée au formateur : Head housekeeper: Attention, all housekeeping staff. Because of the conference this afternoon, the rooms on the third floor must be ready by twelve thirty instead of two o'clock. Thank you.), puis répondez.\n1. What are the staff asked to do?\nA. Have the third-floor rooms ready earlier\nB. Attend the conference at twelve thirty\nC. Clean the conference room before two o'clock\nD. Move the guests to the third floor",
+    "reponseAttendue": "1. A — Have the third-floor rooms ready earlier. Les chambres doivent être prêtes à 12 h 30 « instead of two o'clock », donc plus tôt que d'habitude. La conférence est seulement la cause du changement : personne ne doit y assister.",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (B1.1) — Écoutez l'enregistrement (transcription réservée au formateur : Warehouse supervisor: Before you load the van, scan every parcel and check that the label matches the delivery note. If it doesn't, put the parcel on the blue shelf and tell Marco.), puis répondez.\n1. What should staff do with a parcel that has the wrong label?\nA. Load it into the van anyway\nB. Scan it a second time\nC. Put it on the blue shelf\nD. Send it back to the customer",
+    "reponseAttendue": "1. C — Put it on the blue shelf. « If it doesn't [match], put the parcel on the blue shelf and tell Marco. » Le scan est demandé pour tous les colis, ce n'est pas l'action spécifique en cas d'erreur.",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (B1.1) — Écoutez l'enregistrement (transcription réservée au formateur : Office manager: Just a reminder that the IT team will update all laptops tonight. Please leave yours switched on and connected to the network before you go home.), puis répondez.\n1. What are employees asked to do?\nA. Bring their laptops to the IT team\nB. Leave their laptops on when they go home\nC. Update their laptops before the evening\nD. Disconnect their laptops from the network",
+    "reponseAttendue": "1. B — Leave their laptops on when they go home. « Please leave yours switched on and connected… before you go home. » C'est l'équipe informatique qui fera la mise à jour, pas les salariés.",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (B1.2) — Écoutez l'enregistrement (transcription réservée au formateur : Safety officer: From Monday, visitors to the production area will no longer need safety boots, but they must still wear a helmet and a high-visibility vest.), puis répondez.\n1. What will change on Monday?\nA. Visitors will have to wear helmets.\nB. Visitors will not be allowed in the production area.\nC. Visitors will have to bring their own vests.\nD. Visitors will not need safety boots any more.",
+    "reponseAttendue": "1. D — Visitors will not need safety boots any more.. « will no longer need safety boots » = ils n'auront plus besoin de chaussures de sécurité. Le casque était déjà obligatoire (« must still wear ») : ce n'est donc pas un changement.",
+    "points": 5
+   }
+  ]
+ },
+ "evaluationFinale": {
+  "titre": "Évaluation finale interne — 4 épreuves (C1 à C4) notées sur 20, au format d'entraînement du VTest",
+  "exercices": [
+   {
+    "titre": "C1 — Compréhension orale (B1.1)",
+    "consigne": "Écoutez l'enregistrement (transcription réservée au formateur : Announcer: Could everyone please make sure their expense reports for October are submitted by Thursday? The finance team closes the monthly accounts on Friday morning, and late claims will be paid next month.), puis répondez.\n1. What is the speaker asking staff to do?\nA. Attend a finance meeting on Friday\nB. Submit their October expense reports by Thursday\nC. Check the monthly accounts with the finance team before Friday\nD. Reduce their travel expenses",
+    "reponseAttendue": "1. B — Submit their October expense reports by Thursday. « make sure their expense reports … are submitted by Thursday » : rendre les notes de frais avant jeudi. « Friday » apparaît dans l'annonce, mais concerne la clôture des comptes par le service financier, pas une réunion.",
+    "points": 5
+   },
+   {
+    "titre": "C2 — Compréhension écrite (B1.2)",
+    "consigne": "Lisez le document, puis répondez.\nFrom: Tomasz Wolny, Account Manager, Greenfold Packaging\nTo: Joy Abara, Purchasing Department, Alder & Finch Cosmetics\nSubject: Changes to our prices from 1 January\n\nDear Ms Abara,\n\nI am writing to let you know that, due to the sharp rise in the cost of recycled cardboard this year, we will have to increase the price of our standard boxes by 6% from 1 January.\n\nHowever, as a long-standing customer, you can still benefit from the current prices on any order placed before 15 December, even if the delivery is scheduled for January or February.\n\nI would also like to suggest a short call to discuss our new lightweight box, which uses 20% less material and could reduce the impact of the increase on your budget.\n\nPlease let me know when you are available next week.\n\nKind regards,\nTomasz Wolny\n1. Why is Greenfold Packaging increasing its prices?\nA. Transport costs have risen\nB. A raw material has become more expensive\nC. A new tax on packaging has been introduced\nD. It is launching a new product\n2. How can Ms Abara avoid the price increase?\nA. By placing her order before 15 December\nB. By accepting delivery before January\nC. By paying in advance\nD. By ordering more than usual\n3. What does Tomasz propose?\nA. A visit to the factory\nB. A discount on all boxes ordered before January\nC. A call about a new product\nD. A meeting in January",
+    "reponseAttendue": "1. B — A raw material has become more expensive. « due to the sharp rise in the cost of recycled cardboard » : le carton recyclé est une matière première. Le nouveau produit est mentionné plus loin, mais n'est pas la cause de la hausse.\n2. A — By placing her order before 15 December. « any order placed before 15 December, even if the delivery is scheduled for January » : c'est la date de commande qui compte, pas la date de livraison. D'où le piège de la deuxième option.\n3. C — A call about a new product. « suggest a short call to discuss our new lightweight box » = un appel pour présenter un produit de remplacement. Aucune remise n'est proposée.",
+    "points": 5
+   },
+   {
+    "titre": "C3 — Expression orale (B1.2)",
+    "consigne": "Your company is thinking of replacing all internal face-to-face meetings with video calls. Do you think this is a good idea? Give your opinion and explain your reasons.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Opinion exprimée clairement dès le début. ; Au moins deux arguments justifiés et un exemple concret. ; Nuance : une limite ou une concession (however, on the other hand). ; Temps de parole : au moins 72 secondes sur 90. ; Connecteurs oraux variés et discours fluide. ; Respect du sujet (réunions internes, pas les réunions clients)..",
+    "reponseAttendue": "In my opinion, replacing some internal meetings with video calls is a good idea, but replacing all of them would be a mistake. First, video calls save a lot of time. In my company, colleagues work on three different sites, so a one-hour meeting often meant two hours of travel. With video calls, we can meet more often and for shorter periods. Second, it's cheaper and better for the environment, because people don't need to drive or take the train. However, some meetings really work better face-to-face. For example, when we start a new project or when there's a conflict in the team, it's much easier to understand each other in the same room. People are also more relaxed and creative. So, overall, I would suggest a mix: video calls for regular updates and short meetings, and face-to-face meetings once a month for important discussions and team building.",
+    "points": 5
+   },
+   {
+    "titre": "C4 — Expression écrite (B1.2)",
+    "consigne": "Your manager would like to organise a team-building day for your department (20 people) next spring. Write an email to your manager to propose an activity. Describe the activity, where and when it could take place, explain why it would be useful for the team, give an approximate cost, and ask for approval. Write at least 150 words. — Rappel : traitez les cinq points dans l'ordre, visez 170 à 200 mots, gardez 5 minutes pour relire.\n150 mots minimum, en 30 minutes.\nCritères : Respect du sujet : activité, lieu et date, utilité, coût et demande d'accord sont présents. ; Respect du temps (30 min) et du minimum de 150 mots. ; Cohérence et cohésion : paragraphes clairs, au moins cinq connecteurs différents. ; Contrôle grammatical : conditionnel pour la proposition (would, could), présent et futur corrects. ; Vocabulaire précis et registre professionnel adapté à un supérieur..",
+    "reponseAttendue": "Subject: Proposal for our team-building day\n\nDear Sarah,\n\nFollowing our discussion at the last team meeting, I would like to propose an activity for our team-building day next spring.\n\nMy suggestion is a cooking workshop at Saltmarsh Kitchen Studio, which is about twenty minutes from the office. The workshop is designed for groups of up to 24 people. Participants work in small teams to prepare a three-course lunch, and then everyone eats together. The best date would be Friday 17 April, as there are no major deadlines that week.\n\nI think this activity would be useful for several reasons. First, people from different units would work together, which is rare in our daily work. In addition, the teams have to plan, share tasks and manage time, so it is a good way to improve communication. Finally, it is a relaxed activity that everyone can enjoy, even people who do not like sport.\n\nThe total cost would be around €1,800, including the lunch and transport by minibus.\n\nCould you let me know by the end of the month if you agree, so that I can book the studio?\n\nBest regards,\nJulia",
+    "points": 5
+   }
+  ],
+  "grille": [
+   {
+    "critere": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais : informations exactes, compréhension ou production adaptée au niveau B1.",
+    "points": 5
+   },
+   {
+    "critere": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais : informations exactes, compréhension ou production adaptée au niveau B1.",
+    "points": 5
+   },
+   {
+    "critere": "C3 — S'exprimer et communiquer à l'oral en anglais : informations exactes, compréhension ou production adaptée au niveau B1.",
+    "points": 5
+   },
+   {
+    "critere": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées : informations exactes, compréhension ou production adaptée au niveau B1.",
+    "points": 5
+   }
+  ]
+ },
+ "sources": {
+  "veille": {
+   "reglementaire": [
+    {
+     "lien": "https://www.francecompetences.fr/recherche/rs/6905/",
+     "titreLien": "France Compétences – RS6905",
+     "titre": "Fiche RS6905 – VTest Business English – 4 Skills (certificateur EXASSESS)",
+     "date": "Novembre 2024",
+     "commentaire": "Enregistrement au Répertoire spécifique le 28/11/2024 pour 3 ans (échéance 28/11/2027, dernière délivrance possible le 27/05/2028). La fiche décrit les 4 compétences évaluées (C1 à C4) et les niveaux A2 à C1 ; le niveau A2 est requis pour valider la certification.",
+     "exploitation": "Preuve : fiche consultée et archivée dans le dossier qualité. Action : programmes, test de positionnement et livret d'accueil alignés sur les 4 compétences et sur le prérequis A2 à la validation."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000049496613",
+     "titreLien": "Légifrance – décret n° 2024-394",
+     "titre": "Décret n° 2024-394 du 29 avril 2024 relatif à la participation obligatoire du titulaire d’un compte personnel de formation",
+     "date": "Avril 2024",
+     "commentaire": "Depuis le 2 mai 2024, le titulaire d'un CPF acquitte une participation forfaitaire lors de l'achat d'une formation, sauf cas d'exonération (demandeurs d'emploi, abondement employeur…).",
+     "exploitation": "Preuve : décret archivé. Action : information du stagiaire sur le reste à charge lors de l'entretien d'entrée et dans les conditions générales de vente."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660",
+     "titreLien": "Légifrance – loi n° 2018-771",
+     "titre": "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel",
+     "date": "Septembre 2018",
+     "commentaire": "La loi fonde l'éligibilité au CPF des certifications enregistrées au RNCP ou au Répertoire spécifique et l'obligation de certification qualité des organismes financés sur fonds publics ou mutualisés.",
+     "exploitation": "Preuve : texte archivé. Action : vérification annuelle de la validité de l'enregistrement RS6905 avant toute ouverture de session financée par le CPF."
+    }
+   ],
+   "metier": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages",
+     "titreLien": "Conseil de l’Europe – CECRL",
+     "titre": "Cadre européen commun de référence pour les langues (CECRL) et son volume complémentaire",
+     "date": "Février 2018",
+     "commentaire": "Le volume complémentaire du CECRL actualise les descripteurs (médiation, interaction en ligne, compétences plurilingues). Le VTest affine l'échelle en 10 niveaux de A2 à C1.",
+     "exploitation": "Preuve : descripteurs utilisés dans la grille de positionnement. Action : objectifs de chaque parcours rédigés avec les descripteurs du niveau visé."
+    },
+    {
+     "lien": "https://candidate.vtest.com/",
+     "titreLien": "Plateforme VTest",
+     "titre": "Espace candidat VTest – passage du test en ligne",
+     "date": "Octobre 2026",
+     "commentaire": "Le test se passe en ligne : compréhension orale et écrite adaptatives, expression orale notée automatiquement, rédaction en 30 minutes avec un nombre minimal de mots selon le niveau (80, 150 ou 200 mots).",
+     "exploitation": "Preuve : description des épreuves reprise dans le livret stagiaire. Action : entraînements chronométrés au format des 4 épreuves en fin de parcours."
+    },
+    {
+     "lien": "https://www.francecompetences.fr/",
+     "titreLien": "France Compétences",
+     "titre": "Répertoire spécifique : liste des organismes préparant à la certification RS6905",
+     "date": "Octobre 2026",
+     "commentaire": "La fiche publie la liste des organismes préparant à la certification ; l'organisme vérifie son inscription et les conditions fixées par le certificateur.",
+     "exploitation": "Preuve : capture de la liste. Action : convention ou accord avec le certificateur tenu à jour dans le dossier qualité."
+    }
+   ],
+   "technologique": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages/level-descriptions",
+     "titreLien": "Conseil de l’Europe – descripteurs",
+     "titre": "Description des niveaux communs de référence du CECRL",
+     "date": "Février 2018",
+     "commentaire": "Les descripteurs « interaction en ligne » et « médiation » s'appliquent aux réunions à distance et aux échanges écrits instantanés, désormais courants en contexte professionnel.",
+     "exploitation": "Preuve : grille d'entraînement à la visioconférence. Action : mises en situation de réunion en ligne intégrées aux classes virtuelles."
+    },
+    {
+     "lien": "https://www.w3.org/TR/WCAG22/",
+     "titreLien": "W3C – WCAG 2.2",
+     "titre": "Web Content Accessibility Guidelines (WCAG) 2.2 – recommandation W3C",
+     "date": "Octobre 2023",
+     "commentaire": "Les ressources audio et vidéo de la plateforme doivent être accompagnées de transcriptions et de sous-titres pour rester accessibles.",
+     "exploitation": "Preuve : transcriptions disponibles pour chaque dialogue et audio. Action : contrôle de la présence des transcriptions à chaque mise à jour des contenus."
+    }
+   ]
+  },
+  "ressources": {
+   "supportsHtml": "<p>• Support de cours du parcours B1 : 36 chapitres (leçons, langue clé, vocabulaire, dialogues traduits, exercices et quiz corrigés)<br>• Fichiers audio des dialogues et des écoutes, avec transcriptions<br>• Modèles de productions écrites et orales commentés</p>",
+   "outilsHtml": "<p>• Plateforme e-learning (leçons, audio, studio oral, atelier d’écriture)<br>• Classe virtuelle (Google Meet ou Zoom)<br>• Plateforme officielle VTest pour le passage du test</p>",
+   "ressourcesComplHtml": "<p>• <strong>Fiche officielle :</strong> francecompetences.fr/recherche/rs/6905/<br>• <strong>CECRL :</strong> coe.int – Cadre européen commun de référence pour les langues<br>• <strong>Test :</strong> candidate.vtest.com</p>",
+   "videos": []
+  }
+ }
+}

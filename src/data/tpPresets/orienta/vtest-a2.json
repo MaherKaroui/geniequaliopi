@@ -1,0 +1,1112 @@
+{
+ "id": "vtest-a2",
+ "titre": "VTest Business English (RS6905) — Parcours A2 — 21 h",
+ "heures": 21,
+ "niveau": "A2",
+ "aliases": [
+  "VTest Business English – 4 Skills (RS6905) — Parcours A2 — 21 h",
+  "Anglais professionnel VTest — Parcours A2 — 21 h",
+  "Parcours A2 — 21 h (VTest RS6905)"
+ ],
+ "programme": {
+  "code": "A2-21H",
+  "level": "A2",
+  "title": "Parcours A2 — 21 h",
+  "subtitle": "Remise à niveau : se débrouiller dans les situations professionnelles simples",
+  "hours": 21,
+  "sync_hours": 2.5,
+  "async_hours": 18.5,
+  "public_target": "Débutants et faux-débutants (logistique, services, back-office, services généraux, accueil) visant le niveau A2, minimum exigé pour valider la certification VTest Business English (RS6905).",
+  "prerequisites": "Aucun niveau minimum à l’entrée ; positionnement obligatoire. Ordinateur ou tablette avec micro et casque, connexion internet stable.",
+  "objectives": [
+   "Se présenter et décrire son poste en phrases simples (C3).",
+   "Comprendre des consignes de travail, annonces et messages vocaux simples (C1).",
+   "Repérer l’information utile dans des messages, notes et documents courts (C2).",
+   "Accueillir, téléphoner et formuler une demande simple au travail (C1, C3).",
+   "Écrire en 30 minutes un message ou un email court d’au moins 80 mots (C4)."
+  ],
+  "modalities": "Formation ouverte et à distance (FOAD) : e-learning asynchrone sur la plateforme (leçons, audio, exercices auto-corrigés, studio oral, atelier d'écriture) et classes virtuelles synchrones avec le formateur.",
+  "accompaniment": "Formateur référent joignable par la messagerie de la plateforme (réponse sous 48 h ouvrées), rendez-vous individuels réservables dans l'agenda, assistance technique par messagerie (catégorie « support technique »).",
+  "means": "Plateforme LMS accessible 24 h/24, ressources audio et PDF téléchargeables, formateur anglophone qualifié (CV et compétences tenus à jour dans la plateforme).",
+  "evaluation": "Positionnement d'entrée ; exercices auto-corrigés et productions corrigées par le formateur ; quiz de fin de module (seuil 70 %) ; simulation d'entraînement aux 4 compétences ; évaluation finale interne ; questionnaires de satisfaction à chaud et à froid. Passage de la certification VTest sur la plateforme officielle d'ExAssess.",
+  "accessibility": "Formation accessible aux personnes en situation de handicap : demande d'aménagement confidentielle dès la candidature, analysée par le référent handicap (police agrandie, contrastes, temps majorés en entraînement, sous-titres et transcriptions). Les aménagements de l'examen officiel relèvent du certificateur.",
+  "modules": [
+   {
+    "code": "A2-M1",
+    "titre": "Se présenter et parler de son poste",
+    "heures": 3,
+    "competences": [
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de se présenter à l'oral en 45 secondes en donnant au moins son nom, son poste, son entreprise et son service.",
+     "À l'issue du module, l'apprenant est capable de décrire sa journée de travail en 60 secondes avec au moins quatre verbes au présent simple et deux expressions de temps.",
+     "À l'issue du module, l'apprenant est capable d'épeler son nom et de donner un numéro de téléphone, une adresse e-mail et une date sans erreur.",
+     "À l'issue du module, l'apprenant est capable de poser au moins quatre questions simples correctement formées pour faire connaissance avec un collègue.",
+     "À l'issue du module, l'apprenant est capable d'écrire en 20 minutes un message de présentation d'au moins 80 mots avec objet, salutation, présentation, tâches, coordonnées et formule finale."
+    ]
+   },
+   {
+    "code": "A2-M2",
+    "titre": "Comprendre des consignes et des messages simples",
+    "heures": 4,
+    "competences": [
+     "C1"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier l'action demandée ou interdite dans une consigne orale simple, avec au moins 4 bonnes réponses sur 5.",
+     "À l'issue du module, l'apprenant est capable de noter sans erreur une heure, une date, un numéro et un nom épelé dans une annonce ou un message vocal.",
+     "À l'issue du module, l'apprenant est capable de répondre à 3 questions sur un dialogue court entre collègues (qui, quoi, où, quand).",
+     "À l'issue du module, l'apprenant est capable de repérer une information dans chaque partie d'un dialogue long ou d'un monologue de 1 minute (accueil, visite de site).",
+     "À l'issue du module, l'apprenant est capable de demander de répéter, d'épeler ou de ralentir à l'aide d'au moins trois expressions de vérification."
+    ]
+   },
+   {
+    "code": "A2-M3",
+    "titre": "Lire des messages, notes et documents courts",
+    "heures": 4,
+    "competences": [
+     "C2"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de dire qui écrit, à qui et pourquoi dans un SMS, un message de chat ou un email court de 50 à 140 mots, en répondant correctement à au moins 70 % des questions.",
+     "À l'issue du module, l'apprenant est capable de repérer dans un email court la demande, la confirmation ou le changement d'horaire annoncé, avec le jour et l'heure exacts.",
+     "À l'issue du module, l'apprenant est capable de retrouver dans une note ou une affiche la règle à respecter, l'interdiction et les horaires d'ouverture.",
+     "À l'issue du module, l'apprenant est capable d'extraire d'un document simple (bon de livraison, planning, menu, fiche produit, petite annonce) une quantité, une date, un prix ou un nom en moins de 30 secondes."
+    ]
+   },
+   {
+    "code": "A2-M4",
+    "titre": "Échanges simples au travail : accueil, téléphone, demandes",
+    "heures": 4,
+    "competences": [
+     "C1",
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'accueillir un visiteur en anglais avec au moins 3 phrases adaptées (salutation, question sur le rendez-vous, indication du chemin).",
+     "À l'issue du module, l'apprenant est capable de noter correctement le nom, le numéro de téléphone et la raison d'un appel dans un message enregistré de 20 à 40 secondes.",
+     "À l'issue du module, l'apprenant est capable de formuler une demande polie avec « Can / Could you… ? » et de proposer son aide avec « Can I help you… ? / Shall I… ? ».",
+     "À l'issue du module, l'apprenant est capable d'expliquer à l'oral en 45 à 60 secondes un problème simple au travail : ce qui se passe, depuis quand, et ce qu'il demande."
+    ]
+   },
+   {
+    "code": "A2-M5",
+    "titre": "Écrire des messages et emails courts",
+    "heures": 4,
+    "competences": [
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de rédiger un email simple d'au moins 80 mots comportant un objet, une salutation adaptée, la raison du message, les informations utiles, une phrase de fin et une formule de politesse.",
+     "À l'issue du module, l'apprenant est capable de demander une information ou un rendez-vous avec au moins deux formules polies et deux créneaux correctement datés (on, at, in).",
+     "À l'issue du module, l'apprenant est capable de confirmer, remercier et s'excuser par écrit en suivant l'ordre excuse – cause – solution.",
+     "À l'issue du module, l'apprenant est capable de laisser à un collègue une note complète (qui, quoi, quand, où, que faire) et de relier ses idées avec au moins quatre mots de liaison différents (and, but, because, so, then)."
+    ]
+   },
+   {
+    "code": "A2-M6",
+    "titre": "Entraînement aux 4 compétences et bilan",
+    "heures": 2,
+    "competences": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de répondre en temps limité à des questions sur une déclaration, des dialogues, un monologue et un message vocal, en repérant au moins 6 informations sur 8.",
+     "À l'issue du module, l'apprenant est capable de retrouver des informations précises dans une affiche, un email et une annonce courte (au moins 5 questions sur 7).",
+     "À l'issue du module, l'apprenant est capable de lire trois textes à voix haute, de répéter six énoncés et de répondre à deux questions ouvertes en utilisant au moins 80 % du temps de parole prévu.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un email de 80 mots minimum, puis de formuler trois objectifs de préparation mesurables à partir de son autoévaluation."
+    ]
+   }
+  ]
+ },
+ "competences": [
+  "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel.",
+  "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel.",
+  "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel.",
+  "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel."
+ ],
+ "besoinsList": [
+  "Situer son niveau d'anglais sur l'échelle du CECRL et viser le niveau A2 exigé pour valider le VTest.",
+  "Se présenter et présenter son poste en phrases simples.",
+  "Comprendre des consignes de travail, des annonces et des messages vocaux simples.",
+  "Repérer l'information utile dans des messages, notes et affichages courts.",
+  "Accueillir un visiteur et identifier sa demande en anglais.",
+  "Téléphoner et prendre un message simple (noms, chiffres, horaires).",
+  "Formuler une demande simple à un collègue ou à un service.",
+  "Écrire un message ou un email court d'au moins 80 mots.",
+  "Gagner en assurance à l'oral malgré un vocabulaire encore limité.",
+  "Se familiariser avec le format des 4 épreuves du VTest."
+ ],
+ "syntheseHtml": "• Parcours A2 (21 h) préparant au VTest Business English – 4 Skills (RS6905, Répertoire spécifique, certificateur EXASSESS, enregistrement du 28/11/2024 au 28/11/2027) ; le test est passé en ligne sur la plateforme VTest, l'organisme assure la préparation.<br>• Les 4 compétences du référentiel sont travaillées : C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais ; C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais ; C3 — S'exprimer et communiquer à l'oral en anglais ; C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées.<br>• 6 modules (32 leçons) : cours, langue clé, vocabulaire, dialogues, exercices auto-corrigés, studio oral et atelier d'écriture corrigés par le formateur, quiz de validation à 70 %.<br>• Le niveau A2 du CECRL est le minimum requis pour valider la certification : le test de positionnement d'entrée oriente vers le parcours adapté.",
+ "adaptationsHtml": "• Niveau de départ fixé par le test de positionnement ; le parcours peut être complété par les leçons du niveau inférieur ou supérieur.<br>• Rythme libre en e-learning, réécoute des audios et reprise des exercices ; classes virtuelles pour l'oral.<br>• Transcriptions et traductions disponibles pour chaque dialogue.<br>• Situation de handicap : le référent handicap étudie les aménagements (police agrandie, contrastes, temps majorés en entraînement, sous-titres) ; les aménagements de l'examen officiel relèvent du certificateur.<br>• Les sujets d'expression orale et écrite peuvent être rapprochés du poste du stagiaire.",
+ "qcmDebut": [
+  {
+   "question": "Transcription de l'écoute : « Receptionist: Good morning, everyone. Room 2A is closed today for cleaning, so the team meeting is in Room 4B at ten o'clock. » — Where is the team meeting today?",
+   "options": [
+    "In Room 2A",
+    "In Room 4B",
+    "In the cafeteria",
+    "At reception"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (notice) : « NOTICE – STAFF CAR PARK From Monday 3 June, the staff car park will be closed for repairs for two weeks. Please park in the visitors' car park on Mill Road. It is five minutes from the main entrance, and your parking card will work there. Please do not park on the street. If you have any questions, contact Facilities on extension 220. » — Why is the staff car park closing?",
+   "options": [
+    "For repairs",
+    "For a staff event",
+    "Because it is full",
+    "Because of new parking cards"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Choisissez le mot ou groupe de mots qui complète correctement le courriel : « Hi Mark, I _____ in the office today because I am ill. I will be back tomorrow. Can you move the team meeting to Thursday, please? Thanks, Julie »",
+   "options": [
+    "not am",
+    "am not",
+    "don't",
+    "isn't"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Transcription de l'écoute : « Lisa: Hi Tom, it's Lisa from Accounts. Can you send me the hotel invoice before Friday, please? I need it for your travel expenses. » — What does Lisa ask Tom to do?",
+   "options": [
+    "Send her an invoice",
+    "Call her back on Friday",
+    "Book a hotel for Friday",
+    "Pay for his travel"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (email) : « From: Anna Berg To: All staff, Kestrel Design Subject: Team lunch on Friday Hi everyone, To say thank you for your hard work this month, we're having a team lunch this Friday at 12:30 at Luigi's, the Italian restaurant opposite the office. The company will pay. Please tell me by Wednesday if you can come and if you have any food allergies. Thanks, Anna » — What is the email about?",
+   "options": [
+    "A training day",
+    "A free meal for the team",
+    "A new client from a restaurant",
+    "A change of office"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez le mot ou groupe de mots qui complète correctement le courriel : « Hi Mark, I am not in the office today because I am ill. I _____ back tomorrow. Can you move the team meeting to Thursday, please? Thanks, Julie »",
+   "options": [
+    "will be",
+    "am be",
+    "was",
+    "be"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Daniel: Hello, Brightway Foods, this is Daniel. How can I help? / Emma: Hi Daniel, it's Emma from Northwind Logistics. Your order of forty boxes will arrive tomorrow, not today. Our truck had a problem. / Daniel: Oh, OK. What time tomorrow? / Emma: Around nine in the morning. Is someone at the warehouse then? / Daniel: Yes, the warehouse opens at eight. That's fine. » — Why is Emma calling?",
+   "options": [
+    "To place an order",
+    "To say a delivery is late",
+    "To ask for a payment",
+    "To cancel her company's order"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (memo) : « MEMO To: Warehouse staff From: Paul Dunne, Site Manager Date: 14 October Re: New working hours From 1 November, the warehouse will open one hour earlier, at 6 a.m., because we now receive more deliveries in the morning. The morning shift will finish at 2 p.m. instead of 3 p.m. The afternoon shift will not change. If the new hours are a problem for you, please speak to your team leader before 25 October. » — Why are the opening hours changing?",
+   "options": [
+    "More deliveries arrive in the morning",
+    "Staff asked for shorter morning shifts",
+    "The warehouse is moving",
+    "There is a new team leader"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Choisissez le mot ou groupe de mots qui complète correctement le courriel : « Hi Mark, I am not in the office today because I am ill. I will be back tomorrow. Can you _____ the team meeting to Thursday, please? Thanks, Julie »",
+   "options": [
+    "moving",
+    "moves",
+    "to move",
+    "move"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Transcription de l'écoute : « Julia: Excuse me, I'm new here. Where can I print documents? / Ben: There's a printer next to the kitchen. You need your staff card to use it. / Julia: I don't have my card yet. HR says it'll be ready on Wednesday. / Ben: No problem. Send the file to me and I'll print it for you today. » — Where is the printer?",
+   "options": [
+    "In the HR office upstairs",
+    "At reception",
+    "Near the lifts",
+    "Next to the kitchen"
+   ],
+   "correctIndex": 3
+  }
+ ],
+ "qcmFin": [
+  {
+   "question": "Transcription de l'écoute : « Nora Price: Excuse me, everyone. The photocopier on the first floor isn't working today, so please use the one next to reception. » — Where should people make copies today?",
+   "options": [
+    "On the first floor",
+    "In the meeting room",
+    "Next to reception",
+    "In the manager's office"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Document (note) : « Hi team, The lift is out of order today. The technician will repair it tomorrow morning. If you need to move heavy boxes, please ask Marc for the small trolley. It is in the storage room on the ground floor. Thanks, Clara » — What should staff do to move heavy boxes today?",
+   "options": [
+    "Ask Marc for a trolley",
+    "Use the lift tomorrow",
+    "Call the lift technician",
+    "Wait until next week"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Choisissez le mot correct : « I am writing _____ confirm your order of 200 boxes. »",
+   "options": [
+    "to",
+    "for",
+    "that",
+    "at"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Tom Reed: Just to let you know, the delivery of the new office chairs is late. It won't arrive on Monday; it will arrive on Thursday. » — When will the chairs arrive?",
+   "options": [
+    "On Monday",
+    "On Tuesday",
+    "On Friday",
+    "On Thursday"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (email) : « Dear Ms Owen, Thank you for your email. I can confirm our meeting on Monday 8 July at 11 am in our office in Leeds. Unfortunately, our car park is closed for building work, so please use the public car park in Station Road. Kind regards, Tim Ward » — What problem does Tim mention?",
+   "options": [
+    "The meeting time has changed",
+    "The office moved to Leeds",
+    "The office car park is closed",
+    "Station Road is closed"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez le bon mot de liaison : « First, open the box. _____, check the items with the delivery note. »",
+   "options": [
+    "Then",
+    "Because",
+    "But",
+    "So"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Adam: Priya, the client from Halden Engineering just emailed. They can't come on Tuesday because their flight was cancelled. / Priya: That's a shame. We'd prepared the factory tour. Did they suggest another date? / Adam: They proposed Thursday afternoon, but you're at the trade fair then, aren't you? / Priya: Yes, until Thursday evening. Could you ask if Friday morning works? I'd really like to be there. / Adam: Sure. I'll also check whether the meeting room is free. » — Why can't the client come on Tuesday?",
+   "options": [
+    "Their flight was cancelled",
+    "The factory is closed",
+    "Priya is on holiday",
+    "The meeting room is booked"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (sms) : « Hi Ana, I'm stuck in traffic on the ring road. I'll be 20 minutes late for the 9 o'clock meeting. Can you start without me and ask Leo to show the sales figures? I'll be there for the second part. Thanks, Raj » — What does Raj ask Ana to do?",
+   "options": [
+    "Cancel the meeting",
+    "Show the sales figures herself",
+    "Wait for him at the ring road",
+    "Start the meeting without him"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez la bonne préposition : « Thank you for your email _____ 3 May. »",
+   "options": [
+    "of",
+    "at",
+    "in",
+    "for"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Finance Officer: Just a reminder that from next Monday, all expense claims must be submitted through the new online portal. Paper forms will no longer be accepted, and claims older than sixty days won't be reimbursed. » — What is changing next Monday?",
+   "options": [
+    "Expense claims will be paid faster",
+    "The reimbursement limit will increase",
+    "Claims must be approved by a manager",
+    "Expense claims must be made online"
+   ],
+   "correctIndex": 3
+  }
+ ],
+ "qcmCompetences": [
+  {
+   "competence": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez les consignes avec le mot qui convient au sens : « 1. It's obligatory: you must wear safety shoes. 2. It's forbidden: you mustn't use your phone near the forklifts. 3. It's not necessary: you _____ wear a tie at the office. 4. Don't park in front of the fire exit! »",
+     "options": [
+      "mustn't",
+      "must",
+      "can't",
+      "don't have to"
+     ],
+     "correctIndex": 3,
+     "explication": "Pas nécessaire = « don't have to ». « mustn't » serait une interdiction."
+    },
+    {
+     "question": "Transcription de l'écoute : « Rosa: Hi, I'm Rosa. I work at the reception desk, on the ground floor. I start at eight and I finish at four. » — Where does Rosa work?",
+     "options": [
+      "In the warehouse office",
+      "At the reception desk",
+      "In the meeting room",
+      "In the staff canteen"
+     ],
+     "correctIndex": 1,
+     "explication": "« I work at the reception desk ». Le rez-de-chaussée (ground floor) est l'endroit où se trouve l'accueil."
+    },
+    {
+     "question": "Transcription de l'écoute : « Daniel: My phone number is oh two, four one, six six, eight three, nine seven. » — What is Daniel's phone number?",
+     "options": [
+      "02 41 66 38 97",
+      "02 14 66 83 97",
+      "02 41 60 83 97",
+      "02 41 66 83 97"
+     ],
+     "correctIndex": 3,
+     "explication": "« oh two, four one, six six, eight three, nine seven » = 02 41 66 83 97. Les autres options inversent ou changent un chiffre."
+    },
+    {
+     "question": "Transcription de l'écoute : « Mr Wright: My surname is Wright. That's W-R-I-G-H-T. » — How do you write the surname?",
+     "options": [
+      "Wright",
+      "Wraight",
+      "Wrigth",
+      "Right"
+     ],
+     "correctIndex": 0,
+     "explication": "W-R-I-G-H-T : le W se dit « double-you » et le I « aï ». « Wrigth » inverse le G et le H."
+    },
+    {
+     "question": "Transcription de l'écoute : « Team leader: Please put the heavy boxes on the bottom shelf, not on the top shelf. » — Where must the heavy boxes go?",
+     "options": [
+      "On the top shelf",
+      "On the bottom shelf",
+      "On the floor",
+      "Next to the door"
+     ],
+     "correctIndex": 1,
+     "explication": "« on the bottom shelf, not on the top shelf » : en bas. « top shelf » est cité après « not »."
+    },
+    {
+     "question": "Transcription de l'écoute : « Receptionist: The lift is out of order today. Please use the stairs on the left of the reception. » — What must people use today?",
+     "options": [
+      "The lift on the left",
+      "The fire exit",
+      "The other lift",
+      "The stairs"
+     ],
+     "correctIndex": 3,
+     "explication": "L'ascenseur est en panne (out of order) : « Please use the stairs ». « on the left » décrit la position de l'escalier, pas d'un ascenseur."
+    },
+    {
+     "question": "Transcription de l'écoute : « Anna: Hello, this is Anna from accounts. The meeting is now on Thursday, not Tuesday. Same time, ten o'clock. » — When is the meeting now?",
+     "options": [
+      "Thursday at 10",
+      "Tuesday at 10",
+      "Thursday at 12",
+      "Tuesday at 12"
+     ],
+     "correctIndex": 0,
+     "explication": "« now on Thursday, not Tuesday » et « Same time, ten o'clock » : jeudi à 10 h."
+    },
+    {
+     "question": "Transcription de l'écoute : « HR assistant: The new uniforms are here. You can collect them from the HR office between one and four. » — When can staff collect their uniforms?",
+     "options": [
+      "Before 1 o'clock",
+      "After 4 o'clock",
+      "Between 1 and 4",
+      "Between 4 and 5"
+     ],
+     "correctIndex": 2,
+     "explication": "« between one and four » : entre 13 h et 16 h."
+    },
+    {
+     "question": "Transcription de l'écoute : « Facility manager: Attention, please: the car park is closed on Saturday for cleaning. Please park in the street. » — Why is the car park closed?",
+     "options": [
+      "For cleaning",
+      "For a delivery",
+      "For repairs",
+      "For a meeting"
+     ],
+     "correctIndex": 0,
+     "explication": "« closed on Saturday for cleaning » : pour le nettoyage."
+    },
+    {
+     "question": "Transcription de l'écoute : « Yard manager: Drivers, please don't leave your trucks at gate three. Use gate five today. » — Which gate must drivers use today?",
+     "options": [
+      "Gate 3",
+      "Gate 13",
+      "Gate 8",
+      "Gate 5"
+     ],
+     "correctIndex": 3,
+     "explication": "« Use gate five today. » La porte 3 est interdite aujourd'hui (don't leave your trucks at gate three)."
+    }
+   ]
+  },
+  {
+   "competence": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Document (notice) : « NEW STAFF – WELCOME DAY Monday 12 October, Meeting Room 2 (first floor) 9:00 – Welcome coffee with the HR team 9:30 – Visit of the warehouse with Paul Martin 11:00 – Your badge and your computer password (IT office) 12:30 – Lunch in the canteen Please bring your ID card and your bank details. Questions? Call Emma on extension 100. » — Where is the welcome coffee?",
+     "options": [
+      "In the canteen",
+      "In the HR manager's office",
+      "In Meeting Room 2",
+      "In the warehouse"
+     ],
+     "correctIndex": 2,
+     "explication": "La journée a lieu en « Meeting Room 2 » et le café est la première activité. La cantine est seulement pour le déjeuner."
+    },
+    {
+     "question": "Document (notice) : « NEW STAFF – WELCOME DAY Monday 12 October, Meeting Room 2 (first floor) 9:00 – Welcome coffee with the HR team 9:30 – Visit of the warehouse with Paul Martin 11:00 – Your badge and your computer password (IT office) 12:30 – Lunch in the canteen Please bring your ID card and your bank details. Questions? Call Emma on extension 100. » — What must new staff bring?",
+     "options": [
+      "Their computer",
+      "Their ID card",
+      "A badge photo",
+      "Their password"
+     ],
+     "correctIndex": 1,
+     "explication": "« Please bring your ID card and your bank details. » Le badge et le mot de passe sont donnés par le service informatique."
+    },
+    {
+     "question": "Document (email) : « From: Bookings – Maple Court Conference Centre To: Daniel Ruiz Subject: Booking confirmed – Room Oak, 5 June Dear Mr Ruiz, I'm writing to confirm your booking of Room Oak for Wednesday 5 June, from 9 am to 1 pm, for 12 people. The room has a screen and a flipchart. Coffee and tea are ready at 8.45. Lunch is not included. The car park is free for our visitors. Please give the registration numbers of your cars to reception when you arrive. If you have any questions, call us on 0141 496 0277. Best regards, Mia Turner Bookings Assistant » — Why does Mia Turner write to Mr Ruiz?",
+     "options": [
+      "To ask for a booking",
+      "To change a booking",
+      "To confirm a booking",
+      "To cancel a booking"
+     ],
+     "correctIndex": 2,
+     "explication": "« I'm writing to confirm your booking » et l'objet « Booking confirmed ». La réservation est déjà faite : ce n'est pas une demande."
+    },
+    {
+     "question": "Document (email) : « From: Bookings – Maple Court Conference Centre To: Daniel Ruiz Subject: Booking confirmed – Room Oak, 5 June Dear Mr Ruiz, I'm writing to confirm your booking of Room Oak for Wednesday 5 June, from 9 am to 1 pm, for 12 people. The room has a screen and a flipchart. Coffee and tea are ready at 8.45. Lunch is not included. The car park is free for our visitors. Please give the registration numbers of your cars to reception when you arrive. If you have any questions, call us on 0141 496 0277. Best regards, Mia Turner Bookings Assistant » — What is NOT included?",
+     "options": [
+      "A screen",
+      "Lunch",
+      "Coffee and tea",
+      "Car parking"
+     ],
+     "correctIndex": 1,
+     "explication": "« Lunch is not included » = le déjeuner n'est pas compris. Le parking est gratuit (free), donc il est inclus."
+    },
+    {
+     "question": "Document (email) : « From: Bookings – Maple Court Conference Centre To: Daniel Ruiz Subject: Booking confirmed – Room Oak, 5 June Dear Mr Ruiz, I'm writing to confirm your booking of Room Oak for Wednesday 5 June, from 9 am to 1 pm, for 12 people. The room has a screen and a flipchart. Coffee and tea are ready at 8.45. Lunch is not included. The car park is free for our visitors. Please give the registration numbers of your cars to reception when you arrive. If you have any questions, call us on 0141 496 0277. Best regards, Mia Turner Bookings Assistant » — What must visitors give to reception?",
+     "options": [
+      "Their car numbers",
+      "The booking reference",
+      "The list of 12 names",
+      "Their parking ticket"
+     ],
+     "correctIndex": 0,
+     "explication": "« Please give the registration numbers of your cars to reception » : les numéros d'immatriculation. Il n'y a pas de ticket : le parking est gratuit."
+    },
+    {
+     "question": "Document (notice) : « REDSTONE DISTRIBUTION – LOADING AREA SAFETY RULES - High-visibility vests must be worn at all times. - Hard hats must be worn when the forklifts are working. - Visitors must stay behind the yellow line. - Do not use your phone when you walk in the loading area. - Keep all fire exits clear. Do not leave pallets or boxes in front of the doors. - If the alarm rings, stop work and go to the assembly point in car park A. Questions? Ask Carla Jones, Health and Safety Officer, ext. 214. » — When must staff wear a hard hat?",
+     "options": [
+      "At all times",
+      "When the forklifts are working",
+      "Only in car park A",
+      "When visitors are in the area"
+     ],
+     "correctIndex": 1,
+     "explication": "« Hard hats must be worn when the forklifts are working » : seulement quand les chariots élévateurs travaillent. « At all times » concerne les gilets, pas les casques."
+    },
+    {
+     "question": "Document (notice) : « REDSTONE DISTRIBUTION – LOADING AREA SAFETY RULES - High-visibility vests must be worn at all times. - Hard hats must be worn when the forklifts are working. - Visitors must stay behind the yellow line. - Do not use your phone when you walk in the loading area. - Keep all fire exits clear. Do not leave pallets or boxes in front of the doors. - If the alarm rings, stop work and go to the assembly point in car park A. Questions? Ask Carla Jones, Health and Safety Officer, ext. 214. » — What is NOT allowed in the loading area?",
+     "options": [
+      "Wearing a vest",
+      "Walking behind the yellow line",
+      "Using a phone while walking",
+      "Asking Carla a question"
+     ],
+     "correctIndex": 2,
+     "explication": "« Do not use your phone when you walk » : le téléphone en marchant est interdit. Rester derrière la ligne jaune est au contraire obligatoire pour les visiteurs."
+    },
+    {
+     "question": "Document (notice) : « REDSTONE DISTRIBUTION – LOADING AREA SAFETY RULES - High-visibility vests must be worn at all times. - Hard hats must be worn when the forklifts are working. - Visitors must stay behind the yellow line. - Do not use your phone when you walk in the loading area. - Keep all fire exits clear. Do not leave pallets or boxes in front of the doors. - If the alarm rings, stop work and go to the assembly point in car park A. Questions? Ask Carla Jones, Health and Safety Officer, ext. 214. » — What must people do if the alarm rings?",
+     "options": [
+      "Call extension 214",
+      "Go to car park A",
+      "Move the pallets",
+      "Stay behind the yellow line"
+     ],
+     "correctIndex": 1,
+     "explication": "« stop work and go to the assembly point in car park A ». Le poste 214 sert seulement à poser des questions sur les règles."
+    },
+    {
+     "question": "Document (email) : « From: Helen Shaw, HR Assistant To: All warehouse staff Subject: New timesheets Dear all, From next month, we will use a new online system for timesheets. You will not need to fill in paper forms any more. Each team leader will receive a short training on Thursday 20 June at 2 pm. Then, team leaders will show the system to their teams. Please send your last paper timesheet by Friday 28 June. If you have any questions, contact me on extension 118. Best regards, Helen Shaw » — What is the email about?",
+     "options": [
+      "A change in working hours",
+      "A training course for all warehouse staff",
+      "A problem with last month's pay",
+      "A new way to record working time"
+     ],
+     "correctIndex": 3,
+     "explication": "Un nouveau système en ligne pour les feuilles de temps = une nouvelle façon d'enregistrer le temps de travail. La formation ne concerne que les chefs d'équipe, pas tout le personnel."
+    },
+    {
+     "question": "Document (email) : « From: Helen Shaw, HR Assistant To: All warehouse staff Subject: New timesheets Dear all, From next month, we will use a new online system for timesheets. You will not need to fill in paper forms any more. Each team leader will receive a short training on Thursday 20 June at 2 pm. Then, team leaders will show the system to their teams. Please send your last paper timesheet by Friday 28 June. If you have any questions, contact me on extension 118. Best regards, Helen Shaw » — Who will go to the training on 20 June?",
+     "options": [
+      "All warehouse staff",
+      "Helen Shaw's assistants",
+      "The team leaders",
+      "New employees only"
+     ],
+     "correctIndex": 2,
+     "explication": "« Each team leader will receive a short training » : les chefs d'équipe. Ils formeront ensuite leurs équipes."
+    }
+   ]
+  },
+  {
+   "competence": "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez le message laissé au service maintenance avec le mot qui convient : « Hi, this is Tariq from the staff kitchen, second floor. The dishwasher is _____ a strange noise, and the tap is leaking. There is water on the floor. The problem started at 9 o'clock. The coffee machine is also out of order. Could you send a technician to fix them today, please? »",
+     "options": [
+      "making",
+      "doing",
+      "having",
+      "giving"
+     ],
+     "correctIndex": 0,
+     "explication": "« to make a noise » = faire un bruit. En anglais, on ne dit pas « do a noise »."
+    },
+    {
+     "question": "Choisissez la forme correcte du verbe be : « She _____ a receptionist at Sunfield Hotel. »",
+     "options": [
+      "are",
+      "is",
+      "am",
+      "be"
+     ],
+     "correctIndex": 1,
+     "explication": "Avec she, he ou it : « is ». « are » s'emploie avec you, we, they."
+    },
+    {
+     "question": "Choisissez l'article correct : « I'm _____ engineer in the technical team. »",
+     "options": [
+      "a",
+      "the",
+      "an",
+      "—"
+     ],
+     "correctIndex": 2,
+     "explication": "« engineer » commence par un son de voyelle : « an engineer ». L'article est obligatoire devant un métier."
+    },
+    {
+     "question": "Choisissez la forme correcte du verbe : « Paul _____ the trucks every morning. »",
+     "options": [
+      "check",
+      "is check",
+      "checking",
+      "checks"
+     ],
+     "correctIndex": 3,
+     "explication": "Habitude (every morning) + Paul = he : présent simple avec -s, « checks »."
+    },
+    {
+     "question": "Choisissez la négation correcte : « We _____ work on Sundays. »",
+     "options": [
+      "doesn't",
+      "don't",
+      "aren't",
+      "not"
+     ],
+     "correctIndex": 1,
+     "explication": "Avec we et un verbe d'action au présent simple : « don't ». « doesn't » est réservé à he, she, it."
+    },
+    {
+     "question": "Choisissez les prépositions correctes : « The meeting is _____ Tuesday at 10:30. »",
+     "options": [
+      "in",
+      "on",
+      "at",
+      "by"
+     ],
+     "correctIndex": 1,
+     "explication": "« on » + jour de la semaine : « on Tuesday »."
+    },
+    {
+     "question": "Choisissez les prépositions correctes : « The meeting is on Tuesday _____ 10:30. »",
+     "options": [
+      "at",
+      "on",
+      "in",
+      "for"
+     ],
+     "correctIndex": 0,
+     "explication": "« at » + heure précise : « at 10:30 »."
+    },
+    {
+     "question": "Complétez l'accueil avec le mot qui convient : « Good morning, _____ to Bluepoint Services. Who are you here to see? … Thank you. Please take a seat. Mr Evans will be with you in a minute. »",
+     "options": [
+      "welcome",
+      "hello",
+      "good",
+      "nice"
+     ],
+     "correctIndex": 0,
+     "explication": "« Welcome to + entreprise » = bienvenue chez…"
+    },
+    {
+     "question": "Complétez l'accueil avec le mot qui convient : « Good morning, welcome to Bluepoint Services. Who are you here to _____? … Thank you. Please take a seat. Mr Evans will be with you in a minute. »",
+     "options": [
+      "see",
+      "look",
+      "watch",
+      "find"
+     ],
+     "correctIndex": 0,
+     "explication": "« Who are you here to see? » = qui venez-vous voir ? « see » s'emploie pour un rendez-vous avec une personne."
+    },
+    {
+     "question": "Complétez l'accueil avec le mot qui convient : « Good morning, welcome to Bluepoint Services. Who are you here to see? … Thank you. Please take a _____. Mr Evans will be with you in a minute. »",
+     "options": [
+      "chair",
+      "seat",
+      "place",
+      "sit"
+     ],
+     "correctIndex": 1,
+     "explication": "« Please take a seat » = asseyez-vous. « take a place » est un calque du français."
+    }
+   ]
+  },
+  {
+   "competence": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Choisissez la forme correcte de la question indirecte : « Could you tell me when the truck _____? »",
+     "options": [
+      "arrives",
+      "does arrive",
+      "arrive",
+      "is arrive"
+     ],
+     "correctIndex": 0,
+     "explication": "Question indirecte : sujet + verbe conjugué normalement, sans « does » : when the truck arrives."
+    },
+    {
+     "question": "Document (email) : « Dear Mr Patel, I am writing to ask if we can change the time of our meeting on Thursday. I have a delivery at 10 am and I need to be in the warehouse. Would it be possible to meet at 2 pm instead? Kind regards, Elena Rossi » — Which subject line is best for this email?",
+     "options": [
+      "Hello",
+      "Delivery at 10 am in the warehouse",
+      "Meeting on Thursday – new time?",
+      "Question"
+     ],
+     "correctIndex": 2,
+     "explication": "Un bon objet résume le sujet principal : changer l'heure de la réunion de jeudi. La livraison n'est que la raison du changement ; « Hello » et « Question » sont trop vagues."
+    },
+    {
+     "question": "Complétez le message de Léa avec le bon mot de liaison : « Hi team, I'm Léa and I'm the new receptionist. I answer the phone and I welcome visitors. I work on Mondays, but I don't work on Fridays. I like this job _____ I meet a lot of people. I can also speak Spanish. I'm new, so please be patient with me! »",
+     "options": [
+      "but",
+      "so",
+      "also",
+      "because"
+     ],
+     "correctIndex": 3,
+     "explication": "La deuxième partie donne la raison (elle rencontre beaucoup de gens) : « because »."
+    },
+    {
+     "question": "Complétez cette demande de rendez-vous en choisissant le bon mot dans chaque liste : « Subject: Meeting about the new delivery schedule Dear Mr Lee, I am the new logistics assistant at Silverline Warehousing. I would like to meet you to talk about the new delivery schedule. Would it be possible to meet next week? I am free on Tuesday afternoon or on Thursday at 10 am. Could you tell me which day _____ better for you? Thank you in advance. Best regards, Omar Haddad »",
+     "options": [
+      "is",
+      "are",
+      "be",
+      "it is"
+     ],
+     "correctIndex": 0,
+     "explication": "Question indirecte : sujet + verbe, sans inversion. « which day is better » ; « which day it is better » ajoute un sujet en trop."
+    },
+    {
+     "question": "Préparation de la classe virtuelle : choisissez la forme correcte. Chaque phrase reprend une erreur fréquente du groupe : « 1. The driver arrives at 7 am every day. 2. Could you send me some information about the training? 3. The meeting is on Monday 4 March. 4. I look forward to meeting you next week. 5. Could you tell me where _____? »",
+     "options": [
+      "is the warehouse",
+      "the warehouse is",
+      "does the warehouse",
+      "the warehouse it is"
+     ],
+     "correctIndex": 1,
+     "explication": "Question indirecte : sujet + verbe, sans inversion. « where the warehouse is ». « the warehouse it is » répète le sujet."
+    },
+    {
+     "question": "Choisissez la forme correcte : « Thank you for _____ the documents so quickly. »",
+     "options": [
+      "send",
+      "sending",
+      "sent",
+      "to send"
+     ],
+     "correctIndex": 1,
+     "explication": "« Thank you for + -ing » : for est une préposition, le verbe prend -ing."
+    },
+    {
+     "question": "Choisissez la formule d'excuse correcte : « We _____ for the late delivery of your order. »",
+     "options": [
+      "apologise",
+      "sorry",
+      "excuse",
+      "regret to"
+     ],
+     "correctIndex": 0,
+     "explication": "« We apologise for… » est la formule d'excuse de l'entreprise. « We sorry » n'a pas de verbe : il faudrait « We are sorry »."
+    },
+    {
+     "question": "Choisissez la bonne préposition de temps : « The meeting starts _____ 10 am on Friday. »",
+     "options": [
+      "at",
+      "on",
+      "in",
+      "by"
+     ],
+     "correctIndex": 0,
+     "explication": "« at » + heure : at 10 am. « on » est utilisé pour le jour (on Friday)."
+    },
+    {
+     "question": "Choisissez le bon mot de liaison : « The printer is broken, _____ we cannot print the labels today. »",
+     "options": [
+      "so",
+      "because",
+      "but",
+      "then"
+     ],
+     "correctIndex": 0,
+     "explication": "L'imprimante est en panne, DONC on ne peut pas imprimer : conséquence, « so ». « because » introduirait une cause."
+    },
+    {
+     "question": "Choisissez le bon mot de liaison : « I can't come to work today _____ I am ill. »",
+     "options": [
+      "because",
+      "so",
+      "then",
+      "and"
+     ],
+     "correctIndex": 0,
+     "explication": "La maladie est la CAUSE de l'absence : « because ». « so » inverserait la logique."
+    }
+   ]
+  }
+ ],
+ "questionsOuvertesDebut": [
+  {
+   "question": "Please introduce yourself. Tell us your name, what you do, where you work and what you do on a typical working day.",
+   "reponseAttendue": "Hello, my name is Karim Benali. I'm a sales assistant at Delta Home, a company that sells kitchen equipment. I work in our office in Lille. On a typical day, I start at half past eight. First, I read my emails and answer questions from customers. Then I prepare quotes and send them to our clients. In the afternoon, I often call customers to check their orders. I like my job because I speak to a lot of different people."
+  },
+  {
+   "question": "Describe a problem you had at work. What happened, what did you do to solve it, and what did you learn from it?",
+   "reponseAttendue": "Last year, I was responsible for organising a training day for twenty new employees. Two days before the event, the trainer called me to say she was ill and couldn't come. At first I panicked, because the programme was already printed and everyone had booked the day. So I contacted two experienced colleagues, and they agreed to run the morning session. Then I asked the training company to send a replacement for the afternoon, and they found someone the same day. In the end, the feedback was very positive. What I learned is that you should always have a plan B, so now I keep a list of internal colleagues who can step in at short notice."
+  },
+  {
+   "question": "Your team is moving to a new office next month. Write an email to your colleagues to explain the move. Include: the date and the new address, what they need to do before the move, and what will be different in the new office. (Rappel : écrivez un courriel structuré à vos collègues, au moins 150 mots, en traitant les trois points demandés.)",
+   "reponseAttendue": "Subject: Our move to the new office on 14 November\n\nHi everyone,\n\nAs you know, our team is moving to a new office next month. I'd like to give you some practical information so that the move goes smoothly.\n\nThe move will take place on Friday 14 November. From Monday 17 November, we will work at 25 Harbour Street, on the fourth floor. The building is a ten-minute walk from Central Station, and there is a car park behind it.\n\nBefore the move, please do three things. First, clear your desk and put your personal items in the boxes that Facilities will deliver on 10 November. Second, label every box with your name and team. Finally, save all your files on the shared drive, because our computers will be reset.\n\nThere will also be some changes in the new office. We will not have fixed desks any more, so you will need to book a desk using the new app. However, there will be four meeting rooms instead of one, and a much bigger kitchen.\n\nIf you have any questions, please let me know.\n\nBest regards,\nClaire"
+  },
+  {
+   "question": "Some companies are asking employees to return to the office full-time, while others are keeping remote work. What is your opinion on remote work? Give reasons and examples to support your view.",
+   "reponseAttendue": "In my view, a hybrid model is clearly the most effective option, although I don't think there's a single answer for every company. On the one hand, remote work has real advantages. People save time on commuting, and for tasks that need concentration, such as writing a report or analysing data, working from home is often more productive. In my previous job, our team actually completed projects faster after we introduced two remote days a week. On the other hand, full-time remote work has hidden costs. New employees learn a lot simply by listening to experienced colleagues, and that's much harder over video calls. Creativity also suffers: many good ideas come from informal conversations that never happen online. That said, forcing everyone back to the office five days a week sends a message of mistrust and may push talented people to leave. So I'd argue that the best approach is to agree on shared office days for collaboration and leave the rest flexible. What matters is not where people work, but whether the organisation of work is clear and fair."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Order number:",
+   "reponseAttendue": "4729 / 4 7 2 9 / 4-7-2-9. Le numéro est épelé chiffre par chiffre : four, seven, two, nine = 4729."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Delivery day:",
+   "reponseAttendue": "Tuesday / tuesday / on Tuesday. « We'll deliver it on Tuesday » : la livraison a lieu mardi."
+  },
+  {
+   "question": "Transcription de l'écoute : « Sam Porter: Hello, this is Sam Porter from Greenfield Office Supplies. I'm calling about your order. The order number is four, seven, two, nine. We'll deliver it on Tuesday. If you have any questions, please call me on extension three one five. Thank you. » — Sam's extension number:",
+   "reponseAttendue": "315 / 3 1 5 / three one five. « Extension three one five » = poste 315."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — New date of the induction day:",
+   "reponseAttendue": "9 May / 9th May / May 9 / May 9th / the ninth of May / ninth of May / 9/5 / 09/05. « It's now on the ninth of May, not the second » : le 9 mai remplace le 2 mai."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Start time:",
+   "reponseAttendue": "8:30 / 8.30 / 08:30 / 8h30 / half past eight / 8:30 am / 8.30 am. « Half past eight » = 8 h 30."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Name of the room:",
+   "reponseAttendue": "Atlas / Atlas Room / the Atlas Room / atlas. La salle s'appelle « the Atlas Room », au troisième étage."
+  }
+ ],
+ "questionsOuvertesFin": [
+  {
+   "question": "A visitor arrives at your workplace for a meeting with your manager. Welcome the visitor, check the appointment, and explain how to get to the meeting room.",
+   "reponseAttendue": "Good morning, welcome to Bluepoint Services. Do you have an appointment? … Ah, with Mr Evans at ten. Can I have your name, please? … Thank you, Ms Duval. Here is your visitor badge. Please wear it at all times. The meeting room is on the first floor. Take the lift on your left, then turn right. It's the third door, next to the kitchen. Mr Evans will meet you there. Would you like some water? … Have a nice meeting!"
+  },
+  {
+   "question": "You answer the phone at work. The caller wants to speak to your manager, but your manager is not there. Answer the phone, explain the situation, take a message and check the information.",
+   "reponseAttendue": "Good morning, Kestrel Print, Julie speaking. How can I help you? … I'm sorry, Mr Evans is in a meeting until eleven. Can I take a message? … Can I have your name, please? … Could you spell your surname? … Thank you. And what is it about? … OK, the new prices. What is your phone number? … Sorry, could you repeat the end, please? … Let me check: Mr Lee Brown, from Atlas Office Supplies, about the new prices, and your number is 0113 496 0574. I'll give Mr Evans the message. Thank you for calling. Goodbye."
+  },
+  {
+   "question": "Tomorrow you must prepare a room for a training session for 15 people. You need help. Ask a colleague for help: explain what you need and ask for two or three things politely.",
+   "reponseAttendue": "Hi Paul, could you help me tomorrow morning, please? We have a training session at nine in room 4, for fifteen people. There are only ten chairs in the room. Could you bring five chairs from the meeting room? Also, can you check the projector at half past eight? It didn't work last week. And could you put some water and glasses on the table? Thank you very much, that's very kind."
+  },
+  {
+   "question": "You call your manager. There is a problem at work this morning: a machine or a piece of equipment is not working, or a delivery is late. Explain the problem, say when it started or why, and ask for help.",
+   "reponseAttendue": "Hello Mrs Grant, it's Julien from the warehouse. There's a problem with the forklift in zone C. It isn't working, and it's making a loud noise. The problem started at half past seven, when I switched it on. There is a red light on the screen. Because of this, we can't move the pallets for the Danbury order, and the truck comes at ten. Could you call the technician, please? Or can we use the forklift from zone A in the meantime? Please call me back on my mobile. Thank you."
+  },
+  {
+   "question": "You work at the reception desk of Brightdesk Facilities. Write an email to your manager, Mr Grant. Tell him that you will be absent tomorrow morning because you have a medical appointment. Say what time you will arrive, who will answer the phone at reception, and where he can find the list of visitors for tomorrow. Write at least 80 words. — Rappel : vous écrivez à votre responsable : restez poli (Dear Mr Grant, Kind regards) et donnez des informations précises (heure, nom, lieu).",
+   "reponseAttendue": "Subject: Absence tomorrow morning – Thursday 12 June\n\nDear Mr Grant,\n\nI am writing to tell you that I will be absent tomorrow morning, Thursday 12 June, because I have a medical appointment at 9 am. I will arrive at the office at 1 pm.\n\nMy colleague Emma Clarke will answer the phone at reception in the morning. I have explained the visitor procedure to her, and she has the keys for the meeting rooms.\n\nThe list of visitors for tomorrow is in the blue folder on the reception desk. There are three visitors in the morning.\n\nPlease call me on my mobile if you have any questions.\n\nKind regards,\nJulie Morel\nReceptionist, Brightdesk Facilities"
+  },
+  {
+   "question": "You work in the purchasing department of Maplewood Services. You need new cardboard boxes for the warehouse. Write an email to a supplier, Packwell Supplies. Ask for the price of 500 medium boxes, the delivery time, and whether they can deliver on Saturdays. Also ask for a short meeting next week to see some samples, and suggest two possible times. Write at least 80 words. — Rappel : Could you tell me…? / I would like to know… / Would it be possible…? ; on + jour, at + heure.",
+   "reponseAttendue": "Subject: Price request – 500 medium boxes\n\nDear Sir or Madam,\n\nI work in the purchasing department of Maplewood Services. I am writing because we need new cardboard boxes for our warehouse.\n\nCould you tell me the price of 500 medium boxes? I would also like to know the usual delivery time and if you can deliver on Saturdays, because our warehouse is open at weekends.\n\nWould it be possible to meet next week? We would like to see some samples before we order. I am available on Tuesday at 10 am or on Wednesday at 3 pm.\n\nThank you in advance for your reply.\n\nKind regards,\nHugo Laurent\nPurchasing Assistant, Maplewood Services"
+  },
+  {
+   "question": "You work in customer service at Northgate Parcels. A customer, Mr Evans, wrote to complain: his parcel arrived three days late and the box was damaged. Write a reply. Thank him for his email, apologise, explain the reason for the delay (a problem with a truck), confirm what you will do (refund the delivery cost of £12 and send a new product if it is broken), and thank him for his patience. Write at least 80 words. — Rappel : prétérit pour ce qui s'est passé, will pour la solution.",
+   "reponseAttendue": "Subject: Your parcel – our apologies\n\nDear Mr Evans,\n\nThank you for your email of 4 March. I am very sorry that your parcel arrived three days late and that the box was damaged.\n\nThe delay happened because one of our trucks broke down near Manchester, and we needed a new truck to continue the delivery. The box was probably damaged during the transfer.\n\nI can confirm that we will refund the delivery cost of £12 to your bank card this week. If the product inside is broken, please send us a photo and we will send you a new one at no extra cost.\n\nWe apologise again for the inconvenience. Thank you for your patience.\n\nKind regards,\nAmina Diallo\nCustomer Service, Northgate Parcels"
+  },
+  {
+   "question": "You are a warehouse assistant at Silverline Warehousing. You will be on holiday next week. Write a note to your colleague Jamal, who will do your work. Tell him: what he must do every morning, one delivery that is planned (day, time, supplier), where the keys and the order folder are, and who to call if there is a problem. Write at least 80 words. — Rappel : Please…, Don't forget to…, If…, The keys are in…",
+   "reponseAttendue": "Hi Jamal,\n\nThanks a lot for doing my work next week. Here is some information.\n\nEvery morning, please check the stock list on the computer and print the orders for the day. The pickers start at 7.30, so try to have the orders ready before that time.\n\nOn Wednesday at 9 am, Packwell Supplies will deliver 300 boxes. Please count them and sign the delivery note.\n\nThe keys for the loading area are in the grey cabinet, and the order folder is on my desk.\n\nIf there is a problem, call Karen Lee, the warehouse manager, on extension 214.\n\nSee you on 17 June!\nInès"
+  },
+  {
+   "question": "Write an email to your team leader about a small problem at work yesterday (for example a broken printer, a late delivery or a lost key). Explain what happened, why it happened, what you did, and what you suggest now. Use at least four different linking words (and, but, because, so, then). Write at least 80 words. — Rappel : because = la cause, so = le résultat, then = l'étape suivante.",
+   "reponseAttendue": "Subject: Problem with the label printer\n\nHi Martin,\n\nI am writing about a problem we had yesterday afternoon. The label printer in the packing area stopped at 3 pm, so we could not print the labels for the evening orders.\n\nFirst, I checked the paper and the cables, but everything was fine. Then, I called the IT helpdesk and a technician came at 4.30. He said the printer was very old and the motor was broken.\n\nWe printed the labels in the office, and the orders left on time. However, it was slow because the office printer is far from the packing area.\n\nI suggest that we order a new printer this week.\n\nThanks,\nSara"
+  },
+  {
+   "question": "Describe your workplace. Where is it, and what do you do there every day?",
+   "reponseAttendue": "I work in a big warehouse near Lyon. It belongs to a logistics company called Greenfield Logistics. There are about forty people in my team. I am a warehouse assistant. Every morning, I start at seven o'clock. First, I check the orders on the computer. Then, I prepare the pallets with my colleagues. In the afternoon, we load the trucks. I like my job because the team is friendly, but it is sometimes tiring. So, that is my workplace."
+  }
+ ],
+ "exercices": [
+  {
+   "titre": "Expression orale — A2-M1-L1-I4 (A2.1)",
+   "consigne": "Please introduce yourself. What's your name? What's your job? Where do you work?\nPréparation 30 s, réponse orale de 45 s.\nCritères : Donne son nom, son poste (avec a / an) et son entreprise ou son secteur. ; Précise son service ou son équipe et au moins une tâche. ; Emploie correctement le verbe be (I'm, he's, she's). ; Parle pendant au moins 30 secondes avec une prononciation compréhensible..",
+   "reponseAttendue": "Hello, my name is Karim Benali. I'm a delivery driver. I work for Maple Parcel Services in Lyon. I'm in the transport team, with ten other drivers. My manager is Mrs Lopez. She's very nice. Every day, I deliver parcels to shops and offices. I like my job because I meet a lot of people. Nice to meet you!",
+   "points": 10
+  },
+  {
+   "titre": "Email — A2-M1-L5-I3 (A2.2)",
+   "consigne": "You are the new logistics assistant at Bluestone Logistics. Write a short email to your new team. Introduce yourself (name, job, team, start date), describe two or three of your tasks, give your working hours and explain how people can contact you. Write at least 80 words.\n\nRappel : objet, salutation, qui je suis, ce que je fais (présent simple), horaires, coordonnées, formule finale. Au moins 80 mots.\n80 mots minimum, en 20 minutes.\nCritères : Respect de la consigne : nom, poste, équipe, date d'arrivée, au moins deux tâches, horaires et moyen de contact. ; Structure : objet, salutation, paragraphes courts, formule finale et signature. ; Cohésion : au moins trois mots de liaison (and, but, because, also, so). ; Grammaire : verbe be, présent simple avec -s à la 3e personne, a / an devant le poste, prépositions de temps. ; Vocabulaire du travail adapté et majuscules aux jours et aux mois. ; Longueur : au moins 80 mots..",
+   "reponseAttendue": "Subject: Hello from the new logistics assistant\n\nHello everyone,\n\nMy name is Inès Moreau, and I'm the new logistics assistant at Bluestone Logistics. I started on 7 September. I work in the transport office with Ana and Hugo, and my manager is Mrs Patel.\n\nEvery morning, I check the delivery lists and I answer calls from our drivers. In the afternoon, I also prepare the documents for the trucks. I work from 8:30 to 4:30, Monday to Friday.\n\nI'm new, so I have a lot of questions! You can call me on extension 128 or email me at i.moreau@bluestone-log.com.\n\nSee you soon,\nInès Moreau",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — A2-M1-L2-I4 (A2.1)",
+   "consigne": "Describe a normal day at work. What do you do in the morning and in the afternoon?\nPréparation 30 s, réponse orale de 60 s.\nCritères : Donne son heure d'arrivée et de départ. ; Cite au moins quatre tâches avec des verbes au présent simple. ; Utilise au moins deux mots d'ordre (First, Then, After that…). ; Parle pendant au moins 45 secondes sans longues pauses..",
+   "reponseAttendue": "I'm an office assistant at Clearwater Facility Services. I start work at half past eight. First, I check my emails and I answer the phone. Then I prepare the badges for the visitors. I usually have a coffee break at ten thirty. After that, I order office supplies, like paper and coffee. In the afternoon, I send the invoices to our customers and I update the planning. I finish at five o'clock. I don't work on Fridays. I like my job because my colleagues are very nice.",
+   "points": 10
+  },
+  {
+   "titre": "Email — A2-M5-L1-I3 (A2.1)",
+   "consigne": "You work at the reception desk of Brightdesk Facilities. Write an email to your manager, Mr Grant. Tell him that you will be absent tomorrow morning because you have a medical appointment. Say what time you will arrive, who will answer the phone at reception, and where he can find the list of visitors for tomorrow. Write at least 80 words. — Rappel : vous écrivez à votre responsable : restez poli (Dear Mr Grant, Kind regards) et donnez des informations précises (heure, nom, lieu).\n80 mots minimum, en 20 minutes.\nCritères : Respect du sujet : absence, heure d'arrivée, remplaçant à l'accueil et emplacement de la liste des visiteurs sont indiqués. ; Structure : objet clair, salutation, raison du message, informations, phrase de fin, formule de politesse et signature. ; Registre poli adapté à un responsable (pas de style SMS). ; Phrases simples correctes : présent simple, will pour le futur, majuscules aux jours. ; Au moins 80 mots, rédigés dans le temps prévu..",
+   "reponseAttendue": "Subject: Absence tomorrow morning – Thursday 12 June\n\nDear Mr Grant,\n\nI am writing to tell you that I will be absent tomorrow morning, Thursday 12 June, because I have a medical appointment at 9 am. I will arrive at the office at 1 pm.\n\nMy colleague Emma Clarke will answer the phone at reception in the morning. I have explained the visitor procedure to her, and she has the keys for the meeting rooms.\n\nThe list of visitors for tomorrow is in the blue folder on the reception desk. There are three visitors in the morning.\n\nPlease call me on my mobile if you have any questions.\n\nKind regards,\nJulie Morel\nReceptionist, Brightdesk Facilities",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — A2-M4-L1-I4 (A2.1)",
+   "consigne": "A visitor arrives at your workplace for a meeting with your manager. Welcome the visitor, check the appointment, and explain how to get to the meeting room.\nPréparation 30 s, réponse orale de 45 s.\nCritères : Une salutation et une formule de bienvenue adaptées au moment de la journée. ; Au moins une question polie pour vérifier le rendez-vous ou le nom (Can I… ? / Could you… ?). ; Le chemin est expliqué avec au moins deux indications (étage, gauche/droite, repère). ; Phrases courtes et compréhensibles, sans longue pause, pendant au moins 30 secondes..",
+   "reponseAttendue": "Good morning, welcome to Bluepoint Services. Do you have an appointment? … Ah, with Mr Evans at ten. Can I have your name, please? … Thank you, Ms Duval. Here is your visitor badge. Please wear it at all times. The meeting room is on the first floor. Take the lift on your left, then turn right. It's the third door, next to the kitchen. Mr Evans will meet you there. Would you like some water? … Have a nice meeting!",
+   "points": 10
+  },
+  {
+   "titre": "Email — A2-M5-L2-I2 (A2.2)",
+   "consigne": "You work in the purchasing department of Maplewood Services. You need new cardboard boxes for the warehouse. Write an email to a supplier, Packwell Supplies. Ask for the price of 500 medium boxes, the delivery time, and whether they can deliver on Saturdays. Also ask for a short meeting next week to see some samples, and suggest two possible times. Write at least 80 words. — Rappel : Could you tell me…? / I would like to know… / Would it be possible…? ; on + jour, at + heure.\n80 mots minimum, en 30 minutes.\nCritères : Respect du sujet : prix, délai, livraison le samedi, rendez-vous et deux créneaux sont présents. ; Structure en trois parties : présentation et raison, questions, phrase de fin. ; Demandes polies correctement construites (Could you…?, I would like to know if…, Would it be possible…?). ; Prépositions de temps correctes (on, at, in). ; Au moins 80 mots, rédigés en 30 minutes..",
+   "reponseAttendue": "Subject: Price request – 500 medium boxes\n\nDear Sir or Madam,\n\nI work in the purchasing department of Maplewood Services. I am writing because we need new cardboard boxes for our warehouse.\n\nCould you tell me the price of 500 medium boxes? I would also like to know the usual delivery time and if you can deliver on Saturdays, because our warehouse is open at weekends.\n\nWould it be possible to meet next week? We would like to see some samples before we order. I am available on Tuesday at 10 am or on Wednesday at 3 pm.\n\nThank you in advance for your reply.\n\nKind regards,\nHugo Laurent\nPurchasing Assistant, Maplewood Services",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — A2-M4-L2-I5 (A2.2)",
+   "consigne": "You answer the phone at work. The caller wants to speak to your manager, but your manager is not there. Answer the phone, explain the situation, take a message and check the information.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Réponse au téléphone avec le nom de l'entreprise et son prénom (… speaking). ; Explication simple de l'absence (in a meeting, on holiday…) et proposition de prendre un message. ; Au moins deux demandes polies : épeler, répéter, numéro de téléphone. ; Vérification finale du message (Let me check…). ; Discours compréhensible, sans longue pause, pendant au moins 45 secondes..",
+   "reponseAttendue": "Good morning, Kestrel Print, Julie speaking. How can I help you? … I'm sorry, Mr Evans is in a meeting until eleven. Can I take a message? … Can I have your name, please? … Could you spell your surname? … Thank you. And what is it about? … OK, the new prices. What is your phone number? … Sorry, could you repeat the end, please? … Let me check: Mr Lee Brown, from Atlas Office Supplies, about the new prices, and your number is 0113 496 0574. I'll give Mr Evans the message. Thank you for calling. Goodbye.",
+   "points": 10
+  },
+  {
+   "titre": "Email — A2-M5-L3-I3 (A2.2)",
+   "consigne": "You work in customer service at Northgate Parcels. A customer, Mr Evans, wrote to complain: his parcel arrived three days late and the box was damaged. Write a reply. Thank him for his email, apologise, explain the reason for the delay (a problem with a truck), confirm what you will do (refund the delivery cost of £12 and send a new product if it is broken), and thank him for his patience. Write at least 80 words. — Rappel : prétérit pour ce qui s'est passé, will pour la solution.\n80 mots minimum, en 30 minutes.\nCritères : Respect du sujet : remerciement, excuse, cause du retard, remboursement de 12 £, solution pour le produit cassé, remerciement final. ; Ordre logique : excuse, cause, solution. ; Formules correctes : Thank you for…, I am sorry for…, We apologise for…, I can confirm that… ; Prétérit pour les faits passés et will pour la solution. ; Au moins 80 mots, rédigés en 30 minutes..",
+   "reponseAttendue": "Subject: Your parcel – our apologies\n\nDear Mr Evans,\n\nThank you for your email of 4 March. I am very sorry that your parcel arrived three days late and that the box was damaged.\n\nThe delay happened because one of our trucks broke down near Manchester, and we needed a new truck to continue the delivery. The box was probably damaged during the transfer.\n\nI can confirm that we will refund the delivery cost of £12 to your bank card this week. If the product inside is broken, please send us a photo and we will send you a new one at no extra cost.\n\nWe apologise again for the inconvenience. Thank you for your patience.\n\nKind regards,\nAmina Diallo\nCustomer Service, Northgate Parcels",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — A2-M4-L3-I4 (A2.1)",
+   "consigne": "Tomorrow you must prepare a room for a training session for 15 people. You need help. Ask a colleague for help: explain what you need and ask for two or three things politely.\nPréparation 30 s, réponse orale de 45 s.\nCritères : La situation est expliquée en une ou deux phrases simples (quoi, quand). ; Au moins deux demandes polies avec « Can you… ? / Could you… ? » + base verbale. ; Utilisation de « please » et d'une formule de remerciement. ; Phrases compréhensibles, intonation montante sur les questions, au moins 30 secondes de parole..",
+   "reponseAttendue": "Hi Paul, could you help me tomorrow morning, please? We have a training session at nine in room 4, for fifteen people. There are only ten chairs in the room. Could you bring five chairs from the meeting room? Also, can you check the projector at half past eight? It didn't work last week. And could you put some water and glasses on the table? Thank you very much, that's very kind.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — A2-M4-L4-I4 (A2.2)",
+   "consigne": "You call your manager. There is a problem at work this morning: a machine or a piece of equipment is not working, or a delivery is late. Explain the problem, say when it started or why, and ask for help.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Le problème est annoncé clairement (There's a problem with… / … isn't working / … is late). ; Le moment ou la cause est indiqué (It started at… / because…). ; Une conséquence simple est donnée (we can't…, the customers are waiting…). ; Une demande polie termine le message (Could you… ? / What should I do?). ; Discours compréhensible et organisé, au moins 45 secondes..",
+   "reponseAttendue": "Hello Mrs Grant, it's Julien from the warehouse. There's a problem with the forklift in zone C. It isn't working, and it's making a loud noise. The problem started at half past seven, when I switched it on. There is a red light on the screen. Because of this, we can't move the pallets for the Danbury order, and the truck comes at ten. Could you call the technician, please? Or can we use the forklift from zone A in the meantime? Please call me back on my mobile. Thank you.",
+   "points": 10
+  }
+ ],
+ "exerciceIntermediaire": {
+  "titre": "Évaluation intermédiaire — 4 productions notées sur 20",
+  "contexte": "Évaluation à mi-parcours (modules A2-M2 à A2-M4) : productions orales et écrites corrigées par le formateur avec les critères de chaque sujet.",
+  "questions": [
+   {
+    "question": "C1 — Compréhension orale (A2.1) — Écoutez l'enregistrement (transcription réservée au formateur : Warehouse supervisor: Everyone, please wear your gloves and your hi-vis vest in zone B. The boxes there are very heavy.), puis répondez.\n1. What must workers do in zone B?\nA. Wear gloves and a hi-vis vest\nB. Carry light boxes only\nC. Leave zone B quickly\nD. Put on a helmet",
+    "reponseAttendue": "1. A — Wear gloves and a hi-vis vest. « please wear your gloves and your hi-vis vest in zone B ». Les cartons sont lourds : c'est la raison de la consigne, pas une consigne de ne porter que des cartons légers.",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (A2.1) — Écoutez l'enregistrement (transcription réservée au formateur : Office manager: Please don't print in colour. Use the black and white printer on the second floor.), puis répondez.\n1. What does the manager ask?\nA. Print in colour on the second floor\nB. Use the printer on the first floor\nC. Print in black and white only\nD. Buy a new colour printer",
+    "reponseAttendue": "1. C — Print in black and white only. « don't print in colour » + « use the black and white printer ». La première option reprend « colour » et « second floor » mais oublie la négation.",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (A2.1) — Écoutez l'enregistrement (transcription réservée au formateur : Security officer: Visitors must sign in at reception and wear a badge at all times. They mustn't go into the warehouse alone.), puis répondez.\n1. What mustn't visitors do?\nA. Sign in at the reception desk\nB. Wear a visitor badge\nC. Wait for their host\nD. Go into the warehouse alone",
+    "reponseAttendue": "1. D — Go into the warehouse alone. « They mustn't go into the warehouse alone » : c'est interdit. Signer à l'accueil et porter un badge sont au contraire obligatoires (must).",
+    "points": 5
+   },
+   {
+    "question": "C1 — Compréhension orale (A2.1) — Écoutez l'enregistrement (transcription réservée au formateur : Cleaning team leader: Before you clean the machine, switch it off and unplug it. Then call me.), puis répondez.\n1. What is the first thing to do?\nA. Clean the machine\nB. Switch off the machine\nC. Call the team leader first\nD. Plug in the machine",
+    "reponseAttendue": "1. B — Switch off the machine. « Before you clean the machine, switch it off » : on éteint d'abord. Le nettoyage est cité en premier dans la phrase, mais il vient après (before).",
+    "points": 5
+   }
+  ]
+ },
+ "evaluationFinale": {
+  "titre": "Évaluation finale interne — 4 épreuves (C1 à C4) notées sur 20, au format d'entraînement du VTest",
+  "exercices": [
+   {
+    "titre": "C1 — Compréhension orale (A2.1)",
+    "consigne": "Écoutez l'enregistrement (transcription réservée au formateur : Mark Ellis: The delivery for the Bristol shop will leave the warehouse at half past seven tomorrow morning.), puis répondez.\n1. What does the speaker say?\nA. The delivery is for the warehouse\nB. The truck leaves at 7.30 tomorrow morning\nC. The shop opens at 7.30\nD. The delivery arrived this morning",
+    "reponseAttendue": "1. B — The truck leaves at 7.30 tomorrow morning. « will leave the warehouse at half past seven tomorrow morning » : la livraison part à 7 h 30 demain. 7 h 30 n'est pas l'heure d'ouverture du magasin, et la livraison est pour le magasin de Bristol, pas pour l'entrepôt.",
+    "points": 5
+   },
+   {
+    "titre": "C2 — Compréhension écrite (A2.1)",
+    "consigne": "Lisez le document, puis répondez.\nNOTICE – STAFF CANTEEN\n\nFrom Monday 3 June, the staff canteen will open at 11.30 am instead of 12 pm. Hot meals are served until 2 pm. Sandwiches and salads are available until 3 pm.\n\nPlease note: the canteen will be closed on Friday 7 June for cleaning. On that day, free sandwiches will be available in the meeting room on the first floor.\n\nThank you,\nFacilities Team\n1. What is changing from 3 June?\nA. Hot meals are free\nB. The canteen closes at 3 pm\nC. The canteen opens earlier than usual\nD. Salads are not available\n2. Where can staff eat on 7 June?\nA. In the canteen after 3 pm\nB. In a meeting room upstairs\nC. In a café near the office\nD. At their desks on the ground floor",
+    "reponseAttendue": "1. C — The canteen opens earlier than usual. « will open at 11.30 am instead of 12 pm » : elle ouvre plus tôt. 15 h est seulement l'heure limite pour les sandwichs et salades, pas la fermeture.\n2. B — In a meeting room upstairs. « free sandwiches will be available in the meeting room on the first floor » : une salle de réunion à l'étage (upstairs). La cantine est fermée ce jour-là.",
+    "points": 5
+   },
+   {
+    "titre": "C3 — Expression orale (A2.2)",
+    "consigne": "A new colleague is starting in your team tomorrow. Explain what he or she must do on the first day.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Respect du sujet : au moins quatre consignes pour le premier jour. ; Temps de parole : au moins 48 secondes sur 60. ; Consignes claires : impératif, please, don't forget to, you will… ; Étapes dans l'ordre avec first, then, after that. ; Discours compréhensible, sans longues pauses ni répétitions..",
+    "reponseAttendue": "Welcome to the team! Tomorrow is your first day, so here is some information. Please arrive at half past eight and go to reception. Show your ID card, and the receptionist will give you a badge. Then, I will meet you and show you the office. First, we will visit the warehouse and the meeting rooms. After that, you will get your computer and your login. Don't forget to bring your bank details for the HR department. At half past twelve, we have lunch together in the canteen. In the afternoon, you will watch a short safety video. If you have any questions, you can ask me at any time.",
+    "points": 5
+   },
+   {
+    "titre": "C4 — Expression écrite (A2.2)",
+    "consigne": "You work in the services department of Harbourline Hotel. Your manager asked you to organise a short training session on the new booking software for your team. Write an email to your colleagues. Say what the training is about, when and where it will take place, what they need to bring, and ask them to confirm by a date. Write at least 80 words. — Rappel : traitez les quatre points dans l'ordre, visez 90 à 120 mots, gardez 5 minutes pour relire.\n80 mots minimum, en 30 minutes.\nCritères : Respect du sujet : thème de la formation, date et lieu, matériel à apporter, demande de confirmation avec date limite. ; Respect du temps (30 min) et du minimum de 80 mots. ; Cohérence : objet, salutation, paragraphes courts, mots de liaison simples. ; Grammaire : will pour le futur, impératif poli, question polie (Could you…?). ; Vocabulaire adapté au sujet (training, software, booking, laptop)..",
+    "reponseAttendue": "Subject: Training on the new booking software – Thursday 10 October\n\nHello everyone,\n\nAs you know, we will start using the new booking software next month. Our manager asked me to organise a short training session for the team.\n\nThe training will take place on Thursday 10 October, from 2 pm to 4 pm, in the meeting room on the first floor. A trainer from the software company will show us how to create, change and cancel a booking.\n\nPlease bring your laptop and your login details, because we will practise on the real system.\n\nCould you confirm by Monday 7 October if you can come?\n\nThank you, and see you on Thursday!\n\nBest regards,\nChloé",
+    "points": 5
+   }
+  ],
+  "grille": [
+   {
+    "critere": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais : informations exactes, compréhension ou production adaptée au niveau A2.",
+    "points": 5
+   },
+   {
+    "critere": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais : informations exactes, compréhension ou production adaptée au niveau A2.",
+    "points": 5
+   },
+   {
+    "critere": "C3 — S'exprimer et communiquer à l'oral en anglais : informations exactes, compréhension ou production adaptée au niveau A2.",
+    "points": 5
+   },
+   {
+    "critere": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées : informations exactes, compréhension ou production adaptée au niveau A2.",
+    "points": 5
+   }
+  ]
+ },
+ "sources": {
+  "veille": {
+   "reglementaire": [
+    {
+     "lien": "https://www.francecompetences.fr/recherche/rs/6905/",
+     "titreLien": "France Compétences – RS6905",
+     "titre": "Fiche RS6905 – VTest Business English – 4 Skills (certificateur EXASSESS)",
+     "date": "Novembre 2024",
+     "commentaire": "Enregistrement au Répertoire spécifique le 28/11/2024 pour 3 ans (échéance 28/11/2027, dernière délivrance possible le 27/05/2028). La fiche décrit les 4 compétences évaluées (C1 à C4) et les niveaux A2 à C1 ; le niveau A2 est requis pour valider la certification.",
+     "exploitation": "Preuve : fiche consultée et archivée dans le dossier qualité. Action : programmes, test de positionnement et livret d'accueil alignés sur les 4 compétences et sur le prérequis A2 à la validation."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000049496613",
+     "titreLien": "Légifrance – décret n° 2024-394",
+     "titre": "Décret n° 2024-394 du 29 avril 2024 relatif à la participation obligatoire du titulaire d’un compte personnel de formation",
+     "date": "Avril 2024",
+     "commentaire": "Depuis le 2 mai 2024, le titulaire d'un CPF acquitte une participation forfaitaire lors de l'achat d'une formation, sauf cas d'exonération (demandeurs d'emploi, abondement employeur…).",
+     "exploitation": "Preuve : décret archivé. Action : information du stagiaire sur le reste à charge lors de l'entretien d'entrée et dans les conditions générales de vente."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660",
+     "titreLien": "Légifrance – loi n° 2018-771",
+     "titre": "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel",
+     "date": "Septembre 2018",
+     "commentaire": "La loi fonde l'éligibilité au CPF des certifications enregistrées au RNCP ou au Répertoire spécifique et l'obligation de certification qualité des organismes financés sur fonds publics ou mutualisés.",
+     "exploitation": "Preuve : texte archivé. Action : vérification annuelle de la validité de l'enregistrement RS6905 avant toute ouverture de session financée par le CPF."
+    }
+   ],
+   "metier": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages",
+     "titreLien": "Conseil de l’Europe – CECRL",
+     "titre": "Cadre européen commun de référence pour les langues (CECRL) et son volume complémentaire",
+     "date": "Février 2018",
+     "commentaire": "Le volume complémentaire du CECRL actualise les descripteurs (médiation, interaction en ligne, compétences plurilingues). Le VTest affine l'échelle en 10 niveaux de A2 à C1.",
+     "exploitation": "Preuve : descripteurs utilisés dans la grille de positionnement. Action : objectifs de chaque parcours rédigés avec les descripteurs du niveau visé."
+    },
+    {
+     "lien": "https://candidate.vtest.com/",
+     "titreLien": "Plateforme VTest",
+     "titre": "Espace candidat VTest – passage du test en ligne",
+     "date": "Octobre 2026",
+     "commentaire": "Le test se passe en ligne : compréhension orale et écrite adaptatives, expression orale notée automatiquement, rédaction en 30 minutes avec un nombre minimal de mots selon le niveau (80, 150 ou 200 mots).",
+     "exploitation": "Preuve : description des épreuves reprise dans le livret stagiaire. Action : entraînements chronométrés au format des 4 épreuves en fin de parcours."
+    },
+    {
+     "lien": "https://www.francecompetences.fr/",
+     "titreLien": "France Compétences",
+     "titre": "Répertoire spécifique : liste des organismes préparant à la certification RS6905",
+     "date": "Octobre 2026",
+     "commentaire": "La fiche publie la liste des organismes préparant à la certification ; l'organisme vérifie son inscription et les conditions fixées par le certificateur.",
+     "exploitation": "Preuve : capture de la liste. Action : convention ou accord avec le certificateur tenu à jour dans le dossier qualité."
+    }
+   ],
+   "technologique": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages/level-descriptions",
+     "titreLien": "Conseil de l’Europe – descripteurs",
+     "titre": "Description des niveaux communs de référence du CECRL",
+     "date": "Février 2018",
+     "commentaire": "Les descripteurs « interaction en ligne » et « médiation » s'appliquent aux réunions à distance et aux échanges écrits instantanés, désormais courants en contexte professionnel.",
+     "exploitation": "Preuve : grille d'entraînement à la visioconférence. Action : mises en situation de réunion en ligne intégrées aux classes virtuelles."
+    },
+    {
+     "lien": "https://www.w3.org/TR/WCAG22/",
+     "titreLien": "W3C – WCAG 2.2",
+     "titre": "Web Content Accessibility Guidelines (WCAG) 2.2 – recommandation W3C",
+     "date": "Octobre 2023",
+     "commentaire": "Les ressources audio et vidéo de la plateforme doivent être accompagnées de transcriptions et de sous-titres pour rester accessibles.",
+     "exploitation": "Preuve : transcriptions disponibles pour chaque dialogue et audio. Action : contrôle de la présence des transcriptions à chaque mise à jour des contenus."
+    }
+   ]
+  },
+  "ressources": {
+   "supportsHtml": "<p>• Support de cours du parcours A2 : 39 chapitres (leçons, langue clé, vocabulaire, dialogues traduits, exercices et quiz corrigés)<br>• Fichiers audio des dialogues et des écoutes, avec transcriptions<br>• Modèles de productions écrites et orales commentés</p>",
+   "outilsHtml": "<p>• Plateforme e-learning (leçons, audio, studio oral, atelier d’écriture)<br>• Classe virtuelle (Google Meet ou Zoom)<br>• Plateforme officielle VTest pour le passage du test</p>",
+   "ressourcesComplHtml": "<p>• <strong>Fiche officielle :</strong> francecompetences.fr/recherche/rs/6905/<br>• <strong>CECRL :</strong> coe.int – Cadre européen commun de référence pour les langues<br>• <strong>Test :</strong> candidate.vtest.com</p>",
+   "videos": []
+  }
+ }
+}

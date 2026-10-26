@@ -1,0 +1,1118 @@
+{
+ "id": "vtest-c1",
+ "titre": "VTest Business English (RS6905) — Parcours C1 — 50 h",
+ "heures": 50,
+ "niveau": "C1",
+ "aliases": [
+  "VTest Business English – 4 Skills (RS6905) — Parcours C1 — 50 h",
+  "Anglais professionnel VTest — Parcours C1 — 50 h",
+  "Parcours C1 — 50 h (VTest RS6905)"
+ ],
+ "programme": {
+  "code": "C1-50H",
+  "level": "C1",
+  "title": "Parcours C1 — 50 h",
+  "subtitle": "Maîtriser les communications professionnelles complexes et nuancées",
+  "hours": 50,
+  "sync_hours": 10,
+  "async_hours": 40,
+  "public_target": "Cadres et professionnels de la communication, du marketing, de la négociation, de la finance ou de l'assistanat de direction.",
+  "prerequisites": "Niveau B2 estimé au positionnement. Équipement : ordinateur, micro, casque, connexion stable.",
+  "objectives": [
+   "Mener une communication professionnelle stratégique, nuancée et adaptée à l'interlocuteur (C3).",
+   "Comprendre un discours étendu, implicite et idiomatique (C1).",
+   "Analyser des documents longs et complexes, attitudes et opinions implicites comprises (C2).",
+   "Argumenter, négocier et prendre la parole sans hésitation (C3).",
+   "Rédiger des rapports et écrits professionnels avancés d'au moins 200 mots en 30 minutes (C4)."
+  ],
+  "modalities": "Formation ouverte et à distance (FOAD) : e-learning asynchrone sur la plateforme (leçons, audio, exercices auto-corrigés, studio oral, atelier d'écriture) et classes virtuelles synchrones avec le formateur.",
+  "accompaniment": "Formateur référent joignable par la messagerie de la plateforme (réponse sous 48 h ouvrées), rendez-vous individuels réservables dans l'agenda, assistance technique par messagerie (catégorie « support technique »).",
+  "means": "Plateforme LMS accessible 24 h/24, ressources audio et PDF téléchargeables, formateur anglophone qualifié (CV et compétences tenus à jour dans la plateforme).",
+  "evaluation": "Positionnement d'entrée ; exercices auto-corrigés et productions corrigées par le formateur ; quiz de fin de module (seuil 70 %) ; simulation d'entraînement aux 4 compétences ; évaluation finale interne ; questionnaires de satisfaction à chaud et à froid. Passage de la certification VTest sur la plateforme officielle d'ExAssess.",
+  "accessibility": "Formation accessible aux personnes en situation de handicap : demande d'aménagement confidentielle dès la candidature, analysée par le référent handicap (police agrandie, contrastes, temps majorés en entraînement, sous-titres et transcriptions). Les aménagements de l'examen officiel relèvent du certificateur.",
+  "modules": [
+   {
+    "code": "C1-M1",
+    "titre": "Communication professionnelle stratégique",
+    "heures": 7,
+    "competences": [
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de reformuler un même message pour trois interlocuteurs différents (direction, client, partenaire) en adaptant l'angle, le registre et la phrase d'ouverture, sans hésitation notable.",
+     "À l'issue du module, l'apprenant est capable de présenter une recommandation en 90 à 120 secondes en utilisant au moins deux procédés de cadrage (gain/perte, ancrage, contraste) et une structure explicite.",
+     "À l'issue du module, l'apprenant est capable d'annoncer une mauvaise nouvelle ou de tenir une déclaration de crise en reconnaissant les faits, en exprimant l'empathie et en annonçant des actions datées, sans minimiser ni spéculer.",
+     "À l'issue du module, l'apprenant est capable de raconter une histoire d'entreprise structurée (situation, tension, tournant, résultat, message) en 90 secondes, avec au moins un chiffre concret.",
+     "À l'issue du module, l'apprenant est capable de répondre à une question imprévue en 60 à 90 secondes en appliquant une structure d'improvisation (PREP ou passé-présent-futur) et des expressions pour gagner du temps.",
+     "À l'issue du module, l'apprenant est capable d'identifier et d'employer au moins dix expressions idiomatiques et procédés d'atténuation propres au discours professionnel de niveau C1."
+    ]
+   },
+   {
+    "code": "C1-M2",
+    "titre": "Compréhension orale et nuances du discours",
+    "heures": 8,
+    "competences": [
+     "C1"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier l'intention réelle d'un locuteur (refus, réserve, critique, concession) derrière une formulation indirecte, avec au moins 8 réponses justes sur 10.",
+     "À l'issue du module, l'apprenant est capable d'interpréter correctement l'ironie, l'euphémisme et l'understatement en évaluant le degré réel d'un problème évoqué.",
+     "À l'issue du module, l'apprenant est capable de paraphraser en anglais standard au moins 30 idiomes et phrasal verbs fréquents dans les réunions, négociations et communications financières.",
+     "À l'issue du module, l'apprenant est capable d'identifier la problématique d'un débat entre trois ou quatre intervenants, la position de chacun et la décision finale.",
+     "À l'issue du module, l'apprenant est capable d'extraire d'une keynote, d'une conférence de résultats ou d'un podcast la thèse principale et au moins trois données chiffrées exactes, quel que soit l'accent du locuteur."
+    ]
+   },
+   {
+    "code": "C1-M3",
+    "titre": "Analyse de documents complexes",
+    "heures": 8,
+    "competences": [
+     "C2"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de répondre correctement à au moins 75 % des questions portant sur des textes professionnels de 300 à 500 mots (rapports, tribunes, contrats, politiques, courriels, rapports d'audit), dans l'ordre du texte.",
+     "À l'issue du module, l'apprenant est capable de qualifier l'attitude d'un auteur (prudence, scepticisme, ironie, autocritique, défense) en citant au moins deux indices textuels.",
+     "À l'issue du module, l'apprenant est capable de restituer le sens implicite d'au moins cinq procédés (litote, euphémisme, concession, verbe introducteur, fausse excuse) dans un document professionnel.",
+     "À l'issue du module, l'apprenant est capable de distinguer obligation, faculté, condition et exception dans une clause contractuelle ou une politique interne (shall, may, subject to, provided that, notwithstanding, are encouraged to).",
+     "À l'issue du module, l'apprenant est capable de comparer deux ou trois sources sur un même sujet et d'identifier au moins une convergence, une divergence et une omission.",
+     "À l'issue du module, l'apprenant est capable de traiter un document complexe de 400 mots et ses questions en 9 minutes environ."
+    ]
+   },
+   {
+    "code": "C1-M4",
+    "titre": "Argumentation, négociation et prise de parole",
+    "heures": 10,
+    "competences": [
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de défendre oralement, en 90 à 120 secondes, une thèse délimitée appuyée sur au moins deux preuves et une réfutation anticipée, sans hésitation notable.",
+     "À l'issue du module, l'apprenant est capable de mener une négociation de 12 minutes en explorant les intérêts de l'autre partie et en formulant des concessions exclusivement conditionnelles, jusqu'à un accord récapitulé sur au moins trois variables.",
+     "À l'issue du module, l'apprenant est capable de présenter un pitch de 2 minutes en six étapes et des résultats chiffrés en annonçant d'abord le message clé et en décrivant les évolutions avec précision.",
+     "À l'issue du module, l'apprenant est capable d'ouvrir et de conduire une revue de projet en précisant l'objectif, le déroulement et les attendus de chaque participant, puis d'en récapituler les décisions (qui, quoi, quand).",
+     "À l'issue du module, l'apprenant est capable de répondre en moins de 90 secondes à une question hostile (fausse prémisse, faux dilemme, question multiple) sans l'éluder ni perdre son sang-froid, et de modérer un débat de manière impartiale."
+    ]
+   },
+   {
+    "code": "C1-M5",
+    "titre": "Rédaction avancée et rapports professionnels",
+    "heures": 10,
+    "competences": [
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un rapport de recommandation d'au moins 200 mots comportant objet, constats chiffrés, options évaluées, recommandation justifiée et prochaines étapes.",
+     "À l'issue du module, l'apprenant est capable de condenser un document long en un executive summary autonome qui énonce la conclusion, les trois constats principaux et la décision attendue dans le premier tiers du texte.",
+     "À l'issue du module, l'apprenant est capable de rédiger un cahier des charges ou un appel d'offres distinguant exigences obligatoires (shall / must) et souhaitables (should), avec critères d'évaluation et calendrier.",
+     "À l'issue du module, l'apprenant est capable de défendre une position argumentée dans une note de position ou un texte de communication commerciale, en intégrant et en réfutant au moins une objection.",
+     "À l'issue du module, l'apprenant est capable de rédiger un email à fort enjeu (escalade, excuses institutionnelles) qui reconnaît le problème sans aveu de responsabilité excessif et engage des actions datées.",
+     "À l'issue du module, l'apprenant est capable de rédiger un document préparatoire à une réunion, une revue de projet ou un retour d'expérience présentant objectifs, thèmes abordés et attendus, de façon à fournir un ordre du jour précis aux participants.",
+     "À l'issue du module, l'apprenant est capable d'employer correctement dans un même texte au moins trois procédés de style C1 (inversion, nominalisation, cohésion par reprise lexicale ou démonstratif + nom) et de supprimer le jargon inutile."
+    ]
+   },
+   {
+    "code": "C1-M6",
+    "titre": "Simulations transversales et bilan",
+    "heures": 7,
+    "competences": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de répondre en temps limité à deux séries complètes d'activités d'écoute de niveau C1 (déclarations, dialogues courts et longs, monologues, réponse construite) avec au moins 75 % de bonnes réponses, en repérant attitudes implicites et changements de position.",
+     "À l'issue du module, l'apprenant est capable d'analyser huit textes longs (emails, rapports, articles, comptes rendus) et d'y identifier opinions déclarées ou implicites, réserves et conséquences, avec au moins 75 % de bonnes réponses en moins de 40 minutes par série.",
+     "À l'issue du module, l'apprenant est capable de réaliser les treize activités d'une simulation orale (3 lectures, 6 répétitions, 4 questions ouvertes de 45 à 120 secondes) en utilisant au moins 85 % du temps de parole et en structurant chaque réponse ouverte.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes deux textes argumentés de plus de 200 mots, puis de présenter et formaliser par écrit la gestion d'une crise fournisseur à partir de sources orales et écrites.",
+     "À l'issue du module, l'apprenant est capable de comparer ses résultats internes aux critères C1 du référentiel et de formuler un plan de préparation au passage comportant au moins trois objectifs mesurables et datés."
+    ]
+   }
+  ]
+ },
+ "competences": [
+  "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel.",
+  "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel.",
+  "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel.",
+  "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel."
+ ],
+ "besoinsList": [
+  "Situer son niveau d'anglais et viser le niveau C1 au VTest.",
+  "Adapter un message stratégique à plusieurs auditoires.",
+  "Saisir les nuances, sous-entendus et prises de position dans un discours.",
+  "Analyser de façon critique un dossier documentaire complexe.",
+  "Argumenter et négocier en comité face aux objections les plus dures.",
+  "Rédiger un rapport de recommandation et un document préparatoire à une revue.",
+  "Animer une revue de projet et synthétiser une réunion à plusieurs voix.",
+  "Maîtriser les registres formel et informel dans des échanges sensibles.",
+  "Développer une argumentation orale de 2 minutes sans notes.",
+  "S'entraîner aux épreuves du VTest au niveau C1."
+ ],
+ "syntheseHtml": "• Parcours C1 (50 h) préparant au VTest Business English – 4 Skills (RS6905, Répertoire spécifique, certificateur EXASSESS, enregistrement du 28/11/2024 au 28/11/2027) ; le test est passé en ligne sur la plateforme VTest, l'organisme assure la préparation.<br>• Les 4 compétences du référentiel sont travaillées : C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais ; C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais ; C3 — S'exprimer et communiquer à l'oral en anglais ; C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées.<br>• 6 modules (61 leçons) : cours, langue clé, vocabulaire, dialogues, exercices auto-corrigés, studio oral et atelier d'écriture corrigés par le formateur, quiz de validation à 70 %.<br>• Le niveau A2 du CECRL est le minimum requis pour valider la certification : le test de positionnement d'entrée oriente vers le parcours adapté.",
+ "adaptationsHtml": "• Niveau de départ fixé par le test de positionnement ; le parcours peut être complété par les leçons du niveau inférieur ou supérieur.<br>• Rythme libre en e-learning, réécoute des audios et reprise des exercices ; classes virtuelles pour l'oral.<br>• Transcriptions et traductions disponibles pour chaque dialogue.<br>• Situation de handicap : le référent handicap étudie les aménagements (police agrandie, contrastes, temps majorés en entraînement, sous-titres) ; les aménagements de l'examen officiel relèvent du certificateur.<br>• Les sujets d'expression orale et écrite peuvent être rapprochés du poste du stagiaire.",
+ "qcmDebut": [
+  {
+   "question": "Transcription de l'écoute : « Helen: So, Marcus, the engagement survey results for your department came back. Overall they're decent, but one thing stood out: people feel decisions are made without them. / Marcus: I'm a bit surprised, to be honest. I hold a team meeting every Monday. / Helen: Yes, and people mentioned that. The point seems to be that by the time something reaches the Monday meeting, it's already been settled. They feel informed rather than consulted. / Marcus: Fair enough. I suppose I've been trying to shield them from the endless back-and-forth with senior management. / Helen: That's understandable, and nobody doubts your intentions. But there may be a middle ground. You don't need to involve everyone in everything. / Marcus: What did you have in mind? / Helen: Perhaps flag upcoming decisions a week in advance and invite input on the ones that directly affect their work. And be explicit about which decisions are genuinely open and which aren't. / Marcus: I can see that working. Although I'd have to be careful it doesn't bog everything down. » — What is the real issue raised by the survey?",
+   "options": [
+    "Marcus holds too few meetings",
+    "Senior management ignores the department",
+    "Staff disagree with most decisions",
+    "Staff feel they are told, not asked"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (article) : « When Green Claims Backfire For much of the past decade, sustainability messaging was treated by many companies as a low-risk, high-reward exercise. A carefully worded commitment to reach net zero by 2050 cost little, generated positive headlines, and was unlikely to be scrutinised until long after the executives who made it had moved on. That calculation is changing. Regulators in several jurisdictions now require environmental claims to be specific, substantiated and verifiable, and they have begun to fine firms that fall short. Meanwhile, activist investors and campaign groups have become adept at comparing public pledges with what companies actually disclose in their annual accounts, and are quick to publicise any gap. The result, somewhat paradoxically, has been a rise in what some analysts call greenhushing: companies that are making genuine progress choosing to say less about it, for fear that any imperfection in their data will be seized upon. A survey of 1,200 firms last year found that almost a quarter had deliberately scaled back their sustainability communications, even though their targets remained unchanged. Some observers welcome this as a healthy correction after years of exaggeration. Others are more concerned. If the companies doing the most are also saying the least, they argue, investors and consumers lose the very information they need to reward good performance, and the pressure on laggards to improve is correspondingly reduced. The challenge for regulators, then, is to deter misleading claims without discouraging honest ones. » — What does the writer suggest about sustainability claims in the past?",
+   "options": [
+    "They were strictly regulated",
+    "They carried little risk for those who made them",
+    "They were mainly made by small firms",
+    "They were usually accurate"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement cette note de la direction : « Were the merger _____ ahead, around 300 roles could be affected. As the board has yet to reach a decision, staff are understandably anxious. It is essential that communication be handled sensitively, lest rumours undermine the process. Only once the review is complete will the company make a formal announcement. »",
+   "options": [
+    "going",
+    "to go",
+    "go",
+    "gone"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Transcription de l'écoute : « Speaker: There's a tendency in these debates to treat productivity as if it were a single, easily measurable quantity. It isn't. / Speaker: When companies tell us remote staff are more productive, what they've usually measured is output on well-defined, individual tasks, which is precisely the kind of work that benefits from fewer interruptions. / Speaker: What those measures tend to miss is the slower, more diffuse stuff: the junior colleague who learns how to handle a difficult client by overhearing a call, or the idea that emerges from a conversation in the corridor. / Speaker: None of that shows up in this quarter's figures, but you'd be unwise to assume it doesn't show up eventually, usually in the form of a weaker talent pipeline. » — What is the speaker's criticism of claims about remote productivity?",
+   "options": [
+    "They exaggerate the cost of offices",
+    "They ignore employee wellbeing",
+    "They only measure narrow individual tasks",
+    "They are based on too small a sample of companies"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Document (email) : « From: Daniel Okoye, Operations Director To: Executive Committee Subject: Review of the warehouse automation pilot Colleagues, As requested, here is my assessment of the six-month automation pilot at our Tilbury warehouse, ahead of next week's decision on whether to extend it to our other three sites. The headline figures are, on the face of it, impressive: picking errors fell by 41 percent and throughput rose by 18 percent. I would caution, however, against reading too much into them. The pilot site was selected precisely because it had the most modern building and the most experienced workforce, and it received a level of support from the vendor's engineers that we cannot assume will be available, or affordable, at scale. More significantly, the projected payback period of three years rests on labour savings that have not yet materialised. Headcount at Tilbury is unchanged, partly because staff have been redeployed to supervise the robots, and partly because the system still requires manual intervention more often than the vendor anticipated. None of this is an argument for abandoning automation. I remain convinced that it is the right long-term direction. But I would recommend a more cautious next step: extending the pilot to one further site, ideally our oldest one at Corby, where conditions are least favourable. If the results hold there, we will have a far more reliable basis for a group-wide investment of this size. Daniel » — Why does Daniel question the headline figures?",
+   "options": [
+    "They were calculated by the vendor",
+    "The pilot took place in unusually favourable conditions",
+    "They cover too short a period",
+    "They contradict staff feedback"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement cette note de la direction : « Were the merger to go ahead, around 300 roles could be affected. _____ the board has yet to reach a decision, staff are understandably anxious. It is essential that communication be handled sensitively, lest rumours undermine the process. Only once the review is complete will the company make a formal announcement. »",
+   "options": [
+    "As",
+    "Despite",
+    "However",
+    "Unless"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Victor: On paper, buying Delmar Analytics makes sense. Their client base complements ours almost perfectly, and the price is, if anything, on the low side. / Naomi: Which is precisely what makes me uneasy. Companies don't usually sell below value unless there's something they'd rather we didn't look at too closely. / Victor: Due diligence hasn't flagged anything major. There's the pending dispute with their former co-founder, but our lawyers think the exposure is limited. / Naomi: Limited according to whom, though? And based on what? / Victor: Our lawyers. Although, admittedly, they've only seen what Delmar chose to disclose. / Naomi: Then I'm not prepared to sign off on the current terms. I'm not saying we walk away, but I'd want part of the price held back until the dispute is settled. / Victor: An escrow arrangement. They'll resist it, but it's hardly an unusual request in a deal like this. / Naomi: And if they refuse outright, that tells us something too, doesn't it? / Victor: It does. I'll put it to their advisers this week and see how they react. » — Why is Naomi suspicious of the deal?",
+   "options": [
+    "The two client bases overlap too much",
+    "The asking price seems unusually low",
+    "Due diligence revealed serious problems",
+    "Victor has a conflict of interest"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (article) : « The Subscription Trap There was a time, not so long ago, when converting a product into a subscription was regarded as the closest thing in business to a free lunch. Recurring revenue was predictable, investors rewarded it with generous valuations, and customers, lulled by modest monthly fees, seemed scarcely to notice what they were paying in aggregate. That consensus is fraying. Churn rates across consumer subscription services have climbed steadily, and a growing share of customers now cancel and re-subscribe according to whatever they happen to want that month, a behaviour the industry has rather ruefully christened serial churning. What was meant to be a long-term relationship has, for many users, become a series of short-term transactions, with the added cost to the provider of re-acquiring the same customer several times a year. Business-to-business software, long assumed to be immune, is not faring much better. Finance departments under pressure to cut costs have started auditing the dozens of tools their companies subscribe to, often discovering licences that nobody has used in months. Vendors that once took renewals for granted are finding themselves in negotiations they had not prepared for. It would be premature to declare the model dead. For products that are genuinely used every day, a subscription remains a perfectly sensible arrangement for both sides. The difficulty lies with the many firms that adopted it not because it suited their product but because it suited their valuation. For them, the coming years are likely to involve some uncomfortable rethinking, and perhaps a quiet return to the old-fashioned practice of simply selling things. » — Why were subscriptions initially so attractive to companies?",
+   "options": [
+    "Customers explicitly asked for them",
+    "They were cheaper to operate",
+    "Regulators encouraged them",
+    "They generated predictable income that investors rewarded"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement cette note de la direction : « Were the merger to go ahead, around 300 roles could be affected. As the board has yet to reach a decision, staff are understandably anxious. It is essential that communication be handled _____, lest rumours undermine the process. Only once the review is complete will the company make a formal announcement. »",
+   "options": [
+    "sensitive",
+    "sensitivity",
+    "sensible",
+    "sensitively"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Transcription de l'écoute : « Commentator: It has become fashionable to speak of reshoring as though bringing production home were simply a matter of political will. The reality is rather less obliging. / Commentator: A firm can relocate a factory in eighteen months; rebuilding the dense web of specialist suppliers, toolmakers and skilled technicians that once surrounded it can take a generation, if it happens at all. / Commentator: None of which is to dismiss the case for greater resilience. The pandemic exposed genuine vulnerabilities. But resilience and self-sufficiency are not the same thing. / Commentator: For most firms, the more realistic, and arguably more robust, strategy is diversification: spreading suppliers across several regions so that no single disruption can bring the whole operation to a halt. » — What point does the commentator make about reshoring?",
+   "options": [
+    "It is mainly blocked by political opposition at home",
+    "It is faster than most firms believe",
+    "Rebuilding the supplier network is the hardest part",
+    "It always reduces production costs"
+   ],
+   "correctIndex": 2
+  }
+ ],
+ "qcmFin": [
+  {
+   "question": "Transcription de l'écoute : « Project Sponsor: I'm all for ambition, but committing to a March launch when we haven't even finished user testing strikes me as a hostage to fortune. » — What does the speaker think about the March launch?",
+   "options": [
+    "It is ambitious but realistic",
+    "It is risky given the current progress",
+    "It should be brought forward",
+    "It has already been confirmed after user testing"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (email) : « From: Gareth Bloom To: Product team Subject: Feedback on the beta Thanks to everyone for the beta release. Early feedback is broadly positive, and the new dashboard in particular has been well received. I would, however, caution against reading too much into these first reactions: most testers are long-standing customers who are already familiar with our tools. Before we finalise the roadmap, I would like us to recruit at least twenty new users for a second round. » — Why does Gareth want a second round of testing?",
+   "options": [
+    "The dashboard received negative feedback",
+    "Long-standing customers refused to take part",
+    "The first testers may not reflect new users",
+    "The roadmap has already been finalised"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez l'expression qui convient pour introduire une concession dans une réponse orale argumentée : « I strongly support the hybrid model. _____, it does require managers to plan meetings more carefully. »",
+   "options": [
+    "As a result",
+    "In addition",
+    "For instance",
+    "Admittedly"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez la forme correcte : « Not only _____ the project on time, but it also came in under budget. »",
+   "options": [
+    "the team delivered",
+    "delivered the team",
+    "did the team deliver",
+    "the team did deliver"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Transcription de l'écoute : « Regional Manager: The new commission structure was supposed to reward teamwork; in practice, it's had people quietly steering clients away from colleagues' territories. » — What is the speaker suggesting?",
+   "options": [
+    "Teamwork has improved since the change",
+    "Clients have complained about the sales team",
+    "Territories should be merged",
+    "The new system has had the opposite effect"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (article) : « Much has been written about the four-day week, most of it either evangelical or dismissive. The trials run so far are encouraging, but they share a bias that is rarely acknowledged: companies volunteered to take part, and those most likely to volunteer were those already confident that the model would suit them. Whether the results would hold in a sector with round-the-clock customer demand remains an open question. » — What is the writer's main point?",
+   "options": [
+    "The trial results may not apply to all types of company",
+    "The four-day week has clearly failed in most trials",
+    "Customer-facing sectors have already adopted the model",
+    "Companies were forced to take part in the trials"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Choisissez la forme correcte : « _____ we known about the contamination earlier, we could have warned the retailer. »",
+   "options": [
+    "Had",
+    "If",
+    "Have",
+    "Should"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Head of IT: We could patch the old system for another year, and I wouldn't lose sleep over it, but every patch makes the eventual migration more expensive. » — What is the speaker's position?",
+   "options": [
+    "Delaying is possible but increases future costs",
+    "The old system must be replaced immediately",
+    "Patching the system is too risky",
+    "The migration will be cheaper next year"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (minutes) : « Item 3: Office relocation. The facilities manager presented two sites. The committee agreed in principle to the Riverside option, pending confirmation that the landlord will fund the fit-out works. The finance director noted that, without this contribution, the Riverside option would cost more over five years than the current lease. A decision will be taken at the next meeting. » — What is the status of the Riverside option?",
+   "options": [
+    "It has been formally approved",
+    "It has been rejected for financial reasons",
+    "It will be chosen whatever the landlord decides about the works",
+    "It is favoured but depends on the landlord's contribution"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez le mot qui convient dans ce document préparatoire : « Participants are kindly asked to read the _____ before the session and to come prepared with two examples. »",
+   "options": [
+    "pre-reading",
+    "pre-read",
+    "foreword",
+    "preview"
+   ],
+   "correctIndex": 1
+  }
+ ],
+ "qcmCompetences": [
+  {
+   "competence": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Transcription de l'écoute : « Charles Whitfield: That's certainly an interesting proposal, and we'll bear it in mind when we review our options next year. » — What does the speaker most probably mean?",
+     "options": [
+      "He is enthusiastic and wants to start soon",
+      "He needs more information before deciding",
+      "He is politely declining the proposal for now",
+      "He has already chosen this proposal for next year"
+     ],
+     "correctIndex": 2,
+     "explication": "« an interesting proposal » et « we'll bear it in mind… next year » sont des formules typiques de refus poli en anglais britannique. Il ne demande aucune information supplémentaire."
+    },
+    {
+     "question": "Transcription de l'écoute : « Olivia Grant: That's certainly an interesting idea, and I'll bear it in mind, but I think we should stick with the current supplier for now. » — What is the speaker's real position?",
+     "options": [
+      "She will seriously consider changing supplier",
+      "She wants more information before deciding",
+      "She is politely rejecting the suggestion",
+      "She agrees with the suggestion in principle"
+     ],
+     "correctIndex": 2,
+     "explication": "« interesting idea » et « I'll bear it in mind » sont des accords de façade ; « we should stick with the current supplier » révèle le refus. Elle ne demande pas d'informations supplémentaires (option 2)."
+    },
+    {
+     "question": "Transcription de l'écoute : « Martin Delacroix: Moving on to the rebranding. Hannah, I gather you've had second thoughts about the timing? / Hannah Lowe: Not about the rebrand itself; I'm still convinced it's overdue. What concerns me is launching it in the same quarter as the price increase. / Martin Delacroix: You think customers would connect the two? / Hannah Lowe: I think the press certainly would. 'New logo, higher prices' is a headline that writes itself, and it would undo a lot of the goodwill we're trying to build. / Gareth Pugh: With respect, Hannah, if we push the rebrand back, we lose the trade fair in May, and that's where most of our distributors will see it for the first time. / Hannah Lowe: That's a fair point. Could we unveil it to distributors at the fair, but hold the consumer launch until September? / Gareth Pugh: A soft launch to the trade first. I could live with that, provided the distributors are briefed not to share it publicly. / Martin Delacroix: Then let's go with a trade preview in May and a full launch in September. Gareth, could you draft the embargo note for the distributors? » — What is Hannah's main concern?",
+     "options": [
+      "The rebrand is no longer necessary",
+      "The new logo has not been tested with customers",
+      "The rebrand may be linked to the price rise",
+      "The press has already criticised the price increase"
+     ],
+     "correctIndex": 2,
+     "explication": "« What concerns me is launching it in the same quarter as the price increase… 'New logo, higher prices' » : elle craint l'association des deux. Elle affirme au contraire que le changement d'image est nécessaire (« overdue »)."
+    },
+    {
+     "question": "Complétez chaque phrase avec le mot qui forme l'expression idiomatique correcte : « 1. The CFO finally _____ off on the revised budget yesterday. 2. If the pilot fails, it's back to the drawing board. 3. Can you give me a ballpark figure? It doesn't need to be exact. 4. The client keeps moving the goalposts, so we never know what they really want. 5. The merger fell through when the regulator raised objections. »",
+     "options": [
+      "signed",
+      "wrote",
+      "took",
+      "set"
+     ],
+     "correctIndex": 0,
+     "explication": "« to sign off on » = valider officiellement. « set off » signifie partir, sans rapport."
+    },
+    {
+     "question": "Transcription de l'écoute : « Anil Mehta, Project Lead, Bengaluru (Indian English): Jessica, we'd like to prepone the steering committee to Wednesday, if that's okay. The client audit has been moved up. / Jessica Moore, Programme Director, Atlanta (US English): Prepone, so you mean bring it forward? Wednesday works, but I'll need the deck by Tuesday noon, Eastern time. / Anil Mehta, Project Lead, Bengaluru (Indian English): Noon Eastern is nine thirty in the evening for us, so that should be fine. I'll share it by our end of day. / Jessica Moore, Programme Director, Atlanta (US English): Perfect. And can you loop in the risk team? They had questions last time. / Anil Mehta, Project Lead, Bengaluru (Indian English): Sure, I'll do the needful and add them to the invite. » — What does Anil want to do?",
+     "options": [
+      "Cancel the steering committee",
+      "Hold the meeting earlier",
+      "Hold the meeting later",
+      "Change the meeting's agenda"
+     ],
+     "correctIndex": 1,
+     "explication": "« prepone » (anglais indien) = avancer, reformulé par Jessica : « bring it forward ». L'option « later » correspond à postpone, le contraire."
+    },
+    {
+     "question": "Transcription de l'écoute : « Elena Rossi: I've seen the draft press release about the system outage. It says 'a small number of customers experienced minor delays'. / Hugh Bennett: That's what legal suggested. They want to keep it low-key. / Elena Rossi: I understand, but eleven thousand people couldn't access their accounts for six hours. If we call that minor, the story becomes our tone, not the outage. Let's give the real figure, apologise properly, and announce the compensation. / Hugh Bennett: Fair enough. I'll run your version past legal before lunch. » — What is Elena's main objection to the draft?",
+     "options": [
+      "It contains confidential legal information",
+      "It minimises the scale of the incident",
+      "It announces compensation too early",
+      "It was written without consulting legal"
+     ],
+     "correctIndex": 1,
+     "explication": "Elle reproche la minimisation (« small number… minor delays ») alors que onze mille clients ont été privés d'accès. Le juridique a bien été consulté : c'est lui qui a suggéré la formulation."
+    },
+    {
+     "question": "Transcription de l'écoute : « Elena Rossi: I've seen the draft press release about the system outage. It says 'a small number of customers experienced minor delays'. / Hugh Bennett: That's what legal suggested. They want to keep it low-key. / Elena Rossi: I understand, but eleven thousand people couldn't access their accounts for six hours. If we call that minor, the story becomes our tone, not the outage. Let's give the real figure, apologise properly, and announce the compensation. / Hugh Bennett: Fair enough. I'll run your version past legal before lunch. » — What does Elena mean by 'the story becomes our tone, not the outage'?",
+     "options": [
+      "The press will focus on how the company frames the problem",
+      "The outage will be forgotten quickly",
+      "The press release should adopt a lighter, more reassuring tone",
+      "Customers prefer short statements"
+     ],
+     "correctIndex": 0,
+     "explication": "Elle anticipe que la presse se focalisera sur le ton minimisant de l'entreprise plutôt que sur la panne elle-même. Elle ne propose pas un ton plus léger, au contraire."
+    },
+    {
+     "question": "Transcription de l'écoute : « Elena Rossi: I've seen the draft press release about the system outage. It says 'a small number of customers experienced minor delays'. / Hugh Bennett: That's what legal suggested. They want to keep it low-key. / Elena Rossi: I understand, but eleven thousand people couldn't access their accounts for six hours. If we call that minor, the story becomes our tone, not the outage. Let's give the real figure, apologise properly, and announce the compensation. / Hugh Bennett: Fair enough. I'll run your version past legal before lunch. » — What will Hugh do next?",
+     "options": [
+      "Publish Elena's version immediately",
+      "Rewrite the release himself",
+      "Ask legal to review Elena's version",
+      "Cancel the press release"
+     ],
+     "correctIndex": 2,
+     "explication": "« I'll run your version past legal before lunch » = soumettre au juridique. Il ne publie pas immédiatement."
+    },
+    {
+     "question": "Transcription de l'écoute : « Natalie Cho: I'd be comfortable signing off on the budget, provided the pilot is limited to two regions and we review the results in June. » — What is Natalie's position?",
+     "options": [
+      "She rejects the budget until June",
+      "She approves the budget for all regions",
+      "She will decide after reviewing the results",
+      "She approves the budget under specific conditions"
+     ],
+     "correctIndex": 3,
+     "explication": "« I'd be comfortable…, provided… » exprime un accord conditionnel : deux régions et une revue en juin. Elle ne reporte pas sa décision : la revue de juin porte sur les résultats du pilote."
+    },
+    {
+     "question": "Transcription de l'écoute : « Head of HR: I'm not saying the new policy is a bad idea, but I'd have liked to be consulted before it went out to six thousand people. » — What is the speaker's main feeling?",
+     "options": [
+      "She disagrees completely with the policy.",
+      "She is annoyed about not being involved.",
+      "She is delighted with the policy.",
+      "She wants the policy sent to more people."
+     ],
+     "correctIndex": 1,
+     "explication": "« I'd have liked to be consulted » : elle reproche de ne pas avoir été associée. « I'm not saying the new policy is a bad idea » exclut un désaccord total."
+    }
+   ]
+  },
+  {
+   "competence": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Document (email) : « From: Edward Pryce, Head of Procurement, Thornbury Group To: Lucia Marchetti, Account Manager, Vellora Packaging Subject: Revised proposal Dear Lucia, Thank you for the revised proposal, which arrived on Friday. I can see a great deal of work has gone into it, and the sustainability section in particular is a real step forward. I wonder, though, whether the pricing quite reflects the volumes we discussed in March. My colleagues in finance were, shall we say, a little surprised by the figure on page six. You may also wish to revisit the delivery schedule, as I'm not entirely sure a six-week lead time would sit comfortably with our retail calendar. None of this is insurmountable, of course, and we'd very much like to continue the conversation. Perhaps you could let me have your thoughts by the end of next week? Kind regards, Edward » — What does Edward actually mean by 'a little surprised by the figure on page six'?",
+     "options": [
+      "Finance found the price slightly lower than expected",
+      "Finance needs more time to check the figure",
+      "Finance has noticed a typing error",
+      "Finance considers the price clearly too high"
+     ],
+     "correctIndex": 3,
+     "explication": "« shall we say, a little surprised » est un understatement typique : la surprise est en réalité forte et négative. Le contexte (volumes promis en mars) indique un prix jugé trop élevé."
+    },
+    {
+     "question": "Document (report) : « Outlook and Principal Risks Ardent Biofoods N.V. — Annual Report 2025 (extract) Trading in the first weeks of the new financial year has been broadly in line with our expectations. Volumes in our plant-based dairy range continue to grow, albeit at a more measured pace than in 2024, when demand benefited from an exceptional promotional programme with two major retailers. We therefore expect revenue growth in 2026 to be in the mid-single digits, compared with 11% in the year under review. Input costs remain the most significant uncertainty. Oat and pea protein prices have stabilised since the summer, but they remain some 20% above their five-year average, and our hedging arrangements cover only the first half of the year. Should prices rise again in the autumn, we would seek to recover part of the increase through pricing, although our ability to do so will depend on the competitive environment in each market. We are not, at this stage, in a position to quantify the potential impact with any precision. The Board has also reviewed the risk associated with customer concentration. Our three largest customers accounted for 46% of revenue in 2025, up from 41% the previous year. These relationships are long-standing and, in our view, mutually beneficial; nonetheless, the loss or significant renegotiation of any one of them would have a material adverse effect on the Group's results. Diversifying our customer base, notably through the food-service channel, is one of the objectives of the strategy presented on page 14. Regarding regulation, proposed changes to labelling rules for plant-based products in two of our markets could require us to rename several items. We have engaged constructively with the authorities and believe that any changes can be managed within existing budgets, provided that a reasonable transition period is granted. Taking these factors into account, the Board remains cautiously optimistic. The fundamentals of the category are sound, our brands are well positioned, and our balance sheet gives us the flexibility to continue investing through the cycle. » — Why do the directors expect slower revenue growth in 2026?",
+     "options": [
+      "Because consumers are losing interest in plant-based products.",
+      "Because 2025 benefited from a one-off promotion.",
+      "Because two major retailers have decided to stop selling the plant-based dairy range altogether.",
+      "Because the company has decided to raise its prices."
+     ],
+     "correctIndex": 1,
+     "explication": "La croissance de l'année écoulée « benefited from an exceptional promotional programme » : la base de comparaison est donc gonflée. Les volumes continuent de croître, ce qui exclut la perte d'intérêt des consommateurs ; les distributeurs n'ont pas cessé de vendre la gamme."
+    },
+    {
+     "question": "Document (report) : « Outlook and Principal Risks Ardent Biofoods N.V. — Annual Report 2025 (extract) Trading in the first weeks of the new financial year has been broadly in line with our expectations. Volumes in our plant-based dairy range continue to grow, albeit at a more measured pace than in 2024, when demand benefited from an exceptional promotional programme with two major retailers. We therefore expect revenue growth in 2026 to be in the mid-single digits, compared with 11% in the year under review. Input costs remain the most significant uncertainty. Oat and pea protein prices have stabilised since the summer, but they remain some 20% above their five-year average, and our hedging arrangements cover only the first half of the year. Should prices rise again in the autumn, we would seek to recover part of the increase through pricing, although our ability to do so will depend on the competitive environment in each market. We are not, at this stage, in a position to quantify the potential impact with any precision. The Board has also reviewed the risk associated with customer concentration. Our three largest customers accounted for 46% of revenue in 2025, up from 41% the previous year. These relationships are long-standing and, in our view, mutually beneficial; nonetheless, the loss or significant renegotiation of any one of them would have a material adverse effect on the Group's results. Diversifying our customer base, notably through the food-service channel, is one of the objectives of the strategy presented on page 14. Regarding regulation, proposed changes to labelling rules for plant-based products in two of our markets could require us to rename several items. We have engaged constructively with the authorities and believe that any changes can be managed within existing budgets, provided that a reasonable transition period is granted. Taking these factors into account, the Board remains cautiously optimistic. The fundamentals of the category are sound, our brands are well positioned, and our balance sheet gives us the flexibility to continue investing through the cycle. » — What does the report suggest about input costs?",
+     "options": [
+      "The company is fully protected against any rise in input prices for the whole of 2026 thanks to its hedging.",
+      "Prices have returned to their five-year average.",
+      "The company has already raised its prices to offset them.",
+      "The company's protection against price rises is incomplete and their impact cannot yet be measured."
+     ],
+     "correctIndex": 3,
+     "explication": "Les couvertures ne portent que sur le premier semestre et « we are not, at this stage, in a position to quantify the potential impact ». « fully protected » est faux ; les prix restent 20 % au-dessus de la moyenne ; la hausse des prix de vente n'est qu'une hypothèse (« Should prices rise… we would seek to… »)."
+    },
+    {
+     "question": "Document (report) : « Outlook and Principal Risks Ardent Biofoods N.V. — Annual Report 2025 (extract) Trading in the first weeks of the new financial year has been broadly in line with our expectations. Volumes in our plant-based dairy range continue to grow, albeit at a more measured pace than in 2024, when demand benefited from an exceptional promotional programme with two major retailers. We therefore expect revenue growth in 2026 to be in the mid-single digits, compared with 11% in the year under review. Input costs remain the most significant uncertainty. Oat and pea protein prices have stabilised since the summer, but they remain some 20% above their five-year average, and our hedging arrangements cover only the first half of the year. Should prices rise again in the autumn, we would seek to recover part of the increase through pricing, although our ability to do so will depend on the competitive environment in each market. We are not, at this stage, in a position to quantify the potential impact with any precision. The Board has also reviewed the risk associated with customer concentration. Our three largest customers accounted for 46% of revenue in 2025, up from 41% the previous year. These relationships are long-standing and, in our view, mutually beneficial; nonetheless, the loss or significant renegotiation of any one of them would have a material adverse effect on the Group's results. Diversifying our customer base, notably through the food-service channel, is one of the objectives of the strategy presented on page 14. Regarding regulation, proposed changes to labelling rules for plant-based products in two of our markets could require us to rename several items. We have engaged constructively with the authorities and believe that any changes can be managed within existing budgets, provided that a reasonable transition period is granted. Taking these factors into account, the Board remains cautiously optimistic. The fundamentals of the category are sound, our brands are well positioned, and our balance sheet gives us the flexibility to continue investing through the cycle. » — How do the directors present the relationship with their three largest customers?",
+     "options": [
+      "As valuable but a source of serious risk.",
+      "As deteriorating and likely to be renegotiated soon.",
+      "As a risk that has decreased, since the three customers now account for a smaller share of revenue.",
+      "As a reason to abandon the food-service channel."
+     ],
+     "correctIndex": 0,
+     "explication": "« long-standing and… mutually beneficial; nonetheless, the loss… would have a material adverse effect » : jugement positif, puis concession sur le risque. La part de ces clients est passée de 41 % à 46 % : le risque a augmenté, il n'a pas diminué."
+    },
+    {
+     "question": "Document (report) : « Outlook and Principal Risks Ardent Biofoods N.V. — Annual Report 2025 (extract) Trading in the first weeks of the new financial year has been broadly in line with our expectations. Volumes in our plant-based dairy range continue to grow, albeit at a more measured pace than in 2024, when demand benefited from an exceptional promotional programme with two major retailers. We therefore expect revenue growth in 2026 to be in the mid-single digits, compared with 11% in the year under review. Input costs remain the most significant uncertainty. Oat and pea protein prices have stabilised since the summer, but they remain some 20% above their five-year average, and our hedging arrangements cover only the first half of the year. Should prices rise again in the autumn, we would seek to recover part of the increase through pricing, although our ability to do so will depend on the competitive environment in each market. We are not, at this stage, in a position to quantify the potential impact with any precision. The Board has also reviewed the risk associated with customer concentration. Our three largest customers accounted for 46% of revenue in 2025, up from 41% the previous year. These relationships are long-standing and, in our view, mutually beneficial; nonetheless, the loss or significant renegotiation of any one of them would have a material adverse effect on the Group's results. Diversifying our customer base, notably through the food-service channel, is one of the objectives of the strategy presented on page 14. Regarding regulation, proposed changes to labelling rules for plant-based products in two of our markets could require us to rename several items. We have engaged constructively with the authorities and believe that any changes can be managed within existing budgets, provided that a reasonable transition period is granted. Taking these factors into account, the Board remains cautiously optimistic. The fundamentals of the category are sound, our brands are well positioned, and our balance sheet gives us the flexibility to continue investing through the cycle. » — In the last paragraph, “cautiously optimistic” indicates that the Board",
+     "options": [
+      "expects results to exceed all its previous forecasts.",
+      "has serious doubts about the future of the category.",
+      "is confident overall but unwilling to make firm commitments.",
+      "plans to reduce investment until the cycle improves."
+     ],
+     "correctIndex": 2,
+     "explication": "« cautiously optimistic » = optimisme réel mais mesuré, sans engagement ferme, ce que confirme la liste des incertitudes. Le texte dit au contraire que le bilan permet de « continue investing through the cycle »."
+    },
+    {
+     "question": "Document (report) : « B2B Buying Behaviour Survey 2026 — Key Findings Brightmoor Research Institute 1. Digital channels now dominate the early stages of purchasing Of the 1,850 procurement professionals surveyed, 71% said they complete more than half of their research before speaking to a supplier, compared with 58% in our 2023 survey. Buyers under 35 are the most independent: 84% of them prefer to shortlist suppliers without any contact with a sales representative. This does not, however, mean that sales teams have become irrelevant. Once a shortlist exists, two thirds of respondents still expect a detailed conversation with a specialist before committing to a contract worth more than €100,000. 2. Peer recommendations outweigh vendor content Asked which sources they trust most, respondents ranked recommendations from colleagues in other organisations first, followed by independent reviews. Vendor white papers and webinars came sixth out of eight. Interestingly, respondents who rated vendor content poorly were nevertheless frequent consumers of it, which suggests that such material is used for information gathering even when it is not trusted for decision-making. 3. Firms with structured buying committees report higher satisfaction Organisations in which purchases above a set threshold are reviewed by a cross-functional committee reported higher satisfaction with their suppliers than those in which decisions are taken by a single manager. We would caution against reading too much into this finding. Firms with formal committees tend to be larger and better resourced, and they may simply be in a stronger position to negotiate favourable terms. Our data do not allow us to isolate the effect of the committee itself. 4. Sustainability criteria are rising, but slowly Forty-three per cent of buyers said that environmental criteria were formally included in their supplier evaluations, up from 36% two years ago. However, only 12% reported that such criteria had been decisive in at least one contract award during the past year. The gap between policy and practice remains wide. Methodology note: the survey was conducted online in January and February 2026 across nine European countries. Results have been weighted by company size and sector. The margin of error for the full sample is approximately ±2.3 percentage points. » — According to section 1, what is true of buyers under 35?",
+     "options": [
+      "They never speak to suppliers before signing a contract.",
+      "They make up 71% of the respondents.",
+      "They most often shortlist suppliers without salespeople.",
+      "They no longer expect any detailed conversation with a specialist, even for contracts above €100,000."
+     ],
+     "correctIndex": 2,
+     "explication": "84 % des moins de 35 ans préfèrent établir leur liste restreinte sans commercial. Le chiffre de 71 % concerne l'ensemble des répondants ; et le texte précise que deux tiers attendent encore un échange avant un gros contrat."
+    },
+    {
+     "question": "Document (report) : « B2B Buying Behaviour Survey 2026 — Key Findings Brightmoor Research Institute 1. Digital channels now dominate the early stages of purchasing Of the 1,850 procurement professionals surveyed, 71% said they complete more than half of their research before speaking to a supplier, compared with 58% in our 2023 survey. Buyers under 35 are the most independent: 84% of them prefer to shortlist suppliers without any contact with a sales representative. This does not, however, mean that sales teams have become irrelevant. Once a shortlist exists, two thirds of respondents still expect a detailed conversation with a specialist before committing to a contract worth more than €100,000. 2. Peer recommendations outweigh vendor content Asked which sources they trust most, respondents ranked recommendations from colleagues in other organisations first, followed by independent reviews. Vendor white papers and webinars came sixth out of eight. Interestingly, respondents who rated vendor content poorly were nevertheless frequent consumers of it, which suggests that such material is used for information gathering even when it is not trusted for decision-making. 3. Firms with structured buying committees report higher satisfaction Organisations in which purchases above a set threshold are reviewed by a cross-functional committee reported higher satisfaction with their suppliers than those in which decisions are taken by a single manager. We would caution against reading too much into this finding. Firms with formal committees tend to be larger and better resourced, and they may simply be in a stronger position to negotiate favourable terms. Our data do not allow us to isolate the effect of the committee itself. 4. Sustainability criteria are rising, but slowly Forty-three per cent of buyers said that environmental criteria were formally included in their supplier evaluations, up from 36% two years ago. However, only 12% reported that such criteria had been decisive in at least one contract award during the past year. The gap between policy and practice remains wide. Methodology note: the survey was conducted online in January and February 2026 across nine European countries. Results have been weighted by company size and sector. The margin of error for the full sample is approximately ±2.3 percentage points. » — What is the authors' attitude towards the finding in section 3?",
+     "options": [
+      "They consider it proof that every firm should create a buying committee.",
+      "They are cautious, because other factors could explain the higher satisfaction.",
+      "They reject it as a statistical error.",
+      "They believe single managers negotiate better terms."
+     ],
+     "correctIndex": 1,
+     "explication": "« We would caution against reading too much into this finding » : la taille et les moyens des entreprises pourraient expliquer la satisfaction, et les données ne permettent pas d'isoler l'effet du comité. Ils ne le rejettent pas pour autant comme une erreur."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Halden Logistics Group From: Marta Kowalczyk, Chief Compliance Officer Date: 2 February 2026 Subject: Updated Speak-Up Policy — what has changed and why Colleagues, Following the Board's annual review, our Speak-Up Policy has been updated, and the new version takes effect today. I would like to highlight the main changes and, just as importantly, explain the thinking behind them. First, you can now raise a concern through an independent hotline, operated by an external provider, by telephone or online, 24 hours a day and in eleven languages. You may choose to remain anonymous. Our existing channels — your line manager, HR and the Compliance team — remain available, and many of you will continue to prefer them. That is entirely your choice. Second, the policy now states explicitly that you do not need proof before speaking up. A reasonable belief that something is wrong is sufficient. If a concern raised in good faith turns out to be unfounded, you will not face any negative consequences. Deliberately false reports, on the other hand, will be treated as a disciplinary matter. Third, we have strengthened protection against retaliation. Any form of retaliation — including exclusion from meetings, unjustified changes to working hours or negative comments in performance reviews — will be treated as gross misconduct. Managers are expected to be particularly vigilant on this point, and all managers are required to complete a short training module by 31 March. Why these changes? Our annual staff survey showed that while most colleagues knew how to raise a concern, fewer than half felt confident that they could do so without any impact on their careers. Recent events in parts of our business have also shown that problems which are not raised early tend to become much more serious, and much more costly, later on. A culture in which people speak up is not a sign that something is wrong; it is one of the best indicators that things are being done right. The full policy is available on the intranet. If you have any questions, please contact me or any member of my team. Marta Kowalczyk » — What does the memo say about the existing reporting channels?",
+     "options": [
+      "They have been replaced by the independent hotline.",
+      "They remain available alongside the new hotline.",
+      "They can now be used anonymously.",
+      "They are reserved for managers."
+     ],
+     "correctIndex": 1,
+     "explication": "« Our existing channels… remain available, and many of you will continue to prefer them. » L'anonymat est mentionné pour la nouvelle ligne indépendante, pas pour les canaux internes."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Halden Logistics Group From: Marta Kowalczyk, Chief Compliance Officer Date: 2 February 2026 Subject: Updated Speak-Up Policy — what has changed and why Colleagues, Following the Board's annual review, our Speak-Up Policy has been updated, and the new version takes effect today. I would like to highlight the main changes and, just as importantly, explain the thinking behind them. First, you can now raise a concern through an independent hotline, operated by an external provider, by telephone or online, 24 hours a day and in eleven languages. You may choose to remain anonymous. Our existing channels — your line manager, HR and the Compliance team — remain available, and many of you will continue to prefer them. That is entirely your choice. Second, the policy now states explicitly that you do not need proof before speaking up. A reasonable belief that something is wrong is sufficient. If a concern raised in good faith turns out to be unfounded, you will not face any negative consequences. Deliberately false reports, on the other hand, will be treated as a disciplinary matter. Third, we have strengthened protection against retaliation. Any form of retaliation — including exclusion from meetings, unjustified changes to working hours or negative comments in performance reviews — will be treated as gross misconduct. Managers are expected to be particularly vigilant on this point, and all managers are required to complete a short training module by 31 March. Why these changes? Our annual staff survey showed that while most colleagues knew how to raise a concern, fewer than half felt confident that they could do so without any impact on their careers. Recent events in parts of our business have also shown that problems which are not raised early tend to become much more serious, and much more costly, later on. A culture in which people speak up is not a sign that something is wrong; it is one of the best indicators that things are being done right. The full policy is available on the intranet. If you have any questions, please contact me or any member of my team. Marta Kowalczyk » — According to the memo, what happens to an employee whose honest report proves to be unfounded?",
+     "options": [
+      "The employee will not suffer any negative consequences.",
+      "The employee will receive a formal warning.",
+      "The case will be treated as a disciplinary matter.",
+      "The employee must provide proof before the case is closed."
+     ],
+     "correctIndex": 0,
+     "explication": "« If a concern raised in good faith turns out to be unfounded, you will not face any negative consequences. » Seuls les signalements délibérément faux relèvent du disciplinaire : c'est le piège."
+    },
+    {
+     "question": "Document (memo) : « MEMO To: All staff, Halden Logistics Group From: Marta Kowalczyk, Chief Compliance Officer Date: 2 February 2026 Subject: Updated Speak-Up Policy — what has changed and why Colleagues, Following the Board's annual review, our Speak-Up Policy has been updated, and the new version takes effect today. I would like to highlight the main changes and, just as importantly, explain the thinking behind them. First, you can now raise a concern through an independent hotline, operated by an external provider, by telephone or online, 24 hours a day and in eleven languages. You may choose to remain anonymous. Our existing channels — your line manager, HR and the Compliance team — remain available, and many of you will continue to prefer them. That is entirely your choice. Second, the policy now states explicitly that you do not need proof before speaking up. A reasonable belief that something is wrong is sufficient. If a concern raised in good faith turns out to be unfounded, you will not face any negative consequences. Deliberately false reports, on the other hand, will be treated as a disciplinary matter. Third, we have strengthened protection against retaliation. Any form of retaliation — including exclusion from meetings, unjustified changes to working hours or negative comments in performance reviews — will be treated as gross misconduct. Managers are expected to be particularly vigilant on this point, and all managers are required to complete a short training module by 31 March. Why these changes? Our annual staff survey showed that while most colleagues knew how to raise a concern, fewer than half felt confident that they could do so without any impact on their careers. Recent events in parts of our business have also shown that problems which are not raised early tend to become much more serious, and much more costly, later on. A culture in which people speak up is not a sign that something is wrong; it is one of the best indicators that things are being done right. The full policy is available on the intranet. If you have any questions, please contact me or any member of my team. Marta Kowalczyk » — What is the difference between the two obligations placed on managers in the fourth paragraph?",
+     "options": [
+      "Both are recommendations without a deadline.",
+      "Vigilance is compulsory, but the training is optional.",
+      "Vigilance is an expectation, while the training is a firm requirement with a deadline.",
+      "Both apply only to managers in Compliance."
+     ],
+     "correctIndex": 2,
+     "explication": "« are expected to be particularly vigilant » exprime une attente ; « are required to complete a short training module by 31 March » est une obligation datée. Le texte joue sur cette différence de degré."
+    }
+   ]
+  },
+  {
+   "competence": "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Choisissez la formule qui permet au président de conclure une discussion de comité : « So we're all agreed on a phased rollout. Let's _____ that as a decision, and Priya will report back in June. »",
+     "options": [
+      "minute",
+      "table",
+      "chair",
+      "second"
+     ],
+     "correctIndex": 0,
+     "explication": "« to minute something » = le consigner au procès-verbal. « to table » signifie soumettre au débat (en anglais britannique), ce qui n'a pas de sens une fois la décision prise ; « to second » = appuyer une motion."
+    },
+    {
+     "question": "Complétez ces formules de gestion du processus de négociation : « It feels as though we're going round in circles. Can we park the question of exclusivity for a moment and come back to it later? Let me check I've got the full _____: you need volume, and we need a March start. If we can't reach an agreement today, that's fine, but let's at least put what we've agreed in writing so there's no ambiguity. »",
+     "options": [
+      "image",
+      "view",
+      "picture",
+      "scene"
+     ],
+     "correctIndex": 2,
+     "explication": "« the full picture » = la vision d'ensemble. « the full image » est un calque du français."
+    },
+    {
+     "question": "Choisissez la formulation qui convient le mieux devant un comité de direction : « I'll _____: we won't meet the March deadline, and here's why. »",
+     "options": [
+      "cut corners",
+      "cut it fine",
+      "cut to the chase",
+      "cut both ways"
+     ],
+     "correctIndex": 2,
+     "explication": "« to cut to the chase » = aller droit au but, idéal pour donner la conclusion d'abord. « cut it fine » signifie se laisser très peu de marge ; « cut both ways » = avoir des effets dans les deux sens."
+    },
+    {
+     "question": "Complétez avec la structure d'emphase correcte : « _____ reduce our costs, but it would also improve delivery times. »",
+     "options": [
+      "Not only it would",
+      "Not only would it",
+      "Not only it will",
+      "Only not would it"
+     ],
+     "correctIndex": 1,
+     "explication": "Après « Not only » en tête de phrase, l'auxiliaire précède le sujet : « Not only would it… ». « Not only it would » oublie l'inversion, erreur très fréquente."
+    },
+    {
+     "question": "Choisissez la formulation la plus exacte dans une déclaration de crise, alors que l'enquête est en cours : « _____ that payment details were accessed. »",
+     "options": [
+      "We have no evidence at this stage",
+      "We can guarantee",
+      "It is impossible",
+      "Nobody believes"
+     ],
+     "correctIndex": 0,
+     "explication": "Tant que l'enquête n'est pas close, on dose la certitude : « We have no evidence at this stage that… ». « We can guarantee » ou « It is impossible » engagent l'entreprise sur un fait non vérifié."
+    },
+    {
+     "question": "Complétez l'expression idiomatique : « A six-month transition period should help to soften the _____ for the teams affected by the restructuring. »",
+     "options": [
+      "hit",
+      "fall",
+      "shock",
+      "blow"
+     ],
+     "correctIndex": 3,
+     "explication": "La collocation figée est « to soften the blow » (amortir le choc). « soften the shock » ou « soften the hit » sont compréhensibles mais non idiomatiques."
+    },
+    {
+     "question": "Choisissez la formulation qui exprime un désaccord de façon diplomatique : « _____, but I'm not sure the timing works for the Asian distributors. »",
+     "options": [
+      "You're completely wrong",
+      "That's a stupid idea",
+      "I can see where you're coming from",
+      "With no respect"
+     ],
+     "correctIndex": 2,
+     "explication": "On reconnaît le point de vue de l'interlocuteur avant de nuancer. Les autres formules sont frontales, voire insultantes ; « with no respect » détourne « with the greatest respect »."
+    },
+    {
+     "question": "Complétez avec l'expression qui permet de répondre honnêtement à une question imprévue : « I don't have the exact figures _____, but I'll send them to you by Friday. »",
+     "options": [
+      "at hand",
+      "to hand",
+      "in hand",
+      "by hand"
+     ],
+     "correctIndex": 1,
+     "explication": "« to have something to hand » = l'avoir sous la main. « in hand » signifie maîtrisé ou en cours ; « by hand » = à la main (manuellement)."
+    },
+    {
+     "question": "Choisissez l'expression correcte : « Our projections suggest a payback period of eighteen months, and this is _____ out by the results of the pilot in Lyon. »",
+     "options": [
+      "carried",
+      "backed",
+      "borne",
+      "held"
+     ],
+     "correctIndex": 2,
+     "explication": "« to be borne out by » = être confirmé par. « backed » exige « up » (backed up by) ; « carried out » signifie « réalisé »."
+    },
+    {
+     "question": "Choisissez l'expression qui complète la concession conditionnelle : « We could include on-site training at no extra cost, _____ that the contract runs for at least three years. »",
+     "options": [
+      "unless",
+      "even though",
+      "in case",
+      "provided"
+     ],
+     "correctIndex": 3,
+     "explication": "« provided that » = à condition que : il introduit la condition de la concession. « unless » (sauf si) inverserait le sens ; « in case » signifie « au cas où »."
+    }
+   ]
+  },
+  {
+   "competence": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Chaque phrase reprend une erreur fréquente relevée dans les rédactions du groupe. Choisissez la forme correcte, puis comparez votre réponse avec celle du formateur pendant la séance : « 1. We recommend that the committee approve the revised budget. 2. Costs rose _____ 9% last year, reaching €4.2 million. 3. Lumio and Pexa hold 28% and 19% of the market respectively. 4. Despite the high initial cost, the system pays for itself within two years. 5. We observed a significant increase in staff turnover. 6. The Provider shall respond to urgent requests within two hours (mandatory requirement). 7. The current situation is difficult, but we expect a recovery next year. 8. Far from simplifying the process, the proposal would increase administrative work. »",
+     "options": [
+      "of",
+      "to",
+      "at",
+      "by"
+     ],
+     "correctIndex": 3,
+     "explication": "« rose by 9% » exprime l'écart ; « reaching €4.2 million » donne le niveau atteint (on aurait pu écrire « to €4.2 million »)."
+    },
+    {
+     "question": "Document (report) : « Learner's paragraph (market analysis, extract): The market of refurbished laptops is very big and it grows a lot, it was 620 million euros in 2025 and it has an important growth of 9%, this is amazing because the market of normal computers only grows of 2%. The actual leaders are Lumio, Pexa and Rendo, they have respectively 28, 19 and 11%. So there is a lot of place for new companies. Actually the public buyers must buy refurbished products because of a new law, so this is why the market grows. To conclude, we must absolutely go on this market. » — Which C4 criterion is most clearly met by this paragraph?",
+     "options": [
+      "Control of grammatical forms",
+      "Precision and range of business vocabulary",
+      "Appropriate formal register",
+      "Relevance to the task, with key figures"
+     ],
+     "correctIndex": 3,
+     "explication": "Le paragraphe reprend les chiffres clés et répond au sujet (taille, croissance, concurrence, moteur, conclusion). En revanche, la grammaire (grows of, an important growth), le vocabulaire (important, actual) et le registre (amazing, absolutely) sont fragiles."
+    },
+    {
+     "question": "Choisissez la forme correcte dans ce rapport formel : « The auditors recommend that each site _____ its own risk register from January. »",
+     "options": [
+      "keeps",
+      "keep",
+      "kept",
+      "will keep"
+     ],
+     "correctIndex": 1,
+     "explication": "Après « recommend that », l'anglais écrit soutenu emploie le subjonctif (base verbale) : « that each site keep ». « keeps » est la faute la plus fréquente."
+    },
+    {
+     "question": "Complétez la conclusion de ce rapport en choisissant dans chaque liste la forme la plus correcte et la plus adaptée au registre écrit soutenu : « 5. Recommendation On balance, Option B offers the most favourable trade-off between cost and operational risk. We therefore recommend that the board _____ the relocation to the Saint-Priest site, provided that a detailed lease review is completed beforehand. Should the board approve this recommendation, the facilities team would begin negotiations in early May. The main risk, namely disruption during the move, could be mitigated by scheduling the transfer over two consecutive weekends. »",
+     "options": [
+      "approves",
+      "approve",
+      "will approve",
+      "approving"
+     ],
+     "correctIndex": 1,
+     "explication": "Après « recommend that », l'anglais écrit soutenu emploie le subjonctif, c'est-à-dire la base verbale sans -s : that the board approve. « approves » est une faute fréquente dans ce registre."
+    },
+    {
+     "question": "Complétez la conclusion de ce rapport en choisissant dans chaque liste la forme la plus correcte et la plus adaptée au registre écrit soutenu : « 5. Recommendation On balance, Option B offers the most favourable trade-off between cost and operational risk. We therefore recommend that the board approve the relocation to the Saint-Priest site, provided that a detailed lease review is completed beforehand. _____ the board approve this recommendation, the facilities team would begin negotiations in early May. The main risk, namely disruption during the move, could be mitigated by scheduling the transfer over two consecutive weekends. »",
+     "options": [
+      "Should",
+      "If",
+      "Would",
+      "Unless"
+     ],
+     "correctIndex": 0,
+     "explication": "L'inversion conditionnelle « Should the board approve… » remplace « If the board approves… ». « If » est impossible ici car le verbe qui suit est à la base verbale sans sujet inversé correct."
+    },
+    {
+     "question": "Complétez la conclusion de ce rapport en choisissant dans chaque liste la forme la plus correcte et la plus adaptée au registre écrit soutenu : « 5. Recommendation On balance, Option B offers the most favourable trade-off between cost and operational risk. We therefore recommend that the board approve the relocation to the Saint-Priest site, provided that a detailed lease review is completed beforehand. Should the board approve this recommendation, the facilities team would begin negotiations in early May. The main risk, namely disruption during the move, _____ by scheduling the transfer over two consecutive weekends. »",
+     "options": [
+      "could mitigate",
+      "could be mitigated",
+      "could have mitigated",
+      "is mitigating"
+     ],
+     "correctIndex": 1,
+     "explication": "Le sujet « the main risk » subit l'action : il faut un passif (could be mitigated). « could mitigate » ferait du risque l'agent de l'atténuation, ce qui est absurde."
+    },
+    {
+     "question": "Choisissez pour chaque trou le mot ou l'expression qui rend la synthèse plus concise et plus précise : « Rising resin prices have eroded our gross margin by 2.4 points since 2024. In addition, the duplication of contracts across our three plants has prevented us from negotiating volume discounts. _____, these factors point to a structural rather than a temporary problem. Lower freight costs have only partly offset the increase. We are seeking the board's approval of a €1.2 million budget by 30 June. »",
+     "options": [
+      "All in all of them",
+      "Taken together",
+      "Putting together",
+      "Together taken"
+     ],
+     "correctIndex": 1,
+     "explication": "« Taken together » (pris ensemble) est la tournure participiale figée pour synthétiser. « Putting together » ferait du lecteur le sujet implicite et n'a pas ce sens."
+    },
+    {
+     "question": "Complétez ce document préparatoire à un retour d'expérience en choisissant la forme correcte : « Lessons-learned review: data migration incident of 3 June The session will focus on processes, and not on individuals. We will meet with a view to agreeing three improvements to our migration procedure. Participants are expected to have shared their team's timeline of the incident before the meeting. Questions to consider: what prevented earlier detection, and which safeguards worked as intended? Finance will _____ a proposal for an additional testing budget under item 4. »",
+     "options": [
+      "table",
+      "put",
+      "post",
+      "desk"
+     ],
+     "correctIndex": 0,
+     "explication": "En anglais britannique, « to table a proposal » signifie soumettre une proposition à la discussion. Attention : en anglais américain, le même verbe signifie ajourner. « put » demanderait « put forward »."
+    },
+    {
+     "question": "Complétez chaque phrase avec l'inversion correcte : « Not only _____ the deadline, but the team also reduced costs by 8%. Rarely have we seen such a high response rate to a staff survey. At no time were we informed of the change in specifications. Only when the second audit was complete did we understand the scale of the problem. No sooner had the price list been published than two competitors cut their prices. Under no circumstances should passwords be shared with external contractors. »",
+     "options": [
+      "the team met",
+      "did the team meet",
+      "the team did meet",
+      "met the team"
+     ],
+     "correctIndex": 1,
+     "explication": "Après « Not only » en tête de phrase, on inverse avec l'auxiliaire : « did the team meet ». « met the team » inverse le verbe lexical, ce qui n'est pas possible en anglais moderne."
+    },
+    {
+     "question": "Complétez chaque phrase avec l'inversion correcte : « Not only did the team meet the deadline, but the team also reduced costs by 8%. Rarely _____ such a high response rate to a staff survey. At no time were we informed of the change in specifications. Only when the second audit was complete did we understand the scale of the problem. No sooner had the price list been published than two competitors cut their prices. Under no circumstances should passwords be shared with external contractors. »",
+     "options": [
+      "we have seen",
+      "have we seen",
+      "we saw",
+      "seen we have"
+     ],
+     "correctIndex": 1,
+     "explication": "« Rarely » en tête entraîne l'inversion : « have we seen ». « we have seen » serait correct seulement si « rarely » était placé après le sujet."
+    }
+   ]
+  }
+ ],
+ "questionsOuvertesDebut": [
+  {
+   "question": "Some companies are asking employees to return to the office full-time, while others are keeping remote work. What is your opinion on remote work? Give reasons and examples to support your view.",
+   "reponseAttendue": "In my view, a hybrid model is clearly the most effective option, although I don't think there's a single answer for every company. On the one hand, remote work has real advantages. People save time on commuting, and for tasks that need concentration, such as writing a report or analysing data, working from home is often more productive. In my previous job, our team actually completed projects faster after we introduced two remote days a week. On the other hand, full-time remote work has hidden costs. New employees learn a lot simply by listening to experienced colleagues, and that's much harder over video calls. Creativity also suffers: many good ideas come from informal conversations that never happen online. That said, forcing everyone back to the office five days a week sends a message of mistrust and may push talented people to leave. So I'd argue that the best approach is to agree on shared office days for collaboration and leave the rest flexible. What matters is not where people work, but whether the organisation of work is clear and fair."
+  },
+  {
+   "question": "Describe a problem you had at work. What happened, what did you do to solve it, and what did you learn from it?",
+   "reponseAttendue": "Last year, I was responsible for organising a training day for twenty new employees. Two days before the event, the trainer called me to say she was ill and couldn't come. At first I panicked, because the programme was already printed and everyone had booked the day. So I contacted two experienced colleagues, and they agreed to run the morning session. Then I asked the training company to send a replacement for the afternoon, and they found someone the same day. In the end, the feedback was very positive. What I learned is that you should always have a plan B, so now I keep a list of internal colleagues who can step in at short notice."
+  },
+  {
+   "question": "Your team is moving to a new office next month. Write an email to your colleagues to explain the move. Include: the date and the new address, what they need to do before the move, and what will be different in the new office. (Rappel : écrivez un courriel structuré à vos collègues, au moins 150 mots, en traitant les trois points demandés.)",
+   "reponseAttendue": "Subject: Our move to the new office on 14 November\n\nHi everyone,\n\nAs you know, our team is moving to a new office next month. I'd like to give you some practical information so that the move goes smoothly.\n\nThe move will take place on Friday 14 November. From Monday 17 November, we will work at 25 Harbour Street, on the fourth floor. The building is a ten-minute walk from Central Station, and there is a car park behind it.\n\nBefore the move, please do three things. First, clear your desk and put your personal items in the boxes that Facilities will deliver on 10 November. Second, label every box with your name and team. Finally, save all your files on the shared drive, because our computers will be reset.\n\nThere will also be some changes in the new office. We will not have fixed desks any more, so you will need to book a desk using the new app. However, there will be four meeting rooms instead of one, and a much bigger kitchen.\n\nIf you have any questions, please let me know.\n\nBest regards,\nClaire"
+  },
+  {
+   "question": "Please introduce yourself. Tell us your name, what you do, where you work and what you do on a typical working day.",
+   "reponseAttendue": "Hello, my name is Karim Benali. I'm a sales assistant at Delta Home, a company that sells kitchen equipment. I work in our office in Lille. On a typical day, I start at half past eight. First, I read my emails and answer questions from customers. Then I prepare quotes and send them to our clients. In the afternoon, I often call customers to check their orders. I like my job because I speak to a lot of different people."
+  },
+  {
+   "question": "Transcription de l'écoute : « Compliance Officer: Following the recent audit, we're tightening our policy on supplier gifts and hospitality. With immediate effect, staff may accept hospitality worth no more than fifty pounds per occasion, and anything above twenty pounds must be logged in the gifts register within five working days. Gifts from suppliers currently involved in a tender are prohibited outright, regardless of value. » — Maximum value of hospitality per occasion (£):",
+   "reponseAttendue": "50 / £50 / 50 pounds / fifty / fifty pounds. « No more than fifty pounds per occasion » : 50 £ au maximum."
+  },
+  {
+   "question": "Transcription de l'écoute : « Compliance Officer: Following the recent audit, we're tightening our policy on supplier gifts and hospitality. With immediate effect, staff may accept hospitality worth no more than fifty pounds per occasion, and anything above twenty pounds must be logged in the gifts register within five working days. Gifts from suppliers currently involved in a tender are prohibited outright, regardless of value. » — Value above which a gift must be logged (£):",
+   "reponseAttendue": "20 / £20 / 20 pounds / twenty / twenty pounds. « Anything above twenty pounds must be logged » : au-delà de 20 £, déclaration obligatoire."
+  },
+  {
+   "question": "Transcription de l'écoute : « Compliance Officer: Following the recent audit, we're tightening our policy on supplier gifts and hospitality. With immediate effect, staff may accept hospitality worth no more than fifty pounds per occasion, and anything above twenty pounds must be logged in the gifts register within five working days. Gifts from suppliers currently involved in a tender are prohibited outright, regardless of value. » — Deadline for logging it (in working days):",
+   "reponseAttendue": "5 / five / 5 days / five days / 5 working days / five working days. « Within five working days » : sous cinq jours ouvrés."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Revenue in the third quarter (in millions of euros):",
+   "reponseAttendue": "2.4 / 2,4 / 2.4 million / 2.4 million euros / €2.4 million / 2.4m. « Two point four million euros » = 2,4 millions d'euros."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Increase compared with last year (%):",
+   "reponseAttendue": "18 / 18% / 18 % / eighteen / 18 percent. « Up eighteen percent on last year » : hausse de 18 %."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Current churn rate (%):",
+   "reponseAttendue": "6 / 6% / 6 % / six / 6 percent. Le taux d'attrition est passé de 9 % à 6 % ; la valeur actuelle est 6 %."
+  }
+ ],
+ "questionsOuvertesFin": [
+  {
+   "question": "Your company is considering a four-day working week for its head office staff. Argue either for or against introducing it as a trial, supporting your position with evidence and addressing the strongest objection.",
+   "reponseAttendue": "What I'd like to argue is that we should trial a four-day week at head office, for six months and for non-client-facing teams only. First, our engagement survey shows that workload and fatigue are now the main reasons people give for leaving, and replacing a manager costs us roughly half their annual salary. Which matters because even a modest drop in turnover would cover the cost of the trial. Second, several firms in our sector that have run similar pilots report stable or slightly higher output, largely because meetings get shorter and priorities get sharper. Now, you could argue that customers would find us harder to reach. That's a fair point, which is exactly why I'd exclude client-facing teams from the first phase. Admittedly, the evidence from other companies isn't conclusive. Even so, a time-limited, measured pilot carries very little risk. So what I'm proposing is a six-month trial, with output, absence and retention tracked monthly, and a go or no-go decision at the end."
+  },
+  {
+   "question": "A board member claims that your company should stop all sponsorship of local sports clubs because 'it has no measurable return'. Present a reasoned counter-argument, using at least two pieces of evidence and showing where you agree with the board member.",
+   "reponseAttendue": "I take the point that sponsorship is harder to measure than, say, a digital campaign, and I agree that we shouldn't spend money we can't account for. But I'd question the premise that there's no measurable return. Last year, two thirds of our new apprentices told us they'd first heard of the company through a club we support, and in a tight labour market, that's a recruitment channel we'd otherwise have to pay agencies for. Secondly, our local sales team reports that sponsorship opens doors with small business owners who sit on those club committees. That's admittedly anecdotal, but it's consistent across three regions. So rather than stopping altogether, I'd suggest we keep the partnerships that clearly feed recruitment or sales, drop the ones that don't, and attach two or three simple indicators to each contract, such as applications received or meetings generated. In all likelihood, we'd end up spending less, but spending it far more deliberately. And if, after a year, the indicators show nothing, I'd be the first to recommend pulling out."
+  },
+  {
+   "question": "In a meeting, a senior colleague states: 'Our customers don't care about sustainability; they only look at price.' You have survey data showing that 40% of your B2B customers now include environmental criteria in their tenders. Respond to your colleague tactfully but firmly.",
+   "reponseAttendue": "I can see where you're coming from, and I'd agree that price is still the deciding factor in most of our deals. That said, I'm not sure the data supports the idea that customers don't care about sustainability at all. In our last survey, forty per cent of our business customers told us they now include environmental criteria in their tenders, and that figure has roughly doubled in two years. So the way I'd put it is that sustainability may not win us a contract on its own, but it's increasingly what gets us onto the shortlist in the first place. Rather than debating it in the abstract, could we look at the last ten tenders we lost and check how many had environmental requirements we couldn't meet? That would give us a much clearer picture before we decide anything."
+  },
+  {
+   "question": "You manage a conference venue. A corporate client insists on a 20% discount for their annual three-day event, which you cannot grant. Speak to the client: explore their interests, reframe the issue and propose a conditional solution that protects your margin.",
+   "reponseAttendue": "Thank you for being upfront about the twenty per cent. Before we talk figures, could you help me understand what's driving that number? Is it a reduction in your overall events budget, or is it more about the cost per delegate? And what would make this year's event a success from your side? If I've understood your colleague's email correctly, the real pressure is on the per-head cost, because attendance is likely to be lower this year. If that's the case, I think there's more room to work with than a straight discount. For example, if you could move the event from June to early May, which is a quieter period for us, we'd be in a position to reduce the room hire by around ten per cent. And provided that you confirm the booking for the next two years, we could include the evening reception at no extra charge, which would bring your cost per delegate down considerably. I can't go to twenty per cent on the current dates, but I'm confident we can find a package that works for both of us."
+  },
+  {
+   "question": "You are buying cloud services for your company. At the end of a long meeting, the supplier's account manager says: 'Look, this is our final offer, and it's only valid until five o'clock today.' The offer is reasonable on price but the contract has no service level agreement. Respond.",
+   "reponseAttendue": "I appreciate you being clear, and I'll say straight away that the pricing is competitive; we're not far apart on that. But I'm not in a position to sign anything by five o'clock today, and to be honest, a deadline like that makes me more cautious rather than less. The real sticking point for us isn't price, it's the absence of a service level agreement. We're moving our customer-facing applications onto this platform, so an outage without any guaranteed response time or service credits is a risk my board simply won't accept. So here's what I'd suggest. If you can add a standard SLA, say ninety-nine point nine per cent availability with service credits, I'm confident we can sign this week at the price you've proposed. I'd much rather close this with you, so let's see whether your legal team can turn that around by Thursday."
+  },
+  {
+   "question": "You sell industrial cleaning equipment. A prospect tells you: 'Your machine is 15% more expensive than your competitor's. Why should we pay more?' Make the case for your product without immediately offering a discount.",
+   "reponseAttendue": "That's a fair question, and you're right: on the purchase price alone, we're about fifteen per cent higher. But I'd encourage you to look at what the machine will actually cost you over its lifetime. Ours uses roughly thirty per cent less water and detergent, which, at your volumes, comes to around four thousand euros a year. It's also designed to run for ten years rather than six, and the maintenance contract is fixed for the first five, so you're not exposed to unexpected repair bills. And perhaps most importantly, downtime: our average response time for a breakdown is under twenty-four hours, which matters a great deal if a cleaning line stops during a production shift. So on total cost of ownership, we're actually cheaper by the end of year three. Could I ask what matters most to you here: the upfront budget, or the running costs? Because if the upfront figure is the real constraint, we could look at a leasing arrangement rather than touching the price itself."
+  },
+  {
+   "question": "You are about to open a negotiation with a new partner. In about one minute, set the frame: thank your counterpart, propose how to structure the conversation, state your main priority without revealing your walk-away point, and ask an open question about their needs.",
+   "reponseAttendue": "Thanks very much for making the time today, Amara; I know your diary is full this month. I'd suggest we start by setting out what each of us needs from this agreement, then look at volumes and timing, and leave the detailed pricing until we have a clearer picture. From our side, the overriding priority is timing: the product has been approved and we're aiming for a launch in March, so a reliable start date matters more to us than almost anything else. We also want a partner we can grow with over several years, not just a one-off contract. So before we talk numbers, could you tell me what would make this partnership worthwhile from Pellworth's point of view, and whether there are any constraints on your side we should be aware of?"
+  },
+  {
+   "question": "Debrief your negotiation. Explain what outcome you reached (or why you reached none), describe one concession that worked well and one tactical mistake you made, and say what you would do differently next time.",
+   "reponseAttendue": "We reached an agreement on three of the four variables: a two-year contract, two million packs a year, and a guaranteed March start. The set-up fee wasn't waived, but it's spread across the unit price, which raises it by about two cents. The concession that worked best was offering a second year: I made it conditional on the March start, and that unlocked everything. My main mistake was revealing too early that March was critical. Once my partner knew that, she had a lot of leverage, and I think I paid for it on the unit price. Next time, I'd spend longer exploring her constraints before disclosing my own priorities, and I'd prepare a clearer ranking of my tradeables, because I hesitated when she asked about payment terms. One phrase I'll definitely reuse is 'Can we park that for a moment?'; it really took the tension out of the conversation."
+  },
+  {
+   "question": "A high-performing team member asks you for a 12% pay rise. Your budget allows a maximum of 4% this year, but you are keen to keep her. Respond: acknowledge her contribution, explain the constraint honestly, and offer at least two concrete alternatives with a clear next step.",
+   "reponseAttendue": "First of all, thank you for raising this directly, and let me say clearly that your request is justified. Since you took over the product data project, we've cut reporting time by half, and two other departments now rely on your dashboards. I'll be completely transparent about the constraint: this year, I can't go beyond four per cent on base salary, and I don't want to promise you something I can't deliver. But I don't think the conversation should stop there. Two things I can do. First, your role has clearly grown, so I'd like to put you forward for a regrade to senior analyst, which sits outside the annual budget and would bring your salary much closer to what you're asking. Second, I can add a performance bonus tied to the data platform launch, worth up to six per cent. I'll submit the regrade request to HR by the end of next week and give you their answer before the end of the month. Would that be a reasonable way forward?"
+  },
+  {
+   "question": "Pitch a new service or internal project (real or imagined) to an investment committee or to your company's executive board. Include a hook, the problem, your solution, the market or scope, evidence of traction, and a precise request (amount, use of funds, milestones).",
+   "reponseAttendue": "Last year, our field technicians spent an average of forty minutes a day looking for the right spare part or the right manual. Across three hundred technicians, that's the equivalent of twenty-five full-time jobs, lost every year. The tools we have today were designed for the office, not for someone standing on a ladder in a client's plant room. So we've built FieldMate, a voice-driven assistant that technicians can query hands-free, in their own language, and that pulls answers directly from our maintenance database. What this means in practice is simple: today, technicians search; with FieldMate, they ask. We ran a three-month pilot with forty technicians in the Lyon region. Search time fell by sixty per cent, first-time fix rates rose by nine points, and thirty-seven of the forty asked to keep the tool. We're now asking the board for four hundred and fifty thousand euros to roll it out to all three hundred technicians over the next twelve months: two thirds for integration and licences, one third for training. The first milestone is full coverage in France by June, and on our estimates, the project pays for itself in under eighteen months."
+  }
+ ],
+ "exercices": [
+  {
+   "titre": "Expression orale — C1-M1-L1-I4 (C1.1)",
+   "consigne": "Your team will deliver a client report two weeks late because a data provider changed its format. Explain the situation first to your managing director, then to the client's finance director.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Ouvre chaque version par l'information essentielle (conclusion d'abord pour la direction, impact concret pour le client). ; Change d'angle de façon perceptible : risque et maîtrise interne d'un côté, conséquences pratiques et garanties de l'autre. ; Emploie au moins une phrase clivée et deux procédés d'atténuation ou de cadrage. ; Ne se justifie pas de manière défensive ; mentionne la cause une seule fois, factuellement. ; Parle de façon fluide pendant 75 à 90 secondes, sans pause longue ni recherche de mots..",
+   "reponseAttendue": "First, to our managing director: the short version is that the Halden Mutual report will be two weeks late, and the risk is contained. Our data provider changed its file format without notice, which meant rebuilding two of our models. It's not the extra work that worries me so much as the client's board meeting on the twentieth, so I've already secured a slot to walk them through the preliminary figures beforehand. No impact on fees, and I'll confirm the final date by Friday. Now, to the client's finance director: I wanted to speak to you personally about the timing of the report. What this means for you in practical terms is that you'll receive the full version on the fourteenth rather than the first. However, you'll have the key indicators for your board in time, because we'll present them to you next Tuesday. I'd rather give you a date we can stand behind than one we'd have to revisit, and I'll keep you posted at every stage.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L2-I3 (C1.1)",
+   "consigne": "Your company is considering whether to keep its annual client event in a luxury hotel or move it online. You are convinced it should remain in person, despite the higher cost. Make your case to the management committee.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Pose un cadre explicite (gain/perte, investissement plutôt que coût, contraste) dès l'ouverture. ; Appuie l'argument sur au moins un chiffre ou un fait vérifiable plausible. ; Formule une concession réelle et revient à la thèse (Granted… That said…). ; Emploie au moins une structure d'emphase (inversion, phrase clivée ou question rhétorique). ; Termine par une demande précise et parle sans hésitation pendant 90 à 120 secondes..",
+   "reponseAttendue": "I'd like to start by reframing the question. We tend to talk about the client event as a cost line of around ninety thousand euros. I'd suggest we look at it instead as the single most effective retention tool we have. Last year, eleven of the forty clients who attended in person signed new or extended contracts within three months, worth well over a million in combined revenue. Not only does the event deepen relationships, but it also gives our account teams something no video call can: unscheduled conversations over coffee, which is where most of our upsell opportunities actually come from. Granted, the hotel is expensive, and an online format would be cheaper and easier to organise. That said, we ran a webinar version in 2021 and attendance dropped by half, while follow-up meetings practically disappeared. So what's the real cost of saving ninety thousand? Potentially, a large share of next year's renewals. What I'm asking for today is approval to keep the in-person format, with a ten percent budget cut that I'll achieve by shortening the event to a single day.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L3-I3 (C1.2)",
+   "consigne": "A journalist asks you: 'Your online banking app has been down for nine hours. Customers can't pay their bills. Isn't this simply the result of cutting your IT budget last year?'\nPréparation 60 s, réponse orale de 90 s.\nCritères : Répond d'abord brièvement à la question posée, sans « no comment » ni démenti non vérifié. ; Reconnaît l'impact pour les clients et présente des excuses sans formule administrative. ; Annonce des actions précises (faites et en cours) et un prochain point d'information daté. ; Utilise au moins deux formules de recentrage ou de dosage de la certitude (At this stage…, What I can tell you is…). ; Garde un ton calme et un débit maîtrisé pendant 75 à 90 secondes..",
+   "reponseAttendue": "I understand why you're asking that, and it's a fair question. It would be wrong of me to speculate about the cause while our engineers are still investigating, but I can tell you that our IT investment has actually increased this year, and we'll share the full findings once we have them. What matters most right now is our customers. Many of them haven't been able to pay bills or move money since this morning, and that's simply not acceptable. We're sorry. Here's what we're doing. We've restored access to card payments and cash withdrawals, which are working normally. Our teams are working to bring the app back online, and we expect a partial restoration within the next three hours. In the meantime, anyone who incurs a late payment fee because of this outage will be reimbursed in full; they don't need to prove anything, they just need to contact us. We will give a further update at six o'clock this evening, and I'll be happy to take your questions again then.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L4-I3 (C1.2)",
+   "consigne": "You manage a team of six. Your director has just refused the two promotions you had requested for your team members, citing a company-wide freeze. Break the news to one of the employees concerned, who has been expecting it.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Annonce la décision clairement dans les 20 premières secondes, après un signal d'alerte bref. ; Donne la raison réelle sans se désolidariser de l'entreprise (pas de « It's not my decision »). ; Reconnaît l'impact et la déception de l'interlocuteur avec des formules sincères. ; Propose au moins une alternative concrète et une prochaine étape datée. ; Atténue la forme (modaux, passé de politesse) sans rendre la décision ambiguë ; débit posé pendant 75 à 90 secondes..",
+   "reponseAttendue": "Thanks for coming in, Laura. I'm afraid I don't have the news you were hoping for, and I'd rather tell you face to face. The promotion we discussed won't go ahead this year. The company has frozen all promotions until the end of the financial year, and there are no exceptions, not even for the cases we put forward. I know how much you've invested in the Halloran account, and I realise this is a real disappointment, especially after the feedback you received in June. I want to be clear that this has nothing to do with your performance, which I've documented in writing. What I can do, however, is make sure you're first in line when the freeze is lifted in April: your file is ready and has already been endorsed by the director. In the meantime, I'd like you to lead the client review in January, which will give you visibility with the management committee. Why don't we sit down again next Tuesday, once you've had time to think it over, and agree on a development plan together?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L5-I3 (C1.1)",
+   "consigne": "You are welcoming a group of new recruits to your company. Tell them a short story about a moment when things went wrong at work and what the team learned from it.\nPréparation 60 s, réponse orale de 90 s.\nCritères : Suit les cinq temps : situation, tension, tournant, résultat, message. ; Emploie au moins trois temps du passé différents (prétérit, past continuous, past perfect) de façon correcte. ; Utilise au moins un procédé de mise en relief (inversion, phrase clivée, discours direct ou présent de narration). ; Inclut au moins un détail concret ou chiffré et relie le message aux nouveaux arrivants. ; Raconte avec fluidité pendant 75 à 90 secondes en variant le rythme..",
+   "reponseAttendue": "Let me tell you about my second week in this job, about six years ago. We were preparing the annual results presentation for our biggest shareholder, and I'd been asked to check the figures. The night before the meeting, I was going through the appendix one last time when I realised that a whole column had been copied from the previous year. Two hundred numbers, all wrong. Now, I was the newest person on the team, and the deck had already been approved by the finance director. Little did I know how she would react. I picked up the phone, my heart pounding, and said, 'I think we have a problem.' And she simply replied, 'Thank you. Let's fix it together.' We worked until two in the morning, and the presentation went ahead without a single error. It wasn't until much later that I understood what had happened that night: she'd made it safe for a junior colleague to raise a problem. So here's my message to you: if you spot something that doesn't look right, say so. Nobody here will ever blame you for asking.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L6-I2 (C1.2)",
+   "consigne": "Off the top of your head: should companies allow employees to choose freely between working from home and working in the office?\nPréparation 15 s, réponse orale de 60 s.\nCritères : Reformule ou délimite la question dans la première phrase. ; Donne une position claire dans les 15 premières secondes, assortie d'une nuance. ; Appuie l'avis sur une raison et un exemple concret. ; Conclut en revenant explicitement à sa position. ; Parle 50 à 60 secondes sans remplissage vide ni longue pause..",
+   "reponseAttendue": "So, if I understand the question correctly, it's about complete freedom of choice, rather than hybrid working in general. On balance, I'd say no, not entirely, although I'm strongly in favour of flexibility. The main reason is that some activities simply work better face to face: onboarding new staff, for instance, or creative workshops. In my previous company, we let everyone choose, and within a year our new recruits were taking twice as long to become autonomous, because nobody was around to answer their questions. So my take on it is this: give people a lot of freedom, but agree on two or three anchor days a week when the team is together.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L6-I3 (C1.2)",
+   "consigne": "A senior manager stops you in the corridor and asks: 'How has your department's way of working changed over the last few years, and where do you see it going?'\nPréparation 20 s, réponse orale de 90 s.\nCritères : Organise la réponse en trois temps clairement signalés (A few years ago… Today… Going forward…). ; Emploie correctement le present perfect pour les évolutions et le futur ou des modaux pour les perspectives. ; Exprime au moins une opinion nuancée sur l'évolution décrite. ; Gère honnêtement une information manquante, le cas échéant. ; Termine par une phrase de clôture nette ; discours fluide pendant 75 à 90 secondes..",
+   "reponseAttendue": "That's a big question, so let me take it in three steps. A few years ago, our accounts payable team was essentially processing paper invoices: we had around eight people keying in data, and closing the month took nearly two weeks. Since then, things have changed considerably. We've automated most of the data entry, and today the month-end close takes five working days. The team is the same size, but the work is very different: people now spend most of their time analysing exceptions and talking to suppliers rather than typing. I'd say that's been a genuinely positive change, although some colleagues found the transition hard, and I think we underestimated the training effort. Going forward, I expect AI tools to take over a good part of the exception handling too. I don't have the vendor's latest roadmap to hand, but my understanding is that a pilot could start next year. So, in short: less processing, more judgement, and that's where we'll need to invest in skills.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L7-I3 (C1.2)",
+   "consigne": "During a video call, a senior partner from your company's Tokyo office proposes moving the launch of a joint product forward by two months. You believe this is unrealistic. He has spoken in front of his whole team. Respond.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Reconnaît d'abord la proposition et ses mérites, sans formule creuse. ; Exprime le désaccord de façon dépersonnalisée (données, contraintes) et non frontale. ; Vérifie un point de compréhension par une question de reformulation. ; Propose une alternative qui permet à l'interlocuteur de préserver la face devant son équipe. ; Adopte un débit posé, des phrases claires et évite les idiomes trop locaux ; 75 à 90 secondes..",
+   "reponseAttendue": "Thank you, Mr Sato, and thank you to your team for such a detailed plan. I fully understand the reasoning: an earlier launch would put us ahead of the competition before the year-end season, and that's a very real advantage. Just so I'm clear, are you proposing to move the whole launch forward, including the European markets, or mainly the Japanese one? I ask because, from our side, the regulatory approval in Europe is the main constraint. Our latest information suggests it won't be granted before late March, so a launch in January there would be difficult for us. Might it be worth considering a phased approach? We could launch in Japan in January, as your team suggests, and use those first eight weeks to gather customer feedback, which would strengthen the European launch in March. That way, we benefit from your team's timing and reduce the regulatory risk. Perhaps our project leads could look at this together this week and share a revised timeline on Friday?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L8-I3 (C1.2)",
+   "consigne": "You are presenting to the executive committee of a mid-sized marketing agency. You recommend replacing the agency's three separate project-management tools with a single platform. Present your recommendation.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Énonce la décision attendue dans la première phrase. ; Présente au moins deux options et justifie la recommandation par deux raisons, dont une chiffrée. ; Nomme le principal risque et la mesure qui le limite. ; Formule une demande précise (montant, calendrier, date de revue). ; S'exprime sans hésitation pendant 100 à 120 secondes, avec des structures d'emphase et de nuance de niveau C1..",
+   "reponseAttendue": "Good morning. I'm here to ask for your approval to replace our three project-management tools with a single platform from the first of March. Let me explain why. At the moment, the creative team, the media team and account management each use a different system. In practice, that means project information is re-keyed two or three times, and our own time tracking shows it costs us around six hours per person per month. Across sixty staff, that's roughly the equivalent of two full-time salaries. We looked at three options: keeping the current set-up, connecting the existing tools through an integration layer, or moving to a single platform. The integration option looked attractive at first, but it would still leave us paying three licences and maintaining the connectors. That's why we recommend a single platform, which would also give clients a shared view of their projects, something two of our largest accounts have asked for. The main risk is adoption: people are attached to their tools. We'd mitigate that by migrating one team at a time, starting with account management, and by appointing a champion in each team. What I'm asking for today is a budget of forty-five thousand euros for the first year, covering licences and training, with a go/no-go review at the end of June based on time saved and client feedback.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — C1-M1-L9-I3 (C1.2)",
+   "consigne": "What do you think is the most overrated skill in business today, and why?\nPréparation 15 s, réponse orale de 60 s.\nCritères : Donne une position claire dès la première ou la deuxième phrase. ; Respecte la contrainte (une inversion correcte et l'idiome imposé, employés à bon escient). ; Justifie par une raison et un exemple concret, puis nuance l'avis. ; Termine par une phrase de clôture qui revient à la position initiale. ; Parle 50 à 60 secondes sans remplissage vide (um, er, you know, like)..",
+   "reponseAttendue": "If I had to pick one, I'd say multitasking. It's often presented as an essential skill, but rarely does it deliver what people expect. The main reason is that switching between tasks has a cost: every time you jump from an email to a spreadsheet and back, you lose focus. In my team, we tried blocking two hours each morning with no meetings and no messages, and not only did the error rate in our reports fall, but people also left the office earlier. Having said that, I'd accept that responsiveness is a double-edged sword: clients do expect quick answers, so you can't disappear for a whole day. But on balance, I'm convinced: multitasking is the most overrated skill in business, and deep focus is the most underrated.",
+   "points": 10
+  }
+ ],
+ "exerciceIntermediaire": {
+  "titre": "Évaluation intermédiaire — 4 productions notées sur 20",
+  "contexte": "Évaluation à mi-parcours (modules C1-M2 à C1-M4) : productions orales et écrites corrigées par le formateur avec les critères de chaque sujet.",
+  "questions": [
+   {
+    "question": "Expression orale — C1-M4-L9-I1 (C1.2) — A panel member asks you: 'Your projections assume you'll triple your customer base in eighteen months. Isn't that wildly optimistic?' Answer the question.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Réponse directe dès la première phrase (Answer). ; Justification par au moins un fait ou une donnée (Detail). ; Reconnaissance honnête de l'incertitude, sans affaiblir le propos. ; Retour au message clé ou à la demande en conclusion (Direction). ; Aucun préambule inutile ; débit fluide..",
+    "reponseAttendue": "It's ambitious, but I wouldn't call it wildly optimistic, and here's why. Over the last six months, we've grown by about seven per cent a month, almost entirely through referrals, without any paid marketing at all. Tripling in eighteen months requires roughly six and a half per cent a month, so we're actually assuming a slight slowdown. What could change that picture is our dependence on two distribution partners, and I fully accept that if one of them pulled out, we'd be looking at doubling rather than tripling. That's precisely why part of this round is earmarked for building our own sales team, so that by the end of next year, partners account for less than half of new customers. So yes, it's a stretch target, but it's grounded in what we're already delivering.",
+    "points": 5
+   },
+   {
+    "question": "Expression orale — C1-M4-L10-I2 (C1.2) — You are chairing a project review. The launch of a new mobile app is four weeks late and the marketing and development teams blame each other. Open the meeting: state the purpose, explain how the review will run, set out exactly what you expect from each participant, and establish ground rules.\nPréparation 60 s, réponse orale de 90 s.\nCritères : Objectif énoncé en une phrase, orienté solution (et non recherche de coupable). ; Déroulé en étapes ordonnées, avec une indication de durée. ; Attendus précis par participant ou par équipe (qui apporte quoi, quelle décision en sortie). ; Au moins une règle de fonctionnement explicite. ; Ton ferme et apaisant ; formulations variées (I need…, could you…, I'd like…)..",
+    "reponseAttendue": "Good afternoon, everyone, and thank you for making the time. I'm aware this has been a frustrating few weeks for both teams, so let me be clear about what today is for. The purpose of this review is to agree on a credible new launch date, not to decide whose fault the delay is. We'll take it in three stages. For the first fifteen minutes, we'll establish the facts: where each workstream is against the original plan. Then we'll spend about twenty minutes on causes, looking at handovers between marketing and development rather than at individuals. And we'll use the last twenty-five minutes for options and a decision. In terms of what I need from you: Sara, could you bring the current status of the app store submission and any outstanding bugs? Tom, I'd like the marketing team to tell us which campaign dates are fixed and which can still move. By the end of the hour, I need one agreed launch date and an owner for every remaining action. Two ground rules: we stick to facts and figures, and if a topic is outside today's scope, we'll note it and take it offline.",
+    "points": 5
+   },
+   {
+    "question": "Expression orale — C1-M4-L11-I2 (C1.2) — You are the head of customer service at a telecom company. At a staff town hall, an employee asks: 'Isn't the new chatbot just a way to get rid of half of us without admitting it?' Answer the question.\nPréparation 45 s, réponse orale de 75 s.\nCritères : Reconnaissance de l'inquiétude sans valider la prémisse. ; Recadrage explicite de l'accusation implicite. ; Réponse factuelle et vérifiable (engagements, chiffres, calendrier). ; Retour au message clé (bridging) en conclusion. ; Aucune reprise des termes négatifs de la question ; ton calme et respectueux..",
+    "reponseAttendue": "Thank you for asking that so openly; I know a lot of people are wondering the same thing, and it's far better to discuss it here than in the corridor. I don't accept that there's a hidden agenda, and I'll be as specific as I can. The chatbot will handle simple requests, such as password resets and billing dates, which currently make up about a third of our calls. We've committed, in writing, to no compulsory redundancies in customer service as a result of this project. What will change is the nature of the work: fewer repetitive calls, and more of the complex cases that customers actually need a person for. Over the next six months, every adviser will be offered training in technical support or retention, and both of those teams are recruiting. And that's really the point of this change: to give you more interesting work, and to give customers faster answers. If anyone wants to see the commitment in writing, I'll share it with the whole team this afternoon.",
+    "points": 5
+   },
+   {
+    "question": "Expression orale — C1-M4-L11-I3 (C1.2) — You are the CEO of a food company that has just recalled a batch of products. A journalist asks: 'How many people have been affected, who's responsible, and what will you do if regulators fine you?' Answer professionally.\nPréparation 45 s, réponse orale de 75 s.\nCritères : Signalement explicite de la question multiple et choix d'un ordre de traitement. ; Réponse factuelle sur la question prioritaire (santé des consommateurs). ; Refus argumenté de désigner un responsable prématurément. ; Refus de spéculer sur l'hypothèse, assorti d'une information utile. ; Retour au message (sécurité, transparence) ; sang-froid perceptible dans le débit..",
+    "reponseAttendue": "There are three questions there, and I'd like to start with the one that matters most, which is people's health. As of this morning, we've received eleven reports of mild illness, and as far as we know, nobody has needed hospital treatment. Anyone who bought the product can return it to any store for a full refund, and our helpline is open around the clock. On responsibility, I'm not going to point fingers before the investigation is complete; that wouldn't be fair, and it wouldn't help anyone. What I can tell you is that the problem has been traced to a single production line, which has been shut down, and an independent laboratory is reviewing our procedures. As for a possible fine, I'm not going to speculate on what regulators might decide. We're cooperating fully with them, and we'll publish the findings of the investigation. Our priority right now is simple: making sure every affected product is off the shelves and that this cannot happen again.",
+    "points": 5
+   }
+  ]
+ },
+ "evaluationFinale": {
+  "titre": "Évaluation finale interne — 4 épreuves (C1 à C4) notées sur 20, au format d'entraînement du VTest",
+  "exercices": [
+   {
+    "titre": "C1 — Compréhension orale (C1.1)",
+    "consigne": "Écoutez l'enregistrement (transcription réservée au formateur : Operations Director: Bringing in agency staff will get us through the peak, granted, but if we're still relying on them in March, we'll have to admit that the scheduling problem was never really fixed.), puis répondez.\n1. What is the speaker's view of using agency staff?\nA. It is the best long-term option for getting through the peak season\nB. It should be stopped before the peak begins\nC. It is a short-term fix that leaves the real problem unsolved\nD. It has already solved the scheduling problem",
+    "reponseAttendue": "1. C — It is a short-term fix that leaves the real problem unsolved. « granted » concède l'utilité immédiate (passer le pic), puis « the scheduling problem was never really fixed » montre que ce n'est qu'un palliatif. L'option « already solved » est le piège : la locutrice dit précisément le contraire.",
+    "points": 5
+   },
+   {
+    "titre": "C2 — Compréhension écrite (C1.1)",
+    "consigne": "Lisez le document, puis répondez.\nFrom: Imogen Clarke, Head of Procurement, Brindlewood Foods\nTo: Marcus Hale, Account Director, Ostfield Logistics\nSubject: Service levels under our current agreement\n\nDear Marcus,\n\nThank you for your call on Tuesday and for the candour with which you described the staffing difficulties at your Northampton hub. I appreciate that the past quarter has been exceptionally challenging for the whole sector, and I want to be clear that this email is not intended as a prelude to terminating our agreement.\n\nThat said, the figures speak for themselves. On-time delivery to our stores fell from 97 per cent in the first quarter to 88 per cent in the third, well below the 95 per cent threshold in our service-level agreement. More concerning than the headline figure is the pattern: almost all late deliveries involved chilled products, which have the shortest shelf life and the highest cost when wasted.\n\nUnder clause 9.2, we would be entitled to a service credit of roughly £64,000 for the quarter. I am prepared to waive half of that amount, on the condition that Ostfield presents a written recovery plan by 15 November, including named responsibilities and weekly reporting on chilled deliveries until performance is back above the threshold for two consecutive months.\n\nI would also ask that you consider ring-fencing a dedicated team for our chilled volumes over the Christmas period. I recognise this has a cost, and I am open to discussing how it might be shared.\n\nI look forward to your proposal.\n\nKind regards,\nImogen Clarke\n1. What does Imogen make clear at the start of the email?\nA. She intends to end the contract with Ostfield\nB. She is not planning to cancel the agreement\nC. She was unaware of the staffing problems\nD. She blames the whole sector for the delays\n2. According to Imogen, what is the most worrying aspect of the performance?\nA. The overall drop in on-time deliveries to stores\nB. The number of stores affected\nC. The cost of the service credit\nD. The concentration of delays on chilled products\n3. What is Imogen's position on the cost of a dedicated team?\nA. She is willing to negotiate a shared arrangement\nB. She expects Ostfield to pay the full cost\nC. She will pay for it if the recovery plan is accepted\nD. She considers it unnecessary before Christmas",
+    "reponseAttendue": "1. B — She is not planning to cancel the agreement. « this email is not intended as a prelude to terminating our agreement » : elle ne compte pas résilier. Elle avait été informée des difficultés de personnel lors de l'appel de mardi, ce qui écarte la troisième option.\n2. D — The concentration of delays on chilled products. « More concerning than the headline figure is the pattern: almost all late deliveries involved chilled products » : la concentration sur les produits frais. Le chiffre global (88 %) est explicitement jugé moins préoccupant.\n3. A — She is willing to negotiate a shared arrangement. « I am open to discussing how it might be shared » : partage du coût négociable. Elle ne promet pas de payer seule, et ne lie pas ce point au plan de redressement.",
+    "points": 5
+   },
+   {
+    "titre": "C3 — Expression orale (C1.1)",
+    "consigne": "Present these half-year results to your management team: customer satisfaction score rose from 72 to 81; average response time fell from 9 hours to 4 hours; but the support department's costs were 12% over budget, mainly because of temporary staff hired during a system migration. Explain the figures, distinguish one-off from structural factors, and finish with next steps.\nPréparation 60 s, réponse orale de 90 s.\nCritères : Message clé annoncé en premier (bottom line up front). ; Évolutions décrites avec précision (by / to / from…to, verbes et adverbes variés). ; Distinction explicite entre facteur ponctuel et facteur durable. ; Dépassement budgétaire présenté avec transparence, sans euphémisme excessif. ; Conclusion sur les prochaines étapes ; nombres prononcés clairement..",
+    "reponseAttendue": "In short, service quality improved markedly over the half-year, but at a cost that was higher than planned. On the positive side, our customer satisfaction score rose from seventy-two to eighty-one, its highest level in three years, and average response time more than halved, falling from nine hours to four. However, I won't sugar-coat the cost side: the department finished twelve per cent over budget. The bulk of that overspend is attributable to temporary staff we brought in during the system migration, so it's very largely a one-off. Now that the migration is complete, those contracts have ended. The underlying point, though, is that part of the improvement in response times came from that extra capacity, so we need to make sure we don't slip back. Looking ahead, we have two priorities: first, to automate the most frequent requests, which should absorb about a fifth of our volume; and second, to monitor response times weekly, so that we can keep satisfaction above eighty while bringing costs back in line with budget by the end of the year.",
+    "points": 5
+   },
+   {
+    "titre": "C4 — Expression écrite (C1.1)",
+    "consigne": "You are Head of Workplace Services at Corvane Analytics (240 employees). The lease on the company's Lyon office (3,200 m²) expires on 30 September. Six months of badge data show average daily occupancy of 38%, rising to 61% on Tuesdays and Thursdays. Three options are on the table: (A) renew the current lease; (B) move to a smaller flexible workspace of about 1,800 m²; (C) give up the office and go fully remote. Write a recommendation report to the Executive Committee: state the purpose, summarise the findings, assess the three options, make and justify a recommendation, and set out the next steps. Write at least 200 words. — Rappel : la recommandation doit apparaître dès le début ; distinguez les faits de votre interprétation.\n200 mots minimum, en 30 minutes.\nCritères : Respect du sujet : les trois options sont évaluées et une seule est recommandée. ; Structure en rubriques (purpose, findings, options, recommendation, next steps), recommandation annoncée dès le début. ; Faits chiffrés distingués de l'interprétation (this suggests, in our view). ; Langue de la recommandation maîtrisée : recommend that + base verbale, on balance, provided that, inversion conditionnelle. ; Cohésion : progression logique, reprises par démonstratif + nom (this option, these figures). ; Au moins 200 mots, registre soutenu et lisible, rédigés dans le temps imparti..",
+    "reponseAttendue": "Report: Office Strategy Following the Expiry of the Lyon Lease\nTo: Executive Committee\nFrom: Hélène Marchetti, Head of Workplace Services\n\n1. Purpose\nThis report assesses three options for our Lyon premises, whose lease expires on 30 September, and recommends relocating to a smaller flexible workspace.\n\n2. Findings\nBadge data collected over the past six months show that average daily occupancy has stabilised at 38%, peaking at 61% on Tuesdays and Thursdays. A staff survey (182 responses) indicates that most employees value two to three office days per week, chiefly for collaboration and onboarding. These figures suggest that our current space is designed for a way of working that no longer exists.\n\n3. Options assessed\nOption A, renewing the current lease, offers continuity but would lock us into fixed costs of around €1.1 million a year for space we largely do not use.\nOption B, relocating to an 1,800 m² flexible workspace, would cut annual costs by an estimated 34% while still accommodating peak attendance, provided that a desk-booking system is introduced.\nOption C, moving to fully remote working, would generate the greatest savings but would, in our view, undermine team cohesion and the integration of the forty graduates we plan to recruit this year.\n\n4. Recommendation\nOn balance, it is recommended that the committee approve Option B. Not only does it align our footprint with actual usage, but it also preserves the in-person collaboration that staff themselves describe as essential. The main risk lies in overcrowding on peak days; this could be mitigated by a booking system and by staggering team days.\n\n5. Next steps\nShould the committee endorse this recommendation, Workplace Services will shortlist three sites by 15 May, present a detailed cost comparison in June and consult staff representatives before any lease is signed.\n\nI would welcome the opportunity to discuss these findings at the April meeting.",
+    "points": 5
+   }
+  ],
+  "grille": [
+   {
+    "critere": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais : informations exactes, compréhension ou production adaptée au niveau C1.",
+    "points": 5
+   },
+   {
+    "critere": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais : informations exactes, compréhension ou production adaptée au niveau C1.",
+    "points": 5
+   },
+   {
+    "critere": "C3 — S'exprimer et communiquer à l'oral en anglais : informations exactes, compréhension ou production adaptée au niveau C1.",
+    "points": 5
+   },
+   {
+    "critere": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées : informations exactes, compréhension ou production adaptée au niveau C1.",
+    "points": 5
+   }
+  ]
+ },
+ "sources": {
+  "veille": {
+   "reglementaire": [
+    {
+     "lien": "https://www.francecompetences.fr/recherche/rs/6905/",
+     "titreLien": "France Compétences – RS6905",
+     "titre": "Fiche RS6905 – VTest Business English – 4 Skills (certificateur EXASSESS)",
+     "date": "Novembre 2024",
+     "commentaire": "Enregistrement au Répertoire spécifique le 28/11/2024 pour 3 ans (échéance 28/11/2027, dernière délivrance possible le 27/05/2028). La fiche décrit les 4 compétences évaluées (C1 à C4) et les niveaux A2 à C1 ; le niveau A2 est requis pour valider la certification.",
+     "exploitation": "Preuve : fiche consultée et archivée dans le dossier qualité. Action : programmes, test de positionnement et livret d'accueil alignés sur les 4 compétences et sur le prérequis A2 à la validation."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000049496613",
+     "titreLien": "Légifrance – décret n° 2024-394",
+     "titre": "Décret n° 2024-394 du 29 avril 2024 relatif à la participation obligatoire du titulaire d’un compte personnel de formation",
+     "date": "Avril 2024",
+     "commentaire": "Depuis le 2 mai 2024, le titulaire d'un CPF acquitte une participation forfaitaire lors de l'achat d'une formation, sauf cas d'exonération (demandeurs d'emploi, abondement employeur…).",
+     "exploitation": "Preuve : décret archivé. Action : information du stagiaire sur le reste à charge lors de l'entretien d'entrée et dans les conditions générales de vente."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660",
+     "titreLien": "Légifrance – loi n° 2018-771",
+     "titre": "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel",
+     "date": "Septembre 2018",
+     "commentaire": "La loi fonde l'éligibilité au CPF des certifications enregistrées au RNCP ou au Répertoire spécifique et l'obligation de certification qualité des organismes financés sur fonds publics ou mutualisés.",
+     "exploitation": "Preuve : texte archivé. Action : vérification annuelle de la validité de l'enregistrement RS6905 avant toute ouverture de session financée par le CPF."
+    }
+   ],
+   "metier": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages",
+     "titreLien": "Conseil de l’Europe – CECRL",
+     "titre": "Cadre européen commun de référence pour les langues (CECRL) et son volume complémentaire",
+     "date": "Février 2018",
+     "commentaire": "Le volume complémentaire du CECRL actualise les descripteurs (médiation, interaction en ligne, compétences plurilingues). Le VTest affine l'échelle en 10 niveaux de A2 à C1.",
+     "exploitation": "Preuve : descripteurs utilisés dans la grille de positionnement. Action : objectifs de chaque parcours rédigés avec les descripteurs du niveau visé."
+    },
+    {
+     "lien": "https://candidate.vtest.com/",
+     "titreLien": "Plateforme VTest",
+     "titre": "Espace candidat VTest – passage du test en ligne",
+     "date": "Octobre 2026",
+     "commentaire": "Le test se passe en ligne : compréhension orale et écrite adaptatives, expression orale notée automatiquement, rédaction en 30 minutes avec un nombre minimal de mots selon le niveau (80, 150 ou 200 mots).",
+     "exploitation": "Preuve : description des épreuves reprise dans le livret stagiaire. Action : entraînements chronométrés au format des 4 épreuves en fin de parcours."
+    },
+    {
+     "lien": "https://www.francecompetences.fr/",
+     "titreLien": "France Compétences",
+     "titre": "Répertoire spécifique : liste des organismes préparant à la certification RS6905",
+     "date": "Octobre 2026",
+     "commentaire": "La fiche publie la liste des organismes préparant à la certification ; l'organisme vérifie son inscription et les conditions fixées par le certificateur.",
+     "exploitation": "Preuve : capture de la liste. Action : convention ou accord avec le certificateur tenu à jour dans le dossier qualité."
+    }
+   ],
+   "technologique": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages/level-descriptions",
+     "titreLien": "Conseil de l’Europe – descripteurs",
+     "titre": "Description des niveaux communs de référence du CECRL",
+     "date": "Février 2018",
+     "commentaire": "Les descripteurs « interaction en ligne » et « médiation » s'appliquent aux réunions à distance et aux échanges écrits instantanés, désormais courants en contexte professionnel.",
+     "exploitation": "Preuve : grille d'entraînement à la visioconférence. Action : mises en situation de réunion en ligne intégrées aux classes virtuelles."
+    },
+    {
+     "lien": "https://www.w3.org/TR/WCAG22/",
+     "titreLien": "W3C – WCAG 2.2",
+     "titre": "Web Content Accessibility Guidelines (WCAG) 2.2 – recommandation W3C",
+     "date": "Octobre 2023",
+     "commentaire": "Les ressources audio et vidéo de la plateforme doivent être accompagnées de transcriptions et de sous-titres pour rester accessibles.",
+     "exploitation": "Preuve : transcriptions disponibles pour chaque dialogue et audio. Action : contrôle de la présence des transcriptions à chaque mise à jour des contenus."
+    }
+   ]
+  },
+  "ressources": {
+   "supportsHtml": "<p>• Support de cours du parcours C1 : 68 chapitres (leçons, langue clé, vocabulaire, dialogues traduits, exercices et quiz corrigés)<br>• Fichiers audio des dialogues et des écoutes, avec transcriptions<br>• Modèles de productions écrites et orales commentés</p>",
+   "outilsHtml": "<p>• Plateforme e-learning (leçons, audio, studio oral, atelier d’écriture)<br>• Classe virtuelle (Google Meet ou Zoom)<br>• Plateforme officielle VTest pour le passage du test</p>",
+   "ressourcesComplHtml": "<p>• <strong>Fiche officielle :</strong> francecompetences.fr/recherche/rs/6905/<br>• <strong>CECRL :</strong> coe.int – Cadre européen commun de référence pour les langues<br>• <strong>Test :</strong> candidate.vtest.com</p>",
+   "videos": []
+  }
+ }
+}

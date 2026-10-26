@@ -1,0 +1,1114 @@
+{
+ "id": "vtest-b2",
+ "titre": "VTest Business English (RS6905) — Parcours B2 — 30 h",
+ "heures": 30,
+ "niveau": "B2",
+ "aliases": [
+  "VTest Business English – 4 Skills (RS6905) — Parcours B2 — 30 h",
+  "Anglais professionnel VTest — Parcours B2 — 30 h",
+  "Parcours B2 — 30 h (VTest RS6905)"
+ ],
+ "programme": {
+  "code": "B2-30H",
+  "level": "B2",
+  "title": "Parcours B2 — 30 h",
+  "subtitle": "Communiquer avec autonomie, précision et argumentation",
+  "hours": 30,
+  "sync_hours": 3.5,
+  "async_hours": 26.5,
+  "public_target": "Professionnels de l'ingénierie, du commerce, des achats, de l'enseignement ou des fonctions scientifiques visant une communication autonome et argumentée en anglais.",
+  "prerequisites": "Niveau B1 estimé au positionnement. Équipement : ordinateur, micro, casque, connexion stable.",
+  "objectives": [
+   "Exposer et argumenter un point de vue professionnel avec nuance pendant 1 à 2 minutes (C3).",
+   "Comprendre les idées principales et les nuances d'échanges complexes (C1).",
+   "Analyser des documents et rapports et en dégager les arguments et positions (C2).",
+   "Conduire une réunion, une présentation ou une négociation simple (C3).",
+   "Rédiger en 30 minutes un écrit structuré et argumenté d'au moins 200 mots (C4)."
+  ],
+  "modalities": "Formation ouverte et à distance (FOAD) : e-learning asynchrone sur la plateforme (leçons, audio, exercices auto-corrigés, studio oral, atelier d'écriture) et classes virtuelles synchrones avec le formateur.",
+  "accompaniment": "Formateur référent joignable par la messagerie de la plateforme (réponse sous 48 h ouvrées), rendez-vous individuels réservables dans l'agenda, assistance technique par messagerie (catégorie « support technique »).",
+  "means": "Plateforme LMS accessible 24 h/24, ressources audio et PDF téléchargeables, formateur anglophone qualifié (CV et compétences tenus à jour dans la plateforme).",
+  "evaluation": "Positionnement d'entrée ; exercices auto-corrigés et productions corrigées par le formateur ; quiz de fin de module (seuil 70 %) ; simulation d'entraînement aux 4 compétences ; évaluation finale interne ; questionnaires de satisfaction à chaud et à froid. Passage de la certification VTest sur la plateforme officielle d'ExAssess.",
+  "accessibility": "Formation accessible aux personnes en situation de handicap : demande d'aménagement confidentielle dès la candidature, analysée par le référent handicap (police agrandie, contrastes, temps majorés en entraînement, sous-titres et transcriptions). Les aménagements de l'examen officiel relèvent du certificateur.",
+  "modules": [
+   {
+    "code": "B2-M1",
+    "titre": "Communication professionnelle avancée",
+    "heures": 4,
+    "competences": [
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de reformuler un message direct en message diplomatique en employant au moins trois procédés d'atténuation (modal, passé de distance, euphémisme, question négative) sans perdre l'information essentielle.",
+     "À l'issue du module, l'apprenant est capable d'exprimer en 60 à 90 secondes une opinion nuancée comportant une position, une concession, un contre-argument, une condition et une conclusion.",
+     "À l'issue du module, l'apprenant est capable de mener un exposé de 1 à 2 minutes présentant un projet (contexte, proposition, deux bénéfices chiffrés, un risque maîtrisé, une demande) balisé par au moins quatre marqueurs de structure.",
+     "À l'issue du module, l'apprenant est capable de répondre en 45 à 75 secondes à une question ou une objection en suivant les étapes accueillir – répondre – vérifier, y compris lorsqu'il ne connaît pas la réponse."
+    ]
+   },
+   {
+    "code": "B2-M2",
+    "titre": "Compréhension d'échanges complexes",
+    "heures": 5,
+    "competences": [
+     "C1"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'attribuer correctement à chaque participant d'une conférence à trois ou quatre voix sa position et son action, en répondant juste à au moins 70 % des questions.",
+     "À l'issue du module, l'apprenant est capable d'identifier la problématique d'un échange entre deux personnes, la position de chacune et l'issue du débat (décision, compromis ou report).",
+     "À l'issue du module, l'apprenant est capable d'interpréter le sens réel d'énoncés implicites (litote, refus poli, ironie, scepticisme) et l'attitude d'un locuteur.",
+     "À l'issue du module, l'apprenant est capable de dégager le message principal d'un monologue de 2 à 3 minutes et d'en relever au moins trois données chiffrées en distinguant résultats et prévisions.",
+     "À l'issue du module, l'apprenant est capable de reconnaître à l'oral au moins 25 termes de la vie économique de l'entreprise et d'éviter les principaux faux amis."
+    ]
+   },
+   {
+    "code": "B2-M3",
+    "titre": "Analyse de documents et rapports",
+    "heures": 5,
+    "competences": [
+     "C2"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable d'identifier dans un rapport d'activité de 250 à 400 mots la tendance principale, ses causes et la recommandation de l'auteur en répondant correctement à au moins 70 % des questions.",
+     "À l'issue du module, l'apprenant est capable de distinguer dans une analyse de marché les données établies, les prévisions et les recommandations, en justifiant chaque réponse par une phrase du texte.",
+     "À l'issue du module, l'apprenant est capable de repérer dans un cahier des charges ou un appel d'offres les exigences obligatoires, les exigences souhaitables, les critères d'attribution et l'échéance de remise.",
+     "À l'issue du module, l'apprenant est capable de dégager la thèse, les concessions et la position nuancée de l'auteur d'un article de presse économique de 300 mots.",
+     "À l'issue du module, l'apprenant est capable d'identifier dans une réclamation ou un échange de négociation écrit la demande réelle, les conditions posées et le ton de l'émetteur.",
+     "À l'issue du module, l'apprenant est capable de répondre à 4 questions sur un document de 300 mots en moins de 6 minutes en combinant lecture globale et recherche ciblée."
+    ]
+   },
+   {
+    "code": "B2-M4",
+    "titre": "Réunions, présentations et négociations",
+    "heures": 6,
+    "competences": [
+     "C3"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de conduire une réunion en anglais en décrivant l'objectif, en donnant des indications précises sur le déroulement et les attendus, et en clôturant par une synthèse des décisions et des actions.",
+     "À l'issue du module, l'apprenant est capable de recadrer poliment un échange qui s'écarte de l'ordre du jour et de reformuler en moins de 30 secondes les positions exprimées.",
+     "À l'issue du module, l'apprenant est capable de présenter oralement une offre commerciale de 90 à 120 secondes structurée en besoin, solution, bénéfices chiffrés et appel à l'action.",
+     "À l'issue du module, l'apprenant est capable de formuler en négociation une position, une concession conditionnelle et une limite claire, sans ambiguïté.",
+     "À l'issue du module, l'apprenant est capable de mener un entretien professionnel ou une revue de projet en annonçant l'objectif, les étapes et les attendus, et en posant des questions ouvertes de relance.",
+     "À l'issue du module, l'apprenant est capable de repérer, à l'écoute d'une réunion ou d'une négociation, la décision prise, les objections et la position de chaque intervenant."
+    ]
+   },
+   {
+    "code": "B2-M5",
+    "titre": "Rédaction professionnelle structurée",
+    "heures": 6,
+    "competences": [
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un email argumenté (proposition ou refus diplomatique) d'au moins 150 mots comportant contexte, argument chiffré, objection anticipée, alternative et action attendue avec échéance.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un rapport technique ou une analyse de marché d'au moins 200 mots organisé en sections titrées et terminé par au moins deux recommandations justifiées.",
+     "À l'issue du module, l'apprenant est capable de rédiger un document préparatoire à une réunion, une revue de projet ou un retour d'expérience présentant objectifs, thèmes abordés (avec responsable et durée), préparation demandée et attendus.",
+     "À l'issue du module, l'apprenant est capable de rédiger les sections clés d'un cahier des charges en formulant au moins six exigences mesurables avec le modal adapté (must, shall, should, may).",
+     "À l'issue du module, l'apprenant est capable d'employer correctement au moins huit connecteurs différents de concession, de cause et de conséquence dans un texte de 150 à 250 mots."
+    ]
+   },
+   {
+    "code": "B2-M6",
+    "titre": "Mises en situation et bilan final",
+    "heures": 4,
+    "competences": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "objectifs": [
+     "À l'issue du module, l'apprenant est capable de répondre en temps limité à des questions sur une déclaration, un dialogue court, un dialogue long, un monologue et un message, en identifiant la position de chaque interlocuteur et au moins deux détails précis (au moins 9 réponses justes sur 11).",
+     "À l'issue du module, l'apprenant est capable d'analyser un email, une note, un article et un compte rendu en identifiant l'objet, la demande, la décision et les nuances d'opinion (au moins 11 réponses justes sur 14).",
+     "À l'issue du module, l'apprenant est capable de lire trois textes à voix haute, de répéter six énoncés et de répondre à quatre questions ouvertes de 45 secondes à 2 minutes en utilisant au moins 80 % du temps de parole, avec une opinion nuancée et argumentée.",
+     "À l'issue du module, l'apprenant est capable de rédiger en 30 minutes un texte argumenté de 200 mots minimum, puis de formuler trois objectifs de préparation mesurables à partir de son autoévaluation."
+    ]
+   }
+  ]
+ },
+ "competences": [
+  "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel.",
+  "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel.",
+  "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel.",
+  "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel."
+ ],
+ "besoinsList": [
+  "Situer son niveau d'anglais et viser le niveau B2 au VTest.",
+  "Présenter un projet et défendre une position face à des objections.",
+  "Comprendre des échanges complexes à plusieurs interlocuteurs.",
+  "Analyser des rapports et documents professionnels longs.",
+  "Conduire une réunion de décision et une négociation.",
+  "Rédiger un dossier de recommandation structuré de 200 mots et plus.",
+  "Nuancer son discours et choisir un registre adapté.",
+  "Prendre des notes efficaces pendant une réunion en anglais.",
+  "Réduire les erreurs grammaticales récurrentes à l'écrit.",
+  "S'entraîner aux 4 épreuves du VTest au niveau B2."
+ ],
+ "syntheseHtml": "• Parcours B2 (30 h) préparant au VTest Business English – 4 Skills (RS6905, Répertoire spécifique, certificateur EXASSESS, enregistrement du 28/11/2024 au 28/11/2027) ; le test est passé en ligne sur la plateforme VTest, l'organisme assure la préparation.<br>• Les 4 compétences du référentiel sont travaillées : C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais ; C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais ; C3 — S'exprimer et communiquer à l'oral en anglais ; C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées.<br>• 6 modules (38 leçons) : cours, langue clé, vocabulaire, dialogues, exercices auto-corrigés, studio oral et atelier d'écriture corrigés par le formateur, quiz de validation à 70 %.<br>• Le niveau A2 du CECRL est le minimum requis pour valider la certification : le test de positionnement d'entrée oriente vers le parcours adapté.",
+ "adaptationsHtml": "• Niveau de départ fixé par le test de positionnement ; le parcours peut être complété par les leçons du niveau inférieur ou supérieur.<br>• Rythme libre en e-learning, réécoute des audios et reprise des exercices ; classes virtuelles pour l'oral.<br>• Transcriptions et traductions disponibles pour chaque dialogue.<br>• Situation de handicap : le référent handicap étudie les aménagements (police agrandie, contrastes, temps majorés en entraînement, sous-titres) ; les aménagements de l'examen officiel relèvent du certificateur.<br>• Les sujets d'expression orale et écrite peuvent être rapprochés du poste du stagiaire.",
+ "qcmDebut": [
+  {
+   "question": "Transcription de l'écoute : « Owen: Thanks for joining, Clara. I wanted to talk about the CRM rollout. We're now about three weeks behind schedule. / Clara: I've seen the report. Is it still the data migration? / Owen: Partly, but the migration itself is fine now. The real issue is that the sales teams haven't been trained, and we can't go live until they have. / Clara: Why hasn't the training started? It was planned for September. / Owen: The external trainer pulled out at short notice, and finding a replacement took longer than expected. / Clara: OK. So what are the options? / Owen: Either we wait for the new trainer, who's available from the twentieth, or we use two of our own power users to run shorter sessions next week. / Clara: Internal sessions would be quicker, but I'm worried about quality. These are our biggest accounts. / Owen: We could do both: internal sessions now for the basics, and the external trainer later for the advanced features. / Clara: That sounds reasonable, provided the power users get some relief from their normal targets. Put it in writing and I'll approve it. » — What is now the main cause of the delay?",
+   "options": [
+    "Continuing problems with the data migration",
+    "A cut in the project budget",
+    "A bug in the new software",
+    "The sales teams have not been trained"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (report) : « Customer Satisfaction Survey – Summary of Findings This year's survey was completed by 1,240 customers, a response rate of 31 percent, slightly higher than last year. Overall satisfaction remained stable at 7.8 out of 10. Delivery speed was once again the area most frequently praised, with 82 percent of respondents rating it as good or excellent. This reflects the investment made in the new regional depot in Leeds, which has reduced average delivery times in the north from four days to two. By contrast, satisfaction with after-sales support has declined for the second consecutive year, from 7.1 to 6.4. Comments suggest that the main frustration is not the quality of the answers provided but the time it takes to get them: the average waiting time on the support line has risen to 14 minutes. Several customers also noted that they had to explain their problem more than once when they were transferred between agents. We recommend introducing a callback option and a shared case history so that agents can see previous contacts. Both measures could be implemented within the current budget. » — How did overall satisfaction change this year?",
+   "options": [
+    "It rose sharply",
+    "It stayed about the same",
+    "It fell slightly",
+    "It fell sharply"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement l'extrait de rapport d'incident : « Had we _____ the problem earlier, we could have avoided the delay. Going forward, all orders will be checked by two people before they are sent. I would also suggest requesting a written confirmation from each supplier within 24 hours. With these measures in place, we expect errors to fall significantly. »",
+   "options": [
+    "identify",
+    "identified",
+    "been identifying",
+    "to identify"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Transcription de l'écoute : « Head of Operations: Good afternoon. As many of you know, our lease at the Kingsgate site ends next June. After looking at several options, the board has decided not to renew it. / Head of Operations: Instead, the customer service and finance teams will move to our Easton building, which has been partly empty since the warehouse was automated. / Head of Operations: We know this will mean a longer commute for some of you. To help, we'll run a free shuttle bus from Kingsgate station for the first twelve months, and anyone who'd prefer to work from home two days a week can now request it through their manager. / Head of Operations: We'll also hold drop-in sessions next week to answer individual questions. » — Why are the two teams moving?",
+   "options": [
+    "The current lease is not being renewed",
+    "The Kingsgate building has been sold to another firm",
+    "The teams have grown too large",
+    "The warehouse needs more staff"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (email) : « From: Lucia Romano, Events Director, Meridian Pharma To: Tom Ashby, Sales Manager, Castleview Hotel Subject: RE: Quotation for annual sales conference Dear Tom, Thank you for your quotation for our sales conference on 18-20 March. Your venue was clearly the favourite among the committee members who visited last month, particularly because of the main hall and the quality of the catering. However, the total of €68,500 is around 12 percent above our budget, and we have received a competitive offer from another hotel in the area. Before we make a final decision, I wanted to see whether there is any flexibility. In particular, we would like to know whether you could include the audiovisual equipment, currently charged at €4,200, in the room rental. We would also be prepared to reduce the number of breakout rooms from six to four if that would lower the price. On our side, we could confirm the booking by the end of this month and pay a 40 percent deposit, rather than the 25 percent mentioned in your terms. I would be grateful for your reply by Friday, as the committee meets next Monday. Kind regards, Lucia Romano » — What is the main purpose of Lucia's email?",
+   "options": [
+    "To confirm the booking",
+    "To complain about the site visit",
+    "To negotiate a lower price",
+    "To cancel the conference"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement l'extrait de rapport d'incident : « Had we identified the problem earlier, we could have avoided the delay. Going forward, all orders _____ by two people before they are sent. I would also suggest requesting a written confirmation from each supplier within 24 hours. With these measures in place, we expect errors to fall significantly. »",
+   "options": [
+    "will be checked",
+    "will check",
+    "are checking",
+    "have checked"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Transcription de l'écoute : « Ingrid: Rafael, I've read your letter about the eleven percent increase. Frankly, that's going to be very hard to justify internally. / Rafael: I understand. But our energy costs have nearly doubled, and we've absorbed them for over a year. / Ingrid: I appreciate that, but our contract only allows one price review a year, and we had one in March. / Rafael: True, though there's a clause covering exceptional cost changes. Our legal team believes this qualifies. / Ingrid: Let's not go down the legal route. What if we accepted a smaller increase now, say five percent, and reviewed it again in six months? / Rafael: Five is too low for us. Could you live with seven, if we extended your payment terms from thirty to sixty days? / Ingrid: That would help our cash flow, I admit. But in return I'd need that rate guaranteed for at least two years. / Rafael: I'll have to check with my director, but I think we can work with that. » — How does Rafael justify the price increase?",
+   "options": [
+    "His company's energy costs have risen sharply",
+    "Ingrid's company is ordering more than before",
+    "The contract was signed too long ago",
+    "A competitor has raised its prices"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (article) : « Hiring for Skills, Not Degrees A growing number of employers are dropping degree requirements from job advertisements, arguing that what matters is what candidates can do, not where they studied. Supporters say the approach widens the talent pool, improves diversity and reduces staff turnover, since employees hired for proven skills tend to be better matched to their roles. Yet a recent study by the Fairmont Institute suggests that the shift may be more cosmetic than real. Although the proportion of advertisements without a degree requirement has doubled in five years, the proportion of non-graduates actually hired into those roles has risen by less than four percentage points. In many cases, the researchers found, recruiters continued to filter applications by education informally, or hiring managers simply preferred graduates when faced with two otherwise similar candidates. The authors argue that removing a line from a job advertisement is the easy part. Genuine change requires redesigning the selection process itself: structured interviews, practical work samples and clear scoring criteria that leave less room for habit and unconscious bias. Companies that had made these deeper changes, the study found, hired non-graduates at three times the rate of those that had not. » — What do supporters of skills-based hiring claim?",
+   "options": [
+    "It reduces recruitment costs",
+    "Employees tend to stay longer",
+    "It speeds up recruitment",
+    "It attracts more graduates"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Choisissez la forme qui complète correctement l'extrait de rapport d'incident : « Had we identified the problem earlier, we could have avoided the delay. Going forward, all orders will be checked by two people before they are sent. I would also suggest _____ a written confirmation from each supplier within 24 hours. With these measures in place, we expect errors to fall significantly. »",
+   "options": [
+    "to request",
+    "request",
+    "requested",
+    "requesting"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Transcription de l'écoute : « Presenter: Turning to the plant-based food sector, the headline figures look encouraging: sales rose by fourteen percent last year. But that number hides a more complicated picture. / Presenter: Most of the growth came from just two categories, oat drinks and meat-free burgers, while sales of plant-based ready meals actually fell. / Presenter: The analysts I spoke to were divided. Some see the slowdown as a natural correction after years of hype. / Presenter: Others argue that price is the real issue: plant-based products still cost around thirty percent more than their conventional equivalents, and in a tight economy, many shoppers simply aren't willing to pay that premium. » — What does the presenter suggest about the fourteen percent figure?",
+   "options": [
+    "It was lower than expected",
+    "It hides uneven results across categories",
+    "It mainly reflects strong ready-meal sales",
+    "It was calculated incorrectly"
+   ],
+   "correctIndex": 1
+  }
+ ],
+ "qcmFin": [
+  {
+   "question": "Transcription de l'écoute : « Finance Manager: Please note that the deadline for submitting budget proposals has been brought forward to the twelfth, as the board meeting itself has been moved to the following Monday. » — What has changed?",
+   "options": [
+    "The board meeting has been cancelled",
+    "Budget proposals must now be submitted earlier",
+    "The budget has been reduced",
+    "The deadline has been postponed by a week"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Document (notice) : « From 1 March, visitors to the Delft laboratory will need to be registered at least 48 hours in advance. Same-day access will only be granted to emergency maintenance contractors, provided that they are accompanied by a member of the facilities team throughout their visit. » — Who can enter the laboratory without being registered two days in advance?",
+   "options": [
+    "Any visitor accompanied by a member of staff",
+    "Visitors arriving before 1 March",
+    "Escorted emergency maintenance contractors",
+    "Members of the facilities team only"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Complétez l'expression utile pour conclure une prise de parole : « Let me _____ up the main points before we move on to the next item. »",
+   "options": [
+    "make",
+    "put",
+    "take",
+    "sum"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez la forme correcte : « By the end of the review, we expect to have _____ a decision on the launch date. »",
+   "options": [
+    "reach",
+    "reached",
+    "reaching",
+    "reaches"
+   ],
+   "correctIndex": 1
+  },
+  {
+   "question": "Transcription de l'écoute : « Operations Director: I'd normally say yes straight away, but given the timing, I'd rather we waited until the audit is finished before we commit to anything. » — What does the speaker mean?",
+   "options": [
+    "She agrees immediately",
+    "She refuses the proposal completely",
+    "She thinks the audit is unnecessary at this stage",
+    "She wants to wait for the audit to finish"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Document (minutes) : « S. Patel proposed moving the client workshop online to reduce costs. A. Moreno argued that the client had specifically asked for a face-to-face session. After discussion, it was agreed to keep the workshop in person but to shorten it from two days to one, thereby cutting travel and venue costs by about 40%. » — What was decided?",
+   "options": [
+    "To hold the workshop online",
+    "To cancel the workshop",
+    "To keep the two-day format",
+    "To hold a shorter face-to-face workshop"
+   ],
+   "correctIndex": 3
+  },
+  {
+   "question": "Choisissez le connecteur correct : « _____ being cheaper, the second option was rejected because of its longer lead time. »",
+   "options": [
+    "Although",
+    "Because",
+    "Despite",
+    "Whereas"
+   ],
+   "correctIndex": 2
+  },
+  {
+   "question": "Transcription de l'écoute : « Purchasing Manager: Admittedly, the new supplier is more expensive, but their defect rate is a fraction of what we're used to, so overall I think we'd actually save money. » — What is the speaker's opinion of the new supplier?",
+   "options": [
+    "It would save money overall despite higher prices",
+    "It is too expensive to be considered",
+    "Its quality is about the same as the current supplier's",
+    "It should be asked to lower its prices"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Document (article) : « Many retailers have rushed to install self-service checkouts. Consumer researcher Dana Whitfield accepts that they reduce queues at peak times, but she warns that removing staff entirely is a mistake: 'Shoppers who need help and cannot find it simply go elsewhere, and that loss never appears in the savings figures.' » — What is Dana Whitfield's position?",
+   "options": [
+    "Self-service checkouts help, but cutting all staff can lose customers",
+    "Self-service checkouts should be removed from stores as soon as possible",
+    "Self-service checkouts increase queues",
+    "Retailers should hire more cashiers at peak times"
+   ],
+   "correctIndex": 0
+  },
+  {
+   "question": "Choisissez la préposition correcte : « Profits rose _____ €2.4 million this year, up from €2.1 million. »",
+   "options": [
+    "by",
+    "of",
+    "to",
+    "at"
+   ],
+   "correctIndex": 2
+  }
+ ],
+ "qcmCompetences": [
+  {
+   "competence": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de valider le degré de compréhension de la langue anglaise parlée nécessaire dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez ce compte rendu de conférence téléphonique avec le mot correct : « Several participants were on mute at the start of the call. Anna explained that the main _____ was whether to delay the launch. Tom was clearly against a delay, while Mia sat on the fence. In the end, the decision was postponed until the next call. »",
+     "options": [
+      "problematic",
+      "issue",
+      "subject of",
+      "matter about"
+     ],
+     "correctIndex": 1,
+     "explication": "« the main issue was whether… » = la question principale était de savoir si… « problematic » est un adjectif en anglais."
+    },
+    {
+     "question": "Complétez ce compte rendu d'un débat avec le mot correct : « The main _____ at Monday's meeting was whether to move the call centre to a cheaper location. Paul was clearly in favour of the move, mainly because of the savings. Sandra was against it at first, but she gradually came round to his view when she saw the staff survey. Mark sat on the fence throughout the discussion. As no final agreement was reached, the decision was postponed until the next board meeting. »",
+     "options": [
+      "problematic",
+      "issue",
+      "question of",
+      "matter about"
+     ],
+     "correctIndex": 1,
+     "explication": "« the main issue » = la question principale, l'enjeu. « problematic » est un adjectif en anglais (problématique = posant problème) : faux ami."
+    },
+    {
+     "question": "Complétez ce résumé des résultats d'une entreprise avec le terme économique correct : « Last year, our turnover reached ninety-two million euros, a record. However, net profit fell slightly because our _____ rose after we moved to larger offices. The main challenge now is cash flow: some customers are paying very late, and we have had to extend our bank overdraft. On the positive side, we gained two points of market share in Germany. As a result, shareholders will receive the same dividend as last year. »",
+     "options": [
+      "charges",
+      "overheads",
+      "spendings",
+      "expenses of"
+     ],
+     "correctIndex": 1,
+     "explication": "« overheads » = frais généraux (loyer, énergie des bureaux…). « charges » désigne en anglais des frais facturés, pas les charges de l'entreprise."
+    },
+    {
+     "question": "Faux amis. Choisissez le mot anglais qui traduit correctement l'idée entre parenthèses : « The _____ cost of the project (le coût réel) was twenty per cent higher than the budget. One benefit of the new system (un avantage) is that it reduces paperwork. We may possibly (éventuellement) open an office in Spain, but nothing is decided. After long negotiations, the two firms eventually (finalement) agreed on a price. Our company (notre entreprise) employs three hundred people. »",
+     "options": [
+      "current",
+      "actual",
+      "present",
+      "topical"
+     ],
+     "correctIndex": 1,
+     "explication": "« actual » = réel, effectif. « current » signifie actuel : c'est justement le faux ami à éviter dans l'autre sens."
+    },
+    {
+     "question": "Faux amis. Choisissez le mot anglais qui traduit correctement l'idée entre parenthèses : « The actual cost of the project (le coût réel) was twenty per cent higher than the budget. One _____ of the new system (un avantage) is that it reduces paperwork. We may possibly (éventuellement) open an office in Spain, but nothing is decided. After long negotiations, the two firms eventually (finalement) agreed on a price. Our company (notre entreprise) employs three hundred people. »",
+     "options": [
+      "profit",
+      "benefice",
+      "benefit",
+      "gain of"
+     ],
+     "correctIndex": 2,
+     "explication": "« benefit » = avantage. « profit » serait un bénéfice financier, ce qui n'a pas de sens pour une réduction de paperasse."
+    },
+    {
+     "question": "Faux amis. Choisissez le mot anglais qui traduit correctement l'idée entre parenthèses : « The actual cost of the project (le coût réel) was twenty per cent higher than the budget. One benefit of the new system (un avantage) is that it reduces paperwork. We may _____ (éventuellement) open an office in Spain, but nothing is decided. After long negotiations, the two firms eventually (finalement) agreed on a price. Our company (notre entreprise) employs three hundred people. »",
+     "options": [
+      "eventually",
+      "possibly",
+      "finally",
+      "lastly"
+     ],
+     "correctIndex": 1,
+     "explication": "« éventuellement » = possibly (ou perhaps). « eventually » est un faux ami : il signifie « finalement »."
+    },
+    {
+     "question": "Faux amis. Choisissez le mot anglais qui traduit correctement l'idée entre parenthèses : « The actual cost of the project (le coût réel) was twenty per cent higher than the budget. One benefit of the new system (un avantage) is that it reduces paperwork. We may possibly (éventuellement) open an office in Spain, but nothing is decided. After long negotiations, the two firms _____ (finalement) agreed on a price. Our company (notre entreprise) employs three hundred people. »",
+     "options": [
+      "possibly",
+      "actually",
+      "eventually",
+      "lately"
+     ],
+     "correctIndex": 2,
+     "explication": "« eventually » = finalement, après un long processus. « actually » signifie « en fait »."
+    },
+    {
+     "question": "Faux amis. Choisissez le mot anglais qui traduit correctement l'idée entre parenthèses : « The actual cost of the project (le coût réel) was twenty per cent higher than the budget. One benefit of the new system (un avantage) is that it reduces paperwork. We may possibly (éventuellement) open an office in Spain, but nothing is decided. After long negotiations, the two firms eventually (finalement) agreed on a price. Our _____ (notre entreprise) employs three hundred people. »",
+     "options": [
+      "society",
+      "company",
+      "firm of",
+      "corporation of"
+     ],
+     "correctIndex": 1,
+     "explication": "Une entreprise = « a company ». « society » désigne la société au sens collectif ou une association."
+    },
+    {
+     "question": "Transcription de l'écoute : « Rachel Moreau: To be honest, I'm not entirely convinced the supplier can meet that deadline, but I'm happy to be proved wrong. » — What does the speaker mean?",
+     "options": [
+      "She is certain the supplier will deliver the order late.",
+      "She has some doubts about the supplier's deadline.",
+      "She wants to change supplier immediately.",
+      "She thinks the deadline is too far away."
+     ],
+     "correctIndex": 1,
+     "explication": "« not entirely convinced » exprime un doute atténué, renforcé par « happy to be proved wrong ». L'option 1 est trop forte : elle n'est pas certaine."
+    },
+    {
+     "question": "Transcription de l'écoute : « Owen Carter: Admittedly, the pilot cost more than we'd planned, but it halved our delivery errors, so I'd still roll it out across the region. » — What does the speaker recommend?",
+     "options": [
+      "Extending the project despite its higher cost",
+      "Stopping the pilot because it was too expensive",
+      "Repeating the pilot with a smaller budget",
+      "Reducing the number of deliveries"
+     ],
+     "correctIndex": 0,
+     "explication": "« Admittedly » introduit la concession (coût plus élevé) ; la recommandation suit « so I'd still roll it out across the region ». L'option 2 ne retient que la concession."
+    }
+   ]
+  },
+  {
+   "competence": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais afin de repérer, distinguer, identifier, sélectionner et apprécier des informations qui permettent de répondre à des questions avec précision dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Document (report) : « Analysis: Customer complaints rose by 30% after the new returns portal went live. However, most complaints concern the confirmation emails, which are often filtered as spam, rather than the portal itself. Recommendation: We recommend changing the sending domain of the confirmation emails before considering any changes to the portal, which would be considerably more expensive. » — What does the author recommend?",
+     "options": [
+      "Redesigning the returns portal",
+      "Closing the portal until the problem has been fully solved",
+      "Fixing the email problem before changing the portal",
+      "Answering each complaint individually"
+     ],
+     "correctIndex": 2,
+     "explication": "« We recommend changing the sending domain of the confirmation emails before considering any changes to the portal » : on traite d'abord la cause réelle, moins coûteuse. La refonte du portail n'est pas recommandée à ce stade."
+    },
+    {
+     "question": "Document (report) : « Pelham Instruments – Strategy Team Benchtop bioreactors for teaching laboratories: market assessment Purpose This note assesses whether Pelham should launch a simplified benchtop bioreactor aimed at universities and technical colleges, a segment we do not currently serve. Demand Teaching laboratories increasingly want students to work on equipment similar to what they will use in industry. Our interviews with 24 heads of department show clear interest: 19 said they would consider buying such a unit within three years. Interest, however, is not the same as budget. Most institutions buy large equipment only when they obtain a specific capital grant, and grant cycles are slow and unpredictable. We therefore estimate realistic annual demand at 150 to 200 units in Europe, well below the figure suggested by the interviews alone. Competition Two established suppliers already sell research-grade systems to universities, but at prices (above €40,000) that teaching departments can rarely afford. A small start-up offers a low-cost unit at around €9,000; it is popular with lecturers but has a reputation for unreliable software. A product priced between €15,000 and €18,000, with robust software and a teaching package, would therefore occupy a gap in the market. Risks The main risk is cannibalisation: some research customers might choose the cheaper teaching model instead of our standard system. We consider this risk limited, as the teaching unit would lack the data-logging precision that research users need. A second risk is that development could take longer than the planned eighteen months if we redesign the software from scratch. Conclusion The opportunity is real but modest. We recommend a go decision only if development costs can be kept below €1.2 million by reusing the existing control software. » — Why does the strategy team estimate demand below what the interviews suggest?",
+     "options": [
+      "Several heads of department refused to be interviewed.",
+      "Institutions rely on irregular grants for equipment.",
+      "Students prefer to train on industrial equipment.",
+      "The start-up has already captured most of the market."
+     ],
+     "correctIndex": 1,
+     "explication": "« Interest, however, is not the same as budget… grant cycles are slow and unpredictable ». L'intérêt existe (19 sur 24), mais le financement limite les achats réels."
+    },
+    {
+     "question": "Document (report) : « Pelham Instruments – Strategy Team Benchtop bioreactors for teaching laboratories: market assessment Purpose This note assesses whether Pelham should launch a simplified benchtop bioreactor aimed at universities and technical colleges, a segment we do not currently serve. Demand Teaching laboratories increasingly want students to work on equipment similar to what they will use in industry. Our interviews with 24 heads of department show clear interest: 19 said they would consider buying such a unit within three years. Interest, however, is not the same as budget. Most institutions buy large equipment only when they obtain a specific capital grant, and grant cycles are slow and unpredictable. We therefore estimate realistic annual demand at 150 to 200 units in Europe, well below the figure suggested by the interviews alone. Competition Two established suppliers already sell research-grade systems to universities, but at prices (above €40,000) that teaching departments can rarely afford. A small start-up offers a low-cost unit at around €9,000; it is popular with lecturers but has a reputation for unreliable software. A product priced between €15,000 and €18,000, with robust software and a teaching package, would therefore occupy a gap in the market. Risks The main risk is cannibalisation: some research customers might choose the cheaper teaching model instead of our standard system. We consider this risk limited, as the teaching unit would lack the data-logging precision that research users need. A second risk is that development could take longer than the planned eighteen months if we redesign the software from scratch. Conclusion The opportunity is real but modest. We recommend a go decision only if development costs can be kept below €1.2 million by reusing the existing control software. » — What gap in the market does the note identify?",
+     "options": [
+      "A mid-priced, reliable teaching product",
+      "A research-grade system for under €9,000",
+      "A low-cost unit with no software",
+      "A data-logging upgrade for existing systems"
+     ],
+     "correctIndex": 0,
+     "explication": "Entre les systèmes de recherche (plus de 40 000 €) et l'unité de la start-up (9 000 €, logiciel peu fiable), un produit à 15 000–18 000 € avec un logiciel robuste occuperait un créneau. Les autres options inventent des produits non mentionnés."
+    },
+    {
+     "question": "Document (report) : « Pelham Instruments – Strategy Team Benchtop bioreactors for teaching laboratories: market assessment Purpose This note assesses whether Pelham should launch a simplified benchtop bioreactor aimed at universities and technical colleges, a segment we do not currently serve. Demand Teaching laboratories increasingly want students to work on equipment similar to what they will use in industry. Our interviews with 24 heads of department show clear interest: 19 said they would consider buying such a unit within three years. Interest, however, is not the same as budget. Most institutions buy large equipment only when they obtain a specific capital grant, and grant cycles are slow and unpredictable. We therefore estimate realistic annual demand at 150 to 200 units in Europe, well below the figure suggested by the interviews alone. Competition Two established suppliers already sell research-grade systems to universities, but at prices (above €40,000) that teaching departments can rarely afford. A small start-up offers a low-cost unit at around €9,000; it is popular with lecturers but has a reputation for unreliable software. A product priced between €15,000 and €18,000, with robust software and a teaching package, would therefore occupy a gap in the market. Risks The main risk is cannibalisation: some research customers might choose the cheaper teaching model instead of our standard system. We consider this risk limited, as the teaching unit would lack the data-logging precision that research users need. A second risk is that development could take longer than the planned eighteen months if we redesign the software from scratch. Conclusion The opportunity is real but modest. We recommend a go decision only if development costs can be kept below €1.2 million by reusing the existing control software. » — How does the team assess the risk of cannibalisation?",
+     "options": [
+      "As the main reason not to launch the product",
+      "As impossible to estimate at this stage",
+      "As limited, since researchers need more precision",
+      "As serious, because research customers want lower prices"
+     ],
+     "correctIndex": 2,
+     "explication": "« We consider this risk limited, as the teaching unit would lack the data-logging precision that research users need ». Il est cité comme « main risk », mais jugé limité : l'option 1 confond importance et probabilité."
+    },
+    {
+     "question": "Document (report) : « Pelham Instruments – Strategy Team Benchtop bioreactors for teaching laboratories: market assessment Purpose This note assesses whether Pelham should launch a simplified benchtop bioreactor aimed at universities and technical colleges, a segment we do not currently serve. Demand Teaching laboratories increasingly want students to work on equipment similar to what they will use in industry. Our interviews with 24 heads of department show clear interest: 19 said they would consider buying such a unit within three years. Interest, however, is not the same as budget. Most institutions buy large equipment only when they obtain a specific capital grant, and grant cycles are slow and unpredictable. We therefore estimate realistic annual demand at 150 to 200 units in Europe, well below the figure suggested by the interviews alone. Competition Two established suppliers already sell research-grade systems to universities, but at prices (above €40,000) that teaching departments can rarely afford. A small start-up offers a low-cost unit at around €9,000; it is popular with lecturers but has a reputation for unreliable software. A product priced between €15,000 and €18,000, with robust software and a teaching package, would therefore occupy a gap in the market. Risks The main risk is cannibalisation: some research customers might choose the cheaper teaching model instead of our standard system. We consider this risk limited, as the teaching unit would lack the data-logging precision that research users need. A second risk is that development could take longer than the planned eighteen months if we redesign the software from scratch. Conclusion The opportunity is real but modest. We recommend a go decision only if development costs can be kept below €1.2 million by reusing the existing control software. » — What is the overall recommendation?",
+     "options": [
+      "Launch the product immediately",
+      "Abandon the project because demand is too low to justify it",
+      "Redesign the software before deciding",
+      "Proceed only if reusing software keeps costs down"
+     ],
+     "correctIndex": 3,
+     "explication": "« We recommend a go decision only if development costs can be kept below €1.2 million by reusing the existing control software ». Refaire le logiciel (option 3) est justement présenté comme un risque de retard."
+    },
+    {
+     "question": "Document (notice) : « ASHGROVE COLLEGE – INVITATION TO TENDER Reference: AC-ITT-2026-14 Supply of electrical installation training benches 1. Background Ashgrove College is expanding its electrical engineering workshop to accommodate apprentices from three regional employers. The College wishes to purchase twelve training benches allowing learners to practise domestic and industrial wiring in safe, low-voltage conditions. 2. Scope The contract covers the supply, installation and commissioning of the benches, initial training for teaching staff, and maintenance for a period of three years from acceptance. Furniture and IT equipment are outside the scope of this tender. 3. Key requirements 3.1 The benches shall comply with current electrical safety standards for teaching environments. 3.2 The supplier shall deliver and install all benches before 15 January, as the first cohort begins on 2 February. 3.3 The supplier shall provide at least one full day of on-site training for up to six members of staff. 3.4 A remote diagnostics function is desirable. 3.5 Bidders may propose an extended warranty as a priced option. 4. Award criteria The contract will be awarded to the most economically advantageous tender, assessed as follows: technical merit 50%; price 30%; after-sales service 20%. Tenders that fail to meet any requirement in 3.1 to 3.3 will be considered non-compliant and will not be scored. 5. Submission Clarification questions must be sent through the procurement portal no later than 20 October. Responses will be published to all bidders without identifying the sender. Tenders must be uploaded by 12 noon on 3 November. Late submissions will not be considered. The College reserves the right not to award the contract if no tender represents value for money. » — Which of the following is NOT included in the contract?",
+     "options": [
+      "Training for teaching staff",
+      "Three years of maintenance",
+      "Furniture for the workshop",
+      "Commissioning of the benches"
+     ],
+     "correctIndex": 2,
+     "explication": "« Furniture and IT equipment are outside the scope of this tender ». La formation, la maintenance et la mise en service figurent toutes dans la section 2."
+    },
+    {
+     "question": "Document (notice) : « ASHGROVE COLLEGE – INVITATION TO TENDER Reference: AC-ITT-2026-14 Supply of electrical installation training benches 1. Background Ashgrove College is expanding its electrical engineering workshop to accommodate apprentices from three regional employers. The College wishes to purchase twelve training benches allowing learners to practise domestic and industrial wiring in safe, low-voltage conditions. 2. Scope The contract covers the supply, installation and commissioning of the benches, initial training for teaching staff, and maintenance for a period of three years from acceptance. Furniture and IT equipment are outside the scope of this tender. 3. Key requirements 3.1 The benches shall comply with current electrical safety standards for teaching environments. 3.2 The supplier shall deliver and install all benches before 15 January, as the first cohort begins on 2 February. 3.3 The supplier shall provide at least one full day of on-site training for up to six members of staff. 3.4 A remote diagnostics function is desirable. 3.5 Bidders may propose an extended warranty as a priced option. 4. Award criteria The contract will be awarded to the most economically advantageous tender, assessed as follows: technical merit 50%; price 30%; after-sales service 20%. Tenders that fail to meet any requirement in 3.1 to 3.3 will be considered non-compliant and will not be scored. 5. Submission Clarification questions must be sent through the procurement portal no later than 20 October. Responses will be published to all bidders without identifying the sender. Tenders must be uploaded by 12 noon on 3 November. Late submissions will not be considered. The College reserves the right not to award the contract if no tender represents value for money. » — Why is the installation deadline important to the College?",
+     "options": [
+      "A new group of learners starts soon after.",
+      "The college's budget expires on 15 January.",
+      "The warranty period begins on 2 February.",
+      "Employers will inspect the workshop in January."
+     ],
+     "correctIndex": 0,
+     "explication": "« before 15 January, as the first cohort begins on 2 February » : « as » donne la raison. Aucune expiration de budget ni inspection n'est mentionnée."
+    },
+    {
+     "question": "Document (notice) : « ASHGROVE COLLEGE – INVITATION TO TENDER Reference: AC-ITT-2026-14 Supply of electrical installation training benches 1. Background Ashgrove College is expanding its electrical engineering workshop to accommodate apprentices from three regional employers. The College wishes to purchase twelve training benches allowing learners to practise domestic and industrial wiring in safe, low-voltage conditions. 2. Scope The contract covers the supply, installation and commissioning of the benches, initial training for teaching staff, and maintenance for a period of three years from acceptance. Furniture and IT equipment are outside the scope of this tender. 3. Key requirements 3.1 The benches shall comply with current electrical safety standards for teaching environments. 3.2 The supplier shall deliver and install all benches before 15 January, as the first cohort begins on 2 February. 3.3 The supplier shall provide at least one full day of on-site training for up to six members of staff. 3.4 A remote diagnostics function is desirable. 3.5 Bidders may propose an extended warranty as a priced option. 4. Award criteria The contract will be awarded to the most economically advantageous tender, assessed as follows: technical merit 50%; price 30%; after-sales service 20%. Tenders that fail to meet any requirement in 3.1 to 3.3 will be considered non-compliant and will not be scored. 5. Submission Clarification questions must be sent through the procurement portal no later than 20 October. Responses will be published to all bidders without identifying the sender. Tenders must be uploaded by 12 noon on 3 November. Late submissions will not be considered. The College reserves the right not to award the contract if no tender represents value for money. » — What would happen to a tender that does not offer remote diagnostics?",
+     "options": [
+      "It would be excluded as non-compliant.",
+      "It would be accepted only with an extended warranty.",
+      "It would have to be resubmitted before 3 November.",
+      "It could be scored but lose technical points."
+     ],
+     "correctIndex": 3,
+     "explication": "Le diagnostic à distance est « desirable » (3.4), donc non éliminatoire. Seules les exigences 3.1 à 3.3 rendent une offre non conforme : l'option 1 est le piège principal."
+    },
+    {
+     "question": "Document (notice) : « ASHGROVE COLLEGE – INVITATION TO TENDER Reference: AC-ITT-2026-14 Supply of electrical installation training benches 1. Background Ashgrove College is expanding its electrical engineering workshop to accommodate apprentices from three regional employers. The College wishes to purchase twelve training benches allowing learners to practise domestic and industrial wiring in safe, low-voltage conditions. 2. Scope The contract covers the supply, installation and commissioning of the benches, initial training for teaching staff, and maintenance for a period of three years from acceptance. Furniture and IT equipment are outside the scope of this tender. 3. Key requirements 3.1 The benches shall comply with current electrical safety standards for teaching environments. 3.2 The supplier shall deliver and install all benches before 15 January, as the first cohort begins on 2 February. 3.3 The supplier shall provide at least one full day of on-site training for up to six members of staff. 3.4 A remote diagnostics function is desirable. 3.5 Bidders may propose an extended warranty as a priced option. 4. Award criteria The contract will be awarded to the most economically advantageous tender, assessed as follows: technical merit 50%; price 30%; after-sales service 20%. Tenders that fail to meet any requirement in 3.1 to 3.3 will be considered non-compliant and will not be scored. 5. Submission Clarification questions must be sent through the procurement portal no later than 20 October. Responses will be published to all bidders without identifying the sender. Tenders must be uploaded by 12 noon on 3 November. Late submissions will not be considered. The College reserves the right not to award the contract if no tender represents value for money. » — What does the College say about clarification questions?",
+     "options": [
+      "They must be sent by email to the head of the workshop.",
+      "The answers will be shared with every bidder anonymously.",
+      "They can be submitted until the closing date.",
+      "Only bidders who ask questions will receive the answers."
+     ],
+     "correctIndex": 1,
+     "explication": "« Responses will be published to all bidders without identifying the sender ». La date limite des questions (20 octobre) est antérieure à la date de remise (3 novembre) : l'option 3 confond les deux."
+    },
+    {
+     "question": "Document (notice) : « LUMERA BIOSCIENCES – PROCUREMENT DEPARTMENT RFP LB-2026-07: Laboratory waste collection and disposal services Clarification Notice No. 2 – issued 9 October This notice responds to questions received from bidders up to 6 October. It forms part of the tender documents. Except where expressly stated below, all other provisions of the RFP remain unchanged. Q1. Can bidders subcontract the transport of hazardous chemical waste? A1. Yes, subcontracting of transport is permitted, provided that the subcontractor holds the relevant licence and is named in the tender. The prime contractor remains fully responsible for compliance. Subcontracting of the final treatment of waste is not permitted. Q2. The RFP requires weekly collection from all three sites. Would fortnightly collection be acceptable for the Hillcrest site, which produces smaller volumes? A2. Weekly collection remains a requirement for all sites. However, bidders may submit a priced variant with fortnightly collection at Hillcrest. Variants will only be considered if the main offer is compliant. Q3. Section 7 states that the contract will start on 1 January. Is this date fixed? A3. No. Following a delay in internal approvals, Section 7 is hereby amended: the contract start date is now 1 March. The closing date for tenders is not affected and remains 31 October. Q4. Will Lumera provide historical waste volumes by category? A4. A summary table covering the last 24 months has been uploaded to the portal as Annex F. Please note that the figures for the current year are provisional. Bidders are reminded that no further questions will be accepted after 16 October. » — What does the notice say about the rest of the RFP?",
+     "options": [
+      "It has been withdrawn and will be reissued.",
+      "It still applies unless this notice changes it.",
+      "It is replaced entirely by this notice.",
+      "It applies only to the Hillcrest site."
+     ],
+     "correctIndex": 1,
+     "explication": "« Except where expressly stated below, all other provisions of the RFP remain unchanged ». L'avis complète le dossier, il ne le remplace pas (option 3)."
+    }
+   ]
+  },
+  {
+   "competence": "C3 — S'exprimer et communiquer à l'oral en anglais afin d'apprécier les aptitudes à échanger, décrire, formuler, argumenter sur un ensemble de sujets dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez cet extrait d'argumentaire commercial avec le mot exact : « The system monitors each motor in real time, which _____ that your team can act before a breakdown. On similar sites, unplanned downtime fell by a third. I understand your concern about the initial cost, but the payback period is under two years. We have a strong track record in the dairy sector. As a next step, I'd suggest a short pilot on one line. »",
+     "options": [
+      "means",
+      "signifies",
+      "says",
+      "wants"
+     ],
+     "correctIndex": 0,
+     "explication": "« which means that… » relie une caractéristique à son bénéfice. « signifies » est trop formel et rare dans ce contexte oral."
+    },
+    {
+     "question": "Complétez l'introduction de cet exposé avec le marqueur de structure correct : « I'd like to cover three points this morning. First, I'll describe the current ordering process. Then I'll move on to our proposal. And to _____ up, I'll explain what we need from you. »",
+     "options": [
+      "sum",
+      "summing",
+      "summary",
+      "resume"
+     ],
+     "correctIndex": 0,
+     "explication": "« to sum up » = pour résumer. « resume » signifie « reprendre » en anglais, c'est un faux ami."
+    },
+    {
+     "question": "Cet e-mail s'adresse à une nouvelle cliente. Choisissez la formulation adaptée à un registre formel : « Dear Ms Laurent, Thank you for your enquiry. Please find attached our latest catalogue. I would be grateful if you could confirm the delivery address. Please do not hesitate to contact me should you need any further information. _____ regards, Owen Carter »",
+     "options": [
+      "Cheers",
+      "Lots of",
+      "Best wishes to",
+      "Kind"
+     ],
+     "correctIndex": 3,
+     "explication": "« Kind regards » convient à un échange professionnel. « Cheers » est réservé aux collègues proches."
+    },
+    {
+     "question": "Choisissez la forme qui rend ce message à la fois correct et diplomatique : « The test results _____ to suggest that the new coating lasts longer. However, it might be wise to run one more test before we decide. I was wondering whether you could share the raw data with us. I'm afraid the delay will affect the launch date, but only by a few days. »",
+     "options": [
+      "must",
+      "seem",
+      "are seeming",
+      "appear to"
+     ],
+     "correctIndex": 1,
+     "explication": "« seem to suggest » présente l'interprétation avec prudence. « appear to » produirait « appear to to suggest » ; « must » serait trop affirmatif."
+    },
+    {
+     "question": "Choisissez la forme qui rend ce message à la fois correct et diplomatique : « The test results seem to suggest that the new coating lasts longer. However, it _____ be wise to run one more test before we decide. I was wondering whether you could share the raw data with us. I'm afraid the delay will affect the launch date, but only by a few days. »",
+     "options": [
+      "will",
+      "ought",
+      "might",
+      "has to"
+     ],
+     "correctIndex": 2,
+     "explication": "« it might be wise to… » : suggestion atténuée. « ought » exige « to » (ought to be)."
+    },
+    {
+     "question": "Choisissez la forme qui rend ce message à la fois correct et diplomatique : « The test results seem to suggest that the new coating lasts longer. However, it might be wise to run one more test before we decide. I was _____ whether you could share the raw data with us. I'm afraid the delay will affect the launch date, but only by a few days. »",
+     "options": [
+      "wondering",
+      "asking",
+      "demanding",
+      "questioning"
+     ],
+     "correctIndex": 0,
+     "explication": "« I was wondering whether you could… » est la demande polie type. « demanding » signifie « exiger » : faux ami très peu diplomatique."
+    },
+    {
+     "question": "Choisissez la forme qui rend ce message à la fois correct et diplomatique : « The test results seem to suggest that the new coating lasts longer. However, it might be wise to run one more test before we decide. I was wondering whether you could share the raw data with us. _____ afraid the delay will affect the launch date, but only by a few days. »",
+     "options": [
+      "I have",
+      "It's",
+      "I'm",
+      "I feel"
+     ],
+     "correctIndex": 2,
+     "explication": "« I'm afraid… » = je crains que… ; formule d'amortissement avant une mauvaise nouvelle. « I have afraid » est un calque fautif."
+    },
+    {
+     "question": "Complétez cette argumentation avec le connecteur correct : « _____ its high price, the machine is very popular with our customers. While I understand your concerns, I think we should go ahead. We'll order ten units, provided that the supplier agrees to a trial period. All things considered, it's the right decision for the long term. »",
+     "options": [
+      "Although",
+      "However",
+      "Despite",
+      "Even"
+     ],
+     "correctIndex": 2,
+     "explication": "« Despite » + groupe nominal (its high price). « Although » est tentant, mais il exige une proposition complète (although it is expensive)."
+    },
+    {
+     "question": "Complétez cette argumentation avec le connecteur correct : « Despite its high price, the machine is very popular with our customers. _____ I understand your concerns, I think we should go ahead. We'll order ten units, provided that the supplier agrees to a trial period. All things considered, it's the right decision for the long term. »",
+     "options": [
+      "Despite",
+      "While",
+      "However",
+      "In spite of"
+     ],
+     "correctIndex": 1,
+     "explication": "« While » + proposition (I understand your concerns) exprime la concession. « In spite of » devrait être suivi d'un nom."
+    },
+    {
+     "question": "Complétez cette argumentation avec le connecteur correct : « Despite its high price, the machine is very popular with our customers. While I understand your concerns, I think we should go ahead. We'll order ten units, _____ the supplier agrees to a trial period. All things considered, it's the right decision for the long term. »",
+     "options": [
+      "unless",
+      "otherwise",
+      "even if",
+      "provided that"
+     ],
+     "correctIndex": 3,
+     "explication": "« provided that » = à condition que. « unless » inverserait la condition."
+    }
+   ]
+  },
+  {
+   "competence": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées afin de mesurer les aptitudes à écrire, décrire, formuler, questionner, argumenter, structurer ses idées sur un sujet donné dans un contexte professionnel",
+   "questions": [
+    {
+     "question": "Complétez cet email de refus diplomatique en choisissant la forme correcte dans chaque liste : « Subject: Your request for extended payment terms Dear Mr Okonkwo, Thank you for your letter of 3 June, which we have considered carefully with our finance team. _____ the significant increase in our own supplier costs this year, I am afraid we are not in a position to extend your payment terms from 30 to 90 days. What we can offer, however, is to split your next two invoices into three monthly instalments, which would ease the pressure on your cash flow over the summer. We value our long-standing partnership and hope that this arrangement meets your needs. I would be happy to discuss it on a call next week. Kind regards, Elena Marsh »",
+     "options": [
+      "Because",
+      "Despite",
+      "Given",
+      "Although"
+     ],
+     "correctIndex": 2,
+     "explication": "« Given » + nom exprime la cause (étant donné). « Because » demanderait « because of » devant un nom ; « Despite » et « Although » expriment la concession, ce qui contredit la logique du refus."
+    },
+    {
+     "question": "Complétez cet extrait de recommandations en choisissant la forme correcte : « Based on the results of the pilot, we recommend rolling out the new handheld scanners to all three warehouses. The figures show that picking errors fell by 40% during the trial. It is essential that every site _____ at least two trained super-users before the roll-out. The battery problems reported in week 2 appear to have been caused by an outdated firmware version. Should the issue occur again, the supplier has agreed to replace the devices free of charge. Overall, the benefits clearly outweigh the costs. »",
+     "options": [
+      "has",
+      "have",
+      "will have",
+      "having"
+     ],
+     "correctIndex": 1,
+     "explication": "Après « It is essential that », l'anglais soutenu emploie le subjonctif : base verbale sans -s (every site have). « has » se rencontre en anglais courant, mais la forme attendue dans un rapport formel est « have »."
+    },
+    {
+     "question": "Complétez ce mémo en choisissant le connecteur correct. Regardez toujours ce qui suit le trou : nom, -ing ou proposition complète ? : « Subject: Postponement of the Lyon office opening Despite the strong demand from our French clients, we have decided to postpone the opening of our Lyon office until next spring. This decision was not taken lightly. Admittedly, the delay will cost us some business in the short term. However, the building is simply not ready: the renovation work has fallen six weeks behind schedule due to a shortage of qualified electricians. _____ the contractor has promised to finish by January, we cannot risk opening in the middle of our busiest season. As a result, the Lyon team will continue to work from our Paris office until April, which means that clients will see no change in service. Of the two options we considered, a temporary office or a later opening, the latter was clearly the less costly. »",
+     "options": [
+      "Even though",
+      "Despite",
+      "Because",
+      "So"
+     ],
+     "correctIndex": 0,
+     "explication": "Proposition complète (the contractor has promised…) et sens concessif : « Even though ». « Despite » ne peut pas être suivi d'un sujet + verbe."
+    },
+    {
+     "question": "Exercice de séance : chaque phrase reprend une erreur fréquente relevée dans les rédactions du groupe. Choisissez la forme correcte, puis comparez avec la correction du formateur : « 1. We recommend renewing the contract for another year. 2. Despite the delays, the project was delivered on budget. 3. The figures _____ that demand is slowing down. 4. The new tool will allow us to reduce costs by 10%. 5. I am afraid we are not in a position to offer a further discount. 6. Sales rose by 12% in the second quarter. 7. The proposal, which was discussed last week, has been approved. 8. Further information about the budget will be sent next week. »",
+     "options": [
+      "suggest",
+      "suggests",
+      "are suggesting that",
+      "suggesting"
+     ],
+     "correctIndex": 0,
+     "explication": "Sujet pluriel (The figures) : « suggest » sans -s. La forme progressive « are suggesting that » doublerait « that »."
+    },
+    {
+     "question": "Choisissez le connecteur correct : « _____ the higher initial cost, the new system would pay for itself within two years. »",
+     "options": [
+      "Although",
+      "Despite",
+      "Whereas",
+      "However"
+     ],
+     "correctIndex": 1,
+     "explication": "Suivi d'un groupe nominal (the higher initial cost) : « Despite ». « Although » exigerait une proposition (Although the initial cost is higher)."
+    },
+    {
+     "question": "Choisissez la forme correcte : « Based on these findings, we recommend _____ a second supplier for critical components. »",
+     "options": [
+      "to appoint",
+      "appoint",
+      "appointing",
+      "that appointing"
+     ],
+     "correctIndex": 2,
+     "explication": "« recommend » + -ing (ou recommend that we appoint). « recommend to appoint » est un calque fautif."
+    },
+    {
+     "question": "Complétez la formule de refus diplomatique : « I'm afraid we are not in a _____ to accept these payment terms. »",
+     "options": [
+      "situation",
+      "condition",
+      "place",
+      "position"
+     ],
+     "correctIndex": 3,
+     "explication": "Expression figée : « not in a position to » = pas en mesure de. Les autres noms ne forment pas cette expression."
+    },
+    {
+     "question": "Choisissez le connecteur de cause adapté à la construction : « The delay was _____ a shortage of electronic components. »",
+     "options": [
+      "due to",
+      "because",
+      "since",
+      "as"
+     ],
+     "correctIndex": 0,
+     "explication": "Suivi d'un nom (a shortage) : « due to ». « because », « since » et « as » introduisent une proposition avec verbe."
+    },
+    {
+     "question": "Choisissez le mot qui permet la condition soutenue par inversion : « _____ the problem persist, a full technical audit will be carried out. »",
+     "options": [
+      "If",
+      "Unless",
+      "Should",
+      "Would"
+     ],
+     "correctIndex": 2,
+     "explication": "Inversion : « Should the problem persist » = If the problem persists. Avec « If », le verbe devrait prendre un -s (persists)."
+    },
+    {
+     "question": "Choisissez la préposition correcte : « Online sales now account _____ 35% of our revenue. »",
+     "options": [
+      "for",
+      "of",
+      "to",
+      "with"
+     ],
+     "correctIndex": 0,
+     "explication": "« account for » = représenter (une proportion). « account of » signifie un récit, un compte rendu."
+    }
+   ]
+  }
+ ],
+ "questionsOuvertesDebut": [
+  {
+   "question": "Some companies are asking employees to return to the office full-time, while others are keeping remote work. What is your opinion on remote work? Give reasons and examples to support your view.",
+   "reponseAttendue": "In my view, a hybrid model is clearly the most effective option, although I don't think there's a single answer for every company. On the one hand, remote work has real advantages. People save time on commuting, and for tasks that need concentration, such as writing a report or analysing data, working from home is often more productive. In my previous job, our team actually completed projects faster after we introduced two remote days a week. On the other hand, full-time remote work has hidden costs. New employees learn a lot simply by listening to experienced colleagues, and that's much harder over video calls. Creativity also suffers: many good ideas come from informal conversations that never happen online. That said, forcing everyone back to the office five days a week sends a message of mistrust and may push talented people to leave. So I'd argue that the best approach is to agree on shared office days for collaboration and leave the rest flexible. What matters is not where people work, but whether the organisation of work is clear and fair."
+  },
+  {
+   "question": "Describe a problem you had at work. What happened, what did you do to solve it, and what did you learn from it?",
+   "reponseAttendue": "Last year, I was responsible for organising a training day for twenty new employees. Two days before the event, the trainer called me to say she was ill and couldn't come. At first I panicked, because the programme was already printed and everyone had booked the day. So I contacted two experienced colleagues, and they agreed to run the morning session. Then I asked the training company to send a replacement for the afternoon, and they found someone the same day. In the end, the feedback was very positive. What I learned is that you should always have a plan B, so now I keep a list of internal colleagues who can step in at short notice."
+  },
+  {
+   "question": "Your team is moving to a new office next month. Write an email to your colleagues to explain the move. Include: the date and the new address, what they need to do before the move, and what will be different in the new office. (Rappel : écrivez un courriel structuré à vos collègues, au moins 150 mots, en traitant les trois points demandés.)",
+   "reponseAttendue": "Subject: Our move to the new office on 14 November\n\nHi everyone,\n\nAs you know, our team is moving to a new office next month. I'd like to give you some practical information so that the move goes smoothly.\n\nThe move will take place on Friday 14 November. From Monday 17 November, we will work at 25 Harbour Street, on the fourth floor. The building is a ten-minute walk from Central Station, and there is a car park behind it.\n\nBefore the move, please do three things. First, clear your desk and put your personal items in the boxes that Facilities will deliver on 10 November. Second, label every box with your name and team. Finally, save all your files on the shared drive, because our computers will be reset.\n\nThere will also be some changes in the new office. We will not have fixed desks any more, so you will need to book a desk using the new app. However, there will be four meeting rooms instead of one, and a much bigger kitchen.\n\nIf you have any questions, please let me know.\n\nBest regards,\nClaire"
+  },
+  {
+   "question": "Please introduce yourself. Tell us your name, what you do, where you work and what you do on a typical working day.",
+   "reponseAttendue": "Hello, my name is Karim Benali. I'm a sales assistant at Delta Home, a company that sells kitchen equipment. I work in our office in Lille. On a typical day, I start at half past eight. First, I read my emails and answer questions from customers. Then I prepare quotes and send them to our clients. In the afternoon, I often call customers to check their orders. I like my job because I speak to a lot of different people."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Revenue in the third quarter (in millions of euros):",
+   "reponseAttendue": "2.4 / 2,4 / 2.4 million / 2.4 million euros / €2.4 million / 2.4m. « Two point four million euros » = 2,4 millions d'euros."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Increase compared with last year (%):",
+   "reponseAttendue": "18 / 18% / 18 % / eighteen / 18 percent. « Up eighteen percent on last year » : hausse de 18 %."
+  },
+  {
+   "question": "Transcription de l'écoute : « Elena: How did the Nordic region do in the third quarter? / Jonas: Better than forecast. Revenue reached two point four million euros, up eighteen percent on last year, mainly thanks to the new subscription model. / Elena: And the churn rate? / Jonas: Down to six percent, from nine. That's the lowest we've ever had. » — Current churn rate (%):",
+   "reponseAttendue": "6 / 6% / 6 % / six / 6 percent. Le taux d'attrition est passé de 9 % à 6 % ; la valeur actuelle est 6 %."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — New date of the induction day:",
+   "reponseAttendue": "9 May / 9th May / May 9 / May 9th / the ninth of May / ninth of May / 9/5 / 09/05. « It's now on the ninth of May, not the second » : le 9 mai remplace le 2 mai."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Start time:",
+   "reponseAttendue": "8:30 / 8.30 / 08:30 / 8h30 / half past eight / 8:30 am / 8.30 am. « Half past eight » = 8 h 30."
+  },
+  {
+   "question": "Transcription de l'écoute : « HR Coordinator: Hi everyone, a quick update on the induction day for new recruits. It's now on the ninth of May, not the second, and it'll start at half past eight in the Atlas Room on the third floor. Please bring a copy of your signed contract and your bank details. Lunch will be provided. » — Name of the room:",
+   "reponseAttendue": "Atlas / Atlas Room / the Atlas Room / atlas. La salle s'appelle « the Atlas Room », au troisième étage."
+  }
+ ],
+ "questionsOuvertesFin": [
+  {
+   "question": "You are chairing a one-hour meeting with your team and two colleagues from the purchasing department. The topic is choosing a new supplier of laboratory consumables (or of a product or service relevant to your job). Open the meeting: state the purpose, explain how the meeting will run and what you expect to have achieved by the end, and assign roles.",
+   "reponseAttendue": "Good morning, everyone, and thank you for joining us, especially our colleagues from purchasing. The purpose of this meeting is to choose a new supplier of laboratory consumables, as our current contract ends in March. Here's how we'll proceed. First, Sara will spend ten minutes summarising the three offers we've received, including prices and delivery times. Then Daniel, from purchasing, will give us his assessment of each supplier's reliability. After that, we'll have about twenty-five minutes to discuss the pros and cons of each option. By the end of the meeting, I'd like us to have chosen one preferred supplier and one back-up, so that purchasing can start negotiating next week. If we can't reach a consensus, I'll make the final decision, but I'd prefer we agreed together. Mei has kindly agreed to take the minutes, and Daniel, could you keep an eye on the time? Right, Sara, over to you."
+  },
+  {
+   "question": "During a meeting about choosing a new project management tool, two colleagues disagree. The IT manager wants the most secure tool, even if it is harder to use. The sales manager wants the simplest tool, because her team will not use a complicated one. Another colleague then starts talking about the office move planned for next year. As the chair, refocus the discussion, summarise the two positions, identify what they agree on and propose the next step.",
+   "reponseAttendue": "Thanks, Paolo. The office move is an important topic, but it's outside the scope of today's meeting, so I'll add it to the parking lot and we can come back to it next month. Let's get back to the tool. So, if I've understood correctly, Kenji's priority is security, even if the tool is a little harder to learn, whereas Anita is concerned that her sales team simply won't use something complicated. What you both seem to agree on is that a tool nobody uses is worthless, and that a tool that isn't secure is a risk we can't take. So the real question is whether there's an option that is secure enough and still easy to use. I'd suggest that Kenji and Anita shortlist two tools together and organise a short trial with five salespeople. Could you bring the results to our meeting on the twentieth? Is that a fair way forward?"
+  },
+  {
+   "question": "You are presenting a product or service from your own company (or a training programme, a piece of equipment or a software tool) to a potential client who is interested but worried about the price. Present your offer: start from the client's need, describe your solution, turn at least three features into benefits, give one piece of evidence, deal with the price objection and propose a concrete next step.",
+   "reponseAttendue": "Thank you for your time today. I'll cover three things: your needs, our solution and a possible next step. When we spoke last week, you explained that your new sales staff take around six months to reach their targets, mainly because they don't know the technical side of your products well enough. What we're proposing is a twelve-week blended training programme, combining short online modules with four half-day workshops at your site. First, the modules are only fifteen minutes long, which means your staff can complete them between client visits. Second, the workshops are built around your own products, so the skills are immediately usable. And third, managers receive a monthly progress report, which allows them to support people who are falling behind. With a distributor of laboratory equipment last year, the time needed to reach target fell from six months to about four. Results depend on the team, of course, but that's a typical outcome. Now, I understand your concern about the price. The question, really, is whether the programme pays for itself. If each new salesperson reaches target two months earlier, the extra revenue is well above the cost of the training. What I'd suggest is a pilot with your next group of four recruits in January, and a review together in April."
+  },
+  {
+   "question": "You are a supplier of training equipment. A college wants to buy twenty units but asks for a 15% discount and delivery within three weeks. You can offer a maximum of 8% and normally need five weeks. State your position and explain why, propose at least two concessions linked to conditions, set a clear limit and suggest a way forward.",
+   "reponseAttendue": "Thank you for your interest in our equipment. I understand that both price and timing matter to you. However, a fifteen per cent discount isn't something we're in a position to offer, because our prices already include installation and staff training. What we could do is offer eight per cent, provided that you confirm the order by the end of this month, as that would allow us to plan production. On delivery, five weeks is our normal lead time. If you could accept a delivery in two stages, we could deliver ten units within three weeks and the other ten two weeks later. That way, you could start your courses on time. I'm afraid eight per cent is as far as we can go on price. In return for a two-year maintenance contract, however, we would be prepared to add a second day of staff training free of charge. Would that work for you? If so, I can send you a revised quotation tomorrow."
+  },
+  {
+   "question": "You are a buyer. Your supplier of laboratory chemicals has announced a 10% price increase from January. Your budget allows a maximum of 5%. Explain your position, ask a question to understand the supplier's real interests, make a counter-proposal with a concession of your own, and summarise the possible agreement.",
+   "reponseAttendue": "Thank you for explaining the reasons behind the increase. I'll be honest with you: ten per cent is well beyond what our budget allows. Our budget for next year has already been approved, with a maximum increase of five per cent on chemicals. Before we go further, can I ask what matters most to you at the moment? Is it the price itself, or more predictable volumes? … I see, so visibility on volumes would help you plan your production. In that case, here's what I'd suggest. We could commit to ordering all our solvents from you for the next two years, instead of splitting them between two suppliers. That would represent around thirty per cent more volume for you. In return, we would need the increase to be limited to five per cent. We could also agree to quarterly orders rather than monthly ones, which would reduce your delivery costs. So, just to confirm: a five per cent increase, a two-year exclusive agreement on solvents, and quarterly orders. If that's acceptable, I'll present it to my director this week."
+  },
+  {
+   "question": "You are about to interview a candidate for a position in your department (for example a project assistant, a laboratory technician or a sales representative). Open the interview: explain its aim, how long it will last, how it will be organised and what will happen afterwards. Then ask two open questions and one follow-up question, as you would in a real interview.",
+   "reponseAttendue": "Good afternoon, and thank you for coming in. Please make yourself comfortable. The aim of this interview is to understand your experience and how you'd approach the role of laboratory technician in our quality control team. We have about forty-five minutes. I'll start with some questions about your background, then my colleague, Dr Prior, will ask you a few technical questions, and we'll leave the last ten minutes for any questions you may have. After today, we'll be meeting two other candidates, and we'll let you know our decision by Friday the twelfth. So, to begin with, could you walk me through your current role and your main responsibilities? … Thank you. You mentioned that you introduced a new sample tracking procedure. Could you give me a specific example of a problem it solved, and how you measured the result? … Very interesting. And finally, how would you organise your work if three urgent requests arrived on the same morning?"
+  },
+  {
+   "question": "You are the project manager of a project you know (or of this fictional one: installing new training equipment in a technical school, due to be ready for the start of the next term). The project is three weeks behind schedule and 5% over budget. Present a progress review: give the overall status, what has been completed, the causes of the delay, the main risk, two options with their consequences, your recommendation and the decision you need from the committee.",
+   "reponseAttendue": "Good morning, everyone. I'll give you an update on the installation of the new training workshop at Westbridge Technical School. Overall, the project is amber. Since our last review, we've completed the electrical work and delivered eight of the twelve training benches. However, we're three weeks behind schedule. This is mainly due to the late delivery of the remaining benches by the manufacturer, and partly because the school asked us to move two benches to improve access for wheelchair users, which required extra cabling. We're also five per cent over budget, mostly because of that extra cabling, but we're still within our contingency. The main risk now is that the workshop won't be ready for the start of term on the sixth of January. We see two options. Option A is to add a second installation team over the Christmas break, which would cost around twelve thousand euros and allow us to finish by the third of January. Option B is to open the workshop with eight benches only and install the last four during the half-term holiday in February, at no extra cost. Our recommendation is option B, because the first weeks of the course are mainly theoretical and eight benches are enough for the first groups. So, what we need from the committee today is approval of option B and agreement to inform the teaching staff this week."
+  },
+  {
+   "question": "You are chairing the Brightmoor Retail meeting on how to use the €60,000 budget to reduce stock-outs (options A, B and C described in the lesson). First, open the meeting: state the purpose, describe in detail how the meeting will run, what you expect by the end and who will do what. Then, imagining that the group has chosen option C, close the meeting with a summary of the decision, the actions, the owners, the deadlines and any outstanding issue.",
+   "reponseAttendue": "Good morning, everyone, and thank you for joining. The purpose of this meeting is to decide how we use the sixty-thousand-euro budget set aside to reduce stock-outs in our stores. Here's how we'll proceed. First, each of you will have two minutes to present your preferred option: Lena for logistics, Diego for store operations and Sam for finance. Then we'll have ten minutes of open discussion. By the end of the meeting, we need to agree on one option, with a timeline and a named owner for each action. Mei has kindly agreed to take the minutes and will read back the actions at the end. If we can't reach a consensus, I'll make the final decision, but I'd much prefer that we agree together. Right, Lena, over to you. … OK, we're almost out of time, so let me sum up. We've agreed on option C: training for all department managers, plus a trial of the forecasting software in five stores. Diego will organise the training, starting on the twentieth of this month. Lena will set up the trial by the end of next month and report back on the results in March. Sam will track the costs against the budget. The warehouse lease is still outstanding; we'll put it on the agenda of the next management meeting. Can we all live with that? Thank you, everyone."
+  },
+  {
+   "question": "You have just finished the negotiation between Ashgrove College and Voltaris Training Systems (choose your side). Report to your manager: summarise the final agreement with all figures and conditions, explain which concessions you made and what you obtained in return, mention one point you could not obtain, and say what the next steps are.",
+   "reponseAttendue": "I've just finished the negotiation with Voltaris, and I think we got a good deal. To summarise, we've agreed on twenty training benches at nine thousand two hundred euros each, instead of the list price of ten thousand four hundred. Delivery will take place in six weeks, so the benches will arrive one week before the start of term. In return, we agreed to a three-year maintenance contract, which we would probably have needed anyway. They also agreed to include the teacher training free of charge, provided that we sign the order by Friday. The one point I couldn't obtain was a fixed price for the six extra benches we might need next year. They said they couldn't commit to a price so far in advance, but they're willing to discuss it in the spring. As for the next steps, Voltaris will send a written confirmation this afternoon. I'll check it carefully against my notes, and I'll need your approval by Thursday so that we can sign on Friday."
+  },
+  {
+   "question": "You are a key account manager at Stellmark Packaging. Your client Norvik Retail has asked for a 12% discount on next year's contract. Write an email to Ms Ingrid Dahl, Purchasing Manager at Norvik Retail. Thank her for the request; explain why you cannot accept it (rising cost of recycled cardboard and energy); refuse diplomatically; propose an alternative (prices frozen for 12 months in exchange for a two-year contract, plus free storage of up to 20 pallets); suggest a call before a precise date. Write at least 150 words. — Rappel : tampon, raison, refus adouci, alternative avec conditions, action attendue ; registre neutre-formel.",
+   "reponseAttendue": "Subject: Your request regarding next year's pricing\n\nDear Ms Dahl,\n\nThank you for your email of 2 October and for the detailed figures you shared with us. We have considered your request for a 12% discount on next year's contract very carefully.\n\nAs you know, the cost of recycled cardboard has risen by almost 18% since January, and our energy bills have followed the same trend. Although we have absorbed most of these increases so far, our margins on your account are now very limited. For this reason, I am afraid we are not in a position to offer a reduction of 12%.\n\nWhat we can offer, however, is a guaranteed price freeze for the next twelve months, provided that Norvik Retail commits to a two-year agreement. In addition, we would be happy to store up to 20 pallets of your packaging free of charge in our Leeds warehouse, which would give you more flexibility during your peak season.\n\nWe truly value our eight-year partnership, and I believe this arrangement offers both stability and real savings. Would you be available for a call before Friday 17 October to discuss the details?\n\nKind regards,\n\nLaura Brennan\nKey Account Manager, Stellmark Packaging"
+  }
+ ],
+ "exercices": [
+  {
+   "titre": "Expression orale — B2-M1-L1-I4 (B2.1)",
+   "consigne": "A colleague from another department has sent you a project plan. In your opinion, the budget is underestimated and the deadline is unrealistic. Leave a voice message in which you thank them, explain your two concerns diplomatically and suggest a next step.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Le message s'ouvre par un remerciement et une appréciation positive sincère. ; Les deux réserves sont formulées avec au moins trois procédés d'atténuation différents (modal, euphémisme, I'm not entirely…, seems…). ; Chaque réserve est justifiée par un élément précis (chiffre, contrainte, date). ; Une étape suivante concrète est proposée (réunion, date, document). ; Le ton reste posé et fluide pendant au moins 45 secondes, sans sur-adoucissement..",
+   "reponseAttendue": "Hi Marcus, it's Sophie from the engineering team. Thanks very much for sending the project plan; it's clearly structured and it gives us a good basis for discussion. I just wanted to share a couple of concerns before Friday's meeting. First, the budget seems a little tight to me. The testing phase alone might cost more than the amount you've allocated, especially if we need external lab time. Second, I'm not entirely convinced the March deadline is realistic, given that two of our engineers are on another project until February. Would it be possible to meet for half an hour on Wednesday to go through the figures together? Let me know what suits you. Thanks again.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M1-L2-I4 (B2.1)",
+   "consigne": "Some companies are replacing most business travel with video conferencing. Do you think this is a good idea for a company in your sector? Give a nuanced opinion with your position, a concession, a counter-argument, a condition and a conclusion.\nPréparation 45 s, réponse orale de 90 s.\nCritères : La position est annoncée clairement dès la première phrase. ; Une concession explicite est faite (Admittedly, It's true that…). ; Le contre-argument est appuyé par un élément concret (chiffre, exemple, conséquence). ; Une condition est formulée (provided that, as long as, unless). ; La conclusion reprend la position nuancée (on balance, all things considered). ; Le discours est fluide et les connecteurs sont variés (pas uniquement « but »)..",
+   "reponseAttendue": "On the whole, I'd argue that replacing most business travel with video calls is a good idea for a purchasing team like mine. Admittedly, nothing really replaces a site visit when you're assessing a new supplier: you need to see the production line, the storage conditions and the people. That said, most of our meetings with existing suppliers are about prices, volumes and delivery schedules, and those can be handled perfectly well online. Last year, our team spent almost forty thousand euros on travel, and I'd estimate that two thirds of those trips could have been video calls. So I'd support a new policy, provided that we keep a budget for first visits and for audits. On balance, we would save time and money without losing the relationships that really matter.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M1-L3-I4 (B2.2)",
+   "consigne": "Present a project you would like to launch in your department or company, for example a new tool, a training programme, a change of supplier or a process improvement. Describe the context, your proposal, at least two benefits, one risk and how you would manage it, and finish with a clear request.\nPréparation 60 s, réponse orale de 120 s.\nCritères : L'objectif du projet est annoncé dès la première phrase. ; L'exposé suit une structure lisible (contexte, proposition, bénéfices, risque, demande) annoncée ou balisée par au moins quatre marqueurs. ; Au moins deux bénéfices sont précisés par un chiffre, une comparaison ou une conséquence mesurable. ; Un risque est identifié et accompagné d'une mesure de maîtrise. ; L'exposé se termine par une demande précise (quoi, combien, quand). ; Le discours est fluide, non lu, et respecte la durée (au moins 90 secondes, au plus 2 minutes)..",
+   "reponseAttendue": "Good morning. I'd like to present a project that could cut the time our technicians spend on paperwork by about half. I'll cover three points: the problem, our proposal and what I need from you. First, the problem. At the moment, our twelve field technicians fill in paper inspection reports, which are then typed into the system by the office. On average, each report takes forty minutes from start to finish, and around one in ten contains errors. That brings me to our proposal. What we're proposing is to equip the technicians with tablets and a simple digital form that sends the report directly to the system. There are two main benefits. Firstly, we estimate a saving of roughly six hundred hours a year, which is the equivalent of four months of one person's work. Secondly, the form would check the data as it's entered, so errors should fall sharply. The main risk is resistance from technicians who are used to paper. To minimise it, we would involve two of them in testing the form and run a half-day training session for everyone. The total cost would be about eighteen thousand euros, including the tablets. So, in short, I'm asking for your approval to run a three-month pilot with four technicians, starting in February.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M1-L4-I3 (B2.2)",
+   "consigne": "You have just presented a proposal to introduce a shared online calendar for booking meeting rooms and equipment. A senior colleague says: \"We tried something similar three years ago and nobody used it. Why would it work this time?\" Respond to this objection.\nPréparation 30 s, réponse orale de 75 s.\nCritères : L'objection est accueillie et une partie en est concédée (You're right that…). ; Au moins une différence concrète avec la tentative précédente est expliquée. ; Un élément de preuve ou une mesure de suivi est proposé (pilote, indicateur, date de bilan). ; La réponse se termine par une question de vérification. ; Le ton reste calme et non défensif ; le discours est fluide pendant au moins 60 secondes..",
+   "reponseAttendue": "That's a fair point, and you're right that the previous tool wasn't a success. I looked into why, and there seem to have been two main reasons. First, it was a separate website, so people had to log in with a different password, and most of them simply didn't bother. Second, the receptionists kept a paper diary at the same time, so there was no real reason to switch. The difference this time is that the calendar is built into the email software everyone already uses, so booking a room takes about ten seconds. We would also stop the paper diary from day one. To make sure it works, I'd suggest a two-month trial on the second floor and a quick review of usage figures at the end of March. If fewer than half the bookings go through the calendar, we can drop it. Does that address your concern?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M1-L4-I4 (B2.2)",
+   "consigne": "At the end of your project presentation, a manager asks: \"What exactly will the maintenance cost be in the third year?\" You do not have this figure. Answer the question honestly and professionally.\nPréparation 30 s, réponse orale de 60 s.\nCritères : La question est accueillie et éventuellement reformulée. ; L'intervenant reconnaît ne pas avoir le chiffre, sans s'excuser excessivement. ; Il donne les informations dont il dispose (fourchette, coût des deux premières années, contrat). ; Il prend un engagement précis : qui contacter, quoi envoyer, quand. ; Le discours est clair et fluide pendant au moins 45 secondes..",
+   "reponseAttendue": "That's an important question, thank you. If I've understood correctly, you'd like to know whether maintenance costs will increase once the warranty ends. I'm afraid I don't have the exact figure for year three with me today. What I can tell you is that the first two years are covered by the supplier's warranty, so maintenance is included in the purchase price. After that, the supplier offers a service contract, and for similar customers it has been between eight and ten per cent of the purchase price per year. I'll ask the supplier for a written quote for years three to five and send it to you and the finance team by next Tuesday. Would that be helpful?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M1-L5-I1 (B2.2)",
+   "consigne": "Choose one of these projects or use your own: (a) replacing paper delivery notes with a mobile app for your drivers; (b) offering a short online English course to your sales team; (c) switching to a local supplier for a key component. Present the project to your management: objective, context, proposal, two benefits with figures, one risk and how you would manage it, and a clear request.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Les six temps de l'exposé sont présents et reconnaissables. ; Au moins quatre marqueurs de structure variés sont utilisés. ; Les bénéfices sont chiffrés ou comparés de façon précise. ; Le risque est assorti d'une mesure de maîtrise crédible. ; La demande finale précise quoi, combien et quand. ; Le registre est neutre et poli ; l'exposé n'est pas lu et tient dans le temps imparti..",
+   "reponseAttendue": "Good morning, and thank you for your time. I'd like to propose switching to a local supplier for the aluminium brackets we use in all our control cabinets. I'll cover the problem, the proposal and what I'm asking for. At the moment, we buy these brackets from a supplier in Asia. The unit price is low, but lead times have gone from six to eleven weeks this year, and twice we've had to stop an assembly line for two days while we waited for parts. What we're proposing is to move sixty per cent of our volume to Brennock Metalworks, a supplier about forty kilometres from our plant. There are two main benefits. Firstly, their lead time is ten days, so we could reduce our safety stock by roughly half, which would free up around fifty thousand euros of cash. Secondly, a local supplier would allow us to visit and audit them easily, which matters for our quality certification. Admittedly, their unit price is about seven per cent higher. However, when you include transport, customs and the cost of line stoppages, the total cost is almost the same. The main risk is relying on a smaller company. To manage it, we would keep forty per cent of the volume with our current supplier for the first year. So, in short, I'm asking for your approval to sign a one-year framework agreement with Brennock Metalworks, starting in April.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M4-L1-I3 (B2.1)",
+   "consigne": "You are chairing a one-hour meeting with your team and two colleagues from the purchasing department. The topic is choosing a new supplier of laboratory consumables (or of a product or service relevant to your job). Open the meeting: state the purpose, explain how the meeting will run and what you expect to have achieved by the end, and assign roles.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Objectif annoncé en une phrase précise (verbe d'action + objet : agree on, choose, decide). ; Déroulement détaillé : au moins trois étapes ordonnées, avec intervenants et durées. ; Attendus explicites (By the end of the meeting, we need…). ; Au moins deux rôles attribués (minutes, timekeeper, presenter) et mode de décision précisé. ; Discours fluide et structuré (connecteurs de séquence), registre courtois et ferme, pendant au moins 60 secondes..",
+   "reponseAttendue": "Good morning, everyone, and thank you for joining us, especially our colleagues from purchasing. The purpose of this meeting is to choose a new supplier of laboratory consumables, as our current contract ends in March. Here's how we'll proceed. First, Sara will spend ten minutes summarising the three offers we've received, including prices and delivery times. Then Daniel, from purchasing, will give us his assessment of each supplier's reliability. After that, we'll have about twenty-five minutes to discuss the pros and cons of each option. By the end of the meeting, I'd like us to have chosen one preferred supplier and one back-up, so that purchasing can start negotiating next week. If we can't reach a consensus, I'll make the final decision, but I'd prefer we agreed together. Mei has kindly agreed to take the minutes, and Daniel, could you keep an eye on the time? Right, Sara, over to you.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M4-L2-I3 (B2.1)",
+   "consigne": "During a meeting about choosing a new project management tool, two colleagues disagree. The IT manager wants the most secure tool, even if it is harder to use. The sales manager wants the simplest tool, because her team will not use a complicated one. Another colleague then starts talking about the office move planned for next year. As the chair, refocus the discussion, summarise the two positions, identify what they agree on and propose the next step.\nPréparation 30 s, réponse orale de 60 s.\nCritères : Recadrage poli du sujet hors ordre du jour avec une solution (parking lot, take it offline). ; Synthèse fidèle et équilibrée des deux positions (whereas, while, on the one hand…). ; Point d'accord explicitement formulé (What you both seem to agree on is…). ; Prochaine étape concrète avec responsable ou échéance. ; Intonation adaptée (descendante pour recadrer, montante pour vérifier) et discours fluide pendant au moins 45 secondes..",
+   "reponseAttendue": "Thanks, Paolo. The office move is an important topic, but it's outside the scope of today's meeting, so I'll add it to the parking lot and we can come back to it next month. Let's get back to the tool. So, if I've understood correctly, Kenji's priority is security, even if the tool is a little harder to learn, whereas Anita is concerned that her sales team simply won't use something complicated. What you both seem to agree on is that a tool nobody uses is worthless, and that a tool that isn't secure is a risk we can't take. So the real question is whether there's an option that is secure enough and still easy to use. I'd suggest that Kenji and Anita shortlist two tools together and organise a short trial with five salespeople. Could you bring the results to our meeting on the twentieth? Is that a fair way forward?",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M4-L3-I3 (B2.2)",
+   "consigne": "You are presenting a product or service from your own company (or a training programme, a piece of equipment or a software tool) to a potential client who is interested but worried about the price. Present your offer: start from the client's need, describe your solution, turn at least three features into benefits, give one piece of evidence, deal with the price objection and propose a concrete next step.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Introduction centrée sur le besoin du client et annonce de la structure (signposting). ; Au moins trois caractéristiques transformées en bénéfices (which means that, so you can). ; Une preuve chiffrée ou un exemple de référence, nuancé (typically, depending on…). ; Objection de prix traitée en trois temps : reconnaissance, reformulation, réponse argumentée. ; Appel à l'action concret ; discours fluide, convaincant et précis pendant au moins 90 secondes..",
+   "reponseAttendue": "Thank you for your time today. I'll cover three things: your needs, our solution and a possible next step. When we spoke last week, you explained that your new sales staff take around six months to reach their targets, mainly because they don't know the technical side of your products well enough. What we're proposing is a twelve-week blended training programme, combining short online modules with four half-day workshops at your site. First, the modules are only fifteen minutes long, which means your staff can complete them between client visits. Second, the workshops are built around your own products, so the skills are immediately usable. And third, managers receive a monthly progress report, which allows them to support people who are falling behind. With a distributor of laboratory equipment last year, the time needed to reach target fell from six months to about four. Results depend on the team, of course, but that's a typical outcome. Now, I understand your concern about the price. The question, really, is whether the programme pays for itself. If each new salesperson reaches target two months earlier, the extra revenue is well above the cost of the training. What I'd suggest is a pilot with your next group of four recruits in January, and a review together in April.",
+   "points": 10
+  },
+  {
+   "titre": "Expression orale — B2-M4-L4-I3 (B2.2)",
+   "consigne": "You are a supplier of training equipment. A college wants to buy twenty units but asks for a 15% discount and delivery within three weeks. You can offer a maximum of 8% and normally need five weeks. State your position and explain why, propose at least two concessions linked to conditions, set a clear limit and suggest a way forward.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Position exposée clairement et justifiée par un argument objectif. ; Au moins deux concessions, chacune liée à une condition ou une contrepartie (if…, provided that…, in return for…). ; Limite formulée sans ambiguïté et sans brutalité (as far as we can go, not in a position to). ; Proposition de suite ou d'alternative qui maintient la relation. ; Emploi correct du conditionnel (could, would) ; discours fluide pendant au moins 60 secondes..",
+   "reponseAttendue": "Thank you for your interest in our equipment. I understand that both price and timing matter to you. However, a fifteen per cent discount isn't something we're in a position to offer, because our prices already include installation and staff training. What we could do is offer eight per cent, provided that you confirm the order by the end of this month, as that would allow us to plan production. On delivery, five weeks is our normal lead time. If you could accept a delivery in two stages, we could deliver ten units within three weeks and the other ten two weeks later. That way, you could start your courses on time. I'm afraid eight per cent is as far as we can go on price. In return for a two-year maintenance contract, however, we would be prepared to add a second day of staff training free of charge. Would that work for you? If so, I can send you a revised quotation tomorrow.",
+   "points": 10
+  }
+ ],
+ "exerciceIntermediaire": {
+  "titre": "Évaluation intermédiaire — 4 productions notées sur 20",
+  "contexte": "Évaluation à mi-parcours (modules B2-M2 à B2-M4) : productions orales et écrites corrigées par le formateur avec les critères de chaque sujet.",
+  "questions": [
+   {
+    "question": "Expression orale — B2-M6-L3-I6 (B2.1) — Some companies now publish the salary range for every job they advertise. Do you think this is a good idea? Why or why not?\nPréparation 30 s, réponse orale de 60 s.\nCritères : Opinion exprimée clairement dès le début. ; Au moins deux arguments et une nuance (however, admittedly). ; Temps de parole : au moins 48 secondes sur 60. ; Vocabulaire précis (salary range, transparency, negotiate, candidates). ; Respect du sujet : publication des salaires dans les offres d'emploi..",
+    "reponseAttendue": "In my view, publishing the salary range is generally a good idea. First, it saves time for everyone: candidates know immediately whether the job matches their expectations, and recruiters don't spend hours interviewing people who would never accept the offer. Second, it makes pay fairer, because it becomes harder to offer very different salaries to people doing the same job. Admittedly, there is a risk for companies: competitors can see exactly what you pay, and current employees may ask for a raise if new recruits are offered more. However, I think these problems can be managed if the ranges are realistic and regularly updated. So, overall, I'm in favour of it, provided that companies are ready to explain how salaries are set within the range.",
+    "points": 5
+   },
+   {
+    "question": "Expression orale — B2-M6-L3-I7 (B2.2) — Your manager is considering moving all your team's documents to a new shared online platform and asks for your recommendation. Present your recommendation and try to convince your manager.\nPréparation 45 s, réponse orale de 90 s.\nCritères : Recommandation claire annoncée dès le début. ; Au moins deux arguments justifiés et un exemple concret. ; Une concession (admittedly, it's true that) et une condition (provided that, as long as). ; Temps de parole : au moins 72 secondes sur 90. ; Discours structuré avec des connecteurs variés ; conclusion qui reprend la recommandation..",
+    "reponseAttendue": "My recommendation is that we should move to the new platform, but in stages rather than all at once. The first reason is efficiency. At the moment, our documents are spread across personal drives, email attachments and an old shared folder, so we regularly waste time looking for the latest version of a file. For example, last month two of us updated different versions of the same price list, and a client received the wrong one. A single platform with version history would prevent that kind of mistake. The second reason is remote work: half the team works from home two days a week, and the platform would give everyone the same access wherever they are. Admittedly, the move will take time, and some colleagues are worried about learning a new tool. That's why I'd suggest starting with one project folder for a month, as long as we also organise a short training session. If the pilot works, we can transfer everything else. So, to sum up, I'd recommend a gradual move, starting next month.",
+    "points": 5
+   },
+   {
+    "question": "Expression orale — B2-M6-L3-I8 (B2.2) — You are leading a project review with your team. Choose a real or imaginary project. Explain the purpose of the meeting, describe the current status of the project, present one problem and the options to solve it, and say clearly what you expect from each participant and by when.\nPréparation 60 s, réponse orale de 120 s.\nCritères : Objectif de la réunion annoncé clairement au début. ; État d'avancement précis (fait / en cours / en retard) avec au moins un chiffre ou une date. ; Un problème présenté avec au moins deux options. ; Attendus précis : qui fait quoi et pour quand. ; Temps de parole : au moins 96 secondes sur 120 ; discours fluide et structuré. ; Registre adapté à l'animation d'une réunion..",
+    "reponseAttendue": "Good morning, everyone, and thanks for joining. The purpose of today's review is to check where we stand on the new customer portal and to agree on how we deal with the delay on the payment module. Let me start with the status. The design phase is complete and was signed off by the client on the tenth. The account and order-tracking features are finished and have been tested, so that part of the project is on track. However, the payment module is about three weeks behind schedule, because the bank's test environment was only made available last Monday. This is our main problem, since the go-live date is the first of March. As I see it, we have two options. The first is to keep the date and launch without online payment, adding it in April. The second is to move the whole launch to the end of March. Admittedly, the first option means a less complete product, but it keeps our commitment to the client, who has already planned a marketing campaign. So, here is what I need from each of you. Lena, could you estimate exactly how much work remains on the payment module by Thursday? Marc, please check with the client whether a launch without payment would be acceptable. And Priya, I'd like you to update the risk log before our next meeting on Monday. We'll take the final decision then. Thanks, everyone.",
+    "points": 5
+   },
+   {
+    "question": "Email — B2-M6-L4-I1 (B2.2) — Your company, Arlow Insurance (400 employees), is considering whether to allow staff to use generative AI tools to draft emails to clients. Write an email to the management committee in which you give your opinion, present the main advantages and the main risks, and make a clear recommendation with the conditions you think are necessary. Write at least 200 words. — Rappel : position nuancée (pour, contre, recommandation conditionnelle), un paragraphe par idée, au moins huit connecteurs, 5 minutes de relecture.\n200 mots minimum, en 30 minutes.\nCritères : Respect du sujet : opinion, avantages, risques et recommandation avec conditions sont présents. ; Respect du temps (30 min) et du minimum de 200 mots. ; Argumentation nuancée : les risques sont présentés honnêtement avant la recommandation. ; Cohérence et cohésion : paragraphes clairs, au moins huit connecteurs différents. ; Contrôle grammatical : conditionnel, recommend + -ing, relatives, passif. ; Vocabulaire précis et registre adapté à un comité de direction..",
+    "reponseAttendue": "Subject: Use of generative AI tools for client emails\n\nDear members of the management committee,\n\nFollowing our recent discussion, I would like to share my view on whether staff should be allowed to use generative AI tools to draft emails to clients. In my opinion, the question is no longer whether these tools will be used, but how we can use them safely.\n\nThe advantages are significant. Our customer service team answers more than 300 emails a day, and many of them deal with similar questions. A well-designed tool could produce a first draft in seconds, which would reduce response times and improve the consistency of our replies. In addition, colleagues who are less confident in writing would benefit from clearer, better-structured messages.\n\nAdmittedly, the risks are real. These tools sometimes produce inaccurate information, which could be serious in an insurance context. Moreover, if staff copy client details into a public tool, we could breach data protection rules.\n\nI would therefore recommend allowing their use, provided that three conditions are met. First, only an approved tool with data hosted in the EU should be authorised. Second, under no circumstances should personal client data be entered into it. Finally, every email must be checked and sent by its author, who remains fully accountable for its content.\n\nBanning these tools completely would simply push their use underground. Clear guidelines, on the other hand, would allow us to benefit from them while protecting our clients.\n\nKind regards,\nKarim Benali\nProject Coordinator",
+    "points": 5
+   }
+  ]
+ },
+ "evaluationFinale": {
+  "titre": "Évaluation finale interne — 4 épreuves (C1 à C4) notées sur 20, au format d'entraînement du VTest",
+  "exercices": [
+   {
+    "titre": "C1 — Compréhension orale (B2.1)",
+    "consigne": "Écoutez l'enregistrement (transcription réservée au formateur : HR Announcer: Due to the ongoing upgrade of our payroll system, salaries for March will be paid on the twenty-ninth rather than the twenty-seventh. Staff who may be affected by the delay, for example those with standing orders due on the twenty-eighth, can request an advance through the HR portal before Friday.), puis répondez.\n1. What can employees affected by the delay do?\nA. Ask for an advance before Friday\nB. Update their bank details on the HR portal\nC. Be paid on the twenty-seventh as usual\nD. Cancel their standing orders through HR",
+    "reponseAttendue": "1. A — Ask for an advance before Friday. « can request an advance through the HR portal before Friday ». Le portail RH sert à demander l'avance, pas à modifier ses coordonnées bancaires ; le paiement du 27 est justement supprimé.",
+    "points": 5
+   },
+   {
+    "titre": "C2 — Compréhension écrite (B2.1)",
+    "consigne": "Lisez le document, puis répondez.\nFrom: Marion Leclerc, Head of Procurement, Ostra Hotels\nTo: David Kerr, Account Director, Brightline Linen Services\nSubject: September invoices and contract review\n\nDear David,\n\nI am writing about the September invoices for our three Lisbon hotels. Having compared them with the delivery notes, our accounts team found that we were charged for 1,240 sets of bed linen at the Alfama site, whereas only 980 were actually delivered. I would be grateful if you could issue a credit note for the difference before the end of the month, as we close our quarterly accounts on 31 October.\n\nMore broadly, this is the third invoicing error this year. While the quality of your service itself remains excellent, these errors take up a considerable amount of our team's time. Before we renew the contract in January, I would therefore like to discuss two changes: a monthly reconciliation of delivery notes and invoices, and a penalty clause should errors exceed 2% of the invoiced amount.\n\nI would suggest a meeting at our head office in the week of 10 November. Please let me know which day would suit you.\n\nKind regards,\nMarion Leclerc\n1. What is the immediate problem?\nA. The bed linen was delivered late\nB. The quality of the linen has declined over recent months\nC. Ostra Hotels was billed for items it never received\nD. The delivery notes have been lost\n2. Why does Marion want the credit note before the end of the month?\nA. Because the current contract ends at the end of the month\nB. Because of her company's quarterly closing date\nC. Because one of the hotels is closing\nD. Because Brightline asked for it\n3. What is Marion's opinion of Brightline?\nA. She is satisfied with the service but not with the invoicing\nB. She wants to end the contract\nC. She thinks the linen is too expensive\nD. She is dissatisfied with every aspect of the service\n4. What does Marion want to include in the new contract?\nA. A lower price per set of linen\nB. Daily deliveries to each hotel\nC. A clause allowing her to change supplier without notice\nD. Monthly checks and a penalty above an error threshold",
+    "reponseAttendue": "1. C — Ostra Hotels was billed for items it never received. 1 240 parures facturées pour 980 livrées : une surfacturation. Les bons de livraison ont justement servi à la comparaison, ils ne sont pas perdus.\n2. B — Because of her company's quarterly closing date. « as we close our quarterly accounts on 31 October » : l'échéance est liée à la clôture trimestrielle. Le contrat, lui, est à renouveler en janvier.\n3. A — She is satisfied with the service but not with the invoicing. « While the quality of your service itself remains excellent, these errors… » : concession. Elle souhaite renouveler le contrat avec des modifications, pas y mettre fin.\n4. D — Monthly checks and a penalty above an error threshold. « a monthly reconciliation… and a penalty clause should errors exceed 2% » : rapprochement mensuel et pénalité au-delà de 2 % d'erreurs. Le prix n'est pas remis en cause.",
+    "points": 5
+   },
+   {
+    "titre": "C3 — Expression orale (B2.1)",
+    "consigne": "Describe a recent change in your workplace or in your field of work, and explain what impact it has had.\nPréparation 30 s, réponse orale de 45 s.\nCritères : Respect du sujet : un changement précis et son impact sont décrits. ; Temps de parole : au moins 36 secondes sur 45. ; Structure : changement, impact, exemple, bilan. ; Temps verbaux corrects (present perfect pour l'impact actuel). ; Discours fluide, sans longues pauses..",
+    "reponseAttendue": "A recent change in my company is the move to electronic signatures for all contracts. Until last year, every contract was printed, signed and sent by post, which could take up to two weeks. Since we introduced the new system, most contracts have been signed within forty-eight hours. For example, last month we closed a deal with a client in Spain in a single day. The only drawback is that some older clients still prefer paper, so we've kept both options for now. Overall, it has made us much faster.",
+    "points": 5
+   },
+   {
+    "titre": "C4 — Expression écrite (B2.1)",
+    "consigne": "Use the notes below to write a memo to all staff (at least 150 words) explaining why this year's annual sales conference will be held online. Link the ideas with at least six different connectors of concession, cause and consequence. Notes: hotel and venue costs up 25% / 30% of sales staff now based abroad / last year's feedback: networking was the most valued part / online format saves about €40,000 / plan: regional face-to-face dinners in June. — Rappel : variez despite, although, due to, given that, as a result, which means that, admittedly… however.\n150 mots minimum, en 20 minutes.\nCritères : Respect du sujet : les cinq notes sont intégrées. ; Au moins six connecteurs différents de concession, cause et conséquence, correctement construits. ; Concession argumentée : l'inconvénient (perte du networking) est reconnu puis traité. ; Ponctuation correcte des connecteurs adverbiaux. ; Registre adapté à une note interne. ; Au moins 150 mots..",
+    "reponseAttendue": "To: All staff\nFrom: Sales Operations\nSubject: Format of this year's sales conference\n\nAs you may know, this year's annual sales conference will be held online. We would like to explain the reasons for this decision.\n\nFirst, hotel and venue costs have risen by 25% compared with last year. In addition, given that 30% of our sales staff are now based abroad, bringing everyone to one location would involve considerable travel expenses. As a result, the online format will save the company around €40,000, which means that this budget can be reinvested in sales tools.\n\nAdmittedly, last year's feedback showed that networking was the most valued part of the event. Although an online conference cannot fully replace informal conversations, we do not want to lose this benefit. We have therefore decided to organise regional face-to-face dinners in June, so that colleagues can meet in smaller groups despite the change of format.\n\nFurther details on the online programme and the regional dinners will be shared next week.",
+    "points": 5
+   }
+  ],
+  "grille": [
+   {
+    "critere": "C1 — Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais : informations exactes, compréhension ou production adaptée au niveau B2.",
+    "points": 5
+   },
+   {
+    "critere": "C2 — Comprendre et analyser un ensemble de textes, emails et articles en anglais : informations exactes, compréhension ou production adaptée au niveau B2.",
+    "points": 5
+   },
+   {
+    "critere": "C3 — S'exprimer et communiquer à l'oral en anglais : informations exactes, compréhension ou production adaptée au niveau B2.",
+    "points": 5
+   },
+   {
+    "critere": "C4 — Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées : informations exactes, compréhension ou production adaptée au niveau B2.",
+    "points": 5
+   }
+  ]
+ },
+ "sources": {
+  "veille": {
+   "reglementaire": [
+    {
+     "lien": "https://www.francecompetences.fr/recherche/rs/6905/",
+     "titreLien": "France Compétences – RS6905",
+     "titre": "Fiche RS6905 – VTest Business English – 4 Skills (certificateur EXASSESS)",
+     "date": "Novembre 2024",
+     "commentaire": "Enregistrement au Répertoire spécifique le 28/11/2024 pour 3 ans (échéance 28/11/2027, dernière délivrance possible le 27/05/2028). La fiche décrit les 4 compétences évaluées (C1 à C4) et les niveaux A2 à C1 ; le niveau A2 est requis pour valider la certification.",
+     "exploitation": "Preuve : fiche consultée et archivée dans le dossier qualité. Action : programmes, test de positionnement et livret d'accueil alignés sur les 4 compétences et sur le prérequis A2 à la validation."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000049496613",
+     "titreLien": "Légifrance – décret n° 2024-394",
+     "titre": "Décret n° 2024-394 du 29 avril 2024 relatif à la participation obligatoire du titulaire d’un compte personnel de formation",
+     "date": "Avril 2024",
+     "commentaire": "Depuis le 2 mai 2024, le titulaire d'un CPF acquitte une participation forfaitaire lors de l'achat d'une formation, sauf cas d'exonération (demandeurs d'emploi, abondement employeur…).",
+     "exploitation": "Preuve : décret archivé. Action : information du stagiaire sur le reste à charge lors de l'entretien d'entrée et dans les conditions générales de vente."
+    },
+    {
+     "lien": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660",
+     "titreLien": "Légifrance – loi n° 2018-771",
+     "titre": "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel",
+     "date": "Septembre 2018",
+     "commentaire": "La loi fonde l'éligibilité au CPF des certifications enregistrées au RNCP ou au Répertoire spécifique et l'obligation de certification qualité des organismes financés sur fonds publics ou mutualisés.",
+     "exploitation": "Preuve : texte archivé. Action : vérification annuelle de la validité de l'enregistrement RS6905 avant toute ouverture de session financée par le CPF."
+    }
+   ],
+   "metier": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages",
+     "titreLien": "Conseil de l’Europe – CECRL",
+     "titre": "Cadre européen commun de référence pour les langues (CECRL) et son volume complémentaire",
+     "date": "Février 2018",
+     "commentaire": "Le volume complémentaire du CECRL actualise les descripteurs (médiation, interaction en ligne, compétences plurilingues). Le VTest affine l'échelle en 10 niveaux de A2 à C1.",
+     "exploitation": "Preuve : descripteurs utilisés dans la grille de positionnement. Action : objectifs de chaque parcours rédigés avec les descripteurs du niveau visé."
+    },
+    {
+     "lien": "https://candidate.vtest.com/",
+     "titreLien": "Plateforme VTest",
+     "titre": "Espace candidat VTest – passage du test en ligne",
+     "date": "Octobre 2026",
+     "commentaire": "Le test se passe en ligne : compréhension orale et écrite adaptatives, expression orale notée automatiquement, rédaction en 30 minutes avec un nombre minimal de mots selon le niveau (80, 150 ou 200 mots).",
+     "exploitation": "Preuve : description des épreuves reprise dans le livret stagiaire. Action : entraînements chronométrés au format des 4 épreuves en fin de parcours."
+    },
+    {
+     "lien": "https://www.francecompetences.fr/",
+     "titreLien": "France Compétences",
+     "titre": "Répertoire spécifique : liste des organismes préparant à la certification RS6905",
+     "date": "Octobre 2026",
+     "commentaire": "La fiche publie la liste des organismes préparant à la certification ; l'organisme vérifie son inscription et les conditions fixées par le certificateur.",
+     "exploitation": "Preuve : capture de la liste. Action : convention ou accord avec le certificateur tenu à jour dans le dossier qualité."
+    }
+   ],
+   "technologique": [
+    {
+     "lien": "https://www.coe.int/fr/web/common-european-framework-reference-languages/level-descriptions",
+     "titreLien": "Conseil de l’Europe – descripteurs",
+     "titre": "Description des niveaux communs de référence du CECRL",
+     "date": "Février 2018",
+     "commentaire": "Les descripteurs « interaction en ligne » et « médiation » s'appliquent aux réunions à distance et aux échanges écrits instantanés, désormais courants en contexte professionnel.",
+     "exploitation": "Preuve : grille d'entraînement à la visioconférence. Action : mises en situation de réunion en ligne intégrées aux classes virtuelles."
+    },
+    {
+     "lien": "https://www.w3.org/TR/WCAG22/",
+     "titreLien": "W3C – WCAG 2.2",
+     "titre": "Web Content Accessibility Guidelines (WCAG) 2.2 – recommandation W3C",
+     "date": "Octobre 2023",
+     "commentaire": "Les ressources audio et vidéo de la plateforme doivent être accompagnées de transcriptions et de sous-titres pour rester accessibles.",
+     "exploitation": "Preuve : transcriptions disponibles pour chaque dialogue et audio. Action : contrôle de la présence des transcriptions à chaque mise à jour des contenus."
+    }
+   ]
+  },
+  "ressources": {
+   "supportsHtml": "<p>• Support de cours du parcours B2 : 45 chapitres (leçons, langue clé, vocabulaire, dialogues traduits, exercices et quiz corrigés)<br>• Fichiers audio des dialogues et des écoutes, avec transcriptions<br>• Modèles de productions écrites et orales commentés</p>",
+   "outilsHtml": "<p>• Plateforme e-learning (leçons, audio, studio oral, atelier d’écriture)<br>• Classe virtuelle (Google Meet ou Zoom)<br>• Plateforme officielle VTest pour le passage du test</p>",
+   "ressourcesComplHtml": "<p>• <strong>Fiche officielle :</strong> francecompetences.fr/recherche/rs/6905/<br>• <strong>CECRL :</strong> coe.int – Cadre européen commun de référence pour les langues<br>• <strong>Test :</strong> candidate.vtest.com</p>",
+   "videos": []
+  }
+ }
+}

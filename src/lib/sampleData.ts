@@ -208,6 +208,8 @@ import { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, 
 export { FORMATION_TP_ETRM, FORMATION_TP_GCF, FORMATION_TP_GP, FORMATION_TP_CA, FORMATION_TP_SC } from "./tpFormations";
 import { FIPU_FORMATIONS } from "./fipuFormations";
 export { FIPU_FORMATIONS } from "./fipuFormations";
+import { VTEST_FORMATIONS, PBNC_FORMATIONS } from "./orientaFormations";
+export { VTEST_FORMATIONS, PBNC_FORMATIONS } from "./orientaFormations";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ONGULAIRE,
@@ -1169,6 +1171,9 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_TP_SC,
   // Prévention INRS (TMS Pros, PRAP) proposée dans les dossiers FIPU d'IZILearn.
   ...FIPU_FORMATIONS,
+  // Parcours Orienta Campus : VTest Business English RS6905 (A2 à C1) et Product Builder No-Code RNCP41480 (titre et blocs).
+  ...VTEST_FORMATIONS,
+  ...PBNC_FORMATIONS,
 ];
 export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Excel Professionnel": [5, 4, 5, 5, 4, 5, 4, 5],
