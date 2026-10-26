@@ -39,6 +39,8 @@ const ApplicationContent = () => {
   if (location.pathname === "/izilearn") return <EspaceIzilearn />;
   // Espace CRM LMS : même espace, données envoyées par la fiche session de CRM LMS.
   if (location.pathname === "/crmlms") return <EspaceIzilearn app="crmlms" />;
+  // Orienta Campus (english-business-academy) : même espace, parcours VTest RS6905 et Product Builder No-Code RNCP41480.
+  if (location.pathname === "/orienta") return <EspaceIzilearn app="orienta" />;
   if (isEmbeddedBDC(location.pathname, location.search)) {
     return <BackgroundJobsProvider><BilanCompetences embedded /></BackgroundJobsProvider>;
   }

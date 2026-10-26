@@ -1,9 +1,9 @@
 /**
- * Plateforme reliée à l'espace documentaire : IZILearn (/izilearn) ou CRM LMS (/crmlms).
- * Les deux envoient le même format de données (IzPayload) ; seuls le nom affiché,
+ * Plateforme reliée à l'espace documentaire : IZILearn (/izilearn), CRM LMS (/crmlms) ou Orienta Campus (/orienta).
+ * Toutes envoient le même format de données (IzPayload) ; seuls le nom affiché,
  * les origines acceptées et les types de messages changent.
  */
-export type AppSource = "izilearn" | "crmlms";
+export type AppSource = "izilearn" | "crmlms" | "orienta";
 
 export interface Plateforme {
   app: AppSource;
@@ -30,12 +30,18 @@ export const PLATEFORMES: Record<AppSource, Plateforme> = {
     origines: [/^https:\/\/crmlms\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/, LOCAL],
     msg: { ready: "geniequaliopi:ready", data: "crmlms:data", save: "geniequaliopi:save", saved: "crmlms:saved" },
   },
+  orienta: {
+    app: "orienta", nom: "Orienta Campus", url: "https://orienta-campus.lovable.app/sessions", visio: "classe virtuelle",
+    // Site publié (orienta-campus.lovable.app, ancien english-business-import-hub), aperçus Lovable et poste local.
+    origines: [/^https:\/\/orienta-campus\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/, LOCAL],
+    msg: { ready: "geniequaliopi:ready", data: "orienta:data", save: "geniequaliopi:save", saved: "orienta:saved" },
+  },
 };
 
 let courante: AppSource = "izilearn";
 
 /** Fixée à la réception des données (et par la route) : les pièces rendues ensuite portent ce nom. */
-export function definirPlateforme(app: AppSource | undefined) { courante = app === "crmlms" ? "crmlms" : "izilearn"; }
+export function definirPlateforme(app: AppSource | undefined) { courante = app && app in PLATEFORMES ? app : "izilearn"; }
 export const plateforme = (): Plateforme => PLATEFORMES[courante];
 export const nomPlateforme = () => plateforme().nom;
 /** « CRM LMS / classe virtuelle », « IZILearn / Google Meet ». */

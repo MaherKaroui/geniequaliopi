@@ -3,7 +3,8 @@
  * (OrganismeInfo / FormationInfo / StagiaireInfo). Champ absent côté IZILearn =
  * champ vide ici : rien n'est emprunté à une formation ou un organisme d'exemple.
  */
-import { nomPlateforme } from "./plateforme";
+import { nomPlateforme, plateforme } from "./plateforme";
+import { intituleOrienta } from "./orienta";
 import { isLilateFormation, lilateLangue } from "@/lib/lilateHumanized";
 import type { CerfaComplement, FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 import type { IzApprenant, IzPayload } from "./types";
@@ -89,8 +90,10 @@ export function versFormation(p: IzPayload): FormationInfo {
   const s = p.session;
   const h = Number(f.dureeHeures || 0);
   const distanciel = estDistanciel(p);
+  // Orienta Campus : parcours rattaché à la formation du catalogue qui porte son contenu.
+  const intitule = plateforme().app === "orienta" ? intituleOrienta(t(f.code), t(f.intitule)) : t(f.intitule);
   return {
-    intitule: t(f.intitule),
+    intitule,
     objectifs: t(f.objectifs),
     prerequis: t(f.prerequis),
     duree: h ? `${String(h).replace(".", ",")} heures` : "",
