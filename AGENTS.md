@@ -1,6 +1,6 @@
 # Architecture rules
 
-- VTest and Product Builder needs-assessment drafts use a shared pathway-aware answer helper before generic branches; exact pathway titles select level/block content, certification-only inputs never infer a level, missing Product Builder qualifications use explicitly unverified profile proposals, and declared qualifications and recorded LMS answers still override each drafted answer.
+- VTest and Product Builder needs-assessment drafts use a shared pathway-aware answer helper before generic branches; exact pathway titles select level/block content, certification-only inputs never infer a level, missing Product Builder qualifications are drafted as a plain Bac+2/niveau 5 diploma line with no validation wording, and declared qualifications and recorded LMS answers still override each drafted answer.
 
 - IZILearn preserves exact AcroForm contract values through its learner adapter and applies them last in the shared CERFA generator, excluding OPCO-reserved fields; this keeps contract data authoritative without changing other documents.
 - CFA mission QCM and J-1 announcement mails expose structured MailAuto builders and share the catalog mail resolver with standard mails for every capture/export path; this prevents separate Gmail shells and preserves mission scheduling.

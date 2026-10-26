@@ -21,12 +21,12 @@ describe('Réponses proposées des besoins VTest et Product Builder', () => {
     expect(first?.handicap).not.toMatch(/Non,|je bénéficie/);
   });
 
-  it.each(PBNC_FORMATIONS)('$intitule : diplôme proposé Bac+2/niveau 5 conforme au prérequis, sans qualification vérifiée inventée', f => {
+  it.each(PBNC_FORMATIONS)('$intitule : diplôme proposé Bac+2/niveau 5 conforme au prérequis, sans mention de validation', f => {
     const answers = people.map((s, i) => getOrientaEvalBesoins(s, f, i));
     expect(new Set(answers.map(a => a?.diplome)).size).toBe(5);
     for (const answer of answers) {
       expect(answer?.diplome).toContain('(Bac+2, niveau 5)');
-      expect(answer?.diplome).toContain('à confirmer par l’apprenant');
+      expect(answer?.diplome).not.toMatch(/proposition|confirmer|prérequis|admission/i);
     }
   });
 
