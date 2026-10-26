@@ -51,7 +51,7 @@ describe('Réponses proposées des besoins VTest et Product Builder', () => {
     }
   });
 
-  it.each(['izilearn', 'crmlms', 'orienta'])('%s : réponses dédiées et réponse enregistrée prioritaire', app => {
+  it.each(['izilearn', 'crmlms', 'orienta'] as const)('%s : réponses dédiées et réponse enregistrée prioritaire', app => {
     const p: IzPayload = {
       version: 1, source: { app, url: 'https://example.org', orgId: 'o', sessionId: 's' },
       organisme: { id: 'o', nom: 'ORGANISME TEST', siret: '12345678900011', nda: '11000000000', adresse: '1 rue de Paris', codePostal: '75001', ville: 'Paris', email: 'contact@example.org', dirigeant: 'Jean MARTIN' },
