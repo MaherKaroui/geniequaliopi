@@ -61,7 +61,7 @@ export function getOrientaEvalBesoins(s: StagiaireInfo, f: FormationInfo, idx: n
     raisonSociale: s.entreprise || '',
     diplome: s.diplome?.trim() || (parcours.anglais
       ? 'À préciser par l’apprenant.'
-      : `${PBNC_DIPLOMES_PROPOSES[k % PBNC_DIPLOMES_PROPOSES.length]} — proposition de profil répondant au prérequis de diplôme, à confirmer par l’apprenant avant validation de l’admission.`),
+      : PBNC_DIPLOMES_PROPOSES[k % PBNC_DIPLOMES_PROPOSES.length]),
     objectif,
     projetPro: parcours.anglais
       ? `I would like to use these skills in professional English situations, especially to ${EN_BESOINS[(k + 3) % 10]}. ${contexte}`
