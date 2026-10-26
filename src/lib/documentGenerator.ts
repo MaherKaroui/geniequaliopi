@@ -43,6 +43,7 @@ import { isTVTEFormation, getTVTEBesoin, getTVTEEvalBesoins, tvteBonnesQcmDebut,
 import { isIAP21Formation, getIAP21Besoin, getIAP21EvalBesoins, iap21BonnesQcmDebut, iap21ReponsesQcmDebut } from "./iaPro21hHumanized";
 import { isMSP21Formation, getMSP21Besoin, getMSP21EvalBesoins, msp21BonnesQcmDebut, msp21ReponsesQcmDebut } from "./msp21Humanized";
 import { isLilateFormation, getLilateBesoin, getLilateEvalBesoins, lilateBonnesQcmDebut, lilateReponsesQcmDebut } from "./lilateHumanized";
+import { isTPBesoinsFormation, getTPBesoinsPrincipal, getTPEvalBesoins } from "./tpBesoinsHumanized";
 import { isARH41366Formation, getARH41366Besoin, getARH41366EvalBesoins, arh41366BonnesQcmDebut, arh41366ReponsesQcmDebut } from "./arh41366Humanized";
 import { isGSC35Formation, getGSC35Besoin, getGSC35EvalBesoins, gsc35BonnesQcmDebut, gsc35ReponsesQcmDebut } from "./gererCentre35hHumanized";
 import { getARH41366ExerciceCFA } from "./arh41366Preset";
@@ -2025,6 +2026,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getARH41366Besoin(s.nom, s.prenom, s.civilite, i)
         : isGSC35Formation(f.intitule, f.codeRNCP)
         ? getGSC35Besoin(s.nom, s.prenom, s.civilite, i)
+        : isTPBesoinsFormation(f.intitule, f.codeRNCP)
+        ? getTPBesoinsPrincipal(f.intitule, f.codeRNCP, s.nom, s.prenom, s.civilite, i)!
         : getTPBesoin(f.intitule, f.codeRNCP, s.nom, s.prenom, i) ?? domain.besoins[i % domain.besoins.length];
       return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoinIndiv];
     });
@@ -8781,6 +8784,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   if (f && isGSC35Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getGSC35EvalBesoins(s, false).disponibilites;
   }
+  if (f && isTPBesoinsFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getTPEvalBesoins(s, false, undefined, f.intitule, f.codeRNCP).disponibilites;
+  }
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
@@ -8927,6 +8933,12 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Gérer son centre de formation – 35 h (non certifiante, avant « création d'entreprise ») ===
   if (isGSC35Formation(f.intitule, f.codeRNCP)) {
     return getGSC35EvalBesoins(s, hasEntreprise, idx);
+  }
+
+  // === Early return : TP ETRM / GCF / Gestionnaire de paie / Comptable assistant / Secrétaire comptable ===
+  // (avant les branches génériques « paie », « secrétariat » et GOTRM, qui ne correspondent pas à ces titres)
+  if (isTPBesoinsFormation(f.intitule, f.codeRNCP)) {
+    return getTPEvalBesoins(s, hasEntreprise, idx, f.intitule, f.codeRNCP);
   }
 
   // === Early return : Création d'entreprise (porteurs de projet) ===
