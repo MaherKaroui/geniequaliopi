@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Compléter les réponses proposées des besoins VTest RS6905 et Product Builder No-Code RNCP41480 : 40 objectifs/projets distincts par parcours, réponses LMS prioritaires, 47 tests réussis et deux aperçus vérifiés en session connectée avec données de contrôle ; session réelle non disponible, non publié.
+
 - [x] Reprendre les champs AcroForm IZILearn en priorité dans le CERFA, protéger le cadre OPCO et corriger les cases ; 52 tests réussis, téléchargement IZILearn vérifié sur un payload de contrôle (NIR, Saint-Denis, sexe M), session réelle non vérifiée ; non publié.
 - [x] Corriger le positionnement IZILearn : 40 copies proposées avec sélections QCM et réponses ouvertes distinctes, résultats enregistrés prioritaires et repli si questions ouvertes absentes ; 40 tests réussis, aperçu rempli vérifié sur session de contrôle, session réelle non vérifiée ; non publié.
 
