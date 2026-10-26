@@ -1,4 +1,5 @@
 import { presetBlankDocument } from "./formationPresets/blankDocuments";
+import { getOrientaEvalBesoins } from "./orientaBesoins";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "./attendancePresentation";
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
 import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
@@ -8852,6 +8853,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
 
 
 function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
+  const orienta = getOrientaEvalBesoins(s, f, idx);
+  if (orienta) return orienta;
   const formation = f.intitule || "la formation";
   const t = formation.toLowerCase();
   const baseHash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
