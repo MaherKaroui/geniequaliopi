@@ -26,6 +26,13 @@ const FR_CONTEXTES = [
   'J’ai besoin d’exercices progressifs et de retours précis pour corriger ma démarche de manière autonome.',
   'Je souhaite justifier mes décisions et m’entraîner à présenter les livrables attendus pour la certification.',
 ];
+const PBNC_DIPLOMES_PROPOSES = [
+  'BTS Services informatiques aux organisations (Bac+2, niveau 5)',
+  'BTS Support à l’action managériale (Bac+2, niveau 5)',
+  'BTS Gestion de la PME (Bac+2, niveau 5)',
+  'BTS Négociation et digitalisation de la relation client (Bac+2, niveau 5)',
+  'DUT Informatique (Bac+2, niveau 5)',
+];
 
 /** Resolve a named pathway first; a certification code alone never implies a CECRL level or a PBNC block. */
 export function orientaBesoinsParcours(f: Pick<FormationInfo, 'intitule' | 'codeRNCP'>) {
@@ -52,7 +59,9 @@ export function getOrientaEvalBesoins(s: StagiaireInfo, f: FormationInfo, idx: n
   return {
     civilite: s.civilite === 'Mme' ? 'Madame' : s.civilite === 'M.' ? 'Monsieur' : s.civilite || '',
     raisonSociale: s.entreprise || '',
-    diplome: s.diplome?.trim() || 'À préciser par l’apprenant.',
+    diplome: s.diplome?.trim() || (parcours.anglais
+      ? 'À préciser par l’apprenant.'
+      : `${PBNC_DIPLOMES_PROPOSES[k % PBNC_DIPLOMES_PROPOSES.length]} — proposition de profil répondant au prérequis de diplôme, à confirmer par l’apprenant avant validation de l’admission.`),
     objectif,
     projetPro: parcours.anglais
       ? `I would like to use these skills in professional English situations, especially to ${EN_BESOINS[(k + 3) % 10]}. ${contexte}`

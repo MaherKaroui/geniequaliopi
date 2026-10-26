@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Adapter le diplôme proposé dans les besoins Product Builder No-Code aux prérequis Bac+2/niveau 5 : cinq profils à confirmer, diplômes déclarés et réponses enregistrées prioritaires ; 32 tests réussis, build OK, non publié.
+
 - [x] Compléter les réponses proposées des besoins VTest RS6905 et Product Builder No-Code RNCP41480 : 40 objectifs/projets distincts par parcours, réponses LMS prioritaires, 47 tests réussis et deux aperçus vérifiés en session connectée avec données de contrôle ; session réelle non disponible, non publié.
 
 - [x] Reprendre les champs AcroForm IZILearn en priorité dans le CERFA, protéger le cadre OPCO et corriger les cases ; 52 tests réussis, téléchargement IZILearn vérifié sur un payload de contrôle (NIR, Saint-Denis, sexe M), session réelle non vérifiée ; non publié.
