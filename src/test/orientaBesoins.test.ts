@@ -18,8 +18,25 @@ describe('Réponses proposées des besoins VTest et Product Builder', () => {
     expect(new Set(answers.map(a => a?.objectif)).size).toBe(40);
     expect(new Set(answers.map(a => a?.projetPro)).size).toBe(40);
     const first = answers[0];
-    expect(first?.diplome).toBe('À préciser par l’apprenant.');
     expect(first?.handicap).not.toMatch(/Non,|je bénéficie/);
+  });
+
+  it.each(PBNC_FORMATIONS)('$intitule : diplôme proposé Bac+2/niveau 5 conforme au prérequis, sans qualification vérifiée inventée', f => {
+    const answers = people.map((s, i) => getOrientaEvalBesoins(s, f, i));
+    expect(new Set(answers.map(a => a?.diplome)).size).toBe(5);
+    for (const answer of answers) {
+      expect(answer?.diplome).toContain('(Bac+2, niveau 5)');
+      expect(answer?.diplome).toContain('à confirmer par l’apprenant');
+    }
+  });
+
+  it('Product Builder : conserve le diplôme déclaré même s’il est inférieur au prérequis', () => {
+    const s = { ...people[0], diplome: 'CAP déclaré' };
+    expect(getOrientaEvalBesoins(s, PBNC_FORMATIONS[0], 0)?.diplome).toBe('CAP déclaré');
+  });
+
+  it('VTest : ne propose pas de diplôme, son prérequis porte sur le niveau de langue', () => {
+    expect(getOrientaEvalBesoins(people[0], VTEST_FORMATIONS[0], 0)?.diplome).toBe('À préciser par l’apprenant.');
   });
 
   it('VTest : intentions en anglais et niveau cible du parcours, sans niveau acquis inventé', () => {
