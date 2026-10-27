@@ -28,7 +28,7 @@ export async function buildBDCNexusZip(
 ): Promise<Blob> {
   const zip = new JSZip();
   const docs = planNexus(org, formation, stagiaires, NEXUS_TEMPLATES);
-  const total = docs.length + 2;
+  const total = docs.length + 3;
   let etape = 0;
   const avancer = (msg: string) => { etape++; reporter?.setProgress(Math.min(98, (etape / total) * 100)); reporter?.setMessage(msg); };
 
@@ -66,6 +66,30 @@ export async function buildBDCNexusZip(
     for (const p of await supportsDeCoursBDC(org, formation, benList, toPdf)) zip.file(p.chemin, p.blob);
   } catch (e) {
     console.warn("[BDC NEXUS] support de cours échoué", e);
+  }
+
+  // Dossier MAILS : mêmes captures Gmail / Outlook datées que le dossier Qualiopi (mails passés uniquement).
+  avancer("Mails");
+  try {
+    const { mailsStagiaire, nomFichierCapture, clientMailOrganisme } = await import("@/lib/mails/mailsAutomatiques");
+    const { captureMail } = await import("@/lib/mails/captureMail");
+    const { buildStagiaireFolderName } = await import("@/lib/fileNaming");
+    const client = clientMailOrganisme(org);
+    for (const s of stagiaires) {
+      if (!(s.nom || "").trim()) continue;
+      const liste = mailsStagiaire(org, formation, s, "bilans-competences");
+      for (let i = 0; i < liste.length; i++) {
+        try {
+          const blob = await captureMail(liste[i], client, liste.slice(0, i));
+          zip.file(`MAILS/${buildStagiaireFolderName(s)}/${nomFichierCapture(liste[i])}`, blob);
+        } catch (e) {
+          console.warn("[BDC NEXUS] capture mail échouée", liste[i].titre, e);
+        }
+        await ceder();
+      }
+    }
+  } catch (e) {
+    console.warn("[BDC NEXUS] mails indisponibles", e);
   }
 
   reporter?.setProgress(99);
