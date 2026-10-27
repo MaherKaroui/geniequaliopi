@@ -68,6 +68,30 @@ export async function buildBDCNexusZip(
     console.warn("[BDC NEXUS] support de cours échoué", e);
   }
 
+  // Dossier MAILS : mêmes captures Gmail / Outlook datées que le dossier Qualiopi (mails passés uniquement).
+  avancer("Mails");
+  try {
+    const { mailsStagiaire, nomFichierCapture, clientMailOrganisme } = await import("@/lib/mails/mailsAutomatiques");
+    const { captureMail } = await import("@/lib/mails/captureMail");
+    const { buildStagiaireFolderName } = await import("@/lib/fileNaming");
+    const client = clientMailOrganisme(org);
+    for (const s of stagiaires) {
+      if (!(s.nom || "").trim()) continue;
+      const liste = mailsStagiaire(org, formation, s, "bilans-competences");
+      for (let i = 0; i < liste.length; i++) {
+        try {
+          const blob = await captureMail(liste[i], client, liste.slice(0, i));
+          zip.file(`MAILS/${buildStagiaireFolderName(s)}/${nomFichierCapture(liste[i])}`, blob);
+        } catch (e) {
+          console.warn("[BDC NEXUS] capture mail échouée", liste[i].titre, e);
+        }
+        await ceder();
+      }
+    }
+  } catch (e) {
+    console.warn("[BDC NEXUS] mails indisponibles", e);
+  }
+
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
   await limiterCheminsZip(zip);
