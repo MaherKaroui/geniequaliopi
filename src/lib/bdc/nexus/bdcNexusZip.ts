@@ -28,7 +28,7 @@ export async function buildBDCNexusZip(
 ): Promise<Blob> {
   const zip = new JSZip();
   const docs = planNexus(org, formation, stagiaires, NEXUS_TEMPLATES);
-  const total = docs.length + 2;
+  const total = docs.length + 3;
   let etape = 0;
   const avancer = (msg: string) => { etape++; reporter?.setProgress(Math.min(98, (etape / total) * 100)); reporter?.setMessage(msg); };
 
