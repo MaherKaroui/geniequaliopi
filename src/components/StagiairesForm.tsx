@@ -9,6 +9,7 @@ import { X, PenTool, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 import ExperiencesEditor from "@/components/ExperiencesEditor";
 import CerfaComplementEditor from "@/components/CerfaComplementEditor";
+import { rechercherEntrepriseParSiret } from "@/lib/siretLookup";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
@@ -58,6 +59,7 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const [importingCerfa, setImportingCerfa] = useState(false);
+  const [siretLoading, setSiretLoading] = useState<number | null>(null);
   const [importingConvoc, setImportingConvoc] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const nbFictifs = data.filter(s => s.fictif).length;
@@ -373,7 +375,26 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
             </div>
             <div>
               <Label>SIRET entreprise</Label>
-              <Input value={stagiaire.siretEntreprise || ""} onChange={e => updateStagiaire(index, 'siretEntreprise', e.target.value)} placeholder="SIRET de l'entreprise" />
+              <div className="flex gap-2">
+                <Input value={stagiaire.siretEntreprise || ""} onChange={e => updateStagiaire(index, 'siretEntreprise', e.target.value)} placeholder="SIRET de l'entreprise" />
+                <Button type="button" variant="outline" disabled={siretLoading === index} onClick={async () => {
+                  setSiretLoading(index);
+                  try {
+                    const r: any = await rechercherEntrepriseParSiret(stagiaire.siretEntreprise || "");
+                    if (!r) { toast.error("Aucune entreprise trouvée pour ce SIRET"); return; }
+                    const cur = data[index];
+                    const cerfa = { ...(cur.cerfa || {}) };
+                    if (r.cerfaApe) cerfa.codeApe = r.cerfaApe;
+                    if (r.cerfaIdcc) cerfa.idcc = r.cerfaIdcc;
+                    cerfa.employeurPublic = r.cerfaPublic;
+                    const updated = [...data];
+                    updated[index] = { ...cur, entreprise: r.entreprise || cur.entreprise, adresseEntreprise: r.adresseEntreprise || cur.adresseEntreprise, siretEntreprise: r.siretEntreprise, cerfa };
+                    onChange(updated);
+                    toast.success(`Entreprise remplie : ${r.entreprise}`);
+                  } catch (e: any) { toast.error(e?.message || "Recherche impossible"); }
+                  finally { setSiretLoading(null); }
+                }}>{siretLoading === index ? <Loader2 className="h-4 w-4 animate-spin" /> : "Remplir"}</Button>
+              </div>
             </div>
             <div>
               <Label>Responsable entreprise</Label>
