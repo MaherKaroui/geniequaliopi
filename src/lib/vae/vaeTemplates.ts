@@ -520,7 +520,7 @@ export function getConventionHTML(d: VAEData): string {
     <p><strong>Moyens techniques requis :</strong> ordinateur, connexion Internet, micro et webcam, adresse de messagerie. Les classes virtuelles se déroulent via un outil de visioconférence sécurisé.</p>
 
     <div class="art">Article 5 — Prix et modalités de financement</div>
-    <p>Le prix forfaitaire de la prestation est de <strong>${esc(o.prixTTC)}</strong>, financement par <strong>${esc(s.financement)}</strong> (Mon Compte Formation). TVA non applicable, art. 293 B du Code général des impôts, le cas échéant.</p>
+    <p>Le prix forfaitaire de la prestation est de <strong>${esc(o.prixTTC)}</strong>, financement par <strong>${esc(s.financement)}</strong>. TVA non applicable, art. 293 B du Code général des impôts, le cas échéant.</p>
 
     <div class="art">Article 6 — Rétractation, annulation et abandon</div>
     <p>Le Candidat dispose d'un délai de rétractation conformément aux dispositions du Code du travail et du Code de la consommation. Les conditions détaillées d'annulation et d'abandon figurent aux CGV annexées.</p>
@@ -605,7 +605,7 @@ export function getAutorisationRGPDHTML(d: VAEData): string {
     <p>Ces données sont traitées aux seules fins suivantes : réalisation et suivi de l'accompagnement VAE, constitution du dossier de validation, gestion administrative et contractuelle, et respect des obligations légales et réglementaires du Prestataire.</p>
 
     <h2>3. Base légale et destinataires</h2>
-    <p>Le traitement repose sur l'exécution de la convention d'accompagnement et, pour certaines utilisations spécifiques, sur votre consentement. Vos données sont destinées au référent en charge de votre accompagnement et, lorsque cela est nécessaire, à l'organisme certificateur et au financeur (notamment la Caisse des Dépôts dans le cadre du CPF). Elles ne sont jamais cédées à des tiers à des fins commerciales.</p>
+    <p>Le traitement repose sur l'exécution de la convention d'accompagnement et, pour certaines utilisations spécifiques, sur votre consentement. Vos données sont destinées au référent en charge de votre accompagnement et, lorsque cela est nécessaire, à l'organisme certificateur et au financeur . Elles ne sont jamais cédées à des tiers à des fins commerciales.</p>
 
     <h2>4. Durée de conservation</h2>
     <p>Vos données sont conservées pendant la durée de l'accompagnement, puis archivées pour la durée nécessaire au respect des obligations légales et au suivi de la certification, avant d'être supprimées.</p>
@@ -860,8 +860,8 @@ export function getCGVHTML(d: VAEData): string {
     <div class="art">Article 5 — Prix et modalités de paiement</div>
     <p>Le prix forfaitaire de la prestation d'accompagnement VAE est fixé à <strong>${esc(o.prixTTC)}</strong>, frais d'examen et de passage devant le jury inclus le cas échéant. TVA non applicable, article 293 B du Code général des impôts (franchise en base), le cas échéant. Les modalités et l'échéancier de paiement sont précisés dans la convention individuelle.</p>
 
-    <div class="art">Article 6 — Financement (CPF — Mon Compte Formation)</div>
-    <p>La prestation est éligible au Compte Personnel de Formation (CPF). Le Candidat peut mobiliser son CPF via la plateforme Mon Compte Formation (moncompteformation.gouv.fr). En cas de prise en charge intégrale par le CPF, aucun montant n'est dû directement par le Candidat.</p>
+    <div class="art">Article 6 — Financement personnel</div>
+    <p>La prestation est financée personnellement par le Candidat, selon le prix et l'échéancier précisés dans la convention individuelle.</p>
 
     <div class="art">Article 7 — Rétractation</div>
     <p>Conformément aux articles L.221-18 et suivants du Code de la consommation, le Client dispose d'un délai de rétractation de quatorze (14) jours à compter de la signature de la convention, sans avoir à justifier de motif ni à payer de pénalité.</p>

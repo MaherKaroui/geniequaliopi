@@ -219,7 +219,12 @@ export function chronoVAE(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo):
 
 export type FinanceurVAE = "CPF" | "Employeur / OPCO" | "France Travail" | "Personnel" | "Région / autre";
 
-export function financeurVAE(s: StagiaireInfo): FinanceurVAE {
+export function financeurVAE(_s: StagiaireInfo): FinanceurVAE {
+  // VAE : financement toujours personnel, dans tout le dossier.
+  return "Personnel";
+}
+
+export function financeurVAEDeclare(s: StagiaireInfo): FinanceurVAE {
   const f = (s.financeur || "").toLowerCase();
   if (/cpf|mon compte/.test(f)) return "CPF";
   if (/opco|entreprise|employeur|plan/.test(f)) return "Employeur / OPCO";

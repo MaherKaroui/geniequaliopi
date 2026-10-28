@@ -73,7 +73,7 @@ export interface VAESession {
   dateFin: string;
   dateDemandeRecevabilite: string;
   modalite: string; // "100 % à distance"
-  financement: string; // "CPF"
+  financement: string; // "Financement personnel"
   lieuSignature: string;
   dateSignature: string;
 }
@@ -155,7 +155,7 @@ export const EMPTY_SESSION: VAESession = {
   dateFin: "",
   dateDemandeRecevabilite: "",
   modalite: "100 % à distance",
-  financement: "CPF",
+  financement: "Financement personnel",
   lieuSignature: "",
   dateSignature: new Date().toISOString().slice(0, 10),
 };
