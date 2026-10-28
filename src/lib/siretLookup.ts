@@ -22,7 +22,7 @@ export async function rechercherEntrepriseParSiret(siretBrut: string): Promise<P
     cerfaApe: ape,
     cerfaIdcc: idcc || "",
     responsableEntreprise: dirigeantNom,
-    dateNaissanceResponsable: /^\d{4}-\d{2}-\d{2}$/.test(dir?.date_de_naissance || "") ? dir.date_de_naissance : "",
+    dateNaissanceResponsable: /^\d{4}-\d{2}(-\d{2})?$/.test(dir?.date_de_naissance || "") ? dir.date_de_naissance : "",
     dateNaissanceMoisResponsable: dir?.date_de_naissance || "",
     posteResponsable: dir?.qualite || "",
     cerfaPublic: String(r.nature_juridique || "").startsWith("7"),

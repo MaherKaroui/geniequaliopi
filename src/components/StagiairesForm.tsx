@@ -391,7 +391,7 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
                     const updated = [...data];
                     updated[index] = { ...cur, entreprise: r.entreprise || cur.entreprise, adresseEntreprise: r.adresseEntreprise || cur.adresseEntreprise, siretEntreprise: r.siretEntreprise, responsableEntreprise: r.responsableEntreprise || cur.responsableEntreprise, dateNaissanceResponsable: r.dateNaissanceResponsable || cur.dateNaissanceResponsable, cerfa };
                     onChange(updated);
-                    toast.success(`Entreprise remplie : ${r.entreprise}`, { description: r.responsableEntreprise ? `${r.responsableEntreprise} — ${r.posteResponsable}${!r.dateNaissanceResponsable && r.dateNaissanceMoisResponsable ? ` · né(e) en ${r.dateNaissanceMoisResponsable} (jour à compléter)` : ""}` : undefined });
+                    toast.success(`Entreprise remplie : ${r.entreprise}`, { description: r.responsableEntreprise ? `${r.responsableEntreprise} — ${r.posteResponsable}` : undefined });
                   } catch (e: any) { toast.error(e?.message || "Recherche impossible"); }
                   finally { setSiretLoading(null); }
                 }}>{siretLoading === index ? <Loader2 className="h-4 w-4 animate-spin" /> : "Remplir"}</Button>
@@ -403,7 +403,10 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
             </div>
             <div>
               <Label>Date de naissance responsable</Label>
-              <Input type="date" value={stagiaire.dateNaissanceResponsable || ""} onChange={e => updateStagiaire(index, 'dateNaissanceResponsable', e.target.value)} />
+              <Input type={/^\d{4}-\d{2}$/.test(stagiaire.dateNaissanceResponsable || "") ? "month" : "date"} value={stagiaire.dateNaissanceResponsable || ""} onChange={e => updateStagiaire(index, 'dateNaissanceResponsable', e.target.value)} />
+              {/^\d{4}-\d{2}$/.test(stagiaire.dateNaissanceResponsable || "") && (
+                <button type="button" className="mt-1 text-xs text-muted-foreground underline" onClick={() => updateStagiaire(index, 'dateNaissanceResponsable', '')}>Mois et année seuls (jour inconnu) — effacer pour saisir la date complète</button>
+              )}
             </div>
             <div>
               <Label>Email responsable</Label>
