@@ -14,3 +14,10 @@ describe("code diplôme officiel", () => {
   it("NTC → 36T31203", () => expect(codeDiplomeOfficiel("TP Négociateur technico-commercial")).toBe("36T31203"));
   it("inconnu → vide", () => expect(codeDiplomeOfficiel("Excel")).toBe(""));
 });
+import { chargerCodesDiplomes } from "@/lib/cerfaApprentissage";
+describe("base Éducation nationale", () => {
+  it("TP Gestionnaire de paie", async () => {
+    const b = await chargerCodesDiplomes();
+    expect(codeDiplomeOfficiel("TP Gestionnaire de paie", "", b)).toMatch(/^.{8}$/);
+  });
+});
