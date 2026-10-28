@@ -10,6 +10,7 @@ import SignaturePad from "@/components/SignaturePad";
 import ExperiencesEditor from "@/components/ExperiencesEditor";
 import CerfaComplementEditor from "@/components/CerfaComplementEditor";
 import { rechercherEntrepriseParSiret } from "@/lib/siretLookup";
+import { completerNir, debutNir } from "@/lib/nir";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
@@ -311,8 +312,13 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
               <Input value={stagiaire.nationalite || ""} onChange={e => updateStagiaire(index, 'nationalite', e.target.value)} placeholder="Française" />
             </div>
             <div>
-              <Label>NIR (n° sécu)</Label>
-              <Input value={stagiaire.nir || ""} onChange={e => updateStagiaire(index, 'nir', e.target.value)} placeholder="1 XX XX XX XXX XXX XX" />
+              <Label>NIR (n° sécu) — clé calculée automatiquement</Label>
+              <Input
+                value={stagiaire.nir || ""}
+                onFocus={() => { if (!stagiaire.nir) { const d = debutNir(stagiaire.civilite || "", stagiaire.dateNaissance || "", stagiaire.departementNaissance || ""); if (d) updateStagiaire(index, 'nir', d); } }}
+                onChange={e => updateStagiaire(index, 'nir', completerNir(e.target.value))}
+                placeholder="13 chiffres → clé ajoutée"
+              />
             </div>
             <div className="md:col-span-2">
               <Label>Adresse</Label>
