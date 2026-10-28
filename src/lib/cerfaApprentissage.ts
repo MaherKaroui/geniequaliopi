@@ -230,6 +230,29 @@ function codeNationalite(v: string | undefined): string {
   return /franc/.test(n) ? "1" : UE.test(n) ? "2" : "3";
 }
 
+/** Code « Diplôme ou titre visé » (nomenclature CERFA) déduit de l'intitulé ; vide si inconnu. */
+export function codeDiplomeVise(intitule: string | undefined): string {
+  const t = (intitule || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (!t) return "";
+  if (/\bmaster\b|\bmba\b/.test(t)) return "73";
+  if (/ingenieur/.test(t)) return "74";
+  if (/licence pro/.test(t)) return "63";
+  if (/\bbut\b|bachelor universitaire/.test(t)) return "64";
+  if (/\blicence\b/.test(t)) return "62";
+  if (/\bbts\b/.test(t)) return "54";
+  if (/\bdut\b/.test(t)) return "55";
+  if (/bac pro|baccalaureat pro/.test(t)) return "41";
+  if (/brevet professionnel|\bbp\b/.test(t)) return "42";
+  if (/\bcap\b/.test(t)) return "33";
+  if (/\bbep\b/.test(t)) return "34";
+  const n = t.match(/niveau\s*([3-8])|bac\s*\+\s*([0-5])/);
+  if (n) {
+    const niv = n[1] ? Number(n[1]) : Number(n[2]) + 4;
+    return niv >= 7 ? "79" : niv === 6 ? "69" : niv === 5 ? "58" : niv === 4 ? "49" : "38";
+  }
+  return "";
+}
+
 export async function genCerfaApprentissagePdf(
   o: OrganismeInfo,
   f: FormationInfo,
@@ -413,11 +436,11 @@ export async function genCerfaApprentissagePdf(
   // Diplôme/titre visé
   // Nomenclature du diplôme/titre (ex. 58), distincte du RNCP en 8_76.
   // La valeur contractuelle IZILearn est appliquée ci-dessous si elle est fournie.
-  setText(form, "Zone de texte 8_77", "");
+  setText(form, "Zone de texte 8_77", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule));
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
-  setText(form, "Zone de texte 8_75", clean(cx.codeDiplome)); // Code diplôme
+  setText(form, "Zone de texte 8_75", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule)); // Code diplôme
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
