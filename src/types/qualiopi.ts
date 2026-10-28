@@ -148,6 +148,7 @@ export interface CerfaComplement {
   salaireBrutMensuel?: string;
   machinesDangereuses?: boolean;
   codeDiplome?: string;
+  codeDiplomeEN?: string;
   heuresDistance?: string;
   lieuSignature?: string;
 }
