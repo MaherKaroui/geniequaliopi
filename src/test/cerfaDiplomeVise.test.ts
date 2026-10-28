@@ -21,3 +21,10 @@ describe("base Éducation nationale", () => {
     expect(codeDiplomeOfficiel("TP Gestionnaire de paie", "", b)).toMatch(/^.{8}$/);
   });
 });
+describe("codes TP précis", () => {
+  it("paie → 36T31501, transport → 46T31102", async () => {
+    const b = await chargerCodesDiplomes();
+    expect(codeDiplomeOfficiel("TP Gestionnaire de paie", "", b)).toBe("36T31501");
+    expect(codeDiplomeOfficiel("TP Exploitant en transport routier de marchandises", "", b)).toBe("46T31102");
+  });
+});

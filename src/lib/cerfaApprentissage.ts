@@ -278,7 +278,7 @@ export function codeDiplomeVise(intitule: string | undefined): string {
   if (/\bcap\b/.test(t)) return "33";
   if (/\bbep\b/.test(t)) return "34";
   // Titres professionnels courants (niveau officiel France Compétences)
-  if (/\bntc\b|negociateur technico|gestionnaire (de paie|comptable|des operations de transport)|assistant de direction|responsable de petite|developpeur web|technicien superieur|\bcip\b|conseiller en insertion|manager d'unite marchande|exploitant en transport|\bmum\b/.test(t)) return "58";
+  if (/\bntc\b|negociateur technico|gestionnaire (de paie|comptable|des operations de transport)|assistant de direction|responsable de petite|developpeur web|technicien superieur|\bcip\b|conseiller en insertion|manager d'unite marchande|\bmum\b/.test(t)) return "58";
   if (/conseiller de vente|employe commercial|assistant de vie|agent de restauration|secretaire assistant|vendeur conseil/.test(t)) return /secretaire assistant|vendeur conseil|conseiller de vente/.test(t) ? "49" : "38";
   const n = t.match(/niveau\s*([3-8])|bac\s*\+\s*([0-5])/);
   if (n) {
@@ -471,11 +471,13 @@ export async function genCerfaApprentissagePdf(
   // Diplôme/titre visé
   // Nomenclature du diplôme/titre (ex. 58), distincte du RNCP en 8_76.
   // La valeur contractuelle IZILearn est appliquée ci-dessous si elle est fournie.
-  setText(form, "Zone de texte 8_77", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule)); // Diplôme ou titre visé
+  const codeOfficiel = clean(cx.codeDiplomeEN) || codeDiplomeOfficiel(f.intitule, f.codeRNCP, await chargerCodesDiplomes());
+  const autreParNiveau: Record<string, string> = { "1": "79", "2": "69", "3": "58", "4": "49", "5": "38" };
+  setText(form, "Zone de texte 8_77", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule) || autreParNiveau[codeOfficiel.charAt(0)] || ""); // Diplôme ou titre visé
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
-  setText(form, "Zone de texte 8_75", clean(cx.codeDiplomeEN) || codeDiplomeOfficiel(f.intitule, f.codeRNCP, await chargerCodesDiplomes())); // Code du diplôme (8 caractères, jamais déduit)
+  setText(form, "Zone de texte 8_75", codeOfficiel); // Code du diplôme (base Éducation nationale)
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
