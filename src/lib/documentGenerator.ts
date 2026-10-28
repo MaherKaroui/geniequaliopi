@@ -2006,7 +2006,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
       // Prise en charge déterministe : avec entreprise → OPCO, sans entreprise → Financement personnel.
-      const financement = financeParEntreprise(s) ? "OPCO" : "Financement personnel";
+      const financement = (o.typesActions || []).includes("vae") || financeParEntreprise(s) === false ? "Financement personnel" : "OPCO";
       const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
