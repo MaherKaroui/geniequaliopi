@@ -14,3 +14,17 @@ describe("code diplôme officiel", () => {
   it("NTC → 36T31203", () => expect(codeDiplomeOfficiel("TP Négociateur technico-commercial")).toBe("36T31203"));
   it("inconnu → vide", () => expect(codeDiplomeOfficiel("Excel")).toBe(""));
 });
+import { chargerCodesDiplomes } from "@/lib/cerfaApprentissage";
+describe("base Éducation nationale", () => {
+  it("TP Gestionnaire de paie", async () => {
+    const b = await chargerCodesDiplomes();
+    expect(codeDiplomeOfficiel("TP Gestionnaire de paie", "", b)).toMatch(/^.{8}$/);
+  });
+});
+describe("codes TP précis", () => {
+  it("paie → 36T31501, transport → 46T31102", async () => {
+    const b = await chargerCodesDiplomes();
+    expect(codeDiplomeOfficiel("TP Gestionnaire de paie", "", b)).toBe("36T31501");
+    expect(codeDiplomeOfficiel("TP Exploitant en transport routier de marchandises", "", b)).toBe("46T31102");
+  });
+});
