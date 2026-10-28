@@ -230,6 +230,17 @@ function codeNationalite(v: string | undefined): string {
   return /franc/.test(n) ? "1" : UE.test(n) ? "2" : "3";
 }
 
+/** Codes diplôme officiels (8 caractères) connus et vérifiés, par RNCP ou intitulé. */
+const CODES_DIPLOME_OFFICIELS: { re: RegExp; rncp?: string; code: string }[] = [
+  { re: /\bntc\b|negociateur technico/, code: "36T31203" },
+];
+export function codeDiplomeOfficiel(intitule?: string, rncp?: string): string {
+  const t = (intitule || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const r = (rncp || "").toUpperCase().replace(/\s/g, "");
+  const hit = CODES_DIPLOME_OFFICIELS.find((c) => (c.rncp && r.includes(c.rncp)) || c.re.test(t));
+  return hit?.code || "";
+}
+
 /** Code « Diplôme ou titre visé » (nomenclature CERFA) déduit de l'intitulé ; vide si inconnu. */
 export function codeDiplomeVise(intitule: string | undefined): string {
   const t = (intitule || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -443,7 +454,7 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
-  setText(form, "Zone de texte 8_75", clean(cx.codeDiplomeEN) || ""); // Code du diplôme (8 caractères, jamais déduit)
+  setText(form, "Zone de texte 8_75", clean(cx.codeDiplomeEN) || codeDiplomeOfficiel(f.intitule, f.codeRNCP)); // Code du diplôme (8 caractères, jamais déduit)
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
