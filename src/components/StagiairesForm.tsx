@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { X, PenTool, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 import ExperiencesEditor from "@/components/ExperiencesEditor";
+import CerfaComplementEditor from "@/components/CerfaComplementEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
@@ -48,6 +49,7 @@ const emptyStagiaire: StagiaireInfo = {
 const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesFormProps) => {
   const avecExperiences = !!typesActions?.some((t) => t === "vae" || t === "bilans-competences");
   const estVAE = !!typesActions?.includes("vae");
+  const estCFA = !!typesActions?.includes("apprentissage");
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -346,6 +348,12 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
                 <option value="non">Non</option>
               </select>
             </div>
+            {estCFA && (
+              <CerfaComplementEditor
+                value={stagiaire.cerfa || {}}
+                onChange={(cerfa) => { const updated = [...data]; updated[index] = { ...updated[index], cerfa }; onChange(updated); }}
+              />
+            )}
             {avecExperiences && (
               <ExperiencesEditor
                 value={stagiaire.experiences || []}
