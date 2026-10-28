@@ -6,3 +6,6 @@ describe("codeDiplomeVise", () => {
   it("niveau 5 → 58", () => expect(codeDiplomeVise("Titre pro niveau 5")).toBe("58"));
   it("inconnu → vide", () => expect(codeDiplomeVise("Excel")).toBe(""));
 });
+describe("TP", () => {
+  it("TP NTC → 58", () => expect(codeDiplomeVise("TP Négociateur Technico-Commercial (NTC)")).toBe("58"));
+});

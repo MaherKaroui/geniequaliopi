@@ -245,6 +245,9 @@ export function codeDiplomeVise(intitule: string | undefined): string {
   if (/brevet professionnel|\bbp\b/.test(t)) return "42";
   if (/\bcap\b/.test(t)) return "33";
   if (/\bbep\b/.test(t)) return "34";
+  // Titres professionnels courants (niveau officiel France Compétences)
+  if (/\bntc\b|negociateur technico|gestionnaire (de paie|comptable|des operations de transport)|assistant de direction|responsable de petite|developpeur web|technicien superieur|\bcip\b|conseiller en insertion|manager d'unite marchande|exploitant en transport|\bmum\b/.test(t)) return "58";
+  if (/conseiller de vente|employe commercial|assistant de vie|agent de restauration|secretaire assistant|vendeur conseil/.test(t)) return /secretaire assistant|vendeur conseil|conseiller de vente/.test(t) ? "49" : "38";
   const n = t.match(/niveau\s*([3-8])|bac\s*\+\s*([0-5])/);
   if (n) {
     const niv = n[1] ? Number(n[1]) : Number(n[2]) + 4;
