@@ -9,3 +9,8 @@ describe("codeDiplomeVise", () => {
 describe("TP", () => {
   it("TP NTC → 58", () => expect(codeDiplomeVise("TP Négociateur Technico-Commercial (NTC)")).toBe("58"));
 });
+import { codeDiplomeOfficiel } from "@/lib/cerfaApprentissage";
+describe("code diplôme officiel", () => {
+  it("NTC → 36T31203", () => expect(codeDiplomeOfficiel("TP Négociateur technico-commercial")).toBe("36T31203"));
+  it("inconnu → vide", () => expect(codeDiplomeOfficiel("Excel")).toBe(""));
+});
