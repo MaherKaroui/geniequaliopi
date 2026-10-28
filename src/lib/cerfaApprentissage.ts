@@ -267,7 +267,7 @@ export function niveauDiplome(diplome?: string): string {
   const t = norm(diplome || "");
   if (!t) return "";
   const n = t.match(/niveau ([3-8])\b/); if (n) return n[1];
-  const b = t.match(/bac ?([0-8])\b/); if (/bac \d|bac\d/.test(t) && b) return String(Math.min(8, Number(b[1]) + 4));
+  const b = t.match(/bac ?([0-8])\b/); if (/bac \d|bac\d/.test(t) && b) return ["4", "5", "5", "6", "6", "7", "7", "7", "8"][Number(b[1])];
   if (/doctorat|\bphd\b/.test(t)) return "8";
   if (/master|ingenieur|\bmba\b|\bdess\b|\bdea\b/.test(t)) return "7";
   if (/licence|bachelor|\bbut\b|maitrise/.test(t)) return "6";
