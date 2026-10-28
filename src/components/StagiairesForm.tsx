@@ -387,10 +387,11 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
                     if (r.cerfaApe) cerfa.codeApe = r.cerfaApe;
                     if (r.cerfaIdcc) cerfa.idcc = r.cerfaIdcc;
                     cerfa.employeurPublic = r.cerfaPublic;
+                    if (r.posteResponsable) cerfa.maitreEmploi = r.posteResponsable;
                     const updated = [...data];
-                    updated[index] = { ...cur, entreprise: r.entreprise || cur.entreprise, adresseEntreprise: r.adresseEntreprise || cur.adresseEntreprise, siretEntreprise: r.siretEntreprise, cerfa };
+                    updated[index] = { ...cur, entreprise: r.entreprise || cur.entreprise, adresseEntreprise: r.adresseEntreprise || cur.adresseEntreprise, siretEntreprise: r.siretEntreprise, responsableEntreprise: r.responsableEntreprise || cur.responsableEntreprise, dateNaissanceResponsable: r.dateNaissanceResponsable || cur.dateNaissanceResponsable, cerfa };
                     onChange(updated);
-                    toast.success(`Entreprise remplie : ${r.entreprise}`);
+                    toast.success(`Entreprise remplie : ${r.entreprise}`, { description: r.responsableEntreprise ? `${r.responsableEntreprise} — ${r.posteResponsable}${!r.dateNaissanceResponsable && r.dateNaissanceMoisResponsable ? ` · né(e) en ${r.dateNaissanceMoisResponsable} (jour à compléter)` : ""}` : undefined });
                   } catch (e: any) { toast.error(e?.message || "Recherche impossible"); }
                   finally { setSiretLoading(null); }
                 }}>{siretLoading === index ? <Loader2 className="h-4 w-4 animate-spin" /> : "Remplir"}</Button>
