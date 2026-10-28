@@ -134,7 +134,10 @@ const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
 function splitDate(iso: string | undefined): [string, string, string] {
   if (!iso) return ["", "", ""];
   const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!m) return ["", "", ""];
+  if (!m) {
+    const ym = iso.match(/^(\d{4})-(\d{2})$/); // mois/année seuls (annuaire public) : jour laissé vide
+    return ym ? ["", ym[2], ym[1]] : ["", "", ""];
+  }
   return [m[3], m[2], m[1]];
 }
 
