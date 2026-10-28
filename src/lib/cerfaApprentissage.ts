@@ -439,11 +439,11 @@ export async function genCerfaApprentissagePdf(
   // Diplôme/titre visé
   // Nomenclature du diplôme/titre (ex. 58), distincte du RNCP en 8_76.
   // La valeur contractuelle IZILearn est appliquée ci-dessous si elle est fournie.
-  setText(form, "Zone de texte 8_77", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule));
+  setText(form, "Zone de texte 8_77", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule)); // Diplôme ou titre visé
   setText(form, "Zone de texte 8_99", clean(o.nom)); // Dénomination CFA responsable
   setText(form, "Zone de texte 8_100", clean(f.intitule)); // Intitulé précis
   setText(form, "Zone de texte 8_73", clean(extra.uai)); // N° UAI
-  setText(form, "Zone de texte 8_75", clean(cx.codeDiplome) || codeDiplomeVise(f.intitule)); // Code diplôme
+  setText(form, "Zone de texte 8_75", clean(cx.codeDiplomeEN) || ""); // Code du diplôme (8 caractères, jamais déduit)
   setText(form, "Zone de texte 8_74", clean(o.siret)); // N° SIRET CFA
   setText(form, "Zone de texte 8_76", clean(f.codeRNCP || "")); // Code RNCP
 
