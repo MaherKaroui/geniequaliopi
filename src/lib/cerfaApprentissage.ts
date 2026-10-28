@@ -262,6 +262,21 @@ function codeDiplomeConnu(intitule?: string, rncp?: string): string {
   return hit?.code || "";
 }
 
+/** Niveau CERFA (3 à 8) déduit du nom d'un diplôme ; vide si inconnu. */
+export function niveauDiplome(diplome?: string): string {
+  const t = norm(diplome || "");
+  if (!t) return "";
+  const n = t.match(/niveau ([3-8])\b/); if (n) return n[1];
+  const b = t.match(/bac ?([0-8])\b/); if (/bac \d|bac\d/.test(t) && b) return String(Math.min(8, Number(b[1]) + 4));
+  if (/doctorat|\bphd\b/.test(t)) return "8";
+  if (/master|ingenieur|\bmba\b|\bdess\b|\bdea\b/.test(t)) return "7";
+  if (/licence|bachelor|\bbut\b|maitrise/.test(t)) return "6";
+  if (/\bbts\b|\bdut\b|\bdeug\b|\bbtsa\b/.test(t)) return "5";
+  if (/\bbac\b|baccalaureat|brevet professionnel|\bbp\b/.test(t)) return "4";
+  if (/\bcap\b|\bbep\b/.test(t)) return "3";
+  return "";
+}
+
 /** Code « Diplôme ou titre visé » (nomenclature CERFA) déduit de l'intitulé ; vide si inconnu. */
 export function codeDiplomeVise(intitule: string | undefined): string {
   const t = (intitule || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -413,11 +428,17 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_44", clean(s.emailResponsable)); // Courriel maître 1
   setText(form, "Zone de texte 8_45", clean(cx.maitreEmploi)); // Emploi occupé par le maître d'apprentissage (distinct du poste de l'apprenti)
 
-  // Maître n°2 — vide
+  setText(form, "Zone de texte 8_50", clean(cx.maitreDiplome)); // Diplôme le plus élevé maître 1
+  setText(form, "Zone de texte 8_52", clean(cx.maitreNiveau) || niveauDiplome(cx.maitreDiplome)); // Niveau maître 1
+
+  // Maître n°2 (positions vérifiées sur le PDF officiel)
   setText(form, "Zone de texte 8_46", clean(cx.maitre2?.nom));
   setText(form, "Zone de texte 8_47", clean(cx.maitre2?.prenom));
-  setText(form, "Zone de texte 8_48", clean(cx.maitre2?.dateNaissance));
-  setText(form, "Zone de texte 8_49", clean(cx.maitre2?.email));
+  const [m2J, m2M, m2A] = splitDate(cx.maitre2?.dateNaissance);
+  setText(form, "Zone de texte 21", m2J);
+  setText(form, "Zone de texte 21_2", m2M);
+  setText(form, "Zone de texte 21_3", m2A);
+  setText(form, "Zone de texte 8_48", clean(cx.maitre2?.email));
 
   // Attestation maître apprentissage
   setCheck(form, "Case #C3#A0 cocher 6", true);

@@ -28,3 +28,12 @@ describe("codes TP précis", () => {
     expect(codeDiplomeOfficiel("TP Exploitant en transport routier de marchandises", "", b)).toBe("46T31102");
   });
 });
+import { niveauDiplome } from "@/lib/cerfaApprentissage";
+describe("niveau maître", () => {
+  it("BTS → 5, Master → 7, CAP → 3, Bac+3 → 6", () => {
+    expect(niveauDiplome("BTS MCO")).toBe("5");
+    expect(niveauDiplome("Master RH")).toBe("7");
+    expect(niveauDiplome("CAP cuisine")).toBe("3");
+    expect(niveauDiplome("Bac+3 commerce")).toBe("6");
+  });
+});

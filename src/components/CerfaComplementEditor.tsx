@@ -30,6 +30,8 @@ const SECTIONS: { titre: string; champs: [TextKey, string, string?][] }[] = [
   ]},
   { titre: "Maître d'apprentissage", champs: [
     ["maitreEmploi", "Emploi occupé par le maître d'apprentissage"],
+    ["maitreDiplome", "Diplôme le plus élevé du maître d'apprentissage", "BTS Commerce international"],
+    ["maitreNiveau", "Niveau de ce diplôme (3 à 8, auto si vide)", "5"],
   ]},
   { titre: "Contrat", champs: [
     ["typeContrat", "Type de contrat (code)", "11"],
