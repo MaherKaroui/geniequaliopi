@@ -137,6 +137,8 @@ export interface CerfaComplement {
   diplomePlusEleve?: string;
   representantLegal?: { nom?: string; numero?: string; voie?: string; complement?: string; codePostal?: string; commune?: string; email?: string };
   maitreEmploi?: string;
+  maitreDiplome?: string;
+  maitreNiveau?: string;
   maitre2?: { nom?: string; prenom?: string; dateNaissance?: string; email?: string };
   typeContrat?: string;
   typeDerogation?: string;
