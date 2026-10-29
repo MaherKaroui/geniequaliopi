@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { getActivePdfOptions, htmlToPdfBlob } from "@/lib/pdfExport";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { setDocStyle } from "@/lib/docBuilder";
 import { getAutomaticDossierDesign } from "@/lib/dossierDesign";
@@ -24,6 +24,7 @@ import { useIzilearn } from "@/lib/izilearn/bridge";
 import { PLATEFORMES, definirPlateforme, marque, type AppSource } from "@/lib/izilearn/plateforme";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import { champsManquants } from "@/lib/izilearn/mapping";
+import { alertesGenerateur } from "@/lib/izilearn/generateurs";
 import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Contexte, type Piece } from "@/lib/izilearn/pieces";
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
 import type { IzFichierRetour } from "@/lib/izilearn/types";
@@ -111,7 +112,7 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
   const aSigner = signatureTarget && signatureTarget.role !== "formateur" ? payload?.apprenants[signatureTarget.index] : null;
   useEffect(() => { setApercuId(null); setSignatureTarget(null); }, [payload?.source.orgId, payload?.source.sessionId]);
-  const manquants = useMemo(() => (payload ? champsManquants(payload) : []), [payload]);
+  const manquants = useMemo(() => (payload && cx0 ? [...champsManquants(payload), ...alertesGenerateur(cx0)] : []), [payload, cx0]);
 
   const visibles = pieces.filter((p) => categories.has(p.categorie) && (p.apprenantIdx === null || apprenants.has(p.apprenantIdx)));
   const categoriesPresentes = CATEGORIES.filter((c) => pieces.some((p) => p.categorie === c.key));
@@ -140,7 +141,7 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
     };
     if (p.pdf && cx) return { blob: await p.pdf(cx), nom: `${p.fichier}.pdf` };
     const html = rendre(p);
-    if (fmt === "pdf") return { blob: await htmlToPdfBlob(html), nom: `${p.fichier}.pdf` };
+    if (fmt === "pdf") return { blob: await htmlToPdfBlob(html, p.tablesFluides ? { ...getActivePdfOptions(), keepTablesTogether: false } : undefined), nom: `${p.fichier}.pdf` };
     const blob = await htmlToWordBlob(html);
     return { blob, nom: `${p.fichier}${blob.type.includes("officedocument") ? ".docx" : ".doc"}` };
   }
@@ -212,7 +213,7 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
             <>
               <p className="text-sm text-muted-foreground">
                 Cet espace se remplit avec les données d'une session {nomApp}. Ouvrez une session dans {nomApp} puis l'onglet
-                <strong> « Génie Qualiopi »</strong> (ou le bouton « Ouvrir en plein écran ») : programme, évaluations, exercices,
+                <strong> « Génie Qualiopi »</strong> : programme, évaluations, exercices,
                 émargements, mails et documents contractuels sont générés pour chaque apprenant.
               </p>
               <Button asChild className="bg-gradient-hero border-0 text-primary-foreground">

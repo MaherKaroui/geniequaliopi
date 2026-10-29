@@ -16,10 +16,11 @@ import { mailHtml, mailsModeles, type MailModele } from "./mails";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { appliquerRevision, developperLivret } from "./presentation";
 import { definirPlateforme, marque } from "./plateforme";
+import { documentsGenerateur, generateurDedie } from "./generateurs";
 
 export type CategorieKey =
   | "programme" | "besoins" | "positionnement" | "convocation" | "convention" | "cgv" | "ri"
-  | "cerfa" | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "certificat" | "mails";
+  | "cerfa" | "livret" | "support" | "exercices" | "examen_final" | "emargement" | "connexion" | "bilan_chaud" | "bilan_froid" | "certificat" | "mails" | "vae" | "bdc";
 
 export interface Categorie { key: CategorieKey; label: string; dossier: string; aide: string }
 
@@ -42,6 +43,8 @@ export const CATEGORIES: Categorie[] = [
   { key: "bilan_froid", label: "Bilan à froid", dossier: "13_Bilan_a_froid", aide: "Enquête à 3 mois." },
   { key: "certificat", label: "Certificat de réalisation", dossier: "13_Certificat_de_realisation", aide: "Certificat de réalisation de l'action, comme dans Qualiopi." },
   { key: "mails", label: "Mails", dossier: "14_Mails", aide: "Mêmes scénarios que la partie Qualiopi, en modèles à envoyer avec leur date prévue." },
+  { key: "vae", label: "Dossier VAE", dossier: "Dossier_VAE", aide: "Pièces du générateur VAE, une série par candidat." },
+  { key: "bdc", label: "Dossier bilan de compétences", dossier: "Dossier_Bilan_de_competences", aide: "Pièces du générateur bilan de compétences, une série par bénéficiaire." },
 ];
 
 export type Source = "izilearn" | "trame" | "document" | "modele";
@@ -56,6 +59,8 @@ export interface Piece {
   mail?: MailModele;
   /** Pièce PDF native (CERFA officiel) : générée depuis le contexte signé. */
   pdf?: (cx: Contexte) => Promise<Blob>;
+  /** Longs tableaux autorisés à se couper entre deux pages (générateurs VAE / BC). */
+  tablesFluides?: boolean;
   rendre: () => string;     // HTML complet
 }
 
@@ -101,6 +106,20 @@ export function estCFA(p: IzPayload): boolean {
 }
 
 export function planPieces(cx: Contexte): Piece[] {
+  const dedie = generateurDedie(cx.p);
+  return finaliser(dedie ? piecesGenerateur(cx, dedie) : piecesActionFormation(cx), cx);
+}
+
+/** VAE / bilan de compétences : pièces des générateurs dédiés, par apprenant. */
+function piecesGenerateur(cx: Contexte, g: "vae" | "bdc"): Piece[] {
+  return cx.stagiaires.flatMap((s, i) => documentsGenerateur(cx, i, g).map((d) => ({
+    id: `${g}_${i}_${d.id}`, categorie: g, titre: `${d.titre} — ${`${s.prenom} ${s.nom}`.trim()}`, apprenantIdx: i,
+    source: "document" as const, fichier: d.fichier, rendre: d.rendre, tablesFluides: d.tablesFluides,
+  })));
+}
+
+/** Actions de formation et CFA. */
+function piecesActionFormation(cx: Contexte): Piece[] {
   const { p, o, f, stagiaires } = cx;
   const g = gabarits(p.formation.typeAction);
   const out: Piece[] = [];
@@ -181,6 +200,11 @@ export function planPieces(cx: Contexte): Piece[] {
       par("mails", m.titre, `${stamp}_${slug(m.titre).toUpperCase()}`, "modele", () => mailHtml(m, o), { id: `m${k}`, mail: m });
     });
   });
+  return out;
+}
+
+function finaliser(out: Piece[], cx: Contexte): Piece[] {
+  const { o } = cx;
   return out.map((piece) => {
     const rendre = piece.rendre;
     // Textes écrits pour IZILearn : nom de la plateforme reliée (CRM LMS…).
