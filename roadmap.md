@@ -83,3 +83,4 @@
 - [x] Responsable pédagogique : faire porter à chaque case la marque du dirigeant (formulaire organisme) dans tous les dossiers.
 - [x] Retirer « CT5 - IND 21 FICHE DE COMPÉTENCES – <intervenant> » du dossier.
 - [x] Retirer « CT6 - IND 27 REGISTRE DE SOUS-TRAITANCE ET DE PORTAGE SALARIAL » du dossier.
+- [x] Retirer « CT5 - IND 22 ATTESTATIONS DE FORMATION CONTINUE (à joindre) » du dossier.
