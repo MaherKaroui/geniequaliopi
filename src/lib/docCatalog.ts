@@ -382,7 +382,6 @@ export function buildFullCatalog(
 
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
-    add("af_c5i22_attestations_formation", "CT5 - IND 22 ATTESTATIONS DE FORMATION CONTINUE (à joindre)", 5, 22, "attestation_fin_formation");
     add("af_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
     intervenantsAF.forEach((fname) => {
       add(`af_c5i22_fiche_entretien_${slugNom(fname)}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
