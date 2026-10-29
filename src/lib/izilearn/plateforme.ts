@@ -20,8 +20,9 @@ const LOCAL = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
 
 export const PLATEFORMES: Record<AppSource, Plateforme> = {
   izilearn: {
-    app: "izilearn", nom: "IZILearn", url: "https://izilearn.netlify.app/sessions", visio: "Google Meet",
-    origines: [/^https:\/\/izilearn\.netlify\.app$/, /^https:\/\/[a-z0-9-]+--izilearn\.netlify\.app$/, LOCAL],
+    app: "izilearn", nom: "IZILearn", url: "https://izilearn.net/sessions", visio: "Google Meet",
+    // Domaine izilearn.net (et www), site Netlify et aperçus de déploiement.
+    origines: [/^https:\/\/(www\.)?izilearn\.net$/, /^https:\/\/izilearn\.netlify\.app$/, /^https:\/\/[a-z0-9-]+--izilearn\.netlify\.app$/, LOCAL],
     msg: { ready: "geniequaliopi:ready", data: "izilearn:data", save: "geniequaliopi:save", saved: "izilearn:saved" },
   },
   crmlms: {

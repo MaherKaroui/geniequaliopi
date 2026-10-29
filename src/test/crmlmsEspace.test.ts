@@ -23,6 +23,9 @@ describe("Espace CRM LMS", () => {
     expect(origineAutorisee("https://id-preview--7487037a-cf01-4bbe-9898-0e1b6d13ef37.lovable.app", "crmlms")).toBe(true);
     expect(origineAutorisee("https://izilearn.netlify.app", "crmlms")).toBe(false);
     expect(origineAutorisee("https://crmlms.lovable.app", "izilearn")).toBe(false);
+    expect(origineAutorisee("https://izilearn.net", "izilearn")).toBe(true);
+    expect(origineAutorisee("https://www.izilearn.net", "izilearn")).toBe(true);
+    expect(origineAutorisee("https://izilearn.net.evil.com", "izilearn")).toBe(false);
     expect(origineAutorisee("https://crmlms.lovable.app.evil.com", "crmlms")).toBe(false);
   });
 
