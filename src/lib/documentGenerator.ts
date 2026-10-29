@@ -7296,7 +7296,14 @@ ${tableHTML(["", "Quantité", "Unité", "Prix unitaire en €", "Montant net en 
   ["Reste à charge éventuel de l'entreprise", "", "", "", "0 €"],
 ])}
 <p style="text-align:right;font-weight:bold">TOTAL NET : ${montant} €</p>
-<p style="font-size:11px;color:#666"><sup>1</sup> Article 261 4, 4° du Code général des impôts<br><sup>2</sup> Il s'agit du niveau de prise en charge défini par la branche dont relève l'entreprise. Il est versé par l'opérateur de compétences (OPCO) concerné.</p>` },
+<p style="font-size:11px;color:#666"><sup>1</sup> Article 261 4, 4° du Code général des impôts<br><sup>2</sup> Il s'agit du niveau de prise en charge défini par la branche dont relève l'entreprise. Il est versé par l'opérateur de compétences (OPCO) concerné.</p>
+<p><strong>Prise en charge par l'OPCO et participation de l'employeur (contrats conclus depuis le 1er juillet 2025) :</strong></p>
+${tableHTML(["Niveau du diplôme préparé", "Plafond de prise en charge par l'OPCO", "Exemples de diplômes"], [
+  [`Niveaux 3 et 4${marqueNiveau(3, 4)}`, "Jusqu'à 500 €", "CAP, BEP, Bac Professionnel"],
+  [`Niveau 5${marqueNiveau(5, 5)}`, "Jusqu'à 300 €", "BTS, BUT (Bac+2)"],
+  [`Niveaux 6 et 7${marqueNiveau(6, 7)}`, "0 € (aide supprimée)", "Licence, Bachelor, Master (Bac+3 et supérieur)"],
+])}
+${nivDiplome >= 6 ? `<p><strong>Participation obligatoire de l'employeur :</strong> l'apprenti préparant un diplôme ou un titre de niveau Bac+3 ou supérieur, l'employeur s'acquitte d'une participation obligatoire forfaitaire de <strong>750 €</strong>, réduite à <strong>200 €</strong> en cas de nouveau contrat après une rupture.</p>` : ""}` },
     { heading: "Article 4 : Frais annexes – pendant le temps en CFA uniquement", content: `<p>Lorsqu'ils sont financés par les CFA, l'OPCO prend en charge une partie de ces frais.</p>
 ${tableHTML(["Frais", "Prise en charge"], [
   ["Frais hébergement", "Non"],
