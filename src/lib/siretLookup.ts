@@ -1,4 +1,5 @@
 import type { StagiaireInfo } from "@/types/qualiopi";
+import { typeEmployeurDepuisNature, regimeSocialDepuisApe } from "@/lib/cerfaNomenclature";
 
 /** Recherche publique (annuaire des entreprises, data.gouv) : seules les données officielles retournées sont reprises. */
 export async function rechercherEntrepriseParSiret(siretBrut: string): Promise<Partial<StagiaireInfo> | null> {
@@ -26,5 +27,8 @@ export async function rechercherEntrepriseParSiret(siretBrut: string): Promise<P
     dateNaissanceMoisResponsable: dir?.date_de_naissance || "",
     posteResponsable: dir?.qualite || "",
     cerfaPublic: String(r.nature_juridique || "").startsWith("7"),
+    cerfaTypeEmployeur: typeEmployeurDepuisNature(r.nature_juridique, ape),
+    cerfaRegimeSocial: regimeSocialDepuisApe(ape),
+    cerfaEmployeurSpecifique: /^782/.test(ape) ? "1" : "",
   } as any;
 }

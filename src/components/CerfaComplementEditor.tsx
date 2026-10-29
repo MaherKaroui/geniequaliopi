@@ -1,6 +1,8 @@
 import { CerfaComplement } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import * as N from "@/lib/cerfaNomenclature";
+import type { Opt } from "@/lib/cerfaNomenclature";
 
 interface Props {
   value: CerfaComplement;
@@ -8,6 +10,19 @@ interface Props {
 }
 
 type TextKey = Exclude<keyof CerfaComplement, "employeurPublic" | "sportifHautNiveau" | "machinesDangereuses" | "representantLegal" | "maitre2">;
+
+const LISTES: Partial<Record<string, Opt[]>> = {
+  typeEmployeur: N.TYPE_EMPLOYEUR,
+  employeurSpecifique: N.EMPLOYEUR_SPECIFIQUE,
+  regimeSocial: N.REGIME_SOCIAL,
+  situationAvant: N.SITUATION_AVANT,
+  dernierDiplomePrepare: N.DIPLOMES,
+  derniereClasse: N.DERNIERE_CLASSE,
+  diplomePlusEleve: N.DIPLOMES,
+  typeContrat: N.TYPE_CONTRAT,
+  typeDerogation: N.TYPE_DEROGATION,
+  codeDiplome: N.DIPLOMES,
+};
 
 const SECTIONS: { titre: string; champs: [TextKey, string, string?][] }[] = [
   { titre: "Employeur", champs: [
@@ -71,7 +86,18 @@ const CerfaComplementEditor = ({ value, onChange }: Props) => {
               {sec.champs.map(([k, label, ph]) => (
                 <div key={k}>
                   <Label>{label}</Label>
-                  <Input value={(value[k] as string) || ""} placeholder={ph} onChange={(e) => set({ [k]: e.target.value })} />
+                  {LISTES[k] ? (
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={(value[k] as string) || ""}
+                      onChange={(e) => set({ [k]: e.target.value })}
+                    >
+                      <option value="">— Non renseigné —</option>
+                      {LISTES[k]!.map(([c, l]) => <option key={c} value={c}>{c} — {l}</option>)}
+                    </select>
+                  ) : (
+                    <Input value={(value[k] as string) || ""} placeholder={ph} onChange={(e) => set({ [k]: e.target.value })} />
+                  )}
                 </div>
               ))}
             </div>
