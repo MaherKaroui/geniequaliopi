@@ -128,6 +128,25 @@ export function rechercherFC(q: string, limit = 20): IndexFC[] {
   return out.sort((a, b) => Number(b.on) - Number(a.on)).slice(0, limit);
 }
 
+const MOTS_VIDES = new Set("titre professionnel tp de du la le les des d l et en a au aux niveau rncp vae accompagnement".split(" "));
+
+/**
+ * Code RNCP le plus probable pour un titre visé (« Titre professionnel Agent magasinier ») : tous les mots
+ * significatifs doivent figurer dans l'intitulé ; fiche active d'abord, puis niveau demandé, puis la plus récente.
+ * L'index doit être chargé (loadIndexFC). Vide si aucune fiche ne correspond.
+ */
+export function codeRNCPPourTitre(titre: string, niveau = ""): string {
+  if (!index) return "";
+  const n = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const mots = (n(titre.replace(/\([^)]*\)/g, " ")).match(/[a-z0-9]+/g) || []).filter((m) => m.length > 1 && !MOTS_VIDES.has(m));
+  if (!mots.length) return "";
+  const num = (c: string) => Number(c.replace(/\D/g, "")) || 0;
+  const trouves = [...index.values()]
+    .filter((e) => e.c.startsWith("RNCP") && mots.every((m) => n(`${e.a || ""} ${e.i}`).includes(m)))
+    .sort((a, b) => Number(b.on) - Number(a.on) || Number(b.n === niveau) - Number(a.n === niveau) || num(b.c) - num(a.c));
+  return trouves[0]?.c || "";
+}
+
 /** Précharge l'index et la fiche d'une formation (à appeler avant génération / export). */
 export async function preloadFranceCompetences(code?: string): Promise<FicheFC | null> {
   await loadIndexFC();

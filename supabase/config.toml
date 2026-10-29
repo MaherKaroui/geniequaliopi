@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.vae-suggest-rncp]
 verify_jwt = false
+
+[functions.bdc-generate-contents]
+verify_jwt = false

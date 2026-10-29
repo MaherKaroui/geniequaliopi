@@ -264,8 +264,8 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
           )}
         </header>
         {!a ? <p className="text-sm text-muted-foreground text-center py-12">Aucun apprenant inscrit à cette session.</p>
-          : dedie === "vae" ? <VAEPage key={cle} embedded initial={versVAEData(cx, i)} draftKey={`vae_${cle}`} />
-          : <BilanCompetences key={cle} embedded initial={versBdcData(cx, i)} draftKey={`bdc_${cle}`} />}
+          : dedie === "vae" ? <VAEPage key={cle} embedded initial={versVAEData(cx, i)} draftKey={`vae_${cle}`} historyKey={`vae_history_${app}_${p.source.orgId}`} />
+          : <BilanCompetences key={cle} embedded initial={versBdcData(cx, i)} draftKey={`bdc_${cle}`} historyKey={`bdc_history_${app}_${p.source.orgId}`} />}
       </div>
     );
   }

@@ -17,7 +17,7 @@ import { BDC_STANDALONE_DOCUMENTS, bdcDocumentTitle, type BdcDocumentId } from "
 import { exportStandaloneBdcDocument, exportStandaloneBdcZip, downloadBdcBlob, bdcFileTag } from "@/lib/bdc/standaloneExport";
 import { envoyerDossiersDansDrive } from "@/lib/envoiDrive";
 import { garderActif } from "@/lib/arrierePlan";
-import { readBdcHistory, writeBdcHistory, type BdcHistoryEntry } from "@/lib/bdc/standaloneHistory";
+import { BDC_HISTORY_KEY, readBdcHistory, writeBdcHistory, type BdcHistoryEntry } from "@/lib/bdc/standaloneHistory";
 import type { Jour, Creneau } from "@/lib/bdc/bdcModel";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,14 +32,14 @@ const field = (label: string, value: string | undefined, onChange: (value: strin
  * `initial` + `draftKey` : bilan ouvert depuis une session IZILearn / CRM LMS, pré-rempli
  * (organisme, bénéficiaire, période, planning) et sauvegardé par bénéficiaire.
  */
-export default function BilanCompetences({ embedded = false, initial, draftKey = DRAFT_KEY }: { embedded?: boolean; initial?: StandaloneBdcData; draftKey?: string }) {
+export default function BilanCompetences({ embedded = false, initial, draftKey = DRAFT_KEY, historyKey = BDC_HISTORY_KEY }: { embedded?: boolean; initial?: StandaloneBdcData; draftKey?: string; historyKey?: string }) {
   const navigate = useNavigate();
   const [data, setData] = useState<StandaloneBdcData>(() => {
     const base = initial ?? emptyBdcData();
     try { const saved = localStorage.getItem(draftKey); return saved ? { ...base, ...JSON.parse(saved) } : base; } catch { return base; }
   });
   const [step, setStep] = useState(initial ? 2 : 1);
-  const [history, setHistory] = useState<BdcHistoryEntry[]>(readBdcHistory);
+  const [history, setHistory] = useState<BdcHistoryEntry[]>(() => readBdcHistory(localStorage, historyKey));
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
   const [loaded, setLoaded] = useState<string | null>(null);
@@ -75,13 +75,13 @@ export default function BilanCompetences({ embedded = false, initial, draftKey =
   const save = (update = false) => {
     const entry: BdcHistoryEntry = { id: update && loaded ? loaded : crypto.randomUUID(), name: name.trim() || `${b.prenom} ${b.nom} — ${f.intitule}`, updatedAt: new Date().toISOString(), data: structuredClone(data) };
     const next = [entry, ...history.filter(item => item.id !== entry.id)];
-    try { writeBdcHistory(next); setHistory(next); setLoaded(entry.id); setName(entry.name); toast.success(update ? "Dossier mis à jour" : "Dossier enregistré dans ce navigateur"); } catch { toast.error("Espace du navigateur insuffisant. Supprimez un ancien dossier ou réduisez les images."); }
+    try { writeBdcHistory(next, localStorage, historyKey); setHistory(next); setLoaded(entry.id); setName(entry.name); toast.success(update ? "Dossier mis à jour" : "Dossier enregistré dans ce navigateur"); } catch { toast.error("Espace du navigateur insuffisant. Supprimez un ancien dossier ou réduisez les images."); }
   };
   const load = (item: BdcHistoryEntry) => { setData(structuredClone(item.data)); setLoaded(item.id); setName(item.name); setStep(1); toast.success("Dossier chargé"); };
   const remove = (item: BdcHistoryEntry) => {
     if (!window.confirm(`Supprimer le dossier « ${item.name} » ?`)) return;
     const next = history.filter(h => h.id !== item.id);
-    try { writeBdcHistory(next); setHistory(next); if (loaded === item.id) setLoaded(null); } catch { toast.error("Suppression impossible."); }
+    try { writeBdcHistory(next, localStorage, historyKey); setHistory(next); if (loaded === item.id) setLoaded(null); } catch { toast.error("Suppression impossible."); }
   };
   const generatePlanning = () => {
     if (data.sessions.some(s => s.presence || s.compteRendu) && !window.confirm("Remplacer le planning et effacer ses comptes rendus et présences ?")) return;

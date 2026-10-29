@@ -30,7 +30,7 @@ const ORG_KEY = "vae_organisme";
  * `initial` + `draftKey` : assistant ouvert depuis une session IZILearn / CRM LMS, pré-rempli
  * (organisme, certification, session) et sauvegardé par apprenant ; on démarre à l'étape Candidat.
  */
-export default function VAEPage({ embedded = false, initial, draftKey }: { embedded?: boolean; initial?: VAEData; draftKey?: string }) {
+export default function VAEPage({ embedded = false, initial, draftKey, historyKey }: { embedded?: boolean; initial?: VAEData; draftKey?: string; historyKey?: string }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [depart] = useState<VAEData | null>(() => {
@@ -83,6 +83,7 @@ export default function VAEPage({ embedded = false, initial, draftKey }: { embed
         {(embedded || user) && (
           <VAEDossierHistory
             userId={embedded ? undefined : user?.id}
+            historyKey={historyKey}
             organisme={organisme}
             certification={certification}
             candidat={candidat}

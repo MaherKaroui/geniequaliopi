@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { codeRNCPPourTitre, loadIndexFC } from "@/lib/franceCompetences";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,17 @@ export default function StepCertification({ data, onChange, candidat }: Props) {
   const [loading, setLoading] = useState(false);
   const [suggesting, setSuggesting] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+
+  // Titre visé sans code : le code RNCP trouvé dans la base France Compétences est mis dans la recherche.
+  useEffect(() => {
+    if (data.rncp || !data.intitule) return;
+    let actif = true;
+    loadIndexFC().then(() => {
+      const code = codeRNCPPourTitre(data.intitule, data.niveau);
+      if (actif && code) setQuery((q) => (q === data.intitule ? code : q));
+    });
+    return () => { actif = false; };
+  }, [data.rncp, data.intitule, data.niveau]);
 
   const lookup = async () => {
     if (!query.trim()) return;

@@ -1,5 +1,4 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@4";
 import { createResponsesCall } from "./responses.ts";
 
@@ -50,12 +49,8 @@ Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return reply({ error: "Méthode non autorisée" }, 405);
   try {
-    const url = Deno.env.get("SUPABASE_URL"), anon = Deno.env.get("SUPABASE_ANON_KEY");
-    if (!url || !anon) return reply({ error: "Configuration d’accès indisponible" }, 500);
-    const token = req.headers.get("Authorization")?.replace(/^Bearer /i, "");
-    if (!token) return reply({ error: "Connectez-vous pour générer les contenus IA." }, 401);
-    const { data, error } = await createClient(url, anon).auth.getUser(token);
-    if (error || !data.user) return reply({ error: "Connectez-vous pour générer les contenus IA." }, 401);
+    // Ouvert sans compte (choix de l'éditeur, 29/10/2026) : l'espace IZILearn / CRM LMS n'a pas de session
+    // Génie Qualiopi, comme le générateur VAE. Les crédits IA ne sont plus protégés par la connexion.
     const parsed = inputSchema.safeParse(await req.json());
     if (!parsed.success) return reply({ error: "Renseignez le bénéficiaire et au moins 20 caractères de parcours ou de projet." }, 400);
     const key = Deno.env.get("LOVABLE_API_KEY");

@@ -14,6 +14,8 @@ interface Props {
   session: VAESession;
   contents: VAEContents;
   onLoad: (o: VAEOrganisme, c: VAECertification, ca: VAECandidat, s: VAESession, co: VAEContents) => void;
+  /** Clé de l'historique local : un historique par plateforme reliée (IZILearn, CRM LMS…) et par organisme. */
+  historyKey?: string;
 }
 
 interface SavedVAE {
@@ -29,10 +31,10 @@ interface SavedVAE {
 }
 
 const LOCAL_KEY = "vae_local_history";
-const readLocal = (): SavedVAE[] => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
-const writeLocal = (list: SavedVAE[]) => localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+const readLocal = (key = LOCAL_KEY): SavedVAE[] => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
+const writeLocal = (list: SavedVAE[], key = LOCAL_KEY) => localStorage.setItem(key, JSON.stringify(list));
 
-export default function VAEDossierHistory({ userId, organisme, certification, candidat, session, contents, onLoad }: Props) {
+export default function VAEDossierHistory({ userId, organisme, certification, candidat, session, contents, onLoad, historyKey = LOCAL_KEY }: Props) {
   const [dossiers, setDossiers] = useState<SavedVAE[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -43,7 +45,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
 
   const local = !userId;
   const fetch = async () => {
-    if (local) { setDossiers(readLocal().sort((a, b) => b.updated_at.localeCompare(a.updated_at))); return; }
+    if (local) { setDossiers(readLocal(historyKey).sort((a, b) => b.updated_at.localeCompare(a.updated_at))); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from("saved_vae_dossiers")
@@ -68,7 +70,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
     if (local) {
       const now = new Date().toISOString();
       const rec: SavedVAE = { id: crypto.randomUUID(), name, organisme, certification, candidat, session, contents, created_at: now, updated_at: now };
-      try { writeLocal([rec, ...readLocal()]); setCurrentId(rec.id); setSaveName(""); fetch(); toast({ title: "Sauvegardé !", description: `Dossier "${name}" enregistré sur cet appareil.` }); }
+      try { writeLocal([rec, ...readLocal(historyKey)], historyKey); setCurrentId(rec.id); setSaveName(""); fetch(); toast({ title: "Sauvegardé !", description: `Dossier "${name}" enregistré sur cet appareil.` }); }
       catch { toast({ title: "Espace plein", description: "Supprimez d'anciens dossiers pour enregistrer celui-ci.", variant: "destructive" }); }
       setSaving(false); return;
     }
@@ -89,7 +91,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
     setSaving(true);
     const name = saveName.trim() || defaultName();
     if (local) {
-      try { writeLocal(readLocal().map(d => d.id === currentId ? { ...d, name, organisme, certification, candidat, session, contents, updated_at: new Date().toISOString() } : d)); fetch(); toast({ title: "Mis à jour", description: `Dossier "${name}" actualisé.` }); }
+      try { writeLocal(readLocal(historyKey).map(d => d.id === currentId ? { ...d, name, organisme, certification, candidat, session, contents, updated_at: new Date().toISOString() } : d), historyKey); fetch(); toast({ title: "Mis à jour", description: `Dossier "${name}" actualisé.` }); }
       catch { toast({ title: "Espace plein", description: "Supprimez d'anciens dossiers pour mettre à jour.", variant: "destructive" }); }
       setSaving(false); return;
     }
@@ -103,7 +105,7 @@ export default function VAEDossierHistory({ userId, organisme, certification, ca
   };
 
   const handleDelete = async (id: string) => {
-    if (local) { writeLocal(readLocal().filter(d => d.id !== id)); if (currentId === id) setCurrentId(null); fetch(); toast({ title: "Supprimé" }); return; }
+    if (local) { writeLocal(readLocal(historyKey).filter(d => d.id !== id), historyKey); if (currentId === id) setCurrentId(null); fetch(); toast({ title: "Supprimé" }); return; }
     const { error } = await supabase.from("saved_vae_dossiers").delete().eq("id", id);
     if (error) toast({ title: "Erreur", description: error.message, variant: "destructive" });
     else { toast({ title: "Supprimé" }); if (currentId === id) setCurrentId(null); setDossiers(p => p.filter(d => d.id !== id)); }
