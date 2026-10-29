@@ -75,7 +75,7 @@ export interface IzSlot {
 }
 
 export interface IzSignature { slotId: string; statut: string; signeLe: string; svg?: string | null; retardMinutes?: number | null }
-export interface IzConnexion { slotId?: string | null; debut: string; fin?: string | null; secondes: number; source: "meet" | "lms" }
+export interface IzConnexion { slotId?: string | null; debut: string; fin?: string | null; secondes: number; source: "meet" | "lms"; /** Adresse IP relevée côté serveur IZILearn, si disponible. */ ip?: string | null; adresseIp?: string | null; ip_address?: string | null }
 export interface IzQR { question: string; reponse: string }
 export interface IzReponses { titre: string; date: string; reponses: IzQR[]; score?: string | null; signataire?: string | null }
 export interface IzQuiz { titre: string; date: string; score?: number | null; max?: number | null; reussi?: boolean | null; appreciation?: string | null }
