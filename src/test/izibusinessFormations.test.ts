@@ -50,6 +50,10 @@ describe("attestation IZIBUSINESS regroupée et plans IND 22", () => {
       const catalog = getFullCatalog(o, f, STAGIAIRES_TEST);
       const attestations = catalog.filter(d => d.template === "attestation_izibusiness");
       expect(attestations).toHaveLength(1);
+      const attHtml = generateDocumentById(attestations[0].id, attestations[0].template, attestations[0].params, o, f, STAGIAIRES_TEST);
+      expect(attHtml).not.toContain('class="header"');
+      expect(attHtml).not.toContain('class="footer"');
+      expect(attHtml).not.toContain("11 75 65432 75");
       const plans = catalog.filter(d => d.indicateur === 22 && /plan de développement/i.test(d.nom));
       expect(plans.length).toBeGreaterThan(0);
       const html = plans.map(d => generateDocumentById(d.id, d.template, d.params, o, f, STAGIAIRES_TEST)).join("\n");
