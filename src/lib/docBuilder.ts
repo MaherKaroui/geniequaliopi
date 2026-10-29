@@ -1169,10 +1169,14 @@ export interface DocBuildConfig {
   extraHtml?: string;
   signatures?: { type: "3" | "2" | "1"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; responsableEntrepriseSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
   stagiaires?: StagiaireInfo[];
+  /** Pièce sans en-tête organisme (ex. attestation IZIBUSINESS). */
+  hideHeader?: boolean;
+  /** Pièce sans pied de page (ex. attestation IZIBUSINESS). */
+  hideFooter?: boolean;
 }
 
 export function buildDocument(config: DocBuildConfig): string {
-  let body = orgHeader(config.org, config.subtitle);
+  let body = config.hideHeader ? "" : orgHeader(config.org, config.subtitle);
   body += `<h1>${config.title}</h1>`;
   if (config.formation && config.showFormationInfo) {
     body += formationInfoBlock(config.formation, config.stagiaires);
@@ -1228,7 +1232,7 @@ export function buildDocument(config: DocBuildConfig): string {
       );
     }
   }
-  body += footer(config.org);
+  if (!config.hideFooter) body += footer(config.org);
   let result = htmlWrap(body);
   // Sans stagiaire désigné, les formes neutres (« le/la », « (e) ») sont laissées à la passe
   // finale de generateDocumentById, qui connaît le stagiaire concerné par le document.
