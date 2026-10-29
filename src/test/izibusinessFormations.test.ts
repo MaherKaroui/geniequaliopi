@@ -18,6 +18,13 @@ describe("attestation IZIBUSINESS regroupée et plans IND 22", () => {
     expect(text).toContain(org.nom);
     expect(text).not.toContain("EMI EVOLUTION");
     expect(document.querySelectorAll('img[alt="Tampon IZIBUSINESS"]')).toHaveLength(1);
+    expect(html).not.toContain('class="header"');
+    expect(html).not.toContain('class="footer"');
+    expect(text).not.toContain("11 75 65432 75");
+    expect(text).not.toContain("déclaration d'activité");
+    expect(text).not.toContain("ne vaut pas agrément");
+    expect(text).toContain("IZIBUSINESS");
+    expect(text).toContain("ATTESTATION DE FIN DE FORMATION");
   });
 
   it("date les deux formations et l'attestation strictement avant la mise à jour, même un lundi ou à cheval sur une année", () => {
