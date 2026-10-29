@@ -26,19 +26,32 @@ const STEPS = [
 
 const ORG_KEY = "vae_organisme";
 
-export default function VAEPage({ embedded = false }: { embedded?: boolean }) {
+/**
+ * `initial` + `draftKey` : assistant ouvert depuis une session IZILearn / CRM LMS, pré-rempli
+ * (organisme, certification, session) et sauvegardé par apprenant ; on démarre à l'étape Candidat.
+ */
+export default function VAEPage({ embedded = false, initial, draftKey }: { embedded?: boolean; initial?: VAEData; draftKey?: string }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [step, setStep] = useState(1);
+  const [depart] = useState<VAEData | null>(() => {
+    if (!initial) return null;
+    try { const s = draftKey && localStorage.getItem(draftKey); return s ? { ...initial, ...JSON.parse(s) } : initial; } catch { return initial; }
+  });
+  const [step, setStep] = useState(initial ? 2 : 1);
   const [organisme, setOrganisme] = useState<VAEOrganisme>(() => {
+    if (depart) return depart.organisme;
     try { const s = localStorage.getItem(ORG_KEY); return s ? JSON.parse(s) : DEFAULT_ORGANISME; } catch { return DEFAULT_ORGANISME; }
   });
-  const [certification, setCertification] = useState<VAECertification>(EMPTY_CERTIFICATION);
-  const [candidat, setCandidat] = useState<VAECandidat>(EMPTY_CANDIDAT);
-  const [session, setSession] = useState<VAESession>(EMPTY_SESSION);
-  const [contents, setContents] = useState<VAEContents>(EMPTY_CONTENTS);
+  const [certification, setCertification] = useState<VAECertification>(depart?.certification ?? EMPTY_CERTIFICATION);
+  const [candidat, setCandidat] = useState<VAECandidat>(depart?.candidat ?? EMPTY_CANDIDAT);
+  const [session, setSession] = useState<VAESession>(depart?.session ?? EMPTY_SESSION);
+  const [contents, setContents] = useState<VAEContents>(depart?.contents ?? EMPTY_CONTENTS);
 
-  useEffect(() => { localStorage.setItem(ORG_KEY, JSON.stringify(organisme)); }, [organisme]);
+  useEffect(() => { if (!initial) localStorage.setItem(ORG_KEY, JSON.stringify(organisme)); }, [organisme, initial]);
+  useEffect(() => {
+    if (!draftKey) return;
+    try { localStorage.setItem(draftKey, JSON.stringify({ organisme, certification, candidat, session, contents })); } catch { /* espace du navigateur plein : la saisie reste à l'écran */ }
+  }, [draftKey, organisme, certification, candidat, session, contents]);
 
   const data: VAEData = { organisme, certification, candidat, session, contents };
 

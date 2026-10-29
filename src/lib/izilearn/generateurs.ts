@@ -25,12 +25,25 @@ export function generateurDedie(p: IzPayload): Generateur | null {
 const reponsesTexte = (r?: IzReponses | null) => (r?.reponses || []).filter((x) => x.reponse?.trim()).map((x) => `${x.question} : ${x.reponse}`).join("\n");
 const mixte = (p: IzPayload) => /hybride|mixte/i.test(p.session.modalite || "");
 
+/** Titre visé, niveau et n° RNCP lus dans un intitulé du type « Accompagnement VAE – TP Maçon (RNCP niveau 3) ». */
+export function certificationDepuisIntitule(intitule: string): { intitule: string; niveau: string; rncp: string } {
+  const rncp = intitule.match(/\bRNCP\s*(\d{4,6})\b/i)?.[1] || "";
+  const niveau = intitule.match(/\bniveau\s*(\d)\b/i)?.[1] || "";
+  const titre = intitule
+    .replace(/^\s*(titre\s+vis[ée]\s*:\s*)?(accompagnement\s+(à\s+la\s+)?)?(validation des acquis de l[’']exp[ée]rience\s*\(vae\)|vae)\s*[–—:-]?\s*/i, "")
+    .replace(/\s*[–—-]?\s*\(?\s*(RNCP\s*)?niveau\s*\d\s*\)?\s*$/i, "")
+    .replace(/\s*-\s*RNCP\s*\d+\s*$/i, "")
+    .trim();
+  return { intitule: titre || intitule, niveau, rncp };
+}
+
 export function versVAEData(cx: Contexte, i: number): VAEData {
   const { p, o, f } = cx;
   const s = cx.stagiaires[i];
   const ref = f.referentiel;
   const code = (f.codeRNCP || "").toUpperCase();
-  const num = code.replace(/\D/g, "");
+  const lu = certificationDepuisIntitule(f.intitule);
+  const num = code.replace(/\D/g, "") || lu.rncp;
   const chrono = chronoVAE(s, f, o);
   const jour = (d: Date | null) => (d ? isoVAE(d) : "");
   return {
@@ -41,7 +54,7 @@ export function versVAEData(cx: Contexte, i: number): VAEData {
       logo: o.logoUrl, signature: o.signatureUrl, tampon: o.tamponUrl,
     },
     certification: {
-      intitule: ref?.intitule || f.intitule, rncp: num, niveau: ref?.niveau ? String(ref.niveau) : "",
+      intitule: ref?.intitule || lu.intitule, rncp: num, niveau: ref?.niveau ? String(ref.niveau) : lu.niveau,
       certificateur: ref?.certificateur || "", dateEcheance: ref?.dateFinEnregistrement || "",
       lien: num ? `https://www.francecompetences.fr/recherche/${code.startsWith("RS") ? "rs" : "rncp"}/${num}/` : "",
       blocs: (ref?.blocs || []).map((b) => ({ code: b.code, intitule: b.intitule })),

@@ -28,12 +28,17 @@ const STEPS = [{ id: 1, label: "Organisme" }, { id: 2, label: "Bénéficiaire" }
 const DRAFT_KEY = "bdc_standalone_draft_v1";
 const field = (label: string, value: string | undefined, onChange: (value: string) => void, type = "text") => <div className="space-y-1"><Label htmlFor={`bdc-${label}`}>{label}</Label><Input id={`bdc-${label}`} type={type} value={value || ""} onChange={e => onChange(e.target.value)} /></div>;
 
-export default function BilanCompetences({ embedded = false }: { embedded?: boolean }) {
+/**
+ * `initial` + `draftKey` : bilan ouvert depuis une session IZILearn / CRM LMS, pré-rempli
+ * (organisme, bénéficiaire, période, planning) et sauvegardé par bénéficiaire.
+ */
+export default function BilanCompetences({ embedded = false, initial, draftKey = DRAFT_KEY }: { embedded?: boolean; initial?: StandaloneBdcData; draftKey?: string }) {
   const navigate = useNavigate();
   const [data, setData] = useState<StandaloneBdcData>(() => {
-    try { const saved = localStorage.getItem(DRAFT_KEY); return saved ? { ...emptyBdcData(), ...JSON.parse(saved) } : emptyBdcData(); } catch { return emptyBdcData(); }
+    const base = initial ?? emptyBdcData();
+    try { const saved = localStorage.getItem(draftKey); return saved ? { ...base, ...JSON.parse(saved) } : base; } catch { return base; }
   });
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(initial ? 2 : 1);
   const [history, setHistory] = useState<BdcHistoryEntry[]>(readBdcHistory);
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
@@ -60,7 +65,7 @@ export default function BilanCompetences({ embedded = false }: { embedded?: bool
       setData(d => applyBdcAI(d, result)); toast.success("Contenus rédigés et intégrés à tous les documents");
     } catch (error) { setAiError(error instanceof Error ? error.message : "Génération IA impossible"); } finally { setLoadingAI(false); }
   };
-  useEffect(() => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); setDraftFailed(false); } catch { setDraftFailed(true); } }, [data]);
+  useEffect(() => { try { localStorage.setItem(draftKey, JSON.stringify(data)); setDraftFailed(false); } catch { setDraftFailed(true); } }, [data, draftKey]);
   useEffect(() => () => { if (preview?.url) URL.revokeObjectURL(preview.url); }, [preview]);
   const org = data.organisme, b = data.beneficiaire, f = data.formation;
   const updateOrg = (patch: Partial<typeof org>) => setData(d => ({ ...d, organisme: { ...d.organisme, ...patch } }));

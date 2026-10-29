@@ -24,7 +24,9 @@ import { useIzilearn } from "@/lib/izilearn/bridge";
 import { PLATEFORMES, definirPlateforme, marque, type AppSource } from "@/lib/izilearn/plateforme";
 import { installerContenu } from "@/lib/izilearn/contenu";
 import { champsManquants } from "@/lib/izilearn/mapping";
-import { alertesGenerateur } from "@/lib/izilearn/generateurs";
+import { alertesGenerateur, generateurDedie, versBdcData, versVAEData } from "@/lib/izilearn/generateurs";
+import VAEPage from "@/pages/VAE";
+import BilanCompetences from "@/pages/BilanCompetences";
 import { CATEGORIES, contexte, dossierApprenant, planPieces, type CategorieKey, type Contexte, type Piece } from "@/lib/izilearn/pieces";
 import { corpsTexte, lienMailto } from "@/lib/izilearn/mails";
 import type { IzFichierRetour } from "@/lib/izilearn/types";
@@ -108,7 +110,11 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
   useEffect(() => { if (cx) setDocStyle(selectedStyle ?? getAutomaticDossierDesign(cx.o, 0).style); }, [cx, selectedStyle]);
   useEffect(() => { if (payload) setApprenants(new Set(payload.apprenants.map((_, i) => i))); }, [payload]);
   const contenu = useMemo(() => (cx ? installerContenu(cx.p, cx.f) : "aucun"), [cx, contentRevision]);
-  const pieces = useMemo(() => (cx ? planPieces(cx) : []), [cx, contentRevision]);
+  const dedie = payload ? generateurDedie(payload) : null;
+  const [candidatIdx, setCandidatIdx] = useState(0);
+  useEffect(() => { setCandidatIdx(0); }, [payload?.source.orgId, payload?.source.sessionId]);
+  // VAE / bilan : l'assistant du générateur remplace la liste de pièces AF / CFA.
+  const pieces = useMemo(() => (cx && !dedie ? planPieces(cx) : []), [cx, contentRevision, dedie]);
   const apercu = pieces.find((piece) => piece.id === apercuId) ?? null;
   const aSigner = signatureTarget && signatureTarget.role !== "formateur" ? payload?.apprenants[signatureTarget.index] : null;
   useEffect(() => { setApercuId(null); setSignatureTarget(null); }, [payload?.source.orgId, payload?.source.sessionId]);
@@ -228,6 +234,41 @@ export default function EspaceIzilearn({ app = "izilearn" }: { app?: AppSource }
 
   const { p, f, stagiaires } = cx;
   const toutesApp = apprenants.size === p.apprenants.length;
+
+  if (dedie) {
+    const i = Math.min(candidatIdx, Math.max(0, p.apprenants.length - 1));
+    const a = p.apprenants[i];
+    const cle = a ? `${app}_${p.source.orgId}_${p.source.sessionId}_${a.inscriptionId}` : "";
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/80 backdrop-blur">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="w-3.5 h-3.5" />Connecté à {nomApp}</span>
+                <span>· {p.organisme.nom}</span>
+              </div>
+              <div role="heading" aria-level={1} className="text-lg font-bold truncate">{f.intitule}</div>
+              <p className="text-xs text-muted-foreground">{dedie === "vae" ? "Générateur VAE" : "Générateur bilan de compétences"} · organisme, certification et session repris de {nomApp} ; candidat, CV et contenus à compléter puis génération par l'IA.</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={actualiser} title={`Recharger les données depuis ${nomApp}`}><RefreshCw className="w-4 h-4 mr-1" />Actualiser</Button>
+          </div>
+          {p.apprenants.length > 1 && (
+            <div className="max-w-5xl mx-auto px-4 pb-3 flex flex-wrap gap-1.5" role="tablist" aria-label={dedie === "vae" ? "Candidats" : "Bénéficiaires"}>
+              {p.apprenants.map((x, k) => (
+                <Button key={x.inscriptionId} size="sm" role="tab" aria-selected={k === i} variant={k === i ? "default" : "outline"} onClick={() => setCandidatIdx(k)}>
+                  {stagiaires[k].prenom} {stagiaires[k].nom}
+                </Button>
+              ))}
+            </div>
+          )}
+        </header>
+        {!a ? <p className="text-sm text-muted-foreground text-center py-12">Aucun apprenant inscrit à cette session.</p>
+          : dedie === "vae" ? <VAEPage key={cle} embedded initial={versVAEData(cx, i)} draftKey={`vae_${cle}`} />
+          : <BilanCompetences key={cle} embedded initial={versBdcData(cx, i)} draftKey={`bdc_${cle}`} />}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

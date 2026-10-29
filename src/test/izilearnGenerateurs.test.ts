@@ -53,3 +53,16 @@ describe("IZILearn × générateurs VAE et bilan de compétences", () => {
     expect(cats.has("vae") || cats.has("bdc")).toBe(false);
   });
 });
+
+import { certificationDepuisIntitule } from "@/lib/izilearn/generateurs";
+describe("certification lue dans l'intitulé VAE", () => {
+  it.each([
+    ["ACCOMPAGNEMENT VAE – TITRE PROFESSIONNEL MAÇON (RNCP NIVEAU 3)", "TITRE PROFESSIONNEL MAÇON", "3", ""],
+    ["VAE – TP Responsable d’Établissement Marchand (REM) – Niveau 6", "TP Responsable d’Établissement Marchand (REM)", "6", ""],
+    ["Titre professionnel Agent magasinier - RNCP 40216", "Titre professionnel Agent magasinier", "", "40216"],
+    ["Titre visé :  Vae Installateur thermique et sanitaire", "Installateur thermique et sanitaire", "", ""],
+    ["Accompagnement à la Validation des Acquis de l’Expérience (VAE)  Titre Professionnel Assistant(e) de Vie aux Familles (ADVF)", "Titre Professionnel Assistant(e) de Vie aux Familles (ADVF)", "", ""],
+  ])("%s", (src, titre, niveau, rncp) => {
+    expect(certificationDepuisIntitule(src)).toEqual({ intitule: titre, niveau, rncp });
+  });
+});
