@@ -706,6 +706,9 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
     h += connectionDayTable(cells.map(esc));
+    // Adresse IP : uniquement celle réellement relevée par IZILearn ce jour-là.
+    const ips = [...new Set(connexions.map((x) => String(x.ip || x.adresseIp || x.ip_address || "").trim()).filter((v) => /^[0-9a-f:.]{3,45}$/i.test(v)))];
+    if (ips.length) h += `<p style="margin:4px 0 0;font-size:11px"><strong>Adresse IP :</strong> ${esc(ips.join(" / "))}</p>`;
     h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
   }
   const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;
