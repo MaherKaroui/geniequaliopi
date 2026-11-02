@@ -153,28 +153,36 @@ export default function AutomatisationEDOF() {
       const formations = Object.fromEntries(certifs.map((c) => [c.code, c.intitule]));
       const generes = sessions.flatMap((s) => s.candidats);
       const nomZip = `Automatisation_EDOF_${exportEdof?.siret || "export"}_${new Date().toISOString().slice(0, 10)}.zip`;
-      const r: ResultatEdof = { fichiers, candidats: generes, formations, centreNom: centre.nom, nomZip, envois: [] };
+      const r: ResultatEdof = {
+        fichiers, candidats: generes, formations, centreNom: centre.nom, nomZip, envois: [],
+        meta: {
+          name: nomFichier || "Export EDOF", export_name: nomFichier, siret: exportEdof?.siret || "", centre,
+          jurys: Object.fromEntries(codesGenerables.map((code) => [code, jurys[code]])),
+          resume: { formations: certifs.filter((c) => codesGenerables.includes(c.code)), candidats: generes },
+        },
+      };
       setResultat(r);
       toast.success(`${fichiers.length} documents générés pour ${nbRetenus} candidat(s)`);
       setTimeout(() => document.getElementById("resultats-edof")?.scrollIntoView({ behavior: "smooth" }), 100);
-      if (user) {
-        try {
-          const a = await enregistrer(user.id, {
-            name: nomFichier || "Export EDOF", export_name: nomFichier, siret: exportEdof?.siret || "", centre,
-            jurys: Object.fromEntries(codesGenerables.map((code) => [code, jurys[code]])),
-            resume: { formations: certifs.filter((c) => codesGenerables.includes(c.code)), candidats: generes },
-          }, fichiers);
-          setResultat({ ...r, histId: a.id });
-          setRafraichirHist((n) => n + 1);
-          toast.success("Enregistré dans l'historique");
-        } catch (e: any) {
-          toast.error(`Historique non enregistré : ${e.message}`);
-        }
-      }
+      if (user) await enregistrerHistorique(r);
     } catch (err: any) {
       toast.error(`Génération impossible : ${err.message || err}`);
     } finally {
       setGeneration(null);
+    }
+  };
+
+  /** Enregistre un résultat dans l'historique (automatique après génération si connecté, ou via le bouton). */
+  const enregistrerHistorique = async (r: ResultatEdof) => {
+    if (!user) { toast.error("Connectez-vous pour enregistrer dans l'historique."); return; }
+    try {
+      const a = await enregistrer(user.id, r.meta, r.fichiers);
+      if (r.envois.length) await ajouterEnvois(a.id, r.envois);
+      setResultat((cur) => (cur && cur.fichiers === r.fichiers ? { ...cur, histId: a.id } : cur));
+      setRafraichirHist((n) => n + 1);
+      toast.success("Enregistré dans l'historique");
+    } catch (e: any) {
+      toast.error(`Historique non enregistré : ${e.message}`);
     }
   };
 
@@ -195,6 +203,7 @@ export default function AutomatisationEDOF() {
       nomZip: `${a.name.replace(/\.(csv|xlsx?)$/i, "")}.zip`,
       histId: a.id,
       envois: a.envois || [],
+      meta: { name: a.name, export_name: a.export_name, siret: a.siret, centre: a.centre, jurys: a.jurys, resume: a.resume },
     });
     setTimeout(() => document.getElementById("resultats-edof")?.scrollIntoView({ behavior: "smooth" }), 100);
   };
@@ -375,7 +384,7 @@ export default function AutomatisationEDOF() {
         )}
         {resultat && (
           <div id="resultats-edof">
-            <ResultatsEdof resultat={resultat} connecte={!!user} onEnvois={majEnvois} />
+            <ResultatsEdof resultat={resultat} connecte={!!user} onEnvois={majEnvois} onEnregistrer={() => enregistrerHistorique(resultat)} />
           </div>
         )}
 

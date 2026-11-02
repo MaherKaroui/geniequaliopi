@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-import { CheckCircle2, Download, Eye, FileText, FolderArchive, Loader2, Mail, Send, XCircle } from "lucide-react";
+import { CheckCircle2, Download, Eye, FileText, FolderArchive, Loader2, Mail, Save, Send, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,7 @@ import { frDate, type EdofCandidat } from "@/lib/edofAuto/candidats";
 import type { FichierPack } from "@/lib/edofAuto/rs7650Pdf";
 import { cleCandidat } from "@/lib/edofAuto/signatures";
 import { ADRESSE_TEST, envoyerAuStagiaire, MESSAGE_DEFAUT, nomFichier, OBJET_DEFAUT, type ReglagesMail } from "@/lib/edofAuto/envoi";
-import { zipper, type EnvoiMail } from "@/lib/edofAuto/historique";
+import { zipper, type Automatisation, type EnvoiMail } from "@/lib/edofAuto/historique";
 
 export interface ResultatEdof {
   fichiers: FichierPack[];
@@ -24,11 +24,14 @@ export interface ResultatEdof {
   nomZip: string;
   histId?: string;
   envois: EnvoiMail[];
+  /** données enregistrées avec l'historique (export, centre, jurys, résumé) */
+  meta: Pick<Automatisation, "name" | "export_name" | "siret" | "centre" | "jurys" | "resume">;
 }
 
 const libelle = (chemin: string) => nomFichier(chemin).replace(/^\d+_/, "").replace(/\.pdf$/i, "").replace(/_/g, " ");
 
-export default function ResultatsEdof({ resultat, connecte, onEnvois }: { resultat: ResultatEdof; connecte: boolean; onEnvois: (envois: EnvoiMail[]) => void }) {
+export default function ResultatsEdof({ resultat, connecte, onEnvois, onEnregistrer }: { resultat: ResultatEdof; connecte: boolean; onEnvois: (envois: EnvoiMail[]) => void; onEnregistrer: () => Promise<void> }) {
+  const [sauvegarde, setSauvegarde] = useState(false);
   const [apercu, setApercu] = useState<{ titre: string; url: string } | null>(null);
   const [reglages, setReglages] = useState<ReglagesMail>({
     expediteur: "", motDePasse: "", nomExpediteur: resultat.centreNom, objet: OBJET_DEFAUT, message: MESSAGE_DEFAUT, modeTest: true,
@@ -98,7 +101,17 @@ export default function ResultatsEdof({ resultat, connecte, onEnvois }: { result
     <section className="bg-card rounded-2xl border shadow-card p-6 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold text-lg flex items-center gap-2"><FolderArchive className="w-5 h-5" /> 5. Documents générés ({resultat.fichiers.length})</h2>
-        <Button size="sm" variant="outline" onClick={toutTelecharger} className="gap-1"><Download className="w-4 h-4" /> Tout télécharger (ZIP)</Button>
+        <span className="flex flex-wrap gap-2">
+          {resultat.histId
+            ? <Badge className="bg-emerald-600 gap-1 h-9 px-3"><CheckCircle2 className="w-4 h-4" /> Enregistré dans l'historique</Badge>
+            : (
+              <Button size="sm" onClick={async () => { setSauvegarde(true); try { await onEnregistrer(); } finally { setSauvegarde(false); } }}
+                disabled={!connecte || sauvegarde} title={connecte ? "" : "Connectez-vous pour enregistrer"} className="gap-1">
+                {sauvegarde ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Enregistrer dans l'historique
+              </Button>
+            )}
+          <Button size="sm" variant="outline" onClick={toutTelecharger} className="gap-1"><Download className="w-4 h-4" /> Tout télécharger (ZIP)</Button>
+        </span>
       </div>
 
       <div className="border rounded-xl p-4 space-y-3 bg-muted/20">
