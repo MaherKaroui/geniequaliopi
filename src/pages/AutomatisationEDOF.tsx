@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import { ArrowLeft, Building2, Download, FileUp, Loader2, Users, Workflow, Info, Award, Stamp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +14,10 @@ import { construireSujet, genererReponsesGeneriques, type SujetCertification } f
 import { estOfficiel, genererPack, resoudreReferentiels, type Referentiel } from "@/lib/edofAuto/pack";
 import { cleCandidat, dataUrlEnOctets } from "@/lib/edofAuto/signatures";
 import SignatureChamp, { lireImage } from "@/components/SignatureChamp";
+import ResultatsEdof, { type ResultatEdof } from "@/components/edof/ResultatsEdof";
+import HistoriqueEdof from "@/components/edof/HistoriqueEdof";
+import { useAuth } from "@/hooks/useAuth";
+import { ajouterEnvois, chargerFichiers, enregistrer, type Automatisation, type EnvoiMail } from "@/lib/edofAuto/historique";
 
 // Jury du PV exemple fourni par le certificateur EYES PERFECT — à confirmer pour chaque session.
 const JURY_RS7650: Jure[] = [
@@ -35,6 +37,7 @@ const villeDepuisAdresse = (adresse: string) => adresse.match(/\d{5}\s+(.+)$/)?.
 
 export default function AutomatisationEDOF() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [exportEdof, setExportEdof] = useState<EdofExport | null>(null);
   const [nomFichier, setNomFichier] = useState("");
   const [referentiels, setReferentiels] = useState<Record<string, Referentiel>>({});
@@ -48,6 +51,8 @@ export default function AutomatisationEDOF() {
   const [signatureCentre, setSignatureCentre] = useState<string>();
   const [sigJurys, setSigJurys] = useState<Record<string, (string | undefined)[]>>({});
   const [sigCandidats, setSigCandidats] = useState<Record<string, string | undefined>>({});
+  const [resultat, setResultat] = useState<ResultatEdof | null>(null);
+  const [rafraichirHist, setRafraichirHist] = useState(0);
 
   const candidats = useMemo(
     () => (exportEdof?.candidats || []).filter((c) => !realisesSeulement || formationRealisee(c.statut)),
@@ -145,16 +150,53 @@ export default function AutomatisationEDOF() {
         },
       }]));
       const fichiers = await genererPack(sessions, contextes, referentiels, undefined, (fait, total) => setGeneration({ fait, total }));
-      const zip = new JSZip();
-      for (const f of fichiers) zip.file(f.chemin, f.donnees);
-      const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, `Automatisation_EDOF_${exportEdof?.siret || "export"}_${new Date().toISOString().slice(0, 10)}.zip`);
+      const formations = Object.fromEntries(certifs.map((c) => [c.code, c.intitule]));
+      const generes = sessions.flatMap((s) => s.candidats);
+      const nomZip = `Automatisation_EDOF_${exportEdof?.siret || "export"}_${new Date().toISOString().slice(0, 10)}.zip`;
+      const r: ResultatEdof = { fichiers, candidats: generes, formations, centreNom: centre.nom, nomZip, envois: [] };
+      setResultat(r);
       toast.success(`${fichiers.length} documents générés pour ${nbRetenus} candidat(s)`);
+      setTimeout(() => document.getElementById("resultats-edof")?.scrollIntoView({ behavior: "smooth" }), 100);
+      if (user) {
+        try {
+          const a = await enregistrer(user.id, {
+            name: nomFichier || "Export EDOF", export_name: nomFichier, siret: exportEdof?.siret || "", centre,
+            jurys: Object.fromEntries(codesGenerables.map((code) => [code, jurys[code]])),
+            resume: { formations: certifs.filter((c) => codesGenerables.includes(c.code)), candidats: generes },
+          }, fichiers);
+          setResultat({ ...r, histId: a.id });
+          setRafraichirHist((n) => n + 1);
+          toast.success("Enregistré dans l'historique");
+        } catch (e: any) {
+          toast.error(`Historique non enregistré : ${e.message}`);
+        }
+      }
     } catch (err: any) {
       toast.error(`Génération impossible : ${err.message || err}`);
     } finally {
       setGeneration(null);
     }
+  };
+
+  const majEnvois = async (envois: EnvoiMail[]) => {
+    setResultat((r) => (r ? { ...r, envois } : r));
+    if (resultat?.histId) {
+      try { await ajouterEnvois(resultat.histId, envois); setRafraichirHist((n) => n + 1); } catch (e: any) { toast.error(`Envois non enregistrés : ${e.message}`); }
+    }
+  };
+
+  const ouvrirHistorique = async (a: Automatisation) => {
+    const fichiers = await chargerFichiers(a);
+    setResultat({
+      fichiers,
+      candidats: (a.resume?.candidats || []) as ResultatEdof["candidats"],
+      formations: Object.fromEntries((a.resume?.formations || []).map((f) => [f.code, f.intitule])),
+      centreNom: a.centre?.nom || "",
+      nomZip: `${a.name.replace(/\.(csv|xlsx?)$/i, "")}.zip`,
+      histId: a.id,
+      envois: a.envois || [],
+    });
+    setTimeout(() => document.getElementById("resultats-edof")?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
   const setJure = (code: string, i: number, champ: keyof Jure, v: string) =>
@@ -331,6 +373,13 @@ export default function AutomatisationEDOF() {
             ))}
           </section>
         )}
+        {resultat && (
+          <div id="resultats-edof">
+            <ResultatsEdof resultat={resultat} connecte={!!user} onEnvois={majEnvois} />
+          </div>
+        )}
+
+        <HistoriqueEdof connecte={!!user} rafraichir={rafraichirHist} onOuvrir={ouvrirHistorique} />
       </main>
     </div>
   );

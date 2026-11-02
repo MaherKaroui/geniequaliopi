@@ -476,10 +476,10 @@ export async function genererSessionGenerique(
   for (let i = 0; i < session.candidats.length; i++) {
     const c = session.candidats[i];
     const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
-    out.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await docPositionnement(ctx, sujet, c, reps[i]) });
-    out.push({ chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await docAttestation(ctx, sujet, c) });
-    out.push({ chemin: `${base}/3_Evaluation_des_connaissances.pdf`, donnees: await docTheorie(ctx, sujet, c, reps[i]) });
-    out.push({ chemin: `${base}/4_Grille_evaluation_des_competences.pdf`, donnees: await docGrille(ctx, sujet, c, reps[i]) });
+    out.push({ candidat: cleCandidat(c), chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await docPositionnement(ctx, sujet, c, reps[i]) });
+    out.push({ candidat: cleCandidat(c), chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await docAttestation(ctx, sujet, c) });
+    out.push({ candidat: cleCandidat(c), chemin: `${base}/3_Evaluation_des_connaissances.pdf`, donnees: await docTheorie(ctx, sujet, c, reps[i]) });
+    out.push({ candidat: cleCandidat(c), chemin: `${base}/4_Grille_evaluation_des_competences.pdf`, donnees: await docGrille(ctx, sujet, c, reps[i]) });
     progression?.();
   }
   out.push({ chemin: `${dossier}/PV_session_${session.dateExamen}.pdf`, donnees: await docPV(ctx, sujet, session, reps) });

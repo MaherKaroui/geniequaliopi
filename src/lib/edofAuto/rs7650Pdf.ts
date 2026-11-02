@@ -321,7 +321,12 @@ export async function remplirPV(charger: ChargeurModele, ctx: ContexteRS7650, se
 
 // ─── Pack complet ─────────────────────────────────────────────────────────────
 
-export interface FichierPack { chemin: string; donnees: Uint8Array }
+export interface FichierPack {
+  chemin: string;
+  donnees: Uint8Array;
+  /** cleCandidat du stagiaire concerné (absent pour le PV et les documents communs) */
+  candidat?: string;
+}
 
 export const slug = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/[^A-Za-z0-9-]+/g, "_").replace(/^_+|_+$/g, "");
 
@@ -335,10 +340,10 @@ export async function genererSessionRS7650(
     const c = s.candidats[i];
     const rep = reps[i];
     const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
-    fichiers.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, ctx, c, rep) });
-    fichiers.push({ chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await remplirAttestation(charger, ctx, c) });
-    fichiers.push({ chemin: `${base}/3_Evaluation_theorique_FS063.pdf`, donnees: await remplirTheo(charger, ctx, c, rep) });
-    fichiers.push({ chemin: `${base}/4_Grille_evaluation_pratique_FS055.pdf`, donnees: await remplirPratique(charger, ctx, c, rep) });
+    fichiers.push({ candidat: cleCandidat(c), chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, ctx, c, rep) });
+    fichiers.push({ candidat: cleCandidat(c), chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await remplirAttestation(charger, ctx, c) });
+    fichiers.push({ candidat: cleCandidat(c), chemin: `${base}/3_Evaluation_theorique_FS063.pdf`, donnees: await remplirTheo(charger, ctx, c, rep) });
+    fichiers.push({ candidat: cleCandidat(c), chemin: `${base}/4_Grille_evaluation_pratique_FS055.pdf`, donnees: await remplirPratique(charger, ctx, c, rep) });
     progression?.();
   }
   fichiers.push({ chemin: `${dossier}/PV_session_${s.dateExamen}.pdf`, donnees: await remplirPV(charger, ctx, s, reps) });

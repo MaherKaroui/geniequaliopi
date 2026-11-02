@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.bdc-generate-contents]
 verify_jwt = false
+
+[functions.edof-send-mail]
+verify_jwt = false
