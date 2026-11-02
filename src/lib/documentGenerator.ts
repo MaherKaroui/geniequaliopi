@@ -8427,6 +8427,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
+${blocDistanceBesoins(f)}
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(f.dateDebut))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
@@ -8601,6 +8602,20 @@ ${lignes}
 </table>`;
 }
 
+/**
+ * Formation à distance : vérification des compétences et de l'équipement numériques
+ * (connexion, ordinateur, utilisation de la plateforme). La vérification est effectuée
+ * systématiquement avant l'entrée en formation : « Oui » est donc toujours coché.
+ * Vierge = true laisse les deux cases décochées (trame à remplir à la main).
+ */
+function blocDistanceBesoins(f: FormationInfo, vierge = false): string {
+  if (!hasDistanciel(f)) return "";
+  return `
+<h3 style="margin-top:18px;color:#1e3a7b">FORMATION À DISTANCE</h3>
+<p><strong>Compétences et équipement numériques vérifiés (connexion, ordinateur, utilisation de la plateforme) :</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${vierge ? "☐" : "☒"} Oui &nbsp;&nbsp;&nbsp; ☐ Non</td></tr></table>`;
+}
+
 /** Réponse enregistrée en ligne (ex. questionnaire IZILearn) : question + réponse libre. */
 interface ReleveBesoin { question?: string; reponse?: string | null }
 
@@ -8692,6 +8707,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
+${blocDistanceBesoins(f)}
 <p style="margin-top:16px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>`;
 
   const entreprisePart = `
