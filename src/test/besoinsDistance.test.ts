@@ -24,4 +24,14 @@ describe("volet « Formation à distance » de l'évaluation des besoins", () =>
   it("n'apparaît pas en présentiel seul", () => {
     expect(trame("Présentiel")).not.toContain("FORMATION À DISTANCE");
   });
+
+  it("figure aussi dans la trame CFA (partie apprenant) et dans la trame générale", () => {
+    const f: any = { ...base, modalites: "Distanciel", rythmeAlternance: "3 semaines entreprise / 1 semaine CFA" };
+    const cfa = generateDocumentById("x", "trame_eval_besoins_stagiaire", { stagiaireIdx: 0 }, o, f, s);
+    expect(cfa).toContain("FORMATION À DISTANCE");
+    expect(cfa).toContain("☒ Oui");
+    const generale = generateDocumentById("x", "trame_eval_besoins", undefined, o, { ...base, modalites: "e-learning" }, s);
+    expect(generale).toContain("FORMATION À DISTANCE");
+    expect(generale).toContain("☒ Oui");
+  });
 });
