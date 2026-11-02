@@ -13,6 +13,7 @@ import GenerateurLogo from "./pages/GenerateurLogo";
 import OPCOMobilites from "./pages/OPCOMobilites";
 import GenerationRapide from "./pages/GenerationRapide";
 import AnalyseBPF from "./pages/AnalyseBPF";
+import AutomatisationEDOF from "./pages/AutomatisationEDOF";
 import GOTRMPage from "./pages/GOTRM";
 import MuseeDossier from "./pages/MuseeDossier";
 import QualiopiCheck from "./pages/QualiopiCheck";
@@ -73,6 +74,7 @@ const ApplicationContent = () => {
           <Route path="/bilan-competences" element={<BilanCompetences />} />
           <Route path="/rapide" element={<GenerationRapide />} />
           <Route path="/analyse-bpf" element={<AnalyseBPF />} />
+          <Route path="/automatisation-edof" element={<AutomatisationEDOF />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

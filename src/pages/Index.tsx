@@ -10,7 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap, BarChart3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap, BarChart3, Workflow } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -187,6 +187,9 @@ const Index = () => {
             </Button>
             <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
               Commencer <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/automatisation-edof")}>
+              <Workflow className="w-5 h-5" /> Automatisation EDOF
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/controle-ey")}>
               <ShieldCheck className="w-5 h-5" /> Contrôle EDOF / EY

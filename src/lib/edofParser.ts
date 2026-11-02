@@ -26,7 +26,7 @@ interface EdofRow {
   ADRESSE_VILLE: string;
 }
 
-function parseEdofDate(raw: string | number | undefined): string {
+export function parseEdofDate(raw: string | number | undefined): string {
   if (!raw) return "";
 
   // Handle Excel serial date numbers (e.g. 45791 = days since 1899-12-30)
@@ -80,7 +80,7 @@ function parseEdofDate(raw: string | number | undefined): string {
   return str;
 }
 
-function formatPhone(raw: string | number | undefined): string {
+export function formatPhone(raw: string | number | undefined): string {
   if (!raw) return "";
   let str = String(raw).replace(/\D/g, "");
   if (str.length === 9) str = "0" + str;
@@ -91,7 +91,7 @@ function formatPhone(raw: string | number | undefined): string {
 }
 
 // Helper: find value from row by trying multiple possible column names (case-insensitive, trimmed)
-function getCol(row: Record<string, any>, ...keys: string[]): any {
+export function getCol(row: Record<string, any>, ...keys: string[]): any {
   for (const key of keys) {
     const kl = key.toLowerCase().trim();
     for (const col of Object.keys(row)) {
@@ -103,10 +103,33 @@ function getCol(row: Record<string, any>, ...keys: string[]): any {
   return "";
 }
 
-export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
-  const workbook = XLSX.read(data, { type: "array" });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+/**
+ * Lit un export EDOF (XLSX, ou CSV « Export_Tous les dossiers_<SIRET>_<date>.csv » séparé par « ; »)
+ * et renvoie une ligne par dossier, indexée par les en-têtes de colonnes.
+ * Les CSV sont lus en texte brut pour que les dates (20/02/1989) et numéros de dossier restent intacts.
+ */
+export function readEdofRows(data: ArrayBuffer): Record<string, any>[] {
+  const bytes = new Uint8Array(data);
+  const isZip = bytes[0] === 0x50 && bytes[1] === 0x4b; // « PK » = XLSX
+  let workbook: XLSX.WorkBook;
+  if (isZip) {
+    workbook = XLSX.read(data, { type: "array" });
+  } else {
+    let text = new TextDecoder("utf-8").decode(bytes);
+    if (text.includes("�")) text = new TextDecoder("windows-1252").decode(bytes);
+    text = text.replace(/^﻿/, "");
+    const firstLine = text.split(/\r?\n/, 1)[0];
+    const FS = firstLine.split(";").length > firstLine.split(",").length ? ";" : ",";
+    workbook = XLSX.read(text, { type: "string", FS, raw: true });
+  }
+  return sheetRows(workbook.Sheets[workbook.SheetNames[0]]);
+}
 
+export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
+  return groupEdofRows(readEdofRows(data));
+}
+
+function sheetRows(sheet: XLSX.WorkSheet): Record<string, any>[] {
   // Lecture en mode tableau pour pouvoir détecter une ligne d'en-tête qui n'est pas la première
   // (certains exports CPF/EDOF ajoutent une ligne de titre comme "Étudiants ACTION FORMATION (CPF203)")
   const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
@@ -119,14 +142,16 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     }
   }
   const headers = matrix[headerIdx].map((h) => String(h).trim());
-  const rows: Record<string, any>[] = matrix.slice(headerIdx + 1)
+  return matrix.slice(headerIdx + 1)
     .filter((r) => r.some((c) => c !== "" && c != null))
     .map((r) => {
       const obj: Record<string, any> = {};
       headers.forEach((h, i) => { if (h) obj[h] = r[i] ?? ""; });
       return obj;
     });
+}
 
+function groupEdofRows(rows: Record<string, any>[]): EdofSession[] {
   // Group by formation title
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
