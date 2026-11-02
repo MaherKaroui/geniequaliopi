@@ -314,34 +314,33 @@ export async function remplirPV(charger: ChargeurModele, ctx: ContexteRS7650, se
 
 export interface FichierPack { chemin: string; donnees: Uint8Array }
 
-const slug = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9-]+/g, "_").replace(/^_+|_+$/g, "");
+export const slug = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/[^A-Za-z0-9-]+/g, "_").replace(/^_+|_+$/g, "");
 
-export async function genererPackRS7650(
-  sessions: SessionExamen[],
-  ctx: ContexteRS7650,
-  charger: ChargeurModele = chargeurHttp,
-  progression?: (fait: number, total: number) => void,
+/** Documents d'une session RS7650 : 4 PDF officiels remplis par candidat + le PV général. */
+export async function genererSessionRS7650(
+  dossier: string, s: SessionExamen, ctx: ContexteRS7650, charger: ChargeurModele = chargeurHttp, progression?: () => void,
 ): Promise<FichierPack[]> {
   const fichiers: FichierPack[] = [];
-  const total = sessions.reduce((s, x) => s + x.candidats.length, 0);
-  let fait = 0;
-  for (const s of sessions) {
-    const dossier = `Session_${s.dateExamen}`;
-    const reps = s.candidats.map(reponsesDe);
-    for (let i = 0; i < s.candidats.length; i++) {
-      const c = s.candidats[i];
-      const rep = reps[i];
-      const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
-      fichiers.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, c, rep) });
-      fichiers.push({ chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await remplirAttestation(charger, ctx, c) });
-      fichiers.push({ chemin: `${base}/3_Evaluation_theorique_FS063.pdf`, donnees: await remplirTheo(charger, ctx, c, rep) });
-      fichiers.push({ chemin: `${base}/4_Grille_evaluation_pratique_FS055.pdf`, donnees: await remplirPratique(charger, ctx, c, rep) });
-      progression?.(++fait, total);
-    }
-    fichiers.push({ chemin: `${dossier}/PV_session_${s.dateExamen}.pdf`, donnees: await remplirPV(charger, ctx, s, reps) });
+  const reps = s.candidats.map(reponsesDe);
+  for (let i = 0; i < s.candidats.length; i++) {
+    const c = s.candidats[i];
+    const rep = reps[i];
+    const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
+    fichiers.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, c, rep) });
+    fichiers.push({ chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await remplirAttestation(charger, ctx, c) });
+    fichiers.push({ chemin: `${base}/3_Evaluation_theorique_FS063.pdf`, donnees: await remplirTheo(charger, ctx, c, rep) });
+    fichiers.push({ chemin: `${base}/4_Grille_evaluation_pratique_FS055.pdf`, donnees: await remplirPratique(charger, ctx, c, rep) });
+    progression?.();
   }
-  for (const [f, nom] of [["reglement-evaluation.pdf", "Reglement_d_evaluation.pdf"], ["referentiel.pdf", "Referentiel_RS7650.pdf"]]) {
-    fichiers.push({ chemin: `_Commun/${nom}`, donnees: new Uint8Array(await charger(f)) });
-  }
+  fichiers.push({ chemin: `${dossier}/PV_session_${s.dateExamen}.pdf`, donnees: await remplirPV(charger, ctx, s, reps) });
   return fichiers;
+}
+
+/** Règlement d'évaluation et référentiel fournis par EYES PERFECT. */
+export async function documentsCommunsRS7650(dossier: string, charger: ChargeurModele = chargeurHttp): Promise<FichierPack[]> {
+  const out: FichierPack[] = [];
+  for (const [f, nom] of [["reglement-evaluation.pdf", "Reglement_d_evaluation.pdf"], ["referentiel.pdf", "Referentiel_RS7650.pdf"]]) {
+    out.push({ chemin: `${dossier}/${nom}`, donnees: new Uint8Array(await charger(f)) });
+  }
+  return out;
 }

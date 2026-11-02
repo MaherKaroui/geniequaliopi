@@ -3,7 +3,8 @@ import { readFileSync, mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { PDFDocument } from "pdf-lib";
 import { formationRealisee, grouperSessions, lireExportEdof } from "@/lib/edofAuto/candidats";
-import { genererPackRS7650, reponsesDe, type ContexteRS7650 } from "@/lib/edofAuto/rs7650Pdf";
+import { reponsesDe, type ContexteRS7650 } from "@/lib/edofAuto/rs7650Pdf";
+import { genererPack } from "@/lib/edofAuto/pack";
 import { competenceValidee, CORRIGE_THEO, SEUIL_THEO } from "@/lib/edofAuto/rs7650Reponses";
 import { THEO_QUESTIONS } from "@/lib/edofAuto/rs7650Layout";
 
@@ -67,7 +68,7 @@ describe("Automatisation EDOF — RS7650", () => {
   });
 
   it("produit le pack complet de PDF remplis", async () => {
-    const pack = await genererPackRS7650(sessions, ctx, charger);
+    const pack = await genererPack(sessions, { RS7650: ctx }, {}, charger);
     expect(pack.filter((f) => f.chemin.endsWith(".pdf"))).toHaveLength(7 * 4 + 2 + 2);
     const pv = await PDFDocument.load(pack.find((f) => f.chemin.includes("PV_session_2026-05-17"))!.donnees);
     expect(pv.getPageCount()).toBe(2); // 6 candidats, 5 lignes par page

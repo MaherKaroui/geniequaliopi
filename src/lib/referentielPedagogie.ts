@@ -35,9 +35,9 @@ function rng(s: string) {
 const lower1 = (t: string) => (t ? t.charAt(0).toLowerCase() + t.slice(1) : t);
 const sansPoint = (t: string) => t.replace(/[.;:\s]+$/, "");
 
-type Famille = "diagnostic" | "realisation" | "relation" | "organisation" | "conception" | "controle" | "securite";
+export type Famille = "diagnostic" | "realisation" | "relation" | "organisation" | "conception" | "controle" | "securite";
 
-function famille(comp: string): Famille {
+export function famille(comp: string): Famille {
   const c = comp.toLowerCase();
   const verbe = c.split(/[\s,]+/)[0] || "";
   // 1. Risques et sécurité priment ; 2. le verbe d'action décide ; 3. à défaut, les mots-clés.
@@ -58,7 +58,7 @@ function famille(comp: string): Famille {
   return "realisation";
 }
 
-const ETAPES: Record<Famille, string[]> = {
+export const ETAPES: Record<Famille, string[]> = {
   diagnostic: ["Recueillir les informations utiles (documents, questions, observation)", "Classer les éléments et repérer les écarts ou besoins", "Formuler un diagnostic argumenté", "Proposer une suite adaptée et la justifier"],
   realisation: ["Préparer le poste, les ressources et les consignes applicables", "Réaliser les opérations dans l'ordre prévu par le protocole ou la procédure", "Contrôler le résultat au regard des exigences attendues", "Consigner la réalisation et remettre en état"],
   relation: ["Accueillir et établir le contact, reformuler la demande", "Questionner pour identifier précisément le besoin", "Argumenter une proposition adaptée et traiter les objections", "Conclure, formaliser l'accord et assurer le suivi"],
@@ -68,7 +68,7 @@ const ETAPES: Record<Famille, string[]> = {
   securite: ["Identifier les dangers et les règles applicables", "Mettre en place les mesures de prévention individuelles et collectives", "Appliquer les protocoles pendant toute l'intervention", "Vérifier, tracer et signaler toute anomalie"],
 };
 
-const CRITERES: Record<Famille, string[]> = {
+export const CRITERES: Record<Famille, string[]> = {
   diagnostic: ["Pertinence des informations recueillies", "Justesse du diagnostic", "Argumentation", "Adaptation de la proposition"],
   realisation: ["Respect de la procédure ou du protocole", "Qualité du résultat obtenu", "Respect des règles de sécurité et de qualité applicables", "Organisation et gestion du temps"],
   relation: ["Qualité de l'accueil et de l'écoute", "Identification du besoin", "Pertinence de l'argumentation", "Conclusion et suivi"],
