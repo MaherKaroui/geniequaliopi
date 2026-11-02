@@ -10,11 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { fetchEntreprise } from "@/lib/bpfAnalyse";
-import type { FicheFC } from "@/lib/franceCompetences";
-import { formationRealisee, frDate, grouperSessions, lireExportEdof, type EdofExport } from "@/lib/edofAuto/candidats";
+import { cleFormation, formationRealisee, frDate, grouperSessions, lireExportEdof, type EdofExport } from "@/lib/edofAuto/candidats";
 import { reponsesDe, type Jure } from "@/lib/edofAuto/rs7650Pdf";
 import { construireSujet, genererReponsesGeneriques, type SujetCertification } from "@/lib/edofAuto/generique";
-import { chargerFiches, estCodeCertification, genererPack, generable, MODELES_OFFICIELS } from "@/lib/edofAuto/pack";
+import { estOfficiel, genererPack, resoudreReferentiels, type Referentiel } from "@/lib/edofAuto/pack";
 
 // Jury du PV exemple fourni par le certificateur EYES PERFECT — à confirmer pour chaque session.
 const JURY_RS7650: Jure[] = [
@@ -34,7 +33,7 @@ export default function AutomatisationEDOF() {
   const navigate = useNavigate();
   const [exportEdof, setExportEdof] = useState<EdofExport | null>(null);
   const [nomFichier, setNomFichier] = useState("");
-  const [fiches, setFiches] = useState<Record<string, FicheFC | null>>({});
+  const [referentiels, setReferentiels] = useState<Record<string, Referentiel>>({});
   const [chargement, setChargement] = useState(false);
   const [realisesSeulement, setRealisesSeulement] = useState(true);
   const [centre, setCentre] = useState({ nom: "", adresse: "", ville: "" });
@@ -49,20 +48,23 @@ export default function AutomatisationEDOF() {
   const certifs = useMemo(() => {
     const m = new Map<string, { code: string; intitule: string; nb: number }>();
     for (const c of candidats) {
-      const code = c.codeCertif || "(sans code)";
+      const code = cleFormation(c);
       if (!m.has(code)) m.set(code, { code, intitule: c.intitule, nb: 0 });
       m.get(code)!.nb++;
     }
     return [...m.values()].sort((a, b) => b.nb - a.nb);
   }, [candidats]);
-  const codesGenerables = certifs.map((c) => c.code).filter((code) => generable(code, fiches));
-  const sessions = useMemo(() => grouperSessions(candidats.filter((c) => codesGenerables.includes(c.codeCertif))), [candidats, codesGenerables.join("|")]);
+  const codesGenerables = certifs.map((c) => c.code).filter((code) => !!referentiels[code]);
+  const sessions = useMemo(() => grouperSessions(candidats.filter((c) => codesGenerables.includes(cleFormation(c)))), [candidats, codesGenerables.join("|")]);
   const nbRetenus = sessions.reduce((n, s) => n + s.candidats.length, 0);
   const sujets = useMemo(() => {
     const out: Record<string, SujetCertification> = {};
-    for (const code of codesGenerables) if (code !== "RS7650" && fiches[code]) out[code] = construireSujet(fiches[code]!);
+    for (const code of codesGenerables) {
+      const ref = referentiels[code];
+      if (ref && !estOfficiel(ref)) out[code] = construireSujet(ref);
+    }
     return out;
-  }, [codesGenerables.join("|"), fiches]);
+  }, [codesGenerables.join("|"), referentiels]);
 
   const chercherCentre = async (siret: string) => {
     if (!siret) return;
@@ -87,9 +89,9 @@ export default function AutomatisationEDOF() {
       toast.success(`${exp.candidats.length} dossiers lus`);
       if (exp.siret) chercherCentre(exp.siret);
       setChargement(true);
-      const codes = [...new Set(exp.candidats.map((c) => c.codeCertif).filter(Boolean))];
-      setFiches(await chargerFiches(codes));
-      setJurys((j) => Object.fromEntries(codes.map((code) => [code, j[code] || (code === "RS7650" ? JURY_RS7650 : juryVide())])));
+      const refs = await resoudreReferentiels(exp.candidats);
+      setReferentiels(refs);
+      setJurys((j) => Object.fromEntries(Object.keys(refs).map((code) => [code, j[code] || (code === "RS7650" ? JURY_RS7650 : juryVide())])));
     } catch (err: any) {
       toast.error(`Lecture de l'export impossible : ${err.message || err}`);
     } finally {
@@ -108,7 +110,7 @@ export default function AutomatisationEDOF() {
     setGeneration({ fait: 0, total: nbRetenus });
     try {
       const contextes = Object.fromEntries(codesGenerables.map((code) => [code, { centre, jury: jurys[code] }]));
-      const fichiers = await genererPack(sessions, contextes, fiches, undefined, (fait, total) => setGeneration({ fait, total }));
+      const fichiers = await genererPack(sessions, contextes, referentiels, undefined, (fait, total) => setGeneration({ fait, total }));
       const zip = new JSZip();
       for (const f of fichiers) zip.file(f.chemin, f.donnees);
       const blob = await zip.generateAsync({ type: "blob" });
@@ -125,10 +127,10 @@ export default function AutomatisationEDOF() {
     setJurys((js) => ({ ...js, [code]: js[code].map((j, k) => (k === i ? { ...j, [champ]: v } : j)) }));
 
   const statutCertif = (code: string) => {
-    if (MODELES_OFFICIELS[code]) return { ok: true, label: "Modèle officiel du certificateur" };
-    if (!estCodeCertification(code)) return { ok: false, label: "Pas une certification RS / RNCP (ex. accompagnement VAE) : ignoré" };
-    if (fiches[code]) return { ok: true, label: `Généré depuis la fiche France Compétences (${fiches[code]!.cert.join(", ") || "certificateur"})` };
-    return { ok: false, label: chargement ? "Recherche de la fiche…" : "Fiche absente de France Compétences (certification échue ou inconnue) : ignoré" };
+    const ref = referentiels[code];
+    if (!ref) return { ok: false, label: chargement ? "Recherche du référentiel…" : "—" };
+    if (estOfficiel(ref)) return { ok: true, label: `Modèle officiel : ${ref.origine}` };
+    return { ok: true, label: `Généré sur le ${ref.origine}` };
   };
 
   return (
@@ -154,10 +156,10 @@ export default function AutomatisationEDOF() {
             <h2 className="font-semibold text-lg">1. Export EDOF</h2>
             <p className="text-sm text-muted-foreground">
               Déposez l'export « Tous les dossiers » de Mon Compte Formation (CSV ou XLSX). Pour chaque stagiaire, quelle que soit
-              la certification (RS ou RNCP), 4 documents sont produits — questionnaire de positionnement, attestation sur l'honneur,
+              la formation, 4 documents sont produits — questionnaire de positionnement, attestation sur l'honneur,
               évaluation des connaissances, grille d'évaluation des compétences — plus un PV par session d'examen, avec des réponses
               propres à chaque candidat. Quand le certificateur a fourni ses documents (RS7650 EYES PERFECT), ce sont eux qui sont remplis ;
-              sinon les documents sont construits sur la fiche officielle France Compétences.
+              sinon les documents sont construits sur la fiche officielle France Compétences, ou à défaut sur l'intitulé de la formation.
             </p>
           </div>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed rounded-xl p-6 cursor-pointer hover:bg-muted/40 transition">
@@ -182,7 +184,7 @@ export default function AutomatisationEDOF() {
           <section className="bg-card rounded-2xl border shadow-card p-6 space-y-3">
             <h2 className="font-semibold text-lg flex items-center gap-2"><Award className="w-5 h-5" /> 2. Certifications de l'export</h2>
             <table className="w-full text-sm">
-              <thead><tr className="text-left text-muted-foreground"><th className="p-2">Code</th><th className="p-2">Intitulé</th><th className="p-2">Dossiers</th><th className="p-2">Documents</th></tr></thead>
+              <thead><tr className="text-left text-muted-foreground"><th className="p-2">Formation</th><th className="p-2">Intitulé</th><th className="p-2">Dossiers</th><th className="p-2">Documents</th></tr></thead>
               <tbody>
                 {certifs.map((c) => {
                   const st = statutCertif(c.code);

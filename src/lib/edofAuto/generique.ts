@@ -1,7 +1,7 @@
 /**
- * Automatisation EDOF — documents d'évaluation pour N'IMPORTE QUELLE certification RS / RNCP
- * dont le certificateur n'a pas fourni de modèle : construits sur la fiche officielle France
- * Compétences (blocs, compétences, prérequis, certificateur).
+ * Automatisation EDOF — documents d'évaluation pour N'IMPORTE QUELLE formation de l'export dont le
+ * certificateur n'a pas fourni de modèle : construits sur la fiche officielle France Compétences
+ * (blocs, compétences, prérequis, certificateur), ou à défaut sur l'intitulé de la formation.
  *
  * Mêmes 5 pièces que pour la RS7650 : questionnaire de positionnement, attestation sur l'honneur,
  * évaluation des connaissances, grille d'évaluation des compétences, PV de session.
@@ -66,8 +66,66 @@ function libelleCourt(lib: string): string {
 }
 const MAX_PAR_UNITE = 8;
 
-export function construireSujet(fiche: FicheFC): SujetCertification {
-  const unites = unitesFC(fiche);
+/** Référentiel sur lequel le sujet est construit (fiche France Compétences ou intitulé seul). */
+export interface SourceReferentiel {
+  code: string;
+  intitule: string;
+  certificateur: string;
+  prerequis: string;
+  domaine: string;
+  unites: { code: string; titre: string; competences: string[] }[];
+  /** D'où vient le référentiel (affiché dans l'interface). */
+  origine: string;
+}
+
+export function sourceDepuisFiche(fiche: FicheFC, code = fiche.c, intitule = fiche.i): SourceReferentiel {
+  return {
+    code,
+    intitule,
+    certificateur: fiche.cert.join(", "),
+    prerequis: (fiche.prerequis || "").replace(/\s+/g, " ").trim(),
+    domaine: (fiche.rome?.[0]?.libelle || fiche.i).replace(/''/g, "'"),
+    unites: unitesFC(fiche),
+    origine: code === fiche.c ? `fiche France Compétences ${fiche.c}` : `référentiel de la fiche active ${fiche.c} (${fiche.i})`,
+  };
+}
+
+/**
+ * Formation sans fiche exploitable (accompagnement VAE, formation non certifiante, fiche échue sans
+ * remplaçante) : compétences génériques formulées sur l'intitulé de la formation.
+ */
+export function sourceDepuisIntitule(code: string, intitule: string): SourceReferentiel {
+  const t = intitule.trim() || "la formation";
+  const vae = /(^|[^a-z])vae([^a-z]|$)|validation des acquis/i.test(t);
+  const competences = vae
+    ? [
+        "Analyser son parcours professionnel et identifier les expériences en lien avec la certification visée",
+        "Organiser la rédaction du dossier de validation et planifier les étapes de la démarche",
+        "Rédiger le dossier de validation en décrivant précisément ses activités et ses résultats",
+        "Contrôler la cohérence du dossier avec le référentiel de la certification visée",
+        "Présenter et argumenter son expérience lors de l'entretien avec le jury",
+      ]
+    : [
+        `Identifier le cadre, les enjeux et le vocabulaire professionnel de : ${lower1(t)}`,
+        `Analyser une situation professionnelle relevant de : ${lower1(t)}`,
+        `Organiser et planifier les activités liées à : ${lower1(t)}`,
+        `Réaliser les tâches clés de la formation « ${t} » en respectant les règles applicables`,
+        "Contrôler la qualité du résultat obtenu et proposer des améliorations",
+        "Communiquer sur son activité et rendre compte des résultats obtenus",
+      ];
+  return {
+    code,
+    intitule: t,
+    certificateur: "",
+    prerequis: "",
+    domaine: t,
+    unites: [{ code: code || "FORMATION", titre: t, competences }],
+    origine: "référentiel construit sur l'intitulé de la formation (aucune fiche France Compétences active)",
+  };
+}
+
+export function construireSujet(source: SourceReferentiel): SujetCertification {
+  const unites = source.unites;
   const competences: CompetenceEval[] = [];
   for (const u of unites) {
     for (const c of u.competences.slice(0, MAX_PAR_UNITE)) {
@@ -78,7 +136,7 @@ export function construireSujet(fiche: FicheFC): SujetCertification {
     }
   }
   // QCM : une question par compétence (répartie sur les blocs), 16 au plus
-  const r = rng(`sujet|${fiche.c}`);
+  const r = rng(`sujet|${source.code}|${source.intitule}`);
   const choisies: CompetenceEval[] = [];
   for (let k = 0; choisies.length < Math.min(MAX_QCM, competences.length); k++) {
     for (const u of unites) {
@@ -108,11 +166,11 @@ export function construireSujet(fiche: FicheFC): SujetCertification {
   }).filter((q) => q.etapes);
   const noteMax = qcm.length + ouvertes.length * 2;
   return {
-    code: fiche.c,
-    intitule: fiche.i,
-    certificateur: fiche.cert.join(", "),
-    prerequis: (fiche.prerequis || "").replace(/\s+/g, " ").trim(),
-    domaine: (fiche.rome?.[0]?.libelle || fiche.i).replace(/''/g, "'"),
+    code: source.code,
+    intitule: source.intitule,
+    certificateur: source.certificateur,
+    prerequis: source.prerequis,
+    domaine: source.domaine,
     unites: unites.map((u) => ({ code: u.code, titre: u.titre, nb: competences.filter((c) => c.unite === u.code).length })),
     competences,
     qcm,
@@ -244,11 +302,16 @@ function enteteCandidat(doc: DocPdf, ctx: ContexteEval, c: EdofCandidat, avecJur
   );
 }
 
+const certifiante = (sujet: SujetCertification) => /^(RS|RNCP)\d+$/.test(sujet.code);
+/** « la certification RS7332 « … » » ou « la formation « … » » (VAE, formation sans code RS/RNCP). */
+const designation = (sujet: SujetCertification) =>
+  certifiante(sujet) ? `la certification ${sujet.code} « ${sujet.intitule} »` : `la formation « ${sujet.intitule} »`;
+
 const entete = (ctx: ContexteEval, sujet: SujetCertification, titre: string, ref: string) => ({
   organisme: ctx.centre.nom,
   titre,
-  sousTitre: `${sujet.code} – ${sujet.intitule}`,
-  reference: `${ref} – ${sujet.code}`,
+  sousTitre: sujet.code ? `${sujet.code} – ${sujet.intitule}` : sujet.intitule,
+  reference: `${ref} – ${sujet.code || "FORMATION"}`,
 });
 
 export async function docPositionnement(ctx: ContexteEval, sujet: SujetCertification, c: EdofCandidat, rep: ReponsesGeneriques) {
@@ -289,7 +352,7 @@ export async function docPositionnement(ctx: ContexteEval, sujet: SujetCertifica
 
 export async function docAttestation(ctx: ContexteEval, sujet: SujetCertification, c: EdofCandidat) {
   const doc = await DocPdf.creer(entete(ctx, sujet, "ATTESTATION SUR L'HONNEUR", "ATT"));
-  doc.paragraphe(`La présente attestation a pour objet de confirmer que le candidat remplit les conditions d'accès à la certification ${sujet.code} « ${sujet.intitule} », conformément au référentiel enregistré par France Compétences${sujet.certificateur ? ` (certificateur : ${sujet.certificateur})` : ""}. Elle est établie dans le cadre de l'inscription à la certification et permet au centre habilité de s'assurer que le candidat satisfait aux prérequis avant sa présentation à l'évaluation certificative.`);
+  doc.paragraphe(`La présente attestation a pour objet de confirmer que le candidat remplit les conditions d'accès à ${designation(sujet)}${certifiante(sujet) && sujet.certificateur ? `, conformément au référentiel enregistré par France Compétences (certificateur : ${sujet.certificateur})` : ""}. Elle est établie dans le cadre de l'inscription et permet au centre de s'assurer que le candidat satisfait aux prérequis avant sa présentation à l'évaluation finale.`);
   doc.titreSection("Identité du candidat");
   doc.tableau(["Rubrique", "Information"], [
     ["Nom et prénom", { t: `${c.civilite} ${nomComplet(c)}`.trim(), reponse: true }],
@@ -300,9 +363,9 @@ export async function docAttestation(ctx: ContexteEval, sujet: SujetCertificatio
   ], [1, 3]);
   if (sujet.prerequis) { doc.titreSection("Prérequis de la certification"); doc.paragraphe(sujet.prerequis, { size: 9 }); }
   doc.titreSection("Déclaration");
-  doc.paragraphe(`Je soussigné(e) ${nomComplet(c)}, atteste sur l'honneur avoir pris connaissance des prérequis exigés pour prétendre à la certification ${sujet.code} « ${sujet.intitule} », tels que définis dans la fiche officielle de France Compétences. Je déclare sur l'honneur remplir ces prérequis et reconnais que toute fausse déclaration de ma part pourra entraîner l'annulation de mon inscription à la certification.`);
+  doc.paragraphe(`Je soussigné(e) ${nomComplet(c)}, atteste sur l'honneur avoir pris connaissance des prérequis exigés pour ${designation(sujet)}${certifiante(sujet) ? ", tels que définis dans la fiche officielle de France Compétences" : ""}. Je déclare sur l'honneur remplir ces prérequis et reconnais que toute fausse déclaration de ma part pourra entraîner l'annulation de mon inscription.`);
   doc.titreSection("Contrôle par le centre habilité");
-  doc.paragraphe(`L'organisme habilité ${ctx.centre.nom} certifie avoir vérifié les pièces justificatives permettant de s'assurer que le candidat remplit les conditions d'accès à la certification ${sujet.code} et atteste avoir pris les mesures nécessaires à cette vérification.`);
+  doc.paragraphe(`L'organisme habilité ${ctx.centre.nom} certifie avoir vérifié les pièces justificatives permettant de s'assurer que le candidat remplit les conditions d'accès à ${designation(sujet)} et atteste avoir pris les mesures nécessaires à cette vérification.`);
   doc.paragraphe(`Fait à ${ctx.centre.ville}, le ${frDate(c.dateDebut)}`, { reponse: true });
   doc.signatures(["Signature du candidat et nom du candidat", "Signature du représentant du centre habilité"], [nomComplet(c), ""]);
   return doc.enregistrer();
@@ -401,9 +464,9 @@ export async function docPV(ctx: ContexteEval, sujet: SujetCertification, sessio
 
 /** Pack d'une session pour une certification sans modèle du certificateur. */
 export async function genererSessionGenerique(
-  dossier: string, session: SessionExamen, fiche: FicheFC, ctx: ContexteEval, progression?: () => void,
+  dossier: string, session: SessionExamen, source: SourceReferentiel, ctx: ContexteEval, progression?: () => void,
 ): Promise<FichierPack[]> {
-  const sujet = construireSujet(fiche);
+  const sujet = construireSujet(source);
   const reps = session.candidats.map((c) => genererReponsesGeneriques(sujet, c));
   const out: FichierPack[] = [];
   for (let i = 0; i < session.candidats.length; i++) {

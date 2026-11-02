@@ -78,8 +78,12 @@ export function lireExportEdof(data: ArrayBuffer, nomFichier = ""): EdofExport {
   return { siret: siretDepuisNomFichier(nomFichier), candidats };
 }
 
+/** Identifiant de la formation : code de certification, ou intitulé quand l'export n'en donne pas. */
+export const cleFormation = (c: EdofCandidat) => c.codeCertif || c.intitule.trim() || "Formation";
+
 export interface SessionExamen {
   cle: string;
+  /** clé de la formation (cleFormation) : code RS / RNCP, CPF200, ou intitulé */
   codeCertif: string;
   dateExamen: string; // ISO = dernier jour de formation
   candidats: EdofCandidat[];
@@ -89,8 +93,9 @@ export interface SessionExamen {
 export function grouperSessions(candidats: EdofCandidat[]): SessionExamen[] {
   const map = new Map<string, SessionExamen>();
   for (const c of candidats) {
-    const cle = `${c.codeCertif}|${c.dateFin}`;
-    if (!map.has(cle)) map.set(cle, { cle, codeCertif: c.codeCertif, dateExamen: c.dateFin, candidats: [] });
+    const formation = cleFormation(c);
+    const cle = `${formation}|${c.dateFin}`;
+    if (!map.has(cle)) map.set(cle, { cle, codeCertif: formation, dateExamen: c.dateFin, candidats: [] });
     map.get(cle)!.candidats.push(c);
   }
   return [...map.values()]

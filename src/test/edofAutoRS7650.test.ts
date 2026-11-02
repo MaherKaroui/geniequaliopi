@@ -68,7 +68,7 @@ describe("Automatisation EDOF — RS7650", () => {
   });
 
   it("produit le pack complet de PDF remplis", async () => {
-    const pack = await genererPack(sessions, { RS7650: ctx }, {}, charger);
+    const pack = await genererPack(sessions, { RS7650: ctx }, { RS7650: { officiel: true, origine: "EYES PERFECT" } }, charger);
     expect(pack.filter((f) => f.chemin.endsWith(".pdf"))).toHaveLength(7 * 4 + 2 + 2);
     const pv = await PDFDocument.load(pack.find((f) => f.chemin.includes("PV_session_2026-05-17"))!.donnees);
     expect(pv.getPageCount()).toBe(2); // 6 candidats, 5 lignes par page

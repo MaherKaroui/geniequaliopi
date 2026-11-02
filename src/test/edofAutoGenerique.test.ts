@@ -4,8 +4,8 @@ import { dirname, join } from "path";
 import { PDFDocument } from "pdf-lib";
 import { setFranceCompetencesReader } from "@/lib/franceCompetences";
 import { formationRealisee, grouperSessions, lireExportEdof } from "@/lib/edofAuto/candidats";
-import { construireSujet, genererReponsesGeneriques } from "@/lib/edofAuto/generique";
-import { chargerFiches, genererPack, generable } from "@/lib/edofAuto/pack";
+import { construireSujet, genererReponsesGeneriques, type SourceReferentiel } from "@/lib/edofAuto/generique";
+import { genererPack, resoudreReferentiels } from "@/lib/edofAuto/pack";
 import type { Jure } from "@/lib/edofAuto/rs7650Pdf";
 
 const ENTETE = "NUMERO_DOSSIER;CIVILITE;NOM;PRENOM;DATE_DE_NAISSANCE;ADRESSE_POSTALE;ADRESSE_CODE_POSTAL;ADRESSE_VILLE;COURRIEL;NUMERO_TELEPHONE_PORTABLE;CODE_CERTIF/THEM;INTITULE_CERTIF/THEM;DATE_DEBUT_SESSION;DATE_FIN_SESSION;STATUT_DOSSIER";
@@ -39,18 +39,19 @@ describe("Automatisation EDOF — toutes certifications", () => {
   const exp = lireExportEdof(new TextEncoder().encode(CSV).buffer, "Export_Tous les dossiers_93401856500010_20261027.csv");
   const candidats = exp.candidats.filter((c) => formationRealisee(c.statut));
 
-  it("retient les RS / RNCP présentes dans France Compétences, écarte VAE et fiches échues", async () => {
-    const fiches = await chargerFiches(candidats.map((c) => c.codeCertif));
-    expect(generable("RS7332", fiches)).toBe(true);
-    expect(generable("RNCP41480", fiches)).toBe(true);
-    expect(generable("CPF200", fiches)).toBe(false);
-    expect(generable("RS6168", fiches)).toBe(false);
+  it("trouve un référentiel pour toutes les formations, même sans fiche active", async () => {
+    const refs = await resoudreReferentiels(candidats);
+    expect(Object.keys(refs).sort()).toEqual(["CPF200", "RNCP41480", "RS6168", "RS7332"]);
+    expect((refs.RS7332 as SourceReferentiel).origine).toContain("fiche France Compétences RS7332");
+    expect((refs.RS6168 as SourceReferentiel).origine).toMatch(/RS7332|remplaçante/); // fiche échue → fiche active au même intitulé
+    expect((refs.CPF200 as SourceReferentiel).origine).toContain("intitulé");
+    expect((refs.CPF200 as SourceReferentiel).unites[0].competences[0]).toMatch(/parcours/); // compétences VAE
   });
 
-  it("construit un sujet sur le référentiel et des copies différentes au-dessus du seuil", async () => {
-    const fiches = await chargerFiches(["RS7332", "RNCP41480"]);
-    for (const code of ["RS7332", "RNCP41480"]) {
-      const sujet = construireSujet(fiches[code]!);
+  it("construit un sujet et des copies différentes au-dessus du seuil", async () => {
+    const refs = await resoudreReferentiels(candidats);
+    for (const code of ["RS7332", "RNCP41480", "CPF200", "RS6168"]) {
+      const sujet = construireSujet(refs[code] as SourceReferentiel);
       expect(sujet.competences.length).toBeGreaterThan(0);
       expect(sujet.qcm.length).toBeGreaterThan(0);
       sujet.qcm.forEach((q) => expect(q.options[q.bonne]).toBeTruthy());
@@ -60,18 +61,18 @@ describe("Automatisation EDOF — toutes certifications", () => {
         expect(r.noteTheo).toBeLessThanOrEqual(sujet.noteMax);
         expect(r.admis).toBe(true);
       }
-      if (reps.length > 1) expect(JSON.stringify(reps[0])).not.toBe(JSON.stringify(reps[1]));
+      expect(JSON.stringify(reps[0])).not.toBe(JSON.stringify(reps[1]));
     }
-    expect(construireSujet(fiches.RNCP41480!).unites).toHaveLength(4);
+    expect(construireSujet(refs.RNCP41480 as SourceReferentiel).unites).toHaveLength(4);
   });
 
-  it("génère 4 PDF par candidat et un PV par session", async () => {
-    const fiches = await chargerFiches(candidats.map((c) => c.codeCertif));
+  it("génère 4 PDF par candidat et un PV par session, pour chaque formation", async () => {
+    const refs = await resoudreReferentiels(candidats);
     const sessions = grouperSessions(candidats);
-    const pack = await genererPack(sessions, { RS7332: { centre, jury }, RNCP41480: { centre, jury } }, fiches);
+    const ctx = Object.fromEntries(Object.keys(refs).map((k) => [k, { centre, jury }]));
+    const pack = await genererPack(sessions, ctx, refs);
     expect(pack.filter((f) => f.chemin.startsWith("RS7332/"))).toHaveLength(2 * 4 + 1);
-    expect(pack.filter((f) => f.chemin.startsWith("RNCP41480/"))).toHaveLength(4 + 1);
-    expect(pack.some((f) => f.chemin.startsWith("CPF200") || f.chemin.startsWith("RS6168"))).toBe(false);
+    for (const code of ["RNCP41480", "CPF200", "RS6168"]) expect(pack.filter((f) => f.chemin.startsWith(`${code}/`))).toHaveLength(4 + 1);
     for (const f of pack) expect((await PDFDocument.load(f.donnees)).getPageCount()).toBeGreaterThan(0);
     const out = process.env.EDOF_OUT;
     if (out) for (const f of pack) { const p = join(out, f.chemin); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, f.donnees); }
