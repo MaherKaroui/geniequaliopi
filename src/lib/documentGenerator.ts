@@ -8500,6 +8500,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${(answers as any).disponibilites || getDisponibilitesAnswer(s, f)}</td></tr></table>
 
+${blocDistanceBesoins(f)}
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(getDateAnalyseBesoins(getStagiaireDateDebut(s, f)))}</p>
