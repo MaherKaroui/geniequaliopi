@@ -314,6 +314,54 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_edof_automatisations: {
+        Row: {
+          centre: Json
+          created_at: string
+          envois: Json
+          export_name: string
+          fichiers: Json
+          id: string
+          jurys: Json
+          name: string
+          resume: Json
+          siret: string
+          updated_at: string
+          user_id: string
+          zip_path: string | null
+        }
+        Insert: {
+          centre?: Json
+          created_at?: string
+          envois?: Json
+          export_name?: string
+          fichiers?: Json
+          id?: string
+          jurys?: Json
+          name: string
+          resume?: Json
+          siret?: string
+          updated_at?: string
+          user_id?: string
+          zip_path?: string | null
+        }
+        Update: {
+          centre?: Json
+          created_at?: string
+          envois?: Json
+          export_name?: string
+          fichiers?: Json
+          id?: string
+          jurys?: Json
+          name?: string
+          resume?: Json
+          siret?: string
+          updated_at?: string
+          user_id?: string
+          zip_path?: string | null
+        }
+        Relationships: []
+      }
       saved_ey_controls: {
         Row: {
           archived: boolean
