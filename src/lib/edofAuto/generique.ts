@@ -14,6 +14,7 @@ import { ageAu, frDate, type EdofCandidat, type SessionExamen } from "./candidat
 import { DocPdf, type Cellule } from "./pdfMiseEnPage";
 import { rng } from "./rs7650Reponses";
 import { slug, type ContexteRS7650 as ContexteEval, type FichierPack } from "./rs7650Pdf";
+import { cleCandidat, marqueCentre } from "./signatures";
 
 const pick = <T,>(r: () => number, arr: T[]): T => arr[Math.floor(r() * arr.length)];
 const shuffle = <T,>(r: () => number, arr: T[]): T[] => {
@@ -346,7 +347,7 @@ export async function docPositionnement(ctx: ContexteEval, sujet: SujetCertifica
   doc.choix("Confirmez-vous que les informations fournies sont exactes et sincères ?", ["Oui", "Non"], [0], { enLigne: true });
   doc.choix("Acceptez-vous qu'elles servent à adapter votre parcours (durée, rythme, contenu) ?", ["Oui", "Non"], [0], { enLigne: true });
   doc.paragraphe(`Fait le ${frDate(c.dateDebut)}`, { reponse: true });
-  doc.signatures(["Signature du candidat"], [nomComplet(c)]);
+  await doc.signatures(["Signature du candidat"], [nomComplet(c)], [ctx.signatures?.candidats?.[cleCandidat(c)]]);
   return doc.enregistrer();
 }
 
@@ -367,7 +368,7 @@ export async function docAttestation(ctx: ContexteEval, sujet: SujetCertificatio
   doc.titreSection("Contrôle par le centre habilité");
   doc.paragraphe(`L'organisme habilité ${ctx.centre.nom} certifie avoir vérifié les pièces justificatives permettant de s'assurer que le candidat remplit les conditions d'accès à ${designation(sujet)} et atteste avoir pris les mesures nécessaires à cette vérification.`);
   doc.paragraphe(`Fait à ${ctx.centre.ville}, le ${frDate(c.dateDebut)}`, { reponse: true });
-  doc.signatures(["Signature du candidat et nom du candidat", "Signature du représentant du centre habilité"], [nomComplet(c), ""]);
+  await doc.signatures(["Signature du candidat et nom du candidat", "Signature du représentant du centre habilité"], [nomComplet(c), ""], [ctx.signatures?.candidats?.[cleCandidat(c)], marqueCentre(ctx.signatures)]);
   return doc.enregistrer();
 }
 
@@ -420,7 +421,7 @@ export async function docGrille(ctx: ContexteEval, sujet: SujetCertification, c:
     { t: rep.admis ? "Favorable" : "Défavorable", reponse: true, centre: true },
     { t: rep.commentaire, reponse: true },
   ]], [1, 1, 1, 4]);
-  doc.signatures(ctx.jury.slice(0, 3).map((j, k) => `${k === 0 ? "Président(e) du jury" : "Membre du jury"} – ${j.qualite}`), ctx.jury.slice(0, 3).map((j) => `${j.civilite} ${j.nom}`.trim()));
+  await doc.signatures(ctx.jury.slice(0, 3).map((j, k) => `${k === 0 ? "Président(e) du jury" : "Membre du jury"} – ${j.qualite}`), ctx.jury.slice(0, 3).map((j) => `${j.civilite} ${j.nom}`.trim()), ctx.signatures?.jurys || []);
   return doc.enregistrer();
 }
 
@@ -448,15 +449,18 @@ export async function docPV(ctx: ContexteEval, sujet: SujetCertification, sessio
   doc.titreSection("Candidats");
   doc.tableau(entetes, lignes, [0.6, 3, ...(parUnite ? sujet.unites.map(() => 1) : [1.4]), 1.2, 1.2, 1.2, 1.6]);
   doc.titreSection("Composition du jury");
-  doc.tableau(["Civilité", "Nom et prénom", "Statut", "Qualité", "Signature"],
-    ctx.jury.slice(0, 3).map((j): Cellule[] => [{ t: j.civilite, reponse: true, centre: true }, { t: j.nom, reponse: true }, { t: j.statut, reponse: true }, { t: j.qualite, reponse: true }, "\n\n"]),
-    [1, 3, 2, 2, 3]);
+  doc.tableau(["Civilité", "Nom et prénom", "Statut", "Qualité"],
+    ctx.jury.slice(0, 3).map((j): Cellule[] => [{ t: j.civilite, reponse: true, centre: true }, { t: j.nom, reponse: true }, { t: j.statut, reponse: true }, { t: j.qualite, reponse: true }]),
+    [1, 3, 2, 3]);
+  await doc.signatures(ctx.jury.slice(0, 3).map((_, k) => (k === 0 ? "Signature – président(e)" : `Signature – juré ${k + 1}`)), ctx.jury.slice(0, 3).map((j) => `${j.civilite} ${j.nom}`.trim()), ctx.signatures?.jurys || []);
   const pres = ctx.jury[0];
   if (pres) {
+    doc.place(150); // tableau et signatures du président sur la même page
     doc.titreSection("Président du jury et cachet");
-    doc.tableau(["Civilité", "Nom et prénom", "Statut", "Qualité", "Signature et cachet"],
-      [[{ t: pres.civilite, reponse: true, centre: true }, { t: pres.nom, reponse: true }, { t: "Président(e) du jury", reponse: true }, { t: pres.qualite, reponse: true }, "\n\n\n"]],
-      [1, 3, 2, 2, 3]);
+    doc.tableau(["Civilité", "Nom et prénom", "Statut", "Qualité"],
+      [[{ t: pres.civilite, reponse: true, centre: true }, { t: pres.nom, reponse: true }, { t: "Président(e) du jury", reponse: true }, { t: pres.qualite, reponse: true }]],
+      [1, 3, 2, 3]);
+    await doc.signatures(["Signature du président(e) du jury", "Cachet du centre organisateur"], [`${pres.civilite} ${pres.nom}`.trim(), ctx.centre.nom], [ctx.signatures?.jurys?.[0], ctx.signatures?.tamponCentre]);
   }
   return doc.enregistrer();
 }

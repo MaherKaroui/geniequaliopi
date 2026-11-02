@@ -5,6 +5,7 @@
  * Les réponses du candidat / du jury sont écrites à l'encre bleue en italique, comme sur les modèles remplis.
  */
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb, type RGB } from "pdf-lib";
+import { poserImage } from "./signatures";
 
 export const ENCRE = rgb(0.08, 0.17, 0.55);
 const NOIR = rgb(0.1, 0.1, 0.12);
@@ -211,16 +212,17 @@ export class DocPdf {
     this.y -= 8;
   }
 
-  /** Cadres de signature vides (signature manuscrite exigée). */
-  signatures(libelles: string[], noms: string[]) {
+  /** Cadres de signature ; l'image fournie (signature ou tampon) est posée dans le cadre, sinon il reste vide. */
+  async signatures(libelles: string[], noms: string[], images: (Uint8Array | undefined)[] = []) {
     this.place(80);
     const w = (this.largeur - (libelles.length - 1) * 12) / libelles.length;
-    libelles.forEach((lib, i) => {
+    for (let i = 0; i < libelles.length; i++) {
       const x = this.M + i * (w + 12);
       this.page.drawRectangle({ x, y: this.y - 70, width: w, height: 70, borderColor: TRAIT, borderWidth: 0.6 });
-      this.page.drawText(this.propre(lib), { x: x + 5, y: this.y - 12, size: 8.5, font: this.fb, color: NOIR });
+      this.page.drawText(this.propre(libelles[i]), { x: x + 5, y: this.y - 12, size: 8.5, font: this.fb, color: NOIR });
       if (noms[i]) this.page.drawText(this.propre(noms[i]), { x: x + 5, y: this.y - 24, size: 9.5, font: this.fi, color: ENCRE });
-    });
+      await poserImage(this.pdf, this.page, images[i], x + 5, this.H - this.y + 27, w - 10, 40);
+    }
     this.y -= 80;
   }
 

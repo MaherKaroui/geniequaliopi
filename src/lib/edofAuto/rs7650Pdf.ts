@@ -3,12 +3,13 @@
  * Les modèles ne sont pas redessinés : on écrit par-dessus, aux coordonnées relevées par
  * scripts/edof-auto (PyMuPDF, origine en haut à gauche, d'où la conversion y = hauteur − y).
  *
- * Aucune signature n'est apposée : le règlement exige l'émargement manuscrit du candidat et des 3 jurés.
+ * Les signatures (stagiaire, jurés) et le tampon du centre sont posés seulement s'ils ont été fournis.
  */
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from "pdf-lib";
 import { frDate, type EdofCandidat, type SessionExamen } from "./candidats";
 import { PRAT_CRITERES, THEO_QUESTIONS, THEO_TOTAUX_P6 } from "./rs7650Layout";
 import { CORRIGE_THEO, genererReponses, NOTE_MAX_THEO, type ReponsesCandidat } from "./rs7650Reponses";
+import { cleCandidat, marqueCentre, poserImage, type SignaturesEval } from "./signatures";
 
 export interface Jure { civilite: string; nom: string; statut: string; qualite: string }
 
@@ -16,6 +17,8 @@ export interface ContexteRS7650 {
   centre: { nom: string; adresse: string; ville: string };
   /** 3 jurés ; le premier est le président du jury */
   jury: Jure[];
+  /** signatures et tampon fournis par l'utilisateur */
+  signatures?: SignaturesEval;
 }
 
 export type ChargeurModele = (fichier: string) => Promise<ArrayBuffer | Uint8Array>;
@@ -192,12 +195,13 @@ export async function remplirPratique(charger: ChargeurModele, ctx: ContexteRS76
     ? `Compétences C1 à C6 acquises, théorie ${rep.noteTheo}/${NOTE_MAX_THEO} (> 20/37) : certification acquise.`
     : "Certification non acquise.";
   p5.lignes(appreciation, 262, 9.5).forEach((l, k) => p5.texte(l, 515, 432 + k * 12, 9.5));
+  for (let k = 0; k < 3; k++) await poserImage(pdf, pages[5], ctx.signatures?.jurys?.[k], 492 + k * 96, 213, 90, 28);
   return pdf.save();
 }
 
 // ─── Questionnaire de positionnement ──────────────────────────────────────────
 
-export async function remplirPositionnement(charger: ChargeurModele, c: EdofCandidat, rep: ReponsesCandidat) {
+export async function remplirPositionnement(charger: ChargeurModele, ctx: ContexteRS7650, c: EdofCandidat, rep: ReponsesCandidat) {
   const { pdf, oblique } = await ouvrir(charger, "positionnement.pdf");
   const pg = pdf.getPages().map((p) => new Plume(p, oblique));
   const p = rep.positionnement;
@@ -233,6 +237,7 @@ export async function remplirPositionnement(charger: ChargeurModele, c: EdofCand
   ouiNon(3, 131, 145, true);
   ouiNon(3, 212, 225, true);
   pg[3].texte(nomComplet(c), 105, 304, 11);
+  await poserImage(pdf, pdf.getPages()[3], ctx.signatures?.candidats?.[cleCandidat(c)], 95, 312, 150, 45);
   return pdf.save();
 }
 
@@ -257,6 +262,8 @@ export async function remplirAttestation(charger: ChargeurModele, ctx: ContexteR
   blanc(52, 649, 126, 661);
   w.texte(frDate(c.dateDebut), 56, 658.5, 10.5);
   w.texte(nomComplet(c), 155, 740, 10, 200);
+  await poserImage(pdf, page, ctx.signatures?.candidats?.[cleCandidat(c)], 235, 697, 120, 38);
+  await poserImage(pdf, page, marqueCentre(ctx.signatures), 395, 694, 160, 48);
   return pdf.save();
 }
 
@@ -299,12 +306,14 @@ export async function remplirPV(charger: ChargeurModele, ctx: ContexteRS7650, se
       w.texte(j.statut, 306, y + 3, 9, 141);
       w.texte(j.qualite, 453, y + 3, 9, 106);
     });
+    for (let k = 0; k < 3; k++) await poserImage(pdf, page, ctx.signatures?.jurys?.[k], 600, PV_JURY[k] - 8.5, 160, 17);
     const pres = ctx.jury[0];
     if (pres) {
       centre(pres.civilite, 40, PV_PRESIDENT);
       w.texte(pres.nom, 66, PV_PRESIDENT + 3, 9, 234);
       w.texte("Président(e) du jury", 306, PV_PRESIDENT + 3, 9, 141);
       w.texte(pres.qualite, 453, PV_PRESIDENT + 3, 9, 106);
+      await poserImage(pdf, page, ctx.signatures?.jurys?.[0], 600, PV_PRESIDENT - 10, 160, 22);
     }
   }
   return pdf.save();
@@ -326,7 +335,7 @@ export async function genererSessionRS7650(
     const c = s.candidats[i];
     const rep = reps[i];
     const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
-    fichiers.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, c, rep) });
+    fichiers.push({ chemin: `${base}/1_Questionnaire_de_positionnement.pdf`, donnees: await remplirPositionnement(charger, ctx, c, rep) });
     fichiers.push({ chemin: `${base}/2_Attestation_sur_l_honneur.pdf`, donnees: await remplirAttestation(charger, ctx, c) });
     fichiers.push({ chemin: `${base}/3_Evaluation_theorique_FS063.pdf`, donnees: await remplirTheo(charger, ctx, c, rep) });
     fichiers.push({ chemin: `${base}/4_Grille_evaluation_pratique_FS055.pdf`, donnees: await remplirPratique(charger, ctx, c, rep) });

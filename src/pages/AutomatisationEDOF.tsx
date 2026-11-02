@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-import { ArrowLeft, Building2, Download, FileUp, Loader2, Users, Workflow, Info, Award } from "lucide-react";
+import { ArrowLeft, Building2, Download, FileUp, Loader2, Users, Workflow, Info, Award, Stamp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,8 @@ import { cleFormation, formationRealisee, frDate, grouperSessions, lireExportEdo
 import { reponsesDe, type Jure } from "@/lib/edofAuto/rs7650Pdf";
 import { construireSujet, genererReponsesGeneriques, type SujetCertification } from "@/lib/edofAuto/generique";
 import { estOfficiel, genererPack, resoudreReferentiels, type Referentiel } from "@/lib/edofAuto/pack";
+import { cleCandidat, dataUrlEnOctets } from "@/lib/edofAuto/signatures";
+import SignatureChamp, { lireImage } from "@/components/SignatureChamp";
 
 // Jury du PV exemple fourni par le certificateur EYES PERFECT — à confirmer pour chaque session.
 const JURY_RS7650: Jure[] = [
@@ -26,6 +28,8 @@ const juryVide = (): Jure[] => [
   { civilite: "Mme", nom: "", statut: "Jury", qualite: "Professionnel externe" },
   { civilite: "M.", nom: "", statut: "Jury", qualite: "Professionnel externe" },
 ];
+
+const sansAccents = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 
 const villeDepuisAdresse = (adresse: string) => adresse.match(/\d{5}\s+(.+)$/)?.[1]?.trim() || "";
 
@@ -40,6 +44,10 @@ export default function AutomatisationEDOF() {
   const [jurys, setJurys] = useState<Record<string, Jure[]>>({});
   const [recherche, setRecherche] = useState(false);
   const [generation, setGeneration] = useState<{ fait: number; total: number } | null>(null);
+  const [tampon, setTampon] = useState<string>();
+  const [signatureCentre, setSignatureCentre] = useState<string>();
+  const [sigJurys, setSigJurys] = useState<Record<string, (string | undefined)[]>>({});
+  const [sigCandidats, setSigCandidats] = useState<Record<string, string | undefined>>({});
 
   const candidats = useMemo(
     () => (exportEdof?.candidats || []).filter((c) => !realisesSeulement || formationRealisee(c.statut)),
@@ -99,6 +107,21 @@ export default function AutomatisationEDOF() {
     }
   };
 
+  /** Import groupé : chaque image est rattachée au stagiaire dont le n° de dossier, ou le nom ET le prénom, figurent dans le nom du fichier. */
+  const importerSignaturesStagiaires = async (files: FileList) => {
+    let n = 0;
+    const ajouts: Record<string, string> = {};
+    for (const f of Array.from(files)) {
+      const nomF = sansAccents(f.name);
+      const c = candidats.find((x) => (x.numeroDossier && nomF.includes(x.numeroDossier)) || (nomF.includes(sansAccents(x.nom)) && nomF.includes(sansAccents(x.prenom))));
+      if (c) { ajouts[cleCandidat(c)] = await lireImage(f); n++; }
+    }
+    setSigCandidats((s) => ({ ...s, ...ajouts }));
+    toast[n ? "success" : "warning"](`${n} signature(s) rattachée(s) sur ${files.length} image(s)`);
+  };
+
+  const octets = (v?: string) => (v ? dataUrlEnOctets(v) : undefined);
+
   const manquants = [
     !centre.nom && "nom du centre",
     !centre.adresse && "adresse du centre",
@@ -109,7 +132,18 @@ export default function AutomatisationEDOF() {
   const generer = async () => {
     setGeneration({ fait: 0, total: nbRetenus });
     try {
-      const contextes = Object.fromEntries(codesGenerables.map((code) => [code, { centre, jury: jurys[code] }]));
+      const candidatsSig: Record<string, Uint8Array> = {};
+      for (const [k, v] of Object.entries(sigCandidats)) if (v) candidatsSig[k] = dataUrlEnOctets(v);
+      const contextes = Object.fromEntries(codesGenerables.map((code) => [code, {
+        centre,
+        jury: jurys[code],
+        signatures: {
+          tamponCentre: octets(tampon),
+          signatureCentre: tampon ? undefined : octets(signatureCentre), // tampon seul s'il existe
+          jurys: (sigJurys[code] || []).map(octets),
+          candidats: candidatsSig,
+        },
+      }]));
       const fichiers = await genererPack(sessions, contextes, referentiels, undefined, (fait, total) => setGeneration({ fait, total }));
       const zip = new JSZip();
       for (const f of fichiers) zip.file(f.chemin, f.donnees);
@@ -222,17 +256,30 @@ export default function AutomatisationEDOF() {
                   {code === "RS7650" && <span className="text-muted-foreground font-normal"> — repris du PV exemple du certificateur, à confirmer</span>}
                 </p>
                 {(jurys[code] || []).map((j, i) => (
-                  <div key={i} className="grid grid-cols-[80px_1fr_1fr_1fr] gap-2">
+                  <div key={i} className="grid grid-cols-[70px_1fr_0.7fr_1fr_auto] gap-2 items-center">
                     <Input value={j.civilite} onChange={(e) => setJure(code, i, "civilite", e.target.value)} />
                     <Input value={j.nom} placeholder="Nom et prénom" onChange={(e) => setJure(code, i, "nom", e.target.value)} />
                     <Input value={j.statut} placeholder="Statut" onChange={(e) => setJure(code, i, "statut", e.target.value)} />
                     <Input value={j.qualite} placeholder="Qualité" onChange={(e) => setJure(code, i, "qualite", e.target.value)} />
+                    <SignatureChamp compact libelle={`Signature de ${j.nom || `juré ${i + 1}`}`} valeur={sigJurys[code]?.[i]}
+                      onChange={(v) => setSigJurys((s) => { const l = [...(s[code] || [])]; l[i] = v; return { ...s, [code]: l }; })} />
                   </div>
                 ))}
               </div>
             ))}
+            <div className="border rounded-xl p-3 space-y-3">
+              <p className="text-sm font-medium flex items-center gap-2"><Stamp className="w-4 h-4" /> Représentant du centre habilité</p>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="space-y-1"><Label>Tampon du centre</Label><SignatureChamp libelle="Tampon du centre" valeur={tampon} onChange={setTampon} /></div>
+                <div className="space-y-1">
+                  <Label>Signature du représentant {tampon && <span className="text-muted-foreground font-normal">(non utilisée : tampon seul)</span>}</Label>
+                  <SignatureChamp libelle="Signature du représentant du centre" valeur={signatureCentre} onChange={setSignatureCentre} />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Pas de tampon ? Créez-le avec le <a className="underline" href="/generateur-tampon" target="_blank" rel="noreferrer">Générateur Tampon</a> puis importez l'image.</p>
+            </div>
             <p className="text-xs text-muted-foreground flex gap-1"><Info className="w-4 h-4 shrink-0" />
-              Les signatures ne sont jamais apposées : candidats et jurés signent à la main.
+              Seules les signatures et le tampon fournis ici sont posés dans les documents ; sans image, le cadre reste vide.
             </p>
             {manquants.length > 0 && nbRetenus > 0 && <p className="text-sm text-destructive">À compléter avant génération : {manquants.join(", ")}.</p>}
           </section>
@@ -240,14 +287,21 @@ export default function AutomatisationEDOF() {
 
         {sessions.length > 0 && (
           <section className="bg-card rounded-2xl border shadow-card p-6 space-y-4">
-            <h2 className="font-semibold text-lg flex items-center gap-2"><Users className="w-5 h-5" /> 4. Sessions d'examen ({sessions.length})</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-semibold text-lg flex items-center gap-2"><Users className="w-5 h-5" /> 4. Sessions d'examen ({sessions.length})</h2>
+              <label className="text-sm border rounded-md px-3 py-1.5 cursor-pointer hover:bg-muted/40">
+                Importer les signatures des stagiaires ({Object.values(sigCandidats).filter(Boolean).length}/{nbRetenus})
+                <input type="file" multiple accept="image/png,image/jpeg" className="hidden" onChange={(e) => { if (e.target.files?.length) importerSignaturesStagiaires(e.target.files); e.target.value = ""; }} />
+              </label>
+            </div>
+            <p className="text-xs text-muted-foreground">Import groupé : une image par stagiaire, nommée avec son n° de dossier CPF ou NOM_Prénom (ex. DUPONT_Marie.png). Ou signez directement dans la colonne Signature.</p>
             {sessions.map((s) => (
               <div key={s.cle} className="border rounded-xl overflow-hidden">
                 <div className="bg-muted/50 px-4 py-2 text-sm font-medium">
                   {s.codeCertif} — examen du {frDate(s.dateExamen)} — {s.candidats.length} candidat(s)
                 </div>
                 <table className="w-full text-xs">
-                  <thead><tr className="text-left text-muted-foreground"><th className="p-2">Candidat</th><th className="p-2">Formation</th><th className="p-2">Statut EDOF</th><th className="p-2">Théorie</th><th className="p-2">Compétences</th><th className="p-2">Résultat</th></tr></thead>
+                  <thead><tr className="text-left text-muted-foreground"><th className="p-2">Candidat</th><th className="p-2">Formation</th><th className="p-2">Statut EDOF</th><th className="p-2">Théorie</th><th className="p-2">Compétences</th><th className="p-2">Résultat</th><th className="p-2">Signature</th></tr></thead>
                   <tbody>
                     {s.candidats.map((c) => {
                       let theo = "", comp = "", admis = false;
@@ -267,6 +321,7 @@ export default function AutomatisationEDOF() {
                           <td className="p-2">{theo}</td>
                           <td className="p-2">{comp}</td>
                           <td className="p-2">{admis ? <Badge className="bg-emerald-600">Acquis</Badge> : <Badge variant="destructive">Non acquis</Badge>}</td>
+                          <td className="p-2"><SignatureChamp compact libelle={`Signature de ${c.prenom} ${c.nom}`} valeur={sigCandidats[cleCandidat(c)]} onChange={(v) => setSigCandidats((s) => ({ ...s, [cleCandidat(c)]: v }))} /></td>
                         </tr>
                       );
                     })}

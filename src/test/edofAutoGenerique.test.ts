@@ -78,3 +78,38 @@ describe("Automatisation EDOF — toutes certifications", () => {
     if (out) for (const f of pack) { const p = join(out, f.chemin); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, f.donnees); }
   }, 120000);
 });
+
+describe("Automatisation EDOF — signatures et tampon fournis", () => {
+  // PNG 1×1 ; SIG_PNG / TAMPON_PNG permettent de vérifier le rendu avec de vraies images
+  const PNG = Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="), (ch) => ch.charCodeAt(0));
+  const sig = process.env.SIG_PNG ? new Uint8Array(readFileSync(process.env.SIG_PNG)) : PNG;
+  const tampon = process.env.TAMPON_PNG ? new Uint8Array(readFileSync(process.env.TAMPON_PNG)) : PNG;
+  const images = (b: Uint8Array) => (new TextDecoder("latin1").decode(b).match(/\/Subtype \/Image/g) || []).length;
+
+  it("pose stagiaire, jurés et tampon du centre dans tous les documents (modèle officiel et générique)", async () => {
+    setFranceCompetencesReader(async (p) => {
+      const f = join(process.cwd(), "public", "france-competences", p);
+      return existsSync(f) ? new Uint8Array(readFileSync(f)) : null;
+    });
+    const exp = lireExportEdof(new TextEncoder().encode([ENTETE,
+      l("300000000001", "SIGNE", "Sarah", "RS7332", "Recruter et intégrer ses collaborateurs", "03/03/2026", "05/03/2026"),
+      l("300000000002", "CILS", "Clara", "RS7650", "Mettre en valeur le regard", "15/05/2026", "17/05/2026"),
+    ].join("\n")).buffer, "x.csv");
+    const refs = await resoudreReferentiels(exp.candidats);
+    const signatures = { tamponCentre: tampon, jurys: [sig, sig, sig], candidats: { "300000000001": sig, "300000000002": sig } };
+    const ctx = { RS7332: { centre, jury, signatures }, RS7650: { centre, jury, signatures } };
+    const charger = async (f: string) => new Uint8Array(readFileSync(join(process.cwd(), "public/edof-auto/rs7650", f)));
+    const pack = await genererPack(grouperSessions(exp.candidats), ctx, refs, charger);
+    const nb = (fin: string, code: string) => images(pack.find((f) => f.chemin.startsWith(code) && f.chemin.endsWith(fin))!.donnees);
+    for (const code of ["RS7332", "RS7650"]) {
+      expect(nb("1_Questionnaire_de_positionnement.pdf", code)).toBeGreaterThanOrEqual(1); // stagiaire
+      expect(nb("2_Attestation_sur_l_honneur.pdf", code)).toBeGreaterThanOrEqual(2); // stagiaire + tampon
+    }
+    expect(nb("4_Grille_evaluation_des_competences.pdf", "RS7332")).toBeGreaterThanOrEqual(1); // jurés
+    expect(nb("4_Grille_evaluation_pratique_FS055.pdf", "RS7650")).toBeGreaterThanOrEqual(1);
+    expect(images(pack.find((f) => f.chemin.startsWith("RS7650") && f.chemin.includes("PV_"))!.donnees)).toBeGreaterThanOrEqual(1);
+    expect(images(pack.find((f) => f.chemin.startsWith("RS7332") && f.chemin.includes("PV_"))!.donnees)).toBeGreaterThanOrEqual(2);
+    const out = process.env.EDOF_OUT;
+    if (out) for (const f of pack) { const p = join(out, "sig", f.chemin); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, f.donnees); }
+  }, 120000);
+});
