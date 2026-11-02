@@ -24,6 +24,8 @@ import { ARH41366_EXERCICES_COMPLETS, ARH41366_QCM_DEBUT, ARH41366_QCM_FIN, ARH4
 import { isARH41366Formation, getARH41366AutoAnswers, ARH41366_QUESTIONS_OUVERTES } from "./arh41366Humanized";
 import { GSC35_EXERCICES_COMPLETS, GSC35_QCM_DEBUT, GSC35_QCM_FIN } from "./gererCentre35hPreset";
 import { isGSC35Formation, getGSC35AutoAnswers, GSC35_QUESTIONS_OUVERTES } from "./gererCentre35hHumanized";
+import { LRB_EXERCICES_COMPLETS, LRB_QCM_DEBUT, LRB_QCM_FIN } from "./robertRS7013Preset";
+import { isLRBFormation, getLRBAutoAnswers, LRB_QUESTIONS_OUVERTES } from "./robertRS7013Humanized";
 
 
 
@@ -1309,6 +1311,27 @@ EVAL_CONTENT["GSC35"] = {
   ],
 };
 
+// ===== Préparation à la Certification en langue française Le Robert (RS7013, C1 et C2) =====
+EVAL_CONTENT["LRB"] = {
+  qcmPositionnement: LRB_QCM_DEBUT,
+  qcmFinal: LRB_QCM_FIN,
+  exercices: LRB_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Rédiger des écrits professionnels conformes aux règles de la langue française",
+    "C2 – S'exprimer de manière adéquate en contexte professionnel (registre, vocabulaire, construction des phrases)",
+  ],
+  appreciations: [
+    "Homophones grammaticaux et accords bien maîtrisés grâce aux tests de remplacement. Le participe passé des verbes pronominaux demande encore de la vigilance.",
+    "Bonne progression sur la conjugaison et l'emploi des modes ; le subjonctif après « il faut que » est acquis. La typographie des courriels reste à consolider.",
+    "Écrits professionnels clairs et corrects ; relecture méthodique. Le choix des paronymes et la suppression des pléonasmes sont à poursuivre.",
+    "Très bon niveau d'ensemble, y compris sur les cas difficiles du participe passé ; score cible ambitieux et réaliste à l'examen blanc.",
+    "Progrès nets sur l'orthographe d'usage et les accords dans le groupe nominal. La construction des phrases longues mérite encore un entraînement.",
+    "Registre de langue bien adapté à l'écrit comme à l'oral ; restitution fidèle des messages. Les accords du verbe avec un sujet éloigné restent à surveiller.",
+    "Base solide en conjugaison ; les prépositions et les constructions verbales progressent. Implication constante pendant les trois journées.",
+    "Bonne maîtrise des règles de ponctuation et de typographie ; vocabulaire précis. Le plan de révision doit être suivi jusqu'au passage de la certification.",
+  ],
+};
+
 EVAL_CONTENT["Management"] = {
   qcmPositionnement: [
     { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
@@ -1538,6 +1561,8 @@ function getContentKey(intitule: string): string {
   if (isMSP21Formation(lower)) return "MSP21";
   // Gérer son centre de formation – 35 h (non certifiante) — avant les contenus génériques
   if (isGSC35Formation(lower)) return "GSC35";
+  // Préparation à la Certification Le Robert (RS7013) — avant la règle « français » (FLE médico-social)
+  if (isLRBFormation(lower)) return "LRB";
   // New formations
   if (mot(lower, "responsable de petite") || mot(lower, "rpms") || mot(lower, "petite et moyenne structure")) return "RPMS";
   if (mot(lower, "assistant") && mot(lower, "direction")) return "Assistant de Direction";
@@ -2283,6 +2308,9 @@ QUESTIONS_OUVERTES["MSP21"] = MSP21_QUESTIONS_OUVERTES;
 // Gérer son centre de formation – 35 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["GSC35"] = GSC35_QUESTIONS_OUVERTES;
 
+// Préparation à la Certification Le Robert (RS7013) — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["LRB"] = LRB_QUESTIONS_OUVERTES;
+
 // TP ARH RNCP41366 — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["ARH41366"] = ARH41366_QUESTIONS_OUVERTES;
 
@@ -2710,6 +2738,19 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoGsc.reponses, autoGsc.scores);
+  }
+
+  // Préparation à la Certification Le Robert (RS7013) : moteur humanisé (une copie différente par stagiaire).
+  if (isLRBFormation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoLrb = getLRBAutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+      stagiaireIndex,
+    );
+    return toAnswers(autoLrb.reponses, autoLrb.scores);
   }
 
   // LILATE anglais / FLE : copie construite item par item à partir du corrigé, selon le niveau CECRL du stagiaire.

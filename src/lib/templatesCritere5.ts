@@ -1,6 +1,7 @@
 // Critère 5 — IND 21 & IND 22 generators (based on real SELECT FORMATION documents)
 import { typeAuditEffectif } from "./typeAudit";
 import { mot } from "./resolveurFormation";
+import { isLRBFormation } from "./robertRS7013Humanized";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
@@ -274,7 +275,8 @@ function formationsMetier(f: FormationInfo): Metier[] {
   const isCommercial = !isNTC && (t.includes("commercial") || t.includes("vente") || t.includes("prospection") || t.includes("relation client"));
   const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux") || t.includes("marketing digital");
-  const isFLE = t.includes("français") || mot(t, "fle");
+  // Certification Le Robert (RS7013) : l'intitulé contient « française », jamais de plan FLE.
+  const isFLE = !isLRBFormation(f.intitule, f.codeRNCP) && (t.includes("français") || mot(t, "fle"));
   const isManagement = t.includes("management") || t.includes("encadrement") || t.includes("leadership") || t.includes("manager");
   const isWord = mot(t, "word") || t.includes("bureautique");
   const E = "Externe";

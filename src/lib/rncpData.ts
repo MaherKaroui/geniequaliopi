@@ -387,6 +387,50 @@ export const RNCP_FICHES: RNCPFiche[] = [
     dureeIndicative: "90h",
   },
   {
+    code: "RS7013",
+    intitule: "Certification en langue française Le Robert",
+    niveau: "Répertoire Spécifique",
+    certificateur: "SEJER (SIRET 39329104200157) — nom commercial « Certification Le Robert » — https://certification.lerobert.com",
+    dateEnregistrement: "31/01/2025",
+    dateEcheance: "31/01/2030",
+    codeNSF: "333 – Enseignement, formation",
+    formacodes: "15011 – Expression écrite / 15281 – Français mise à niveau / 15235 – Français langue étrangère",
+    resume: "La Certification en langue française Le Robert mesure le niveau de maîtrise de la langue française en contexte professionnel : respect des règles de la langue, précision de l'expression orale et écrite. Fiche active, enregistrée par décision du 31/01/2025 pour cinq ans (échéance au 31/01/2030, dernière délivrance possible le 30/07/2030) ; elle remplace la fiche RS5800 (première publication au Journal officiel le 26/01/2022). Prérequis : avoir le français pour langue maternelle ou avoir acquis le niveau A2 du CECRL, et ne pas être en situation d'analphabétisme. Score sur 1 000 points : en dessous de 450 points, la certification n'est pas délivrée (formation complémentaire conseillée) ; de 450 à 599 points, maîtrise des règles les plus courantes (techniciens, ouvriers, agents d'accueil, testeurs informatiques) ; de 600 à 749 points, capacité à rédiger et communiquer par écrit de façon autonome (ingénieurs, managers, conseillers commerciaux, graphistes) ; de 750 à 899 points, aisance, production et correction fiables de tous documents, personne référente (secrétaires de direction, téléconseillers, chargés de communication, psychologues, notaires) ; à partir de 900 points, expertise (relecteurs-correcteurs, formateurs en langues, éditeurs). Pas de validation partielle.",
+    activitesVisees: "Rédaction d'écrits dans le cadre d'une activité professionnelle, dans le respect des règles de la langue française ; expression orale et écrite adaptée à un contexte professionnel défini (registre de langue, vocabulaire sélectionné, construction des phrases).",
+    blocsCompetences: [
+      {
+        titre: "C1 – Rédiger des écrits professionnels conformes aux règles de la langue française",
+        competences: [
+          "Rédiger des écrits dans le cadre d'une activité professionnelle, en respectant les règles de la langue française, dans le but de communiquer efficacement à l'écrit",
+        ],
+        matieres: [
+          { competence: "Orthographe lexicale et d'usage, homophones", contenu: "Accents, consonnes doubles, h muet, mots invariables, pluriels particuliers, homophones lexicaux et grammaticaux, dictée de mots et d'expressions", volume: "4h" },
+          { competence: "Accords", contenu: "Accords dans le groupe nominal (adjectifs de couleur, nombres, tout, même, demi), accord du verbe avec son sujet, accord du participe passé", volume: "4h" },
+          { competence: "Conjugaison et emploi des modes", contenu: "Futur et conditionnel, subjonctif, impératif, passé simple, concordance des temps, après que suivi de l'indicatif", volume: "3h" },
+          { competence: "Ponctuation, typographie et écrits professionnels", contenu: "Ponctuation et typographie française, rédaction et relecture de courriels, comptes rendus et courriers", volume: "3h" },
+        ],
+        modalitesEval: "Épreuve en ligne de 350 questions à correction automatique, commune aux deux compétences. 5 types d'exercices : dictée de mots et d'expressions ; phrases à compléter en insérant un mot ; phrases à compléter après avoir écouté un enregistrement ; questions à choix multiple ; phrases à corriger si on estime qu'elles comportent une erreur. Score sur 1 000 points ; certification délivrée à partir de 450 points ; pas de validation partielle.",
+      },
+      {
+        titre: "C2 – S'exprimer de manière adéquate en contexte professionnel",
+        competences: [
+          "S'exprimer de manière adéquate (registre de langue, vocabulaire sélectionné, construction des phrases) dans un contexte professionnel défini, dans le but de se faire comprendre et de communiquer efficacement",
+        ],
+        matieres: [
+          { competence: "Vocabulaire et précision lexicale", contenu: "Paronymes, impropriétés, pléonasmes, anglicismes et équivalents français, expressions figées", volume: "2h" },
+          { competence: "Construction des phrases", contenu: "Constructions verbales, prépositions, pronoms relatifs, négation, interrogation directe et indirecte", volume: "2h" },
+          { competence: "Registres de langue et compréhension orale", contenu: "Registres et formules de politesse, compréhension d'un enregistrement et restitution, entraînement aux exercices de l'épreuve", volume: "3h" },
+        ],
+        modalitesEval: "Épreuve en ligne de 350 questions à correction automatique, commune aux deux compétences (5 types d'exercices, dont les phrases à compléter après avoir écouté un enregistrement). Score sur 1 000 points ; certification délivrée à partir de 450 points ; pas de validation partielle.",
+      },
+    ],
+    secteursActivite: "Tous secteurs d'activité : toute situation professionnelle qui demande d'écrire et de communiquer en français",
+    typesEmplois: ["Technicien", "Agent d'accueil", "Testeur informatique", "Ingénieur", "Manager", "Conseiller commercial", "Graphiste", "Secrétaire de direction", "Téléconseiller", "Chargé de communication", "Relecteur-correcteur", "Formateur en langues", "Éditeur"],
+    codesROME: [],
+    voiesAcces: ["Formation initiale", "Formation continue", "Candidature individuelle"],
+    dureeIndicative: "21 heures (3 jours)",
+  },
+  {
     code: "RS6776",
     intitule: "Création de contenus rédactionnels et visuels par l'usage responsable de l'intelligence artificielle générative",
     niveau: "Répertoire Spécifique",

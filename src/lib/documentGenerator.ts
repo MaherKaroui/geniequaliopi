@@ -48,6 +48,7 @@ import { isLilateFormation, getLilateBesoin, getLilateEvalBesoins, lilateBonnesQ
 import { isTPBesoinsFormation, getTPBesoinsPrincipal, getTPEvalBesoins } from "./tpBesoinsHumanized";
 import { isARH41366Formation, getARH41366Besoin, getARH41366EvalBesoins, arh41366BonnesQcmDebut, arh41366ReponsesQcmDebut } from "./arh41366Humanized";
 import { isGSC35Formation, getGSC35Besoin, getGSC35EvalBesoins, gsc35BonnesQcmDebut, gsc35ReponsesQcmDebut } from "./gererCentre35hHumanized";
+import { isLRBFormation, getLRBBesoin, getLRBEvalBesoins, lrbBonnesQcmDebut, lrbReponsesQcmDebut } from "./robertRS7013Humanized";
 import { getARH41366ExerciceCFA } from "./arh41366Preset";
 import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
@@ -1520,7 +1521,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Summary table
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLRBFormation(f.intitule, f.codeRNCP) ? lrbReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
@@ -1531,7 +1532,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLRBFormation(f.intitule, f.codeRNCP) ? lrbReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
@@ -1558,7 +1559,8 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 
 function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const lower = f.intitule.toLowerCase();
-  const isFLE = lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français");
+  // Certification Le Robert (RS7013) : l'intitulé contient « française », jamais de contenu FLE médico-social.
+  const isFLE = !isLRBFormation(f.intitule, f.codeRNCP) && (lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français"));
 
   // Domain-specific besoins based on formation title
   function getDomainBesoins(): { besoins: string[]; synthese: string; adaptations: string } {
@@ -2028,6 +2030,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ? getARH41366Besoin(s.nom, s.prenom, s.civilite, i)
         : isGSC35Formation(f.intitule, f.codeRNCP)
         ? getGSC35Besoin(s.nom, s.prenom, s.civilite, i)
+        : isLRBFormation(f.intitule, f.codeRNCP)
+        ? getLRBBesoin(s.nom, s.prenom, s.civilite, i)
         : isTPBesoinsFormation(f.intitule, f.codeRNCP)
         ? getTPBesoinsPrincipal(f.intitule, f.codeRNCP, s.nom, s.prenom, s.civilite, i)!
         : getTPBesoin(f.intitule, f.codeRNCP, s.nom, s.prenom, i) ?? domain.besoins[i % domain.besoins.length];
@@ -2260,7 +2264,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
   // Detect FLE / certification by competence blocks
   const lower = f.intitule.toLowerCase();
-  const isFLEOrCertif = lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français");
+  // Certification Le Robert (RS7013) : jamais les blocs de compétences FLE médico-social.
+  const isFLEOrCertif = !isLRBFormation(f.intitule, f.codeRNCP) && (lower.includes("français") || mot(lower, "fle") || lower.includes("médico-social") || lower.includes("communiquer en français"));
   const isIACertif = !isIAP21Formation(f.intitule, f.codeRNCP) && (lower.includes("ia générative") || lower.includes("intelligence artificielle"));
   const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isBlocFormation = isFLEOrCertif || isIACertif;
@@ -3118,7 +3123,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
   // Summary
   const summaryRows = stagiaires.map((s, i) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, i, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, i, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, i, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, i, s.nom, s.prenom) : isLRBFormation(f.intitule, f.codeRNCP) ? lrbReponsesQcmDebut(questions, i, s.nom, s.prenom) : generateStagiaireAnswers(questions, i));
     const result = computeQCMScore(questions, answers);
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const practicalScore = sc[1];
@@ -4062,7 +4067,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // Individual results
   extra += `<div class="page-break"></div><h2>Résultats individuels</h2>`;
   stagiaires.forEach((s, si) => {
-    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
+    const answers = (isRPMSFormation(f.intitule, f.codeRNCP) ? rpmsReponsesQcmDebut(questions, si, s.nom, s.prenom) : isWM14Formation(f.intitule, f.codeRNCP) ? wm14ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isTVTEFormation(f.intitule, f.codeRNCP) ? tvteReponsesQcmDebut(questions, si, s.nom, s.prenom) : isIAP21Formation(f.intitule, f.codeRNCP) ? iap21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLilateFormation(f.intitule, f.codeRNCP) ? lilateReponsesQcmDebut(questions, si, s.nom, s.prenom) : isMSP21Formation(f.intitule, f.codeRNCP) ? msp21ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isARH41366Formation(f.intitule, f.codeRNCP) ? arh41366ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isGSC35Formation(f.intitule, f.codeRNCP) ? gsc35ReponsesQcmDebut(questions, si, s.nom, s.prenom) : isLRBFormation(f.intitule, f.codeRNCP) ? lrbReponsesQcmDebut(questions, si, s.nom, s.prenom) : generateStagiaireAnswers(questions, si));
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
 
@@ -8796,6 +8801,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
   if (f && isGSC35Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getGSC35EvalBesoins(s, false).disponibilites;
   }
+  if (f && isLRBFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
+    return getLRBEvalBesoins(s, false).disponibilites;
+  }
   if (f && isTPBesoinsFormation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getTPEvalBesoins(s, false, undefined, f.intitule, f.codeRNCP).disponibilites;
   }
@@ -8881,7 +8889,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const civilite = s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : (s.civilite || "Madame");
   
   // Detect formation type for coherent answers
-  const isFLE = t.includes("français") || t.includes("médico-social") || mot(t, "fle") || t.includes("communiquer en");
+  const isFLE = !isLRBFormation(f.intitule, f.codeRNCP) && (t.includes("français") || t.includes("médico-social") || mot(t, "fle") || t.includes("communiquer en"));
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
@@ -8947,6 +8955,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Gérer son centre de formation – 35 h (non certifiante, avant « création d'entreprise ») ===
   if (isGSC35Formation(f.intitule, f.codeRNCP)) {
     return getGSC35EvalBesoins(s, hasEntreprise, idx);
+  }
+
+  // === Early return : Préparation à la Certification Le Robert (RS7013), avant les réponses FLE (« français ») ===
+  if (isLRBFormation(f.intitule, f.codeRNCP)) {
+    return getLRBEvalBesoins(s, hasEntreprise, idx);
   }
 
   // === Early return : TP ETRM / GCF / Gestionnaire de paie / Comptable assistant / Secrétaire comptable ===
@@ -11052,7 +11065,7 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     supportsContent = `<p>• Support de cours PDF : prospection, négociation, closing, gestion de portefeuille<br>• Fiches méthodes : SONCAS, SPIN, CAB, SIMAC<br>• Scripts de prospection téléphonique et email<br>• Modèles de propositions commerciales<br>• Exercices de traitement des objections<br>• Grilles de suivi de pipeline commercial</p>`;
     outilsContent = `<p>• CRM de démonstration pour le suivi des prospects<br>• Outils de prospection LinkedIn (Sales Navigator)<br>• Supports vidéo de mises en situation commerciales<br>• Salle équipée pour les jeux de rôle<br>• QCM et quiz de positionnement commercial</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://www.actionco.fr/" style="color:hsl(220,60%,50%)">actionco.fr</a> – Magazine de la performance commerciale<br>• <strong>Site :</strong> <a href="https://www.linkedin.com/sales/" style="color:hsl(220,60%,50%)">linkedin.com/sales</a> – LinkedIn Sales Navigator<br>• <strong>Livre :</strong> "Vendre aux acheteurs professionnels" (Dunod)<br>• Templates de propositions commerciales<br>• Glossaire des termes commerciaux et de négociation</p>`;
-  } else if (lower.includes('français') || mot(lower, 'fle')) {
+  } else if (!isLRBFormation(f.intitule, f.codeRNCP) && (lower.includes('français') || mot(lower, 'fle'))) {
     supportsContent = `<p>• Support de cours PDF : communication orale et écrite en milieu médico-social<br>• Fiches vocabulaire par situation professionnelle (accueil, transmissions, réunions)<br>• Documents professionnels authentiques (protocoles, cahiers de liaison)<br>• Exercices de rédaction de transmissions écrites<br>• Jeux de rôle en contexte médico-social<br>• QCM de positionnement et d'évaluation finale</p>`;
     outilsContent = `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme d'exercices interactifs FLE (TV5Monde, RFI Savoirs)<br>• Supports audio et vidéo authentiques<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://apprendre.tv5monde.com/" style="color:hsl(220,60%,50%)">apprendre.tv5monde.com</a> – Apprendre le français<br>• <strong>Site :</strong> <a href="https://www.fle.fr/" style="color:hsl(220,60%,50%)">fle.fr</a> – Portail du FLE<br>• <strong>Site :</strong> <a href="https://savoirs.rfi.fr/" style="color:hsl(220,60%,50%)">savoirs.rfi.fr</a> – RFI Savoirs<br>• Glossaire des termes médico-sociaux<br>• Fiches phonétiques téléchargeables</p>`;
@@ -11282,7 +11295,7 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
   const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
   const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
-  const isFLE = t.includes("français") || mot(t, "fle");
+  const isFLE = !isLRBFormation(f?.intitule, f?.codeRNCP) && (t.includes("français") || mot(t, "fle"));
   const isWord = t.includes("word");
   const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
@@ -12171,6 +12184,8 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
         ? arh41366BonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : isGSC35Formation(f.intitule, f.codeRNCP)
         ? gsc35BonnesQcmDebut(questions.length, si, s.nom, s.prenom)
+        : isLRBFormation(f.intitule, f.codeRNCP)
+        ? lrbBonnesQcmDebut(questions.length, si, s.nom, s.prenom)
         : Math.max(1, Math.round(questions.length * 0.4));
       const seedBase = (s.prenom + s.nom + si).split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0);
       const correctSet = new Set<number>();
@@ -15438,6 +15453,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }
   if (mode === "debut" && isGSC35Formation(f.intitule, f.codeRNCP)) {
     targetCorrect = gsc35BonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
+  }
+  if (mode === "debut" && isLRBFormation(f.intitule, f.codeRNCP)) {
+    targetCorrect = lrbBonnesQcmDebut(qcm.length, si, s.nom, s.prenom);
   }
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
