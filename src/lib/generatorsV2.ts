@@ -39,6 +39,7 @@ import { pickMSP21ExerciceAnswer, isMSP21Formation, msp21NoteExercice } from "./
 import { pickLilateExerciceAnswer, isLilateFormation, lilateNoteExercice } from "./lilateHumanized";
 import { pickARH41366ExerciceAnswer, isARH41366Formation, arh41366NoteExercice } from "./arh41366Humanized";
 import { pickGSC35ExerciceAnswer, isGSC35Formation, gsc35NoteExercice } from "./gererCentre35hHumanized";
+import { pickANG40ExerciceAnswer, isANG40Formation, ang40NoteExercice } from "./anglaisPro40hHumanized";
 import { pickLRBExerciceAnswer, isLRBFormation, lrbNoteExercice } from "./robertRS7013Humanized";
 
 // ========== HELPERS ==========
@@ -1189,6 +1190,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, arh41366NoteExercice(stagiaireIdx, ei, true))
         : isGSC35Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, gsc35NoteExercice(stagiaireIdx, ei, true))
+        : isANG40Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, ang40NoteExercice(stagiaireIdx, ei, true))
         : isLRBFormation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, lrbNoteExercice(stagiaireIdx, ei, true))
         : 7 + (exSeed % 4); // 7,8,9,10 sur 10
@@ -1261,6 +1264,8 @@ D) Drive faster to finish the ride.`,
       ? arh41366NoteExercice(stagiaireIdx, ei, false)
       : isGSC35Formation(f.intitule, f.codeRNCP)
       ? gsc35NoteExercice(stagiaireIdx, ei, false)
+      : isANG40Formation(f.intitule, f.codeRNCP)
+      ? ang40NoteExercice(stagiaireIdx, ei, false)
       : isLRBFormation(f.intitule, f.codeRNCP)
       ? lrbNoteExercice(stagiaireIdx, ei, false)
       : Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
@@ -1319,6 +1324,7 @@ D) Drive faster to finish the ride.`,
       || pickLilateExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickMSP21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickGSC35ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickANG40ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickLRBExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
     if (creaRep) {

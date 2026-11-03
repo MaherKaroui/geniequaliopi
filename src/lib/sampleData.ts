@@ -201,6 +201,8 @@ import { FORMATION_ARH41366 } from "./arh41366Preset";
 export { FORMATION_ARH41366, seedARH41366AICaches } from "./arh41366Preset";
 import { FORMATION_GSC35 } from "./gererCentre35hPreset";
 export { FORMATION_GSC35, seedGSC35AICaches } from "./gererCentre35hPreset";
+import { FORMATION_ANG40 } from "./anglaisPro40hPreset";
+export { FORMATION_ANG40, seedANG40AICaches } from "./anglaisPro40hPreset";
 import { FORMATION_LRB } from "./robertRS7013Preset";
 export { FORMATION_LRB, seedLRBAICaches } from "./robertRS7013Preset";
 
@@ -565,6 +567,9 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ARH41366,
   // Gérer son centre de formation – 35 h (non certifiante, C1 à C6) : contenus pré-remplis (gererCentre35hPreset), aucun stagiaire importé
   FORMATION_GSC35,
+  // Anglais Professionnel – 40 h (non certifiante, C1 à C6) : contenus pré-remplis (anglaisPro40hPreset), aucun stagiaire importé.
+  // Distinct de « Anglais Professionnel – Préparation TOEIC », conservé tel quel.
+  FORMATION_ANG40,
   // Préparation à la Certification en langue française Le Robert (RS7013, 21 h à distance, C1 et C2) : contenus pré-remplis (robertRS7013Preset), aucun stagiaire importé
   FORMATION_LRB,
   {

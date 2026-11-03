@@ -24,6 +24,8 @@ import { ARH41366_EXERCICES_COMPLETS, ARH41366_QCM_DEBUT, ARH41366_QCM_FIN, ARH4
 import { isARH41366Formation, getARH41366AutoAnswers, ARH41366_QUESTIONS_OUVERTES } from "./arh41366Humanized";
 import { GSC35_EXERCICES_COMPLETS, GSC35_QCM_DEBUT, GSC35_QCM_FIN } from "./gererCentre35hPreset";
 import { isGSC35Formation, getGSC35AutoAnswers, GSC35_QUESTIONS_OUVERTES } from "./gererCentre35hHumanized";
+import { ANG40_EXERCICES_COMPLETS, ANG40_QCM_DEBUT, ANG40_QCM_FIN } from "./anglaisPro40hPreset";
+import { isANG40Formation, getANG40AutoAnswers, ANG40_QUESTIONS_OUVERTES } from "./anglaisPro40hHumanized";
 import { LRB_EXERCICES_COMPLETS, LRB_QCM_DEBUT, LRB_QCM_FIN } from "./robertRS7013Preset";
 import { isLRBFormation, getLRBAutoAnswers, LRB_QUESTIONS_OUVERTES } from "./robertRS7013Humanized";
 
@@ -1288,6 +1290,30 @@ EVAL_CONTENT["MSP21"] = {
   ],
 };
 
+// ===== Anglais Professionnel – 40 h (non certifiante, C1 à C6) =====
+// Mises en situation corrigées (diagnostic puis C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["ANG40"] = {
+  qcmPositionnement: ANG40_QCM_DEBUT,
+  qcmFinal: ANG40_QCM_FIN,
+  exercices: ANG40_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Mobiliser le vocabulaire métier et les structures grammaticales clés en anglais",
+    "C2 – Rédiger des écrits professionnels clairs et structurés",
+    "C3 – Mener des échanges téléphoniques et des visioconférences",
+    "C4 – Animer et participer activement à des réunions",
+    "C5 – Concevoir et délivrer une présentation professionnelle",
+    "C6 – Conduire une négociation et traiter objections et réclamations",
+  ],
+  appreciations: [
+    "Présentation de soi et de l'entreprise fluide ; le present perfect est désormais bien employé. L'aisance au téléphone reste à consolider.",
+    "Emails nettement plus clairs et mieux structurés, registre adapté. Doit encore oser prendre la parole en réunion.",
+    "Bonne gestion des appels et des visioconférences, reformulations efficaces. Quelques erreurs de prépositions à surveiller à l'écrit.",
+    "Participation active aux réunions, désaccords exprimés avec diplomatie. La présentation chiffrée gagnerait à être plus rythmée.",
+    "Présentation claire et bien appuyée sur les diapositives. La contre-proposition en négociation doit être formulée plus tôt.",
+    "Progression régulière sur les six jours ; réclamation traitée avec calme et méthode. Vocabulaire métier à entretenir par une pratique hebdomadaire.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1534,6 +1560,8 @@ EVAL_CONTENT["Restauration"] = {
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
+  // Anglais Professionnel – 40 h (non certifiante) — avant toute règle « anglais » (TOEIC, VTest, A1)
+  if (isANG40Formation(lower)) return "ANG40";
   // TP ARH RNCP41366 — avant toute règle « assistant », « paie », « secrétariat » ou « social »
   if (isARH41366Formation(lower)) return "ARH41366";
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
@@ -2308,6 +2336,9 @@ QUESTIONS_OUVERTES["MSP21"] = MSP21_QUESTIONS_OUVERTES;
 // Gérer son centre de formation – 35 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["GSC35"] = GSC35_QUESTIONS_OUVERTES;
 
+// Anglais Professionnel – 40 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["ANG40"] = ANG40_QUESTIONS_OUVERTES;
+
 // Préparation à la Certification Le Robert (RS7013) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["LRB"] = LRB_QUESTIONS_OUVERTES;
 
@@ -2726,6 +2757,18 @@ export function generateStagiaireOpenAnswers(
       stagiaireIndex,
     );
     return toAnswers(autoArh.reponses, autoArh.scores);
+  }
+
+  // Anglais Professionnel – 40 h : moteur humanisé (une copie différente par stagiaire).
+  if (isANG40Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoAng = getANG40AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoAng.reponses, autoAng.scores);
   }
 
   // Gérer son centre de formation – 35 h : moteur humanisé (une copie différente par stagiaire).

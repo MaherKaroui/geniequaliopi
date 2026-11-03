@@ -7,6 +7,8 @@ import { isARH41366Formation } from "@/lib/arh41366Humanized";
 import { seedARH41366AICaches } from "@/lib/arh41366Preset";
 import { isGSC35Formation } from "@/lib/gererCentre35hHumanized";
 import { seedGSC35AICaches } from "@/lib/gererCentre35hPreset";
+import { isANG40Formation } from "@/lib/anglaisPro40hHumanized";
+import { seedANG40AICaches } from "@/lib/anglaisPro40hPreset";
 import { isLRBFormation } from "@/lib/robertRS7013Humanized";
 import { seedLRBAICaches } from "@/lib/robertRS7013Preset";
 import { getCachedContentPack } from "@/lib/aiContentPack";
@@ -164,6 +166,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // Gérer son centre de formation – 35 h : même rechargement des packs du preset.
     if (d.formation && isGSC35Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedGSC35AICaches(d.formation);
+    }
+    // Anglais Professionnel – 40 h : même rechargement des packs du preset.
+    if (d.formation && isANG40Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedANG40AICaches(d.formation);
     }
     // Préparation à la Certification Le Robert (RS7013) : même rechargement des packs du preset.
     if (d.formation && isLRBFormation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {

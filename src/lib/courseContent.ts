@@ -487,6 +487,8 @@ import { getMSP21Chapters } from "./courseContentMSP21";
 import { isMSP21Formation } from "./msp21Humanized";
 import { getGererCentre35hChapters } from "./courseContentGererCentre35h";
 import { isGSC35Formation } from "./gererCentre35hHumanized";
+import { getAnglaisPro40hChapters } from "./courseContentAnglaisPro40h";
+import { isANG40Formation } from "./anglaisPro40hHumanized";
 import { getRobertRS7013Chapters } from "./courseContentRobertRS7013";
 import { isLRBFormation } from "./robertRS7013Humanized";
 import { LRB_VIDEOS } from "./robertRS7013Preset";
@@ -547,6 +549,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t0 = formationIntitule.toLowerCase();
   if (mot(t0, 'ongulaire') || mot(t0, 'rs7302')) return getOngulaireChapters();
   if (mot(t0, 'vitrage') || mot(t0, 'rncp36223') || mot(t0, 'pare-brise') || mot(t0, 'pare brise')) return getVitrageChapters();
+  // Anglais Professionnel – 40 h (non certifiante) : support propre, avant toute règle « anglais » (TOEIC, VTest, A1)
+  if (isANG40Formation(formationIntitule)) return getAnglaisPro40hChapters();
   // TP ARH RNCP41366 : support de cours propre, avant toute règle « paie », « secrétariat » ou RH générique
   if (isARH41366Formation(formationIntitule)) return getARH41366Chapters();
   const ai = tryAIChapters(formationIntitule);
