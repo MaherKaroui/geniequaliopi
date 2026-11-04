@@ -454,7 +454,7 @@ export function coh21NoteDebutSur20(idx?: number, nom?: string, prenom?: string)
   return NOTES_DEBUT_SUR_20[rang(baseIndex(idx, nom, prenom), 23, NOTES_DEBUT_SUR_20.length)];
 }
 
-/** Bonnes réponses au QCM de positionnement de début (10 questions → 2 à 6, soit 4 à 12/20). */
+/** Bonnes réponses au QCM de positionnement de début (« Positionnement — vos repères de départ », 8 questions → 2 à 4). */
 export function coh21BonnesQcmDebut(nbQuestions: number, idx?: number, nom?: string, prenom?: string): number {
   return Math.floor((coh21NoteDebutSur20(idx, nom, prenom) / 20) * nbQuestions);
 }

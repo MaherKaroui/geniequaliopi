@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "fs";
 import { resolve } from "path";
 import {
   FORMATION_COH21, COH21_EXERCICES, COH21_QCM_COMPETENCES, COH21_QCM_DEBUT, COH21_QCM_FIN,
+  COH21_POSITIONNEMENT_TITRE, COH21_QCM_DEBUT_EXPLICATIONS,
   COH21_CONTENT_PACK, COH21_EVAL_PACK, COH21_VEILLE_PACK, seedCOH21AICaches,
 } from "@/lib/cohesionEquipe21hPreset";
 import {
@@ -130,9 +131,19 @@ describe("Cohésion d'équipe en entreprise – 21 h — formation exemple non c
       expect(new Set(Object.values(correct)).size, ex.titre).toBeGreaterThanOrEqual(2);
     }
     expect(COH21_EXERCICES).toHaveLength(10);
-    expect(COH21_QCM_DEBUT).toHaveLength(10);
+    // Positionnement — vos repères de départ : 8 questions de connaissances du contenu source, une seule bonne réponse
+    expect(COH21_POSITIONNEMENT_TITRE).toBe("Positionnement — vos repères de départ");
+    expect(COH21_QCM_DEBUT).toHaveLength(8);
+    expect(COH21_QCM_DEBUT_EXPLICATIONS).toHaveLength(8);
+    for (const q of COH21_QCM_DEBUT) {
+      expect(q.options).toHaveLength(3);
+      expect(q.correctIndex).toBeGreaterThanOrEqual(0);
+      expect(q.correctIndex).toBeLessThan(3);
+    }
+    expect(new Set(COH21_QCM_DEBUT.map(q => q.correctIndex)).size).toBeGreaterThanOrEqual(3);
+    expect(COH21_QCM_DEBUT[0].options[COH21_QCM_DEBUT[0].correctIndex]).toBe("Un objectif commun et une interdépendance entre ses membres");
     expect(COH21_QCM_FIN).toHaveLength(10);
-    for (const q of [...COH21_QCM_DEBUT, ...COH21_QCM_FIN]) {
+    for (const q of COH21_QCM_FIN) {
       expect(q.options).toHaveLength(4);
       expect(q.correctIndex).toBeGreaterThanOrEqual(0);
       expect(q.correctIndex).toBeLessThan(4);
@@ -216,6 +227,11 @@ describe("Cohésion d'équipe en entreprise – 21 h — formation exemple non c
       const rep = coh21ReponsesQcmDebut(COH21_QCM_DEBUT, i, "NOM" + i, "Prenom");
       const bonnes = rep.filter((r, qi) => r === COH21_QCM_DEBUT[qi].correctIndex).length;
       expect(bonnes).toBe(coh21BonnesQcmDebut(COH21_QCM_DEBUT.length, i));
+      // Copie cohérente : une réponse cochée par question, parmi les options, score = bonnes réponses
+      expect(rep).toHaveLength(8);
+      rep.forEach((r, qi) => { expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThan(COH21_QCM_DEBUT[qi].options.length); });
+      expect(bonnes).toBeGreaterThanOrEqual(1);
+      expect(bonnes).toBeLessThanOrEqual(4);
     }
   });
 
@@ -263,7 +279,17 @@ describe("Cohésion d'équipe en entreprise – 21 h — câblage", () => {
       expect(c.sections.some(s => /Capsule vidéo/.test(s.title)), c.title).toBe(true);
       expect(c.sections.every(s => !s.content.includes("${")), c.title).toBe(true);
     }
-    expect(chapitres[0].sections.some(s => /Positionnement/.test(s.title))).toBe(true);
+    const pos = chapitres[0].sections.find(s => /Positionnement — vos repères de départ/.test(s.title))!;
+    expect(pos.title).toMatch(/^1\.2 – /);
+    expect(pos.content).toMatch(/Corrigé/);
+    // Corrigé : chaque bonne réponse et chaque explication du positionnement figurent dans la section 1.2
+    for (const q of COH21_QCM_DEBUT) expect(pos.content).toContain(q.options[q.correctIndex]);
+    for (const e of COH21_QCM_DEBUT_EXPLICATIONS) expect(pos.content).toContain(e.slice(0, 40));
+    expect(pos.content).toContain("Un objectif commun et une interdépendance entre ses membres");
+    expect(html).not.toMatch(/ni bonne ni mauvaise/);
+    expect(html).not.toMatch(/agrég/);
+    expect(html).toMatch(/QCM de positionnement de 8 questions, comparé à l'évaluation finale pour mesurer la progression/);
+    expect(html).toMatch(/Où en est notre équipe \? Diagnostic partagé/);
     expect(chapitres[5].sections.some(s => /Évaluation finale des acquis/.test(s.title))).toBe(true);
     expect(html).toMatch(/Maison Lumen est une entreprise fictive/);
     expect(JSON.stringify(chapitres)).not.toMatch(INTERDITS);
@@ -305,6 +331,7 @@ describe("Cohésion d'équipe en entreprise – 21 h — câblage", () => {
     const catalogue = getFullCatalog(org, f, stagiaires);
     expect(catalogue.length).toBeGreaterThan(50);
     let generes = 0;
+    let positionnementVu = 0;
     for (const d of catalogue) {
       let html = "";
       try { html = generateDocumentById(d.id, d.template, d.params, org, f, stagiaires) || ""; } catch { continue; }
@@ -316,7 +343,11 @@ describe("Cohésion d'équipe en entreprise – 21 h — câblage", () => {
       const re = DOCS_ORGANISME.test(d.id) ? HORS_FORMATION : INTERDITS;
       const m = texte.match(new RegExp(`.{0,60}(${re.source}).{0,60}`, "i"));
       if (m) fuites.push(`${d.id} — ${d.nom} : …${m[0]}…`);
+      if (/ni bonne ni mauvaise r[ée]ponse/i.test(texte)) fuites.push(`${d.id} — ${d.nom} : positionnement « sans bonne ni mauvaise réponse »`);
+      if (/simple groupe de personnes/.test(texte) && /repères de départ|positionnement/i.test(texte)) positionnementVu++;
     }
+    // Le QCM de positionnement (8 questions du source) apparaît dans les documents de positionnement générés
+    expect(positionnementVu).toBeGreaterThan(0);
     expect(generes).toBeGreaterThan(50);
     expect(fuites).toEqual([]);
   }, 600_000);
