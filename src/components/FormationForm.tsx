@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches, FORMATION_GSC35, seedGSC35AICaches, FORMATION_LRB, seedLRBAICaches, FORMATION_ANG40, seedANG40AICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches, FORMATION_GSC35, seedGSC35AICaches, FORMATION_LRB, seedLRBAICaches, FORMATION_ANG40, seedANG40AICaches, FORMATION_COH21, seedCOH21AICaches } from "@/lib/sampleData";
 import { isAncienExempleARH } from "@/lib/arhExercises";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
@@ -319,6 +319,14 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         onChange(ang);
         seedANG40AICaches(ang);
         toast.success("Anglais Professionnel – 40 h : évaluation des besoins, tests de positionnement, 10 mises en situation corrigées, 6 QCM par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
+      }
+      // Cohésion d'équipe en entreprise – 21 h (non certifiante) : contenus 100 % pré-remplis, AUCUN stagiaire importé ;
+      // le formateur déjà saisi dans le dossier est conservé.
+      if (selected.intitule === FORMATION_COH21.intitule) {
+        const coh = { ...selected, formateur: data.formateur || selected.formateur, formateurSignatureUrl: data.formateurSignatureUrl };
+        onChange(coh);
+        seedCOH21AICaches(coh);
+        toast.success("Cohésion d'équipe en entreprise – 21 h : évaluation des besoins, positionnement, 10 ateliers corrigés, 6 QCM par module (C1 à C6), support de cours en 6 chapitres et veilles inclus");
       }
       // Préparation à la Certification en langue française Le Robert (RS7013) : contenus 100 % pré-remplis,
       // AUCUN stagiaire importé ; le formateur déjà saisi dans le dossier est conservé.

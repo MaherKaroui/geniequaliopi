@@ -26,6 +26,8 @@ import { GSC35_EXERCICES_COMPLETS, GSC35_QCM_DEBUT, GSC35_QCM_FIN } from "./gere
 import { isGSC35Formation, getGSC35AutoAnswers, GSC35_QUESTIONS_OUVERTES } from "./gererCentre35hHumanized";
 import { ANG40_EXERCICES_COMPLETS, ANG40_QCM_DEBUT, ANG40_QCM_FIN } from "./anglaisPro40hPreset";
 import { isANG40Formation, getANG40AutoAnswers, ANG40_QUESTIONS_OUVERTES } from "./anglaisPro40hHumanized";
+import { COH21_EXERCICES_COMPLETS, COH21_QCM_DEBUT, COH21_QCM_FIN } from "./cohesionEquipe21hPreset";
+import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
 import { LRB_EXERCICES_COMPLETS, LRB_QCM_DEBUT, LRB_QCM_FIN } from "./robertRS7013Preset";
 import { isLRBFormation, getLRBAutoAnswers, LRB_QUESTIONS_OUVERTES } from "./robertRS7013Humanized";
 
@@ -1314,6 +1316,30 @@ EVAL_CONTENT["ANG40"] = {
   ],
 };
 
+// ===== Cohésion d'équipe en entreprise – 21 h (non certifiante, C1 à C6 = modules 1 à 6) =====
+// Ateliers corrigés (C1 à C6) puis un QCM de 6 questions par module (questions du contenu source).
+EVAL_CONTENT["COH21"] = {
+  qcmPositionnement: COH21_QCM_DEBUT,
+  qcmFinal: COH21_QCM_FIN,
+  exercices: COH21_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Expliquer ce qui distingue une équipe d'un groupe et repérer le stade de développement de son équipe",
+    "C2 – Identifier ses préférences de fonctionnement et celles de ses collègues pour mieux coopérer",
+    "C3 – Pratiquer l'écoute active, la reformulation et un feedback constructif, y compris à distance",
+    "C4 – Clarifier les rôles et choisir un mode de décision adapté pour coopérer efficacement",
+    "C5 – Traiter un désaccord ou une tension avant qu'il ne devienne un conflit",
+    "C6 – Construire la charte d'équipe et un plan d'action collectif et individuel à 30, 60 et 90 jours",
+  ],
+  appreciations: [
+    "Diagnostic de l'équipe appuyé sur des faits ; s'exprime plus facilement en sous-groupe qu'en grand groupe. Feedback à travailler.",
+    "Bonne connaissance de ses préférences de fonctionnement et de celles des autres ; reformule avec justesse. Doit encore oser exprimer un désaccord.",
+    "Feedback structuré et précis, reçu sans se défendre. La préparation des conversations difficiles reste à consolider.",
+    "Participation active à la matrice RACI et à la décision par consentement. Tendance à généraliser à surveiller dans les échanges tendus.",
+    "Analyse des tensions juste, recherche des causes organisationnelles. Plan d'action individuel à rendre plus mesurable.",
+    "Contribution constructive à la charte d'équipe ; plan d'action SMART complet avec binôme de suivi. Engagements à tenir dans la durée.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1562,6 +1588,8 @@ function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   // Anglais Professionnel – 40 h (non certifiante) — avant toute règle « anglais » (TOEIC, VTest, A1)
   if (isANG40Formation(lower)) return "ANG40";
+  // Cohésion d'équipe en entreprise – 21 h (non certifiante) — avant toute règle « management », « entreprise », « communication »
+  if (isCOH21Formation(lower)) return "COH21";
   // TP ARH RNCP41366 — avant toute règle « assistant », « paie », « secrétariat » ou « social »
   if (isARH41366Formation(lower)) return "ARH41366";
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
@@ -1757,12 +1785,16 @@ for (const [cle, contenu] of Object.entries(EVAL_COMPLEMENTS)) {
 /** Vrai si la formation dispose d'un contenu d'évaluation dédié (et pas du contenu générique). */
 export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (presetEvalContent(formationIntitule)) return true;
+  // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
+  if (isCOH21Formation(formationIntitule)) return true;
   return hasExactStaticContent({ intitule: formationIntitule });
 }
 
 export function getEvalContent(formationIntitule: string): FormationEvalContent {
   const preset = presetEvalContent(formationIntitule);
   if (preset) return preset;
+  // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
+  if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
   if (!hasExactStaticContent({ intitule: formationIntitule })) return DEFAULT_CONTENT;
   const key = getContentKey(formationIntitule);
   return EVAL_CONTENT[key] || DEFAULT_CONTENT;
@@ -2339,6 +2371,9 @@ QUESTIONS_OUVERTES["GSC35"] = GSC35_QUESTIONS_OUVERTES;
 // Anglais Professionnel – 40 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["ANG40"] = ANG40_QUESTIONS_OUVERTES;
 
+// Cohésion d'équipe en entreprise – 21 h — 10 questions début / fin dans l'ordre des ateliers.
+QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
+
 // Préparation à la Certification Le Robert (RS7013) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["LRB"] = LRB_QUESTIONS_OUVERTES;
 
@@ -2757,6 +2792,18 @@ export function generateStagiaireOpenAnswers(
       stagiaireIndex,
     );
     return toAnswers(autoArh.reponses, autoArh.scores);
+  }
+
+  // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).
+  if (isCOH21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoCoh = getCOH21AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoCoh.reponses, autoCoh.scores);
   }
 
   // Anglais Professionnel – 40 h : moteur humanisé (une copie différente par stagiaire).

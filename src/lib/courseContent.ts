@@ -327,6 +327,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isARH41366Formation(formationIntitule)) return YOUTUBE_ARH41366;
   // Préparation à la Certification Le Robert (RS7013) : l'intitulé contient « française », jamais les vidéos FLE
   if (isLRBFormation(formationIntitule)) return LRB_VIDEOS;
+  // Cohésion d'équipe en entreprise – 21 h : vidéos du preset, jamais les banques « management » ou « entreprise »
+  if (isCOH21Formation(formationIntitule)) return COH21_VIDEOS;
   // CQP Opérateur vitrage (RNCP36223)
   if (t.includes('vitrage') || t.includes('rncp36223') || t.includes('pare-brise') || t.includes('pare brise')) return YOUTUBE_VITRAGE;
   // Massages spécifiques (avant générique)
@@ -489,6 +491,9 @@ import { getGererCentre35hChapters } from "./courseContentGererCentre35h";
 import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { getAnglaisPro40hChapters } from "./courseContentAnglaisPro40h";
 import { isANG40Formation } from "./anglaisPro40hHumanized";
+import { getCohesionEquipe21hChapters } from "./courseContentCohesionEquipe21h";
+import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
+import { COH21_VIDEOS } from "./cohesionEquipe21hPreset";
 import { getRobertRS7013Chapters } from "./courseContentRobertRS7013";
 import { isLRBFormation } from "./robertRS7013Humanized";
 import { LRB_VIDEOS } from "./robertRS7013Preset";
@@ -551,6 +556,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (mot(t0, 'vitrage') || mot(t0, 'rncp36223') || mot(t0, 'pare-brise') || mot(t0, 'pare brise')) return getVitrageChapters();
   // Anglais Professionnel – 40 h (non certifiante) : support propre, avant toute règle « anglais » (TOEIC, VTest, A1)
   if (isANG40Formation(formationIntitule)) return getAnglaisPro40hChapters();
+  // Cohésion d'équipe en entreprise – 21 h (non certifiante) : support propre, avant les règles « management » / « entreprise »
+  if (isCOH21Formation(formationIntitule)) return getCohesionEquipe21hChapters();
   // TP ARH RNCP41366 : support de cours propre, avant toute règle « paie », « secrétariat » ou RH générique
   if (isARH41366Formation(formationIntitule)) return getARH41366Chapters();
   const ai = tryAIChapters(formationIntitule);
