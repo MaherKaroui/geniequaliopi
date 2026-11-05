@@ -205,6 +205,8 @@ import { FORMATION_ANG40 } from "./anglaisPro40hPreset";
 export { FORMATION_ANG40, seedANG40AICaches } from "./anglaisPro40hPreset";
 import { FORMATION_COH21 } from "./cohesionEquipe21hPreset";
 export { FORMATION_COH21, seedCOH21AICaches } from "./cohesionEquipe21hPreset";
+import { FORMATION_DRI47 } from "./droitInstitutions47hPreset";
+export { FORMATION_DRI47, seedDRI47AICaches } from "./droitInstitutions47hPreset";
 import { FORMATION_LRB } from "./robertRS7013Preset";
 export { FORMATION_LRB, seedLRBAICaches } from "./robertRS7013Preset";
 
@@ -574,6 +576,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ANG40,
   // Cohésion d'équipe en entreprise – 21 h (non certifiante, 6 modules, intra-entreprise) : contenus pré-remplis (cohesionEquipe21hPreset), aucun stagiaire importé
   FORMATION_COH21,
+  // Enseignement : fondamentaux du droit et des institutions (non certifiante, 47 h à distance, C1 à C6) : contenus pré-remplis (droitInstitutions47hPreset), aucun stagiaire importé
+  FORMATION_DRI47,
   // Préparation à la Certification en langue française Le Robert (RS7013, 21 h à distance, C1 et C2) : contenus pré-remplis (robertRS7013Preset), aucun stagiaire importé
   FORMATION_LRB,
   {

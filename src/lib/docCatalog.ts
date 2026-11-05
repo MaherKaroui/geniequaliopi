@@ -5,6 +5,7 @@ import { NEXUS_TEMPLATES } from "./bdc/nexus/nexusTemplates";
 import { isIAP21Formation } from "./iaPro21hHumanized";
 import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
+import { isDRI47Formation } from "./droitInstitutions47hHumanized";
 import { isLRBFormation } from "./robertRS7013Humanized";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
@@ -259,7 +260,7 @@ export function buildFullCatalog(
         ];
         const isIAForm = !isIAP21Formation(f.intitule, f.codeRNCP) && (tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative"));
         // Gérer son centre de formation – 35 h et Certification Le Robert (RS7013) : jamais de modules paie / secrétariat (exercices du preset).
-        const moduleTitles = isGSC35Formation(f.intitule, f.codeRNCP) || isLRBFormation(f.intitule, f.codeRNCP) || isCOH21Formation(f.intitule, f.codeRNCP) ? null : isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
+        const moduleTitles = isGSC35Formation(f.intitule, f.codeRNCP) || isLRBFormation(f.intitule, f.codeRNCP) || isCOH21Formation(f.intitule, f.codeRNCP) || isDRI47Formation(f.intitule, f.codeRNCP) ? null : isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
         // Nombre d'exercices / QCM dérivé du parcours RÉEL du stagiaire :
         // ≤ 12 jours de formation → 1 par jour ; au-delà → 1 par semaine calendaire.

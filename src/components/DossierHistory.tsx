@@ -11,6 +11,8 @@ import { isANG40Formation } from "@/lib/anglaisPro40hHumanized";
 import { seedANG40AICaches } from "@/lib/anglaisPro40hPreset";
 import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
 import { seedCOH21AICaches } from "@/lib/cohesionEquipe21hPreset";
+import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
+import { seedDRI47AICaches } from "@/lib/droitInstitutions47hPreset";
 import { isLRBFormation } from "@/lib/robertRS7013Humanized";
 import { seedLRBAICaches } from "@/lib/robertRS7013Preset";
 import { getCachedContentPack } from "@/lib/aiContentPack";
@@ -176,6 +178,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // Cohésion d'équipe en entreprise – 21 h : même rechargement des packs du preset.
     if (d.formation && isCOH21Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedCOH21AICaches(d.formation);
+    }
+    // Enseignement : fondamentaux du droit et des institutions : même rechargement des packs du preset.
+    if (d.formation && isDRI47Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedDRI47AICaches(d.formation);
     }
     // Préparation à la Certification Le Robert (RS7013) : même rechargement des packs du preset.
     if (d.formation && isLRBFormation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {

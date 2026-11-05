@@ -28,6 +28,8 @@ import { ANG40_EXERCICES_COMPLETS, ANG40_QCM_DEBUT, ANG40_QCM_FIN } from "./angl
 import { isANG40Formation, getANG40AutoAnswers, ANG40_QUESTIONS_OUVERTES } from "./anglaisPro40hHumanized";
 import { COH21_EXERCICES_COMPLETS, COH21_QCM_DEBUT, COH21_QCM_FIN } from "./cohesionEquipe21hPreset";
 import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
+import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
+import { isDRI47Formation, getDRI47AutoAnswers, DRI47_QUESTIONS_OUVERTES } from "./droitInstitutions47hHumanized";
 import { LRB_EXERCICES_COMPLETS, LRB_QCM_DEBUT, LRB_QCM_FIN } from "./robertRS7013Preset";
 import { isLRBFormation, getLRBAutoAnswers, LRB_QUESTIONS_OUVERTES } from "./robertRS7013Humanized";
 
@@ -1340,6 +1342,30 @@ EVAL_CONTENT["COH21"] = {
   ],
 };
 
+// ===== Enseignement : fondamentaux du droit et des institutions (non certifiante, C1 à C6 = modules 1 à 6) =====
+// Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["DRI47"] = {
+  qcmPositionnement: DRI47_QCM_DEBUT,
+  qcmFinal: DRI47_QCM_FIN,
+  exercices: DRI47_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Expliquer ce qu'est une règle de droit, identifier ses sources et les situer dans la hiérarchie des normes",
+    "C2 – Distinguer les branches du droit et qualifier une situation juridique simple",
+    "C3 – Décrire l'organisation des pouvoirs sous la Constitution de la Ve République et le rôle de chaque institution",
+    "C4 – Expliquer le fonctionnement des institutions politiques et territoriales, les droits du citoyen et la protection des libertés fondamentales",
+    "C5 – Articuler l'ordre juridique interne avec le droit de l'Union européenne et les traités internationaux",
+    "C6 – Identifier la juridiction compétente pour un litige et les voies de recours ouvertes",
+  ],
+  appreciations: [
+    "Hiérarchie des normes bien maîtrisée ; citations d'articles encore à préciser. Vocabulaire juridique en progrès.",
+    "Qualification des situations juste et argumentée ; le droit de l'Union européenne reste à consolider.",
+    "Très bonne compréhension des institutions de la Ve République ; la procédure législative est à revoir.",
+    "Bonne orientation vers les juridictions compétentes ; voies de recours et délais à mémoriser.",
+    "Raisonnement juridique structuré (faits, problème, règle, solution) ; quelques confusions entre Union européenne et Conseil de l'Europe.",
+    "Progression nette depuis le positionnement ; textes recherchés et vérifiés sur Légifrance en autonomie.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1590,6 +1616,8 @@ function getContentKey(intitule: string): string {
   if (isANG40Formation(lower)) return "ANG40";
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) — avant toute règle « management », « entreprise », « communication »
   if (isCOH21Formation(lower)) return "COH21";
+  // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
+  if (isDRI47Formation(lower)) return "DRI47";
   // TP ARH RNCP41366 — avant toute règle « assistant », « paie », « secrétariat » ou « social »
   if (isARH41366Formation(lower)) return "ARH41366";
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
@@ -1787,6 +1815,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (presetEvalContent(formationIntitule)) return true;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return true;
+  // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
+  if (isDRI47Formation(formationIntitule)) return true;
   return hasExactStaticContent({ intitule: formationIntitule });
 }
 
@@ -1795,6 +1825,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (preset) return preset;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
+  // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
+  if (isDRI47Formation(formationIntitule)) return EVAL_CONTENT["DRI47"];
   if (!hasExactStaticContent({ intitule: formationIntitule })) return DEFAULT_CONTENT;
   const key = getContentKey(formationIntitule);
   return EVAL_CONTENT[key] || DEFAULT_CONTENT;
@@ -2374,6 +2406,9 @@ QUESTIONS_OUVERTES["ANG40"] = ANG40_QUESTIONS_OUVERTES;
 // Cohésion d'équipe en entreprise – 21 h — 10 questions début / fin dans l'ordre des ateliers.
 QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
 
+// Enseignement : fondamentaux du droit et des institutions — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["DRI47"] = DRI47_QUESTIONS_OUVERTES;
+
 // Préparation à la Certification Le Robert (RS7013) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["LRB"] = LRB_QUESTIONS_OUVERTES;
 
@@ -2792,6 +2827,18 @@ export function generateStagiaireOpenAnswers(
       stagiaireIndex,
     );
     return toAnswers(autoArh.reponses, autoArh.scores);
+  }
+
+  // Enseignement : fondamentaux du droit et des institutions : moteur humanisé (une copie différente par stagiaire).
+  if (isDRI47Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoDri = getDRI47AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoDri.reponses, autoDri.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).
