@@ -44,7 +44,7 @@ const GenerateurTampon = () => {
         middle: "Organisme de Formation",
         bottom: o.siret ? `SIRET ${o.siret}` : "SIRET 123 456 789 00012",
         center: (ville || o.ville || "VILLIERS-LE-BEL").toUpperCase(),
-        sub: o.nda ? `NDA ${o.nda}` : "NDA 11 95 12345 95",
+        sub: o.sansNda ? "" : (o.nda ? `NDA ${o.nda}` : "NDA 11 95 12345 95"),
         raisonSociale: (o.nom || "").toUpperCase(),
         adresse: (o.adresse || "").toUpperCase(),
         cpVille: ville.toUpperCase(),
@@ -66,7 +66,7 @@ const GenerateurTampon = () => {
   const [admCpVille, setAdmCpVille] = useState(prefill?.cpVille || "CODE POSTAL VILLE");
   const [admSiret, setAdmSiret] = useState(prefill?.siret || "000 000 000 00000");
   const [admSiren, setAdmSiren] = useState("");
-  const [admNda, setAdmNda] = useState(prefill?.nda || "NDA");
+  const [admNda, setAdmNda] = useState(prefill ? prefill.nda : "NDA");
 
   useEffect(() => {
     if (prefill) {
