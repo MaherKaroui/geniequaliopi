@@ -257,7 +257,9 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
             siret: data.siret,
             ville: data.ville,
             codePostal: data.codePostal,
-            nda: data.nda,
+            adresse: data.adresse,
+            nda: hidden('nda') ? "" : data.nda,
+            sansNda: hidden('nda'),
           }}
         />
       </div>

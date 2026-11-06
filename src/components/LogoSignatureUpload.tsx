@@ -12,7 +12,7 @@ interface LogoSignatureUploadProps {
   onLogoChange: (url: string) => void;
   onSignatureChange: (url: string) => void;
   onTamponChange?: (url: string) => void;
-  organismePrefill?: { nom?: string; siret?: string; ville?: string; codePostal?: string; nda?: string };
+  organismePrefill?: { nom?: string; siret?: string; ville?: string; codePostal?: string; nda?: string; adresse?: string; sansNda?: boolean };
 }
 
 const UploadCard = ({

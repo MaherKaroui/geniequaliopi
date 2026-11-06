@@ -46,6 +46,11 @@ const NDA_DOCUMENTS = [
   { id: "emargement", label: "Feuille d'émargement / Rapport de connexion", icon: "✍️" },
 ];
 
+const NDA_DRAFT_KEY = "demande_nda_brouillon";
+function ndaDraft(): { organisme?: OrganismeInfo; formation?: FormationInfo; stagiaires?: StagiaireInfo[]; cvData?: CVData } | null {
+  try { return JSON.parse(sessionStorage.getItem(NDA_DRAFT_KEY) || "null"); } catch { return null; }
+}
+
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
   siteWeb: "", nda: "", dirigeant: "", responsablePedagogique: "", referentHandicap: "",
@@ -241,10 +246,10 @@ const DemandeNDA = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
-  const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
-  const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
-  const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([]);
-  const [cvData, setCvData] = useState<CVData>(emptyCV);
+  const [organisme, setOrganisme] = useState<OrganismeInfo>(() => ndaDraft()?.organisme ?? emptyOrganisme);
+  const [formation, setFormation] = useState<FormationInfo>(() => ndaDraft()?.formation ?? emptyFormation);
+  const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>(() => ndaDraft()?.stagiaires ?? []);
+  const [cvData, setCvData] = useState<CVData>(() => ndaDraft()?.cvData ?? emptyCV);
   const [cvDesign, setCvDesign] = useState<CVDesign>("classique");
   const [uploadedCV, setUploadedCV] = useState<UploadedCV | null>(null);
   const [extractingCV, setExtractingCV] = useState(false);
@@ -256,6 +261,11 @@ const DemandeNDA = () => {
   const [generating, setGenerating] = useState(false);
   const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
   const [docStyle, setDocStyleState] = useState<DocStyleConfig>({ ...DEFAULT_DOC_STYLE });
+
+  // Conserve la saisie quand on part générer le tampon/logo puis revient
+  useEffect(() => {
+    try { sessionStorage.setItem(NDA_DRAFT_KEY, JSON.stringify({ organisme, formation, stagiaires, cvData })); } catch { /* quota */ }
+  }, [organisme, formation, stagiaires, cvData]);
 
   const handleStyleChange = (newStyle: DocStyleConfig) => {
     setDocStyleState(newStyle);
