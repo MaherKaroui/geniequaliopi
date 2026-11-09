@@ -13,6 +13,9 @@ import { buildDocument, formatDate, isStagiaireFormationTerminee } from "./docBu
 import { getSatisfactionLabel, getAssiduiteLabel, getTauxObtention, getRepartitionParAnnee } from "./indicateursResultats";
 import { typeAuditEffectif, LIBELLES_AUDIT, moisEntre, type TypeAudit } from "./typeAudit";
 import { entreesVeille } from "./veilleExploitee";
+import { orgVersionUlterieure } from "./versionUlterieure";
+import { aleaSession, dateAnalyseRisques } from "./registresQualite";
+import { organismeALaDate } from "./sampleData";
 
 export type TypePrestation = "AF" | "CFA" | "VAE" | "BC";
 
@@ -127,14 +130,27 @@ export function genRevueDirection(o: OrganismeInfo, f: FormationInfo, stagiaires
   const chiffres = indicateursChiffres(o, f, stagiaires);
   const veilles = (["reglementaire", "metier", "technologique"] as const).flatMap((t) => entreesVeille(o, f, t, tp));
   const realisees = veilles.filter((e) => e.statut === "Réalisé").length;
+  const enCours = veilles.length - realisees;
   const obtention = parseDate(o.dateObtentionQualiopi);
-  const cycle = obtention ? `Certificat${v(o.numeroCertificatQualiopi) ? ` n° ${v(o.numeroCertificatQualiopi)}` : ""} obtenu le ${formatDate(iso(obtention))}${v(o.organismeCertificateur) ? ` (${v(o.organismeCertificateur)})` : ""} — ${moisEntre(obtention, today)} mois écoulés sur le cycle de 36 mois.` : "Date d'obtention du certificat à renseigner dans la fiche Organisme.";
+  const numCertif = v(o.numeroCertificatQualiopi);
+  const cycle = obtention
+    ? `Certificat${numCertif ? ` n° ${numCertif}` : ""} obtenu le ${formatDate(iso(obtention))}${v(o.organismeCertificateur) ? ` (${v(o.organismeCertificateur)})` : ""} — ${moisEntre(obtention, today)} mois écoulés sur le cycle de 36 mois.`
+    : `${type === "renouvellement" ? "Fin du cycle de certification en cours" : "Cycle de certification en cours"}${numCertif ? ` (certificat n° ${numCertif}${v(o.organismeCertificateur) ? `, ${v(o.organismeCertificateur)}` : ""})` : ""}.`;
+  // Réclamations et aléas : mêmes enregistrements que le suivi des dysfonctionnements et le tableau d'amélioration.
+  const alea = aleaSession(f);
+  const reclamations = alea
+    ? `<p>Aucune réclamation enregistrée au ${dateTxt}. Un dysfonctionnement a été enregistré : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} le ${alea.date} (signalé par ${alea.canal.toLowerCase()}), clôturé le ${alea.cloture} ; action corrective ${alea.ref} au tableau d'amélioration continue (${alea.action.charAt(0).toLowerCase()}${alea.action.slice(1)}).</p>`
+    : `<p>Aucune réclamation ni aucun dysfonctionnement enregistré au ${dateTxt}.</p>`;
+  const appreciations = stagiaires.some((s) => isStagiaireFormationTerminee(s, f))
+    ? "Les questionnaires de satisfaction des parties prenantes sont examinés en séance (synthèse AC-S01 au tableau d'amélioration continue)."
+    : "Les questionnaires de satisfaction des parties prenantes sont examinés en séance.";
+  const isoRisques = dateAnalyseRisques(o, f, today);
   const sections: { heading: string; content: string; variant?: "green" | "orange" }[] = [
     { heading: "Réunion", content: `<p><strong>Date :</strong> ${dateTxt}<br><strong>Participants :</strong> ${[...new Set([o.dirigeant, o.responsablePedagogique, o.referentQualite, o.referentHandicap].map(v).filter(Boolean))].join(", ")}<br><strong>Objet :</strong> ${type === "renouvellement" ? "bilan du cycle de certification et préparation de l'audit de renouvellement" : "revue qualité annuelle et préparation de l'audit de surveillance"}.<br><strong>Cycle :</strong> ${cycle}</p>` },
     { heading: "1. Résultats (IND 2 et 3)", content: `<ul>${chiffres.map((c) => `<li>${c.libelle} : <strong>${c.valeur}</strong> — ${c.source}</li>`).join("")}</ul>` },
-    { heading: "2. Appréciations et réclamations (IND 30 et 31)", content: `<p>Les questionnaires des parties prenantes et le registre des réclamations sont examinés en séance ; chaque réclamation reçue a donné lieu à un accusé de réception, une réponse et, le cas échéant, une action au tableau d'amélioration continue (références AC-).</p>` },
-    { heading: "3. Veille et environnement (IND 23 à 26)", content: `<p>${veilles.length} information(s) de veille exploitée(s) sur la période, dont ${realisees} action(s) clôturée(s) ; les autres sont suivies au tableau d'amélioration continue.</p>` },
-    { heading: "4. Analyse des risques qualité (IND 32 — décret n° 2026-728)", content: `<p>La cartographie des risques est revue : les mesures de maîtrise des risques cotés « élevés » sont maintenues ; leur efficacité est appréciée au regard des indicateurs ci-dessus (abandons, satisfaction, réclamations). Toute évolution est reportée dans l'analyse des risques mise à jour à cette date.</p>` },
+    { heading: "2. Appréciations et réclamations (IND 30 et 31)", content: `<p>${appreciations}</p>${reclamations}` },
+    { heading: "3. Veille et environnement (IND 23 à 26)", content: `<p>${veilles.length} information(s) de veille exploitée(s) sur la période (références AC-V au tableau d'amélioration continue) : ${enCours ? `${realisees} action(s) clôturée(s), ${enCours} en cours suivie(s) au tableau d'amélioration continue.` : "toutes les actions correspondantes sont clôturées."}</p>` },
+    { heading: "4. Analyse des risques qualité (IND 32 — décret n° 2026-728)", content: `<p>La cartographie des risques établie le ${formatDate(isoRisques)} est revue : les mesures de maîtrise des risques cotés « élevés » (références AC-R) sont maintenues${alea ? ` ; l'aléa ${alea.ref} confirme le risque de défaillance technique, dont la mesure est appliquée` : ""} ; leur efficacité est appréciée au regard des indicateurs ci-dessus (abandons, satisfaction, réclamations). Toute évolution est reportée dans l'analyse des risques mise à jour à cette date.</p>` },
     { heading: "5. Compétences des intervenants (IND 21 et 22)", content: `<p>Le bilan de réalisation du plan de développement des compétences est examiné : les actions dont l'échéance est passée sont confirmées (attestation jointe) ou reportées avec motif.</p>` },
     { heading: "6. Décisions", content: `<ul><li>Mise à jour des indicateurs publiés et de la fiche formation « ${f.intitule} ».</li><li>Maintien des mesures de maîtrise des risques ; revue de l'analyse des risques dans 12 mois au plus.</li><li>${type === "renouvellement" ? "Constitution du dossier de renouvellement : preuves du cycle classées par indicateur." : "Préparation de l'audit de surveillance : preuves de mise en œuvre sur la période classées par indicateur."}</li></ul>`, variant: "green" },
   ];
@@ -142,7 +158,8 @@ export function genRevueDirection(o: OrganismeInfo, f: FormationInfo, stagiaires
     const rep = getRepartitionParAnnee(f, stagiaires);
     sections.splice(2, 0, { heading: "Bilan du cycle de 3 ans", content: rep.length ? `<p>Parcours entrés par année (dossier) : ${rep.map((r) => `${r.annee} : ${r.total}`).join(" ; ")}. Les années sans donnée sont indiquées « non disponible » dans les indicateurs de résultats.</p>` : `<p>Aucune donnée d'activité par année dans le dossier : joindre les bilans pédagogiques et financiers des années du cycle.</p>` });
   }
-  return buildDocument({ org: o, title: "REVUE DE DIRECTION — BILAN QUALITÉ ANNUEL", subtitle: `Indicateur 32 — ${LIBELLES_AUDIT[type]}`, sections, signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite || o.dirigeant], dates: [dateTxt, dateTxt] } });
+  // Réunion postérieure à la V1 : version ultérieure datée du jour de la revue, au siège de cette date.
+  return buildDocument({ org: orgVersionUlterieure(o, iso(date)), title: "REVUE DE DIRECTION — BILAN QUALITÉ ANNUEL", subtitle: `Indicateur 32 — ${LIBELLES_AUDIT[type]}`, sections, signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite || o.dirigeant], dates: [dateTxt, dateTxt] } });
 }
 
 /** IND 22 : bilan de réalisation du plan de développement des compétences (hors nouvel entrant). */
@@ -151,14 +168,23 @@ export function genBilanPlanDeveloppement(o: OrganismeInfo, f: FormationInfo, st
   const date = formatDate(iso(dateRevueDirection(o, today)));
   const dRevue = dateRevueDirection(o, today);
   // Mêmes actions et références (PDC-nn) que le plan de développement des compétences.
+  // Statut déterminé : réalisée seulement si l'attestation figure au dossier, sinon à réaliser / reportée.
   const rows = planDevActions(o, f, [], stagiaires).map((a) => {
     const m = a.periode.match(/^T(\d) (\d{4})$/);
     const finTrim = m ? new Date(+m[2], +m[1] * 3, 0) : null;
     const echue = !finTrim || finTrim <= dRevue;
-    return [a.ref, a.nom, a.beneficiaires, a.besoin, a.periode, echue ? "Réalisée — attestation jointe ☐    Reportée — motif : ……… ☐" : "Échéance non atteinte — maintenue au plan"];
+    const statut = a.realisee
+      ? "Réalisée — attestation de fin de formation jointe au dossier"
+      : echue
+        ? "À réaliser — reportée au plan suivant : aucune attestation de réalisation au dossier à la date du bilan"
+        : "Échéance non atteinte — maintenue au plan";
+    return [a.ref, a.nom, a.beneficiaires, a.besoin, a.periode, statut];
   });
+  // Pièce datée du jour du bilan : organisme à son siège à cette date et pied « V2 <date du bilan> ».
+  const isoBilan = iso(dRevue);
+  const orgBilan = { ...organismeALaDate(o, isoBilan), version: "2", dateMaj: isoBilan };
   return buildDocument({
-    org: o, title: "BILAN DE RÉALISATION DU PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", subtitle: `Indicateur 22 — ${LIBELLES_AUDIT[type]}`,
+    org: orgBilan, title: "BILAN DE RÉALISATION DU PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", subtitle: `Indicateur 22 — ${LIBELLES_AUDIT[type]}`,
     sections: [
       { heading: "Objet", content: `<p>Bilan établi le ${date} pour l'audit de ${type === "renouvellement" ? "renouvellement" : "surveillance"} : chaque action du plan de développement dont l'échéance est passée est confirmée par une attestation (réalisée) ou reportée avec son motif. Seules les actions justifiées par une attestation sont présentées comme réalisées.</p>` },
     ],

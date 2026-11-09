@@ -15,7 +15,10 @@ describe("attestation IZIBUSINESS regroupée et plans IND 22", () => {
     expect(text).toContain("Automatiser la gestion de son centre avec Make et Airtable");
     expect(text).toContain("4 jours (28 heures)");
     expect(text).toContain(org.dirigeant);
-    expect(text).toContain(org.nom);
+    // Formations datées avant la V1 (création de l'organisme) : attestation au nom de la personne seule,
+    // sans raison sociale ni SIRET d'une société qui n'existait pas encore.
+    expect(text).not.toContain(org.nom);
+    if (org.siret) expect(text).not.toContain(org.siret);
     expect(text).not.toContain("EMI EVOLUTION");
     expect(document.querySelectorAll('img[alt="Tampon IZIBUSINESS"]')).toHaveLength(1);
     expect(html).not.toContain('class="header"');

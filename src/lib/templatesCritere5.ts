@@ -6,6 +6,7 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
 import { formationsIziRealisees, formatDateIzi } from "./attestationIzibusiness";
+import { intervenantsReels } from "./piecesAF2026";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
@@ -31,55 +32,124 @@ function ligneExperience(f?: FormationInfo): string {
   return `<li>Expérience minimum de 2 ans dans le domaine « ${domaineFormation(f)} » ou en formation d'adultes sur ce domaine</li>`;
 }
 
+const normNom = (x?: string) => (x || "").replace(/\s*\(\s*externe\s*\)\s*/i, "").trim().toLowerCase().replace(/\s+/g, " ");
+const memeNom = (a?: string, b?: string) => !!normNom(a) && normNom(a) === normNom(b);
+const listeEt = (l: string[]) => l.join(", ").replace(/, ([^,]*)$/, " et $1");
+
+/** Version du document antérieure au décret n° 2026-728 (publié le 4 août 2026) : il ne peut pas y être cité. */
+function avantDecret2026(o: OrganismeInfo): boolean {
+  const d = (o.dateMaj || "").slice(0, 10);
+  return !!d && d < "2026-08-04";
+}
+
+type RoleOF = "pedagogique" | "administratif" | "handicap" | "qualite";
+function rolesOF(o: OrganismeInfo): { k: RoleOF; lib: string; nom: string }[] {
+  return [
+    { k: "pedagogique", lib: "responsable pédagogique", nom: (o.responsablePedagogique || o.dirigeant || "").trim() },
+    { k: "administratif", lib: "référent administratif", nom: (o.poleAdministratif || o.dirigeant || "").trim() },
+    { k: "handicap", lib: "référent handicap", nom: (o.referentHandicap || o.dirigeant || "").trim() },
+    { k: "qualite", lib: "référent qualité", nom: (o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() },
+  ];
+}
+
+/** Section « Titulaire du poste » : la personne qui tient le rôle dans l'organisme. */
+function sectionTitulaire(o: OrganismeInfo, nom?: string): { heading: string; content: string }[] {
+  const n = (nom || "").trim();
+  if (!n) return [];
+  return [{ heading: "Titulaire du poste", content: `<p><strong>${n}</strong>${memeNom(n, o.dirigeant) ? `, dirigeant (mandataire social) de ${o.nom}` : ""}</p>` }];
+}
+
+/** Lieu d'intervention selon la modalité réelle des formations (le texte présentiel reste celui d'origine). */
+function lieuIntervention(o: OrganismeInfo, f: FormationInfo | undefined, presentielHtml: string): string {
+  const m = (f?.modalites || "").toLowerCase();
+  const siege = [o.adresse, [o.codePostal, o.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const mixte = /mixte/.test(m) || (/distanciel/.test(m) && /pr[ée]sentiel/.test(m));
+  const distanciel = !mixte && /distanciel|foad|e-learning|à distance/.test(m);
+  if (distanciel) return `<p>Les formations de l'organisme étant dispensées à distance${f?.lieu ? ` (${f.lieu})` : ""}, la mission est réalisée principalement à distance : visioconférence, téléphone et messagerie.</p><p>Siège de l'organisme : ${siege}.</p>`;
+  if (mixte) return `<p>La mission est réalisée au siège de l'organisme (${siege}) et à distance pour les séquences en classe virtuelle.</p>`;
+  return presentielHtml;
+}
+
+/** Type de contrat : le dirigeant exerce la fonction au titre de son mandat social, sans contrat de travail. */
+function contratTitulaire(o: OrganismeInfo, nom: string | undefined, statutsHtml: string): string {
+  if (memeNom(nom, o.dirigeant)) return `<p>Fonction exercée par ${nom}, dirigeant (mandataire social) de ${o.nom}, au titre de son mandat social : pas de contrat de travail ni de prestation.</p><p>En cas de recrutement ou de délégation de la fonction, le poste pourra être proposé à un salarié, un vacataire ou un prestataire, dans le respect du cadre réglementaire de la formation professionnelle.</p>`;
+  return statutsHtml;
+}
+
+/** Positionnement : reconnaît le cumul des fonctions par une même personne au lieu d'une « collaboration » avec soi-même. */
+function positionnementRole(o: OrganismeInfo, role: RoleOF, libelle: string, f?: FormationInfo): string {
+  const roles = rolesOF(o);
+  const titulaire = roles.find((r) => r.k === role)?.nom || "";
+  const cumul = roles.filter((r) => r.k !== role && memeNom(r.nom, titulaire)).map((r) => r.lib);
+  if (f?.formateur && memeNom(f.formateur, titulaire)) cumul.push("formateur");
+  const autres = roles.filter((r) => r.k !== role && r.nom && !memeNom(r.nom, titulaire)).map((r) => `le ${r.lib} (${r.nom})`);
+  const dirigeant = memeNom(titulaire, o.dirigeant);
+  let t = `<p>${titulaire ? `${titulaire} exerce la fonction de ${libelle}` : `Le/La ${libelle} exerce ses missions`} ${dirigeant ? `en qualité de dirigeant de ${o.nom}` : `sous l'autorité de la direction de ${o.nom}`}.`;
+  if (cumul.length) t += ` Cette fonction est cumulée avec celles de ${listeEt(cumul)} : la coordination entre ces missions est assurée directement par une seule et même personne.`;
+  if (autres.length) t += ` Le titulaire travaille en lien avec ${listeEt(autres)}.`;
+  else if (!cumul.length) t += " Le titulaire travaille en lien avec les autres fonctions de l'organisme.";
+  return t + "</p>";
+}
+
+/** Interlocuteurs du référent qualité : une seule personne nommée quand elle cumule les fonctions. */
+function liensReferentQualite(o: OrganismeInfo): string {
+  const r = rolesOF(o).filter((x) => x.k !== "qualite" && x.nom);
+  if (!r.length) return "la direction";
+  if (new Set(r.map((x) => normNom(x.nom))).size === 1) return `${r[0].nom}, qui exerce les fonctions de ${listeEt(r.map((x) => x.lib))}`;
+  return listeEt(r.map((x) => `le ${x.lib} (${x.nom})`));
+}
+
 function genFichePosteRefQualiteExterne(o: OrganismeInfo) {
   const brut = (o.referentQualite || o.dirigeant || "").trim();
   const externe = /externe/i.test(brut);
   const nomRQ = brut.replace(/\s*\(\s*externe\s*\)\s*/i, "").trim() || o.dirigeant;
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: `Référent qualité${externe ? " externe" : ""} – ${nomRQ}`, sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Identité du référent qualité", content: `<p><strong>${nomRQ}</strong></p><p>${externe ? "Prestataire externe mandaté par l'organisme de formation pour le pilotage et le suivi de la démarche qualité Qualiopi (voir registre de sous-traitance, IND 27)." : `Fonction assurée en interne au sein de ${o.nom}.`}</p>` },
+    { heading: "Identité du référent qualité", content: `<p><strong>${nomRQ}</strong></p><p>${externe ? "Prestataire externe mandaté par l'organisme de formation pour le conseil, le pilotage et le suivi de la démarche qualité Qualiopi (contrat de prestation de conseil ; il n'intervient pas dans la réalisation des actions de formation)." : `Fonction assurée en interne au sein de ${o.nom}.`}</p>` },
     { heading: "Lieu d'intervention", content: `<p>La mission est réalisée principalement à distance, avec des interventions ponctuelles en présentiel au sein des locaux de l'organisme situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges réguliers (visioconférence, téléphone, messagerie) sont organisés avec la direction et l'équipe pédagogique.</p>` },
     { heading: "Type de contrat", content: `<p>${externe ? "Prestataire externe, dans le cadre d'un contrat de prestation de services pour l'accompagnement et le pilotage de la démarche qualité Qualiopi." : "Fonction interne exercée par le dirigeant ou un salarié de l'organisme."}</p><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
-    { heading: "Finalité du poste", content: `<p>Le référent qualité est garant de la conformité de l'organisme au référentiel national qualité (article L.6316-3 du Code du travail), dans sa version issue du décret n° 2026-728 du 1er août 2026 (33 indicateurs, en vigueur le 1er novembre 2026).</p><p>Elle accompagne la direction dans la mise en œuvre, le suivi et l'amélioration continue du système de management de la qualité, et prépare l'organisme aux audits initiaux, de surveillance et de renouvellement.</p>` },
-    { heading: "Missions principales", content: `<ul><li>Concevoir, déployer et faire vivre le système qualité de l'organisme</li><li>Garantir la conformité aux 7 critères et 33 indicateurs du Référentiel National Qualité</li><li>Réaliser des audits internes réguliers et formaliser des plans d'actions correctives</li><li>Préparer et accompagner les audits Qualiopi (initial, surveillance, renouvellement)</li><li>Accompagner la direction lors des audits externes et lever les non-conformités</li><li>Mettre à jour les procédures, processus, modes opératoires et documents qualité</li><li>Former et sensibiliser l'équipe pédagogique et administrative aux exigences Qualiopi</li><li>Analyser les indicateurs qualité (satisfaction, abandons, réclamations, résultats)</li><li>Piloter la veille légale, réglementaire et qualité de la formation professionnelle</li><li>Suivre et exploiter les enquêtes de satisfaction à chaud et à froid</li><li>Gérer le traitement des réclamations et des actions correctives</li><li>Animer la revue de direction annuelle et formaliser le plan d'amélioration continue</li><li>Conseiller la direction sur les évolutions réglementaires et leurs impacts</li></ul>` },
-    { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Maîtrise approfondie du Référentiel National Qualité (Qualiopi) et de ses 33 indicateurs</li><li>Connaissance complète du cadre réglementaire de la formation professionnelle continue</li><li>Conduite d'audits internes et préparation aux audits externes</li><li>Rédaction de procédures, processus et documents qualité</li><li>Analyse de données qualité et construction d'indicateurs de pilotage</li><li>Animation de revues de direction et de revues de processus</li><li>Maîtrise des outils bureautiques et de gestion documentaire</li><li>Pédagogie et transmission auprès des équipes</li></ul>` },
+    { heading: "Finalité du poste", content: `<p>Le référent qualité est garant de la conformité de l'organisme au référentiel national qualité (article L.6316-3 du Code du travail), ${avantDecret2026(o) ? "dans sa version en vigueur" : "dans sa version issue du décret n° 2026-728 du 1er août 2026 (33 indicateurs, en vigueur le 1er novembre 2026)"}.</p><p>Elle accompagne la direction dans la mise en œuvre, le suivi et l'amélioration continue du système de management de la qualité, et prépare l'organisme aux audits initiaux, de surveillance et de renouvellement.</p>` },
+    { heading: "Missions principales", content: `<ul><li>Concevoir, déployer et faire vivre le système qualité de l'organisme</li><li>Garantir la conformité aux 7 critères et ${avantDecret2026(o) ? "aux" : "33"} indicateurs du Référentiel National Qualité</li><li>Réaliser des audits internes réguliers et formaliser des plans d'actions correctives</li><li>Préparer et accompagner les audits Qualiopi (initial, surveillance, renouvellement)</li><li>Accompagner la direction lors des audits externes et lever les non-conformités</li><li>Mettre à jour les procédures, processus, modes opératoires et documents qualité</li><li>Former et sensibiliser l'équipe pédagogique et administrative aux exigences Qualiopi</li><li>Analyser les indicateurs qualité (satisfaction, abandons, réclamations, résultats)</li><li>Piloter la veille légale, réglementaire et qualité de la formation professionnelle</li><li>Suivre et exploiter les enquêtes de satisfaction à chaud et à froid</li><li>Gérer le traitement des réclamations et des actions correctives</li><li>Animer la revue de direction annuelle et formaliser le plan d'amélioration continue</li><li>Conseiller la direction sur les évolutions réglementaires et leurs impacts</li></ul>` },
+    { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Maîtrise approfondie du Référentiel National Qualité (Qualiopi) et de ses ${avantDecret2026(o) ? "" : "33 "}indicateurs</li><li>Connaissance complète du cadre réglementaire de la formation professionnelle continue</li><li>Conduite d'audits internes et préparation aux audits externes</li><li>Rédaction de procédures, processus et documents qualité</li><li>Analyse de données qualité et construction d'indicateurs de pilotage</li><li>Animation de revues de direction et de revues de processus</li><li>Maîtrise des outils bureautiques et de gestion documentaire</li><li>Pédagogie et transmission auprès des équipes</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Rigueur, méthode et sens du détail</li><li>Sens de l'écoute et capacité d'analyse</li><li>Diplomatie et capacité à fédérer autour de la démarche qualité</li><li>Autonomie et sens de l'initiative</li><li>Confidentialité et discrétion professionnelle</li><li>Capacité à travailler à distance et en mode projet</li><li>Esprit pédagogique et bienveillant</li><li>Force de proposition dans l'amélioration continue</li></ul>` },
     { heading: "Profil requis", content: `<ul><li>Expérience confirmée dans le pilotage de la démarche qualité en organisme de formation</li><li>Maîtrise approfondie du Référentiel National Qualité (Qualiopi)</li><li>Expérience de plusieurs audits Qualiopi (initial, surveillance, renouvellement)</li><li>Bonne connaissance du secteur de la formation professionnelle continue, de l'apprentissage et des financeurs (OPCO, CPF, France Travail)</li><li>Expérience en accompagnement et conseil auprès d'organismes de formation</li></ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux procédures internes, documents qualité et outils de pilotage</li><li>Accès aux plateformes utilisées par l'organisme (LMS, EDOF, dossiers stagiaires)</li><li>Appui de la direction et de l'équipe pédagogique</li><li>Documentation réglementaire et veille qualité</li></ul>`, variant: "green" },
-    { heading: "Indicateurs de performance", content: `<ul><li>Conformité aux 33 indicateurs Qualiopi</li><li>Résultats des audits internes et externes (nombre de non-conformités levées)</li><li>Délai de mise en œuvre des actions correctives</li><li>Taux de satisfaction des bénéficiaires</li><li>Mise à jour effective de la veille légale et réglementaire</li><li>Tenue de la revue de direction annuelle</li></ul>` },
-    { heading: "Positionnement", content: `<p>${nomRQ} intervient ${externe ? "en qualité de prestataire externe " : ""}sous l'autorité de la direction de ${o.nom}, en lien étroit avec le responsable pédagogique, le référent administratif et le référent handicap.</p>` },
+    { heading: "Indicateurs de performance", content: `<ul><li>Conformité aux ${avantDecret2026(o) ? "" : "33 "}indicateurs Qualiopi</li><li>Résultats des audits internes et externes (nombre de non-conformités levées)</li><li>Délai de mise en œuvre des actions correctives</li><li>Taux de satisfaction des bénéficiaires</li><li>Mise à jour effective de la veille légale et réglementaire</li><li>Tenue de la revue de direction annuelle</li></ul>` },
+    { heading: "Positionnement", content: `<p>${nomRQ} intervient ${externe ? "en qualité de prestataire externe " : ""}sous l'autorité de la direction de ${o.nom}, en lien avec ${liensReferentQualite(o)}.</p>` },
   ] });
 }
 
 function genFichePosteRefHandicap(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Référent Handicap", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges à distance peuvent être organisés avec les partenaires institutionnels ou les bénéficiaires lorsque la situation le nécessite.</p>` },
-    { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Vacataire,</li><li>Prestataire externe spécialisé, dans le cadre d'une mission d'accompagnement handicap.</li></ul><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
+    ...sectionTitulaire(o, o.referentHandicap),
+    { heading: "Lieu d'intervention", content: lieuIntervention(o, f, `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges à distance peuvent être organisés avec les partenaires institutionnels ou les bénéficiaires lorsque la situation le nécessite.</p>`) },
+    { heading: "Type de contrat", content: contratTitulaire(o, o.referentHandicap, `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Vacataire,</li><li>Prestataire externe spécialisé, dans le cadre d'une mission d'accompagnement handicap.</li></ul><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle et des exigences du Référentiel National Qualité (Qualiopi).</p>`) },
     { heading: "Finalité du poste", content: `<p>Le/La Référent(e) Handicap est chargé(e) de garantir l'accessibilité des formations aux personnes en situation de handicap, d'assurer leur accueil, accompagnement et suivi, et de coordonner les aménagements pédagogiques, matériels et organisationnels nécessaires.</p><p>Il/Elle contribue à la mise en œuvre de la politique d'accessibilité de l'organisme et au respect des obligations légales et qualité.</p>` },
     { heading: "Missions principales", content: `<ul><li>Informer et orienter les personnes en situation de handicap</li><li>Analyser les besoins spécifiques des bénéficiaires en amont de la formation</li><li>Proposer et coordonner les aménagements pédagogiques, matériels et organisationnels</li><li>Assurer le suivi individualisé des stagiaires en situation de handicap</li><li>Sensibiliser les équipes pédagogiques et administratives à l'accueil des publics PSH</li><li>Mobiliser et coordonner les partenaires spécialisés (Agefiph, Cap Emploi, MDPH, etc.)</li><li>Veiller à l'accessibilité des locaux, outils et supports de formation</li><li>Mettre à jour les informations relatives à l'accessibilité sur les supports de communication</li><li>Assurer la traçabilité des actions mises en place</li><li>Participer aux audits et contrôles Qualiopi</li><li>Contribuer à l'amélioration continue de la politique handicap de l'organisme</li></ul>` },
     { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Connaître le cadre légal du handicap et de l'accessibilité</li><li>Analyser les besoins spécifiques des personnes en situation de handicap</li><li>Mettre en place des aménagements adaptés aux contraintes de formation</li><li>Mobiliser les dispositifs et acteurs du champ du handicap</li><li>Conseiller les équipes pédagogiques sur l'adaptation des parcours</li><li>Assurer la traçabilité et la confidentialité des informations</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Écoute active et bienveillance</li><li>Sens de la confidentialité et du respect de la personne</li><li>Empathie et capacité d'adaptation</li><li>Rigueur et sens de l'organisation</li><li>Capacité à travailler en réseau</li><li>Communication claire et rassurante</li><li>Réactivité face aux situations particulières</li><li>Esprit d'analyse et de solution</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Sensibilité ou expérience dans l'accompagnement des personnes en situation de handicap</li><li>Connaissance du secteur de la formation professionnelle appréciée</li><li>Une formation ou une expérience en lien avec le handicap est un plus</li><li>Capacité à travailler en lien avec des partenaires institutionnels</li>${ligneExperience(f)}</ul>` },
+    { heading: "Profil requis", content: `<ul><li>Sensibilité ou expérience dans l'accompagnement des personnes en situation de handicap</li><li>Connaissance du secteur de la formation professionnelle appréciée</li><li>Une formation ou une expérience en lien avec le handicap est un plus</li><li>Capacité à travailler en lien avec des partenaires institutionnels</li></ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux procédures internes liées à l'accessibilité</li><li>Outils de suivi et de traçabilité</li><li>Répertoire des partenaires handicap</li><li>Supports d'information et de sensibilisation</li><li>Appui de la direction et de l'équipe pédagogique</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Nombre de bénéficiaires PSH accompagnés</li><li>Taux de satisfaction des bénéficiaires PSH</li><li>Pertinence des aménagements mis en place</li><li>Traçabilité des actions d'accompagnement</li><li>Résultats des audits Qualiopi</li></ul>` },
-    { heading: "Positionnement hiérarchique", content: `<p>Le/La Référent(e) Handicap intervient sous l'autorité de la direction de l'organisme et travaille en collaboration étroite avec le référent pédagogique, le référent administratif et les formateurs.</p>` },
+    { heading: "Positionnement hiérarchique", content: positionnementRole(o, "handicap", "référent handicap", f) },
   ] });
 }
 
 function genFichePosteRefAdmin(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Référent Administratif", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent être réalisées sur des sites partenaires pour des besoins administratifs liés aux actions de formation.</p>` },
-    { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Vacataire administratif,</li><li>Prestataire indépendant, dans le cadre d'une mission administrative externalisée.</li></ul><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
+    ...sectionTitulaire(o, o.poleAdministratif),
+    { heading: "Lieu d'intervention", content: lieuIntervention(o, f, `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent être réalisées sur des sites partenaires pour des besoins administratifs liés aux actions de formation.</p>`) },
+    { heading: "Type de contrat", content: contratTitulaire(o, o.poleAdministratif, `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Vacataire administratif,</li><li>Prestataire indépendant, dans le cadre d'une mission administrative externalisée.</li></ul><p>Les modalités contractuelles sont établies dans le respect du cadre réglementaire de la formation professionnelle et des exigences du Référentiel National Qualité (Qualiopi).</p>`) },
     { heading: "Finalité du poste", content: `<p>Le/La Référent(e) Administratif(ve) assure la gestion administrative complète des actions de formation, de l'inscription des bénéficiaires jusqu'à l'archivage des dossiers, en garantissant la conformité réglementaire, la traçabilité des documents et le respect des exigences qualité de l'organisme.</p><p>Il/Elle est un acteur clé du bon fonctionnement administratif et de la conformité Qualiopi.</p>` },
     { heading: "Missions principales", content: `<ul><li>Gérer les inscriptions et le suivi administratif des stagiaires</li><li>Constituer, vérifier et archiver les dossiers administratifs de formation</li><li>Établir et suivre les documents réglementaires : contrats ou conventions de formation, convocations, règlement intérieur, conditions générales de vente</li><li>Assurer le suivi des feuilles d'émargement et des attestations de fin de formation</li><li>Gérer les délais d'accès à la formation</li><li>Assurer la relation administrative avec les stagiaires, formateurs et partenaires</li><li>Préparer et suivre les dossiers de financement (CPF, OPCO, autofinancement)</li><li>Veiller au respect des obligations réglementaires (DA, BPF, EDOF, Qualiopi)</li><li>Mettre à jour les bases de données administratives</li><li>Participer aux audits et contrôles (Qualiopi, financeurs, DREETS)</li><li>Contribuer à l'amélioration continue des processus administratifs</li></ul>` },
     { heading: "Savoir-faire (compétences techniques)", content: `<ul><li>Maîtriser les procédures administratives de la formation professionnelle</li><li>Constituer et contrôler des dossiers administratifs conformes</li><li>Utiliser les outils bureautiques (Word, Excel, messagerie)</li><li>Utiliser des outils de gestion de formation et plateformes dématérialisées</li><li>Suivre des échéanciers et respecter les délais réglementaires</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li><li>Assurer la traçabilité et l'archivage documentaire</li><li>Rédiger des courriers et documents administratifs professionnels</li></ul>` },
     { heading: "Savoir-être (compétences comportementales)", content: `<ul><li>Rigueur et sens de l'organisation</li><li>Fiabilité et discrétion professionnelle</li><li>Autonomie dans la gestion des dossiers</li><li>Sens des priorités</li><li>Esprit d'analyse et de contrôle</li><li>Qualités relationnelles et communication professionnelle</li><li>Capacité à travailler en équipe</li><li>Réactivité face aux demandes administratives</li><li>Respect des procédures et des délais</li></ul>` },
-    { heading: "Profil requis", content: `<ul><li>Formation ou expérience en gestion administrative</li><li>Expérience souhaitée dans un organisme de formation</li><li>Connaissance du cadre réglementaire de la formation professionnelle appréciée</li><li>Maîtrise des outils bureautiques</li>${ligneExperience(f)}</ul>` },
+    { heading: "Profil requis", content: `<ul><li>Formation ou expérience en gestion administrative</li><li>Expérience souhaitée dans un organisme de formation</li><li>Connaissance du cadre réglementaire de la formation professionnelle appréciée</li><li>Maîtrise des outils bureautiques</li></ul>` },
     { heading: "Moyens et outils mis à disposition", content: `<ul><li>Poste informatique équipé</li><li>Logiciels bureautiques et outils de gestion administrative</li><li>Accès aux plateformes réglementaires (EDOF, OPCO, etc.)</li><li>Procédures internes et référentiels qualité</li><li>Accompagnement par l'équipe pédagogique et qualité</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Taux de conformité des dossiers administratifs</li><li>Respect des délais réglementaires</li><li>Qualité des documents produits</li><li>Satisfaction des stagiaires et formateurs (partie administrative)</li><li>Résultats des audits et contrôles</li></ul>` },
-    { heading: "Positionnement hiérarchique", content: `<p>Le/La Référent(e) Administratif(ve) exerce ses missions sous l'autorité de la direction de l'organisme et travaille en lien étroit avec le référent pédagogique et les formateurs.</p>` },
+    { heading: "Positionnement hiérarchique", content: positionnementRole(o, "administratif", "référent administratif", f) },
   ] });
 }
 
@@ -107,9 +177,10 @@ function genFichePosteFormateurNom(o: OrganismeInfo, formateurNom?: string, f?: 
     : `<li>Salle et/ou plateau technique équipé pour le domaine « ${dom} »</li><li>Matériels, équipements et consommables nécessaires aux mises en situation</li>`;
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: subtitleName, sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
+    ...sectionTitulaire(o, formateurNom),
     { heading: "Formation concernée", content: `<p><strong>${dom}</strong>${f?.codeRNCP ? ` — ${f.codeRNCP}` : ""}${f?.duree ? `<br/>Durée : ${f.duree}` : ""}${f?.modalites ? `<br/>Modalités : ${f.modalites}` : ""}</p>` },
-    { heading: "Lieu d'intervention", content: `<p>La mission est réalisée${f?.lieu ? ` au sein du lieu de formation : ${f.lieu}` : " au sein des locaux de l'organisme de formation situés au :"}</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent également être organisées sur des sites partenaires, dans le cadre d'actions de formation planifiées par l'organisme.</p>` },
-    { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants, en fonction des besoins pédagogiques :</p><ul><li>Vacataire de la formation professionnelle, avec rémunération à l'heure ou à la journée d'intervention,</li><li>Formateur indépendant, dans le cadre d'un contrat de prestation de services,</li><li>Salarié en contrat à durée déterminée ou indéterminée, selon le volume d'activité.</li></ul><p>L'ensemble des modalités contractuelles est établi dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
+    { heading: "Lieu d'intervention", content: lieuIntervention(o, f, `<p>La mission est réalisée${f?.lieu ? ` au sein du lieu de formation : ${f.lieu}` : " au sein des locaux de l'organisme de formation situés au :"}</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent également être organisées sur des sites partenaires, dans le cadre d'actions de formation planifiées par l'organisme.</p>`) },
+    { heading: "Type de contrat", content: contratTitulaire(o, formateurNom, `<p>Le poste est proposé sous l'un des statuts suivants, en fonction des besoins pédagogiques :</p><ul><li>Vacataire de la formation professionnelle, avec rémunération à l'heure ou à la journée d'intervention,</li><li>Formateur indépendant, dans le cadre d'un contrat de prestation de services,</li><li>Salarié en contrat à durée déterminée ou indéterminée, selon le volume d'activité.</li></ul><p>L'ensemble des modalités contractuelles est établi dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>`) },
     { heading: "Finalité du poste", content: `<p>Le/La formateur(trice) a pour mission de concevoir, animer et évaluer les actions de formation « ${dom} », afin de permettre aux bénéficiaires d'acquérir les compétences visées par le programme et de les mettre en œuvre en situation professionnelle.</p><p>Il/Elle contribue activement à la qualité des parcours de formation, à la satisfaction des stagiaires et à l'amélioration continue des pratiques pédagogiques de l'organisme.</p>` },
     { heading: "Missions principales", content: `<ul><li>Animer les sessions de la formation « ${dom} »${f?.modalites ? ` (${f.modalites})` : ""}</li><li>Présenter clairement les objectifs de formation et le déroulé pédagogique</li><li>Adapter les contenus et le rythme aux profils et niveaux des apprenants</li><li>Mettre en œuvre une pédagogie active favorisant la pratique et l'autonomie</li><li>Accompagner individuellement les stagiaires tout au long de la formation</li><li>Concevoir et utiliser des supports pédagogiques adaptés au domaine</li><li>Évaluer les acquis des stagiaires (positionnement, exercices, évaluations finales)</li><li>Renseigner les documents de suivi pédagogique et administratif</li><li>Réaliser les bilans à chaud et à froid</li><li>Appliquer et respecter les procédures internes et le cadre Qualiopi</li><li>Contribuer aux actions d'amélioration continue de l'organisme</li></ul>` },
     { heading: "Savoir-faire (compétences techniques et pédagogiques)", content: `<ul>${savoirFaireMetier}<li>Concevoir des supports pédagogiques clairs et accessibles</li><li>Animer une formation en alternant apports théoriques et mises en pratique</li><li>Adapter sa pédagogie aux publics accueillis${f?.publicVise ? ` : ${f.publicVise}` : ""}</li><li>Évaluer les compétences acquises à l'aide de grilles et d'outils adaptés</li><li>Assurer un suivi pédagogique structuré</li><li>Appliquer les exigences du Référentiel National Qualité (Qualiopi)</li></ul>` },
@@ -123,8 +194,9 @@ function genFichePosteFormateurNom(o: OrganismeInfo, formateurNom?: string, f?: 
 function genFichePosteResponsablePedagogique(o: OrganismeInfo, f?: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Responsable Pédagogique", sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
-    { heading: "Lieu d'intervention", content: `<p>La fonction est exercée principalement en présentiel, au sein des locaux de l'organisme situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges ponctuels à distance peuvent avoir lieu avec les formateurs, partenaires ou bénéficiaires, selon les besoins pédagogiques et organisationnels.</p>` },
-    { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Cadre dirigeant ou cadre pédagogique,</li><li>Prestataire externe, dans le cadre d'une mission de pilotage pédagogique.</li></ul><p>Les modalités contractuelles sont définies dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
+    ...sectionTitulaire(o, o.responsablePedagogique),
+    { heading: "Lieu d'intervention", content: lieuIntervention(o, f, `<p>La fonction est exercée principalement en présentiel, au sein des locaux de l'organisme situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des échanges ponctuels à distance peuvent avoir lieu avec les formateurs, partenaires ou bénéficiaires, selon les besoins pédagogiques et organisationnels.</p>`) },
+    { heading: "Type de contrat", content: contratTitulaire(o, o.responsablePedagogique, `<p>Le poste est proposé sous l'un des statuts suivants :</p><ul><li>Salarié en contrat à durée déterminée ou indéterminée,</li><li>Cadre dirigeant ou cadre pédagogique,</li><li>Prestataire externe, dans le cadre d'une mission de pilotage pédagogique.</li></ul><p>Les modalités contractuelles sont définies dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>`) },
     { heading: "Finalité du poste", content: `<p>Le/La Responsable Pédagogique est garant(e) de la qualité pédagogique des formations proposées par l'organisme.</p><p>Il/Elle conçoit, pilote, coordonne et évalue les dispositifs de formation, en veillant à l'alignement entre objectifs, contenus, méthodes pédagogiques, évaluations et besoins des bénéficiaires.</p><p>Il/Elle joue un rôle central dans la démarche qualité Qualiopi et dans l'amélioration continue des actions de formation.</p>` },
     { heading: "Missions principales – Pilotage pédagogique", content: `<ul><li>Définir et structurer l'offre de formation de l'organisme</li><li>Élaborer et mettre à jour les programmes de formation</li><li>Garantir la cohérence pédagogique des parcours</li><li>Veiller à l'adéquation entre objectifs, contenus, méthodes et évaluations</li></ul>` },
     { heading: "Missions principales – Coordination des formateurs", content: `<ul><li>Recruter, intégrer et accompagner les formateurs</li><li>Superviser les pratiques pédagogiques</li><li>Organiser des réunions pédagogiques et temps d'échange</li><li>Apporter un appui pédagogique aux formateurs</li></ul>` },
@@ -135,7 +207,7 @@ function genFichePosteResponsablePedagogique(o: OrganismeInfo, f?: FormationInfo
     { heading: "Profil requis", content: `<ul><li>Formation ou expérience significative en ingénierie pédagogique</li><li>Expérience dans la formation professionnelle pour adultes</li><li>Connaissance approfondie du cadre réglementaire de la formation</li><li>Expérience en management ou coordination d'équipe appréciée</li>${ligneExperience(f)}</ul>` },
     { heading: "Moyens et ressources mis à disposition", content: `<ul><li>Accès aux outils pédagogiques et qualité</li><li>Plateformes de gestion de formation et supports numériques</li><li>Procédures internes et référentiels qualité</li><li>Appui de la direction et des équipes administratives</li></ul>`, variant: "green" },
     { heading: "Indicateurs de performance", content: `<ul><li>Atteinte des objectifs pédagogiques</li><li>Taux de satisfaction des bénéficiaires</li><li>Qualité des programmes et des évaluations</li><li>Résultats des audits Qualiopi</li><li>Engagement et performance des formateurs</li></ul>` },
-    { heading: "Positionnement hiérarchique", content: `<p>Le/La Responsable Pédagogique est placé(e) sous l'autorité de la direction de l'organisme et travaille en lien étroit avec le référent administratif, le référent handicap et les formateurs.</p>` },
+    { heading: "Positionnement hiérarchique", content: positionnementRole(o, "pedagogique", "responsable pédagogique", f) },
   ] });
 }
 
@@ -152,6 +224,20 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
   const subtitle = sessionLabel ? `${formateurNom} – ${sessionLabel}` : formateurNom;
   const sessionLine = sessionLabel ? `<br><strong>Session :</strong> du ${formatDate(sessionDates!.debut || "")} au ${formatDate(sessionDates!.fin || "")}` : "";
   const dateSig = sessionDates?.fin || f.dateFin;
+  // Modalité et effectif réels : pas de « présentiel / vidéoprojecteur » pour une classe virtuelle,
+  // pas de « stagiaires » au pluriel pour un stagiaire seul.
+  const modAuto = (f.modalites || "").toLowerCase();
+  const distAuto = /distanciel|foad|e-learning|classe virtuelle/.test(modAuto) && !/mixte|pr[ée]sentiel/.test(modAuto);
+  const mixteAuto = /mixte/.test(modAuto) || (/distanciel/.test(modAuto) && /pr[ée]sentiel/.test(modAuto));
+  const seulStag = stagiaires.length === 1;
+  const lesStag = seulStag ? "le stagiaire" : "les stagiaires";
+  const conditionsAuto = distAuto
+    ? `à distance (${(f.lieu || "classe virtuelle").trim()}), avec partage d'écran et échanges en direct permettant une interaction constante avec ${lesStag}`
+    : mixteAuto ? `en formule mixte (présentiel et distanciel), permettant une interaction constante avec ${lesStag}`
+    : `en présentiel, permettant un accompagnement de proximité et une interaction constante avec ${lesStag}`;
+  const outilsAuto = distAuto
+    ? `Classe virtuelle${f.lieu ? ` (${f.lieu.trim()})` : ""}, partage d'écran, supports numériques transmis au stagiaire${seulStag ? "" : "s"}.`
+    : "Utilisation du matériel informatique, vidéoprojecteur et supports papier/numériques.";
   return buildDocument({ org: o, title: "Auto-évaluation du formateur", subtitle, sections: [
     { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(dateSig)}<br><strong>Formation concernée :</strong> ${f.intitule}${sessionLine}</p>` },
   ], table: {
@@ -162,16 +248,16 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
       ["Adaptation des modalités pédagogiques", "4", "Méthode progressive favorisant la compréhension et la mise en pratique immédiate."],
       ["Clarté des consignes données", "5", "Consignes claires, reformulées si nécessaire pour assurer la compréhension de tous."],
       ["Utilisation de méthodes variées", "5", "Alternance entre démonstrations en direct, exercices pratiques et échanges oraux."],
-      ["Encouragement de la participation", "5", "Participation active encouragée, échanges réguliers avec les stagiaires."],
-      ["Adaptation au rythme des stagiaires", "4", "Souplesse dans le déroulé afin de s'adapter aux niveaux et aux besoins individuels."],
-      ["Utilisation des outils pédagogiques", "5", "Utilisation du matériel informatique, vidéoprojecteur et supports papier/numériques."],
+      ["Encouragement de la participation", "5", `Participation active encouragée, échanges réguliers avec ${lesStag}.`],
+      [`Adaptation au rythme ${seulStag ? "du stagiaire" : "des stagiaires"}`, "4", seulStag ? "Souplesse dans le déroulé afin de s'adapter au niveau et aux besoins du stagiaire." : "Souplesse dans le déroulé afin de s'adapter aux niveaux et aux besoins individuels."],
+      ["Utilisation des outils pédagogiques", "5", outilsAuto],
       ["Suivi individualisé", "5", "Accompagnement personnalisé tout au long de la formation."],
       ["Évaluations mises en œuvre", "5", "Test de positionnement, exercices pratiques et évaluation finale réalisés."],
       ["Suivi de la progression", "5", "Grille d'acquisition des compétences complétée et commentée."],
     ]
   }, extraHtml: `
     <div class="section"><h3>Analyse du formateur</h3>
-    <p>La formation s'est déroulée dans de bonnes conditions en présentiel, permettant un accompagnement de proximité et une interaction constante avec le stagiaire. Les objectifs pédagogiques ont été atteints grâce à une approche progressive, orientée vers la pratique. Le suivi individualisé a permis d'adapter le rythme et les explications en fonction des besoins identifiés lors du test de positionnement initial. Les évaluations mises en place ont confirmé la montée en compétences du stagiaire et la bonne assimilation des notions abordées.</p></div>
+    <p>La formation s'est déroulée dans de bonnes conditions ${conditionsAuto}. Les objectifs pédagogiques ont été atteints grâce à une approche progressive, orientée vers la pratique. Le suivi individualisé a permis d'adapter le rythme et les explications en fonction des besoins identifiés lors du test de positionnement initial. Les évaluations mises en place ont confirmé la montée en compétences ${seulStag ? "du stagiaire" : "des stagiaires"} et la bonne assimilation des notions abordées.</p></div>
     <div class="section"><h3>Propositions d'amélioration</h3>
     <p>Développer des supports complémentaires en autonomie (fiches mémo, tutoriels courts).</p>
     <p>Renforcer encore la pratique sur des cas professionnels concrets.</p></div>
@@ -185,7 +271,30 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
 
 // ===== IND 21 — PROCESSUS DE RECRUTEMENT =====
 
-export function genProcessusRecrutementV2(o: OrganismeInfo) {
+export function genProcessusRecrutementV2(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[]) {
+  // Organisme dont le seul intervenant est le dirigeant : pas d'équipe, de coordinateur ni de formateurs référents.
+  const intervenants = intervenantsReels(o, f, stagiaires);
+  const resp = (o.responsablePedagogique || o.dirigeant || "").trim();
+  if (intervenants.length === 1 && memeNom(intervenants[0], o.dirigeant)) {
+    const nom = intervenants[0];
+    const distance = /distanciel|foad|e-learning|mixte/i.test(f?.modalites || "");
+    return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES FORMATEURS", sections: [
+      { heading: "Champ d'application", content: `<p>À ce jour, les formations de ${o.nom} sont animées par ${nom}, dirigeant de l'organisme${memeNom(resp, nom) ? " et responsable pédagogique" : ""}. Aucun autre formateur n'intervient sur les sessions enregistrées.</p><p>Le processus ci-dessous s'applique dès que ${o.nom} recourt à un formateur externe (salarié, vacataire ou formateur indépendant sous-traitant), pour garantir le même niveau de qualité aux stagiaires.</p>` },
+      { heading: "Critères appliqués en cas de recours à un formateur externe", content: `<ul><li>Compétence dans le domaine de la formation${f?.intitule ? ` « ${f.intitule} »` : ""} : CV daté, diplômes, certifications ou attestations d'expérience.</li><li>Expérience de la formation d'adultes.</li>${distance ? "<li>Maîtrise des outils de formation à distance utilisés par l'organisme (classe virtuelle, partage d'écran, messagerie).</li>" : ""}<li>Engagement à respecter le programme, les modalités d'évaluation et la démarche qualité de l'organisme.</li><li>Pour un indépendant : SIRET et, le cas échéant, numéro de déclaration d'activité.</li></ul>` },
+      { heading: "Étapes", content: `
+      <h3>1. Analyse du besoin</h3>
+      <ul><li>Le dirigeant identifie la formation, le volume horaire et les compétences requises.</li></ul>
+      <h3>2. Recherche et présélection</h3>
+      <ul><li>Diffusion de l'offre (réseau professionnel, plateformes spécialisées) et analyse des CV au regard des critères ci-dessus.</li></ul>
+      <h3>3. Entretien de sélection</h3>
+      <ul><li>Entretien conduit par le dirigeant, avec présentation d'une séquence de formation par le candidat.</li></ul>
+      <h3>4. Vérifications et contractualisation</h3>
+      <ul><li>Contrôle des justificatifs (diplômes, expérience) et signature du contrat de travail ou du contrat de sous-traitance.</li></ul>
+      <h3>5. Intégration</h3>
+      <ul><li>Remise du programme, des supports, des trames d'évaluation et des procédures de l'organisme.</li><li>Point de préparation avant la première session et bilan après celle-ci, appuyé sur les évaluations des stagiaires.</li></ul>` },
+      { heading: "Rôles et responsabilités", content: `<p><strong>${nom}, dirigeant${memeNom(resp, nom) ? " et responsable pédagogique" : ""} :</strong> analyse le besoin, conduit les entretiens, valide le recrutement, assure l'intégration et évalue les premières interventions.</p>`, variant: "green" },
+    ] });
+  }
   return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES FORMATEURS", sections: [
     { heading: "Objectif du processus", content: `<p>Assurer une sélection rigoureuse et une intégration efficace des formateurs afin de garantir la qualité des prestations dispensées aux stagiaires.</p>` },
     { heading: "Processus de recrutement", content: `
@@ -350,6 +459,12 @@ function formationsMetier(f: FormationInfo): Metier[] {
   ];
 }
 
+/** Vrai si le seul intervenant de l'organisme est son dirigeant (pas de salarié formateur). */
+function dirigeantSeul(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): boolean {
+  const l = intervenantsDe(o, f, stagiaires);
+  return l.length === 1 && memeNom(l[0], o.dirigeant);
+}
+
 function intervenantsDe(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string[] {
   return Array.from(new Set([f.formateur, ...(stagiaires || []).map((s) => s.formateur), o.responsablePedagogique, o.dirigeant]
     .map((n) => String(n || "").trim()).filter((n) => n && !/externe/i.test(n))));
@@ -368,13 +483,16 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   const distanciel = /distanciel|distance|visio|meet|zoom|mixte/i.test(`${f.modalites} ${f.lieu}`);
   const certifiante = /^(RS|RNCP)\d+$/i.test(String(f.codeRNCP || "").replace(/\s+/g, ""));
   const financement = "OPCO / fonds d'assurance formation selon le statut";
+  // Dirigeant seul intervenant : pas d'entretien professionnel (mandataire social), mais une revue annuelle de ses compétences.
+  const sourceEntretien = dirigeantSeul(o, f, stagiaires) ? "revue annuelle des compétences du dirigeant" : "entretien professionnel";
+  const decretCitable = !avantDecret2026(o);
   const out: PlanDevAction[] = [];
   const add = (a: Omit<PlanDevAction, "ref">) => out.push({ ref: "", ...a });
 
   // 1. Compétences métier (IND 21-22 : expertise à jour dans le domaine enseigné)
   if (!isVAE && !isBC) {
     formationsMetier(f).forEach((m) => add({
-      famille: "metier", besoin: `${m.origine} — issu de l'entretien professionnel et de la veille métier (IND 24)`, indicateurs: "21, 22, 24",
+      famille: "metier", besoin: `${m.origine} — issu de la ${sourceEntretien} et de la veille métier (IND 24)`, indicateurs: "21, 22, 24",
       nom: m.nom, objectif: m.objectif, beneficiaires: peda, modalite: `${m.type} — distanciel ou présentiel`, prestataire: m.formateur,
       duree: m.duree, periode: "", financement, priorite: "Moyenne", efficacite: "Mise à jour des supports et exercices ; évolution de la satisfaction sur les contenus (IND 30)",
     }));
@@ -391,7 +509,7 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   }
   if (isCFA) {
     add({ famille: "specifique", besoin: "Missions des CFA (art. L.6231-2) et coordination centre / entreprise (IND 13)", indicateurs: "13, 20, 22", nom: "Pédagogie de l'alternance et coordination avec les maîtres d'apprentissage", objectif: "Articuler missions en entreprise et blocs de compétences, conduire les visites de suivi", beneficiaires: tous, modalite: "Externe", prestataire: "Réseau des CFA / organisme spécialisé", duree: "2 jours", periode: "", financement, priorite: "Haute", efficacite: "Visites réalisées / prévues ; grille de coordination renseignée" });
-    add({ famille: "specifique", besoin: "Décret n° 2026-728 : traitement sans délai des ruptures, violences et discriminations (IND 14, 15)", indicateurs: "14, 15, 22", nom: "Prévenir et traiter les violences, le harcèlement et les discriminations envers les apprentis", objectif: "Repérer, recueillir un signalement, orienter vers les interlocuteurs et le médiateur de l'apprentissage", beneficiaires: tous, modalite: "Externe — distanciel", prestataire: "Organisme spécialisé en prévention des violences", duree: "1 jour", periode: "", financement, priorite: "Haute", efficacite: "Procédure appliquée ; délai de prise en charge des situations signalées" });
+    add({ famille: "specifique", besoin: `${decretCitable ? "Décret n° 2026-728 : traitement" : "Traitement"} sans délai des ruptures, violences et discriminations (IND 14, 15)`, indicateurs: "14, 15, 22", nom: "Prévenir et traiter les violences, le harcèlement et les discriminations envers les apprentis", objectif: "Repérer, recueillir un signalement, orienter vers les interlocuteurs et le médiateur de l'apprentissage", beneficiaires: tous, modalite: "Externe — distanciel", prestataire: "Organisme spécialisé en prévention des violences", duree: "1 jour", periode: "", financement, priorite: "Haute", efficacite: "Procédure appliquée ; délai de prise en charge des situations signalées" });
     add({ famille: "specifique", besoin: "Mobilité nationale et internationale des apprentis (IND 20)", indicateurs: "20, 22", nom: "Monter un projet de mobilité Erasmus+ pour des apprentis", objectif: "Connaître les financements, conventions et accompagnements possibles", beneficiaires: o.referentMobilite || tous, modalite: "Externe — webinaire", prestataire: "Agence Erasmus+ France Éducation Formation", duree: "0,5 jour", periode: "", financement: "Sans coût (webinaire institutionnel)", priorite: "Normale", efficacite: "Nombre de projets de mobilité étudiés / engagés" });
   }
   // 3. Pédagogie
@@ -401,8 +519,9 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   if (certifiante && !isBC) add({ famille: "specifique", besoin: `Exigences de la certification ${f.codeRNCP} — référentiel d'évaluation du certificateur (IND 7, 16)`, indicateurs: "7, 16, 22", nom: `Référentiel d'évaluation et modalités d'épreuves de la certification ${f.codeRNCP}`, objectif: "Aligner les évaluations formatives sur les épreuves et respecter les exigences formelles du certificateur", beneficiaires: peda, modalite: "Externe ou réunion d'information du certificateur", prestataire: "Certificateur de la fiche (voir fiche France Compétences)", duree: "0,5 jour", periode: "", financement: "Selon le certificateur", priorite: "Haute", efficacite: "Tableau croisé à jour ; taux de réussite à la certification" });
   // 5. Handicap (IND 26)
   add({ famille: "handicap", besoin: "Accueil des personnes en situation de handicap — référent handicap (IND 26)", indicateurs: "26, 22", nom: "Référent handicap : accueil, compensation et mobilisation du réseau", objectif: "Identifier les besoins de compensation, mobiliser les partenaires (Agefiph, Cap emploi, MDPH) et adapter la prestation", beneficiaires: o.referentHandicap || o.dirigeant || tous, modalite: "Externe — distanciel", prestataire: "Ressource Handicap Formation (RHF) de la région / Agefiph", duree: "1 jour", periode: "", financement: "Sans coût ou OPCO selon l'offre régionale", priorite: "Haute", efficacite: "Demandes d'aménagement traitées sous 8 jours" });
-  // 6. Qualité et réglementation (IND 23, 27, 32)
-  add({ famille: "reglementaire", besoin: "Veille réglementaire : décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026 (IND 23)", indicateurs: "23, 27, 32, 33", nom: "Référentiel national qualité 2026 : indicateurs 27, 32 et 33", objectif: "Intégrer la traçabilité sous-traitance / portage, l'analyse des risques qualité et, pour un CFA, l'évaluation des enseignements", beneficiaires: tous, modalite: "Autoformation (texte du décret, guide de lecture) + réunion interne", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour", periode: "", financement: "Sans coût", priorite: "Haute", efficacite: "Registre IND 27 et analyse des risques IND 32 à jour" });
+  // 6. Qualité et réglementation (IND 23, 27, 32) — le décret 2026-728 (publié le 4 août 2026) n'est cité
+  // que dans un plan mis à jour après cette date, et planifié au plus tôt au T3 2026.
+  if (decretCitable) add({ famille: "reglementaire", besoin: "Veille réglementaire : décret n° 2026-728 du 1er août 2026, en vigueur le 1er novembre 2026 (IND 23)", indicateurs: "23, 27, 32, 33", nom: "Référentiel national qualité 2026 : indicateurs 27, 32 et 33", objectif: "Intégrer la traçabilité sous-traitance / portage, l'analyse des risques qualité et, pour un CFA, l'évaluation des enseignements", beneficiaires: tous, modalite: "Autoformation (texte du décret, guide de lecture) + réunion interne", prestataire: /externe/i.test(o.referentQualite || "") ? `Référent qualité externe — ${(o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "")}` : `Interne — ${o.referentQualite || o.dirigeant}`, duree: "0,5 jour", periode: "", financement: "Sans coût", priorite: "Haute", efficacite: "Registre IND 27 et analyse des risques IND 32 à jour" });
   // 7. Completed actions share their exact dates with the combined attestation.
   const dirigeantOuTous = o.dirigeant || tous;
   formationsIziRealisees(o).forEach(fi => add({ famille: fi.id === "gerer_centre" ? "qualite" : "numerique", besoin: fi.id === "gerer_centre" ? "Pilotage administratif, financier et réglementaire de l'organisme (IND 22, 32)" : "Automatisation du suivi administratif (IND 22, 32)", indicateurs: "22, 32", nom: fi.nom, objectif: fi.objectif, beneficiaires: dirigeantOuTous, modalite: "Externe — présentiel", prestataire: "IZIBUSINESS — Nadine DENDANI", duree: fi.duree, periode: `Du ${formatDateIzi(fi.debut)} au ${formatDateIzi(fi.fin)}`, financement, priorite: "Haute", efficacite: "Attestation de fin de formation commune IZIBUSINESS jointe (2 formations, 28 heures)", realisee: true }));
@@ -417,7 +536,8 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   out.forEach((a, i) => {
     a.ref = `PDC-${String(i + 1).padStart(2, "0")}`;
     if (a.realisee) return;
-    const trimIdx = Math.floor((moisDebut - 1) / 3) + Math.floor(i / 2);
+    let trimIdx = Math.floor((moisDebut - 1) / 3) + Math.floor(i / 2);
+    if (/2026-728/.test(`${a.besoin} ${a.nom}`)) trimIdx = Math.max(trimIdx, (2026 - an) * 4 + 2);
     a.periode = `T${(trimIdx % 4) + 1} ${an + Math.floor(trimIdx / 4)}`;
   });
   void formateurs;
@@ -439,6 +559,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const dateEtab = maj ? formatDate(maj) : formatDate(new Date().toISOString().slice(0, 10));
   const an = maj ? Number(maj.slice(0, 4)) : new Date().getFullYear();
   const initial = typeAuditEffectif(o) === "initial";
+  const seul = dirigeantSeul(o, f, stagiaires);
   const statut = initial
     ? "Prévue — attestation à joindre après réalisation"
     : "Voir bilan de réalisation (IND 22) : réalisée avec attestation ou reportée avec motif";
@@ -448,16 +569,16 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   let h = `<tr><th colspan="${C}">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES ${an} – ${an + 1}</th></tr>`;
   h += ligne("Établi le", `${dateEtab} (V${o.version || "1"}) par ${o.responsablePedagogique || o.dirigeant} — validé par ${o.dirigeant}`);
   h += ligne("Périmètre", `Ensemble des personnes intervenant dans les prestations : ${intervenants.join(", ") || o.dirigeant}${/externe/i.test(o.referentQualite || "") ? ` ; accompagnement qualité externe : ${o.referentQualite}` : ""}. Les intervenants sous-traitants ou en portage salarial transmettent leurs attestations de formation (IND 27).`);
-  h += ligne("Référence", "Indicateur 22 du référentiel national qualité (décret n° 2026-728) : « Le prestataire entretient et développe les compétences de ses salariés, adaptées aux prestations qu'il délivre. » Un indépendant démontre sa propre démarche de formation continue.");
+  h += ligne("Référence", `Indicateur 22 du référentiel national qualité${avantDecret2026(o) ? "" : " (décret n° 2026-728)"} : « Le prestataire entretient et développe les compétences de ses salariés, adaptées aux prestations qu'il délivre. » Un indépendant démontre sa propre démarche de formation continue.`);
   h += ligne("Financement", "OPCO de branche pour les salariés ; fonds d'assurance formation selon le statut pour le dirigeant non salarié (à confirmer à la demande de prise en charge) ; ressources gratuites institutionnelles lorsque c'est indiqué.");
   h += ligne("Situation d'audit", initial ? "Nouvel entrant : plan prévisionnel ; sa mise en œuvre sera vérifiée à l'audit de surveillance." : "Surveillance / renouvellement : la réalisation de chaque action est tracée dans le bilan de réalisation du plan (IND 22).");
 
   h += sec("1. RECENSEMENT DES BESOINS DE COMPÉTENCES");
   h += `<tr><th>Source</th><th colspan="5">Ce qui est analysé</th><th colspan="6">Besoins identifiés</th></tr>`;
   const sources: [string, string, string][] = [
-    ["Entretien professionnel annuel", "Parcours, compétences, souhaits d'évolution de chaque intervenant", "Actualisation technique dans le domaine enseigné ; développement pédagogique"],
+    seul ? ["Revue annuelle des compétences du dirigeant", `Parcours, compétences et besoins de ${o.dirigeant}, dirigeant (mandataire social) et seul intervenant`, "Actualisation technique dans le domaine enseigné ; développement pédagogique"] : ["Entretien professionnel annuel", "Parcours, compétences, souhaits d'évolution de chaque intervenant", "Actualisation technique dans le domaine enseigné ; développement pédagogique"],
     ["Appréciations des bénéficiaires (IND 30)", "Commentaires sur les contenus, l'animation et les supports", "Méthodes actives, individualisation, qualité des supports"],
-    ["Veilles légale, métiers et innovations (IND 23 à 25)", "Évolutions réglementaires, du métier et des outils", "Référentiel 2026, évolutions du métier, outils numériques"],
+    ["Veilles légale, métiers et innovations (IND 23 à 25)", "Évolutions réglementaires, du métier et des outils", `${avantDecret2026(o) ? "Évolutions du référentiel qualité" : "Référentiel 2026"}, évolutions du métier, outils numériques`],
     ["Analyse des risques qualité (IND 32)", "Risques « compétence insuffisante ou non actualisée d'un intervenant »", "Plan de formation continue annuel pour chaque intervenant"],
     ["Handicap (IND 26)", "Demandes d'aménagement reçues et réseau mobilisé", "Formation du référent handicap"],
   ];
@@ -477,7 +598,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     ["Analyse de pratiques", "Étude de situations vécues avec les stagiaires, recherche de solutions", "Trimestrielle", "Fiche de synthèse"],
     ["Autoformation et veille", "Lecture des sources de veille, webinaires institutionnels (Centre Inffo, France Compétences, Carif-Oref)", "Continue", "Registre de veille (IND 23 à 25)"],
     ["Réseaux professionnels", "Participation aux réseaux régionaux de la formation et de la branche", "Au moins 2 fois par an", "Invitations, comptes rendus"],
-    ["Entretien professionnel", "Bilan des compétences, besoins et projet de chaque intervenant", "Annuel (et bilan à 6 ans pour les salariés)", "Fiche d'entretien signée"],
+    seul ? ["Revue annuelle des compétences du dirigeant", "Bilan des compétences, des actions suivies et des besoins du dirigeant-formateur", "Annuelle, après la dernière session de l'année", "Fiche de revue annuelle"] : ["Entretien professionnel", "Bilan des compétences, besoins et projet de chaque intervenant", "Annuel (et bilan à 6 ans pour les salariés)", "Fiche d'entretien signée"],
   ];
   leviers.forEach(([a, b, c, d]) => { h += `<tr><td>${a}</td><td colspan="5">${b}</td><td colspan="3">${c}</td><td colspan="3">${d}</td></tr>`; });
 
@@ -490,7 +611,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     ["Impact", "Évolution des appréciations des stagiaires sur les contenus et l'animation (IND 30) et des taux de réussite (IND 2, 3)", "Revue annuelle", o.dirigeant],
   ];
   eff.forEach(([a, b, c, d]) => { h += `<tr><td>${a}</td><td colspan="5">${b}</td><td colspan="3">${c}</td><td colspan="3">${d}</td></tr>`; });
-  h += ligne("Révision", `Plan revu chaque année après les entretiens professionnels et la revue qualité, et à chaque arrivée d'un nouvel intervenant. Prochaine révision : au plus tard le ${formatDate(`${an + 1}${maj ? maj.slice(4) : "-01-01"}`)}.`);
+  h += ligne("Révision", `Plan revu chaque année après ${seul ? "la revue annuelle des compétences du dirigeant" : "les entretiens professionnels"} et la revue qualité, et à chaque arrivée d'un nouvel intervenant. Prochaine révision : au plus tard le ${formatDate(`${an + 1}${maj ? maj.slice(4) : "-01-01"}`)}.`);
 
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8">

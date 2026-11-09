@@ -95,15 +95,35 @@ function hash(str: string): number {
  * @param identite prénom + nom (ou tout identifiant stable du stagiaire)
  * @param index position du stagiaire dans le groupe (garantit l'unicité intra-groupe)
  */
-export function commentaireSatisfaction(identite: string, index: number, mode: SatisfactionMode = "chaud"): string {
+/** Contexte réel de la session : retire les fragments qui le contrediraient. */
+export interface ContexteCommentaire {
+  /** Stagiaire seul dans la session : pas de « groupe », d'« autres participants ». */
+  seul?: boolean;
+  /** Formation 100 % à distance : pas de « salle » ni d'« atelier ». */
+  distanciel?: boolean;
+  /** Aucune entreprise (particulier, demandeur d'emploi) : pas de « poste », « collègues », « travail ». */
+  sansEntreprise?: boolean;
+}
+
+function filtrer(banque: string[], ctx?: ContexteCommentaire): string[] {
+  if (!ctx) return banque;
+  const out = banque.filter((t) =>
+    !(ctx.seul && /groupe|quelqu'un|autres participants|ensemble|nos profils/i.test(t)) &&
+    !(ctx.distanciel && /salle|en atelier/i.test(t)) &&
+    !(ctx.sansEntreprise && /poste|collègues|mon travail|mon retour|responsabilités/i.test(t)));
+  return out.length ? out : banque;
+}
+
+export function commentaireSatisfaction(identite: string, index: number, mode: SatisfactionMode = "chaud", ctx?: ContexteCommentaire): string {
   const seed = hash(`${identite}|${mode}`) + index * 7919;
-  const projections = mode === "froid" ? PROJECTIONS_FROID : PROJECTIONS_CHAUD;
+  const projections = filtrer(mode === "froid" ? PROJECTIONS_FROID : PROJECTIONS_CHAUD, ctx);
+  const ouv = filtrer(OUVERTURES, ctx), ped = filtrer(PEDAGOGIE, ctx), pra = filtrer(PRATIQUE, ctx);
 
   // Décalages premiers différents par banque : deux stagiaires voisins n'ont
   // aucun fragment en commun et aucune combinaison ne se répète dans un groupe.
-  const o = OUVERTURES[(seed + index * 1) % OUVERTURES.length];
-  const p = PEDAGOGIE[(seed + index * 5) % PEDAGOGIE.length];
-  const pr = PRATIQUE[(seed + index * 7) % PRATIQUE.length];
+  const o = ouv[(seed + index * 1) % ouv.length];
+  const p = ped[(seed + index * 5) % ped.length];
+  const pr = pra[(seed + index * 7) % pra.length];
   const pj = projections[(seed + index * 11) % projections.length];
 
   return `${o} ${p} ${pr} ${pj}`;

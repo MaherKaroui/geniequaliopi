@@ -66,6 +66,23 @@ export interface OrganismeInfo {
   dateFinValiditeQualiopi?: string;
   /** Type d'audit préparé : « auto » (défaut) = déduit du certificat Qualiopi. */
   typeAudit?: "auto" | "initial" | "surveillance" | "renouvellement";
+  /**
+   * Siège précédent (transfert de siège) : les pièces datées avant `jusquAu` portent
+   * cette adresse, ce SIRET et ce tampon, et non ceux du siège actuel.
+   */
+  ancienSiege?: SiegeAnterieur;
+  /** Posé par organismeALaDate quand l'organisme est présenté à son ancien siège. */
+  siegeActuel?: Pick<OrganismeInfo, "adresse" | "codePostal" | "ville" | "siret" | "tamponUrl">;
+}
+
+export interface SiegeAnterieur {
+  adresse: string;
+  codePostal: string;
+  ville: string;
+  siret: string;
+  tamponUrl?: string;
+  /** Date du transfert (AAAA-MM-JJ) : l'ancien siège vaut pour toute date antérieure. */
+  jusquAu: string;
 }
 
 export interface StagiaireInfo {

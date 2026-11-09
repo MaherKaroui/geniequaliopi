@@ -823,9 +823,9 @@ export function genProcedureAdaptationPedagogiqueCFA(o: OrganismeInfo) {
     <ul style="margin-top:15px">
       <li>Diagnostic du bénéficiaire et adaptation de l'action de formation pour les personnes en situation de handicap</li>
       <li>Évaluation des pré-requis des stagiaires (test de positionnement début)</li>
-      <li>Apport théorique et vécu (expérience sur le champ de la formation et de l'audit)</li>
+      <li>Apports théoriques illustrés par l'expérience professionnelle du formateur dans le domaine de la formation</li>
       <li>Réflexions sur les cas réels</li>
-      <li>Mises en situation par questionnement collectif</li>
+      <li>Mises en situation et questionnement oral, individuel ou collectif selon l'effectif de la session</li>
       <li>Retours d'expériences sur les formations réalisées</li>
       <li>Tests de contrôle de connaissances en fin de formation (évaluation de fin de formation)</li>
     </ul>

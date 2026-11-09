@@ -1322,7 +1322,30 @@ export function mergeOrganisme(userOrg: OrganismeInfo): OrganismeInfo {
   if (!txt(merged.outilsUtilises)) merged.outilsUtilises = "Google Meet, Zoom, messagerie électronique";
   // Dirigeant : le tampon seul s'il existe, sinon la signature — jamais les deux ensemble.
   if (txt(merged.tamponUrl)) merged.signatureUrl = "";
-  return merged;
+  // Le dossier est daté de sa mise à jour (V1) : il porte le siège en vigueur à cette date.
+  return organismeALaDate(merged, merged.dateMaj);
+}
+
+/**
+ * Organisme tel qu'il était à `dateISO` : avant un transfert de siège, l'ancienne adresse,
+ * l'ancien SIRET et l'ancien tampon. Le siège actuel reste accessible pour les pièces datées
+ * après le transfert (revue de direction, veille…) : `organismeALaDate(o, dateRecente)`.
+ */
+export function organismeALaDate(org: OrganismeInfo, dateISO: string | undefined): OrganismeInfo {
+  const { siegeActuel, ...reste } = org;
+  const courant: OrganismeInfo = siegeActuel ? { ...reste, ...siegeActuel } : org;
+  const a = courant.ancienSiege;
+  const jour = (dateISO || "").slice(0, 10);
+  if (!a?.jusquAu || !a.adresse || !/^\d{4}-\d{2}-\d{2}$/.test(jour) || jour >= a.jusquAu) return courant;
+  return {
+    ...courant,
+    adresse: a.adresse,
+    codePostal: a.codePostal || courant.codePostal,
+    ville: a.ville || courant.ville,
+    siret: a.siret || courant.siret,
+    tamponUrl: a.tamponUrl || courant.tamponUrl,
+    siegeActuel: { adresse: courant.adresse, codePostal: courant.codePostal, ville: courant.ville, siret: courant.siret, tamponUrl: courant.tamponUrl },
+  };
 }
 
 export function mergeStagiaires(userStagiaires: StagiaireInfo[]): StagiaireInfo[] {

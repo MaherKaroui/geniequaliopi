@@ -406,13 +406,15 @@ export function buildFullCatalog(
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
 
     // IND 26 — Accueil et accompagnement handicap
-    add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
+    // Une seule veille handicap : l'ancien « VEILLE HANDICAP » (tableau_veille type handicap) produisait
+    // exactement le même document que les sources et réseaux suivis.
     add("af_c6i26_veille_sourcee", "CT6 - IND 26 SOURCES ET RÉSEAUX HANDICAP SUIVIS", 6, 26, "veille_sourcee", { theme: "handicap" });
     // PDFs statiques IND 26
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("af_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
-    add("af_c6i26_formation_referent_handicap", "CT6 - IND 26 FORMATION DU RÉFÉRENT HANDICAP (à joindre)", 6, 26, "diplome_referent_handicap_docx");
+    // L'attestation de formation du référent handicap est une pièce de tiers : jamais générée ni
+    // remplacée par une page « à joindre » dans le dossier exporté (l'organisme la joint lui-même).
     // Fiche du réseau Ressources Handicap Formation d'Île-de-France : seulement pour un organisme francilien.
     if (/^(75|77|78|91|92|93|94|95)/.test((orgCodePostal || "").replace(/\s/g, ""))) add("af_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("af_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
@@ -429,7 +431,7 @@ export function buildFullCatalog(
       add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     }
     if (/externe|fd\s*certif/i.test(referentQualiteNom || "")) {
-      add("af_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", 6, 27, "mandat_qualiopi", { actionType: "actions-formation" });
+      add("af_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE CONSEIL QUALITÉ ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DU RÉFÉRENT QUALITÉ EXTERNE", 6, 27, "mandat_qualiopi", { actionType: "actions-formation" });
     }
 
     // IND 28 — Formation en situation de travail (seulement si la formation comporte de l'alternance)
@@ -509,7 +511,10 @@ export function buildFullCatalog(
     Array.from(new Set(stagiaires.map((s) => (s.entreprise || "").trim()).filter(Boolean))).forEach((ent, ei) => {
       add(`af_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
     });
-    add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
+    // Enquête financeur : seulement s'il existe un financeur tiers (pas pour un dossier 100 % autofinancé).
+    if (!stagiaires.length || stagiaires.some((s) => !/particulier|personnel|fonds propres|autofinanc|auto-financ|financement perso/i.test(s.financeur || ""))) {
+      add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
+    }
     add("af_c7i30_tableau_relance_excel", "CT7 - IND 30 TABLEAU DE RELANCE", 7, 30, "relances_appreciations_excel");
     add("af_c7i30_procedure_relance", "CT7 - IND 30 PROCÉDURE DE RELANCE", 7, 30, "procedure_relance_appreciations");
     
@@ -1182,7 +1187,7 @@ export function buildFullCatalog(
     add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
     if (hasExternalFormateur) add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
     add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
-    add("cfa_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi", { actionType: "apprentissage" });
+    add("cfa_c6i27_mandat_qualiopi", /fd\s*certif/i.test(referentQualiteNom || "") ? "CT6 - IND 27 CONTRAT DE PRESTATION DE CONSEIL QUALITÉ ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT" : "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi", { actionType: "apprentissage" });
     add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
     // Checklist formateur — un fichier par session (groupé par dates)
     {
@@ -1571,8 +1576,8 @@ export function buildFullCatalog(
 
   // La prestation qualité externe reste distincte de la sous-traitance pédagogique.
   if (/fd\s*certif/i.test(referentQualiteNom || "")) {
-    if (isBDC) add("bdc_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "bilans-competences" });
-    if (isVAE) add("vae_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE SERVICES ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "vae" });
+    if (isBDC) add("bdc_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE CONSEIL QUALITÉ ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "bilans-competences" });
+    if (isVAE) add("vae_c6i27_mandat_qualiopi", "CT6 - IND 27 CONTRAT DE PRESTATION DE CONSEIL QUALITÉ ET MANDAT DE REPRÉSENTATION – FD CERTIF EXPERT", 6, 27, "mandat_qualiopi", { actionType: "vae" });
   }
 
   // On ne conserve que les mails réellement générables.

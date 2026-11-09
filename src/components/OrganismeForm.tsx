@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { OrganismeInfo } from "@/types/qualiopi";
+import { OrganismeInfo, SiegeAnterieur } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,11 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
 
   const update = (field: keyof OrganismeInfo, value: string) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const updateAncienSiege = (field: keyof SiegeAnterieur, value: string) => {
+    const a: SiegeAnterieur = { adresse: "", codePostal: "", ville: "", siret: "", jusquAu: "", ...data.ancienSiege, [field]: value };
+    onChange({ ...data, ancienSiege: a });
   };
 
   const fetchPappers = async () => {
@@ -226,6 +231,30 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
         <div>
           <Label htmlFor="dateMaj">Date de mise à jour (MAJ)</Label>
           <Input id="dateMaj" type="date" value={data.dateMaj} onChange={e => update('dateMaj', e.target.value)} />
+        </div>
+        <div className="md:col-span-2 rounded-md border p-3">
+          <Label className="mb-1 block">Ancien siège (en cas de transfert)</Label>
+          <p className="mb-3 text-xs text-muted-foreground">Les pièces datées avant le transfert portent l'ancienne adresse, l'ancien SIRET et l'ancien tampon.</p>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <Input aria-label="Ancienne adresse" placeholder="Ancienne adresse" value={data.ancienSiege?.adresse || ''} onChange={e => updateAncienSiege('adresse', e.target.value)} />
+            <Input aria-label="Ancien SIRET" placeholder="Ancien SIRET" value={data.ancienSiege?.siret || ''} onChange={e => updateAncienSiege('siret', e.target.value)} />
+            <Input aria-label="Ancien code postal" placeholder="Code postal" value={data.ancienSiege?.codePostal || ''} onChange={e => updateAncienSiege('codePostal', e.target.value)} />
+            <Input aria-label="Ancienne ville" placeholder="Ville" value={data.ancienSiege?.ville || ''} onChange={e => updateAncienSiege('ville', e.target.value)} />
+            <div>
+              <Label htmlFor="jusquAu" className="text-xs">Date du transfert</Label>
+              <Input id="jusquAu" type="date" value={data.ancienSiege?.jusquAu || ''} onChange={e => updateAncienSiege('jusquAu', e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="ancienTampon" className="text-xs">Tampon de l'ancien siège (PNG){data.ancienSiege?.tamponUrl ? ' — chargé' : ''}</Label>
+              <Input id="ancienTampon" type="file" accept="image/png,image/jpeg" onChange={e => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => updateAncienSiege('tamponUrl', String(reader.result || ''));
+                reader.readAsDataURL(file);
+              }} />
+            </div>
+          </div>
         </div>
         {!hidden('typesActions') && (
         <div className="md:col-span-2">

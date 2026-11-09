@@ -78,6 +78,12 @@ export function genPieceAFournir(o: OrganismeInfo, titre: string, justificatifs:
 
 // ─── IND 17 ─────────────────────────────────────────────────────────────────
 
+/** « 1 participant », « 12 participants » : accord sur l'effectif saisi (sinon le nombre de stagiaires). */
+function nbParticipants(f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const n = parseInt(v(f.nombreParticipants), 10) || stagiaires.length || 1;
+  return `${n} participant${n > 1 ? "s" : ""}`;
+}
+
 export function genMoyensEnvironnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const m = modalite(f);
   const outils = v(o.outilsUtilises) || "Google Meet, Zoom, messagerie électronique";
@@ -102,7 +108,7 @@ export function genMoyensEnvironnement(o: OrganismeInfo, f: FormationInfo, stagi
     title: "DESCRIPTIF DES MOYENS HUMAINS, TECHNIQUES ET DE L'ENVIRONNEMENT",
     subtitle: `Indicateur 17 — ${f.intitule}`,
     sections: [
-      { heading: "Modalité de la prestation", content: `<p>Formation <strong>${m === "distanciel" ? "à distance (classe virtuelle)" : m === "mixte" ? "mixte (présentiel et distanciel)" : "en présentiel"}</strong>, ${v(f.duree) || "durée précisée au programme"}, pour ${v(f.nombreParticipants) || String(stagiaires.length || 1)} participant(s) maximum par session.</p>` },
+      { heading: "Modalité de la prestation", content: `<p>Formation <strong>${m === "distanciel" ? "à distance (classe virtuelle)" : m === "mixte" ? "mixte (présentiel et distanciel)" : "en présentiel"}</strong>, ${v(f.duree) || "durée précisée au programme"}, pour ${nbParticipants(f, stagiaires)} maximum par session.</p>` },
     ],
     table: { headers: ["Moyen", "Description", "Justificatif à joindre"], rows },
     extraHtml: `<p style="margin-top:10px">Descriptif établi le ${dateMajFr(o)} et revu avant chaque session. Les justificatifs de la dernière colonne sont des pièces de l'organisme ou de ses fournisseurs : ils sont joints au dossier, ils ne sont pas produits par le générateur.</p>`,
@@ -132,28 +138,61 @@ export function genCRReunionPedagogique(o: OrganismeInfo, f: FormationInfo, stag
   const dateReunion = sess.debut ? subtractBusinessDays(sess.debut, 3) : isoMaj(o);
   const tenue = dateReunion <= today;
   const intervenants = intervenantsReels(o, f, stagiaires);
+  const respPeda = v(o.responsablePedagogique) || v(o.dirigeant);
+  const meme = (a?: string, b?: string) => v(a).toLowerCase().replace(/\s+/g, " ") === v(b).toLowerCase().replace(/\s+/g, " ");
+  const participants: string[] = [];
+  [o.dirigeant, o.responsablePedagogique, ...intervenants, o.referentHandicap].forEach((n) => { if (v(n) && !participants.some((p) => meme(p, n))) participants.push(v(n)); });
+  const nbStag = sess.noms.length;
+  const plusieursIntervenants = intervenants.length > 1;
+  const stagTxt = nbStag ? `${nbStag} stagiaire${nbStag > 1 ? "s" : ""} (${sess.noms.join(", ")})` : "effectif à confirmer";
   const psh = stagiaires.filter((s) => s.rqth === "oui").map((s) => `${s.prenom} ${s.nom}`);
+  // Une seule personne (dirigeant formateur unique) : pas de « réunion » ni de groupes de niveau, mais une note de préparation.
+  const seul = participants.length <= 1;
+  const titre = seul
+    ? (tenue ? "NOTE DE PRÉPARATION PÉDAGOGIQUE DE LA SESSION" : "NOTE DE PRÉPARATION PÉDAGOGIQUE — SESSION À VENIR")
+    : (tenue ? "COMPTE RENDU DE RÉUNION PÉDAGOGIQUE DE PRÉPARATION" : "ORDRE DU JOUR — RÉUNION PÉDAGOGIQUE DE PRÉPARATION");
+  // Le test d'entrée a lieu à l'ouverture de la session : son résultat n'est pas connu à la date de préparation.
+  const positionnement = nbStag > 1
+    ? `Test de positionnement prévu à l'ouverture de la session, le ${formatDate(sess.debut)} (IND 8) : groupes de niveau et adaptations décidés sur ses résultats.`
+    : `Test de positionnement de ${sess.noms[0] || "la personne inscrite"} prévu à l'ouverture de la session, le ${formatDate(sess.debut)} (IND 8) : le parcours est ajusté individuellement sur ses résultats.`;
+  const repartition = plusieursIntervenants
+    ? "Répartition des séquences entre intervenants, supports et exercices corrigés à utiliser."
+    : `Toutes les séquences sont assurées par ${intervenants[0] || respPeda} ; supports, fichiers d'exercices et corrigés de chaque séquence préparés.`;
+  const etape = plusieursIntervenants
+    ? "Point d'étape à mi-parcours entre le responsable pédagogique et les intervenants."
+    : `Point d'étape individuel à mi-parcours avec ${nbStag > 1 ? "chaque stagiaire" : sess.noms[0] || "la personne formée"}.`;
+  const unSignataire = seul || (!plusieursIntervenants && meme(intervenants[0], respPeda));
   return buildDocument({
     org: o,
-    title: tenue ? "COMPTE RENDU DE RÉUNION PÉDAGOGIQUE DE PRÉPARATION" : "ORDRE DU JOUR — RÉUNION PÉDAGOGIQUE DE PRÉPARATION",
+    title: titre,
     subtitle: `Indicateur 18 — ${f.intitule}`,
     sections: [
-      { heading: "Réunion", content: `<p><strong>Date :</strong> ${formatDate(dateReunion)}${tenue ? "" : " (programmée)"}<br><strong>Participants :</strong> ${[...new Set([o.dirigeant, o.responsablePedagogique, ...intervenants, o.referentHandicap].filter(Boolean))].join(", ")}<br><strong>Session :</strong> du ${formatDate(sess.debut)} au ${formatDate(sess.fin)} — ${sess.noms.length} stagiaire(s)</p>` },
-      { heading: "Points traités", content: `<ol><li>Analyse des besoins des stagiaires et adaptations décidées (trames IND 4).</li><li>Résultats des tests de positionnement et constitution des groupes de niveau (IND 8).</li><li>${psh.length ? `Aménagements pour ${psh.join(", ")} (RQTH) validés avec le référent handicap.` : "Aucun besoin de compensation déclaré ; rappel de la procédure en cas de besoin exprimé en cours de session."}</li><li>Répartition des séquences entre intervenants, supports et exercices corrigés à utiliser.</li><li>Organisation ${modalite(f) === "presentiel" ? "des locaux et du matériel" : "des classes virtuelles : liens, test de connexion, solution de repli"}.</li><li>Modalités d'émargement, d'évaluation et de recueil des appréciations.</li></ol>` },
-      { heading: tenue ? "Décisions" : "Décisions attendues", content: `<ul><li>Planning des intervenants validé (document joint).</li><li>Point d'étape à mi-parcours entre le responsable pédagogique et les intervenants.</li><li>Bilan de session sous 8 jours après la fin de la formation.</li></ul>` },
+      { heading: seul ? "Préparation" : "Réunion", content: `<p><strong>Date :</strong> ${formatDate(dateReunion)}${tenue ? "" : " (programmée)"}<br>${seul ? `<strong>Établie par :</strong> ${participants[0] || respPeda}, responsable pédagogique et formateur unique de la session` : `<strong>Participants :</strong> ${participants.join(", ")}`}<br><strong>Session :</strong> du ${formatDate(sess.debut)} au ${formatDate(sess.fin)} — ${stagTxt}</p>` },
+      { heading: "Points traités", content: `<ol><li>Analyse des besoins ${nbStag > 1 ? "des stagiaires" : nbStag ? `de ${sess.noms[0]}` : "de la personne inscrite"} et adaptations décidées (trames IND 4).</li><li>${positionnement}</li><li>${psh.length ? `Aménagements pour ${psh.join(", ")} (RQTH) validés avec le référent handicap.` : "Aucun besoin de compensation déclaré ; rappel de la procédure en cas de besoin exprimé en cours de session."}</li><li>${repartition}</li><li>Organisation ${modalite(f) === "presentiel" ? "des locaux et du matériel" : "des classes virtuelles : liens, test de connexion, solution de repli"}.</li><li>Modalités d'émargement, d'évaluation et de recueil des appréciations.</li></ol>` },
+      { heading: tenue ? "Décisions" : "Décisions attendues", content: `<ul><li>${plusieursIntervenants ? "Planning des intervenants validé" : "Planning de la session validé"} (document joint).</li><li>${etape}</li><li>Bilan de session sous 8 jours après la fin de la formation.</li></ul>` },
     ],
-    signatures: tenue ? { type: "2", labels: ["Le responsable pédagogique", "Pour les intervenants"], names: [o.responsablePedagogique || o.dirigeant, intervenants[0] || o.dirigeant], dates: [formatDate(dateReunion), formatDate(dateReunion)] } : undefined,
+    signatures: !tenue ? undefined : unSignataire
+      ? { type: "1", labels: ["Le responsable pédagogique"], names: [respPeda], dates: [formatDate(dateReunion)] }
+      : { type: "2", labels: ["Le responsable pédagogique", "Pour les intervenants"], names: [respPeda, intervenants.find((n) => !meme(n, respPeda)) || intervenants[0] || o.dirigeant], dates: [formatDate(dateReunion), formatDate(dateReunion)] },
   });
 }
 
 export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const rows: string[][] = [];
-  const modules = (f.programme || "").split("\n").map((l) => l.trim()).filter((l) => /^(module|jour|bloc|séquence|étape|phase)\b/i.test(l));
+  // Titre de chaque module + contenu des lignes qui le suivent (sinon « Jour 1 – … (7h) : » sortait sans contenu).
+  const modules: string[] = [];
+  (f.programme || "").split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
+    if (/^(module|jour|bloc|séquence|étape|phase)\b/i.test(l)) modules.push(l.replace(/\s*:\s*$/, ""));
+    else if (modules.length) {
+      const contenu = l.replace(/^[-•*]\s*/, "").replace(/^\d{1,2}h\d{0,2}\s*[–-]\s*\d{1,2}h\d{0,2}\s*:\s*/i, "");
+      modules[modules.length - 1] += `${/ : /.test(modules[modules.length - 1]) ? " ; " : " : "}${contenu}`;
+    }
+  });
   sessions(f, stagiaires).forEach((sess) => {
     const jours = getFormationDays({ ...f, dateDebut: sess.debut, dateFin: sess.fin });
     const intervenant = stagiaires.find((s) => v(s.dateDebutFormation) === sess.debut && v(s.formateur))?.formateur || f.formateur || o.dirigeant;
     jours.forEach((j, i) => {
-      rows.push([j, "09h00 – 12h30 / 13h30 – 17h00", modules.length ? modules[Math.min(i, modules.length - 1)].replace(/\s*:\s*/, " : ") : `Séquence ${i + 1}`, intervenant, modalite(f) === "presentiel" ? (f.lieu || o.ville) : "Classe virtuelle"]);
+      rows.push([j, "09h00 – 12h30 / 13h30 – 17h00", modules.length ? modules[Math.min(i, modules.length - 1)] : `Séquence ${i + 1}`, intervenant, modalite(f) === "presentiel" ? (f.lieu || o.ville) : "Classe virtuelle"]);
     });
   });
   return buildDocument({

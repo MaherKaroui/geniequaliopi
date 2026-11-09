@@ -3,7 +3,8 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays, cachetDirigeantHtml } from "./docBuilder";
 import { entreesVeille, genVeilleExploitee } from "./veilleExploitee";
-import { genVeilleSourcee } from "./piecesAF2026";
+import { genVeilleSourcee, intervenantsReels, estDirigeant } from "./piecesAF2026";
+import type { StagiaireInfo } from "@/types/qualiopi";
 import type { TypePrestation } from "./qualite2026";
 
 
@@ -46,15 +47,26 @@ export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
 
 // ===== IND 27 — PARTENAIRES, CONTRAT SOUS-TRAITANCE, CHARTE QUALITÉ =====
 
-export function genListePartenairesV2(o: OrganismeInfo) {
-  const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  return buildDocument({ org: o, title: "LES PARTENAIRES", sections: [
-    { heading: "", content: `<p>${o.nom} s'attache à développer constamment son réseau de partenaires afin d'assurer une très grande employabilité à ses étudiants.</p>` },
-  ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
-    <table>
-      <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
-      <tr style="background:#fff"><td>Dirigeant</td><td>Dirigeant<br>${tamponHtml}</td></tr>
-    </table>` });
+/**
+ * IND 27 — partenaires et intervenants externes. L'organisme et son dirigeant ne sont jamais
+ * listés comme « partenaires ». Sans sous-traitant ni salarié porté, la pièce l'indique.
+ */
+export function genListePartenairesV2(o: OrganismeInfo, f?: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const norm = (x?: string) => (x || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const externes = intervenantsReels(o, f, stagiaires).filter((n) => !estDirigeant(o, n) && norm(n) !== norm(o.responsablePedagogique));
+  const refQ = (o.referentQualite || "").trim();
+  const refExterne = /extern|fd\s*certif/i.test(refQ);
+  const rows: string[][] = [
+    ...externes.map((n) => [n, "Formateur intervenant (sous-traitance de formation)", "Contrat de sous-traitance avec clauses qualité (IND 27)"]),
+    ...(refExterne ? [[refQ.replace(/\s*\(\s*externe\s*\)\s*/i, ""), "Conseil qualité et représentation aux audits (prestation de conseil, pas de sous-traitance de formation)", "Contrat de prestation de conseil qualité"]] : []),
+  ];
+  const constat = externes.length
+    ? `<p>${o.nom} fait appel à ${externes.length} intervenant(s) externe(s) pour réaliser ses formations : chaque contrat de sous-traitance comporte les clauses qualité exigées par l'indicateur 27.</p>`
+    : `<p>${o.nom} n'a recours à aucun sous-traitant de formation ni à aucun salarié porté : les formations sont réalisées par ${o.dirigeant || "le dirigeant"}. L'indicateur 27 (sous-traitance et portage salarial) est donc non applicable à la date du présent document ; il le deviendrait dès la première sous-traitance, avec un contrat comportant les clauses qualité.</p>`;
+  return buildDocument({ org: o, title: "LES PARTENAIRES ET INTERVENANTS EXTERNES", subtitle: "Indicateur 27", sections: [
+    { heading: "Constat", content: constat },
+    { heading: "Partenaires et prestataires", content: rows.length ? "" : "<p>Aucun partenaire ni prestataire externe enregistré.</p>" },
+  ], table: rows.length ? { headers: ["Partenaire / prestataire", "Rôle", "Pièce contractuelle"], rows } : undefined });
 }
 
 export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, stagiaires: import("@/types/qualiopi").StagiaireInfo[]) {

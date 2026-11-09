@@ -77,6 +77,44 @@ function parseHtmlToSheets(html: string): SheetSpec[] {
   return sheets;
 }
 
+/**
+ * Typage des cellules lues en texte brut. Sans cela, SheetJS (raw: false) interprète « 22/09/2025 »
+ * comme une date américaine (jour et mois inversés) et la convertit à minuit heure locale
+ * (« 22:00 / 23:00 » la veille une fois relue en UTC). Ici :
+ * - jj/mm/aaaa → vraie date Excel (numéro de série calculé en UTC, format jj/mm/aaaa) ;
+ * - nombre simple (« 12 », « 4,5 ») → nombre ; tout le reste reste du texte.
+ */
+function typerCellules(ws: XLSX.WorkSheet) {
+  const ref = ws["!ref"];
+  if (!ref) return;
+  const range = XLSX.utils.decode_range(ref);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+      if (!cell || cell.t !== "s" || typeof cell.v !== "string") continue;
+      const t = cell.v.trim();
+      const d = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (d) {
+        const j = Number(d[1]), m = Number(d[2]), a = Number(d[3]);
+        const utc = Date.UTC(a, m - 1, j);
+        const verif = new Date(utc);
+        if (verif.getUTCDate() === j && verif.getUTCMonth() === m - 1) {
+          cell.t = "n";
+          cell.v = Math.round((utc - Date.UTC(1899, 11, 30)) / 86400000);
+          cell.z = "dd/mm/yyyy";
+          delete cell.w;
+        }
+        continue;
+      }
+      if (/^-?\d{1,12}([.,]\d+)?$/.test(t) && !/^0\d/.test(t)) {
+        cell.t = "n";
+        cell.v = Number(t.replace(",", "."));
+        delete cell.w;
+      }
+    }
+  }
+}
+
 function applyAutoColumnWidths(ws: XLSX.WorkSheet) {
   const ref = ws["!ref"];
   if (!ref) return;
@@ -87,7 +125,7 @@ function applyAutoColumnWidths(ws: XLSX.WorkSheet) {
     for (let R = range.s.r; R <= range.e.r; R++) {
       const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
       if (cell && cell.v != null) {
-        const text = String(cell.v);
+        const text = cell.z === "dd/mm/yyyy" ? "00/00/0000" : String(cell.v);
         // approx largeur : longueur de la plus longue ligne
         const longest = text.split(/\r?\n/).reduce((m, l) => Math.max(m, l.length), 0);
         if (longest > max) max = longest;
@@ -110,7 +148,9 @@ export function htmlToXlsxBlob(html: string): Blob {
   const usedNames = new Set<string>();
 
   sheets.forEach((spec, idx) => {
-    const ws = XLSX.utils.table_to_sheet(spec.table, { raw: false });
+    // raw: true → aucune conversion automatique (dates US, fuseau) ; typage explicite ensuite.
+    const ws = XLSX.utils.table_to_sheet(spec.table, { raw: true });
+    typerCellules(ws);
 
     // Nettoie les fusions qui dépassent le range réel des données
     // (sinon Excel refuse d'ouvrir le fichier comme corrompu)

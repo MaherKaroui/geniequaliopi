@@ -7,6 +7,7 @@ import { mentionTVA } from "./mentionsLegales";
 import { parseMontant } from "./templatesCA";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 import { getUnitesExercices } from "./parcoursStagiaire";
+import { horairesSessionTexte, horairesSessionLigne, tarifNetDeTaxe, tarifMentionneTva, estDistancielPur, moyensSelonModalite } from "./sessionTextes";
 
 function getHoraireFin(_f: FormationInfo): string {
   // Conservé pour compatibilité — horaires journée standard
@@ -22,9 +23,16 @@ const HORAIRES_LIGNE_PSH = "Lun-Ven 09h00–12h30 / 13h30–17h00 (aménagement 
 export function isPSHStagiaire(s: StagiaireInfo | undefined | null): boolean {
   return !!s && ((s as any).rqth || "").toLowerCase() === "oui";
 }
-function horairesTexteFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIRES_TEXTE_PSH : HORAIRES_TEXTE; }
-function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIRES_LIGNE_PSH : HORAIRES_LIGNE; }
-import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
+// Jours dérivés des dates réelles de la session (ex. « Du mardi au jeudi ») ; libellé standard à défaut.
+function horairesTexteFor(s?: StagiaireInfo, f?: FormationInfo) {
+  if (!f) return isPSHStagiaire(s) ? HORAIRES_TEXTE_PSH : HORAIRES_TEXTE;
+  return horairesSessionTexte(f, s ? getStagiaireDateDebut(s, f) : f.dateDebut, s ? getStagiaireDateFin(s, f) : f.dateFin, isPSHStagiaire(s) ? "(aménagement personne en situation de handicap)" : "(7 h/jour)");
+}
+function horairesLigneFor(s?: StagiaireInfo, f?: FormationInfo) {
+  if (!f) return isPSHStagiaire(s) ? HORAIRES_LIGNE_PSH : HORAIRES_LIGNE;
+  return horairesSessionLigne(f, s ? getStagiaireDateDebut(s, f) : f.dateDebut, s ? getStagiaireDateFin(s, f) : f.dateFin, isPSHStagiaire(s) ? "(aménagement PSH)" : "(7 h/jour)");
+}
+import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, noteTestOuvert, QCMQuestion } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
 import { IA_GENERATIVE_EVAL_PACK } from "./iaGenerativePreset";
@@ -125,6 +133,51 @@ function respEntrepriseSig(s: StagiaireInfo): string {
   return `<div style="height:48px;border-bottom:1px dotted #bbb;margin-top:10px"></div>`;
 }
 
+/** Mentions du contrat (L.6353-4) tirées des données saisies : formateur, effectif de la session, financement. */
+function contratSessionInfos(s: StagiaireInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const formateur = ((s as any).formateur || f.formateur || "").trim();
+  const deb = getStagiaireDateDebut(s, f), fin = getStagiaireDateFin(s, f);
+  const effectif = stagiaires.filter((x) => getStagiaireDateDebut(x, f) === deb && getStagiaireDateFin(x, f) === fin).length || stagiaires.length;
+  const financement = ((s as any).financeur || "").trim();
+  return (!isPresentiel(f) && (f.lieu || "").trim() ? `<br><strong>Classe virtuelle :</strong> ${f.lieu}` : "")
+    + (formateur ? `<br><strong>Formateur :</strong> ${formateur}` : "")
+    + (effectif > 0 ? `<br><strong>Effectif de la session :</strong> ${effectif} stagiaire${effectif > 1 ? "s" : ""}` : "")
+    + (financement ? `<br><strong>Mode de financement :</strong> ${financement}` : "");
+}
+
+/** Moyens saisis, sans les équipements de salle quand la formation est entièrement à distance. */
+function moyensContratHtml(f: FormationInfo): string {
+  const items = moyensSelonModalite(f.moyensPedagogiques || "", f);
+  return items.length ? `<ul>${items.map((m) => `<li>${m.charAt(0).toUpperCase()}${m.slice(1)}</li>`).join("")}</ul>` : `<p>${f.moyensPedagogiques || ""}</p>`;
+}
+
+/** Coût affiché : pas de « TTC » quand l'organisme n'est pas assujetti ; la mention TVA suit une seule fois. */
+function coutContrat(o: OrganismeInfo, tarif: string): string {
+  return o.regimeTva === "assujetti" ? tarif : tarifNetDeTaxe(tarif, false);
+}
+
+/**
+ * Annulation / abandon. Stagiaire qui finance lui-même sa formation (contrat L.6353-3) : aucune indemnité
+ * de dédit, seules les prestations effectivement dispensées sont dues (L.6353-7). La clause de dédit
+ * ne vise que les formations financées par une entreprise (convention), hors fonds de la formation (L.6354-1).
+ */
+function clauseAnnulationCGV(o: OrganismeInfo): string {
+  return `<h3>8.1 Stagiaire finançant lui-même sa formation (contrat de formation professionnelle)</h3>`
+    + `<p>Toute annulation après le délai de rétractation doit être notifiée par écrit à ${o.nom}.</p>`
+    + `<p>Si, par suite de force majeure dûment reconnue, le stagiaire est empêché de suivre la formation, il peut rompre le contrat : seules les prestations de formation effectivement dispensées sont alors dues, au prorata temporis de leur valeur prévue au contrat (art. L.6353-7 du Code du travail). Aucune indemnité de dédit n'est facturée au stagiaire qui finance lui-même sa formation ; les sommes versées au-delà des prestations dispensées lui sont remboursées.</p>`
+    + `<h3>8.2 Formation financée par une entreprise (convention de formation)</h3>`
+    + `<p>En cas d'annulation par l'entreprise moins de 7 jours ouvrés avant le début, une indemnité de 30 % du prix peut être facturée ; en cas d'abandon en cours de formation sans motif de force majeure, seules les heures réellement suivies sont facturées au titre de la formation, majorées de la même indemnité de 30 % sur le reliquat. Les sommes dues au titre du dédit ne peuvent être imputées sur les fonds de la formation professionnelle ni faire l'objet d'une demande de prise en charge (art. L.6354-1 du Code du travail).</p>`
+    + `<h3>8.3 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>`;
+}
+
+/** Entrée en vigueur datée et signée par l'organisme (date de la version du dossier), pas par le stagiaire. */
+function entreeEnVigueurReglement(o: OrganismeInfo): string {
+  const d = (o.dateMaj || "").trim();
+  return `<p>Le présent règlement intérieur est établi par ${o.nom}${d ? ` et entre en vigueur le ${formatDate(d)}` : " et entre en vigueur à la date de son établissement"}. Il s'applique à toutes les formations dispensées à compter de cette date.</p>`
+    + `<p>Il est remis à chaque stagiaire avant son entrée en formation, avec le contrat de formation ; la signature du stagiaire atteste qu'il en a pris connaissance.</p>`
+    + `<p><strong>Fait à ${o.ville}${d ? `, le ${formatDate(d)}` : ""}</strong><br>Pour ${o.nom} : ${o.dirigeant}</p>${orgSig(o)}`;
+}
+
 function modaliteTexte(f: FormationInfo): string {
   const m = (f.modalites || '').toLowerCase();
   if (m.includes('mixte')) return 'en présentiel et en distanciel (formation mixte)';
@@ -152,11 +205,11 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${f.tarif} par stagiaire</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${f.tarif ? `<p>Tarif de la formation « ${f.intitule} » : ${coutContrat(o, f.tarif)} par stagiaire.</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation de 10 jours (art. L.6353-5 du Code du travail).</p><ul><li>À l'issue de ce délai, un acompte de <strong>30 % au plus</strong> du prix peut être demandé (art. L.6353-6)</li><li>Le solde est échelonné au fur et à mesure du déroulement de la formation</li><li>Formation financée par l'employeur ou un OPCO : facturation après réalisation, règlement à 30 jours</li>${estCertifiante(f) ? "<li>Formation financée par le CPF : règlement par la Caisse des Dépôts selon les conditions générales de la plateforme Mon Compte Formation</li>" : ""}</ul>` },
 
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
-    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation moins de 7 jours ouvrés avant le début, une indemnité de 30 % du prix peut être facturée ; en cas d'abandon en cours de formation sans motif de force majeure, seules les heures réellement suivies sont dues, majorées de la même indemnité de 30 % sur le reliquat (art. L.6354-1 du Code du travail : les sommes dues au titre du dédit ne peuvent être imputées sur les fonds de la formation professionnelle).</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
+    { heading: "Article 8 – Annulation, report et abandon", content: clauseAnnulationCGV(o) },
     { heading: "Article 9 – Assiduité et obligations du stagiaire", content: `<p>Le stagiaire s'engage à :</p><ul><li>Respecter les horaires et le règlement intérieur</li><li>Suivre la formation avec assiduité</li><li>Informer ${o.nom} de toute absence ou retard</li></ul><p>Les absences injustifiées peuvent entraîner l'interruption de la formation.</p>` },
     { heading: "Article 10 – Règlement intérieur", content: `<p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>` },
     { heading: "Article 11 – Accessibilité et handicap", content: `<p>${o.nom} s'engage à étudier toute demande d'aménagement pour les personnes en situation de handicap.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>` },
@@ -205,14 +258,18 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     sections.push({ heading: `Article ${artNum++} – Accès à la plateforme de formation à distance`, content: `<p>Le stagiaire s'engage à :</p><ul><li>Se connecter aux heures prévues dans le planning de formation</li><li>Disposer d'un environnement calme et d'une connexion internet stable</li><li>Activer sa caméra lors des sessions en visioconférence (sauf dérogation préalable)</li><li>Ne pas enregistrer, capturer ou diffuser les sessions de formation sans autorisation</li><li>Signaler tout problème technique au formateur ou au support technique</li></ul>` });
   }
 
+  if (!pres) {
+    // R.6352-1, 1° : consignes d'hygiène et de sécurité, adaptées à une formation suivie à distance.
+    sections.push({ heading: `Article ${artNum++} – Hygiène et sécurité`, content: `<p>Conformément à l'article R.6352-1 du Code du travail, le stagiaire respecte les règles d'hygiène et de sécurité. La formation étant suivie à distance, depuis un lieu choisi par le stagiaire, celui-ci veille à :</p><ul><li>s'installer dans un lieu calme, sain et sûr, et respecter les consignes de sécurité (notamment incendie) applicables dans ce lieu,</li><li>utiliser un poste de travail en bon état et un branchement électrique conforme,</li><li>adopter une posture adaptée devant l'écran et profiter des pauses prévues au planning,</li><li>ne jamais suivre une séance en conduisant un véhicule ou en accomplissant une activité dangereuse,</li><li>ne pas suivre la formation sous l'emprise de l'alcool ou de substances illicites.</li></ul><p>Tout malaise ou accident survenant pendant une séance est signalé sans délai au formateur, qui interrompt la séance si nécessaire et fait appel aux secours.</p>` });
+  }
   sections.push(
     { heading: `Article ${artNum++} – Discipline et comportement`, content: `<p>Tout comportement inapproprié (violence, propos discriminatoires, harcèlement, non-respect des consignes) est strictement interdit.</p><p>En cas de manquement grave ou répété, ${o.nom} pourra appliquer une sanction disciplinaire conformément à la procédure décrite ci-après.</p>` },
-    { heading: `Article ${artNum++} – Sanctions disciplinaires`, content: `<p>Les sanctions applicables sont :</p><ul><li>Avertissement écrit</li><li>Blâme</li><li>Exclusion temporaire de la formation</li><li>Exclusion définitive de la formation</li></ul><p>La sanction est proportionnée à la gravité des faits reprochés.</p>` },
-    { heading: `Article ${artNum++} – Procédure disciplinaire`, content: `<p>Aucune sanction ne peut être prononcée sans que le stagiaire ait été informé des faits reprochés.</p><p>Le stagiaire est convoqué à un entretien au cours duquel :</p><ul><li>les motifs de la sanction sont exposés,</li><li>le stagiaire peut présenter ses observations.</li></ul><p>La décision est notifiée par écrit.</p>` },
+    { heading: `Article ${artNum++} – Sanctions disciplinaires`, content: `<p>Constitue une sanction toute mesure, autre que les observations verbales, prise par le directeur de l'organisme ou son représentant à la suite d'un agissement du stagiaire considéré comme fautif, que cette mesure soit de nature à affecter immédiatement ou non la présence de l'intéressé dans la formation ou à mettre en cause la continuité de la formation qu'il reçoit (art. R.6352-3 du Code du travail).</p><p>Les sanctions applicables sont :</p><ul><li>Avertissement écrit</li><li>Blâme</li><li>Exclusion temporaire de la formation</li><li>Exclusion définitive de la formation</li></ul><p>La sanction est proportionnée à la gravité des faits reprochés. Aucune amende ni autre sanction pécuniaire ne peut être prononcée.</p>` },
+    { heading: `Article ${artNum++} – Procédure disciplinaire`, content: `<p>Aucune sanction ne peut être infligée au stagiaire sans que celui-ci ait été informé au préalable des griefs retenus contre lui (art. R.6352-4).</p><p>Lorsque le directeur de l'organisme ou son représentant envisage une sanction ayant une incidence, immédiate ou non, sur la présence du stagiaire dans la formation (art. R.6352-5) :</p><ul><li>il convoque le stagiaire par lettre recommandée avec avis de réception ou par lettre remise contre décharge, en précisant l'objet de la convocation, ainsi que la date, l'heure et le lieu de l'entretien ;</li><li>le stagiaire peut se faire assister par une personne de son choix, stagiaire ou salarié de l'organisme ; la convocation mentionne cette faculté ;</li><li>au cours de l'entretien, le motif de la sanction envisagée est indiqué au stagiaire, dont les explications sont recueillies.</li></ul><p>La sanction ne peut intervenir moins d'un jour franc ni plus de quinze jours après l'entretien. Elle fait l'objet d'une décision écrite et motivée, notifiée au stagiaire par lettre recommandée avec avis de réception ou remise contre décharge (art. R.6352-6).</p><p>Lorsque l'agissement a rendu indispensable une mesure conservatoire d'exclusion temporaire à effet immédiat, aucune sanction définitive ne peut être prise sans que la procédure ci-dessus ait été respectée (art. R.6352-7).</p><p>Le directeur de l'organisme informe de la sanction prise l'employeur, lorsque le stagiaire est un salarié bénéficiant d'une action dans le cadre du plan de développement des compétences, et le financeur de la formation, le cas échéant (art. R.6352-8).</p>` },
     { heading: `Article ${artNum++} – Propriété intellectuelle`, content: `<p>Les supports pédagogiques remis aux stagiaires sont protégés par le droit d'auteur.</p><p>Ils sont réservés à un usage strictement personnel et ne peuvent être reproduits, diffusés ou utilisés à des fins commerciales sans autorisation écrite de ${o.nom}.</p>` },
     { heading: `Article ${artNum++} – Données personnelles`, content: `<p>Les données personnelles des stagiaires sont traitées dans le respect du Règlement Général sur la Protection des Données (RGPD).</p><p>Le stagiaire dispose d'un droit d'accès, de rectification et de suppression de ses données.</p>` },
     { heading: `Article ${artNum++} – Accessibilité et situation de handicap`, content: `<p>La formation est accessible aux personnes en situation de handicap.</p><p>Des aménagements peuvent être mis en place sur demande préalable.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>`, variant: "green" },
-    { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
+    { heading: `Article ${artNum++} – Entrée en vigueur`, content: entreeEnVigueurReglement(o) },
   );
 
   // Per-stagiaire signature pages
@@ -245,7 +302,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
       <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
       <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
-      <h3>Horaires</h3><p>${horairesTexteFor(s)}</p>
+      <h3>Horaires</h3><p>${horairesTexteFor(s, f)}</p>
       <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
       <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
       ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Assistance technique et pédagogique</h3><p>Pendant toute la durée de la formation, une assistance technique et pédagogique est assurée par ${o.nom}. Contact : <a href="mailto:${o.email}">${o.email}</a>${o.telephone?.trim() ? ` – Tél. : ${o.telephone}` : ""}.</p>`}
@@ -258,7 +315,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
         <p>Des aménagements peuvent être mis en place sur demande préalable.</p>
         <p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>
       </div>
-      <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
+      <p>${isPresentiel(f) ? "Nous vous remercions de vous présenter 15 minutes avant le début de la formation." : "Nous vous remercions de vous connecter 15 minutes avant le début de chaque séance, afin de vérifier votre son, votre caméra et votre accès à la classe virtuelle."}</p>
       <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
       <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
        <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
@@ -301,14 +358,14 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${listeObjectifs(f)}</p>
       <h3>Article 3 – Organisation de la formation</h3>
-      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s, f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}${contratSessionInfos(s, f, stagiaires)}</p>
       <h3>Article 4 – Prérequis</h3>
       <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
       <h3>Article 5 – Moyens pédagogiques et techniques</h3>
       <p>La formation comprend :</p>
       <ul><li>Apports théoriques</li><li>Démonstrations commentées</li><li>Exercices pratiques</li><li>Mise en situation professionnelle</li></ul>
       <p><strong>Moyens mobilisés :</strong></p>
-      <p>${f.moyensPedagogiques}</p>
+      ${moyensContratHtml(f)}
       <h3>Article 6 – Modalités d'évaluation</h3>
       <p>Les acquis du stagiaire sont évalués par :</p>
       <ul><li>Un test de positionnement en début de formation</li><li>Des exercices pratiques en cours de formation</li><li>Une évaluation finale en fin de formation</li><li>Une grille d'acquisition des compétences</li></ul>
@@ -319,7 +376,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
         <p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>
       </div>
       <h3>Article 8 – Dispositions financières</h3>
-       <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+       <p><strong>Coût total de la formation :</strong> ${coutContrat(o, getStagiaireTarif(s, f))}</p>
       <p>${mentionTVA(o)}</p>
       <p><strong>Modalités de paiement :</strong> aucune somme n'est exigible avant l'expiration du délai de rétractation de 10 jours. À son terme, un acompte de 30 % au plus du prix peut être demandé ; le solde est réglé au fur et à mesure du déroulement de la formation (art. L.6353-6 du Code du travail).${estCertifiante(f) ? " En cas de financement CPF, aucun paiement n'est demandé au stagiaire hors reste à charge éventuel affiché sur Mon Compte Formation." : ""}</p>
       <h3>Article 9 – Délai de rétractation</h3>
@@ -327,7 +384,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>
       <p>Aucune somme ne peut être exigée avant l'expiration de ce délai.</p>
       <h3>Article 10 – Annulation et abandon</h3>
-      <p>En cas d'annulation ou d'abandon de la formation par le stagiaire après le délai de rétractation, les conditions financières applicables sont celles prévues dans les Conditions Générales de Vente de ${o.nom}.</p>
+      <p>Si, par suite de force majeure dûment reconnue, le stagiaire est empêché de suivre la formation, il peut rompre le présent contrat : seules les prestations de formation effectivement dispensées sont alors dues, au prorata temporis de leur valeur prévue au contrat (art. L.6353-7 du Code du travail). Les autres conditions d'annulation sont celles prévues dans les Conditions Générales de Vente de ${o.nom}.</p>
       <h3>Article 11 – Règlement intérieur</h3>
       <p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>
       <h3>Article 12 – Protection des données personnelles</h3>
@@ -360,7 +417,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
     <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
     <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
-    <h3>Horaires</h3><p>${horairesTexteFor(s)}</p>
+    <h3>Horaires</h3><p>${horairesTexteFor(s, f)}</p>
     <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
     <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
     ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Assistance technique et pédagogique</h3><p>Pendant toute la durée de la formation, une assistance technique et pédagogique est assurée par ${o.nom}. Contact : <a href="mailto:${o.email}">${o.email}</a>${o.telephone?.trim() ? ` – Tél. : ${o.telephone}` : ""}.</p>`}
@@ -373,7 +430,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
       <p>Des aménagements peuvent être mis en place sur demande préalable.</p>
       <p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>
     </div>
-    <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
+    <p>${isPresentiel(f) ? "Nous vous remercions de vous présenter 15 minutes avant le début de la formation." : "Nous vous remercions de vous connecter 15 minutes avant le début de chaque séance, afin de vérifier votre son, votre caméra et votre accès à la classe virtuelle."}</p>
     <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getDateConvocation(getStagiaireDateDebut(s, f) || f.dateDebut))}</p>
@@ -410,14 +467,14 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>À l'issue de la formation, le ${benef} sera capable de :</p>
     <p>${listeObjectifs(f)}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+    <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s, f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}${contratSessionInfos(s, f, stagiaires)}</p>
     <h3>Article 4 – Prérequis</h3>
     <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
     <h3>Article 5 – Moyens pédagogiques et techniques</h3>
     <p>La formation comprend :</p>
     <ul><li>Apports théoriques</li><li>Démonstrations commentées</li><li>Exercices pratiques</li><li>Mise en situation professionnelle</li></ul>
     <p><strong>Moyens mobilisés :</strong></p>
-    <p>${f.moyensPedagogiques}</p>
+    ${moyensContratHtml(f)}
     <h3>Article 6 – Modalités d'évaluation</h3>
     <p>Les acquis du ${benef} sont évalués par :</p>
     <ul><li>Un test de positionnement en début de formation</li><li>Des exercices pratiques en cours de formation</li><li>Une évaluation finale en fin de formation</li><li>Une grille d'acquisition des compétences</li></ul>
@@ -428,7 +485,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
       <p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>
     </div>
     <h3>Article 8 – Dispositions financières</h3>
-    <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
+    <p><strong>Coût total de la formation :</strong> ${coutContrat(o, getStagiaireTarif(s, f))}</p>
     <p>${mentionTVA(o)}</p>
     <p><strong>Modalités de paiement :</strong> aucune somme n'est exigible avant l'expiration du délai de rétractation de 10 jours. À son terme, un acompte de 30 % au plus du prix peut être demandé ; le solde est réglé au fur et à mesure du déroulement de la formation (art. L.6353-6 du Code du travail).${estCertifiante(f) ? " En cas de financement CPF, aucun paiement n'est demandé au stagiaire hors reste à charge éventuel affiché sur Mon Compte Formation." : ""}</p>
     <h3>Article 9 – Délai de rétractation</h3>
@@ -436,7 +493,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>
     <p>Aucune somme ne peut être exigée avant l'expiration de ce délai.</p>
     <h3>Article 10 – Annulation et abandon</h3>
-    <p>En cas d'annulation ou d'abandon de la formation par le stagiaire après le délai de rétractation, les conditions financières applicables sont celles prévues dans les Conditions Générales de Vente de ${o.nom}.</p>
+    <p>Si, par suite de force majeure dûment reconnue, le stagiaire est empêché de suivre la formation, il peut rompre le présent contrat : seules les prestations de formation effectivement dispensées sont alors dues, au prorata temporis de leur valeur prévue au contrat (art. L.6353-7 du Code du travail). Les autres conditions d'annulation sont celles prévues dans les Conditions Générales de Vente de ${o.nom}.</p>
     <h3>Article 11 – Règlement intérieur</h3>
     <p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>
     <h3>Article 12 – Protection des données personnelles</h3>
@@ -485,7 +542,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
     <p>${listeObjectifs(f)}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
+    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${horairesLigneFor(s, f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
     <h3>Article 4 – Programme</h3>
     <p>Le programme détaillé est annexé à la présente convention.</p>
     <p><strong>Prérequis :</strong> ${f.prerequis || 'Aucun prérequis spécifique'}</p>
@@ -563,7 +620,7 @@ export function genConventionFormationTripartiteGroupe(o: OrganismeInfo, f: Form
       `<strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br><small>${s.poste}</small>` : ""}`,
       `du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}`,
       getStagiaireDuree(s, f),
-      horairesLigneFor(s),
+      horairesLigneFor(s, f),
       m !== null ? fmtEurConv(m) : "Non renseigné",
     ];
   });
@@ -735,9 +792,9 @@ export function genProcedureAdaptation_V2(o: OrganismeInfo, f: FormationInfo) {
     <ul>
       <li>Diagnostic du bénéficiaire et adaptation de l'action de formation pour les personnes en situation de handicap</li>
       <li>Évaluation des pré-requis des stagiaires (test de positionnement)</li>
-      <li>Apport théorique et vécu (expérience sur le champ de la formation et de l'audit)</li>
+      <li>Apports théoriques illustrés par l'expérience professionnelle du formateur dans le domaine de la formation</li>
       <li>Réflexions sur les cas réels</li>
-      <li>Mises en situation par questionnement collectif</li>
+      <li>Mises en situation et questionnement oral, individuel ou collectif selon l'effectif de la session</li>
       <li>Retours d'expériences sur les formations réalisées</li>
       <li>Tests de contrôle de connaissances en fin de formation (évaluation de fin de formation)</li>
     </ul>
@@ -1097,6 +1154,9 @@ D) Drive faster to finish the ride.`,
   let totalNote = 0;
   let totalMax = 0;
   const notesRecap: { titre: string; note: number; max: number }[] = [];
+  const manquesFichier: string[] = [];
+  // Stagiaire seul dans sa session : aucune comparaison au « groupe ».
+  const seulEnSession = stagiaires.filter(x => getStagiaireDateDebut(x, f) === getStagiaireDateDebut(s, f) && getStagiaireDateFin(x, f) === getStagiaireDateFin(s, f)).length <= 1;
 
   // Profils — le 'style' contient des marqueurs (e)/ve//se résolus selon la civilité du stagiaire
   const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string; strengthsEN: string; weaknessEN: string; styleEN: string }> = [
@@ -1339,6 +1399,8 @@ D) Drive faster to finish the ride.`,
       || pickDRI47ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickLRBExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
+    let manqueEx = "";
+    let realisesEx: string[] = [];
     if (creaRep) {
       extra += `<p>${creaRep}</p>`;
     } else {
@@ -1347,6 +1409,9 @@ D) Drive faster to finish the ride.`,
       const elements = repClean.replace(/\.$/, "").split(/\s*[,;]\s*/).map(e => e.trim()).filter(Boolean);
       const manque = noteRound < 5 && elements.length > 2 ? elements[elements.length - 1 - (stagiaireIdx % 2)] : "";
       const realises = manque ? elements.filter(e => e !== manque) : elements;
+      manqueEx = manque;
+      realisesEx = realises;
+      if (manque) manquesFichier.push(manque);
       const contexte = s.entreprise?.trim() ? ` à partir d'une situation de ${s.entreprise.trim()}` : "";
       extra += `<p>J'ai réalisé l'exercice${contexte}. Ma production comporte : ${realises.join(" ; ")}.${manque ? ` Je n'ai pas finalisé : ${manque}.` : ""}</p>`;
     }
@@ -1356,14 +1421,17 @@ D) Drive faster to finish the ride.`,
     const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
     extra += `<h4>Correction et commentaire du formateur :</h4>`;
     
-    if (noteRound >= 4.5) {
+    if (noteRound >= 4.5 && manqueEx) {
+      // Travail non terminé : jamais « aucune lacune » ni « validation sans réserve ».
+      extra += `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a traité l'essentiel de la consigne avec méthode${realisesEx.length ? ` (${realisesEx.slice(0, 3).join(", ")})` : ""}.</p><p><strong>Axes d'amélioration :</strong> l'élément « ${manqueEx} » n'a pas été finalisé ; il est à compléter pour que le livrable soit entièrement conforme à la consigne.</p><p><strong>Compétence évaluée :</strong> Acquise – élément non finalisé à compléter.</p>`;
+    } else if (noteRound >= 4.5) {
       const corrs = [
         `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a parfaitement respecté la consigne et la méthodologie attendue. Le travail est complet, bien structuré et directement exploitable en contexte professionnel. J'apprécie particulièrement ${profile.strengths} dont ${s.prenom} a fait preuve tout au long de l'exercice.</p><p><strong>Axes d'amélioration :</strong> Aucun point bloquant. ${s.prenom} pourrait simplement approfondir certains aspects avancés pour aller encore plus loin. L'ensemble est excellent.</p><p><strong>Compétence évaluée :</strong> Pleinement acquise – Niveau : Maîtrise.</p>`,
-        `<p><strong>Points forts :</strong> Excellent travail, ${s.prenom} démontre une réelle appropriation des compétences visées. La démarche est ${profile.style} et le résultat dépasse les attendus. ${s.prenom} a su enrichir l'exercice d'apports personnels pertinents issus de son expérience chez ${s.entreprise}.</p><p><strong>Axes d'amélioration :</strong> RAS – Le niveau est au-dessus des objectifs de la formation. ${s.prenom} est pleinement opérationnel(le).</p><p><strong>Compétence évaluée :</strong> Acquise avec excellence – Niveau : Expert.</p>`,
-        `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fait preuve d'une maîtrise remarquable. Le travail est rigoureux, chaque étape est documentée et justifiée. La qualité du rendu est professionnelle. ${s.prenom} montre une capacité d'analyse et de synthèse supérieure à la moyenne du groupe.</p><p><strong>Axes d'amélioration :</strong> Continuer à développer ${profile.strengths} qui est un véritable atout. Aucune lacune identifiée sur cet exercice.</p><p><strong>Compétence évaluée :</strong> Acquise – Validation sans réserve.</p>`,
-        `<p><strong>Points forts :</strong> Travail exemplaire de ${s.prenom}. L'approche est ${profile.style}, les consignes sont parfaitement respectées. Le livrable est soigné et complet. ${s.prenom} a même anticipé des problèmes potentiels dans sa réponse, ce qui démontre une maturité professionnelle appréciable.</p><p><strong>Axes d'amélioration :</strong> ${s.prenom} pourrait partager sa méthodologie avec le groupe pour tirer l'ensemble vers le haut. Aucun point de faiblesse identifié.</p><p><strong>Compétence évaluée :</strong> Pleinement acquise.</p>`,
+        `<p><strong>Points forts :</strong> Excellent travail, ${s.prenom} démontre une réelle appropriation des compétences visées. La démarche est ${profile.style} et le résultat dépasse les attendus.${s.entreprise?.trim() ? ` ${s.prenom} a su enrichir l'exercice d'apports personnels pertinents issus de son expérience chez ${s.entreprise.trim()}.` : ""}</p><p><strong>Axes d'amélioration :</strong> RAS – Le niveau est au-dessus des objectifs de la formation. ${s.prenom} est pleinement opérationnel(le).</p><p><strong>Compétence évaluée :</strong> Acquise avec excellence – Niveau : Maîtrise.</p>`,
+        `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fait preuve d'une maîtrise remarquable. Le travail est rigoureux, chaque étape est documentée et justifiée. La qualité du rendu est professionnelle. ${s.prenom} montre une capacité d'analyse et de synthèse ${seulEnSession ? "très solide" : "supérieure à la moyenne du groupe"}.</p><p><strong>Axes d'amélioration :</strong> Continuer à développer ${profile.strengths} qui est un véritable atout. Aucune lacune identifiée sur cet exercice.</p><p><strong>Compétence évaluée :</strong> Acquise – Validation sans réserve.</p>`,
+        `<p><strong>Points forts :</strong> Travail exemplaire de ${s.prenom}. L'approche est ${profile.style}, les consignes sont parfaitement respectées. Le livrable est soigné et complet. ${s.prenom} a même anticipé des problèmes potentiels dans sa réponse, ce qui démontre une maturité professionnelle appréciable.</p><p><strong>Axes d'amélioration :</strong> ${seulEnSession ? `${s.prenom} pourrait formaliser sa méthode dans une fiche mémo réutilisable.` : `${s.prenom} pourrait partager sa méthodologie avec le groupe pour tirer l'ensemble vers le haut.`} Aucun point de faiblesse identifié.</p><p><strong>Compétence évaluée :</strong> Pleinement acquise.</p>`,
         `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a démontré une excellente compréhension et une grande autonomie. Le travail est irréprochable sur le fond et la forme. Son profil ${profile.style} lui permet de traiter ce type d'exercice avec aisance et efficacité.</p><p><strong>Axes d'amélioration :</strong> Aucun axe critique. ${s.prenom} est encouragé(e) à explorer des cas d'usage plus avancés pour continuer sa progression.</p><p><strong>Compétence évaluée :</strong> Acquise – Félicitations.</p>`,
-        `<p><strong>Points forts :</strong> ${s.prenom} a réalisé cet exercice avec brio. Toutes les étapes sont correctement identifiées et exécutées. Le résultat témoigne d'une compréhension approfondie du sujet et d'une capacité réelle à transférer les acquis en situation de travail chez ${s.entreprise}.</p><p><strong>Axes d'amélioration :</strong> Rien à signaler. ${s.prenom} fait partie des meilleur(e)s du groupe sur cet exercice.</p><p><strong>Compétence évaluée :</strong> Acquise avec distinction.</p>`,
+        `<p><strong>Points forts :</strong> ${s.prenom} a réalisé cet exercice avec brio. Toutes les étapes sont correctement identifiées et exécutées. Le résultat témoigne d'une compréhension approfondie du sujet et d'une capacité réelle à transférer les acquis en situation de travail${s.entreprise?.trim() ? ` chez ${s.entreprise.trim()}` : ""}.</p><p><strong>Axes d'amélioration :</strong> Rien à signaler. ${seulEnSession ? "L'objectif de l'exercice est pleinement atteint." : `${s.prenom} fait partie des meilleur(e)s du groupe sur cet exercice.`}</p><p><strong>Compétence évaluée :</strong> Acquise avec distinction.</p>`,
       ];
       extra += corrs[corrSeed];
     } else if (noteRound >= 3.5) {
@@ -1427,21 +1495,174 @@ D) Drive faster to finish the ride.`,
   // Un seul barème affiché : les points obtenus sur les points possibles de l'exercice.
   extra += `<p><strong>Score final attribué : ${totalNote}/${totalMax} points (soit ${moyenneFinale}/10)</strong></p>`;
 
-  const appreciationFinale = appreciationsFR[appIdx][appSeed].replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`);
+  const appreciationFinale = appreciationsFR[appIdx][appSeed]
+    .replace(/Validation sans réserve\./, manquesFichier.length ? "Compétence validée ; l'élément non finalisé sera repris." : "Validation sans réserve.").replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`);
   extra = extra.replace("__APPRECIATION_FINALE__", appreciationFinale);
   return buildDocument({ org: o, title: `${libelleEval} – ${qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase()} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 
+// ====== RÉSULTATS DE L'ÉVALUATION FINALE — source unique pour l'examen, la grille et l'attestation ======
+type ExerciceEval = { titre: string; consigne: string; reponseAttendue: string };
+interface ItemEvalFinale { texte: string; points: number; max: number }
+interface ResultatsExamenFinal {
+  qcm: { q: QCMQuestion; reponse: string; correcte: string; ok: boolean }[];
+  cas: { ex: ExerciceEval; note: number; max: number; realises: string[]; manque: string }[];
+  scoreQCM: number;
+  noteQCM10: number;
+  notePratique10: number;
+  note20: number;
+  valide: boolean;
+  items: ItemEvalFinale[];
+  seed: number;
+}
+
+const RE_RACCOURCI = /\b(?:ctrl|alt|maj|shift|cmd)\s*\+\s*[a-z0-9]+/gi;
+const fmtNoteFr = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1).replace(".", ","));
+
+/** Ce que le stagiaire a montré maîtriser au test de fin (réponses justes ou non notées), en texte compact. */
+function acquisTestFin(f: FormationInfo, s: StagiaireInfo, si: number): string {
+  try {
+    const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
+    const ans = generateStagiaireOpenAnswers(qo.fin, si, false, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
+    const { notees } = noteTestOuvert(qo.fin, ans);
+    return ans.filter((a, i) => !notees[i] || a.score >= 1).map((a) => a.reponse).join(" ").toLowerCase().replace(/\s+/g, "");
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Résultats de l'examen final d'un stagiaire, déterministes (même nom = mêmes réponses dans tous les documents).
+ * Une question de QCM portant sur un raccourci que le stagiaire a correctement cité au test de fin n'est jamais
+ * comptée fausse. La partie pratique porte sur les exercices non déjà traités dans les exercices journaliers.
+ */
+export function resultatsExamenFinal(f: FormationInfo, s: StagiaireInfo, si: number): ResultatsExamenFinal | null {
+  const evalData = getEvalContent(f.intitule);
+  const qcmFinal: QCMQuestion[] = evalData?.qcmFinal || [];
+  const exercicesEval: ExerciceEval[] = evalData?.exercices || [];
+  if (qcmFinal.length === 0 && exercicesEval.length === 0) return null;
+
+  const hash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const seed = (hash * 31 + si * 17) & 0x7FFFFFFF;
+  const nbQ = qcmFinal.length;
+  const targetCorrect = nbQ === 0 ? 0 : Math.max(Math.floor(nbQ * 0.7), nbQ - 3 + (seed % 3)); // 7-9/10
+  const connu = acquisTestFin(f, s, si);
+  const protege = (q: QCMQuestion) => [...`${q.question} ${q.options[q.correctIndex] || ""}`.matchAll(RE_RACCOURCI)]
+    .some((m) => connu.includes(m[0].toLowerCase().replace(/\s+/g, "")));
+  const wrong = new Set<number>();
+  const nbWrong = nbQ - targetCorrect;
+  for (let k = 0; k < nbQ * 3 && wrong.size < nbWrong; k++) {
+    const i = (seed * 7 + k * 13) % nbQ;
+    if (!protege(qcmFinal[i])) wrong.add(i);
+  }
+
+  const letters = ["A", "B", "C", "D"];
+  const qcm = qcmFinal.map((q, qi) => {
+    const correcte = letters[q.correctIndex] || "A";
+    const ok = !wrong.has(qi);
+    const autres = letters.slice(0, q.options.length).filter((l) => l !== correcte);
+    return { q, correcte, ok, reponse: ok ? correcte : autres[(seed + qi) % autres.length] };
+  });
+  const scoreQCM = qcm.filter((r) => r.ok).length;
+
+  // Partie pratique : exercices non encore traités dans les exercices journaliers (même source qu'eux).
+  const aiPack = getCachedContentPack(f);
+  const source: ExerciceEval[] = aiPack?.exercises?.length
+    ? aiPack.exercises.map((e: any) => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue }))
+    : exercicesEval;
+  const nonQcm = (l: ExerciceEval[]) => l.filter((e) => !/^QCM\b/i.test(e.titre));
+  const nbUnites = getUnitesExercices(s, f).length;
+  let pratiques = nonQcm(source.slice(nbUnites)).slice(0, 3);
+  if (pratiques.length === 0) pratiques = nonQcm(exercicesEval).slice(0, 3);
+  if (pratiques.length === 0 && exercicesEval[0]) pratiques = [exercicesEval[0]];
+  const pointsParCas = pratiques.length ? 10 / pratiques.length : 0;
+  const cas = pratiques.map((ex, pi) => {
+    const ratio = 0.72 + (((seed + pi * 37) % 28) / 100); // 0.72 - 0.99
+    const note = Math.round(ratio * pointsParCas * 10) / 10;
+    const elements = String(ex.reponseAttendue || "").replace(/\.\s*$/, "").split(/\s*[;,]\s*|\.\s+/).map((e) => e.trim()).filter(Boolean);
+    const manque = ratio < 0.9 && elements.length > 2 ? elements[elements.length - 1 - (si % 2)] : "";
+    return { ex, note, max: Math.round(pointsParCas * 10) / 10, realises: manque ? elements.filter((e) => e !== manque) : elements, manque };
+  });
+
+  const noteQCM10 = nbQ > 0 ? Math.round((scoreQCM / nbQ) * 10 * 10) / 10 : 0;
+  const notePratique10 = Math.round(cas.reduce((a, c) => a + c.note, 0) * 10) / 10;
+  const note20 = Math.round((noteQCM10 + notePratique10) * 10) / 10;
+  const items: ItemEvalFinale[] = [
+    ...qcm.map((r) => ({ texte: `${r.q.question} ${r.q.options[r.q.correctIndex] || ""}`, points: r.ok ? 1 : 0, max: 1 })),
+    ...cas.map((c) => ({ texte: `${c.ex.titre} ${c.ex.consigne}`, points: c.note, max: c.max })),
+  ];
+  return { qcm, cas, scoreQCM, noteQCM10, notePratique10, note20, valide: note20 >= 10, items, seed };
+}
+
+const MOTS_VIDES_COMPETENCE = new Set(["comment", "quel", "quelle", "quels", "quelles", "dans", "avec", "pour", "permet", "permettent", "faire", "fait", "word", "microsoft", "document", "documents", "exercice", "consigne", "selon", "votre", "vous", "entre", "chaque", "cette", "sont", "etre", "avoir", "plus", "tout", "tous", "toutes", "leur", "leurs", "mise", "sert", "quoi", "utiliser", "partir", "afin", "ainsi", "lors", "logiciel", "realiser", "professionnel", "professionnelle", "professionnelles", "professionnels"]);
+function racinesCompetence(t: string): Set<string> {
+  return new Set(t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+    .split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !MOTS_VIDES_COMPETENCE.has(w)).map((w) => w.slice(0, 4)));
+}
+
+/**
+ * Note sur 10 de chaque compétence, tirée des questions et cas de l'examen final qui s'y rapportent
+ * (rattachement par mots-clés ; à défaut, note globale de l'examen). Arrondi au demi-point.
+ */
+function notesCompetencesExamen(competences: string[], r: ResultatsExamenFinal): number[] {
+  const rc = competences.map(racinesCompetence);
+  const acc = competences.map(() => ({ p: 0, m: 0 }));
+  r.items.forEach((it, i) => {
+    const ri = racinesCompetence(it.texte);
+    let best = -1, bestN = 0;
+    rc.forEach((set, ci) => {
+      let n = 0;
+      set.forEach((x) => { if (ri.has(x)) n++; });
+      if (n > bestN) { bestN = n; best = ci; }
+    });
+    const ci = best >= 0 ? best : i % Math.max(1, competences.length);
+    if (acc[ci]) { acc[ci].p += it.points; acc[ci].m += it.max; }
+  });
+  return acc.map((a) => Math.round((a.m > 0 ? a.p / a.m * 10 : r.note20 / 2) * 2) / 2);
+}
+
+/** Barème affiché sur la grille : 8 à 10 acquis, 5 à 7 en cours d'acquisition, 1 à 4 non acquis. */
+function statutCompetence(note10: number): "acquis" | "en cours" | "non acquis" {
+  return note10 >= 8 ? "acquis" : note10 >= 5 ? "en cours" : "non acquis";
+}
+
+/** Compétences listées sur la grille d'acquisition (et reprises sur l'attestation). */
+function competencesGrilleFormation(f: FormationInfo): string[] {
+  const evalData = getEvalContent(f.intitule);
+  const tGrille = (f.intitule || "").toLowerCase();
+  const isPaieGrille = tGrille.includes("gestionnaire de paie") || tGrille.includes("gestionnaire paie") || (tGrille.includes("paie") && (tGrille.includes("bulletin") || tGrille.includes("gestion") || tGrille.includes("dsn")));
+  const isSecretariatGrille = tGrille.includes("secrétariat") || tGrille.includes("secretariat") || tGrille.includes("secrétaire") || tGrille.includes("secretaire") || tGrille.includes("office manager") || tGrille.includes("assistanat");
+  const PAIE_MODULES = [
+    "Module 1 — Fondamentaux du droit du travail",
+    "Module 2 — Construire un bulletin de paie",
+    "Module 3 — Cotisations, DSN et déclarations",
+    "Module 4 — Absences, congés payés et IJSS",
+    "Module 5 — Rupture du contrat et STC",
+    "Module 6 — Contrôles, veille et posture pro",
+  ];
+  const SECRETARIAT_MODULES = [
+    "Module 1 — Métier, éthique et RGPD",
+    "Module 2 — Communication écrite professionnelle",
+    "Module 3 — Outils bureautiques et collaboratifs",
+    "Module 4 — Accueil, téléphone et anglais pro",
+    "Module 5 — Organisation, archivage et employabilité",
+  ];
+  // Formation sans contenu dédié : compétences tirées des objectifs saisis (plus de « Compétence technique 1/2 »).
+  const depuisObjectifs = (f.objectifs || "").split("\n").map(l => l.replace(/^\s*[-•]\s*/, "").trim().replace(/\.$/, ""))
+    .filter(l => l && !/capable de\s*:?$/i.test(l) && !/^à l'issue/i.test(l));
+  const generiques = (evalData.competences || []).every(c => /comp[ée]tence (technique|transversale)\s*\d/i.test(c));
+  return isPaieGrille ? PAIE_MODULES : isSecretariatGrille ? SECRETARIAT_MODULES
+    : (generiques || !(evalData.competences || []).length) && depuisObjectifs.length ? depuisObjectifs : evalData.competences;
+}
+
 // ====== EXAMEN FINAL — regroupe tous les QCM en un seul document, daté de la fin de formation ======
 export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const evalData = getEvalContent(f.intitule);
-  const qcmFinal = evalData?.qcmFinal || [];
-  const exercicesEval = evalData?.exercices || [];
   const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const r = resultatsExamenFinal(f, s, stagiaireIdx);
 
-  if (qcmFinal.length === 0 && exercicesEval.length === 0) {
+  if (!r) {
     return buildDocument({
       org: o, title: `EXAMEN FINAL – ${f.intitule.toUpperCase()}`,
       subtitle: `${s.prenom} ${s.nom} – ${dateFin}`,
@@ -1452,19 +1673,8 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
   // Détection GOTRM pour humanisation des réponses
   const tLow = (f.intitule || "").toLowerCase();
   const isGOTRM = tLow.includes("gotrm") || tLow.includes("gestionnaire des opérations de transport") || tLow.includes("exploitant transport") || tLow.includes("tp-01329") || tLow.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
-
-  // Nonce temps (bucket 30 min) → réponses différentes à chaque génération
-  const nonce = Math.floor(Date.now() / (30 * 60 * 1000)) & 0xFFFF;
-
-  // Profil stagiaire déterministe — score cible 14-19/20
-  const hash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const seed = (hash * 31 + stagiaireIdx * 17 + nonce * 41) & 0x7FFFFFFF;
-  const nbQ = qcmFinal.length;
-  const targetCorrect = nbQ === 0 ? 0 : Math.max(Math.floor(nbQ * 0.7), nbQ - 3 + (seed % 3)); // 7-9/10
-  const wrong = new Set<number>();
-  for (let k = 0; k < nbQ - targetCorrect; k++) {
-    wrong.add((seed * 7 + k * 13) % nbQ);
-  }
+  const seed = r.seed;
+  const nbQ = r.qcm.length;
 
   // Commentaires humanisés (GOTRM)
   const GOTRM_OK_COMMENTS = [
@@ -1499,86 +1709,71 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
   `;
 
   // ===== PARTIE 1 : QCM de synthèse =====
-  let scoreQCM = 0;
   if (nbQ > 0) {
     extra += `<h3>Partie 1 — QCM de synthèse (${nbQ} questions sur 10 points)</h3>`;
     extra += `<p><em>Cochez la bonne réponse pour chaque question.</em></p>`;
-    qcmFinal.forEach((q, qi) => {
-      const letters = ['A', 'B', 'C', 'D'];
-      const correctLetter = letters[q.correctIndex] || 'A';
-      const isWrong = wrong.has(qi);
-      const otherLetters = letters.slice(0, q.options.length).filter(l => l !== correctLetter);
-      const studentAnswer = isWrong ? otherLetters[(seed + qi) % otherLetters.length] : correctLetter;
-      if (!isWrong) scoreQCM++;
-      const humanNote = humanFor(qi, !isWrong);
+    const letters = ['A', 'B', 'C', 'D'];
+    r.qcm.forEach((res, qi) => {
+      const q = res.q;
+      const humanNote = humanFor(qi, res.ok);
       extra += `<div style="margin:12px 0; page-break-inside:avoid;">`;
       extra += `<p><strong>Question ${qi + 1}.</strong> ${q.question}</p>`;
       extra += `<p style="margin-left:16px; line-height:1.7;">`;
       q.options.forEach((opt, oi) => { extra += `${letters[oi]}. ${opt}<br/>`; });
       extra += `</p>`;
-      extra += `<p><strong>Réponse du stagiaire :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${studentAnswer}</span> &nbsp; — &nbsp; <strong>Bonne réponse :</strong> ${correctLetter} &nbsp; — &nbsp; <strong>Note :</strong> ${isWrong ? 0 : 1}/1`;
+      extra += `<p><strong>Réponse du stagiaire :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${res.reponse}</span> &nbsp; — &nbsp; <strong>Bonne réponse :</strong> ${res.correcte} &nbsp; — &nbsp; <strong>Note :</strong> ${res.ok ? 1 : 0}/1`;
       if (humanNote) extra += `<br><em style="color:#475569;font-size:0.92em">« ${humanNote} »</em>`;
       extra += `</p></div>`;
     });
-    const noteQCMSur10 = Math.round((scoreQCM / nbQ) * 10 * 10) / 10;
     extra += tableHTML(["Élément", "Résultat"], [
-      ["Score QCM", `${scoreQCM} / ${nbQ}`],
-      ["Note partie 1 (sur 10)", `${noteQCMSur10} / 10`],
+      ["Score QCM", `${r.scoreQCM} / ${nbQ}`],
+      ["Note partie 1 (sur 10)", `${fmtNoteFr(r.noteQCM10)} / 10`],
     ]);
   }
 
   // ===== PARTIE 2 : Études de cas pratiques (jusqu'à 3 cas) =====
-  const pratiques = exercicesEval.filter(e => !/^QCM\b/i.test(e.titre)).slice(0, 3);
-  if (pratiques.length === 0 && exercicesEval[0]) pratiques.push(exercicesEval[0]);
-  const nbPratiques = pratiques.length;
-  const notesPratiques: number[] = [];
-
-  // Introductions humanisées pour le rendu écrit du stagiaire (variées par nonce)
+  // Introductions humanisées GOTRM ; pour les autres formations, la production est décrite sans formule plaquée.
   const GOTRM_INTROS = [
     "Voici ma proposition, structurée comme on l'a vue en formation :",
     "Je pars du raisonnement travaillé en cas pratique, puis j'adapte :",
     "Je reprends la méthode PRK + contrôles + plan d'actions :",
     "En m'appuyant sur la doctrine CNR et le décret 2017-1740 :",
   ];
-  const GENERIC_INTROS = [
-    "Voici mon analyse et mes propositions :",
-    "Je structure ma réponse en 4 temps (contexte, analyse, solutions, plan d'action) :",
-    "En m'appuyant sur les acquis de la formation :",
-  ];
-  const introPool = isGOTRM ? GOTRM_INTROS : GENERIC_INTROS;
 
-  if (nbPratiques > 0) {
+  if (r.cas.length > 0) {
     extra += `<div style="page-break-before: always;"></div>`;
-    extra += `<h3>Partie 2 — Études de cas pratiques (sur 10 points, ${nbPratiques} cas)</h3>`;
-    const pointsParCas = 10 / nbPratiques;
-    pratiques.forEach((pratique, pi) => {
-      const ratio = 0.72 + (((seed + pi * 37) % 28) / 100); // 0.72 - 0.99
-      const noteCas = Math.round(ratio * pointsParCas * 10) / 10;
-      notesPratiques.push(noteCas);
-      const intro = introPool[(seed + pi * 11) % introPool.length];
+    extra += `<h3>Partie 2 — Études de cas pratiques (sur 10 points, ${r.cas.length} cas)</h3>`;
+    r.cas.forEach((c, pi) => {
       if (pi > 0) extra += `<div style="page-break-before: always;"></div>`;
-      extra += `<h4 style="margin-top:12px">Cas ${pi + 1} — ${pratique.titre}</h4>`;
-      extra += `<p><strong>Consigne :</strong></p><p>${pratique.consigne}</p>`;
+      extra += `<h4 style="margin-top:12px">Cas ${pi + 1} — ${c.ex.titre}</h4>`;
+      extra += `<p><strong>Consigne :</strong></p><p>${c.ex.consigne}</p>`;
       extra += `<p><strong>Travail rendu par ${s.prenom} ${s.nom} :</strong></p>`;
-      extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;"><em>${intro}</em><br/>${pratique.reponseAttendue}</p>`;
-      extra += `<p><strong>Note cas ${pi + 1} :</strong> ${noteCas} / ${Math.round(pointsParCas * 10) / 10}</p>`;
+      if (isGOTRM) {
+        const intro = GOTRM_INTROS[(seed + pi * 11) % GOTRM_INTROS.length];
+        extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;"><em>${intro}</em><br/>${c.ex.reponseAttendue}</p>`;
+      } else {
+        extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;">Ma production comporte : ${c.realises.join(" ; ")}.${c.manque ? `<br/>Je n'ai pas terminé : ${c.manque}.` : ""}</p>`;
+      }
+      extra += `<p><strong>Note cas ${pi + 1} :</strong> ${fmtNoteFr(c.note)} / ${fmtNoteFr(c.max)}${c.manque ? ` — élément non réalisé : ${c.manque}` : ""}</p>`;
     });
   }
-  const notePratiqueSur10 = Math.round(notesPratiques.reduce((a, b) => a + b, 0) * 10) / 10;
 
   // ===== SYNTHÈSE =====
-  const noteQCMSur10Final = nbQ > 0 ? Math.round((scoreQCM / nbQ) * 10 * 10) / 10 : 0;
-  const noteFinaleSur20 = Math.round((noteQCMSur10Final + notePratiqueSur10) * 10) / 10;
   extra += `<div style="page-break-before: always;"></div>`;
   extra += `<h2>SYNTHÈSE GÉNÉRALE DE L'EXAMEN FINAL</h2>`;
   extra += tableHTML(["Élément", "Résultat"], [
-    ["Partie 1 — QCM de synthèse", `${noteQCMSur10Final} / 10`],
-    ["Partie 2 — Études de cas pratiques", `${notePratiqueSur10} / 10`],
-    ["Note finale sur 20", `${noteFinaleSur20} / 20`],
-    ["Décision", noteFinaleSur20 >= 10 ? "✅ EXAMEN VALIDÉ" : "⚠️ EXAMEN À REPRÉSENTER"],
+    ["Partie 1 — QCM de synthèse", `${fmtNoteFr(r.noteQCM10)} / 10`],
+    ["Partie 2 — Études de cas pratiques", `${fmtNoteFr(r.notePratique10)} / 10`],
+    ["Note finale sur 20", `${fmtNoteFr(r.note20)} / 20`],
+    ["Décision", r.valide ? "✅ EXAMEN VALIDÉ" : "⚠️ EXAMEN À REPRÉSENTER"],
   ]);
 
-  extra += `<p style="margin-top:24px;"><strong>Appréciation du formateur :</strong> ${s.prenom} ${s.nom} a démontré une bonne maîtrise des compétences clés de la formation « ${f.intitule} ». Les notions fondamentales sont acquises et directement transférables en situation professionnelle.</p>`;
+  const nbFaux = r.qcm.filter((x) => !x.ok).length;
+  const manques = r.cas.filter((c) => c.manque).length;
+  const reserve = nbFaux || manques
+    ? ` Points à consolider : ${[nbFaux ? `${nbFaux} question${nbFaux > 1 ? "s" : ""} du QCM` : "", manques ? `${manques} cas pratique${manques > 1 ? "s" : ""} non terminé${manques > 1 ? "s" : ""}` : ""].filter(Boolean).join(" et ")}.`
+    : "";
+  extra += `<p style="margin-top:24px;"><strong>Appréciation du formateur :</strong> ${s.prenom} ${s.nom} ${r.valide ? "a démontré une bonne maîtrise des compétences clés" : "n'a pas encore atteint le niveau attendu sur l'ensemble des compétences"} de la formation « ${f.intitule} ».${reserve} Le détail par compétence figure sur la grille d'acquisition.</p>`;
 
   return buildDocument({
     org: o,
@@ -1591,7 +1786,6 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
 
 export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const evalData = getEvalContent(f.intitule);
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
 
   let extra = `
@@ -1601,45 +1795,21 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
     <p><strong>FORMATION :</strong> ${f.intitule}</p>
   `;
 
-  const headers = ["", "NIVEAU", "", ""];
-  const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
   const termine = isStagiaireFormationTerminee(s, f);
+  const competencesGrille = competencesGrilleFormation(f);
 
-  // Pour les formations Paie / Secrétariat : compétences = titres des modules du support de cours.
-  const tGrille = (f.intitule || "").toLowerCase();
-  const isPaieGrille = tGrille.includes("gestionnaire de paie") || tGrille.includes("gestionnaire paie") || (tGrille.includes("paie") && (tGrille.includes("bulletin") || tGrille.includes("gestion") || tGrille.includes("dsn")));
-  const isSecretariatGrille = tGrille.includes("secrétariat") || tGrille.includes("secretariat") || tGrille.includes("secrétaire") || tGrille.includes("secretaire") || tGrille.includes("office manager") || tGrille.includes("assistanat");
-  const PAIE_MODULES = [
-    "Module 1 — Fondamentaux du droit du travail",
-    "Module 2 — Construire un bulletin de paie",
-    "Module 3 — Cotisations, DSN et déclarations",
-    "Module 4 — Absences, congés payés et IJSS",
-    "Module 5 — Rupture du contrat et STC",
-    "Module 6 — Contrôles, veille et posture pro",
-  ];
-  const SECRETARIAT_MODULES = [
-    "Module 1 — Métier, éthique et RGPD",
-    "Module 2 — Communication écrite professionnelle",
-    "Module 3 — Outils bureautiques et collaboratifs",
-    "Module 4 — Accueil, téléphone et anglais pro",
-    "Module 5 — Organisation, archivage et employabilité",
-  ];
-  // Formation sans contenu dédié : compétences tirées des objectifs saisis (plus de « Compétence technique 1/2 »).
-  const depuisObjectifs = (f.objectifs || "").split("\n").map(l => l.replace(/^\s*[-•]\s*/, "").trim().replace(/\.$/, ""))
-    .filter(l => l && !/capable de\s*:?$/i.test(l) && !/^à l'issue/i.test(l));
-  const generiques = (evalData.competences || []).every(c => /comp[ée]tence (technique|transversale)\s*\d/i.test(c));
-  const competencesGrille = isPaieGrille ? PAIE_MODULES : isSecretariatGrille ? SECRETARIAT_MODULES
-    : (generiques || !(evalData.competences || []).length) && depuisObjectifs.length ? depuisObjectifs : evalData.competences;
-
-  // Niveau calculé depuis la note obtenue par compétence (≥ 8 acquis, 5-7 en cours, ≤ 4 non acquis).
+  // Niveau tiré des notes réelles de l'examen final (QCM + études de cas) rattachées à chaque compétence,
+  // selon le barème affiché (≥ 8 acquis, 5-7 en cours, ≤ 4 non acquis). Sans examen : notes de référence.
+  const r = termine ? resultatsExamenFinal(f, s, stagiaireIdx) : null;
+  const notes = r ? notesCompetencesExamen(competencesGrille, r) : competencesGrille.map((_c, ci) => sc[ci % sc.length] ?? 7);
   const rows = competencesGrille.map((comp, ci) => {
-    if (!termine) return [comp, '', '', ''];
-    const note = sc[ci % sc.length] ?? 7;
-    return note >= 8 ? [comp, 'X', '', ''] : note >= 5 ? [comp, '', '', 'X'] : [comp, '', 'X', ''];
+    if (!termine) return [comp, '', '', '', ''];
+    const st = statutCompetence(notes[ci]);
+    return [comp, st === "acquis" ? 'X' : '', st === "non acquis" ? 'X' : '', st === "en cours" ? 'X' : '', `${fmtNoteFr(notes[ci])}/10`];
   });
 
-
-  extra += tableHTML(subHeaders, rows);
+  extra += tableHTML(["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION", "NOTE"], rows);
+  if (r) extra += `<p>Notes établies à partir de l'examen final du ${formatDate(getStagiaireDateFin(s, f))} (QCM de synthèse et études de cas, questions rattachées à chaque compétence) — note de l'examen : ${fmtNoteFr(r.note20)}/20.</p>`;
   extra += `<p><strong>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</strong></p>`;
   extra += `<div class="section">
     <p>*NON ACQUIS (DES GRANDES LACUNES) : 1/10 - 4/10</p>
@@ -1657,41 +1827,62 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
   const nomComplet = `${civ} ${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim();
   const color = getDocStyleColor();
 
+  // L.6353-1 : objectifs, nature, dates et durée de l'action, résultats de l'évaluation des acquis —
+  // les mêmes que l'examen final et la grille d'acquisition.
+  const termine = isStagiaireFormationTerminee(s, f);
+  const r = termine ? resultatsExamenFinal(f, s, stagiaireIdx) : null;
+  const valide = !r || r.valide;
+  const competences = competencesGrilleFormation(f);
+  const notes = r ? notesCompetencesExamen(competences, r) : [];
+  const parStatut = (st: string) => competences.filter((_c, i) => r && statutCompetence(notes[i]) === st);
+  const acquises = parStatut("acquis"), enCours = parStatut("en cours"), nonAcquises = parStatut("non acquis");
+  const objectifs = (f.objectifs || "").split(/\n|(?<=\.)\s+(?=[A-ZÀÂÉÈÊÎÔÙÛÇ])/).map((l) => l.trim().replace(/^[-•]\s*/, "").replace(/\.$/, ""))
+    .filter((l) => l && !/^à l'issue de/i.test(l) && !/capable de\s*:?$/i.test(l));
+  const debut = formatDate(getStagiaireDateDebut(s, f)), fin = formatDate(getStagiaireDateFin(s, f));
+  const duree = getStagiaireDuree(s, f);
+  const resultatsHtml = r
+    ? `<p style="margin:4px 0"><strong>Résultats de l'évaluation des acquis :</strong> examen final du ${fin} : ${fmtNoteFr(r.note20)}/20 (${r.valide ? "validé" : "non validé"}).`
+      + `${acquises.length ? ` Compétences acquises : ${acquises.join(" ; ")}.` : ""}`
+      + `${enCours.length ? ` En cours d'acquisition : ${enCours.join(" ; ")}.` : ""}`
+      + `${nonAcquises.length ? ` Non acquises : ${nonAcquises.join(" ; ")}.` : ""}</p>`
+    : "";
+
   const extra = `
-    <div style="width:297mm;height:210mm;box-sizing:border-box;position:relative;padding:18mm 22mm;background:#ffffff;font-family:'Playfair Display', Georgia, serif;">
+    <div style="width:297mm;height:210mm;box-sizing:border-box;position:relative;padding:16mm 22mm;background:#ffffff;font-family:'Playfair Display', Georgia, serif;">
       <!-- Bordures ornementales -->
       <div style="position:absolute;top:8mm;left:8mm;right:8mm;bottom:8mm;border:4px double ${color};pointer-events:none;"></div>
       <div style="position:absolute;top:11mm;left:11mm;right:11mm;bottom:11mm;border:1px solid ${color};pointer-events:none;opacity:0.6;"></div>
 
       <!-- En-tête -->
-      <div style="text-align:center;margin-top:6mm">
+      <div style="text-align:center;margin-top:2mm">
         <div style="font-size:10px;letter-spacing:5px;color:${color};font-weight:600;text-transform:uppercase">— ${o.nom.toUpperCase()} —</div>
-        <h1 style="font-size:42px;letter-spacing:5px;color:${color};margin:10px 0 2px;font-weight:700">ATTESTATION</h1>
-        <div style="font-size:20px;letter-spacing:7px;color:${color};margin-bottom:4px">DE RÉUSSITE</div>
-        <div style="width:100px;height:2px;background:${color};margin:10px auto 14px"></div>
+        <h1 style="font-size:34px;letter-spacing:5px;color:${color};margin:6px 0 2px;font-weight:700">ATTESTATION</h1>
+        <div style="font-size:16px;letter-spacing:6px;color:${color};margin-bottom:4px">${valide ? "DE RÉUSSITE" : "DE FIN DE FORMATION"}</div>
+        <div style="width:100px;height:2px;background:${color};margin:6px auto 8px"></div>
         <p style="font-size:12px;color:#555;margin:0">Le présent document atteste que</p>
       </div>
 
       <!-- Bénéficiaire -->
-      <div style="text-align:center;margin:10mm 0 6mm">
-        <div style="font-size:32px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
+      <div style="text-align:center;margin:4mm 0 3mm">
+        <div style="font-size:26px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
       </div>
 
       <!-- Formation -->
-      <div style="text-align:center;font-size:13px;color:#333;line-height:1.7;max-width:220mm;margin:0 auto">
-        <p style="margin:0">a suivi avec succès et validé la formation :</p>
-        <p style="margin:8px 0;font-size:17px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
-        ${getStagiaireDuree(s, f) ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>` : ""}
+      <div style="text-align:center;font-size:12px;color:#333;line-height:1.5;max-width:235mm;margin:0 auto">
+        <p style="margin:0">${valide ? "a suivi avec succès et validé" : "a suivi"} la formation :</p>
+        <p style="margin:4px 0;font-size:16px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
+        <p style="margin:2px 0"><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
+        <p style="margin:2px 0"><strong>Dates :</strong> du ${debut} au ${fin}${duree ? ` — <strong>Durée :</strong> ${duree}` : ""} — <strong>Modalité :</strong> ${modaliteTexte(f)}</p>
+      </div>
+      <div style="font-size:10.5px;color:#333;line-height:1.4;max-width:235mm;margin:3mm auto 0;text-align:left">
+        ${objectifs.length ? `<p style="margin:4px 0"><strong>Objectifs :</strong> ${objectifs.join(" ; ")}.</p>` : ""}
+        ${resultatsHtml}
+        <p style="margin:4px 0;font-style:italic;color:#666">Attestation délivrée en application de l'article L.6353-1 du Code du travail ; elle peut permettre de renseigner le passeport orientation-formation (art. L.6315-2).</p>
       </div>
 
-      <!-- Mention légale -->
-      <p style="text-align:center;font-style:italic;color:#666;font-size:11px;margin:8mm auto 0;max-width:200mm">
-        Cette attestation peut permettre de renseigner le passeport orientation-formation (art. L.6315-2 du Code du travail).
-      </p>
-
       <!-- Cachet / signature en bas à droite -->
-      <div style="position:absolute;bottom:22mm;right:26mm;text-align:center">
-        <div style="height:90px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+      <div style="position:absolute;bottom:18mm;right:26mm;text-align:center">
+        <div style="height:70px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
         <div style="border-top:1px solid #333;padding-top:5px;font-size:11px;min-width:220px">
           <strong>${o.dirigeant || o.nom}</strong><br>
           <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
@@ -1699,7 +1890,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       </div>
 
       <!-- Date en bas à gauche -->
-      <div style="position:absolute;bottom:22mm;left:26mm;font-size:11px;color:#555">
+      <div style="position:absolute;bottom:18mm;left:26mm;font-size:11px;color:#555">
         Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}
       </div>
     </div>
@@ -1930,10 +2121,10 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 2 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) ont pour objet de définir les modalités et conditions dans lesquelles ${o.nom} propose et dispense ses actions de formation professionnelle ${modaliteTexte(f)}.</p><p>Toute inscription à une formation implique l'adhésion pleine et entière du stagiaire aux présentes CGV.</p>` },
     { heading: "Article 3 – Nature des actions de formation", content: `<p>Les formations proposées relèvent des actions de formation définies à l'article L.6313-1 du Code du travail.</p><p>Les objectifs, contenus, durées et modalités sont détaillés dans le programme de formation remis au stagiaire avant l'inscription.</p>` },
     { heading: "Article 4 – Modalités d'inscription", content: `<p>L'inscription à une formation s'effectue selon les étapes suivantes :</p><ol><li>Préinscription via le site internet, les réseaux sociaux ou par téléphone</li><li>Analyse de la demande par ${o.nom}</li><li>Validation de l'adéquation formation/projet</li><li>Transmission des documents contractuels (contrat, règlement intérieur, convocation, CGV)</li><li>Retour du contrat signé et, le cas échéant, versement de l'acompte</li></ol><p>L'inscription devient définitive après réception du contrat signé.</p>` },
-    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${getStagiaireTarif(s, f)} par stagiaire — ${mentionTVA(o)}</p>` : ''}` },
+    { heading: "Article 5 – Tarifs", content: `<p>Les tarifs sont indiqués en euros. ${mentionTVA(o)}</p><p>Sauf mention contraire, le prix comprend :</p><ul><li>Les heures de formation</li><li>Les supports pédagogiques</li><li>L'accompagnement pédagogique</li></ul>${getStagiaireTarif(s, f) ? `<p>Tarif de la formation « ${f.intitule} » : ${coutContrat(o, getStagiaireTarif(s, f))} par stagiaire.</p>` : ''}` },
     { heading: "Article 6 – Modalités de paiement", content: `<p>Aucune somme ne peut être exigée avant l'expiration du délai légal de rétractation de 10 jours (art. L.6353-5 du Code du travail).</p><ul><li>À l'issue de ce délai, un acompte de <strong>30 % au plus</strong> du prix peut être demandé (art. L.6353-6)</li><li>Le solde est échelonné au fur et à mesure du déroulement de la formation</li><li>Formation financée par l'employeur ou un OPCO : facturation après réalisation, règlement à 30 jours</li>${estCertifiante(f) ? "<li>Formation financée par le CPF : règlement par la Caisse des Dépôts selon les conditions générales de la plateforme Mon Compte Formation</li>" : ""}</ul>` },
     { heading: "Article 7 – Délai de rétractation", content: `<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat.</p><p>La rétractation doit être notifiée par lettre recommandée avec accusé de réception.</p>` },
-    { heading: "Article 8 – Annulation, report et abandon", content: `<h3>8.1 Annulation par le stagiaire</h3><p>Toute annulation après le délai de rétractation doit être notifiée par écrit.</p><p>En cas d'annulation moins de 7 jours ouvrés avant le début, une indemnité de 30 % du prix peut être facturée ; en cas d'abandon en cours de formation sans motif de force majeure, seules les heures réellement suivies sont dues, majorées de la même indemnité de 30 % sur le reliquat (art. L.6354-1 du Code du travail : les sommes dues au titre du dédit ne peuvent être imputées sur les fonds de la formation professionnelle).</p><h3>8.2 Annulation par l'organisme</h3><p>${o.nom} se réserve le droit d'annuler ou de reporter une formation en cas de force majeure ou d'effectif insuffisant.</p><p>Dans ce cas, les sommes versées sont intégralement remboursées.</p>` },
+    { heading: "Article 8 – Annulation, report et abandon", content: clauseAnnulationCGV(o) },
     { heading: "Article 9 – Assiduité et obligations du stagiaire", content: `<p>Le stagiaire s'engage à :</p><ul><li>Respecter les horaires et le règlement intérieur</li><li>Suivre la formation avec assiduité</li><li>Informer ${o.nom} de toute absence ou retard</li></ul><p>Les absences injustifiées peuvent entraîner l'interruption de la formation.</p>` },
     { heading: "Article 10 – Règlement intérieur", content: `<p>Le stagiaire s'engage à respecter le règlement intérieur de ${o.nom}, remis avant l'entrée en formation.</p>` },
     { heading: "Article 11 – Accessibilité et handicap", content: `<p>${o.nom} s'engage à étudier toute demande d'aménagement pour les personnes en situation de handicap.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>` },
@@ -1979,14 +2170,18 @@ export function genReglementStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     sections.push({ heading: `Article ${artNum++} – Accès à la plateforme de formation à distance`, content: `<p>Le stagiaire s'engage à :</p><ul><li>Se connecter aux heures prévues dans le planning de formation</li><li>Disposer d'un environnement calme et d'une connexion internet stable</li><li>Activer sa caméra lors des sessions en visioconférence (sauf dérogation préalable)</li><li>Ne pas enregistrer, capturer ou diffuser les sessions de formation sans autorisation</li><li>Signaler tout problème technique au formateur ou au support technique</li></ul>` });
   }
 
+  if (!pres) {
+    // R.6352-1, 1° : consignes d'hygiène et de sécurité, adaptées à une formation suivie à distance.
+    sections.push({ heading: `Article ${artNum++} – Hygiène et sécurité`, content: `<p>Conformément à l'article R.6352-1 du Code du travail, le stagiaire respecte les règles d'hygiène et de sécurité. La formation étant suivie à distance, depuis un lieu choisi par le stagiaire, celui-ci veille à :</p><ul><li>s'installer dans un lieu calme, sain et sûr, et respecter les consignes de sécurité (notamment incendie) applicables dans ce lieu,</li><li>utiliser un poste de travail en bon état et un branchement électrique conforme,</li><li>adopter une posture adaptée devant l'écran et profiter des pauses prévues au planning,</li><li>ne jamais suivre une séance en conduisant un véhicule ou en accomplissant une activité dangereuse,</li><li>ne pas suivre la formation sous l'emprise de l'alcool ou de substances illicites.</li></ul><p>Tout malaise ou accident survenant pendant une séance est signalé sans délai au formateur, qui interrompt la séance si nécessaire et fait appel aux secours.</p>` });
+  }
   sections.push(
     { heading: `Article ${artNum++} – Discipline et comportement`, content: `<p>Tout comportement inapproprié (violence, propos discriminatoires, harcèlement, non-respect des consignes) est strictement interdit.</p><p>En cas de manquement grave ou répété, ${o.nom} pourra appliquer une sanction disciplinaire conformément à la procédure décrite ci-après.</p>` },
-    { heading: `Article ${artNum++} – Sanctions disciplinaires`, content: `<p>Les sanctions applicables sont :</p><ul><li>Avertissement écrit</li><li>Blâme</li><li>Exclusion temporaire de la formation</li><li>Exclusion définitive de la formation</li></ul><p>La sanction est proportionnée à la gravité des faits reprochés.</p>` },
-    { heading: `Article ${artNum++} – Procédure disciplinaire`, content: `<p>Aucune sanction ne peut être prononcée sans que le stagiaire ait été informé des faits reprochés.</p><p>Le stagiaire est convoqué à un entretien au cours duquel :</p><ul><li>les motifs de la sanction sont exposés,</li><li>le stagiaire peut présenter ses observations.</li></ul><p>La décision est notifiée par écrit.</p>` },
+    { heading: `Article ${artNum++} – Sanctions disciplinaires`, content: `<p>Constitue une sanction toute mesure, autre que les observations verbales, prise par le directeur de l'organisme ou son représentant à la suite d'un agissement du stagiaire considéré comme fautif, que cette mesure soit de nature à affecter immédiatement ou non la présence de l'intéressé dans la formation ou à mettre en cause la continuité de la formation qu'il reçoit (art. R.6352-3 du Code du travail).</p><p>Les sanctions applicables sont :</p><ul><li>Avertissement écrit</li><li>Blâme</li><li>Exclusion temporaire de la formation</li><li>Exclusion définitive de la formation</li></ul><p>La sanction est proportionnée à la gravité des faits reprochés. Aucune amende ni autre sanction pécuniaire ne peut être prononcée.</p>` },
+    { heading: `Article ${artNum++} – Procédure disciplinaire`, content: `<p>Aucune sanction ne peut être infligée au stagiaire sans que celui-ci ait été informé au préalable des griefs retenus contre lui (art. R.6352-4).</p><p>Lorsque le directeur de l'organisme ou son représentant envisage une sanction ayant une incidence, immédiate ou non, sur la présence du stagiaire dans la formation (art. R.6352-5) :</p><ul><li>il convoque le stagiaire par lettre recommandée avec avis de réception ou par lettre remise contre décharge, en précisant l'objet de la convocation, ainsi que la date, l'heure et le lieu de l'entretien ;</li><li>le stagiaire peut se faire assister par une personne de son choix, stagiaire ou salarié de l'organisme ; la convocation mentionne cette faculté ;</li><li>au cours de l'entretien, le motif de la sanction envisagée est indiqué au stagiaire, dont les explications sont recueillies.</li></ul><p>La sanction ne peut intervenir moins d'un jour franc ni plus de quinze jours après l'entretien. Elle fait l'objet d'une décision écrite et motivée, notifiée au stagiaire par lettre recommandée avec avis de réception ou remise contre décharge (art. R.6352-6).</p><p>Lorsque l'agissement a rendu indispensable une mesure conservatoire d'exclusion temporaire à effet immédiat, aucune sanction définitive ne peut être prise sans que la procédure ci-dessus ait été respectée (art. R.6352-7).</p><p>Le directeur de l'organisme informe de la sanction prise l'employeur, lorsque le stagiaire est un salarié bénéficiant d'une action dans le cadre du plan de développement des compétences, et le financeur de la formation, le cas échéant (art. R.6352-8).</p>` },
     { heading: `Article ${artNum++} – Propriété intellectuelle`, content: `<p>Les supports pédagogiques remis aux stagiaires sont protégés par le droit d'auteur.</p><p>Ils sont réservés à un usage strictement personnel et ne peuvent être reproduits, diffusés ou utilisés à des fins commerciales sans autorisation écrite de ${o.nom}.</p>` },
     { heading: `Article ${artNum++} – Données personnelles`, content: `<p>Les données personnelles des stagiaires sont traitées dans le respect du Règlement Général sur la Protection des Données (RGPD).</p><p>Le stagiaire dispose d'un droit d'accès, de rectification et de suppression de ses données.</p>` },
     { heading: `Article ${artNum++} – Accessibilité et situation de handicap`, content: `<p>La formation est accessible aux personnes en situation de handicap.</p><p>Des aménagements peuvent être mis en place sur demande préalable.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}</p><p>${o.email}</p>`, variant: "green" },
-    { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
+    { heading: `Article ${artNum++} – Entrée en vigueur`, content: entreeEnVigueurReglement(o) },
   );
 
   const sigDateReg = formatDate(getDateSignatureDossier(getStagiaireDateDebut(s, f) || f.dateDebut));

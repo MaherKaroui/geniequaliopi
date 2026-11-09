@@ -60,11 +60,17 @@ export function genAttestationIzibusiness(o: OrganismeInfo, beneficiaire?: strin
   const formations = formationsIziRealisees(o);
   const fin = formations.map(fi => fi.fin).sort().at(-1) || iso(baseDate(o));
   const nom = (beneficiaire || o.dirigeant || "").trim();
+  // Formations antérieures à la date de V1 (date de création de l'organisme dans le générateur) : la société
+  // n'existait pas encore, l'attestation est donc au nom de la personne seule, sans raison sociale ni SIRET.
+  const avantCreation = !!(o.dateMaj || "").trim() && formations.some(fi => fi.debut < iso(baseDate(o)));
+  const beneficiaireHtml = avantCreation && nom
+    ? `<strong>${esc(nom)}</strong>`
+    : `${nom ? `<strong>${esc(nom)}</strong>` : ""}${o.nom ? `${nom ? ", " : ""}${esc(o.nom)}` : ""}${o.siret ? ` (SIRET ${esc(o.siret)})` : ""}`;
   const izi = { ...o, ...IZIBUSINESS_ORG, telephone: "", logoUrl: "", tamponUrl: izibusinessTamponAsset.url, signatureUrl: "", dateMaj: fin } as OrganismeInfo;
   const html = buildDocument({
     org: izi, title: "ATTESTATION DE FIN DE FORMATION", hideHeader: true, hideFooter: true,
     sections: [
-      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}), atteste que :</p><p>${nom ? `<strong>${esc(nom)}</strong>` : ""}${o.nom ? `${nom ? ", " : ""}${esc(o.nom)}` : ""}${o.siret ? ` (SIRET ${esc(o.siret)})` : ""},</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
+      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}), atteste que :</p><p>${beneficiaireHtml},</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
       ...formations.map((fi, i) => ({ heading: `Formation ${i + 1} — « ${fi.nom} »`, content: `<p>Du ${formatDate(fi.debut)} au ${formatDate(fi.fin)}, d'une durée de <strong>${fi.duree}</strong>.</p><p><strong>Objectif :</strong> ${fi.objectif}</p><p><strong>Contenu :</strong><br>${fi.programme.join("<br>")}</p>${i === formations.length - 1 ? `<p><strong>Durée totale : 4 jours (${formations.reduce((n, item) => n + item.heures, 0)} heures).</strong></p>` : ""}` })),
       { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique en fin de chaque formation.</p>`, variant: "green" },
     ],

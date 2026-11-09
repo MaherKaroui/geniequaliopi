@@ -2782,6 +2782,31 @@ export function getQuestionsOuvertes(
   };
 }
 
+/** Réponse modèle rédigée à la 1re personne (vécu, attentes, projet) : question sans réponse type. */
+const RE_REPONSE_PERSONNELLE = /^\s*(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/;
+
+/** Question d'opinion / de projet : elle éclaire le positionnement mais n'est pas notée. */
+export function estQuestionOpinion(q: QuestionOuverte | undefined | null): boolean {
+  return RE_REPONSE_PERSONNELLE.test(String(q?.reponseAttendue || ""));
+}
+
+/**
+ * Note d'un test à questions ouvertes, sur 10 : somme exacte des points des seules questions notées
+ * (les questions d'opinion sont exclues), ramenée sur 10 et arrondie au demi-point.
+ * Même valeur pour le test individuel, la grille de niveaux et les documents qui la reprennent.
+ */
+export function noteTestOuvert(
+  questions: QuestionOuverte[],
+  answers: { score: number }[],
+): { note: number; points: number; nbNotees: number; notees: boolean[] } {
+  let notees = questions.map((q) => !estQuestionOpinion(q));
+  if (!notees.some(Boolean)) notees = questions.map(() => true);
+  const nbNotees = notees.filter(Boolean).length;
+  const points = answers.reduce((s, a, i) => s + (notees[i] ? a?.score || 0 : 0), 0);
+  const note = nbNotees ? Math.round((points / nbNotees) * 10 * 2) / 2 : 0;
+  return { note, points, nbNotees, notees };
+}
+
 // ===== GENERATE STAGIAIRE OPEN-ENDED ANSWERS =====
 // Uses cognitive profile to generate realistic text answers with varying quality
 
@@ -3217,7 +3242,8 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
     const tmp = varied[1]; varied[1] = varied[2]; varied[2] = tmp;
   }
   
-  return varied.join(' ') + expansions[seed];
+  // Réponse personnelle (vécu, attentes) : pas de phrase générique ajoutée.
+  return varied.join(' ') + (RE_REPONSE_PERSONNELLE.test(cleaned) ? '' : expansions[seed]);
 }
 
 function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }, isEnglish?: boolean): string {
@@ -3233,19 +3259,30 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
   } else if (sentences.length === 2) {
     mainContent = sentences[variation % 2];
   } else {
-    const words = cleaned.split(' ');
-    const cuts = [0.4, 0.5, 0.6];
-    const cutoff = Math.max(3, Math.floor(words.length * cuts[variation]));
-    mainContent = words.slice(0, cutoff).join(' ');
+    // Une seule phrase : on garde les premières propositions entières (jamais une phrase coupée
+    // au milieu, du type « Il faut cliquer sur le menu Fichier,. »).
+    const phrase = cleaned.replace(/[\s.!?…]+$/, '');
+    const clauses = phrase.split(/\s*[,;:]\s*(?:puis\s+|et\s+)?|\s+(?:puis|ainsi que)\s+/).map(c => c.trim()).filter(Boolean);
+    if (clauses.length >= 2) {
+      mainContent = clauses.slice(0, Math.max(1, Math.floor(clauses.length / 2))).join(', ');
+    } else {
+      const words = phrase.split(' ');
+      const cuts = [0.4, 0.5, 0.6];
+      let cut = words.slice(0, Math.max(3, Math.floor(words.length * cuts[variation])));
+      // Pas de mot de liaison ni de verbe orphelin en fin de réponse (« … du ruban contient. »).
+      const orphelins = /^(le|la|les|l['’]|un|une|des|du|de|d['’]|au|aux|à|a|en|et|ou|puis|sur|dans|par|pour|avec|sans|qui|que|dont|est|sont|permet|permettent|contient|contiennent|sert|servent|ont|fait|font|peut|peuvent|doit|doivent|faut|se|ce|son|sa|ses|leur|leurs)$/i;
+      while (cut.length > 2 && orphelins.test(cut[cut.length - 1].replace(/[,;:]+$/, ''))) cut = cut.slice(0, -1);
+      mainContent = cut.join(' ');
+    }
   }
   
-  return mainContent.replace(/[\s.!?…]+$/, '') + '.';
+  return mainContent.replace(/[\s.!?…,;:]+$/, '') + '.';
 }
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, isEnglish?: boolean): string {
   // Question sur le vécu ou les attentes du stagiaire (réponse modèle à la 1re personne) :
   // il n'y a pas de « mauvaise » réponse, seulement une réponse moins développée.
-  if (/^\s*(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/.test(expected)) {
+  if (RE_REPONSE_PERSONNELLE.test(expected)) {
     return generatePartialAnswer(expected, seed, stagiaireIndex, questionIndex);
   }
   const vaguePool = isEnglish

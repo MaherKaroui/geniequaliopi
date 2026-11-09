@@ -939,7 +939,18 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
     ? `Formation terminée le ${fin ? fmtDate(fin) : "—"} — bilan à froid à administrer 3 à 6 mois après la fin`
     : `Formation en cours — bilan à froid à administrer 3 à 6 mois après la fin (${fin ? fmtDate(fin) : "—"})`;
 
-  const questions = [
+  // Sans entreprise (particulier, demandeur d'emploi) : formulation neutre, sans « travail » ni « rôle ».
+  const sansEntreprise = !estCFA && !(s.entreprise || "").trim();
+  const questions = sansEntreprise ? [
+    "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans vos activités (professionnelles ou personnelles) ?",
+    "Les outils et conseils reçus pendant la formation sont-ils adaptés à vos besoins actuels ?",
+    "La formation vous a-t-elle permis de gagner en efficacité dans vos activités ?",
+    "Avec le recul, comment évaluez-vous la qualité globale de la formation ?",
+    "La durée de la formation était-elle adaptée à vos besoins ?",
+    "La formation vous a-t-elle aidé à avancer dans votre projet ?",
+    "Les compétences ou connaissances acquises vous sont-elles utiles aujourd'hui ?",
+    "Avez-vous trouvé le programme de formation suffisamment complet ?",
+  ] : [
     "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans votre travail ?",
     "Les outils et conseils reçus pendant la formation sont-ils adaptés à vos besoins actuels ?",
     "La formation vous a-t-elle permis d'améliorer votre performance ou votre efficacité dans votre rôle ?",
@@ -996,8 +1007,14 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
 
   // commentaire unique par stagiaire (voir satisfactionComments.ts)
 
-  // Bilan à froid : pas de date exacte, mention "3 à 6 mois après la fin de formation"
+  // Date de réponse : 3 mois après la fin de formation (même date que l'envoi du tableau de relance),
+  // jamais après aujourd'hui.
   const mentionDelai = "3 à 6 mois après la fin de formation";
+  const reponse = finDate ? new Date(finDate.getFullYear(), finDate.getMonth() + 3, finDate.getDate()) : null;
+  if (reponse && reponse.getDate() !== finDate!.getDate()) reponse.setDate(0);
+  const reponseTxt = reponse && reponse.getTime() <= Date.now()
+    ? `${String(reponse.getDate()).padStart(2, "0")}/${String(reponse.getMonth() + 1).padStart(2, "0")}/${reponse.getFullYear()}`
+    : "";
 
   return buildDocument({ org: o, formation: f, stagiaires: [s], title: "Questionnaire de Satisfaction du bénéficiaire – À froid", sections: [
     { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
@@ -1006,12 +1023,13 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
         <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
         <tr><td ${tdb}>${labelBenef}</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
         <tr><td ${tdb}>Période d'administration</td><td ${td}>${mentionDelai}</td></tr>
+        ${reponseTxt ? `<tr><td ${tdb}>Date de réponse</td><td ${td}>${reponseTxt}</td></tr>` : ""}
       </table>` },
     { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>
       <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
-    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "froid")}</em></p>` },
+    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "froid", { seul: stagiaires.length === 1, distanciel: /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || ""), sansEntreprise })}</em></p>` },
   ]});
 }
 

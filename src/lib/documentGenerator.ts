@@ -13,6 +13,8 @@ import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
+import { aleaSession, dateAnalyseRisques, dateArreteRegistre, nombreIncidents } from "./registresQualite";
+import { orgVersionUlterieure, intervenantUnique } from "./versionUlterieure";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
 import { genClausesQualiteContrat, genAnalyseRisquesQualite, genProcedureEvaluationEnseignements, genGrilleEvaluationEnseignements, genSyntheseEvaluationEnseignements, risquesQualite } from "./qualite2026";
@@ -31,11 +33,12 @@ import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTSt
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement, signatureDirigeantHtml, cachetDirigeantHtml } from "./docBuilder";
-import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
+import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, organismeALaDate, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
+import { horairesSessionTexte, horairesSessionLigne, tarifNetDeTaxe, tarifMentionneTva, estDistancielPur, joursSessionLabel } from "./sessionTextes";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
-import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion } from "./evalContent";
+import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte, QCMQuestion, noteTestOuvert, estQuestionOpinion } from "./evalContent";
 import { isVitrageFormation, getVitrageBesoin, getVitrageEvalBesoins } from "./vitrageHumanized";
 import { isOngulaireFormation, getOngulaireBesoin, getOngulaireEvalBesoins } from "./ongulaireHumanized";
 import { isRPMSFormation, getRPMSBesoin, getRPMSEvalBesoins, rpmsBonnesQcmDebut, rpmsReponsesQcmDebut } from "./rpmsHumanized";
@@ -70,7 +73,7 @@ import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiaires
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
 import inserjeunesNtcAsset from "@/assets/inserjeunes-ntc.png.asset.json";
 import izibusinessTamponAsset from "@/assets/izibusiness_tampon.png.asset.json";
-import { genAttestationIzibusiness } from "./attestationIzibusiness";
+import { genAttestationIzibusiness, formationsIziRealisees } from "./attestationIzibusiness";
 import { genNewsletterMissionCFA } from "./newslettersMissionsCFA";
 import { getModuleSpecificConsigne, buildModuleSpecificResponse } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genCasRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
@@ -197,6 +200,8 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
+  // Siège en vigueur à la date du dossier (transfert de siège : ancienne adresse avant le transfert).
+  org = organismeALaDate(org, org?.dateMaj);
   const presetBlank = /besoins/.test(template) && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
   // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
@@ -629,7 +634,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "screenshot_openai": return genVeilleSourcee(o, f, "technologique");
     case "screenshot_agefiph": return genVeilleSourcee(o, f, "handicap");
     case "veille_sourcee": return genVeilleSourcee(o, f, params?.theme ?? "reglementaire");
-    case "procedure_veille_exploitee": return genProcedureVeilleExploitee(o);
+    case "procedure_veille_exploitee": return genProcedureVeilleExploitee(o, f);
     case "cr_exploitation_veille": return genCompteRenduExploitationVeille(o, f, stagiaires, params?.type ?? "AF");
     // Pièces de tiers : jamais fabriquées, remplacées par la liste des justificatifs à joindre.
     case "certificat_coursera":
@@ -652,7 +657,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "cr_reunion_pedagogique_af": return genCRReunionPedagogique(o, f, stagiaires);
     case "planning_intervenants_af": return genPlanningIntervenantsAF(o, f, stagiaires);
     case "cooperation_socio_eco_af": return genCooperationSocioEconomique(o, f, stagiaires);
-    case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f);
+    case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f, { dateDoc: dateAnalyseRisques(o, f), incidents: [aleaSession(f)].filter(Boolean) });
     case "clauses_qualite_contrat": return genClausesQualiteContrat(o, params?.type ?? "AF");
     case "preuves_veille_reglementaire": return genPreuvesVeilleReglementaire(o, f);
     case "fiche_innovation": return genFicheInnovation(o, params?.sujet ?? "");
@@ -671,7 +676,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "synthese_retours": return genSyntheseRetours(o, f);
     case "bilan_annuel_qualite": return genBilanAnnuel(o);
     case "registre_reclamations": return genRegistreReclamations(o);
-    case "procedure_reclamation": return genProcedureReclamation(o);
+    case "procedure_reclamation": return genProcedureReclamation(o, f, stagiaires);
     case "fiche_reclamation": return genFicheReclamation(o, params?.num ?? 1);
     case "suivi_reclamations": return genSuiviReclamations(o);
     case "plan_amelioration": return genPlanAmelioration(o);
@@ -811,7 +816,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
       return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaireForDoc, sessionDates);
     }
-    case "liste_partenaires": return genListePartenairesV2(o);
+    case "liste_partenaires": return genListePartenairesV2(o, f, stagiaires);
     case "mandat_qualiopi": return /fd\s*certif/i.test(o.referentQualite || "")
       ? genContratPrestationQualiopi(o, params?.actionType)
       : genMandatQualiopi(o);
@@ -824,7 +829,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "suivi_dysfonctionnements_excel": return genSuiviDysfonctionnementsExcel(o, f, stagiaires);
     case "relances_appreciations_excel": return genRelancesAppreciationsExcel(o, f, stagiaires);
     case "procedure_relance_appreciations": return genProcedureRelanceAppreciations(o, f);
-    case "procedure_amelioration_continue": return genProcedureAmeliorationContinue(o);
+    case "procedure_amelioration_continue": return genProcedureAmeliorationContinue(o, f, stagiaires);
     case "appreciations_beneficiaires": return genAppreciationsBeneficiaires(o, f, stagiaires);
     case "appreciations_beneficiaires_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -856,7 +861,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "tableau_synthese_amelioration": return genTableauSyntheseAmelioration(o);
     case "grille_recrutement_formateur": return genGrilleRecrutementFormateur(o);
     case "process_recrutement_formateur": return genProcessRecrutementFormateur(o);
-    case "procedure_recrutement_formateur": return genProcessusRecrutementV2(o);
+    case "procedure_recrutement_formateur": return genProcessusRecrutementV2(o, f, stagiaires);
     case "registre_personnel": return genRegistrePersonnel(o, formateurs);
     case "descriptif_moyens_foad": return genDescriptifFOAD(o);
     case "contrat_sous_traitance": return genContratSousTraitance(o);
@@ -1105,7 +1110,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "veille_sourcee_cfa": return genVeilleSourceeCFA(o, f);
     case "procedure_insertion_poursuite_etudes_cfa": return genProcedureInsertionPoursuiteEtudesCFA(o, f);
     case "clauses_qualite_contrat_cfa": return genClausesQualiteContrat(o, params?.typePrestation ?? "CFA");
-    case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f);
+    case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f, { dateDoc: dateAnalyseRisques(o, f), incidents: [aleaSession(f)].filter(Boolean) });
     case "procedure_evaluation_enseignements_cfa": return genProcedureEvaluationEnseignements(o, f);
     case "grille_evaluation_enseignements_cfa": {
       const s0 = stagiaires[params?.stagiaireIdx ?? 0] || stagiaires[0];
@@ -1653,7 +1658,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Ressources complémentaires en ligne pour le travail personnel`,
       };
     }
-    if (lower.includes("ia") || lower.includes("intelligence artificielle") || lower.includes("contenus") || lower.includes("rédactionnel")) {
+    if (mot(lower, "ia") || lower.includes("intelligence artificielle") || lower.includes("contenus") || lower.includes("rédactionnel")) {
       return {
         besoins: [
           "Comprendre les fondamentaux de l'IA générative et ses applications professionnelles",
@@ -2229,7 +2234,9 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     .split(/\n|[,;](?=\s)/)
     .map(l => l.trim())
     .filter(l => l.length > 3)
-    .filter(l => !/questionnaire\s+de\s+satisfaction/i.test(l));
+    .filter(l => !/questionnaire\s+de\s+satisfaction/i.test(l))
+    // Le positionnement se fait à l'entrée ; en fin de parcours c'est une évaluation des acquis.
+    .map(l => l.replace(/test de positionnement en d[ée]but et (?:en )?fin de formation/i, "Test de positionnement à l'entrée en formation et évaluation des acquis en fin de formation"));
   const evalHtml = evalItems.length > 0
     ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}<li>Grille d'acquisition des compétences</li></ul>`
     : `<ul>
@@ -2532,7 +2539,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p>
       <p><strong>Email :</strong> ${o.email}</p>
       ${optSiteWeb(o)}
-      <p><strong>Dirigeant :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
+      <p><strong>Dirigeant :</strong> ${o.dirigeant}</p>
     </div>
 
     <h2>2. Intitulé de la formation</h2>
@@ -2591,7 +2598,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation && !f.dureeSaisiePrioritaire ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> ${estFormationHebdo(f) ? texteHorairesHebdo(f.dateDebut) : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"}</p>
+      <p><strong>Horaires :</strong> ${estFormationHebdo(f) ? texteHorairesHebdo(f.dateDebut) : (() => {
+        // Une seule session : jours tirés de ses dates réelles ; plusieurs sessions : libellé standard.
+        const sess = [...new Set((stagiaires.length ? stagiaires : [{} as StagiaireInfo]).map(s => `${s.dateDebutFormation || f.dateDebut || ""}|${s.dateFinFormation || f.dateFin || ""}`))];
+        if (sess.length !== 1) return "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)";
+        const [d, e] = sess[0].split("|");
+        return horairesSessionTexte(f, d, e);
+      })()}</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${f.nombreParticipants || nbStagiaires}</p>
@@ -2716,7 +2729,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
           return `<p><strong>Étapes d'inscription :</strong></p>
       <ol>
         <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
-        <li>Rendez-vous au centre de formation pour confirmation des objectifs de formation</li>
+        <li>${estDistancielPur(f) ? "Entretien téléphonique ou en visioconférence" : "Rendez-vous au centre de formation"} pour confirmation des objectifs de formation</li>
         <li>Réalisation de l'évaluation des besoins et du test de positionnement</li>
         <li>Envoi des documents administratifs :
           <ul>
@@ -2758,8 +2771,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>11. Tarif</h2>
     <div class="section">
-      <p><strong>Tarif :</strong> ${displayTarif}</p>
-      <p>TVA non applicable, article 261-4-4° du CGI.</p>
+      <p><strong>Tarif :</strong> ${tarifNetDeTaxe(displayTarif)}</p>
+      ${tarifMentionneTva(displayTarif) ? "" : "<p>TVA non applicable, article 261-4-4° du CGI.</p>"}
       <p><em>Possibilité de prise en charge, Contactez-nous pour un devis personnalisé.</em></p>
     </div>
 
@@ -3193,8 +3206,8 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Ven 09h00-12h30 / 13h30-17h00 (7 h/jour)</p>` },
-    { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> ${getDisplayDuree(f) || "À définir selon le groupe"}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> ${horairesSessionLigne(f)}</p>` },
+    { heading: "Informations pratiques", content: "<p>• " + (estDistancielPur(f) ? "Merci de vous connecter 15 minutes avant le début de chaque séance, avec le lien de connexion indiqué dans votre convocation" : "Merci de vous présenter 15 minutes avant le début de la formation, muni(e) de votre convocation") + "<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous est remis avant l'entrée en formation, avec le contrat de formation</p>" },
   ] });
 }
 
@@ -3321,7 +3334,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   if (f.dureeSaisiePrioritaire) extra += `<p><strong>Durée :</strong> ${getStagiaireDuree(s, f)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
-  extra += `<p><strong>Horaires :</strong> ${estFormationHebdo(f) ? texteHorairesHebdo(dateDebut) : "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)"}</p>`;
+  extra += `<p><strong>Horaires :</strong> ${horairesSessionTexte(f, dateDebut, dateFin)}</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
@@ -3497,7 +3510,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let extra = '';
   const outilClasse = (o.outilsUtilises || 'Classe virtuelle').split(/[,;/]/)[0].trim() || 'Classe virtuelle';
   extra += connectionIntro(o.outilsUtilises || 'Classe virtuelle');
-  extra += `<p style="font-size:11px;color:#555"><em>Relevé établi par le formateur à partir de la liste des participants de chaque classe virtuelle. L'export des journaux de l'outil (rapport de participation) est conservé et joint en annexe.</em></p>`;
+  extra += `<p style="font-size:11px;color:#555"><em>Relevé établi par le formateur à partir de la plateforme de classe virtuelle (liste des participants et heures de connexion de chaque séance).</em></p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
   if (isCFA) extra += `<p><em>Rythme d'alternance : ${f.rythmeAlternance}. Seules les semaines en CFA apparaissent dans le relevé (les semaines en entreprise ne génèrent pas de connexion LMS).</em></p>`;
 
@@ -3723,7 +3736,13 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   }
 
   const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
-  const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
+  // Note = somme exacte des points des questions notées (les questions d'opinion/projet ne sont pas notées), sur 10.
+  const noteTest = noteTestOuvert(questions, answers);
+  const totalScore = noteTest.note;
+  const fmtNote = (n: number) => Number.isInteger(n) ? `${n}` : n.toFixed(1).replace(".", ",");
+  const baremeTxt = noteTest.nbNotees === 10 && questions.length === 10
+    ? ""
+    : ` (${fmtNote(noteTest.points)} point${noteTest.points > 1 ? "s" : ""} sur ${noteTest.nbNotees} question${noteTest.nbNotees > 1 ? "s" : ""} notée${noteTest.nbNotees > 1 ? "s" : ""}, ramené sur 10${noteTest.nbNotees < questions.length ? " ; les questions sur le parcours et les attentes ne sont pas notées" : ""})`;
   const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
   const dateDebutSession = formatDate(getStagiaireDateDebut(s, f));
@@ -3734,12 +3753,13 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
   extra += `<p><strong>Date du test :</strong> ${dateTest}</p>`;
   extra += `<p><strong>Durée estimée :</strong> 20 minutes</p>`;
-  extra += `<p><strong>Note :</strong> ${totalScore} /10</p>`;
+  extra += `<p><strong>Note :</strong> ${fmtNote(totalScore)} /10${baremeTxt}</p>`;
 
   extra += `<h3>Questions</h3>`;
   questions.forEach((q, qi) => {
     const ans = answers[qi];
-    const appreciation = generateQuestionAppreciation(ans.score, qi, si, isDebut, s);
+    const notee = noteTest.notees[qi];
+    const appreciation = notee ? generateQuestionAppreciation(ans.score, qi, si, isDebut, s) : "";
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
 
     extra += `<p><strong>Réponse du stagiaire :</strong> ${ans.reponse}</p>`;
@@ -3747,12 +3767,14 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     // à la 1re personne (vécu, attentes) n'est pas un corrigé et ferait doublon avec la réponse.
     const attendu = String((q as any).reponseAttendue || "").trim();
     if (attendu && !/^(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/.test(attendu)) extra += `<p style="color:#475569"><strong>Corrigé / éléments attendus :</strong> ${attendu}</p>`;
-    else if (attendu) extra += `<p style="color:#475569"><strong>Éléments d'appréciation :</strong> question de positionnement sans réponse type ; le formateur apprécie la précision, les exemples donnés et le lien avec le projet du stagiaire.</p>`;
-    extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
+    else if (attendu) extra += `<p style="color:#475569"><strong>Éléments d'appréciation :</strong> question de positionnement sans réponse type, non notée ; la réponse sert à connaître le parcours et les attentes du stagiaire.</p>`;
+    extra += notee
+      ? `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${fmtNote(ans.score)} / 1). ${appreciation}</em></p>`
+      : `<p><em><strong>Appréciation du formateur :</strong> question non notée — réponse prise en compte pour adapter le parcours.</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
   });
 
-  extra += `<h3>Total : ${totalScore} /10</h3>`;
+  extra += `<h3>Total : ${fmtNote(totalScore)} /10</h3>`;
   if (isDebut) {
     const g = groupeNiveauDepuisScore(totalScore);
     extra += `<p><strong>Positionnement :</strong> ${g.groupe} – ${g.niveau} (barème : 0 à 3,5 débutant ; 4 à 6,5 intermédiaire ; 7 à 10 avancé).<br><strong>Adaptation du parcours :</strong> ${g.adaptation}</p>`;
@@ -3819,7 +3841,7 @@ function generateQuestionAppreciation(score: number, qi: number, si: number, isD
 
 function generateFormateurComment(s: StagiaireInfo, f: FormationInfo, totalScore: number, isDebut: boolean, si: number): string {
   const fullName = `${s.prenom} ${s.nom}`;
-  const scoreDisplay = Number.isInteger(totalScore) ? `${totalScore}` : `${totalScore.toFixed(1)}`;
+  const scoreDisplay = Number.isInteger(totalScore) ? `${totalScore}` : `${totalScore.toFixed(1).replace(".", ",")}`;
   const formation = f.intitule || "la formation";
   const pct = totalScore / 10 * 100;
 
@@ -4024,7 +4046,7 @@ function groupeNiveauDepuisScore(score: number): { groupe: string; niveau: strin
 function scorePositionnementDebut(f: FormationInfo, s: StagiaireInfo, si: number): number {
   const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const answers = generateStagiaireOpenAnswers(qo.debut, si, true, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste, civilite: s.civilite }, { intitule: f.intitule, codeRNCP: f.codeRNCP });
-  return answers.reduce((sum, a) => sum + a.score, 0);
+  return noteTestOuvert(qo.debut, answers).note;
 }
 
 function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -4047,7 +4069,7 @@ function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stag
     const rows = stagiaires.map((s, i) => {
       const note = scorePositionnementDebut(f, s, i);
       const g = groupeNiveauDepuisScore(note);
-      return [s.prenom + " " + s.nom, `${Number.isInteger(note) ? note : note.toFixed(1)} /10`, g.groupe, g.niveau, g.adaptation];
+      return [s.prenom + " " + s.nom, `${Number.isInteger(note) ? note : note.toFixed(1).replace(".", ",")} /10`, g.groupe, g.niveau, g.adaptation];
     });
     extra += tableHTML(["Stagiaire", "Note d'entrée", "Groupe", "Niveau", "Adaptation du parcours"], rows);
   }
@@ -4665,18 +4687,16 @@ function genRegistreReclamations(o: OrganismeInfo) {
   }, sections: [{ heading: "Bilan", content: "<p>5 réclamations en 2024 (vs 8 en 2023) – 100% traitées sous 48h – Satisfaction post-traitement : 4.5/5</p>", variant: "green" }] });
 }
 
-function genProcedureReclamation(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "GESTION DES RÉCLAMATIONS, DES DYSFONCTIONNEMENTS, ALÉAS ET PLAN D'AMÉLIORATION CONTINUE", sections: [
+function genProcedureReclamation(o: OrganismeInfo, f?: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  // Registre réel : arrêté à une date, aucune réclamation inventée ; l'aléa du suivi des
+  // dysfonctionnements (même source) y est reporté. Arrêté après la V1 → version ultérieure.
+  const dateRegistre = f ? dateArreteRegistre(o, f, stagiaires) : (o.dateMaj || new Date().toISOString().slice(0, 10));
+  const alea = f ? aleaSession(f) : null;
+  const lieuSession = f ? [f.intitule, alea?.date, f.lieu].filter(Boolean).join(", ") : "";
+  const registre = `<h2>Registre des réclamations et dysfonctionnements</h2><p><strong>Aucune réclamation enregistrée au ${formatDate(dateRegistre)}.</strong>${alea ? " Dysfonctionnement reporté du suivi des dysfonctionnements (IND 31) :" : " Aucun dysfonctionnement enregistré à cette date."}</p>`;
+  return buildDocument({ org: orgVersionUlterieure(o, dateRegistre), title: "GESTION DES RÉCLAMATIONS, DES DYSFONCTIONNEMENTS, ALÉAS ET PLAN D'AMÉLIORATION CONTINUE", sections: [
     { heading: "Procédure", content: `<p>L'organisme de formation enregistre et gère les réclamations de tiers et les dysfonctionnements internes.</p><p>Chaque réclamation (qu'elle soit exprimée par téléphone, mail, courrier ou tout autre moyen) est enregistrée et comprend :</p><ul><li>La date de réclamation</li><li>L'identification de la personne réclamant : nom, fonction, coordonnées</li><li>La formation concernée par le sujet (intitulé, date et lieu)</li><li>L'objet de la réclamation</li></ul><p>L'organisme de formation accuse réception de la réclamation par mail dans un délai de <strong>48H</strong>.</p><p>La réclamation est traitée dans le cadre de la gestion des dysfonctionnements.</p><p>Une réponse écrite par mail ou courrier est adressée au réclamant dans un délai de <strong>8 jours maximum</strong>.</p><p>L'organisme de formation analyse chaque dysfonctionnement, quelle qu'en soit la source afin de déterminer les actions d'amélioration à mettre en œuvre, le délai de réalisation et le responsable de l'action.</p>` },
-  ], table: {
-    headers: ["Formation concernée (intitulé, date, lieu)", "Objet de la réclamation, dysfonctionnement, aléa", "Personne réclamant (nom, fonction, coordonnées)", "Date de réception", "Date de l'accusé réception", "Référent", "Solutions apportées / actions"],
-    rows: [
-      ["", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", ""],
-    ]
-  } });
+  ], extraHtml: registre + (alea ? `<table><thead><tr>${["Formation concernée (intitulé, date, lieu)", "Objet de la réclamation, dysfonctionnement, aléa", "Personne réclamant (nom, fonction, coordonnées)", "Date de réception", "Date de l'accusé réception", "Référent", "Solutions apportées / actions"].map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody><tr>${[lieuSession, `Dysfonctionnement (pas une réclamation) : ${alea.desc} — cause : ${alea.causes}`, `${alea.partie} (signalement par ${alea.canal.toLowerCase()})`, alea.date, "Sans objet (signalement traité en séance)", o.responsablePedagogique || o.dirigeant, `${alea.ref} : ${alea.action} ; clôturé le ${alea.cloture}`].map((c) => `<td>${c}</td>`).join("")}</tr></tbody></table>` : "") });
 }
 
 function genFicheReclamation(o: OrganismeInfo, num: number) {
@@ -6160,7 +6180,7 @@ function genProcedureAbandon(o: OrganismeInfo) {
     { heading: "Définition de l'abandon", content: "<p>Est considéré comme un abandon toute cessation définitive de la formation avant son terme, quelle qu'en soit la raison (personnelle, professionnelle, médicale, insatisfaction).</p>" },
     { heading: "Détection et alerte", content: "<p>• Suivi quotidien des absences (émargement ou connexion)<br>• Alerte dès 2 absences consécutives non justifiées<br>• Contact téléphonique dans les 24h<br>• Entretien individuel proposé sous 48h</p>" },
     { heading: "Traitement", content: "<p>1. Entretien avec le stagiaire pour comprendre les raisons<br>2. Recherche de solutions alternatives (report, aménagement, accompagnement)<br>3. Si abandon confirmé : formalisation par écrit<br>4. Information de l'employeur et/ou du financeur<br>5. Attestation d'assiduité partielle<br>6. Enregistrement dans le registre des abandons</p>" },
-    { heading: "Suivi post-abandon", content: "<p>• Contact à 1 mois pour proposer un accompagnement<br>• Proposition de reprise si possible<br>• Analyse des causes pour prévention</p>" },
+    { heading: "Suivi post-abandon", content: "<p>• Relance à 1 mois puis à 3 mois après l'abandon pour proposer un accompagnement, une reprise ou une réorientation<br>• Proposition de reprise si possible<br>• Analyse des causes pour prévention</p>" },
     { heading: "Indicateurs", content: "<p>• Taux d'abandon par formation<br>• Causes principales identifiées<br>• Taux de reprise après abandon<br>• Actions préventives mises en œuvre</p>", variant: "green" },
   ] });
 }
@@ -6237,7 +6257,7 @@ function genProcedureAbsences(o: OrganismeInfo) {
 
 function genFormulaireReclamation(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "FORMULAIRE DE DÉPÔT DE RÉCLAMATION", sections: [
-    { heading: "Informations du réclamant", content: "<p><strong>Nom :</strong> ………………………………………………………………..<br><strong>Prénom :</strong> ………………………………………………………………<br><strong>Date de naissance :</strong> …………………………………………………<br><strong>Adresse :</strong> ………………………………………………………………<br><strong>Téléphone :</strong> ……………………………………………………………<br><strong>Mail :</strong> ……………………………………………………………………</p>" },
+    { heading: "Informations du réclamant", content: "<p><strong>Nom :</strong> ………………………………………………………………..<br><strong>Prénom :</strong> ………………………………………………………………<br><strong>Adresse :</strong> ………………………………………………………………<br><strong>Téléphone :</strong> ……………………………………………………………<br><strong>Mail :</strong> ……………………………………………………………………</p>" },
     { heading: "Formation concernée", content: "<p><strong>Date de la formation :</strong> …………………………………………………<br><strong>Intitulé de la formation :</strong> …………………………………………………</p>" },
     { heading: "Description de la réclamation", content: "<p>Veuillez détailler de manière la plus précise possible votre réclamation :</p><p>……………………………………………………………………………………………………………</p><p>………………………………………………………………………………………………………</p><p>……………………………………………………………………………………………………………</p><p>………………………………………………………………………………………………………</p><p>……………………………………………………………………………………………………………</p><p>………………………………………………………………………………………………………</p>" },
     { heading: "Autorisation", content: `<p>J'autorise le centre de formation ${o.nom} à conserver ce formulaire pour améliorer la qualité des prestations de ses formations et à reprendre contact avec moi afin d'avoir de plus amples informations :</p><p>☐ Oui &nbsp;&nbsp;&nbsp;&nbsp; ☐ Non</p>` },
@@ -7557,9 +7577,78 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
   signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
+/** Fin de la dernière session de la formation (formation + stagiaires). */
+function derniereFinSession(f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const fins = [f.dateFin, ...stagiaires.map((s) => s.dateFinFormation)].map((d) => String(d || "").slice(0, 10)).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+  return fins.at(-1) || "";
+}
+
+/** Lendemain ouvré d'une date ISO (date de revue après la dernière session). */
+function lendemainOuvre(isoDate: string): string {
+  const d = new Date(`${isoDate}T12:00:00`);
+  do d.setDate(d.getDate() + 1); while (d.getDay() === 0 || d.getDay() === 6);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Bilan d'activité fondé uniquement sur les indicateurs saisis de la formation (rien d'inventé). */
+function bilanIndicateursReels(f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const val = (x?: string) => String(x || "").trim();
+  const nbFormes = val(f.nombreStagiairesFormes) || (stagiaires.length ? String(stagiaires.length) : "");
+  const n = parseInt(nbFormes, 10);
+  const avis = val(f.nombreAvisSatisfaction);
+  const lignes = [
+    `<li>Formation animée : « ${f.intitule} »${f.dateDebut && f.dateFin ? `, session du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}` : ""}${f.modalites ? ` (${f.modalites})` : ""}.</li>`,
+    `<li>Stagiaires formés : ${nbFormes ? `${nbFormes} stagiaire${n > 1 ? "s" : ""}` : "non renseigné"}.</li>`,
+    `<li>Satisfaction des stagiaires : ${val(f.tauxSatisfaction) || "non renseignée"}${avis ? ` (${avis} avis recueilli${parseInt(avis, 10) > 1 ? "s" : ""})` : ""}.</li>`,
+    `<li>Assiduité : ${val(f.tauxAssiduite) || "non renseignée"}.</li>`,
+  ];
+  return `<ul>${lignes.join("")}</ul><p>Source : indicateurs de résultats de la formation (IND 2) et questionnaires de satisfaction du dossier.</p>`;
+}
+
+/**
+ * Revue annuelle des compétences du dirigeant-formateur : un mandataire social n'a pas d'entretien
+ * annuel ou professionnel de salarié. Datée après la dernière session, un seul visa (celui de l'organisme).
+ */
+function genRevueCompetencesDirigeant(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], nom: string) {
+  const fin = derniereFinSession(f, stagiaires);
+  const dRevue = fin ? lendemainOuvre(fin) : (o.dateMaj || new Date().toISOString().slice(0, 10));
+  const org = { ...organismeALaDate(o, dRevue), dateMaj: dRevue };
+  const memeNom = (a?: string, b?: string) => String(a || "").trim().toLowerCase().replace(/\s+/g, " ") === String(b || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const fonctions = ["dirigeant (mandataire social)"];
+  if (memeNom(o.responsablePedagogique, nom)) fonctions.push("responsable pédagogique");
+  if (memeNom(o.poleAdministratif, nom)) fonctions.push("référent administratif");
+  if (memeNom(o.referentHandicap, nom)) fonctions.push("référent handicap");
+  fonctions.push("formateur");
+  const actions = planDevActions(o, f, [], stagiaires);
+  const realisees = actions.filter((a) => a.realisee && a.beneficiaires.toLowerCase().includes(nom.toLowerCase()));
+  const finPeriode = (per: string) => { const m = per.match(/^T(\d) (\d{4})$/); return m ? `${m[2]}-${String(+m[1] * 3).padStart(2, "0")}-31` : ""; };
+  const nonRealisees = actions.filter((a) => !a.realisee && a.beneficiaires.toLowerCase().includes(nom.toLowerCase()));
+  const echues = nonRealisees.filter((a) => finPeriode(a.periode) && finPeriode(a.periode) < dRevue);
+  const prevues = nonRealisees.filter((a) => !echues.includes(a));
+  return buildDocument({
+    org,
+    title: "REVUE ANNUELLE DES COMPÉTENCES DU DIRIGEANT-FORMATEUR",
+    subtitle: nom,
+    sections: [
+      { heading: "Identification", content: `<p><strong>Nom :</strong> ${nom}<br><strong>Fonctions :</strong> ${fonctions.join(", ")}<br><strong>Statut :</strong> dirigeant (mandataire social) de ${o.nom} — pas d'entretien annuel ou professionnel de salarié : cette revue en tient lieu pour l'indicateur 22<br><strong>Date de la revue :</strong> ${formatDate(dRevue)}${fin ? ` (après la dernière session, terminée le ${formatDate(fin)})` : ""}</p>` },
+      { heading: "I – Bilan de l'activité de formation", content: bilanIndicateursReels(f, stagiaires) },
+      { heading: "II – Actions de développement des compétences suivies", content: realisees.length ? `<ul>${realisees.map((a) => `<li>${a.ref} — ${a.nom} (${a.periode}) : attestation de fin de formation jointe au dossier.</li>`).join("")}</ul>` : `<p>Aucune action réalisée avec attestation au dossier à la date de la revue.</p>` },
+      { heading: "III – Besoins retenus pour la période à venir", content: `${echues.length ? `<p>Actions du plan dont l'échéance est passée sans attestation au dossier, reconduites :</p><ul>${echues.map((a) => `<li>${a.ref} — ${a.nom} (prévue ${a.periode})</li>`).join("")}</ul>` : ""}${prevues.length ? `<p>Actions inscrites au plan de développement des compétences (IND 22) :</p><ul>${prevues.map((a) => `<li>${a.ref} — ${a.nom} (${a.periode})</li>`).join("")}</ul>` : ""}${!echues.length && !prevues.length ? `<p>Besoins à inscrire au plan de développement des compétences (IND 22).</p>` : ""}` },
+      { heading: "IV – Décision", content: `<p>Qualification de ${nom} maintenue pour l'animation de la formation « ${f.intitule} ». Prochaine revue : après la dernière session de l'année suivante.</p>`, variant: "green" },
+    ],
+    signatures: { type: "1", labels: ["Le dirigeant"], names: [o.dirigeant], dates: [formatDate(dRevue)] },
+  });
+}
+
 function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = []) {
   const formateurNom = f.formateur || `${fmt.prenom} ${fmt.nom}`;
-  const dateEntretien = formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
+  // Dirigeant (mandataire social) : revue annuelle des compétences, pas d'entretien de salarié.
+  if (o.dirigeant && formateurNom.trim().toLowerCase().replace(/\s+/g, " ") === o.dirigeant.trim().toLowerCase().replace(/\s+/g, " ")) {
+    return genRevueCompetencesDirigeant(o, f, stagiaires, formateurNom);
+  }
+  // Entretien après la dernière session de l'année (et non à la date de V1, antérieure à la qualification).
+  const finSessions = derniereFinSession(f, stagiaires);
+  const dateEntretien = formatDate(finSessions ? lendemainOuvre(finSessions) : (o.dateMaj || new Date().toISOString().slice(0, 10)));
   // Date fin = date fin du stagiaire assigné à ce formateur, sinon date fin formation
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
   const dateFinFormateur = matchingStagiaire?.dateFinFormation || f.dateFin || new Date().toISOString().slice(0, 10);
@@ -7576,7 +7665,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
           <p><strong>NOM PRÉNOM DU FORMATEUR :</strong> ${formateurNom}</p>
           <p><strong>DATE DE 1ÈRE QUALIFICATION :</strong> ${dateQualif}</p>
           <p><strong>DATE D'ENTRETIEN :</strong> ${dateEntretien}</p>
-          <p><strong>STATUT :</strong> ☑ Prestataire</p>
+          <p><strong>STATUT :</strong> ☐ Salarié &nbsp; ☐ Vacataire &nbsp; ☐ Prestataire</p>
           <p><strong>LE DOSSIER DE QUALIFICATION EST-IL COMPLET ?</strong> ☑ Oui</p>
           <p><strong>Si NON, Éléments manquants à fournir :</strong> Néant – le dossier est complet (CV, diplômes, attestation d'expérience, casier judiciaire).</p>
         `
@@ -7606,7 +7695,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         heading: "II – ANALYSE DU BILAN",
         content: `
           <p><strong>Bilan des résultats des évaluations des stagiaires :</strong></p>
-          <p>Les évaluations de satisfaction à chaud montrent un taux global de satisfaction de 94 %. Les stagiaires soulignent la clarté des explications, la disponibilité du formateur et la qualité des exercices pratiques. Les évaluations sommatives confirment un taux de réussite de 92 % aux QCM finaux.</p>
+          ${bilanIndicateursReels(f, stagiaires)}
           <p><strong>Décisions quant aux qualifications sur les modules dispensés :</strong></p>
           <p>Qualification maintenue sur l'ensemble des modules dispensés (${f.intitule}). Le formateur est habilité à poursuivre l'animation de ces sessions pour l'année à venir.</p>
         `
@@ -7617,7 +7706,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
           <p><strong>Par rapport aux missions, les objectifs sont-ils ?</strong></p>
           <p>☐ Dépassés &nbsp;&nbsp; ☑ <strong>Totalement remplis</strong> &nbsp;&nbsp; ☐ Partiellement remplis &nbsp;&nbsp; ☐ Non remplis</p>
           <p><strong>Commentaires :</strong></p>
-          <p>${formateurNom} a fait preuve d'un engagement constant tout au long de l'année. Les retours des stagiaires et des entreprises partenaires sont très positifs. L'adaptation aux différents profils de publics (demandeurs d'emploi, salariés, PSH) est un point fort à souligner. La rigueur dans le suivi administratif et pédagogique est exemplaire.</p>
+          <p>Synthèse établie à partir des indicateurs ci-dessus et des appréciations des stagiaires de la période.</p>
         `
       },
       {
@@ -7707,7 +7796,6 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
           <p><strong>2) MOYENS (équipements, organisation, horaires…)</strong></p>
           <ul>
             <li>Mise à disposition d'une licence annuelle pour un outil de création de contenus interactifs (Genially, Canva Pro)</li>
-            <li>Accès à une salle de formation équipée d'un vidéoprojecteur interactif et d'un tableau blanc numérique</li>
             <li>Aménagement des horaires pour intégrer des temps de préparation pédagogique</li>
           </ul>
           <p><strong>3) AUTRES (COMMUNICATION…)</strong></p>
@@ -7725,7 +7813,6 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
           <p><strong>Informations, remarques, suggestions que le formateur souhaite faire remonter à la structure :</strong></p>
           <ul>
             <li>Proposer des réunions pédagogiques trimestrielles entre formateurs pour mutualiser les pratiques</li>
-            <li>Mettre en place un système de mentorat pour les nouveaux formateurs intégrant l'équipe</li>
             <li>Développer une bibliothèque numérique partagée de ressources pédagogiques</li>
           </ul>
           <p style="margin-top:16px"><em>Une copie de ce document m'a été remise.</em></p>
@@ -7743,6 +7830,12 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
       </div>`;
     })()
   });
+}
+
+/** Le formateur nommé est-il le dirigeant de l'organisme ? */
+function estDirigeantFormateur(o: OrganismeInfo, nom: string): boolean {
+  const n = (x?: string) => (x || "").trim().toLowerCase().replace(/\s+/g, " ");
+  return !!n(o.dirigeant) && n(o.dirigeant) === n(nom);
 }
 
 function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
@@ -7783,8 +7876,20 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
     const formateurNom = (s.formateur && s.formateur.trim()) || f.formateur || "[Formateur non renseigné]";
     const traineeName = `${s.prenom || ""} ${s.nom || ""}`.trim();
     const p = patterns[globalIdx % patterns.length];
-    const c = commentaires[globalIdx % commentaires.length];
-    const rows = criteres.map((crit, idx) => {
+    // Formateur = dirigeant : il n'évalue ni « la direction », ni sa rémunération, ni l'équipe
+    // pédagogique, et on ne lui demande pas s'il recommanderait son propre organisme.
+    const dirigeant = estDirigeantFormateur(o, formateurNom);
+    const unStag = stagiaires.length <= 1;
+    const distEnq = /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || "");
+    const aleaEnq = aleaSession(f);
+    const base = commentaires[globalIdx % commentaires.length];
+    const c = dirigeant
+      ? { pos: unStag ? "Stagiaire impliqué, progression régulière, supports adaptés à son niveau." : "Stagiaires impliqués, supports adaptés au niveau du groupe.", axes: aleaEnq ? `${aleaEnq.action} (suite à l'aléa du ${aleaEnq.date}).` : "Prévoir davantage de cas pratiques sectoriels.", reco: true }
+      : unStag && /groupe|profils stagiaires/.test(base.pos) ? commentaires[3] : base;
+    const criteresDoc = criteres
+      .map((crit, idx) => ({ crit: distEnq && /Conditions matérielles/.test(crit) ? "Conditions techniques (plateforme de classe virtuelle, connexion)" : crit, idx }))
+      .filter(({ crit }) => !dirigeant || !/direction|Rémunération|équipe pédagogique/.test(crit));
+    const rows = criteresDoc.map(({ crit, idx }) => {
       if (!terminee) return [crit, "", "", "", ""];
       const score = p[idx];
       return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
@@ -7805,7 +7910,7 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
     html += `</table>`;
     html += `<p style="margin-top:10px"><strong>Points positifs :</strong> ${terminee ? c.pos : ""}</p>`;
     html += `<p><strong>Axes d'amélioration suggérés :</strong> ${terminee ? c.axes : ""}</p>`;
-    html += `<p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ${terminee ? (c.reco ? "☒ Oui  ☐ Non" : "☐ Oui  ☒ Non") : "☐ Oui  ☐ Non"}</p>`;
+    if (!dirigeant) html += `<p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ${terminee ? (c.reco ? "☒ Oui  ☐ Non" : "☐ Oui  ☒ Non") : "☐ Oui  ☐ Non"}</p>`;
     html += `<p><strong>Signature formateur :</strong> ${terminee ? formateurNom : ""}</p>`;
     html += `</div>`;
     return html;
@@ -8856,7 +8961,9 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
       `Les créneaux proposés (<strong>09h00 – 12h30</strong> / <strong>13h30 – 17h00</strong>) sont compatibles avec mon emploi du temps. Je demande un aménagement du rythme : exercices réalisables en temps majoré et documents en police agrandie.`,
       `Je peux suivre la formation en journée. En raison de ma RQTH, je souhaite que les séances les plus denses soient placées le matin et disposer d'un temps supplémentaire pour les évaluations, selon les modalités définies avec le référent handicap.`,
     ];
-    return variantesPSH[baseHash % variantesPSH.length];
+    const joursPSH = f ? joursSessionLabel(getStagiaireDateDebut(s, f), getStagiaireDateFin(s, f)) : null;
+    const choixPSH = variantesPSH[baseHash % variantesPSH.length];
+    return joursPSH ? choixPSH.replace(/du lundi au vendredi/i, joursPSH) : choixPSH;
   }
 
   const variantesJour = [
@@ -8867,7 +8974,10 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
     `Mes obligations actuelles me permettent un suivi en journée. Je serai présent(e) du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> (7 h/jour), ce qui assure une régularité indispensable à la réussite de la formation.`,
     `Je m'engage à suivre la formation en journée, du lundi au vendredi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me garantit une présence assidue et une concentration optimale tout au long du parcours.`,
   ];
-  return variantesJour[baseHash % variantesJour.length];
+  // Jours réels de la session (ex. « du mardi au jeudi (3 jours consécutifs) ») plutôt qu'un « lundi au vendredi » générique.
+  const joursSession = f ? joursSessionLabel(getStagiaireDateDebut(s, f), getStagiaireDateFin(s, f)) : null;
+  const choix = variantesJour[baseHash % variantesJour.length];
+  return joursSession ? choix.replace(/du lundi au vendredi/i, joursSession) : choix;
 }
 
 export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number): string {
@@ -11042,6 +11152,12 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
   });
 }
 
+/** Vrai si l'organisme déclare une plateforme e-learning (outils, moyens pédagogiques, lieu) : sinon on ne la cite pas. */
+function aPlateformeElearning(o: OrganismeInfo, f: FormationInfo): boolean {
+  const t = `${o.outilsUtilises || ""} ${f.moyensPedagogiques || ""} ${f.lieu || ""} ${f.modalites || ""}`.toLowerCase();
+  return /e-learning|elearning|plateforme|lms|moodle|digiforma|360learning|teachable|foad/.test(t);
+}
+
 function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
   // Override AI : si un AIContentPack est en cache pour cette formation, on utilise
   // les ressources pédagogiques générées par l'IA forte (modèle pro).
@@ -11094,7 +11210,8 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     supportsContent = `<p>• Support de cours PDF : grammaire, vocabulaire professionnel, expressions idiomatiques<br>• Fiches vocabulaire thématiques (réunion, téléphone, email, négociation)<br>• Exercices de compréhension orale avec transcriptions<br>• Exercices de rédaction d'emails et de courriers professionnels<br>• Tests d'entraînement au TOEIC (Listening & Reading)<br>• Dialogues et jeux de rôle en contexte professionnel</p>`;
     outilsContent = `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme d'exercices interactifs en ligne<br>• Supports audio authentiques (podcasts, interviews)<br>• Outils de reconnaissance vocale pour la prononciation<br>• QCM TOEIC en ligne pour l'auto-évaluation</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://www.britishcouncil.fr/" style="color:hsl(220,60%,50%)">britishcouncil.fr</a> – Ressources pédagogiques British Council<br>• <strong>Site :</strong> <a href="https://www.ets.org/toeic.html" style="color:hsl(220,60%,50%)">ets.org/toeic</a> – Préparation officielle TOEIC<br>• <strong>App :</strong> Duolingo, Babbel – Pratique en autonomie<br>• <strong>Podcast :</strong> BBC Learning English, ESL Pod<br>• Glossaire des termes professionnels anglais-français</p>`;
-  } else if (lower.includes('ia') || lower.includes('intelligence artificielle') || lower.includes('contenus rédactionnels')) {
+  } else if (mot(lower, 'ia') || lower.includes('intelligence artificielle') || lower.includes('contenus rédactionnels')) {
+    // mot entier : « Initiation » contient « ia » et tombait ici (ressources ChatGPT/Midjourney pour une formation Word).
     supportsContent = `<p>• Support de cours PDF : fondamentaux de l'IA générative, prompt engineering, création de contenus<br>• Fiches méthodologiques par outil (ChatGPT, Midjourney, DALL-E, Canva IA)<br>• Templates de prompts efficaces par cas d'usage<br>• Guide de bonnes pratiques éthiques et RGPD<br>• Exercices de création de contenus rédactionnels et visuels<br>• Grille d'évaluation de la qualité des productions IA</p>`;
     outilsContent = `<p>• Accès aux outils IA (ChatGPT, Midjourney, Canva IA)<br>• Poste informatique avec connexion Internet haut débit<br>• Plateforme de partage de productions (Google Drive)<br>• Outils de comparaison de résultats entre modèles<br>• QCM en ligne et exercices interactifs</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://openai.com/blog" style="color:hsl(220,60%,50%)">openai.com/blog</a> – Actualités ChatGPT et GPT-4<br>• <strong>Site :</strong> <a href="https://www.midjourney.com/" style="color:hsl(220,60%,50%)">midjourney.com</a> – Génération d'images IA<br>• <strong>Site :</strong> <a href="https://huggingface.co/" style="color:hsl(220,60%,50%)">huggingface.co</a> – Modèles IA open source<br>• <strong>Guide :</strong> France Num – IA pour les TPE/PME<br>• Veille IA : newsletter et blog spécialisés</p>`;
@@ -11128,9 +11245,17 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     outilsContent = `<p>• Salle de formation en présentiel équipée de postes informatiques individuels (1 poste par stagiaire)<br>• Microsoft Excel (version 2019 ou 365) installé sur chaque poste, avec Power Query et Power Pivot activés<br>• Vidéoprojecteur et paperboard pour les démonstrations en direct<br>• ${o.outilsUtilises || 'Clés USB avec fichiers d\'entraînement Excel, supports de cours imprimés'}<br>• Plateforme de dépôt des fichiers Excel produits par les stagiaires (corrections individualisées)<br>• Simulateur TOSA Excel pour l'évaluation finale</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://support.microsoft.com/fr-fr/excel" style="color:hsl(220,60%,50%);text-decoration:underline">support.microsoft.com – Excel</a> – Documentation officielle (formules, Power Query, Power Pivot, VBA)<br>• <strong>Site :</strong> <a href="https://www.tosa.org/" style="color:hsl(220,60%,50%);text-decoration:underline">tosa.org</a> – Certification TOSA Excel (niveau avancé et expert)<br>• <strong>Site :</strong> <a href="https://excel-pratique.com/" style="color:hsl(220,60%,50%);text-decoration:underline">excel-pratique.com</a> – Tutoriels et exercices Excel<br>• <strong>Site :</strong> <a href="https://www.excel-formations.fr/" style="color:hsl(220,60%,50%);text-decoration:underline">excel-formations.fr</a> – Ressources avancées Excel et VBA<br>• <strong>Livre :</strong> "Excel – Analyse de données avec tableaux croisés dynamiques, Power Pivot et Power Query" (ENI)<br>• <strong>Livre :</strong> "Programmation VBA pour Excel" (Wiley)<br>• Glossaire Excel avancé : fonctions matricielles dynamiques, modèle de données, langage M, DAX</p>`;
   } else if (lower.includes('word') || lower.includes('excel') || lower.includes('bureautique') || lower.includes('pack office') || lower.includes('powerpoint') || lower.includes('office')) {
-    supportsContent = `<p>• Support de cours PDF : prise en main, mise en forme avancée, styles, modèles, publipostage<br>• Fiches mémo par fonctionnalité (tableaux, en-têtes/pieds de page, sommaire automatique)<br>• Exercices pratiques progressifs avec corrigés détaillés<br>• Modèles de documents professionnels réutilisables (CV, courrier, rapport, compte rendu)<br>• Guide des raccourcis clavier essentiels<br>• QCM d'entraînement à la certification ICDL / TOSA</p>`;
-    outilsContent = `<p>• Poste informatique équipé de Microsoft 365 (Word, Excel, PowerPoint)<br>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme e-learning avec exercices interactifs<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation<br>• Simulateur de certification ICDL en ligne</p>`;
-    ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://support.microsoft.com/fr-fr/word" style="color:hsl(220,60%,50%);text-decoration:underline">support.microsoft.com – Word</a> – Centre d'aide officiel Microsoft Word<br>• <strong>Site :</strong> <a href="https://support.microsoft.com/fr-fr/excel" style="color:hsl(220,60%,50%);text-decoration:underline">support.microsoft.com – Excel</a> – Centre d'aide officiel Microsoft Excel<br>• <strong>Site :</strong> <a href="https://icdl.org/certifications/" style="color:hsl(220,60%,50%);text-decoration:underline">icdl.org</a> – Certification ICDL (ex-PCIE)<br>• <strong>Site :</strong> <a href="https://www.tosa.org/" style="color:hsl(220,60%,50%);text-decoration:underline">tosa.org</a> – Certification TOSA bureautique<br>• <strong>Site :</strong> <a href="https://www.votreassistante.net/" style="color:hsl(220,60%,50%);text-decoration:underline">votreassistante.net</a> – Tutoriels Word, Excel, PowerPoint<br>• Glossaire des termes bureautiques et raccourcis clavier</p>`;
+    // Ressources limitées aux logiciels cités dans l'intitulé ; certification et plateforme seulement si elles existent.
+    const LOGICIELS: [string, string, string][] = [["word", "Word", "word"], ["excel", "Excel", "excel"], ["powerpoint", "PowerPoint", "powerpoint"], ["outlook", "Outlook", "outlook"]];
+    const cites = LOGICIELS.filter(([k]) => mot(lower, k));
+    const logiciels = cites.length ? cites : LOGICIELS.slice(0, 3);
+    const noms = logiciels.map(([, n]) => n).join(", ");
+    const ext = logiciels.map(([k]) => (k === "word" ? ".docx" : k === "excel" ? ".xlsx" : k === "powerpoint" ? ".pptx" : "")).filter(Boolean).join(", ");
+    const certif = /tosa|icdl|pcie/i.test(`${f.intitule} ${f.codeRNCP || ""} ${f.methodesEvaluation || ""}`);
+    const plateforme = aPlateformeElearning(o, f);
+    supportsContent = `<p>• Support de cours PDF ${noms} reprenant les séquences du programme « ${f.intitule} »<br>• Fichiers d'exercices ${noms}${ext ? ` (${ext})` : ""} progressifs, avec leurs corrigés<br>• Fiches mémo des fonctionnalités vues en formation et des raccourcis clavier ${noms}<br>• QCM de positionnement et QCM d'évaluation des acquis${certif ? "<br>• QCM d'entraînement à la certification visée" : ""}</p>`;
+    outilsContent = `<p>• Poste informatique équipé de Microsoft ${noms}${o.outilsUtilises ? `<br>• ${o.outilsUtilises}` : ""}${plateforme ? "<br>• Plateforme e-learning de l'organisme (exercices en ligne)" : ""}${hasDistanciel(f) && !/meet|zoom|teams|visio/i.test(o.outilsUtilises || "") ? `<br>• Outil de visioconférence${f.lieu && !/^(distanciel|à distance|a distance)$/i.test(f.lieu.trim()) ? ` (${f.lieu})` : ""} avec partage d'écran pour les démonstrations` : ""}<br>• Envoi des fichiers d'exercices et des corrigés par email</p>`;
+    ressourcesCompl = `<p>${logiciels.map(([, n, slug]) => `• <strong>Site :</strong> <a href="https://support.microsoft.com/fr-fr/${slug}" style="color:hsl(220,60%,50%);text-decoration:underline">support.microsoft.com – ${n}</a> – Centre d'aide officiel Microsoft ${n}`).join("<br>")}${certif ? `<br>• <strong>Site :</strong> <a href="https://www.tosa.org/" style="color:hsl(220,60%,50%);text-decoration:underline">tosa.org</a> – Certification TOSA<br>• <strong>Site :</strong> <a href="https://icdl.org/certifications/" style="color:hsl(220,60%,50%);text-decoration:underline">icdl.org</a> – Certification ICDL` : ""}<br>• Glossaire des termes et raccourcis clavier ${noms}</p>`;
   } else if (lower.includes('cip') || lower.includes('conseiller en insertion') || lower.includes('insertion professionnelle')) {
     supportsContent = `<p>• Support de cours PDF : posture du CIP, techniques d'entretien, construction de projet professionnel<br>• Fiches méthodologiques : écoute active, reformulation, questionnement, ADVP<br>• Trames d'entretien (diagnostic, suivi, bilan)<br>• Études de cas réels d'accompagnement (anonymisés)<br>• Référentiel emploi-formation et fiches ROME<br>• Grilles d'auto-évaluation des compétences du CIP</p>`;
     outilsContent = `<p>• Accès aux ressources France Travail (Pôle emploi), Mon Compte Formation, ROME<br>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Salle équipée pour les jeux de rôle d'entretien<br>• Logiciel de suivi de parcours bénéficiaires<br>• QCM en ligne et évaluations formatives</p>`;
@@ -11172,9 +11297,11 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     outilsContent = `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Tableur Excel / Google Sheets pour le pilotage financier<br>• Logiciels de gestion en démo : Pennylane, Indy, Tiime, Sage, EBP<br>• Simulateurs en ligne : URSSAF, impots.gouv.fr, BPI Création<br>• Plateforme e-learning avec quiz et études de cas<br>• Vidéoprojecteur et paperboard pour les ateliers stratégiques (SWOT, business model canvas)</p>`;
     ressourcesCompl = `<p>• <strong>Site :</strong> <a href="https://bpifrance-creation.fr/" style="color:hsl(220,60%,50%)">bpifrance-creation.fr</a> – Outils et guides pour dirigeants TPE/PME<br>• <strong>Site :</strong> <a href="https://www.economie.gouv.fr/entreprises" style="color:hsl(220,60%,50%)">economie.gouv.fr/entreprises</a> – Portail officiel des entreprises<br>• <strong>Site :</strong> <a href="https://entreprendre.service-public.fr/" style="color:hsl(220,60%,50%)">entreprendre.service-public.fr</a> – Démarches et obligations<br>• <strong>Site :</strong> <a href="https://www.urssaf.fr/" style="color:hsl(220,60%,50%)">urssaf.fr</a> – Cotisations sociales et simulateurs<br>• <strong>Site :</strong> <a href="https://www.impots.gouv.fr/professionnel" style="color:hsl(220,60%,50%)">impots.gouv.fr/professionnel</a> – Fiscalité des entreprises<br>• <strong>Livre :</strong> "Maxi-fiches de Gestion d'entreprise" (Dunod) — synthèse compta/finance/RH/marketing<br>• <strong>Livre :</strong> "Business Model Nouvelle Génération" (A. Osterwalder, Pearson)<br>• Glossaire des termes financiers, juridiques et fiscaux</p>`;
   } else {
-    supportsContent = `<p>• Support de cours PDF complet remis à chaque stagiaire<br>• Diaporama de présentation (PowerPoint)<br>• Fiches mémo et synthèses par chapitre<br>• Exercices pratiques et corrigés</p>`;
-    outilsContent = `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme e-learning (accès 6 mois après la formation)<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation</p>`;
-    ressourcesCompl = `<p>• Bibliographie et sitographie recommandées<br>• Tutoriels vidéo complémentaires sur la plateforme<br>• Fiches synthèse téléchargeables<br>• Glossaire des termes techniques<br>• FAQ et forum de discussion entre stagiaires</p>`;
+    // Formation sans ressources spécifiques : ressources génériques liées à l'intitulé, sans plateforme supposée.
+    const plateforme = aPlateformeElearning(o, f);
+    supportsContent = `<p>• Support de cours PDF « ${f.intitule} » remis à chaque stagiaire<br>• Diaporama de présentation des séquences du programme<br>• Fiches mémo et synthèses par séquence<br>• Exercices pratiques et corrigés</p>`;
+    outilsContent = `<p>${o.outilsUtilises ? `• ${o.outilsUtilises}<br>` : ""}${plateforme ? "• Plateforme e-learning de l'organisme (accès 6 mois après la formation)<br>" : ""}${hasDistanciel(f) ? "• Outil de visioconférence pour les séances à distance<br>" : ""}• QCM d'auto-évaluation des acquis</p>`;
+    ressourcesCompl = `<p>• Bibliographie et sitographie recommandées sur « ${f.intitule} »<br>• Fiches synthèse téléchargeables<br>• Glossaire des termes techniques</p>`;
   }
 
   return buildDocument({ org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
@@ -11182,7 +11309,9 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Outils numériques et matériels", content: outilsContent },
     { heading: "Ressources vidéo complémentaires", content: `<p>Les vidéos ci-dessous sont mises à disposition des stagiaires pour approfondir les notions abordées en formation :</p>${videosHtml}` },
     { heading: "Ressources complémentaires", content: ressourcesCompl, variant: "green" },
-    { heading: "Modalités d'accès", content: `<p>• Les supports sont envoyés par email avant le début de la formation<br>• L'accès à la plateforme e-learning est activé le premier jour de formation<br>• Les ressources restent accessibles pendant 6 mois après la fin de la formation<br>• Un lien de téléchargement est fourni pour les documents PDF</p>` },
+    { heading: "Modalités d'accès", content: aPlateformeElearning(o, f)
+      ? `<p>• Les supports sont envoyés par email avant le début de la formation<br>• L'accès à la plateforme e-learning est activé le premier jour de formation<br>• Les ressources restent accessibles pendant 6 mois après la fin de la formation<br>• Un lien de téléchargement est fourni pour les documents PDF</p>`
+      : `<p>• Les supports sont envoyés par email avant le début de la formation<br>• Les fichiers d'exercices et les corrigés sont transmis par email au fil des séquences<br>• Le stagiaire conserve les documents remis après la fin de la formation</p>` },
   ] });
 }
 
@@ -11451,22 +11580,6 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
  * Daté du premier jour de session, clôturé 2 jours ouvrés plus tard ; absent tant
  * que la session n'a pas commencé (aucune trace datée dans le futur).
  */
-function aleaSession(f: FormationInfo): { ref: string; date: string; cloture: string; partie: string; canal: string; desc: string; causes: string; action: string } | null {
-  const debut = new Date(`${(f.dateDebut || "").slice(0, 10)}T00:00:00`);
-  if (isNaN(debut.getTime())) return null;
-  const now = new Date();
-  if (debut > now) return null;
-  const plus2 = new Date(debut);
-  let k = 2;
-  while (k > 0) { plus2.setDate(plus2.getDate() + 1); if (plus2.getDay() !== 0 && plus2.getDay() !== 6) k--; }
-  const fmt = (d: Date) => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-  const distanciel = /distanciel|distance|ligne|visio|meet|zoom/i.test(`${f.modalites} ${f.lieu}`);
-  const cloture = fmt(plus2 > now ? now : plus2);
-  return distanciel
-    ? { ref: "AC-D01", date: fmt(debut), cloture, partie: "Stagiaire", canal: "Email", desc: "Coupures de connexion d'un participant pendant la classe virtuelle", causes: "Connexion internet instable du participant ; lien de secours non communiqué", action: "Envoi systématique d'un second lien et du support avant chaque séance ; test de connexion la veille" }
-    : { ref: "AC-D01", date: fmt(debut), cloture, partie: "Stagiaire", canal: "Oral en formation", desc: "Nuisances sonores dans la salle de formation", causes: "Travaux imprévus à proximité de la salle", action: "Changement de salle et vérification des conditions d'accueil la veille de chaque session" };
-}
-
 function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo, formations: FormationInfo[], stagiaires: StagiaireInfo[]) {
   // Use formation START date as base, then generate dates BEFORE it
   // Improvements must be planned and closed BEFORE the training starts
@@ -11521,7 +11634,12 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
     const clos = e.statut === "Réalisé";
     lignes.push([`AC-V${String(i + 1).padStart(2, "0")}`, e.priseEnCompte, `Veille IND ${ind}`, `${e.titre} — ${e.impact}`, ind === 23 ? "Évolution réglementaire non prise en compte" : ind === 24 ? "Contenus décalés des besoins du métier" : "Méthodes et outils pédagogiques obsolètes", e.action, e.pilote, e.echeance, clos ? e.echeance : "", clos ? `Clôturé — ${e.diffusion}` : "En cours"]);
   });
-  const dateRisques = formatDate((o.dateMaj || todayIso) <= todayIso ? (o.dateMaj || todayIso) : todayIso);
+  // Les actions issues de l'analyse des risques (fondée sur le décret n° 2026-728) s'ouvrent à la date
+  // de cette analyse, jamais avant la prise en compte du décret.
+  const isoRisques = dateAnalyseRisques(o, f);
+  const dateRisques = formatDate(isoRisques <= todayIso ? isoRisques : todayIso);
+  const dateMajFr = formatDate((o.dateMaj || todayIso) <= todayIso ? (o.dateMaj || todayIso) : todayIso);
+  const seulAC = intervenantUnique(o, f, stagiaires);
   const typeAud = typeAuditEffectif(o);
   const dateRD = formatDate((() => { const d = dateRevueDirection(o); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })());
   risquesAction.forEach((r, i) => {
@@ -11539,11 +11657,21 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
     const analyse = new Date(finSession);
     let n = 10;
     while (n > 0) { analyse.setDate(analyse.getDate() + 1); if (analyse.getDay() !== 0 && analyse.getDay() !== 6) n--; }
-    lignes.push(["AC-S01", fmtDate(finSession), "Appréciations des parties prenantes (IND 30)", `Synthèse des questionnaires à chaud de la session du ${formatDate((f.dateDebut || "").slice(0, 10))} au ${formatDate((f.dateFin || "").slice(0, 10))}`, "Contenus ou animation inadaptés non détectés", "Analyse de la synthèse en réunion pédagogique ; mise à jour des supports sur les points les moins bien notés", o.responsablePedagogique || o.dirigeant, "10 jours ouvrés après la session", fmtDate(analyse > today ? today : analyse), "Clôturé — synthèse des appréciations et compte rendu de réunion pédagogique"]);
+    lignes.push(["AC-S01", fmtDate(finSession), "Appréciations des parties prenantes (IND 30)", `Synthèse des questionnaires à chaud de la session du ${formatDate((f.dateDebut || "").slice(0, 10))} au ${formatDate((f.dateFin || "").slice(0, 10))}`, "Contenus ou animation inadaptés non détectés", seulAC ? "Analyse de la synthèse par le formateur (seul intervenant) ; mise à jour des supports sur les points les moins bien notés" : "Analyse de la synthèse en réunion pédagogique ; mise à jour des supports sur les points les moins bien notés", o.responsablePedagogique || o.dirigeant, "10 jours ouvrés après la session", fmtDate(analyse > today ? today : analyse), seulAC ? "Clôturé — synthèse des appréciations analysée" : "Clôturé — synthèse des appréciations et compte rendu de réunion pédagogique"]);
   }
   // Plan de développement des compétences (IND 22) : actions prioritaires.
+  // Une formation déjà suivie avant la V1 (avant la création de l'organisme) n'est pas une action
+  // ouverte par l'organisme : elle est datée de ses vraies dates et marquée « à titre personnel ».
+  const izi = formationsIziRealisees(o);
   planDevActions(o, f, SAMPLE_FORMATEURS, stagiaires).filter((a) => a.priorite === "Haute").slice(0, 3).forEach((a, i) => {
-    lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, dateRisques, "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, a.periode, "", typeAud === "initial" ? "Prévue — attestation à joindre" : "Voir le bilan de réalisation du plan (IND 22)"]);
+    const reel = a.realisee ? izi.find((fi) => fi.nom === a.nom) : undefined;
+    const avantV1 = !!reel && !!o.dateMaj && reel.debut < o.dateMaj;
+    if (reel) {
+      lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, formatDate(reel.debut), "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, formatDate(reel.fin), formatDate(reel.fin),
+        avantV1 ? `Réalisée — suivie à titre personnel par ${a.beneficiaires} avant la création de ${o.nom} ; attestation jointe` : "Réalisée — attestation de fin de formation jointe"]);
+      return;
+    }
+    lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, dateMajFr, "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, a.periode, "", typeAud === "initial" ? "Prévue — attestation à joindre" : "Voir le bilan de réalisation du plan (IND 22)"]);
   });
   if (typeAud !== "initial") {
     lignes.push(["AC-RD01", dateRD, `Revue de direction (${LIBELLES_AUDIT[typeAud]})`, "Revue annuelle des résultats, appréciations, réclamations, veille et risques", "Tous risques de la cartographie", typeAud === "renouvellement" ? "Bilan du cycle de certification et mise à jour de l'analyse des risques" : "Mise à jour des indicateurs publiés et de l'analyse des risques", o.dirigeant, dateRD, dateRD, "Clôturé — compte rendu de revue de direction (IND 32)"]);
@@ -11617,40 +11745,87 @@ function genSuiviDysfonctionnementsExcel(o: OrganismeInfo, f: FormationInfo, sta
 }
 
 function genRelancesAppreciationsExcel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  // Une ligne par stagiaire : questionnaire à chaud envoyé le dernier jour de formation, à froid
+  // 3 mois après (même date que le bilan à froid). Réception renseignée seulement si le
+  // questionnaire figure au dossier ; aucune relance inventée.
+  const isoFin = (s: StagiaireInfo) => {
+    const d = String(getStagiaireDateFin(s, f) || "").trim();
+    const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    return m ? `${m[3]}-${m[2]}-${m[1]}` : d.slice(0, 10);
+  };
+  const fr = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : "");
+  const plus3Mois = (iso: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
+    const [a, m, j] = iso.split("-").map(Number);
+    const d = new Date(Date.UTC(a, m - 1 + 3, j));
+    if (d.getUTCDate() !== j) d.setUTCDate(0);
+    return d.toISOString().slice(0, 10);
+  };
+  const auj = new Date().toISOString().slice(0, 10);
   let xlsHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Relances</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse">
-<tr><td colspan="10" style="font-size:14pt;font-weight:bold;color:#1e3a7b;border:none">TABLEAU DE RELANCES DES APPRÉCIATIONS</td></tr>
-<tr><td colspan="10" style="font-size:11pt;border:none">${f.intitule}</td></tr>
+<tr><td colspan="13" style="font-size:14pt;font-weight:bold;color:#1e3a7b;border:none">TABLEAU DE RELANCES DES APPRÉCIATIONS</td></tr>
+<tr><td colspan="13" style="font-size:11pt;border:none">${f.intitule}</td></tr>
 <tr style="background:#1e3a7b;color:#fff;font-weight:bold">
   <th rowspan="2">Date de l'action de formation</th>
   <th rowspan="2">Action de formation</th>
   <th colspan="4">Contact</th>
-  <th rowspan="2">Date d'envoi</th>
-  <th rowspan="2">Date de réception</th>
+  <th colspan="2">Questionnaire à chaud</th>
+  <th colspan="2">Questionnaire à froid</th>
   <th rowspan="2">Date de relance à 7 jours</th>
+  <th rowspan="2">Statut</th>
   <th rowspan="2">COMMENTAIRES</th>
 </tr>
 <tr style="background:#1e3a7b;color:#fff;font-weight:bold">
-  <th>Raison sociale</th><th>Identité</th><th>Email</th><th>Tel</th>
+  <th>Raison sociale</th><th>Identité</th><th>Email</th><th>Tel</th><th>Date d'envoi</th><th>Date de réception</th><th>Date d'envoi</th><th>Date de réception</th>
 </tr>`;
-
-  // Empty rows for manual filling
-  for (let i = 0; i < 15; i++) {
-    xlsHtml += `<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
-  }
-
+  stagiaires.forEach((s) => {
+    const fin = isoFin(s);
+    const debut = String(getStagiaireDateDebut(s, f) || "").trim();
+    const froid = plus3Mois(fin);
+    const chaudRecu = !!fin && fin <= auj && isStagiaireFormationTerminee(s, f);
+    const froidEnvoye = !!froid && froid <= auj;
+    const froidRecu = froidEnvoye && isBilanFroidDisponible(fin); // bilan à froid rempli au dossier (même règle)
+    const statut = froidRecu ? "Clôturé — questionnaires à chaud et à froid reçus" : chaudRecu ? (froidEnvoye ? "Questionnaire à froid envoyé — réponse attendue" : `Questionnaire à froid prévu le ${fr(froid)}`) : "Session non terminée";
+    const cells = [
+      `${fr(/^\d{4}-\d{2}-\d{2}/.test(debut) ? debut.slice(0, 10) : "") || debut} – ${fr(fin)}`,
+      f.intitule,
+      (s.entreprise || "").trim() || "Particulier",
+      `${s.civilite ? `${s.civilite} ` : ""}${s.prenom || ""} ${s.nom || ""}`.trim(),
+      s.email || "",
+      s.telephone || "",
+      chaudRecu ? fr(fin) : "",
+      chaudRecu ? fr(fin) : "",
+      froidEnvoye ? fr(froid) : "",
+      froidRecu ? fr(froid) : "",
+      "",
+      statut,
+      froidRecu || (chaudRecu && !froidEnvoye) ? "Aucune relance nécessaire" : chaudRecu ? "Relance à 7 jours sans réponse" : "",
+    ];
+    xlsHtml += `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
+  });
   xlsHtml += `</table></body></html>`;
   return xlsHtml;
 }
 
-function genProcedureAmeliorationContinue(o: OrganismeInfo) {
+function genProcedureAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  // Organisme sans salarié (dirigeant seul intervenant) : ni « relais qualité », ni « personnel », ni « duos de formateurs ».
+  const seul = intervenantUnique(o, f, stagiaires);
+  const refQ = (o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "").trim();
+  const suiviPar = seul
+    ? `par le dirigeant${refQ && refQ !== (o.dirigeant || "").trim() ? `, avec l'appui du référent qualité (${refQ})` : ""}`
+    : `par le référent qualité${refQ ? ` (${refQ})` : ""}`;
+  const suggestions = seul ? "des propositions du référent qualité et des retours des stagiaires" : "suggestions du personnel";
+  const exemplePreventif = seul
+    ? "l'action préventive aurait pu être l'identification préalable d'un formateur remplaçant qualifié, mobilisable par contrat de sous-traitance en cas d'indisponibilité du dirigeant-formateur."
+    : "l'action préventive aurait pu être la création de duos de formateurs pouvant pallier les absences de l'un ou de l'autre.";
   return buildDocument({ org: o, title: "PROCÉDURE AMÉLIORATION CONTINUE", sections: [
-    { heading: "1. Objet de la procédure", content: `<p>Cette procédure a pour objet de définir et détecter les dysfonctionnements liés aux prestations de formation ou au système qualité de l'organisme.</p><p>Suite à la détection des dysfonctionnements, une analyse des causes doit permettre de définir les actions correctives et/ou préventives à mettre en œuvre. Les actions correctives et préventives sont ensuite suivies dans leur mise en œuvre et leur efficacité par le relais qualité. Les actions d'amélioration peuvent également être issues de suggestions du personnel.</p>` },
+    { heading: "1. Objet de la procédure", content: `<p>Cette procédure a pour objet de définir et détecter les dysfonctionnements liés aux prestations de formation ou au système qualité de l'organisme.</p><p>Suite à la détection des dysfonctionnements, une analyse des causes doit permettre de définir les actions correctives et/ou préventives à mettre en œuvre. Les actions correctives et préventives sont ensuite suivies dans leur mise en œuvre et leur efficacité ${suiviPar}. Les actions d'amélioration peuvent également être issues ${seul ? "" : "de "}${suggestions}.</p>` },
     { heading: "2. Exigences couvertes par la procédure", content: `<p>Référentiel National Qualité :</p><ul><li>Critère 7 : indicateurs 31, 32</li><li>Critère 6 : indicateurs 23, 24, 25</li></ul>` },
     { heading: "3. Principaux documents associés", content: `<ul><li>Fichier Excel « Tableau d'amélioration continue »</li><li>Fichier Excel « Réclamations et dysfonctionnements »</li><li>Enquête de satisfaction à chaud</li><li>Enquête de satisfaction à froid</li><li>Veille (innovation/métier/réglementaire)</li><li>Questionnaire parties prenantes</li></ul>` },
-    { heading: "4. Définitions relatives à l'activité décrite", content: `<p><strong>Dysfonctionnement/Réclamation :</strong> non satisfaction d'une exigence ou d'un engagement de l'organisme. Ces engagements concernent les exigences externes (légales, demandes des clients, cahier des charges, exigence normative) ou internes (engagement des organismes, objectifs, disposition des procédures…).</p><p><strong>Action corrective :</strong> après analyse, action visant à éliminer, non plus le dysfonctionnement, mais la ou les causes du dysfonctionnement. Exemple : on définit une personne ressource pouvant remplacer le formateur absent pour l'avenir.</p><p><strong>Action préventive :</strong> action visant à éliminer la cause d'un dysfonctionnement potentiel, avant que celui-ci ne se soit produit. Exemple : l'action préventive aurait pu être la création de duos de formateurs pouvant pallier les absences de l'un ou de l'autre.</p>` },
-    { heading: "5. Procédure", content: `<p>Cette procédure vise à positionner l'organisme de formation ${o.nom} dans une démarche d'amélioration continue pour l'ensemble de son fonctionnement.</p><p>Les sources d'amélioration comprennent :</p><ul><li>Les réclamations et aléas signalés par les stagiaires, entreprises ou financeurs</li><li>Les résultats des enquêtes de satisfaction (à chaud et à froid)</li><li>Les retours des formateurs (compte-rendu de formation)</li><li>Les résultats des veilles réglementaire, métier et technologique</li><li>Les audits internes et externes</li><li>Les entretiens avec le personnel</li></ul><p>Chaque action d'amélioration est tracée dans le tableau d'amélioration continue avec : la date d'ouverture, l'origine, la description, l'action décidée, le responsable, le délai, la date de clôture et les commentaires.</p>` },
+    { heading: "4. Définitions relatives à l'activité décrite", content: `<p><strong>Dysfonctionnement/Réclamation :</strong> non satisfaction d'une exigence ou d'un engagement de l'organisme. Ces engagements concernent les exigences externes (légales, demandes des clients, cahier des charges, exigence normative) ou internes (engagement des organismes, objectifs, disposition des procédures…).</p><p><strong>Action corrective :</strong> après analyse, action visant à éliminer, non plus le dysfonctionnement, mais la ou les causes du dysfonctionnement. Exemple : on définit une personne ressource pouvant remplacer le formateur absent pour l'avenir.</p><p><strong>Action préventive :</strong> action visant à éliminer la cause d'un dysfonctionnement potentiel, avant que celui-ci ne se soit produit. Exemple : ${exemplePreventif}</p>` },
+    { heading: "5. Procédure", content: `<p>Cette procédure vise à positionner l'organisme de formation ${o.nom} dans une démarche d'amélioration continue pour l'ensemble de son fonctionnement.</p><p>Les sources d'amélioration comprennent :</p><ul><li>Les réclamations et aléas signalés par les stagiaires, entreprises ou financeurs</li><li>Les résultats des enquêtes de satisfaction (à chaud et à froid)</li><li>Les retours des formateurs (compte-rendu de formation)</li><li>Les résultats des veilles réglementaire, métier et technologique</li><li>Les audits internes et externes</li><li>${seul ? "La revue annuelle des compétences du dirigeant" : "Les entretiens avec le personnel"}</li></ul><p>Chaque action d'amélioration est tracée dans le tableau d'amélioration continue avec : la date d'ouverture, l'origine, la description, l'action décidée, le responsable, le délai, la date de clôture et les commentaires.</p>` },
   ] });
 }
 
@@ -12075,6 +12250,10 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     [0,0,0,0,0,0,0,0,0,1,0,0],
   ];
   const pat = patterns[si % patterns.length];
+  // Critères sans objet : conditions matérielles (salle) pour une formation 100 % à distance.
+  const distChaud = /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || "");
+  const nonConcerne = (label: string) => distChaud && label === "Conditions matérielles";
+  const libellePublic = (o.typesActions || []).includes("apprentissage") ? "L'apprenti(e)" : "Le stagiaire";
 
   const dateFin = getStagiaireDateFin(s, f);
   let extra = '';
@@ -12083,26 +12262,28 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   }
   extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
-    <tr><td><strong>L'apprenti(e) :</strong></td><td>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
+    <tr><td><strong>${libellePublic} :</strong></td><td>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
     <tr><td><strong>Formation :</strong></td><td>${f.intitule}</td></tr>
     <tr><td><strong>Formateur :</strong></td><td>${f.formateur}</td></tr>
   </table>`;
 
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr></thead><tbody>`;
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Non concerné</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
-    if (termine) {
+    if (nonConcerne(label)) {
+      extra += `<tr><td>${label} (formation à distance)</td><td style="text-align:center;font-weight:700">${termine ? "X" : ""}</td><td></td><td></td><td></td><td></td></tr>`;
+    } else if (termine) {
       const n = pat[idx];
-      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+      extra += `<tr><td>${label}</td><td></td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
     } else {
-      extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td></tr>`;
+      extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td><td></td></tr>`;
     }
   });
   extra += `</tbody></table>`;
 
   if (termine) {
     // commentaire unique par stagiaire (voir satisfactionComments.ts)
-    extra += `<p><strong>Commentaire :</strong> ${commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud")}</p>`;
+    extra += `<p><strong>Commentaire :</strong> ${commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud", { seul: stagiaires.length === 1, distanciel: distChaud, sansEntreprise: !(s.entreprise || "").trim() })}</p>`;
   } else {
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
   }
@@ -12132,6 +12313,10 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     return r < 0.55 ? 4 : 3;
   };
 
+  // Items sans objet : aide au financement si autofinancement, confort / équipement des locaux si 100 % à distance.
+  const distQ = /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || "");
+  const autofinance = /particulier|personnel|fonds propres|autofinanc|auto-financ/i.test(s.financeur || "");
+  const ncQ = (label: string) => (autofinance && /dossier de financement/.test(label)) || (distQ && /Confort et équipement/.test(label));
   const criteresLabels: [string, boolean][] = [
     ["1. Avant l'entrée en formation", true],
     ["Échanges avec le conseiller formation, le formateur", false],
@@ -12150,7 +12335,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     ["D'actualiser vos connaissances ?", false],
     ["D'acquérir des compétences nouvelles ?", false],
     ["De repérer des points faibles à combler ?", false],
-    ["De mieux appréhender votre rôle dans l'entreprise ?", false],
+    [(s.entreprise || "").trim() ? "De mieux appréhender votre rôle dans l'entreprise ?" : "De mieux préparer votre projet professionnel ?", false],
     ["La mise en pratique vous paraît-elle facile ?", false],
     ["Le programme était-il suffisant pour répondre à vos besoins ?", false],
   ];
@@ -12160,7 +12345,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     if (isHeader) {
       extra += `<tr style="background:#e8edf5;font-weight:bold"><td colspan="6">${label}</td></tr>`;
     } else if (termine) {
-      const note = generateNote();
+      const note = ncQ(label) ? (generateNote(), 0) : generateNote();
       extra += `<tr><td>${label}</td><td>${note === 0 ? 'X' : ''}</td><td>${note === 1 ? 'X' : ''}</td><td>${note === 2 ? 'X' : ''}</td><td>${note === 3 ? 'X' : ''}</td><td>${note === 4 ? 'X' : ''}</td></tr>`;
     } else {
       extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td><td></td></tr>`;
@@ -12173,8 +12358,12 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     const globalNote = globalNotes[si % globalNotes.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td>${globalNote === '7/10' ? 'X' : ''}</td><td>${['10/10', '9/10', '8/10'].includes(globalNote) ? 'X' : ''}</td></tr></table>`;
 
-    // commentaire unique par stagiaire (voir satisfactionComments.ts)
-    extra += `<p><strong>Commentaire :</strong> ${commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud")}</p>`;
+    // Commentaire propre au questionnaire : jamais la copie mot pour mot de celui du bilan à chaud.
+    const ctxCom = { seul: stagiaires.length === 1, distanciel: distQ, sansEntreprise: !(s.entreprise || "").trim() };
+    const comChaud = commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud", ctxCom);
+    let comQ = commentaireSatisfaction(`${s.prenom} ${s.nom}|questionnaire`, si, "chaud", ctxCom);
+    for (let k = 1; comQ === comChaud && k < 10; k++) comQ = commentaireSatisfaction(`${s.prenom} ${s.nom}|questionnaire`, si + k, "chaud", ctxCom);
+    extra += `<p><strong>Commentaire :</strong> ${comQ}</p>`;
   } else {
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td></td><td></td></tr></table>`;
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
@@ -12922,7 +13111,15 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 
   // Indicateurs issus des données saisies (plus de taux calculés « 80 + 3n % »).
   const tauxPresence = (f.tauxAssiduite || "").trim() ? `${String(f.tauxAssiduite).replace(/\s*%$/, "")} %` : "Selon les émargements joints (IND 11)";
-  const tauxReussite = "Selon les examens finaux et grilles d'acquisition joints (IND 11)";
+  // Taux de réussite : seulement s'il est calculable (admis / présentés saisis), sinon la ligne est retirée.
+  const obtention = getTauxObtention(f);
+  const tauxReussite = obtention ? `${obtention.taux} % (${obtention.admis} admis sur ${obtention.presentes} présentés)` : "";
+  // Incidents : même source que le suivi des dysfonctionnements (IND 31).
+  const alea = aleaSession(f);
+  const nbIncidents = nombreIncidents(f);
+  // Accords au nombre réel de stagiaires.
+  const un = nbStagiairesFormateur === 1;
+  const lesStag = un ? "le stagiaire" : "les stagiaires";
 
   let extra = `
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -12935,7 +13132,7 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 </table>
 
 <h3>1. Déroulement général de la formation</h3>
-<p>La formation <strong>${f.intitule}</strong> s'est déroulée conformément au programme prévu. L'ensemble des objectifs pédagogiques a été couvert dans le temps imparti. Les stagiaires ont fait preuve d'implication et de motivation tout au long de la formation.</p>
+<p>La formation <strong>${f.intitule}</strong> s'est déroulée conformément au programme prévu. L'ensemble des objectifs pédagogiques a été couvert dans le temps imparti. ${un ? "Le stagiaire a fait preuve" : "Les stagiaires ont fait preuve"} d'implication et de motivation tout au long de la formation.</p>
 
 <h3>2. Objectifs pédagogiques atteints</h3>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -12959,31 +13156,31 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 <h3>3. Indicateurs quantitatifs</h3>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td><strong>Taux de présence</strong></td><td>${tauxPresence}</td></tr>
-<tr><td><strong>Taux de réussite aux évaluations</strong></td><td>${tauxReussite}</td></tr>
+${tauxReussite ? `<tr><td><strong>Taux de réussite aux évaluations</strong></td><td>${tauxReussite}</td></tr>` : ""}
 <tr><td><strong>Nombre d'abandons</strong></td><td>0</td></tr>
-<tr><td><strong>Nombre d'incidents</strong></td><td>0</td></tr>
+<tr><td><strong>Nombre d'incidents</strong></td><td>${nbIncidents}${alea ? ` (${alea.date} : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} — ${alea.ref}, voir le suivi des dysfonctionnements)` : ""}</td></tr>
 </table>
 
 <h3>4. Difficultés rencontrées</h3>
-<p>Aucune difficulté majeure n'a été rencontrée. L'hétérogénéité des niveaux initiaux a nécessité une adaptation ponctuelle du rythme et des exercices complémentaires pour les participants les plus avancés.</p>
+<p>${alea ? `Une difficulté a été rencontrée : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} (${alea.date}). Action corrective : ${alea.action.charAt(0).toLowerCase()}${alea.action.slice(1)}.` : "Aucune difficulté majeure n'a été rencontrée."} ${un ? "Le rythme et les exercices ont été adaptés au niveau du stagiaire, mesuré au test de positionnement." : "L'hétérogénéité des niveaux initiaux a nécessité une adaptation ponctuelle du rythme et des exercices complémentaires pour les participants les plus avancés."}</p>
 
 <h3>5. Points forts de la formation</h3>
 <ul>
-<li>Bonne dynamique de groupe et participation active</li>
+<li>${un ? "Participation active du stagiaire et suivi individualisé" : "Bonne dynamique de groupe et participation active"}</li>
 <li>Exercices pratiques en lien direct avec les situations professionnelles</li>
 <li>Supports pédagogiques clairs et bien structurés</li>
-<li>Alternance théorie/pratique appréciée par les stagiaires</li>
+<li>Alternance théorie/pratique appréciée par ${lesStag}</li>
 </ul>
 
 <h3>6. Axes d'amélioration identifiés</h3>
 <ul>
 <li>Prévoir davantage de temps pour les cas pratiques</li>
-<li>Approfondir certains modules selon le niveau du groupe</li>
+<li>${un ? "Approfondir certains modules selon le niveau du stagiaire" : "Approfondir certains modules selon le niveau du groupe"}</li>
 <li>Enrichir les supports avec des fiches mémo à emporter</li>
 </ul>
 
 <h3>7. Recommandations</h3>
-<p>Il est recommandé de maintenir un suivi post-formation (bilan à froid) afin de mesurer l'impact des acquis à moyen terme. Un module complémentaire pourrait être proposé aux stagiaires souhaitant approfondir certains aspects.</p>
+<p>Il est recommandé de maintenir un suivi post-formation (bilan à froid) afin de mesurer l'impact des acquis à moyen terme. Un module complémentaire pourrait être proposé ${un ? "au stagiaire s'il souhaite" : "aux stagiaires souhaitant"} approfondir certains aspects.</p>
 
 <div style="margin-top:30px;display:flex;justify-content:space-between">
   <div style="text-align:center;width:45%">

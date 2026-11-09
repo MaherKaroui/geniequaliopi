@@ -2,6 +2,7 @@ import { joursFeriesDeLAnnee } from "./joursFeries";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
+import { tarifNetDeTaxe } from "./sessionTextes";
 
 /** Return telephone string only if non-empty, otherwise "" */
 export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
@@ -931,7 +932,8 @@ export function formationInfoBlockStagiaire(f: FormationInfo, s: StagiaireInfo):
     "Lieu": f.lieu,
     "Modalités": f.modalites,
     "Formateur": f.formateur,
-    "Tarif": getStagiaireTarif(s, f),
+    // « TTC » sans objet quand le tarif saisi est exonéré de TVA : « net de taxe », mention unique.
+    "Tarif": tarifNetDeTaxe(getStagiaireTarif(s, f)),
   });
 }
 
@@ -954,7 +956,7 @@ export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[
   items["Lieu"] = f.lieu;
   items["Modalités"] = f.modalites;
   items["Formateur"] = f.formateur;
-  items["Tarif"] = getDisplayTarif(f, stagiaires);
+  items["Tarif"] = tarifNetDeTaxe(getDisplayTarif(f, stagiaires));
   return infoGrid(items);
 }
 
