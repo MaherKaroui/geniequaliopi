@@ -5,7 +5,7 @@ import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genC
 import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
 import { mot } from "./resolveurFormation";
-import { resolveFormation, financeursEffectifs } from "./formationResolue";
+import { resolveFormation, financeursEffectifs, estCertifiante } from "./formationResolue";
 import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14MissionsCFA, genPlanAnnuel14MissionsCFA, genProcedureAccompagnementSocialCFA, genProcedureEvaluationCompetencesCFA } from "./missionsCFA2026";
 import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2026, genInformationDroitsDevoirsSST2026, genTableauCandidatsSansContrat2026 } from "./missionsCFA2026Plans";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
@@ -4829,7 +4829,7 @@ function genIndicateursPerformance(o: OrganismeInfo, formations: FormationInfo[]
     ["Taux de satisfaction", satisfaction || NON_COLLECTE],
     ["Taux d'assiduité", assiduite || NON_COLLECTE],
     ["Nombre de stagiaires formés", nbFormes || (repartition.length ? String(repartition.reduce((a, r) => a + r.total, 0)) : NON_COLLECTE)],
-    ["Taux d'obtention de la certification", obtention ? `${obtention.taux} % (${obtention.admis}/${obtention.presentes})` : "Non disponible"],
+    ["Taux d'obtention de la certification", obtention ? `${obtention.taux} % (${obtention.admis}/${obtention.presentes})` : (estCertifiante(f) ? "Aucun résultat de certification à ce jour" : "Non applicable (formation non certifiante)")],
   ];
   tableHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:11px;margin-top:8px">
     <tr style="background:#1e3a7b;color:#fff"><th style="width:60%">Indicateur${(f?.anneeIndicateurs || "").trim() ? ` – ${f!.anneeIndicateurs}` : ""}</th><th>Résultat</th></tr>
@@ -4839,7 +4839,6 @@ function genIndicateursPerformance(o: OrganismeInfo, formations: FormationInfo[]
   if (commentaire) {
     tableHtml += `<p style="margin-top:12px">${commentaire}</p>`;
   }
-  tableHtml += `<p style="margin-top:12px;font-style:italic;color:#666">⚠️ Ce document est généré au format Excel (.xls) dans le dossier ZIP exporté.</p>`;
 
   return buildDocument({ org: o, title: `TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${anneeTitre}`, extraHtml: tableHtml });
 }
