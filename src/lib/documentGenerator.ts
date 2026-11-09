@@ -314,10 +314,13 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   let f = formations[fi] || formations[0];
   const fmt = formateurs[params?.formateurIdx ?? 0];
 
-  // Override formateur from stagiaire's assigned formateur if available
+  // Le formateur saisi dans le formulaire Formation est prioritaire (émargements,
+  // contrats, évaluations…). Le formateur rattaché au stagiaire (import EDOF,
+  // données d'exemple, IZILearn) ne sert que si le formulaire est vide.
+  const formateurSaisi = (userFormation?.formateur || "").trim();
   const si = params?.stagiaireIdx ?? 0;
   const targetStagiaire = stagiaires[si] || stagiaires[0];
-  if (targetStagiaire?.formateur && targetStagiaire.formateur.trim()) {
+  if (!formateurSaisi && targetStagiaire?.formateur && targetStagiaire.formateur.trim()) {
     f = { ...f, formateur: targetStagiaire.formateur };
   }
   // Override formateur signature from stagiaire's formateurSignatureUrl if available
@@ -801,7 +804,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
         if (stagiaireForDoc.length === 0) stagiaireForDoc = stagiaires;
       } else if (typeof params?.stagiaireIdx === "number" && stagiaires[params.stagiaireIdx]) {
         const s = stagiaires[params.stagiaireIdx];
-        if (s.formateur && s.formateur.trim()) formateurName = s.formateur;
+        if (!params?.formateurNom && !formateurSaisi && s.formateur && s.formateur.trim()) formateurName = s.formateur;
         stagiaireForDoc = [s];
       }
       const parts = formateurName.trim().split(/\s+/);
