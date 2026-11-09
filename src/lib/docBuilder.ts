@@ -1143,7 +1143,11 @@ export function footer(org: OrganismeInfo): string {
   const certif = (org.organismeCertificateur || "").trim();
   const finVal = (org.dateFinValiditeQualiopi || "").trim();
   let qualiopiLine = "";
-  if (numQ) {
+  // Une pièce antérieure à l'obtention du certificat ne peut pas en citer le numéro.
+  const obtention = (org.dateObtentionQualiopi || "").trim().slice(0, 10);
+  const datePiece = String((org as any).dateMaj || "").trim().slice(0, 10);
+  const avantCertificat = !!obtention && !!datePiece && datePiece < obtention;
+  if (numQ && !avantCertificat) {
     const finTxt = finVal ? new Date(finVal).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' }) : "";
     qualiopiLine = `<p style="margin:0 0 8px">Certifié Qualiopi n° ${numQ}${certif ? ` délivré par ${certif}` : ""} au titre des actions de formation${finTxt ? ` — valable jusqu'au ${finTxt}` : ""}</p>`;
   }
