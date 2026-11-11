@@ -53,4 +53,20 @@ describe("référentiel Qualiopi V9 / V10", () => {
       expect(hp).toMatch(/registre des signalements/);
     });
   }
+
+  it("V10 : signature du référent qualité = celle du dirigeant s'il s'agit de la même personne, sinon celle du formulaire", () => {
+    const f = FORMATIONS_TEST["actions-formation"];
+    const SIG_DIR = "data:image/png;base64,SIGDIRIGEANT", SIG_RQ = "data:image/png;base64,SIGREFQUALITE";
+    const base = { ...ORG_TEST, typesActions: ["actions-formation" as const], typeAudit: "initial" as const, signatureUrl: SIG_DIR, tamponUrl: "" };
+    const note = (o: typeof base & Record<string, unknown>) => {
+      const d = getFullCatalog(o, f, STAGIAIRES_TEST).find((x) => x.template === "v10_note_veille")!;
+      return generateDocumentById(d.id, d.template, d.params, o, f, STAGIAIRES_TEST);
+    };
+    const meme = { ...base, dirigeant: "Valentin PROVENIER", referentQualite: "PROVENIER Valentin" };
+    expect(note(meme)).toContain(SIG_DIR);
+    const autre = { ...base, dirigeant: "Valentin PROVENIER", referentQualite: "Inès MARCHAND", referentQualiteSignatureUrl: SIG_RQ };
+    const h = note(autre);
+    expect(h).toContain(SIG_RQ);
+    expect(h).not.toContain(SIG_DIR);
+  });
 });

@@ -71,6 +71,8 @@ export interface OrganismeInfo {
    * (audit initial), V9 pour la surveillance et le renouvellement (période transitoire).
    */
   referentielQualiopi?: "auto" | "V9" | "V10";
+  /** Signature du référent qualité lorsqu'il n'est pas le dirigeant (guide V10). */
+  referentQualiteSignatureUrl?: string;
   /**
    * Siège précédent (transfert de siège) : les pièces datées avant `jusquAu` portent
    * cette adresse, ce SIRET et ce tampon, et non ceux du siège actuel.

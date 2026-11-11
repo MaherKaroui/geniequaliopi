@@ -1,4 +1,5 @@
 import { joursFeriesDeLAnnee } from "./joursFeries";
+import { versionReferentiel } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
@@ -990,8 +991,22 @@ function tamponImg(url: string | undefined): string {
 
 /** Tampon du référent qualité externe (FD CERTIF EXPERT), déterminé par l'en-tête du document. */
 let tamponReferentQualite: string | undefined;
-export function setReferentQualiteTampon(org: Pick<OrganismeInfo, "referentQualite"> | undefined) {
+/** Guide V10 : signature du référent qualité interne (null = règle par défaut, ligne vide). */
+let signatureReferentQualite: string | null = null;
+const nomCle = (n?: string) => (n || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().split(/[\s-]+/).filter(Boolean).sort().join(" ");
+/** Le référent qualité est-il le dirigeant (même nom, casse, accents et ordre prénom / nom ignorés) ? */
+export function referentQualiteEstDirigeant(o?: Partial<Pick<OrganismeInfo, "referentQualite" | "dirigeant">> | null): boolean {
+  const rq = nomCle(o?.referentQualite);
+  return !!rq && rq === nomCle(o?.dirigeant);
+}
+export function setReferentQualiteTampon(org: Partial<OrganismeInfo> | undefined) {
   tamponReferentQualite = /fd\s*certif/i.test(org?.referentQualite || "") ? "/images/FD_CERTIF_TAMPON.png" : undefined;
+  signatureReferentQualite = null;
+  if (!org || tamponReferentQualite || versionReferentiel(org) !== "V10") return;
+  // Même personne que le dirigeant : sa signature (à défaut son tampon) ; sinon la signature saisie dans le formulaire organisme.
+  signatureReferentQualite = referentQualiteEstDirigeant(org)
+    ? (sigImg(org.signatureUrl, "Signature référent qualité") || tamponImg(org.tamponUrl))
+    : sigImg(org.referentQualiteSignatureUrl, "Signature référent qualité");
 }
 
 /** Dirigeant : tampon seul s'il existe, sinon signature — jamais les deux. */
@@ -1014,6 +1029,9 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   // Référent qualité externe FD CERTIF EXPERT : son tampon (sauf libellé combiné avec le dirigeant).
   if (/qualit/.test(l) && !/dirigeant|directeur/.test(l) && (tamponReferentQualite || /fd\s*certif/i.test(nom))) {
     return tamponImg(tamponReferentQualite || "/images/FD_CERTIF_TAMPON.png");
+  }
+  if (/qualit/.test(l) && !/dirigeant|directeur/.test(l) && signatureReferentQualite) {
+    return signatureReferentQualite;
   }
   // Specific CFA Conseil de Perfectionnement overrides
   if (l.includes('directeur du cfa')) {
