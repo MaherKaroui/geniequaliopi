@@ -13,6 +13,8 @@ import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
 import { seedCOH21AICaches } from "@/lib/cohesionEquipe21hPreset";
 import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
 import { seedDRI47AICaches } from "@/lib/droitInstitutions47hPreset";
+import { isFPA45Formation } from "@/lib/fpa45hHumanized";
+import { seedFPA45AICaches } from "@/lib/fpa45hPreset";
 import { isLRBFormation } from "@/lib/robertRS7013Humanized";
 import { seedLRBAICaches } from "@/lib/robertRS7013Preset";
 import { getCachedContentPack } from "@/lib/aiContentPack";
@@ -182,6 +184,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // Enseignement : fondamentaux du droit et des institutions : même rechargement des packs du preset.
     if (d.formation && isDRI47Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedDRI47AICaches(d.formation);
+    }
+    // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : même rechargement des packs du preset.
+    if (d.formation && isFPA45Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedFPA45AICaches(d.formation);
     }
     // Préparation à la Certification Le Robert (RS7013) : même rechargement des packs du preset.
     if (d.formation && isLRBFormation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {

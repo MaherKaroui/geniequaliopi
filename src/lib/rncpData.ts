@@ -2144,6 +2144,86 @@ export const RNCP_FICHES: RNCPFiche[] = [
     ],
     dureeIndicative: "Parcours par apprentissage de 420 h au CFA sur 12 mois (1 semaine au CFA / 3 semaines en entreprise). Épreuve du titre : mise en situation professionnelle de 3 h 30, entretien technique de 30 min et entretien final de 20 min (4 h 20), sur la base du dossier professionnel et des résultats des évaluations passées en cours de formation ; titre obtenu en totalité ou par CCP.",
   },
+  {
+    code: "RNCP37275",
+    intitule: "TP - Formateur professionnel d'adultes",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION (SIRET 11000007200014)",
+    dateEnregistrement: "29/04/2023",
+    dateEcheance: "29/04/2028",
+    codeNSF: "333 – Enseignement, formation",
+    formacodes: "",
+    resume: "Le formateur professionnel d'adultes conçoit et prépare des formations multimodales à partir d'une demande, les anime et évalue les acquis des apprenants, accompagne les apprenants dans leur parcours, y compris à distance, et inscrit sa pratique dans une démarche de qualité et de responsabilité sociale des entreprises. Titre professionnel de niveau 5 délivré par le ministère chargé de l'emploi, composé de 4 CCP capitalisables ; il remplace la fiche RNCP247 (parcours certifiants depuis le 29/04/2023). Le titre est aussi accessible par la validation des acquis de l'expérience.",
+    activitesVisees: "Élaboration de la progression pédagogique d'une formation multimodale à partir d'une demande ; conception de scénarios pédagogiques et d'accompagnement ; conception d'activités d'apprentissage et d'évaluation ; animation de formations selon différentes modalités ; évaluation des acquis et remédiation aux difficultés individuelles ; accueil des apprenants et co-construction de leur parcours ; tutorat à distance ; accompagnement du développement professionnel ; respect de la réglementation en formation et dans sa spécialité ; veille ; analyse de ses pratiques professionnelles.",
+    blocsCompetences: [
+      {
+        titre: "Bloc 1 – RNCP37275BC01 – Concevoir et préparer la formation",
+        competences: [
+          "Élaborer la progression pédagogique d'une formation multimodale à partir d'une demande",
+          "Concevoir un scénario pédagogique et d'accompagnement en intégrant la multimodalité",
+          "Concevoir des activités d'apprentissage et d'évaluation en intégrant la multimodalité",
+        ],
+        matieres: [
+          { competence: "C1 — Situer le métier de formateur, le titre FPA et l'environnement de la formation professionnelle", contenu: "Module 1 — Le métier de formateur d'adultes, le titre FPA et l'environnement de la formation professionnelle (acteurs, financements dont le CPF, obligations de l'organisme, Qualiopi)", volume: "2h" },
+          { competence: "C2 — Concevoir et préparer une formation multimodale", contenu: "Module 2 — CCP 1 : analyse de la demande, objectifs, progression, scénario pédagogique et d'accompagnement, activités d'apprentissage et d'évaluation", volume: "12h" },
+        ],
+        modalitesEval: "Présentation d'un projet réalisé en amont de la session : dossier technique de 8 à 12 pages, oral de 25 min et questionnement de 10 min, soit 35 min.",
+      },
+      {
+        titre: "Bloc 2 – RNCP37275BC02 – Animer une formation et évaluer les acquis des apprenants",
+        competences: [
+          "Animer une formation et faciliter les apprentissages selon différentes modalités",
+          "Évaluer les acquis de formation des apprenants",
+          "Remédier aux difficultés individuelles d'apprentissage",
+        ],
+        matieres: [
+          { competence: "C3 — Animer une formation en présentiel et à distance, évaluer les acquis et remédier", contenu: "Module 3 — CCP 2 : animation en présentiel et en classe virtuelle, gestion de groupe, évaluation diagnostique, formative et sommative, remédiation, cas pratique intermédiaire", volume: "12h" },
+        ],
+        modalitesEval: "Présentation d'un projet réalisé en amont de la session : dossier technique de 5 à 8 pages, oral de 20 min et questionnement de 10 min, soit 30 min.",
+      },
+      {
+        titre: "Bloc 3 – RNCP37275BC03 – Accompagner les apprenants en formation",
+        competences: [
+          "Accompagner les apprenants dans leur parcours de formation",
+          "Accueillir un apprenant en formation et co-construire son parcours",
+          "Tutorer les apprenants à distance",
+          "Accompagner le développement professionnel des apprenants",
+        ],
+        matieres: [
+          { competence: "C4 — Accueillir, co-construire le parcours, tutorer à distance et accompagner le développement professionnel", contenu: "Module 4 — CCP 3 : accueil, entretien de positionnement, contrat pédagogique, handicap et compensation, tutorat à distance, prévention des abandons, développement professionnel", volume: "9h" },
+        ],
+        modalitesEval: "Présentation d'un projet réalisé en amont de la session : dossier technique de 7 à 10 pages, oral de 15 min et questionnement de 10 min, puis entretien technique de 20 min, soit 45 min.",
+      },
+      {
+        titre: "Bloc 4 – RNCP37275BC04 – Inscrire sa pratique professionnelle dans une démarche de qualité et de responsabilité sociale des entreprises",
+        competences: [
+          "Respecter et faire respecter la règlementation en vigueur en formation et dans sa spécialité",
+          "Réaliser une veille pour maintenir son expertise de formateur et de professionnel dans sa spécialité",
+          "Analyser ses pratiques professionnelles",
+        ],
+        matieres: [
+          { competence: "C5 — Inscrire sa pratique dans une démarche de qualité et de RSE", contenu: "Module 5 — CCP 4 : réglementation de la formation, référentiel national qualité, accessibilité et handicap, RGPD, prévention des violences et du harcèlement, veille, analyse de pratique", volume: "7h" },
+          { competence: "C6 — Créer des supports multimodaux et préparer les épreuves du titre", contenu: "Module 6 — Supports et ressources asynchrones (PowerPoint, Canva, Genially, capsule vidéo), dossier professionnel, dossiers techniques, préparation de l'oral devant le jury, évaluation finale interne", volume: "3h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle de 55 min (tirage au sort d'un sujet parmi 6, 45 min de préparation d'une analyse de pratique sur une situation vécue, 10 min d'oral, au début de l'examen) et questionnement à partir de production (dossier technique de 10 à 15 pages, oral de 15 min, questionnement de 10 min), soit 1 h 20.",
+      },
+    ],
+    secteursActivite: "Organismes de formation publics et privés, centres de formation d'apprentis, services formation des entreprises et des administrations, structures d'insertion, activité de formateur indépendant.",
+    typesEmplois: [
+      "Formateur",
+      "Formateur d'adultes",
+      "Formateur professionnel",
+      "Formateur technique",
+      "Formateur consultant",
+    ],
+    codesROME: ["K2111 – Formation professionnelle"],
+    voiesAcces: [
+      "Après un parcours de formation continue",
+      "Par capitalisation des CCP",
+      "Par expérience (VAE)",
+    ],
+    dureeIndicative: "Formation de 45 h préparant aux compétences des 4 CCP (elle ne remplace ni le parcours complet ni la période en entreprise). Session de validation devant un jury de professionnels habilité par le représentant territorial du ministère chargé de l'emploi (DREETS), sur la base du dossier professionnel et des résultats des évaluations passées en cours de formation ; épreuves : CCP 1 35 min, CCP 2 30 min, CCP 3 45 min, CCP 4 1 h 20 ; titre obtenu en totalité ou par CCP (arrêté du 22 décembre 2015 modifié relatif aux conditions de délivrance des titres professionnels).",
+  },
 ];
 
 const isoToFr = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split("-").reverse().join("/") : d);

@@ -30,6 +30,8 @@ import { COH21_EXERCICES_COMPLETS, COH21_QCM_DEBUT, COH21_QCM_FIN } from "./cohe
 import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
 import { isDRI47Formation, getDRI47AutoAnswers, DRI47_QUESTIONS_OUVERTES } from "./droitInstitutions47hHumanized";
+import { FPA45_EXERCICES_COMPLETS, FPA45_QCM_DEBUT, FPA45_QCM_FIN } from "./fpa45hPreset";
+import { isFPA45Formation, getFPA45AutoAnswers, FPA45_QUESTIONS_OUVERTES } from "./fpa45hHumanized";
 import { LRB_EXERCICES_COMPLETS, LRB_QCM_DEBUT, LRB_QCM_FIN } from "./robertRS7013Preset";
 import { isLRBFormation, getLRBAutoAnswers, LRB_QUESTIONS_OUVERTES } from "./robertRS7013Humanized";
 
@@ -1366,6 +1368,30 @@ EVAL_CONTENT["DRI47"] = {
   ],
 };
 
+// ===== Formation de formateur professionnel pour adultes (TP FPA – RNCP37275, 45 h, C1 à C6 = modules 1 à 6) =====
+// Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["FPA45"] = {
+  qcmPositionnement: FPA45_QCM_DEBUT,
+  qcmFinal: FPA45_QCM_FIN,
+  exercices: FPA45_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Situer le métier de formateur, le titre FPA (RNCP37275) et l'environnement de la formation professionnelle",
+    "C2 – Concevoir et préparer une formation multimodale : progression, scénario pédagogique et d'accompagnement, activités d'apprentissage et d'évaluation (CCP 1)",
+    "C3 – Animer une formation en présentiel et à distance, évaluer les acquis et remédier aux difficultés individuelles (CCP 2)",
+    "C4 – Accueillir un apprenant, co-construire son parcours, le tutorer à distance et accompagner son développement professionnel (CCP 3)",
+    "C5 – Inscrire sa pratique dans une démarche de qualité et de RSE : réglementation, accessibilité, veille et analyse de pratique (CCP 4)",
+    "C6 – Créer des supports multimodaux et préparer le dossier professionnel et les épreuves du titre",
+  ],
+  appreciations: [
+    "Objectifs pédagogiques bien formulés avec des verbes d'action ; la progression multimodale reste à équilibrer entre synchrone et asynchrone.",
+    "Scénario pédagogique complet et cohérent ; les modalités d'évaluation sont à relier plus explicitement à chaque objectif.",
+    "Animation dynamique en classe virtuelle, consignes claires ; la gestion du temps et la remédiation individuelle sont à consolider.",
+    "Posture d'accompagnement bienveillante ; le suivi du tutorat à distance gagnerait à être tracé dans un tableau de bord.",
+    "Bonne connaissance du cadre réglementaire et de Qualiopi ; l'analyse de pratique est sincère et à approfondir avec le cycle de Kolb.",
+    "Progression nette depuis le positionnement ; supports accessibles et dossier professionnel bien engagé.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1618,6 +1644,8 @@ function getContentKey(intitule: string): string {
   if (isCOH21Formation(lower)) return "COH21";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
   if (isDRI47Formation(lower)) return "DRI47";
+  // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) — avant toute règle « formateur », « formation », « enseignement »
+  if (isFPA45Formation(lower)) return "FPA45";
   // TP ARH RNCP41366 — avant toute règle « assistant », « paie », « secrétariat » ou « social »
   if (isARH41366Formation(lower)) return "ARH41366";
   // CQP Opérateur vitrage — avant tout autre test (contient "cqp", "automobile", "réparation")
@@ -1817,6 +1845,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isCOH21Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
   if (isDRI47Formation(formationIntitule)) return true;
+  // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : reconnue aussi sous ses variantes d'intitulé
+  if (isFPA45Formation(formationIntitule)) return true;
   return hasExactStaticContent({ intitule: formationIntitule });
 }
 
@@ -1827,6 +1857,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
   if (isDRI47Formation(formationIntitule)) return EVAL_CONTENT["DRI47"];
+  // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : reconnue aussi sous ses variantes d'intitulé
+  if (isFPA45Formation(formationIntitule)) return EVAL_CONTENT["FPA45"];
   if (!hasExactStaticContent({ intitule: formationIntitule })) return DEFAULT_CONTENT;
   const key = getContentKey(formationIntitule);
   return EVAL_CONTENT[key] || DEFAULT_CONTENT;
@@ -2409,6 +2441,9 @@ QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
 // Enseignement : fondamentaux du droit et des institutions — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["DRI47"] = DRI47_QUESTIONS_OUVERTES;
 
+// Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["FPA45"] = FPA45_QUESTIONS_OUVERTES;
+
 // Préparation à la Certification Le Robert (RS7013) — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["LRB"] = LRB_QUESTIONS_OUVERTES;
 
@@ -2864,6 +2899,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoDri.reponses, autoDri.scores);
+  }
+
+  // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : moteur humanisé (une copie différente par stagiaire).
+  if (isFPA45Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoFpa = getFPA45AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoFpa.reponses, autoFpa.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).
