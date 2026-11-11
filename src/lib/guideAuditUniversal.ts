@@ -8,7 +8,7 @@
 // adapté à chaque type d'action.
 
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
+import { typeAuditEffectif, attenduSelonAudit, versionReferentiel, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
 import { generateGuideAuditCFA } from "./guideAuditCFA";
@@ -343,7 +343,7 @@ function generateGuideAutres(
       const preuves = preuvesParIndicateur(ind.numero, type, ind.questionsPreuves);
       const vig = pointVigilance(ind.numero, type);
       html += `<h3 class="ind">Indicateur ${ind.numero} — ${ind.intitule.split(".")[0]} ${tagsHtml}</h3>
-      <div class="lvl"><strong>Niveau attendu :</strong> ${ind.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero)}</em></div>
+      <div class="lvl"><strong>Niveau attendu :</strong> ${ind.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero, versionReferentiel(org))}</em></div>
       <div class="dire"><strong>✅ Ce qu'il faut dire :</strong> « ${script} »</div>
       <p><strong>📁 Documents à présenter</strong></p>
       <ul class="docs">${preuves.map(p => `<li>${p}</li>`).join("")}</ul>

@@ -1,4 +1,4 @@
-import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
+import { typeAuditEffectif, attenduSelonAudit, versionReferentiel, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry, CRITERES_INFO } from "@/types/qualiopi";
 import { baseStyle, formatDate, orgHeader, footer, isFacebookPage } from "./docBuilder";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
@@ -248,7 +248,7 @@ tr:nth-child(even){background:#f8f9fa}
           </div>
           <div class="indicateur-content">
             ${ref ? `<div class="indicateur-intitule">${ref.intitule}</div>` : `<div class="indicateur-intitule">${ind.titre}</div>`}
-            ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero)}</em></div>` : ""}
+            ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}<br><em>${attenduSelonAudit(typeAudit, ind.numero, versionReferentiel(org))}</em></div>` : ""}
 
             <div class="preuves-list">
               <h4>📁 Preuves et documents (${indDocs.length})</h4>

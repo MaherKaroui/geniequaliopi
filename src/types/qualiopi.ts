@@ -67,6 +67,11 @@ export interface OrganismeInfo {
   /** Type d'audit préparé : « auto » (défaut) = déduit du certificat Qualiopi. */
   typeAudit?: "auto" | "initial" | "surveillance" | "renouvellement";
   /**
+   * Version du guide de lecture appliquée : « auto » (défaut) = V10 pour un nouvel entrant
+   * (audit initial), V9 pour la surveillance et le renouvellement (période transitoire).
+   */
+  referentielQualiopi?: "auto" | "V9" | "V10";
+  /**
    * Siège précédent (transfert de siège) : les pièces datées avant `jusquAu` portent
    * cette adresse, ce SIRET et ce tampon, et non ceux du siège actuel.
    */

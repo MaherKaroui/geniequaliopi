@@ -11,7 +11,7 @@ import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type
 import { setDocStyle, setDocRefDate } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { resolveFormation, financeursEffectifs } from "@/lib/formationResolue";
-import { typeAuditEffectif, LIBELLES_AUDIT, type TypeAudit, type TypeAuditSaisi } from "@/lib/typeAudit";
+import { typeAuditEffectif, versionReferentiel, LIBELLES_AUDIT, LIBELLES_REFERENTIEL, type TypeAudit, type TypeAuditSaisi, type VersionReferentiel } from "@/lib/typeAudit";
 import { clientMailOrganisme, nomFichierCapture } from "@/lib/mails/mailsAutomatiques";
 import { isCaptureMailTemplate, resolveCatalogMail } from "@/lib/mails/catalogMail";
 import { captureMail } from "@/lib/mails/captureMail";
@@ -782,6 +782,33 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
     setTypeAuditChoix(v);
     onOrganismeChange?.({ ...organisme, typeAudit: v });
   };
+  // Guide de lecture appliqué : « auto » = V10 pour un nouvel entrant, V9 pour la surveillance et le renouvellement.
+  const [referentielChoix, setReferentielChoix] = useState<"auto" | VersionReferentiel>(organisme.referentielQualiopi || "auto");
+  const setReferentiel = (v: "auto" | VersionReferentiel) => {
+    setReferentielChoix(v);
+    onOrganismeChange?.({ ...organisme, typeAudit: typeAuditChoix, referentielQualiopi: v });
+  };
+  const referentielSelect = (couleur: "blue" | "orange") => (
+    <>
+      <label className={`text-[11px] font-semibold uppercase tracking-wide mt-2 ${couleur === "blue" ? "text-blue-900" : "text-orange-900"}`}>Référentiel Qualiopi</label>
+      <div className="flex gap-1" role="group" aria-label="Version du guide de lecture">
+        {(["auto", "V9", "V10"] as const).map((val) => (
+          <Button
+            key={val}
+            type="button"
+            size="sm"
+            variant={referentielChoix === val ? "default" : "outline"}
+            aria-pressed={referentielChoix === val}
+            onClick={() => setReferentiel(val)}
+            className="h-8 flex-1 text-xs"
+            title={val === "auto" ? "V10 pour un nouvel entrant, V9 pour la surveillance et le renouvellement" : LIBELLES_REFERENTIEL[val]}
+          >
+            {val === "auto" ? `Auto (${versionReferentiel({ ...mergedOrganisme, typeAudit: typeAuditChoix, referentielQualiopi: "auto" })})` : val === "V9" ? "V9 surveillance" : "V10 nouvel entrant"}
+          </Button>
+        ))}
+      </div>
+    </>
+  );
 
   const handleDownloadBookCFA = async () => {
     setLoadingBookCFA(true);
@@ -1687,6 +1714,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                   <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
                 </SelectContent>
               </Select>
+              {referentielSelect("blue")}
             </div>
           </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 p-3 flex gap-1.5 flex-wrap">
@@ -1733,6 +1761,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                     <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
                   </SelectContent>
                 </Select>
+                {referentielSelect("orange")}
               </div>
             </div>
 

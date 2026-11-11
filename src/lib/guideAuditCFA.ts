@@ -3,7 +3,7 @@
 // script, documents à présenter et points de vigilance.
 
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
@@ -46,7 +46,7 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${styles}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
-  <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9 · Édition ${today}</div>
+  <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture ${versionReferentiel(org)} · Édition ${today}</div>
   ${!isNE && !stagiaires.some((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo))) ? `<div class="vigilance"><strong>⚠️ ${getTypeAuditLabel(typeAudit)} :</strong> aucun apprenti du dossier n'a terminé son parcours ; l'auditeur attend des preuves de mise en œuvre sur la période (émargements, évaluations, PV du conseil de perfectionnement, résultats chiffrés).</div>` : ""}
 
   <h2 class="crit" style="font-size:16px">Périmètre audité</h2>
@@ -60,9 +60,9 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
   ${stagiaires.length ? `<p><strong>Apprenants (${stagiaires.length}) :</strong></p><ul class="docs">${stagiaires.map(s => `<li>${s.civilite||""} ${s.prenom||""} ${s.nom||""}${s.entreprise ? ` — ${s.entreprise}` : ""} (${fmt(s.dateDebutFormation)} → ${fmt(s.dateFinFormation)})</li>`).join("")}</ul>` : ""}
 
   <div class="intro">
-    <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec ceux générés par l'application), et (4) les points de vigilance.
+    <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide ${versionReferentiel(org)}, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec ceux générés par l'application), et (4) les points de vigilance.
     ${isNE
-      ? `<br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs ${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.`
+      ? `<br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs ${INDICATEURS_CFA.filter(i => indicateursNouvelEntrant(versionReferentiel(org)).includes(i.numero)).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.`
       : `<br><br><strong>${getTypeAuditLabel(typeAudit)}.</strong> L'auditeur vérifie la <strong>mise en œuvre effective</strong> sur l'ensemble des indicateurs (résultats, taux, satisfaction, amélioration continue).`}
     <br><br><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez de votre processus, puis montrez la preuve.
   </div>`;

@@ -17,7 +17,7 @@ import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualio
 import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
 import { getRNCPByCode } from "../rncpData";
 import { formationsIziRealisees, formatDateIzi } from "../attestationIzibusiness";
-import { REFERENCES_REGLEMENTAIRES_2026, genAnalyseRisquesQualite } from "../qualite2026";
+import { referencesReglementaires, genAnalyseRisquesQualite } from "../qualite2026";
 import {
   certifVAE, profilVAE, calendrierVAE, chronoVAE, heuresVAE, frVAE, frLongVAE, parseDateVAE, estPasse, aujourdhui, graine,
   type SeanceVAE, type CertifVAE,
@@ -775,7 +775,7 @@ export function genVAEPlanDevAccompagnateurs(o: OrganismeInfo, f: FormationInfo)
 // ───────────────────────────── CRITÈRE 6 ─────────────────────────────
 
 export function genVAEVeilleReglementaire(o: OrganismeInfo) {
-  const refs = REFERENCES_REGLEMENTAIRES_2026.filter((r) => r.types.includes("VAE"));
+  const refs = referencesReglementaires(o).filter((r) => r.types.includes("VAE"));
   const plancher = parseDateVAE(o.dateMaj);
   const prise = (d: string) => { const x = parseDateVAE(d); return frVAE(x && plancher && x.getTime() < plancher.getTime() ? plancher : x); };
   return buildDocument({ org: o, title: "VEILLE LÉGALE ET RÉGLEMENTAIRE – VAE", table: {

@@ -10,7 +10,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays } from "./docBuilder";
 import { getFormationDays, type FormateurInfo } from "./sampleData";
-import { REFERENCES_REGLEMENTAIRES_2026 } from "./qualite2026";
+import { referencesReglementaires } from "./qualite2026";
 
 const v = (x: unknown) => (x == null ? "" : String(x).trim());
 
@@ -234,7 +234,7 @@ export function genVeilleSourcee(o: OrganismeInfo, f: FormationInfo, theme: Them
   const titre = theme === "reglementaire" ? "VEILLE LÉGALE ET RÉGLEMENTAIRE — SOURCES ET TEXTES SUIVIS" : theme === "technologique" ? "VEILLE INNOVATIONS PÉDAGOGIQUES ET TECHNOLOGIQUES — SOURCES SUIVIES" : "VEILLE HANDICAP — SOURCES ET RÉSEAUX SUIVIS";
   const ind = theme === "reglementaire" ? 23 : theme === "technologique" ? 25 : 26;
   const textes = theme === "reglementaire"
-    ? REFERENCES_REGLEMENTAIRES_2026.filter((r) => r.types.includes("AF") && r.date <= maj).map((r) => [formatDate(r.date), r.texte, r.objet, `<a href="${r.source}">${r.source}</a>`, "Intégré aux procédures et au dossier qualité"])
+    ? referencesReglementaires(o).filter((r) => r.types.includes("AF") && r.date <= maj).map((r) => [formatDate(r.date), r.texte, r.objet, `<a href="${r.source}">${r.source}</a>`, "Intégré aux procédures et au dossier qualité"])
     : [];
   const consult = formatDate(maj);
   const rows = SOURCES[theme].map((s) => [s.source, s.objet, `<a href="${s.url}">${s.url}</a>`, "Mensuelle", consult]);

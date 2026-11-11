@@ -10,8 +10,16 @@ import type { OrganismeInfo } from "@/types/qualiopi";
 export type TypeAudit = "initial" | "surveillance" | "renouvellement";
 export type TypeAuditSaisi = TypeAudit | "auto";
 
+/** Version du guide de lecture du référentiel national qualité. */
+export type VersionReferentiel = "V9" | "V10";
+
 /** Indicateurs audités en « nouvel entrant » (formalisation seule), guide de lecture V9 ; 33 ajouté (décret 2026-728). */
 export const INDICATEURS_NOUVEL_ENTRANT = [2, 3, 11, 13, 14, 19, 22, 24, 25, 26, 32, 33];
+/** Guide de lecture V10 (novembre 2026) : les indicateurs 22 et 32 sortent de la liste, ils sont audités dès l'audit initial. */
+export const INDICATEURS_NOUVEL_ENTRANT_V10 = [2, 3, 11, 13, 14, 19, 24, 25, 26];
+
+export const indicateursNouvelEntrant = (version: VersionReferentiel = "V9") =>
+  version === "V10" ? INDICATEURS_NOUVEL_ENTRANT_V10 : INDICATEURS_NOUVEL_ENTRANT;
 
 export const LIBELLES_AUDIT: Record<TypeAudit, string> = {
   initial: "Audit initial (nouvel entrant)",
@@ -52,13 +60,32 @@ export function typeAuditEffectif(o?: Partial<OrganismeInfo> | null, today: Date
 
 export const estNouvelEntrant = (o?: Partial<OrganismeInfo> | null, today?: Date) => typeAuditEffectif(o, today) === "initial";
 
-/** Niveau de preuve attendu selon le type d'audit (phrase courte, guide V9). */
-export function attenduSelonAudit(type: TypeAudit, indicateur: number): string {
-  const ne = INDICATEURS_NOUVEL_ENTRANT.includes(indicateur);
+export const LIBELLES_REFERENTIEL: Record<VersionReferentiel, string> = {
+  V9: "Guide de lecture V9 (8 janvier 2024)",
+  V10: "Guide de lecture V10 (novembre 2026)",
+};
+
+/**
+ * Version du guide de lecture appliquée au dossier :
+ * - valeur saisie si elle n'est pas « auto » ;
+ * - nouvel entrant (audit initial) : V10 ;
+ * - surveillance ou renouvellement : V9 (audit possible dans les conditions au 31/10/2026 jusqu'au 31/12/2026).
+ */
+export function versionReferentiel(o?: Partial<OrganismeInfo> | null, today?: Date): VersionReferentiel {
+  const saisi = o?.referentielQualiopi || "auto";
+  if (saisi !== "auto") return saisi;
+  return typeAuditEffectif(o, today) === "initial" ? "V10" : "V9";
+}
+
+/** Niveau de preuve attendu selon le type d'audit (phrase courte, guide V9 ou V10). */
+export function attenduSelonAudit(type: TypeAudit, indicateur: number, version: VersionReferentiel = "V9"): string {
+  const ne = indicateursNouvelEntrant(version).includes(indicateur);
   if (type === "initial") {
-    return ne
-      ? "Nouvel entrant : l'auditeur vérifie la formalisation du processus (procédures, outils, trames) ; la mise en œuvre sera vérifiée à l'audit de surveillance."
-      : "Audit initial : processus formalisé ET premières preuves de mise en œuvre lorsqu'une prestation a déjà été réalisée.";
+    if (ne) return "Nouvel entrant : l'auditeur vérifie la formalisation du processus (procédures, outils, trames) ; la mise en œuvre sera vérifiée à l'audit de surveillance.";
+    if (version === "V10" && (indicateur === 22 || indicateur === 32)) {
+      return "Nouvel entrant, guide V10 : indicateur audité dès l'audit initial — processus formalisé ET preuves de mise en œuvre (actions de développement des compétences réalisées ; analyse des risques, audit interne et suivi des heures non réalisées).";
+    }
+    return "Audit initial : processus formalisé ET premières preuves de mise en œuvre lorsqu'une prestation a déjà été réalisée.";
   }
   if (type === "surveillance") {
     return "Surveillance : l'auditeur vérifie la mise en œuvre effective sur la période écoulée depuis l'audit initial (preuves datées, résultats, actions réalisées).";

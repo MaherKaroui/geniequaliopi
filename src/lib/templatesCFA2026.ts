@@ -8,7 +8,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, tableHTML, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
 import { getRNCPByCode } from "./rncpData";
-import { REFERENCES_REGLEMENTAIRES_2026 } from "./qualite2026";
+import { referencesReglementaires } from "./qualite2026";
 import { semainesEcole, cycleAlternance } from "./calendrierMissionsCFA";
 import { isARH41366Formation, arh41366MissionEntreprise } from "./arh41366Humanized";
 
@@ -167,7 +167,7 @@ export function genJustificatifsIntervenantsCFA(o: OrganismeInfo, f: FormationIn
 
 export function genVeilleSourceeCFA(o: OrganismeInfo, f: FormationInfo) {
   const dateConsult = dateSysteme(o);
-  const refs = REFERENCES_REGLEMENTAIRES_2026.filter((r) => r.types.includes("CFA"));
+  const refs = referencesReglementaires(o).filter((r) => r.types.includes("CFA"));
   const rows = refs.map((r) => [formatDate(r.date), r.texte, r.objet, `<a href="${r.source}" target="_blank">${r.source.replace(/^https?:\/\//, "")}</a>`, dateConsult]);
   const sources = [
     ["Légifrance", "https://www.legifrance.gouv.fr", "Textes législatifs et réglementaires (Code du travail, JORF)"],

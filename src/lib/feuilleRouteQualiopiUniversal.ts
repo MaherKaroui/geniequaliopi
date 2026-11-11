@@ -4,7 +4,7 @@
 
 import { clampCells } from "./xlsxSafe";
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif, attenduSelonAudit, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
+import { typeAuditEffectif, attenduSelonAudit, versionReferentiel, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
 import * as XLSX from "xlsx";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
@@ -89,7 +89,7 @@ export function generateFeuilleRouteQualiopiUniversal(
         ind.intitule,
         `${ind.niveauAttendu}
 
-${attenduSelonAudit(typeAudit, ind.numero)}`,
+${attenduSelonAudit(typeAudit, ind.numero, versionReferentiel(org))}`,
         `« ${script} »`,
         allDocs,
         vigilance,

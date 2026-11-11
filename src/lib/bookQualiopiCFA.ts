@@ -3,7 +3,7 @@
 // avec pour chacun le niveau attendu V9, le script "ce qu'il faut dire", les preuves
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
-import { typeAuditEffectif } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
@@ -62,7 +62,7 @@ li{margin:3px 0;font-size:12.5px}
 
   // Cover
   const logo = org.logoUrl ? `<div style="margin-bottom:18px"><img src="${org.logoUrl}" alt="Logo" style="max-height:90px;max-width:240px;object-fit:contain"/></div>` : "";
-  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · ${getTypeAuditLabel(typeAudit)}</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
+  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · ${getTypeAuditLabel(typeAudit)}</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture ${versionReferentiel(org)}</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
 
   // Présentation OF / Formations / Stagiaires
   const fmt = (d?: string) => d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "—";
@@ -93,8 +93,8 @@ li{margin:3px 0;font-size:12.5px}
   </div><div class="page-break"></div>`;
 
   // Mode d'emploi
-  html += `<div class="page"><h1 class="sec-title">Comment utiliser ce Book</h1><p style="margin:10px 0">Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec les documents générés par l'application), et (4) les points de vigilance.</p>
-  ${isNE ? `<div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>` : `<div class="box warn"><strong>${getTypeAuditLabel(typeAudit)}.</strong> Tous les indicateurs font l'objet d'une vérification de la <strong>mise en œuvre effective</strong> avec preuves de résultats (taux, satisfaction, insertion, amélioration continue).</div>`}
+  html += `<div class="page"><h1 class="sec-title">Comment utiliser ce Book</h1><p style="margin:10px 0">Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide ${versionReferentiel(org)}, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec les documents générés par l'application), et (4) les points de vigilance.</p>
+  ${isNE ? `<div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>${INDICATEURS_CFA.filter(i => indicateursNouvelEntrant(versionReferentiel(org)).includes(i.numero)).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>` : `<div class="box warn"><strong>${getTypeAuditLabel(typeAudit)}.</strong> Tous les indicateurs font l'objet d'une vérification de la <strong>mise en œuvre effective</strong> avec preuves de résultats (taux, satisfaction, insertion, amélioration continue).</div>`}
   <div class="box"><strong>Pondération.</strong> Les indicateurs <strong>${INDICATEURS_CFA.filter(i => i.ponderable).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")}</strong> peuvent donner lieu à une NC mineure. Les autres entraînent une NC majeure en cas de non-respect.</div>
   <div class="box script"><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez d'abord de votre processus, puis montrez la preuve.</div>
   </div><div class="page-break"></div>`;
@@ -118,7 +118,7 @@ li{margin:3px 0;font-size:12.5px}
       ].filter(Boolean).join(" ");
       html += `<div class="ind"><div class="num"><span>INDICATEUR ${ind.numero}</span>${tags}</div><div class="body">
         <p style="font-style:italic;color:#475569;margin-bottom:8px">${ind.titre}</p>
-        <h3>Niveau attendu (Guide V9)</h3><div class="box">${ind.niveauAttendu}</div>
+        <h3>Niveau attendu (Guide ${versionReferentiel(org)})</h3><div class="box">${ind.niveauAttendu}</div>
         <h3>✅ Ce qu'il faut dire</h3><div class="box script">« ${ind.ceQuIlFautDire} »</div>
         <h3>📁 Documents à présenter</h3>
         <ul>${ind.preuves.map(p => {

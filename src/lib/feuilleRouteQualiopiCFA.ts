@@ -5,7 +5,7 @@
 
 import { clampCells } from "./xlsxSafe";
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant } from "./typeAudit";
 import * as XLSX from "xlsx";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
@@ -34,13 +34,13 @@ export function generateFeuilleRouteQualiopiCFA(
   const rows: (string | number)[][] = [];
   rows.push([`PRÉPARATION AUDIT QUALIOPI — CFA ${org.nom} — ${getTypeAuditLabel(typeAudit)} — ${frDate()}`]);
   rows.push([isNE
-    ? `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. Nouvel entrant : indicateurs ${INDICATEURS_CFA.filter(i => i.nouvelEntrant).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")} — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
-    : `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture V9. ${getTypeAuditLabel(typeAudit)} : vérification de la MISE EN ŒUVRE effective sur tous les indicateurs.`]);
+    ? `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture ${versionReferentiel(org)}. Nouvel entrant : indicateurs ${INDICATEURS_CFA.filter(i => indicateursNouvelEntrant(versionReferentiel(org)).includes(i.numero)).map(i => i.numero).join(", ").replace(/, (\d+)$/, " et $1")} — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
+    : `Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — 7 critères / 33 indicateurs — guide de lecture ${versionReferentiel(org)}. ${getTypeAuditLabel(typeAudit)} : vérification de la MISE EN ŒUVRE effective sur tous les indicateurs.`]);
   if (!isNE && !stagiaires.some((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo)))) {
     rows.push([`⚠ ${getTypeAuditLabel(typeAudit)} : aucun apprenti du dossier n'a terminé son parcours — l'auditeur attend des preuves de mise en œuvre sur la période.`]);
   }
   rows.push([]);
-  const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Pondération"];
+  const header = ["Critère", "N°", "Indicateur", `Niveau attendu par l'auditeur (${versionReferentiel(org)})`, "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Pondération"];
   rows.push(header);
 
   Object.entries(CRITERES_CFA).forEach(([cNum, cTitre]) => {

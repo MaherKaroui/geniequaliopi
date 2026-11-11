@@ -12,6 +12,7 @@ import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/ma
 import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
+import { entreesCatalogueReferentiel, renderReferentielTemplate, retirePiecesV9 } from "./referentielV10";
 import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
 import { aleaSession, dateAnalyseRisques, dateArreteRegistre, nombreIncidents } from "./registresQualite";
 import { orgVersionUlterieure, intervenantUnique } from "./versionUlterieure";
@@ -196,7 +197,9 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
   const base = mails.length ? catalogue.filter((d) => !REMPLACES.has(d.template)) : catalogue;
   // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement).
   const audit = entreesCatalogueTypeAudit(mergeOrganisme(org)) as DocEntry[];
-  const complet = [...base, ...fcEntrees, ...audit];
+  // Guide de lecture V10 (nouvel entrant par défaut) : pièces IND 12, 23 et 32 ajoutées, PDF du guide V9 retiré.
+  const v10 = entreesCatalogueReferentiel(mergeOrganisme(org)) as DocEntry[];
+  const complet = retirePiecesV9(mergeOrganisme(org), [...base, ...fcEntrees, ...audit, ...v10]);
   return [...complet, ...mails];
 }
 
@@ -290,6 +293,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   }
   if (template.startsWith("audit_")) {
     const html = renderTypeAuditTemplate(template, o, resolveFormation(userFormation, org, userStagiaires), mergeStagiaires(userStagiaires));
+    if (html !== null) return html;
+  }
+  if (template.startsWith("v10_")) {
+    const html = renderReferentielTemplate(template, params, o, resolveFormation(userFormation, org, userStagiaires), mergeStagiaires(userStagiaires));
     if (html !== null) return html;
   }
   if (template === "mail_capture") {
