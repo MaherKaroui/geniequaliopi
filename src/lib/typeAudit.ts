@@ -88,7 +88,7 @@ export function attenduSelonAudit(type: TypeAudit, indicateur: number, version: 
   if (sansRealisation(type)) {
     if (ne) return `${type === "complementaire" ? "Extension de périmètre (nouvelle catégorie auditée comme un nouvel entrant)" : "Nouvel entrant"} : l'auditeur vérifie la formalisation du processus (procédures, outils, trames) ; la mise en œuvre sera vérifiée à l'audit de surveillance.`;
     if (version === "V10" && (indicateur === 22 || indicateur === 32)) {
-      return "Nouvel entrant, guide V10 : indicateur audité dès l'audit initial — processus formalisé ET preuves de mise en œuvre (actions de développement des compétences réalisées ; analyse des risques, audit interne et suivi des heures non réalisées).";
+      return "Nouvel entrant (décret n° 2026-728) : indicateur audité dès l'audit initial — processus formalisé ET preuves de mise en œuvre (actions de développement des compétences réalisées ; analyse des risques, audit interne et suivi des heures non réalisées).";
     }
     return `${type === "complementaire" ? "Audit complémentaire" : "Audit initial"} : processus formalisé ET premières preuves de mise en œuvre lorsqu'une prestation a déjà été réalisée.`;
   }

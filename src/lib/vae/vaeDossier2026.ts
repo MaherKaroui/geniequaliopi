@@ -784,7 +784,7 @@ export function genVAEPlanDevAccompagnateurs(o: OrganismeInfo, f: FormationInfo)
       ["Actualisation réglementaire VAE", "Veille et appropriation de la réforme (loi n° 2022-1598, décret n° 2023-1275, plateforme vae.gouv.fr)", esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
       ["Référentiel qualité 2026", "Appropriation du décret n° 2026-728 (33 indicateurs)", esc(o.referentQualite), `${annee}`, "Planifiée"],
       ["Accueil du handicap", "Sensibilisation (ressources Agefiph)", esc(o.referentHandicap), `${annee}`, "Planifiée"],
-      ...(versionReferentiel(o) === "V10" ? [["Prévention des violences (IND 12, guide V10)", "Formation du référent à la prévention des violences sexistes et sexuelles, du harcèlement et des discriminations", esc(referentSignalements(o)), `${annee}`, "Planifiée"]] : []),
+      ...(versionReferentiel(o) === "V10" ? [["Prévention des violences (IND 12)", "Formation du référent à la prévention des violences sexistes et sexuelles, du harcèlement et des discriminations", esc(referentSignalements(o)), `${annee}`, "Planifiée"]] : []),
       ["Actualisation métier", `Veille sur le référentiel ${esc(certifVAE(f).code)} et les pratiques du métier`, esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
     ],
   }, sections: [
@@ -930,7 +930,7 @@ export function genVAEPlanAmelioration(o: OrganismeInfo, f: FormationInfo) {
       ["Veille réglementaire", "Réforme de la VAE (loi n° 2022-1598, décret n° 2023-1275)", "Supports mis à jour : dossier de faisabilité, dossier de validation, vae.gouv.fr, suppression de la durée minimale", esc(o.responsablePedagogique), `${annee}`, "Réalisé à l'ouverture du dossier"],
       ["Référentiel qualité 2026", "Décret n° 2026-728 : analyse des risques (IND 32), portage salarial (IND 27)", "Analyse des risques qualité et registre de sous-traitance / portage établis", esc(o.referentQualite), `${annee}`, "Réalisé à l'ouverture du dossier"],
       ...(versionReferentiel(o) === "V10" ? [
-        ["Veille réglementaire (IND 23)", "Guide de lecture V10 : procédure violences, harcèlement et discriminations (IND 12), audit interne et suivi des heures (IND 32)", "Procédure, registre des signalements, programme d'audit interne et suivi des heures établis", esc(o.referentQualite || o.dirigeant), formatDate(dateV10(o)), "Réalisé"],
+        ["Veille réglementaire (IND 23)", "Référentiel national qualité (décret n° 2026-728) : procédure violences, harcèlement et discriminations (IND 12), audit interne et suivi des heures (IND 32)", "Procédure, registre des signalements, programme d'audit interne et suivi des heures établis", esc(o.referentQualite || o.dirigeant), formatDate(dateV10(o)), "Réalisé"],
         ["Audit interne (IND 32)", "Audit interne annuel du dispositif VAE", "Grille d'audit interne appliquée avant chaque audit de certification", esc(o.referentQualite || o.dirigeant), "Annuel", "Planifié"],
       ] : []),
       ["Analyse des risques", "Risque de dossier rédigé par l'accompagnateur", "Charte de l'accompagnateur et traçabilité des versions", esc(o.responsablePedagogique), `${annee}`, "En cours"],

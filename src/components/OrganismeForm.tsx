@@ -163,7 +163,7 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Input id="referentQualite" value={data.referentQualite} onChange={e => update('referentQualite', e.target.value)} placeholder="Nom du référent qualité" />
           {(data.referentQualite || "").trim() && !/fd\s*certif/i.test(data.referentQualite) && (
             referentQualiteEstDirigeant(data)
-              ? <p className="text-[11px] text-muted-foreground mt-1">Même personne que le dirigeant : sa signature est reprise sur les pièces du référent qualité (guide V10).</p>
+              ? <p className="text-[11px] text-muted-foreground mt-1">Même personne que le dirigeant : sa signature est reprise sur les pièces du référent qualité (référentiel 2026).</p>
               : <div className="mt-2">
                   <p className="text-[11px] text-muted-foreground mb-1">Signature du référent qualité (pièces V10 qu'il signe : veille, analyse des risques, audit interne…)</p>
                   <SignatureChamp compact valeur={data.referentQualiteSignatureUrl} libelle="Signature du référent qualité" onChange={(v) => onChange({ ...data, referentQualiteSignatureUrl: v })} />

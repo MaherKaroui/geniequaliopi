@@ -13,7 +13,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, isStagiaireFormationTerminee } from "./docBuilder";
 import { orgVersionUlterieure } from "./versionUlterieure";
-import { versionReferentiel, typeAuditEffectif, LIBELLES_AUDIT, LIBELLES_REFERENTIEL } from "./typeAudit";
+import { versionReferentiel, typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
 import { typePrestation, type TypePrestation } from "./piecesTypeAudit";
 import { INDICATEURS_REFERENCE } from "./qualiopiReference";
 import { parseDuree } from "./sampleData";
@@ -51,11 +51,11 @@ export function entreesCatalogueReferentiel(o: OrganismeInfo): { id: string; nom
   return [...types].flatMap((tp) => {
     const p = PREFIXE[tp];
     return [
-      { id: `${p}_c3i12_v10_procedure_violences`, nom: "CT3 - IND 12 PROCÉDURE DE PRÉVENTION ET DE TRAITEMENT DES VIOLENCES, DU HARCÈLEMENT ET DES DISCRIMINATIONS (V10)", critere: 3, indicateur: 12, template: "v10_procedure_violences", params: { type: tp } },
-      { id: `${p}_c3i12_v10_registre_signalements`, nom: "CT3 - IND 12 REGISTRE DES SIGNALEMENTS (V10)", critere: 3, indicateur: 12, template: "v10_registre_signalements", params: { type: tp } },
-      { id: `${p}_c6i23_v10_note_veille`, nom: "CT6 - IND 23 NOTE DE VEILLE – GUIDE DE LECTURE V10 ET DÉPÔT DES COMPTES", critere: 6, indicateur: 23, template: "v10_note_veille", params: { type: tp } },
-      { id: `${p}_c7i32_v10_audit_interne`, nom: "CT7 - IND 32 PROGRAMME ET GRILLE D'AUDIT INTERNE (V10)", critere: 7, indicateur: 32, template: "v10_audit_interne", params: { type: tp } },
-      { id: `${p}_c7i32_v10_suivi_heures`, nom: "CT7 - IND 32 SUIVI DES HEURES NON RÉALISÉES ET REPORTÉES (V10)", critere: 7, indicateur: 32, template: "v10_suivi_heures", params: { type: tp } },
+      { id: `${p}_c3i12_v10_procedure_violences`, nom: "CT3 - IND 12 PROCÉDURE DE PRÉVENTION ET DE TRAITEMENT DES VIOLENCES, DU HARCÈLEMENT ET DES DISCRIMINATIONS", critere: 3, indicateur: 12, template: "v10_procedure_violences", params: { type: tp } },
+      { id: `${p}_c3i12_v10_registre_signalements`, nom: "CT3 - IND 12 REGISTRE DES SIGNALEMENTS", critere: 3, indicateur: 12, template: "v10_registre_signalements", params: { type: tp } },
+      { id: `${p}_c6i23_v10_note_veille`, nom: "CT6 - IND 23 NOTE DE VEILLE – RÉFÉRENTIEL NATIONAL QUALITÉ 2026 ET DÉPÔT DES COMPTES", critere: 6, indicateur: 23, template: "v10_note_veille", params: { type: tp } },
+      { id: `${p}_c7i32_v10_audit_interne`, nom: "CT7 - IND 32 PROGRAMME ET GRILLE D'AUDIT INTERNE", critere: 7, indicateur: 32, template: "v10_audit_interne", params: { type: tp } },
+      { id: `${p}_c7i32_v10_suivi_heures`, nom: "CT7 - IND 32 SUIVI DES HEURES NON RÉALISÉES ET REPORTÉES", critere: 7, indicateur: 32, template: "v10_suivi_heures", params: { type: tp } },
     ];
   });
 }
@@ -78,7 +78,7 @@ export function genProcedureViolences(oDossier: OrganismeInfo, tp: TypePrestatio
   return buildDocument({
     org: o,
     title: "PROCÉDURE DE PRÉVENTION ET DE TRAITEMENT DES VIOLENCES, DU HARCÈLEMENT ET DES DISCRIMINATIONS",
-    subtitle: "Indicateur 12 — référentiel national qualité, guide de lecture V10",
+    subtitle: "Indicateur 12 — référentiel national qualité (décret n° 2026-728)",
     sections: [
       { heading: "Objet et champ d'application", content: `<p>${o.nom} prévient et traite toute situation de violence, dont les violences sexistes et sexuelles, de harcèlement et de discrimination qui concerne un ${pub}, un intervenant ou toute personne présente${distanciel ? ", y compris pendant les classes virtuelles, dans les messageries et sur les outils numériques de la formation" : " pendant la formation"}${tp === "CFA" ? ", au centre comme dans l'entreprise d'accueil" : ""}. La procédure est remise à chaque ${pub} avec le livret d'accueil et le règlement intérieur, et rappelée à l'ouverture de chaque session.</p>` },
       { heading: "Ce qui est visé", content: `<ul><li><strong>Violences sexistes et sexuelles</strong> : agissement sexiste (art. L. 1142-2-1 du code du travail), outrage sexiste, harcèlement sexuel (art. 222-33 du code pénal), agression sexuelle.</li><li><strong>Harcèlement moral</strong> : agissements répétés dégradant les conditions de formation (art. 222-33-2 du code pénal).</li><li><strong>Discriminations</strong> : traitement défavorable fondé sur un critère prohibé (origine, sexe, handicap, âge, religion, orientation sexuelle… — art. 225-1 du code pénal).</li><li><strong>Violences physiques ou verbales</strong>, menaces, cyberharcèlement.</li></ul>` },
@@ -96,7 +96,7 @@ export function genRegistreSignalements(oDossier: OrganismeInfo, tp: TypePrestat
   return buildDocument({
     org: o,
     title: "REGISTRE DES SIGNALEMENTS — VIOLENCES, HARCÈLEMENT, DISCRIMINATIONS",
-    subtitle: `Indicateur 12 — guide de lecture V10 — tenu par ${referent(o)} (document confidentiel)`,
+    subtitle: `Indicateur 12 — tenu par ${referent(o)} (document confidentiel)`,
     sections: [{ heading: "Règles de tenue", content: `<p>Une ligne par signalement, dès sa réception. Les personnes sont désignées par un code (ex. ${pub.charAt(0).toUpperCase()}1) ; la correspondance nominative est conservée à part, avec accès réservé au référent.</p>` }],
     table: {
       headers: ["N°", "Date de réception", "Canal", "Personne concernée (code)", "Nature", "Mesures conservatoires", "Orientation", "Date de clôture", "Action d'amélioration (IND 32)"],
@@ -134,13 +134,13 @@ export function genNoteVeilleV10(oDossier: OrganismeInfo, tp: TypePrestation): s
   const rows = EVOLUTIONS_V10.filter((e) => !e.types || e.types.includes(tp)).map((e) => [`IND ${e.ind}`, e.exigence, "Pièce du dossier mise à jour ou ajoutée", referent(o)]);
   return buildDocument({
     org: o,
-    title: "NOTE DE VEILLE — GUIDE DE LECTURE V10 DU RÉFÉRENTIEL NATIONAL QUALITÉ",
+    title: "NOTE DE VEILLE — RÉFÉRENTIEL NATIONAL QUALITÉ 2026 ET DÉPÔT DES COMPTES",
     subtitle: "Indicateur 23 — veille légale et réglementaire",
     sections: [
-      { heading: "Textes pris en compte", content: `<ul><li>Décret n° 2026-728 du 1er août 2026 : nouveau référentiel national qualité, en vigueur le 1er novembre 2026.</li><li>Arrêté du 28 octobre 2026 : modalités d'audit et période transitoire jusqu'au 31 décembre 2026.</li><li>Guide de lecture V10 (novembre 2026). Source consultée : synthèse Certifopac (certifopac.fr/qualiopi/referentiel/version10-v10/), à rapprocher du guide officiel.</li></ul><p>Référentiel appliqué au dossier : <strong>${LIBELLES_REFERENTIEL.V10}</strong> — ${LIBELLES_AUDIT[audit]}.</p>` },
+      { heading: "Textes pris en compte", content: `<ul><li>Décret n° 2026-728 du 1er août 2026 : nouveau référentiel national qualité, en vigueur le 1er novembre 2026.</li><li>Arrêté du 28 octobre 2026 : modalités d'audit et période transitoire jusqu'au 31 décembre 2026.</li></ul><p>Référentiel appliqué au dossier : <strong>référentiel national qualité (décret n° 2026-728)</strong> — ${LIBELLES_AUDIT[audit]}.</p>` },
       { heading: "Dépôt des comptes (IND 23)", content: `<p>Le dirigeant vérifie, à la clôture de chaque exercice, que les comptes annuels de ${o.nom} sont déposés au greffe dans le délai légal (dans le mois suivant leur approbation, au plus tard sept mois après la clôture) et conserve avec la présente note le justificatif de dépôt délivré par le greffe. Tant qu'aucun exercice n'est clos, la vérification est programmée à la clôture du premier exercice.</p>` },
     ],
-    table: { headers: ["Indicateur", "Évolution V10", "Exploitation", "Pilote"], rows },
+    table: { headers: ["Indicateur", "Évolution du référentiel", "Exploitation", "Pilote"], rows },
     signatures: { type: "1", labels: ["Le référent qualité"], names: [v(o.referentQualite) || referent(o)], dates: [formatDate(d)] },
   });
 }
@@ -159,7 +159,7 @@ export function genAuditInterne(oDossier: OrganismeInfo, tp: TypePrestation, f?:
   return buildDocument({
     org: o,
     title: "PROGRAMME ET GRILLE D'AUDIT INTERNE",
-    subtitle: "Indicateur 32 — guide de lecture V10",
+    subtitle: "Indicateur 32 — référentiel national qualité (décret n° 2026-728)",
     sections: [
       { heading: "Programme", content: `<ul><li><strong>Périmètre :</strong> ${tp === "AF" ? "actions de formation" : tp === "CFA" ? "actions de formation par apprentissage" : tp === "VAE" ? "accompagnement VAE" : "bilans de compétences"}${f?.intitule ? ` — ${f.intitule}` : ""}.</li><li><strong>Fréquence :</strong> au moins une fois par an, et avant chaque audit de certification.</li><li><strong>Auditeur interne :</strong> ${v(o.referentQualite) || referent(o)} ; un auditeur ne juge pas seul une pièce qu'il a rédigée : la revue est validée par le dirigeant.</li><li><strong>Méthode :</strong> pour chaque indicateur applicable, vérification d'un échantillon de pièces datées et cohérentes entre elles (identité, dates, durées, montants) ; tout écart ouvre une action au tableau d'amélioration continue.</li></ul>` },
     ],
@@ -197,7 +197,7 @@ export function genSuiviHeures(oDossier: OrganismeInfo, tp: TypePrestation, f: F
   return buildDocument({
     org: o,
     title: "SUIVI DES HEURES NON RÉALISÉES ET REPORTÉES",
-    subtitle: "Indicateur 32 — guide de lecture V10",
+    subtitle: "Indicateur 32 — référentiel national qualité (décret n° 2026-728)",
     sections: [
       { heading: "Règle de suivi", content: `<ul><li>Les heures réalisées sont relevées par demi-journée (émargements${/distanciel|distance|meet|zoom/i.test(`${f?.modalites || ""} ${f?.lieu || ""}`) ? " et relevés de connexion à la classe virtuelle" : ""}).</li><li>Toute heure non réalisée (absence, retard, incident technique, annulation) est inscrite avec son motif ; un report est proposé au ${pub} et tracé avec sa date de réalisation.</li><li>Heures non reportées : facturation au prorata des heures réalisées et information du financeur le cas échéant ; analyse de la cause et action au tableau d'amélioration continue lorsqu'un motif se répète.</li></ul>` },
     ],

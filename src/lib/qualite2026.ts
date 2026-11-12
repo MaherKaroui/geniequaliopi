@@ -35,19 +35,18 @@ export const REFERENCES_REGLEMENTAIRES_2026 = [
 ];
 
 /**
- * Guide de lecture V10 et arrêté du 28 octobre 2026 (sources : synthèse Certifopac du guide V10,
+ * Arrêté du 28 octobre 2026 (sources : synthèse Certifopac,
  * https://certifopac.fr/qualiopi/referentiel/version10-v10/ ; texte officiel à rattacher dès sa publication sur Légifrance).
  */
 const REFERENCES_V10 = [
   { date: "2026-10-28", texte: "Arrêté du 28 octobre 2026 relatif aux modalités d'audit associées au référentiel national qualité", objet: "Modalités d'audit (surveillance, CFA, nouveaux entrants, transfert) et seuils des indicateurs 19 et 20. Jusqu'au 31 décembre 2026, les organismes déjà certifiés ou dont l'audit initial était programmé avant le 1er novembre 2026 peuvent être audités dans les conditions applicables au 31 octobre 2026 ; à compter du 1er janvier 2027, tous les audits suivent le nouveau référentiel.", source: "https://certifopac.fr/qualiopi/actualites/arrete-28-octobre-2026/", types: ["AF", "CFA", "VAE", "BC"] as TypePrestation[] },
-  { date: "2026-11-02", texte: "Guide de lecture du référentiel national qualité, V10 (novembre 2026)", objet: "Définitions modifiées des indicateurs 1, 2, 3, 7, 12, 14, 15, 19, 20, 27, 30 et 32, indicateur 33 créé. IND 12 : prévention et traitement des violences, dont les violences sexistes et sexuelles, du harcèlement et des discriminations (procédure, référent, traçabilité). IND 32 : analyse des risques, audit interne, suivi des heures non réalisées et reportées. Nouvel entrant : les indicateurs 22 et 32 sont audités dès l'audit initial. IND 23 : vérification du dépôt des comptes lorsqu'il est applicable.", source: "https://certifopac.fr/qualiopi/referentiel/version10-v10/", types: ["AF", "CFA", "VAE", "BC"] as TypePrestation[] },
 ];
 
 /** Références à citer selon la version du guide de lecture appliquée au dossier (V9 ou V10). */
 export function referencesReglementaires(o?: Partial<OrganismeInfo> | null): typeof REFERENCES_REGLEMENTAIRES_2026 {
   if (versionReferentiel(o) !== "V10") return REFERENCES_REGLEMENTAIRES_2026;
   return REFERENCES_REGLEMENTAIRES_2026.flatMap((r) => /V9 du 8 janvier 2024/.test(r.texte)
-    ? [...REFERENCES_V10, { ...r, objet: "Version applicable aux audits menés dans les conditions au 31 octobre 2026 ; remplacée par le guide V10 pour les audits selon le nouveau référentiel." }]
+    ? [...REFERENCES_V10]
     : [r]);
 }
 

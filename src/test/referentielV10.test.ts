@@ -26,9 +26,8 @@ describe("référentiel Qualiopi V9 / V10", () => {
   it("références : guide V10 et arrêté du 28/10/2026 seulement en V10", () => {
     expect(referencesReglementaires({ typeAudit: "surveillance" }).some((r) => /V10/.test(r.texte))).toBe(false);
     const v10 = referencesReglementaires({ typeAudit: "initial" });
-    expect(v10.some((r) => /V10/.test(r.texte))).toBe(true);
+    expect(v10.some((r) => /Guide de lecture/.test(r.texte))).toBe(false);
     expect(v10.some((r) => /28 octobre 2026/.test(r.texte))).toBe(true);
-    expect(v10.find((r) => /V9/.test(r.texte))?.objet).not.toMatch(/aucune V10/);
   });
 
   for (const t of ["actions-formation", "apprentissage", "vae", "bilans-competences"] as const) {
