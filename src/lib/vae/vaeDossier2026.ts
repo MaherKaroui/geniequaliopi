@@ -473,7 +473,7 @@ export function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const d = estPasse(ch.contrat) ? frVAE(ch.contrat) : undefined;
   return buildDocument({ org: o, title: "AUTORISATION D'ENREGISTREMENT ET D'UTILISATION DE L'IMAGE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, sections: [
     { heading: "Objet", content: `<p>Les mises en situation d'entretien avec le jury peuvent être enregistrées, avec l'accord du candidat, pour lui permettre de s'observer. L'enregistrement est remis au candidat et supprimé à la fin de l'accompagnement. Autorisation remise avec le contrat d'accompagnement.</p>` },
-    { heading: "Choix du candidat", content: `<p>Je soussigné(e) ${esc(s.prenom)} ${esc(s.nom)} :</p><p>☐ J'accepte l'enregistrement de mes mises en situation, pour mon usage personnel uniquement.<br>☐ Je refuse tout enregistrement.</p>`, variant: "green" },
+    { heading: "Choix du candidat", content: `<p>Je soussigné(e) ${esc(s.prenom)} ${esc(s.nom)} :</p><p>☒ J'accepte l'enregistrement de mes mises en situation, pour mon usage personnel uniquement.<br>☐ Je refuse tout enregistrement.</p>`, variant: "green" },
   ], extraHtml: signatures([sigCandidat(s, d)]) });
 }
 export function genVAEInfosPeripheriques(o: OrganismeInfo) {
