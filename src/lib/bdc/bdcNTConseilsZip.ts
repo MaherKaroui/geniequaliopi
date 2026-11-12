@@ -23,6 +23,7 @@ import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBdcContext, fmtDateFR, regionFromCodePostal, tribunalFromCodePostal, profilDeclaratif, repartitionHeures, dureeBilanH, seancesFor, prestationFor, etatBilan, parseDateAny, DELAI_RETRACTATION_BC, MENTION_MCF_BC, financeurEffectifBC, bcCertifieAu, type BdcContext, type Beneficiaire } from "./bdcModel";
 import { genAnalyseRisquesQualite, genClausesQualiteContrat } from "@/lib/qualite2026";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate } from "@/lib/piecesTypeAudit";
+import { entreesCatalogueReferentiel, renderReferentielTemplate } from "@/lib/referentielV10";
 import { buildSuivi6MoisIndividuel } from "./bdcNTStatsXlsx";
 import { mdProcessSuivi6Mois, mdProcessObjectifs, mdProcessInformationPublics, mdInformationsPratiquesDistance, mdFicheCompetencesConsultant, mdReseauActeurs, mdObjectifsIndividualises, dateConventionBC } from "./bdcPiecesMMF";
 import { mdProcessTestPersonnalite, mdMailTestPersonnalite, mdTestPersonnalite, mdConvocation, mdProcessEvaluationObjectifs, mdReperesSynthese, mdTrameSynthese, mdMatrices, htmlClasseurMatrices, fusionnerClasseurs, htmlRegistreAbandons, mdRegistreReclamations, mdRegistreSousTraitance, mdProcessCoordination, fichesDePosteNexus, processVeilleNexus, mdQuestionnairePartie } from "./bdcNexus";
@@ -2102,6 +2103,8 @@ export async function buildBDCMMFZipLegacy(
       { ind: 32, nom: "Analyse des risques sur la qualité des prestations", html: genAnalyseRisquesQualite(org, "BC", formation) },
       // Pièces dépendant du type d'audit (nouvel entrant / surveillance / renouvellement)
       ...entreesCatalogueTypeAudit(org).map((e) => ({ ind: e.indicateur, nom: e.nom.replace(/^CT\d+ - IND \d+ /, ""), html: renderTypeAuditTemplate(e.template, org, formation, benList) || "" })),
+      // Guide de lecture V10 : IND 12 (violences), 23 (note de veille), 32 (audit interne, suivi des heures)
+      ...entreesCatalogueReferentiel({ ...org, typesActions: ["bilans-competences"] }).map((e) => ({ ind: e.indicateur, nom: e.nom.replace(/^CT\d+ - IND \d+ /, ""), html: renderReferentielTemplate(e.template, e.params, org, formation, benList) || "" })),
     ];
     for (const p of pieces2026) {
       advance(p.nom);

@@ -994,10 +994,11 @@ let tamponReferentQualite: string | undefined;
 /** Guide V10 : signature du référent qualité interne (null = règle par défaut, ligne vide). */
 let signatureReferentQualite: string | null = null;
 const nomCle = (n?: string) => (n || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().split(/[\s-]+/).filter(Boolean).sort().join(" ");
-/** Le référent qualité est-il le dirigeant (même nom, casse, accents et ordre prénom / nom ignorés) ? */
+/** Même personne (casse, accents et ordre prénom / nom ignorés) ? */
+export const memePersonne = (a?: string, b?: string) => !!nomCle(a) && nomCle(a) === nomCle(b);
+/** Le référent qualité est-il le dirigeant ? */
 export function referentQualiteEstDirigeant(o?: Partial<Pick<OrganismeInfo, "referentQualite" | "dirigeant">> | null): boolean {
-  const rq = nomCle(o?.referentQualite);
-  return !!rq && rq === nomCle(o?.dirigeant);
+  return memePersonne(o?.referentQualite, o?.dirigeant);
 }
 export function setReferentQualiteTampon(org: Partial<OrganismeInfo> | undefined) {
   tamponReferentQualite = /fd\s*certif/i.test(org?.referentQualite || "") ? "/images/FD_CERTIF_TAMPON.png" : undefined;

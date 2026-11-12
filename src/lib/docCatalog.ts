@@ -1434,7 +1434,7 @@ export function buildFullCatalog(
     add("vae_c3i9_livret_accueil", "CT3 - IND 9 Livret d'accueil VAE", 3, 9, "vae_livret_accueil");
     add("vae_c3i9_cgv", "CT3 - IND 9 Conditions générales de vente VAE", 3, 9, "vae_cgv");
     add("vae_c3i9_reglement_interieur", "CT3 - IND 9 Règlement intérieur VAE", 3, 9, "vae_reglement_interieur");
-    add("vae_c3i9_droit_image", "CT3 - IND 9 Autorisation d'enregistrement des mises en situation", 3, 9, "vae_droit_image");
+    per("vae_c3i9_droit_image", "CT3 - IND 9 Autorisation d'enregistrement des mises en situation", 3, 9, "vae_droit_image");
     add("vae_c3i9_infos_peripheriques", "CT3 - IND 9 Informations périphériques à la prestation", 3, 9, "vae_infos_peripheriques");
     add("vae_c3i9_mail_introduction", "CT3 - IND 9 Modèle de courriel – introduction au parcours VAE", 3, 9, "vae_mail_introduction");
     add("vae_c3i9_mail_recap", "CT3 - IND 9 Modèle de courriel – récapitulatif de l'accompagnement", 3, 9, "vae_mail_recap");

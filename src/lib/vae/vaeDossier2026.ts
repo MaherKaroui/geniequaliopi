@@ -14,7 +14,9 @@
  * - pas de signature simulée : image réelle ou case vide.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif } from "../docBuilder";
+import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
+import { versionReferentiel } from "../typeAudit";
+import { referentSignalements, dateV10 } from "../referentielV10";
 import { getRNCPByCode } from "../rncpData";
 import { formationsIziRealisees, formatDateIzi } from "../attestationIzibusiness";
 import { referencesReglementaires, genAnalyseRisquesQualite } from "../qualite2026";
@@ -36,14 +38,28 @@ function img(url?: string, alt = "signature") {
   return url ? `<img src="${url}" alt="${alt}" style="max-height:60px;max-width:180px;margin-top:6px">` : `<div style="height:55px"></div>`;
 }
 
-/** Bloc de signatures sans signature simulée : image réelle ou case vide. */
+/** Bloc de signatures sans signature simulée : image réelle ou case vide ; organisme : tampon seul s'il existe, sinon signature. */
 function signatures(parts: { label: string; nom: string; date?: string; sig?: string; tampon?: string }[]): string {
-  return `<div class="signature-block-2">${parts.map((p) => `<div class="sig-box"><p class="sig-label">${p.label}</p><p>Nom : ${esc(p.nom) || "________________________"}</p><p>Date : ${p.date || "____ / ____ / ________"}</p><p style="margin-top:20px">Signature :</p>${p.tampon ? img(p.tampon, "cachet") : ""}${img(p.sig)}</div>`).join("")}</div>`;
+  return `<div class="signature-block-2">${parts.map((p) => `<div class="sig-box"><p class="sig-label">${p.label}</p><p>Nom : ${esc(p.nom) || "________________________"}</p><p>Date : ${p.date || "____ / ____ / ________"}</p><p style="margin-top:20px">Signature :</p>${p.tampon ? img(p.tampon, "cachet") : img(p.sig)}</div>`).join("")}</div>`;
 }
 
 const sigCandidat = (s: StagiaireInfo, date?: string) => ({ label: "Le candidat", nom: `${s.prenom} ${s.nom}`, date, sig: s.signatureUrl });
 const sigOrganisme = (o: OrganismeInfo, date?: string) => ({ label: `Pour ${o.nom}, le dirigeant`, nom: o.dirigeant, date, sig: o.signatureUrl, tampon: o.tamponUrl });
-const sigAccompagnateur = (o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, date?: string) => ({ label: "L'accompagnateur VAE", nom: accompagnateur(o, f, s), date, sig: s.formateurSignatureUrl || f.formateurSignatureUrl });
+/** Signature de l'accompagnateur : la sienne ; s'il est le dirigeant, son tampon à défaut, sinon sa signature. */
+const sigAccUrl = (o: OrganismeInfo, f: FormationInfo, s?: StagiaireInfo) =>
+  s?.formateurSignatureUrl || f.formateurSignatureUrl || (memePersonne(accompagnateur(o, f, s), o.dirigeant) ? o.tamponUrl || o.signatureUrl : undefined);
+const sigAccompagnateur = (o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, date?: string) => ({ label: "L'accompagnateur VAE", nom: accompagnateur(o, f, s), date, sig: sigAccUrl(o, f, s) });
+/** Date de la dernière séance réalisée (case vide si aucune). */
+const derniereFaite = (cal: SeanceVAE[]) => { const x = cal.filter((r) => r.realisee).pop(); return x ? frVAE(x.date) : undefined; };
+/** Pièces système : visées par le dirigeant (tampon ou signature, via buildDocument). */
+const sigSysteme = (o: OrganismeInfo) => ({ type: "1" as const, labels: ["Le dirigeant"], names: [o.dirigeant], dates: [dateSysteme(o)] });
+/** Pièces qualité (veille, réclamations, amélioration) : référent qualité et dirigeant. */
+const sigQualite = (o: OrganismeInfo) => referentQualiteEstDirigeant(o)
+  ? { type: "1" as const, labels: ["Le dirigeant, référent qualité"], names: [o.dirigeant], dates: [dateSysteme(o)] }
+  : { type: "2" as const, labels: ["Le référent qualité", "Le dirigeant"], names: [o.referentQualite || o.dirigeant, o.dirigeant], dates: [dateSysteme(o), dateSysteme(o)] };
+/** V10 (IND 12) : rappel de la procédure violences / harcèlement / discriminations dans les pièces remises au candidat. */
+const rappelViolences = (o: OrganismeInfo) => versionReferentiel(o) !== "V10" ? "" :
+  `Toute situation de violence, dont sexiste ou sexuelle, de harcèlement ou de discrimination peut être signalée de façon confidentielle à ${esc(referentSignalements(o))}${o.email ? ` (${esc(o.email)}${telOrg(o)})` : ""}, référent chargé des signalements. La procédure de prévention et de traitement est remise avec le présent document ; chaque signalement est inscrit au registre des signalements.`;
 
 const valides = (stagiaires: StagiaireInfo[]) => stagiaires.filter((s) => (s.nom || "").trim());
 const cand = (stagiaires: StagiaireInfo[], si: number) => stagiaires[si] || stagiaires[0] || ({ civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo);
@@ -99,7 +115,7 @@ export function genVAEDiffusionInfo(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genVAEProcedureInfo(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE D'INFORMATION DU PUBLIC – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PROCÉDURE D'INFORMATION DU PUBLIC – VAE", sections: [
     { heading: "Objet", content: `<p>Garantir une information accessible, détaillée et vérifiable sur l'offre d'accompagnement VAE de ${esc(o.nom)} (indicateur 1).</p>` },
     { heading: "Canaux", content: `<p>${o.siteWeb ? `• ${isFacebookPage(o.siteWeb) ? "Page Facebook" : "Site internet"} : ${linkUrl(o.siteWeb)}<br>` : ""}• Plaquette et fiche d'information VAE<br>• Réponse écrite à chaque demande sous 48 heures ouvrées<br>• Relais : conseillers en évolution professionnelle, France Travail, OPCO, plateforme vae.gouv.fr</p>` },
     { heading: "Contenu obligatoire", content: `<p>Prérequis (expérience en rapport direct avec la certification, sans durée minimale), objectifs, durée, modalités et délais d'accès, tarif, contacts, méthodes, modalités d'évaluation (jury du certificateur), accessibilité, certification visée (intitulé, code RNCP, certificateur, date d'échéance de l'enregistrement).</p>`, variant: "green" },
@@ -171,7 +187,7 @@ export function genVAEInfoCertification(o: OrganismeInfo, f: FormationInfo) {
 // ───────────────────────────── CRITÈRE 2 ─────────────────────────────
 
 export function genVAEProcessAnalyseBesoin(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCESSUS D'ANALYSE DU BESOIN – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PROCESSUS D'ANALYSE DU BESOIN – VAE", sections: [
     { heading: "Étapes", content: `<ol><li><strong>Premier contact</strong> : envoi de la plaquette et de la fiche d'information, proposition d'un entretien de faisabilité gratuit.</li><li><strong>Entretien de faisabilité</strong> (1 heure) : parcours, activités exercées, projet, contraintes, besoins d'adaptation (dont handicap), financement.</li><li><strong>Analyse au regard du référentiel</strong> : chaque bloc professionnel est rapproché des activités décrites ; l'avis est argumenté (favorable, favorable avec vigilance, réorientation).</li><li><strong>Restitution écrite</strong> au candidat (compte rendu d'entretien de faisabilité) et aide au dépôt du dossier de faisabilité sur vae.gouv.fr.</li><li><strong>Contractualisation</strong> : contrat ou convention tripartite, en financement personnel.</li></ol>` },
     { heading: "Prise en compte de l'employeur ou du financeur", content: `<p>Lorsque l'employeur finance, ses attentes sont recueillies dans la convention ; le candidat reste seul auteur de son dossier de validation.</p>`, variant: "green" },
   ] });
@@ -311,7 +327,7 @@ export function genVAEMailHandicap(o: OrganismeInfo) {
 
 export function genVAEReferentielAccompagnement(o: OrganismeInfo, f: FormationInfo) {
   const c = certifVAE(f);
-  return buildDocument({ org: o, title: "OBJECTIFS OPÉRATIONNELS DE L'ACCOMPAGNEMENT VAE", subtitle: c.intitule, sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "OBJECTIFS OPÉRATIONNELS DE L'ACCOMPAGNEMENT VAE", subtitle: c.intitule, sections: [
     { heading: "Objectifs opérationnels et évaluables", content: `<table><thead><tr><th>À l'issue de l'accompagnement, le candidat est capable de…</th><th>Évaluation</th></tr></thead><tbody>
       <tr><td>Relier ses activités aux blocs du référentiel ${esc(c.code)}</td><td>Tableau activités / blocs validé en séance 2</td></tr>
       <tr><td>Décrire précisément une situation de travail par compétence (contexte, actions, résultats)</td><td>Grille d'analyse du dossier de validation</td></tr>
@@ -418,17 +434,18 @@ export function genVAEPositionnement(o: OrganismeInfo, f: FormationInfo, stagiai
 // ───────────────────────────── CRITÈRE 3 ─────────────────────────────
 
 export function genVAELivretAccueil(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LIVRET D'ACCUEIL – ACCOMPAGNEMENT VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "LIVRET D'ACCUEIL – ACCOMPAGNEMENT VAE", sections: [
     { heading: "Bienvenue", content: `<p>Ce livret présente le déroulement de votre accompagnement VAE avec ${esc(o.nom)}.</p>` },
     { heading: "Vos interlocuteurs", content: `<p>Accompagnateur / référent VAE : ${esc(o.responsablePedagogique)}<br>Référent handicap : ${esc(o.referentHandicap)}<br>Administratif : ${esc(o.poleAdministratif)}<br>Contact : ${esc(o.email)}${telOrg(o)}</p>` },
     { heading: "Déroulement", content: `<p>${heuresVAE(f)} heures en séances individuelles de 2 heures, ${esc(f.modalites)} (${esc(lieuVAE(o, f))}). Étapes : lancement, dossier de validation bloc par bloc, portefeuille de preuves, préparation à l'entretien avec le jury. Le jury est organisé par le certificateur.</p>` },
     { heading: "Vos droits et engagements", content: `<p>Accompagnement personnalisé, confidentialité, adaptation possible, réclamation à ${esc(o.email)}. Vous restez seul auteur de votre dossier ; vous vous engagez à être présent et à prévenir de toute absence.</p>`, variant: "green" },
     { heading: "Informations utiles", content: `<p>Plateforme France VAE : vae.gouv.fr — congé VAE (salariés) : autorisation d'absence à demander à l'employeur — règlement intérieur et conditions générales remis avec le contrat.</p>` },
+    ...(rappelViolences(o) ? [{ heading: "Violences, harcèlement, discriminations", content: `<p>${rappelViolences(o)}</p>`, variant: "orange" as const }] : []),
   ] });
 }
 
 export function genVAECGV(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "CONDITIONS GÉNÉRALES DE VENTE – ACCOMPAGNEMENT VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "CONDITIONS GÉNÉRALES DE VENTE – ACCOMPAGNEMENT VAE", sections: [
     { heading: "1. Objet", content: `<p>Les présentes conditions s'appliquent aux prestations d'accompagnement VAE de ${esc(o.nom)} (SIRET ${esc(o.siret)}${o.nda ? `, NDA ${esc(o.nda)}` : ""}).</p>` },
     { heading: "2. Commande", content: `<p>CPF : commande sur Mon Compte Formation, conditions générales de la plateforme applicables (délai de 11 jours ouvrés avant l'entrée). Financement employeur / OPCO : convention tripartite. Financement personnel : contrat d'accompagnement.</p>` },
     { heading: "3. Rétractation (particuliers)", content: `<p>Délai de 10 jours à compter de la signature du contrat (article L.6353-5 du Code du travail), par lettre recommandée avec avis de réception. Aucun paiement n'est exigé avant la fin de ce délai ; acompte limité à 30 % du prix (article L.6353-6).</p>`, variant: "green" },
@@ -440,23 +457,25 @@ export function genVAECGV(o: OrganismeInfo) {
 }
 
 export function genVAEReglementInterieur(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR – ACCOMPAGNEMENT VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "RÈGLEMENT INTÉRIEUR – ACCOMPAGNEMENT VAE", sections: [
     { heading: "Article 1 – Champ", content: `<p>Applicable à tout candidat accompagné par ${esc(o.nom)}, en présentiel comme à distance (articles L.6352-3 et R.6352-1 et suivants du Code du travail).</p>` },
     { heading: "Article 2 – Assiduité", content: `<p>Présence aux séances ; toute absence est signalée au moins 48 heures à l'avance. Les séances sont émargées par le candidat et l'accompagnateur.</p>` },
-    { heading: "Article 3 – Comportement", content: `<p>Respect mutuel ; tout comportement violent, discriminatoire ou harcelant entraîne une procédure disciplinaire.</p>` },
+    { heading: "Article 3 – Comportement", content: `<p>Respect mutuel ; tout comportement violent, discriminatoire ou harcelant entraîne une procédure disciplinaire.${rappelViolences(o) ? ` ${rappelViolences(o)}` : ""}</p>` },
     { heading: "Article 4 – Hygiène et sécurité", content: `<p>En présentiel, respect des consignes affichées dans les locaux ; à distance, le candidat veille à un environnement calme et confidentiel.</p>` },
     { heading: "Article 5 – Sanctions et procédure", content: `<p>Avertissement ou exclusion après entretien préalable, dans le respect des articles R.6352-4 à R.6352-8 du Code du travail.</p>` },
     { heading: "Article 6 – Confidentialité et propriété du dossier", content: `<p>Le dossier de validation reste la propriété du candidat ; il n'est jamais diffusé sans son accord écrit.</p>`, variant: "green" },
   ] });
 }
 
-export function genVAEDroitImage(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "AUTORISATION D'ENREGISTREMENT ET D'UTILISATION DE L'IMAGE", sections: [
-    { heading: "Objet", content: `<p>Les mises en situation d'entretien avec le jury peuvent être enregistrées, avec l'accord du candidat, pour lui permettre de s'observer. L'enregistrement est remis au candidat et supprimé à la fin de l'accompagnement.</p>` },
-    { heading: "Choix du candidat", content: `<p>☐ J'accepte l'enregistrement de mes mises en situation, pour mon usage personnel uniquement.<br>☐ Je refuse tout enregistrement.</p><p>Nom : ________________ Date : ____ / ____ / ________ Signature :</p>`, variant: "green" },
-  ] });
+export function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = cand(stagiaires, si);
+  const ch = chronoVAE(s, f, o);
+  const d = estPasse(ch.contrat) ? frVAE(ch.contrat) : undefined;
+  return buildDocument({ org: o, title: "AUTORISATION D'ENREGISTREMENT ET D'UTILISATION DE L'IMAGE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, sections: [
+    { heading: "Objet", content: `<p>Les mises en situation d'entretien avec le jury peuvent être enregistrées, avec l'accord du candidat, pour lui permettre de s'observer. L'enregistrement est remis au candidat et supprimé à la fin de l'accompagnement. Autorisation remise avec le contrat d'accompagnement.</p>` },
+    { heading: "Choix du candidat", content: `<p>Je soussigné(e) ${esc(s.prenom)} ${esc(s.nom)} :</p><p>☐ J'accepte l'enregistrement de mes mises en situation, pour mon usage personnel uniquement.<br>☐ Je refuse tout enregistrement.</p>`, variant: "green" },
+  ], extraHtml: signatures([sigCandidat(s, d)]) });
 }
-
 export function genVAEInfosPeripheriques(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "INFORMATIONS PÉRIPHÉRIQUES À L'ACCOMPAGNEMENT", sections: [
     { heading: "À distance", content: `<p>Lien de connexion envoyé avant chaque séance ; test de connexion proposé avant la première ; assistance technique par courriel (${esc(o.email)}).</p>` },
@@ -499,7 +518,7 @@ export const genVAEMailConditionsCertification = (o: OrganismeInfo, f: Formation
 export const genVAEMailAideConnexion = (o: OrganismeInfo) => mail(o, "AIDE À LA CONNEXION", "Votre séance à distance : mode d'emploi", `<p>La séance aura lieu en visioconférence ; le lien vous est envoyé la veille. En cas de difficulté, répondez à ce courriel : nous vous proposons un test de connexion ou une solution de repli (téléphone).</p>`);
 
 export function genVAEAdaptationAccompagnement(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "ADAPTATION DE L'ACCOMPAGNEMENT VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "ADAPTATION DE L'ACCOMPAGNEMENT VAE", sections: [
     { heading: "Leviers d'adaptation", content: `<ul><li>Ordre des blocs selon les points d'appui et de vigilance identifiés en faisabilité ;</li><li>rythme et horaires selon les contraintes du candidat ;</li><li>modalité (présentiel / distance) ;</li><li>aménagements liés au handicap (référent : ${esc(o.referentHandicap)}) ;</li><li>séance supplémentaire de mise en situation si le candidat en a besoin, dans la limite du volume contractuel.</li></ul>` },
     { heading: "Traçabilité", content: `<p>Chaque adaptation est notée dans la fiche de suivi individuel et, si elle modifie le contrat, fait l'objet d'un avenant.</p>`, variant: "green" },
   ] });
@@ -526,7 +545,7 @@ export function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, s
   const p = profilVAE(s, f);
   const cal = calendrierVAE(s, f);
   const faites = cal.filter((x) => x.realisee);
-  return buildDocument({ org: o, title: "FICHE DE SUIVI INDIVIDUEL – VAE", subtitle: esc(p.nomComplet), table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigAccompagnateur(o, f, s, derniereFaite(cal)), sigCandidat(s, derniereFaite(cal))]), title: "FICHE DE SUIVI INDIVIDUEL – VAE", subtitle: esc(p.nomComplet), table: {
     headers: ["Séance", "Date", "Horaire", "Durée", "Contenu", "Statut"], rows: seancesRows(cal),
   }, sections: [
     { heading: "Avancement", content: `<p>${faites.length} séance(s) réalisée(s) sur ${cal.length} (${faites.reduce((a, x) => a + x.duree, 0)} h / ${heuresVAE(f)} h). ${p.blocsVigilance.length ? `Priorité donnée à : ${p.blocsVigilance.map(esc).join(" ; ")}.` : ""}${p.rqth ? " Aménagements suivis avec le référent handicap." : ""}</p>`, variant: "green" },
@@ -554,7 +573,7 @@ export function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, s
   const p = profilVAE(s, f);
   const ch = chronoVAE(s, f, o);
   const etape = (label: string, d: Date | null, externe = false) => [label, d ? frVAE(d) : "—", externe ? "Pièce du certificateur à joindre" : estPasse(d) ? "Réalisé" : "À venir"];
-  return buildDocument({ org: o, title: "DOSSIER DE SUIVI DU PARCOURS VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigAccompagnateur(o, f, s, derniereFaite(calendrierVAE(s, f))), sigCandidat(s, derniereFaite(calendrierVAE(s, f)))]), title: "DOSSIER DE SUIVI DU PARCOURS VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, table: {
     headers: ["Étape", "Date", "Statut"],
     rows: [
       etape("Entretien de faisabilité", ch.entretienFaisabilite),
@@ -577,7 +596,7 @@ export function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo
   const fait = estPasse(ch.depotValidation);
   const crit = ["Les activités décrites correspondent au bloc", "Les situations sont précises (contexte, actions, résultats)", "Le vocabulaire professionnel est maîtrisé", "Les preuves sont pertinentes et référencées"];
   const note = (bi: number, ci: number) => (p.couverture[bi]?.niveau === "Partielle" && ci === 3 ? "À renforcer" : "Satisfaisant");
-  return buildDocument({ org: o, title: "GRILLE D'ANALYSE DU DOSSIER DE VALIDATION", subtitle: `${esc(p.nomComplet)} — relecture de l'accompagnateur (non décisionnelle)`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigAccompagnateur(o, f, s, fait ? frVAE(ch.depotValidation) : undefined)]), title: "GRILLE D'ANALYSE DU DOSSIER DE VALIDATION", subtitle: `${esc(p.nomComplet)} — relecture de l'accompagnateur (non décisionnelle)`, table: {
     headers: ["Bloc", ...crit],
     rows: p.couverture.map((x, bi) => [esc(x.bloc.titre), ...crit.map((_, ci) => (fait ? note(bi, ci) : ""))]),
   }, sections: [
@@ -589,9 +608,9 @@ export function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const s = cand(stagiaires, si);
   const cal = calendrierVAE(s, f);
   const acc = accompagnateur(o, f, s);
-  const sigAcc = s.formateurSignatureUrl || f.formateurSignatureUrl;
+  const sigAcc = sigAccUrl(o, f, s);
   const cellule = (url: string | undefined, fait: boolean) => (fait && url ? `<img src="${url}" style="max-height:30px">` : fait ? "" : "—");
-  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)} — accompagnateur : ${esc(acc)}`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigOrganisme(o, derniereFaite(cal))]), title: "FEUILLE D'ÉMARGEMENT – ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)} — accompagnateur : ${esc(acc)}`, table: {
     headers: ["Séance", "Date", "Horaire", "Durée", "Signature du candidat", "Signature de l'accompagnateur"],
     rows: cal.map((x) => [String(x.num), frLongVAE(x.date), x.horaire, `${x.duree} h`, x.realisee ? cellule(s.signatureUrl, true) : "À venir", x.realisee ? cellule(sigAcc, true) : "À venir"]),
   }, sections: [
@@ -603,7 +622,7 @@ export function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires:
 export function genVAEReleveDistance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
   const cal = calendrierVAE(s, f);
-  return buildDocument({ org: o, title: "RELEVÉ DES SÉANCES À DISTANCE – VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigAccompagnateur(o, f, s, derniereFaite(cal))]), title: "RELEVÉ DES SÉANCES À DISTANCE – VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
     headers: ["Séance", "Date", "Horaire prévu", "Durée", "Outil", "Statut"],
     rows: cal.map((x) => [String(x.num), frVAE(x.date), x.horaire, `${x.duree} h`, esc(lieuVAE(o, f)), x.realisee ? "Réalisée — journal de connexion à joindre" : "À venir"]),
   }, sections: [
@@ -612,20 +631,20 @@ export function genVAEReleveDistance(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 export function genVAEProcedureAbandon(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE DE PRÉVENTION DES ABANDONS – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PROCÉDURE DE PRÉVENTION DES ABANDONS – VAE", sections: [
     { heading: "Signaux d'alerte", content: `<p>Absence non prévenue, report répété, absence de nouvelle version du dossier entre deux séances, découragement exprimé.</p>` },
     { heading: "Actions", content: `<ol><li>Relance le jour même (courriel type) et appel sous 48 heures.</li><li>Entretien de remobilisation : causes, adaptation du rythme ou des objectifs intermédiaires.</li><li>Si besoin : orientation (référent handicap, conseiller en évolution professionnelle, aides).</li><li>Abandon confirmé : entretien de sortie (guide dédié), certificat de réalisation des heures effectuées, information sur la reprise possible du parcours.</li></ol>`, variant: "green" },
   ] });
 }
 export function genVAEEviterEchec(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PRÉVENIR LES SITUATIONS D'ÉCHEC – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PRÉVENIR LES SITUATIONS D'ÉCHEC – VAE", sections: [
     { heading: "En amont", content: `<p>Entretien de faisabilité argumenté sur le référentiel ; réorientation si l'expérience ne correspond pas à la certification.</p>` },
     { heading: "Pendant", content: `<p>Priorité aux blocs fragiles, relectures régulières, portefeuille de preuves vérifié, mise en situation d'entretien.</p>` },
     { heading: "Après le jury", content: `<p>En cas de validation partielle : les blocs obtenus sont acquis définitivement ; plan d'action pour les blocs manquants (nouvelle VAE, formation).</p>`, variant: "green" },
   ] });
 }
 export function genVAEFavoriserEngagement(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FAVORISER L'ENGAGEMENT DES CANDIDATS – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "FAVORISER L'ENGAGEMENT DES CANDIDATS – VAE", sections: [
     { heading: "Leviers", content: `<ul><li>Calendrier partagé dès la signature, rappel la veille de chaque séance ;</li><li>objectifs intermédiaires concrets (un bloc décrit par étape) ;</li><li>retours écrits sous 5 jours ouvrés sur chaque version ;</li><li>valorisation des progrès lors de l'entretien intermédiaire.</li></ul>` },
   ] });
 }
@@ -651,7 +670,7 @@ export function genVAEAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, s
 /** IND 16 — l'OF prépare et vérifie les conditions de présentation ; il ne convoque ni ne décide. */
 export function genVAEProcedureJury(o: OrganismeInfo, f: FormationInfo) {
   const c = certifVAE(f);
-  return buildDocument({ org: o, title: "PROCÉDURE DE PRÉPARATION ET DE PRÉSENTATION AU JURY – VAE", subtitle: c.intitule, sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PROCÉDURE DE PRÉPARATION ET DE PRÉSENTATION AU JURY – VAE", subtitle: c.intitule, sections: [
     { heading: "Exigences du certificateur", content: `<p>Certificateur : ${esc(c.certificateur)}. Les modalités de dépôt du dossier de validation, le calendrier des jurys, la composition du jury et les éventuelles mises en situation sont fixés par le certificateur et communiqués via vae.gouv.fr. ${esc(o.nom)} vérifie ces exigences au démarrage de chaque accompagnement.</p>` },
     { heading: "Rôle de l'organisme", content: `<ol><li>Informer le candidat des exigences formelles (format du dossier, pièces, délais).</li><li>Vérifier avant dépôt que le dossier est complet (liste de contrôle).</li><li>Aider à formuler une demande d'aménagement d'épreuve si nécessaire.</li><li>Préparer l'entretien avec le jury (mise en situation).</li><li>Recueillir la décision du jury auprès du candidat pour le suivi des résultats.</li></ol>`, variant: "green" },
     { heading: "Ce que l'organisme ne fait pas", content: `<p>Il ne prononce pas la recevabilité, ne convoque pas le candidat, ne siège pas au jury et ne notifie aucune décision : ces pièces émanent du certificateur et sont jointes au dossier du candidat.</p>` },
@@ -663,7 +682,7 @@ export function genVAESuiviJury(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const c = certifVAE(f);
   const ch = chronoVAE(s, f, o);
   const pret = estPasse(ch.derniereSeance);
-  return buildDocument({ org: o, title: "FICHE DE SUIVI DE LA PRÉSENTATION AU JURY – VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)} — ${esc(c.intitule)}`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigAccompagnateur(o, f, s, pret ? frVAE(ch.derniereSeance) : undefined)]), title: "FICHE DE SUIVI DE LA PRÉSENTATION AU JURY – VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)} — ${esc(c.intitule)}`, table: {
     headers: ["Contrôle", "Statut"],
     rows: [
       ["Exigences du certificateur communiquées au candidat", estPasse(ch.premiereSeance) ? `Oui — séance du ${frVAE(ch.premiereSeance)}` : "À venir"],
@@ -679,19 +698,19 @@ export function genVAESuiviJury(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 // ───────────────────────────── CRITÈRES 4 et 5 ─────────────────────────────
 
 export function genVAEMoyensDedies(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "MOYENS DÉDIÉS À L'ACCOMPAGNEMENT VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "MOYENS DÉDIÉS À L'ACCOMPAGNEMENT VAE", sections: [
     { heading: "Moyens humains", content: `<p>Accompagnateur : ${esc(f.formateur || o.responsablePedagogique)} ; référent handicap : ${esc(o.referentHandicap)} ; administratif : ${esc(o.poleAdministratif)}.</p>` },
     { heading: "Moyens techniques", content: `<p>${esc(o.outilsUtilises)} ; partage de documents sécurisé ; référentiel de certification et guides du certificateur.</p>` },
     { heading: "Environnement", content: `<p>${/distanciel|distance/i.test(f.modalites) ? "Séances à distance en visioconférence, sur un créneau réservé et un lien individuel ; confidentialité garantie." : `Bureau fermé garantissant la confidentialité : ${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)}.`}</p>`, variant: "green" },
   ] });
 }
 export function genVAEMoyensTechniquesPresentiel(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "MOYENS TECHNIQUES ET ENVIRONNEMENT (PRÉSENTIEL)", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "MOYENS TECHNIQUES ET ENVIRONNEMENT (PRÉSENTIEL)", sections: [
     { heading: "Locaux", content: `<p>${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)} : espace d'entretien fermé, poste informatique, connexion internet, impression des documents de travail. Accessibilité à vérifier avec le candidat avant la première séance ; solution à distance proposée si les locaux ne sont pas adaptés.</p>` },
   ] });
 }
 export function genVAECoordinationAccompagnateurs(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "COORDINATION DES INTERVENANTS – VAE", table: { headers: ["Fonction", "Titulaire", "Rôle"], rows: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "COORDINATION DES INTERVENANTS – VAE", table: { headers: ["Fonction", "Titulaire", "Rôle"], rows: [
     ["Direction", esc(o.dirigeant), "Contractualisation, validation des plannings, réclamations"],
     ["Accompagnement / pédagogie", esc(o.responsablePedagogique), "Faisabilité, séances, relectures, préparation au jury"],
     ["Handicap", esc(o.referentHandicap), "Aménagements, lien avec les partenaires"],
@@ -713,7 +732,7 @@ export function genVAEAnnuaireContacts(o: OrganismeInfo) {
   ] } });
 }
 export function genVAEDifferentsPoles(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "LES DIFFÉRENTS PÔLES – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "LES DIFFÉRENTS PÔLES – VAE", sections: [
     { heading: "Pôle pédagogique", content: `<p>${esc(o.responsablePedagogique)} — faisabilité, accompagnement, préparation au jury.</p>` },
     { heading: "Pôle administratif", content: `<p>${esc(o.poleAdministratif)} — contrats, financement, émargements, certificats.</p>` },
     { heading: "Pôle qualité et handicap", content: `<p>${esc(o.referentQualite)} (qualité) — ${esc(o.referentHandicap)} (handicap).</p>`, variant: "green" },
@@ -733,7 +752,7 @@ export function genVAERessources(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 export function genVAEFichePosteAccompagnateur(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FICHE DE POSTE – ACCOMPAGNATEUR VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "FICHE DE POSTE – ACCOMPAGNATEUR VAE", sections: [
     { heading: "Missions", content: `<ul><li>Conduire l'entretien de faisabilité et argumenter l'avis ;</li><li>accompagner la description des activités sans rédiger à la place du candidat ;</li><li>relire et questionner les versions du dossier ;</li><li>préparer l'entretien avec le jury ;</li><li>tracer le suivi (émargements, fiches de suivi).</li></ul>` },
     { heading: "Compétences requises", content: `<ul><li>Maîtrise de la démarche VAE et du cadre réglementaire (loi n° 2022-1598, décret n° 2023-1275) ;</li><li>connaissance du métier et du référentiel de la certification accompagnée ;</li><li>techniques d'entretien d'explicitation et d'écoute ;</li><li>accueil des personnes en situation de handicap.</li></ul>`, variant: "green" },
   ] });
@@ -753,18 +772,19 @@ export function genVAECompetencesAccompagnateur(o: OrganismeInfo, f: FormationIn
     ],
   }, sections: [
     { heading: "Évaluation", content: `<p>Compétences vérifiées à l'entrée en fonction, puis évaluées chaque année (retours des candidats, observation d'une séance, entretien professionnel) ; les besoins identifiés alimentent le plan de développement des compétences (indicateur 22).</p>`, variant: "green" },
-  ], extraHtml: signatures([{ label: "L'accompagnateur", nom: acc, date: dateSysteme(o), sig: f.formateurSignatureUrl }, sigOrganisme(o, dateSysteme(o))]) });
+  ], extraHtml: signatures([{ label: "L'accompagnateur", nom: acc, date: dateSysteme(o), sig: sigAccUrl(o, f) }, sigOrganisme(o, dateSysteme(o))]) });
 }
 
 export function genVAEPlanDevAccompagnateurs(o: OrganismeInfo, f: FormationInfo) {
   const annee = anneeSysteme(o);
-  return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES – ACCOMPAGNATEURS VAE", subtitle: `Année ${annee}`, table: {
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES – ACCOMPAGNATEURS VAE", subtitle: `Année ${annee}`, table: {
     headers: ["Besoin", "Action", "Bénéficiaire", "Échéance", "Statut"],
     rows: [
       ...formationsIziRealisees(o).map(fi => ["Gestion et automatisation du centre", `${fi.nom} — IZIBUSINESS / Nadine DENDANI — ${fi.duree}`, esc(o.dirigeant), `Du ${formatDateIzi(fi.debut)} au ${formatDateIzi(fi.fin)}`, "Réalisée — attestation commune jointe (28 heures)"]),
       ["Actualisation réglementaire VAE", "Veille et appropriation de la réforme (loi n° 2022-1598, décret n° 2023-1275, plateforme vae.gouv.fr)", esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
       ["Référentiel qualité 2026", "Appropriation du décret n° 2026-728 (33 indicateurs)", esc(o.referentQualite), `${annee}`, "Planifiée"],
       ["Accueil du handicap", "Sensibilisation (ressources Agefiph)", esc(o.referentHandicap), `${annee}`, "Planifiée"],
+      ...(versionReferentiel(o) === "V10" ? [["Prévention des violences (IND 12, guide V10)", "Formation du référent à la prévention des violences sexistes et sexuelles, du harcèlement et des discriminations", esc(referentSignalements(o)), `${annee}`, "Planifiée"]] : []),
       ["Actualisation métier", `Veille sur le référentiel ${esc(certifVAE(f).code)} et les pratiques du métier`, esc(f.formateur || o.responsablePedagogique), `${annee}`, "Planifiée"],
     ],
   }, sections: [
@@ -778,7 +798,7 @@ export function genVAEVeilleReglementaire(o: OrganismeInfo) {
   const refs = referencesReglementaires(o).filter((r) => r.types.includes("VAE"));
   const plancher = parseDateVAE(o.dateMaj);
   const prise = (d: string) => { const x = parseDateVAE(d); return frVAE(x && plancher && x.getTime() < plancher.getTime() ? plancher : x); };
-  return buildDocument({ org: o, title: "VEILLE LÉGALE ET RÉGLEMENTAIRE – VAE", table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "VEILLE LÉGALE ET RÉGLEMENTAIRE – VAE", table: {
     headers: ["Texte", "Publication", "Prise en compte", "Contenu", "Exploitation", "Source"],
     rows: refs.map((r) => [esc(r.texte), frVAE(parseDateVAE(r.date)), prise(r.date), esc(r.objet), r.types.length === 1 ? "Mise à jour des supports VAE (terminologie, étapes, prérequis)" : "Mise à jour du système qualité et des procédures", `<a href="${r.source}">${esc(r.source)}</a>`]),
   }, sections: [
@@ -790,7 +810,7 @@ export function genVAEVeilleMetiers(o: OrganismeInfo, f: FormationInfo) {
   const c = certifVAE(f);
   const fiche = c.code ? getRNCPByCode(c.code) : undefined;
   const rome = fiche?.codesROME?.length ? fiche.codesROME.join(", ") : "codes ROME de la fiche France Compétences";
-  return buildDocument({ org: o, title: "VEILLE SUR LES COMPÉTENCES, MÉTIERS ET EMPLOIS – VAE", subtitle: c.intitule, table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "VEILLE SUR LES COMPÉTENCES, MÉTIERS ET EMPLOIS – VAE", subtitle: c.intitule, table: {
     headers: ["Source", "Objet suivi", "Fréquence", "Exploitation"],
     rows: [
       [`Fiche France Compétences ${esc(c.code)}`, "Évolution du référentiel, date d'échéance, fiche de remplacement", "Trimestrielle", "Mise à jour des supports et de la trame du dossier de validation"],
@@ -804,7 +824,7 @@ export function genVAEVeilleMetiers(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genVAEVeilleInnovations(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "VEILLE SUR LES INNOVATIONS PÉDAGOGIQUES ET TECHNOLOGIQUES – VAE", table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "VEILLE SUR LES INNOVATIONS PÉDAGOGIQUES ET TECHNOLOGIQUES – VAE", table: {
     headers: ["Thème", "Source", "Fréquence", "Exploitation"],
     rows: [
       ["Parcours dématérialisé France VAE", "vae.gouv.fr (espace candidat et accompagnateur)", "Trimestrielle", "Mise à jour du guide de dépôt remis aux candidats"],
@@ -818,7 +838,7 @@ export function genVAEVeilleInnovations(o: OrganismeInfo) {
 }
 
 export function genVAEAccessibiliteHandicap(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "ACCESSIBILITÉ ET HANDICAP – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "ACCESSIBILITÉ ET HANDICAP – VAE", sections: [
     { heading: "Référent handicap", content: `<p>${esc(o.referentHandicap)} — ${esc(o.email)}</p>` },
     { heading: "Réseau mobilisable", content: `<p>Agefiph, Cap emploi, MDPH, Ressource handicap formation de la région, médecine du travail (salariés).</p>` },
     { heading: "Aménagements", content: `<p>Rythme et durée des séances, supports adaptés, outils numériques d'accessibilité, séances à distance, aide à la demande d'aménagement des épreuves auprès du certificateur.</p>`, variant: "green" },
@@ -827,7 +847,7 @@ export function genVAEAccessibiliteHandicap(o: OrganismeInfo) {
 
 export function genVAEPartenaires(o: OrganismeInfo, f: FormationInfo) {
   const c = certifVAE(f);
-  return buildDocument({ org: o, title: "PARTENAIRES ET CERTIFICATEUR – VAE", table: { headers: ["Partenaire", "Nature de la relation", "Formalisation"], rows: [
+  return buildDocument({ org: o, signatures: sigSysteme(o), title: "PARTENAIRES ET CERTIFICATEUR – VAE", table: { headers: ["Partenaire", "Nature de la relation", "Formalisation"], rows: [
     [esc(c.certificateur), `Certificateur de ${esc(c.intitule)} : recevabilité, jury, délivrance`, "Relation institutionnelle via vae.gouv.fr — aucune sous-traitance"],
     ["France VAE", "Plateforme nationale du parcours", "Inscription de l'organisme en tant qu'accompagnateur selon les modalités de la plateforme"],
     ["Conseillers en évolution professionnelle / France Travail", "Orientation des candidats", "Échanges au cas par cas"],
@@ -851,7 +871,7 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
   const ch = chronoVAE(s, f, o);
   const fait = estPasse(ch.fin);
   const notes = fait ? satisfactionNotes(s, f) : [];
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
+  return buildDocument({ org: o, extraHtml: signatures([sigCandidat(s, fait ? frVAE(ch.fin) : undefined)]), title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
     headers: ["Critère", "1", "2", "3", "4", "5"],
     rows: CRITERES_SATISFACTION.map((c, i) => [c, ...[1, 2, 3, 4, 5].map((n) => (notes[i] === n ? "☒" : "☐"))]),
   }, sections: [
@@ -862,12 +882,12 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
 export function genVAESyntheseSatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const acheves = valides(stagiaires).filter((s) => estPasse(parseDateVAE(s.dateFinFormation || f.dateFin)));
   if (!acheves.length) {
-    return buildDocument({ org: o, title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", sections: [
+    return buildDocument({ org: o, signatures: sigQualite(o), title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", sections: [
       { heading: "Statut", content: `<p>Aucun accompagnement n'est encore achevé au ${frVAE(aujourdhui())} : la synthèse sera établie à partir des premiers questionnaires de fin d'accompagnement.</p>` },
     ] });
   }
   const moy = CRITERES_SATISFACTION.map((_, i) => acheves.reduce((a, s) => a + satisfactionNotes(s, f)[i], 0) / acheves.length);
-  return buildDocument({ org: o, title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${acheves.length} questionnaire(s) — au ${frVAE(aujourdhui())}`, table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${acheves.length} questionnaire(s) — au ${frVAE(aujourdhui())}`, table: {
     headers: ["Critère", "Moyenne /5"], rows: CRITERES_SATISFACTION.map((c, i) => [c, moy[i].toFixed(1).replace(".", ",")]),
   }, sections: [
     { heading: "Analyse", content: `<p>Critère le moins bien noté : « ${CRITERES_SATISFACTION[moy.indexOf(Math.min(...moy))]} » — action de progrès inscrite au tableau d'amélioration continue.</p>`, variant: "green" },
@@ -885,15 +905,16 @@ export function genVAEAppreciationsPartiesPrenantes(o: OrganismeInfo) {
 }
 
 export function genVAEProcedureReclamation(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE DE TRAITEMENT DES DIFFICULTÉS, RÉCLAMATIONS ET ALÉAS – VAE", sections: [
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "PROCÉDURE DE TRAITEMENT DES DIFFICULTÉS, RÉCLAMATIONS ET ALÉAS – VAE", sections: [
     { heading: "Dépôt", content: `<p>Par courriel (${esc(o.email)}), par courrier (${esc(o.nom)}, ${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)}) ou oralement auprès de l'accompagnateur (retranscription écrite).</p>` },
     { heading: "Traitement", content: `<p>1. Accusé de réception sous 48 heures ouvrées.<br>2. Analyse par ${esc(o.referentQualite)}.<br>3. Réponse écrite sous 15 jours ouvrés.<br>4. Action corrective si nécessaire, inscrite au tableau d'amélioration continue.<br>5. Vérification de la satisfaction du réclamant.</p>`, variant: "green" },
     { heading: "Aléas", content: `<p>Absence de l'accompagnateur, incident technique, report de jury par le certificateur : information du candidat sous 24 heures et proposition d'une solution (report, séance à distance).</p>` },
+    ...(rappelViolences(o) ? [{ heading: "Violences, harcèlement, discriminations (IND 12)", content: `<p>Ces situations ne relèvent pas de la réclamation ordinaire : elles suivent la procédure dédiée. ${rappelViolences(o)}</p>`, variant: "orange" as const }] : []),
   ] });
 }
 
 export function genVAERegistreReclamations(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "REGISTRE DES RÉCLAMATIONS ET ALÉAS – VAE", subtitle: `Ouvert le ${dateSysteme(o)}`, table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "REGISTRE DES RÉCLAMATIONS ET ALÉAS – VAE", subtitle: `Ouvert le ${dateSysteme(o)}`, table: {
     headers: ["N°", "Date", "Origine", "Objet", "Accusé de réception", "Réponse", "Action corrective", "Clôture"],
     rows: [["—", "—", "—", "Aucune réclamation enregistrée à ce jour", "—", "—", "—", "—"]],
   }, sections: [
@@ -903,11 +924,15 @@ export function genVAERegistreReclamations(o: OrganismeInfo) {
 
 export function genVAEPlanAmelioration(o: OrganismeInfo, f: FormationInfo) {
   const annee = anneeSysteme(o);
-  return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE – VAE", subtitle: `Ouvert le ${dateSysteme(o)}`, table: {
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "TABLEAU D'AMÉLIORATION CONTINUE – VAE", subtitle: `Ouvert le ${dateSysteme(o)}`, table: {
     headers: ["Origine", "Constat", "Action", "Pilote", "Échéance", "Statut"],
     rows: [
       ["Veille réglementaire", "Réforme de la VAE (loi n° 2022-1598, décret n° 2023-1275)", "Supports mis à jour : dossier de faisabilité, dossier de validation, vae.gouv.fr, suppression de la durée minimale", esc(o.responsablePedagogique), `${annee}`, "Réalisé à l'ouverture du dossier"],
       ["Référentiel qualité 2026", "Décret n° 2026-728 : analyse des risques (IND 32), portage salarial (IND 27)", "Analyse des risques qualité et registre de sous-traitance / portage établis", esc(o.referentQualite), `${annee}`, "Réalisé à l'ouverture du dossier"],
+      ...(versionReferentiel(o) === "V10" ? [
+        ["Veille réglementaire (IND 23)", "Guide de lecture V10 : procédure violences, harcèlement et discriminations (IND 12), audit interne et suivi des heures (IND 32)", "Procédure, registre des signalements, programme d'audit interne et suivi des heures établis", esc(o.referentQualite || o.dirigeant), formatDate(dateV10(o)), "Réalisé"],
+        ["Audit interne (IND 32)", "Audit interne annuel du dispositif VAE", "Grille d'audit interne appliquée avant chaque audit de certification", esc(o.referentQualite || o.dirigeant), "Annuel", "Planifié"],
+      ] : []),
       ["Analyse des risques", "Risque de dossier rédigé par l'accompagnateur", "Charte de l'accompagnateur et traçabilité des versions", esc(o.responsablePedagogique), `${annee}`, "En cours"],
       ["Appréciations", "Premiers questionnaires de fin d'accompagnement", "Analyse et action sur le critère le moins bien noté", esc(o.referentQualite), "À chaque fin de parcours", "Planifié"],
     ],
@@ -955,7 +980,7 @@ export function renderVAETemplate(template: string, params: Record<string, any> 
     case "vae_livret_accueil": return genVAELivretAccueil(o, f);
     case "vae_cgv": return genVAECGV(o);
     case "vae_reglement_interieur": return genVAEReglementInterieur(o);
-    case "vae_droit_image": return genVAEDroitImage(o);
+    case "vae_droit_image": return genVAEDroitImage(o, f, stagiaires, si);
     case "vae_infos_peripheriques": return genVAEInfosPeripheriques(o);
     case "vae_certificat_realisation": return genVAECertificatRealisation(o, f, stagiaires, si);
     case "vae_mail_introduction": return genVAEMailIntroduction(o);

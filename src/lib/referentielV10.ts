@@ -18,6 +18,7 @@ import { typePrestation, type TypePrestation } from "./piecesTypeAudit";
 import { INDICATEURS_REFERENCE } from "./qualiopiReference";
 import { parseDuree } from "./sampleData";
 import { getAssiduiteLabel } from "./indicateursResultats";
+import { calendrierVAE } from "./vae/vaeProfil";
 
 const v = (x?: string) => (x || "").trim();
 const PUBLIC: Record<TypePrestation, [string, string]> = { AF: ["stagiaire", "stagiaires"], CFA: ["apprenti", "apprentis"], VAE: ["candidat", "candidats"], BC: ["bénéficiaire", "bénéficiaires"] };
@@ -33,7 +34,9 @@ export function dateV10(o: OrganismeInfo, today: Date = new Date()): string {
   return maj && maj > d ? maj : d;
 }
 
-const referent = (o: OrganismeInfo) => v(o.dirigeant) || v(o.referentQualite);
+/** Référent chargé des signalements (IND 12) : le dirigeant. */
+export const referentSignalements = (o: OrganismeInfo) => v(o.dirigeant) || v(o.referentQualite);
+const referent = referentSignalements;
 const contacts = (o: OrganismeInfo) => [v(o.email), v(o.telephone)].filter(Boolean).join(" — ");
 
 /** Entrées de catalogue ajoutées en V10 (une série par type de prestation du dossier). */
@@ -109,7 +112,7 @@ export function genRegistreSignalements(oDossier: OrganismeInfo, tp: TypePrestat
 const EVOLUTIONS_V10: { ind: number; exigence: string; types?: TypePrestation[] }[] = [
   { ind: 1, exigence: "Préciser le type de reconnaissance obtenue et les modalités de financement ; ne jamais induire le public en erreur." },
   { ind: 2, exigence: "Indicateurs de résultats publiés avec leur méthode de calcul (ex. taux de réalisation des heures)." },
-  { ind: 8, exigence: "Positionnement adapté aux personnes en situation de handicap ; à distance, vérification des compétences et outils numériques." },
+  { ind: 8, exigence: "Positionnement adapté aux personnes en situation de handicap ; à distance, vérification des compétences et outils numériques.", types: ["AF", "CFA", "BC"] },
   { ind: 9, exigence: "Information renforcée pour la formation à distance (ressources, activités, rythme) et pour les personnes en situation de handicap." },
   { ind: 12, exigence: "Procédure de prévention et de traitement des violences, dont sexistes et sexuelles, du harcèlement et des discriminations ; référent ; traçabilité." },
   { ind: 15, exigence: "Information des apprentis mineurs, signalement des violences, médiateur de l'apprentissage, inspection du travail.", types: ["CFA"] },
@@ -135,7 +138,7 @@ export function genNoteVeilleV10(oDossier: OrganismeInfo, tp: TypePrestation): s
     subtitle: "Indicateur 23 — veille légale et réglementaire",
     sections: [
       { heading: "Textes pris en compte", content: `<ul><li>Décret n° 2026-728 du 1er août 2026 : nouveau référentiel national qualité, en vigueur le 1er novembre 2026.</li><li>Arrêté du 28 octobre 2026 : modalités d'audit et période transitoire jusqu'au 31 décembre 2026.</li><li>Guide de lecture V10 (novembre 2026). Source consultée : synthèse Certifopac (certifopac.fr/qualiopi/referentiel/version10-v10/), à rapprocher du guide officiel.</li></ul><p>Référentiel appliqué au dossier : <strong>${LIBELLES_REFERENTIEL.V10}</strong> — ${LIBELLES_AUDIT[audit]}.</p>` },
-      { heading: "Dépôt des comptes (IND 23)", content: `<p>Le dirigeant vérifie chaque année que les comptes annuels de ${o.nom} sont déposés au greffe dans le délai légal pour chaque exercice clos, et conserve le justificatif de dépôt. Exercice concerné à la date de la note : ______ ; date de clôture : ______ ; date de dépôt : ______ (ou « non applicable : aucun exercice clos »).</p>` },
+      { heading: "Dépôt des comptes (IND 23)", content: `<p>Le dirigeant vérifie, à la clôture de chaque exercice, que les comptes annuels de ${o.nom} sont déposés au greffe dans le délai légal (dans le mois suivant leur approbation, au plus tard sept mois après la clôture) et conserve avec la présente note le justificatif de dépôt délivré par le greffe. Tant qu'aucun exercice n'est clos, la vérification est programmée à la clôture du premier exercice.</p>` },
     ],
     table: { headers: ["Indicateur", "Évolution V10", "Exploitation", "Pilote"], rows },
     signatures: { type: "1", labels: ["Le référent qualité"], names: [v(o.referentQualite) || referent(o)], dates: [formatDate(d)] },
@@ -161,8 +164,8 @@ export function genAuditInterne(oDossier: OrganismeInfo, tp: TypePrestation, f?:
       { heading: "Programme", content: `<ul><li><strong>Périmètre :</strong> ${tp === "AF" ? "actions de formation" : tp === "CFA" ? "actions de formation par apprentissage" : tp === "VAE" ? "accompagnement VAE" : "bilans de compétences"}${f?.intitule ? ` — ${f.intitule}` : ""}.</li><li><strong>Fréquence :</strong> au moins une fois par an, et avant chaque audit de certification.</li><li><strong>Auditeur interne :</strong> ${v(o.referentQualite) || referent(o)} ; un auditeur ne juge pas seul une pièce qu'il a rédigée : la revue est validée par le dirigeant.</li><li><strong>Méthode :</strong> pour chaque indicateur applicable, vérification d'un échantillon de pièces datées et cohérentes entre elles (identité, dates, durées, montants) ; tout écart ouvre une action au tableau d'amélioration continue.</li></ul>` },
     ],
     table: { headers: ["Indicateur", "Exigence", "Constat", "Pièces vérifiées / écart relevé", "Action (réf. tableau d'amélioration)"], rows },
-    extraHtml: `<h2>Synthèse</h2><p>Date de l'audit : ______ — Nombre d'écarts : ______ — Actions ouvertes : ______</p>`,
-    signatures: { type: "2", labels: ["L'auditeur interne", "Le dirigeant"], names: [v(o.referentQualite) || referent(o), v(o.dirigeant)], dates: ["", ""] },
+    extraHtml: `<h2>Synthèse</h2><p>Programme établi le ${formatDate(d)}. La grille est complétée à chaque audit interne (au moins une fois par an et avant chaque audit de certification) ; chaque écart relevé est reporté au tableau d'amélioration continue avec son action et son échéance.</p>`,
+    signatures: { type: "2", labels: ["L'auditeur interne", "Le dirigeant"], names: [v(o.referentQualite) || referent(o), v(o.dirigeant)], dates: [formatDate(d), formatDate(d)] },
   });
 }
 
@@ -174,6 +177,16 @@ export function genSuiviHeures(oDossier: OrganismeInfo, tp: TypePrestation, f: F
   const assid = v(getAssiduiteLabel(f) || "");
   const complet = /^100\s*%$/.test(assid);
   const rows = stagiaires.filter((s) => v(s.nom)).map((s) => {
+    if (tp === "VAE") {
+      // VAE : heures relevées depuis le calendrier des séances, comme la feuille d'émargement.
+      const cal = calendrierVAE(s, f);
+      const prev = cal.reduce((a, x) => a + x.duree, 0);
+      const faites = cal.filter((x) => x.realisee);
+      const real = faites.reduce((a, x) => a + x.duree, 0);
+      const periode = cal.length ? `${formatDate(iso(cal[0].date))} → ${formatDate(iso(cal[cal.length - 1].date))}` : "—";
+      const statut = faites.length === cal.length ? `${real} h` : `${real} h au ${formatDate(d)} (${cal.length - faites.length} séance(s) à venir)`;
+      return [`${s.prenom} ${s.nom}`, periode, `${prev} h`, statut, "0 h", "—", "—"];
+    }
     const periode = `${formatDate(v(s.dateDebutFormation) || v(f.dateDebut))} → ${formatDate(v(s.dateFinFormation) || v(f.dateFin))}`;
     const termine = isStagiaireFormationTerminee(s, f);
     const h = prevues ? `${prevues} h` : "—";
