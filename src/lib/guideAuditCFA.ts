@@ -3,7 +3,7 @@
 // script, documents à présenter et points de vigilance.
 
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant, sansRealisation } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
@@ -14,7 +14,7 @@ export function generateGuideAuditCFA(
   stagiaires: StagiaireInfo[] = [],
   typeAudit: TypeAuditCFA = typeAuditEffectif(org)
 ): string {
-  const isNE = typeAudit === 'initial';
+  const isNE = sansRealisation(typeAudit);
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const docsByInd = new Map<number, string[]>();
   catalog.forEach(d => {

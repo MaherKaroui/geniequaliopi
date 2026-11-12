@@ -8,7 +8,7 @@
 // adapté à chaque type d'action.
 
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif, attenduSelonAudit, versionReferentiel, LIBELLES_AUDIT, type TypeAudit } from "./typeAudit";
+import { typeAuditEffectif, attenduSelonAudit, versionReferentiel, LIBELLES_AUDIT, sansRealisation, type TypeAudit } from "./typeAudit";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
 import { generateGuideAuditCFA } from "./guideAuditCFA";
@@ -194,7 +194,7 @@ function generateGuideAutres(
 ): string {
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const formationsTerminees = stagiaires.filter((s) => (s.nom || "").trim() && isStagiaireFormationTerminee(s, formations[0] || ({} as FormationInfo))).length;
-  const alerteAudit = typeAudit !== "initial" && formationsTerminees === 0
+  const alerteAudit = !sansRealisation(typeAudit) && formationsTerminees === 0
     ? `<div class="vigilance"><strong>⚠️ ${LIBELLES_AUDIT[typeAudit]} :</strong> aucun ${ACTION_BENEFICIAIRE[type].toLowerCase()} du dossier n'a terminé son parcours. L'auditeur attend des preuves de mise en œuvre sur la période (émargements, évaluations, satisfaction, résultats chiffrés) : ajoutez les sessions réalisées avant l'audit.</div>`
     : "";
   const refCode = ACTION_TO_REF_CODE[type];

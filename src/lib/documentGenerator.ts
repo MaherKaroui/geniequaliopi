@@ -13,7 +13,7 @@ import { getFicheFC } from "./franceCompetences";
 import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genEvaluationBlocsStagiaire } from "./referentielPedagogie";
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { entreesCatalogueReferentiel, renderReferentielTemplate, retirePiecesV9 } from "./referentielV10";
-import { typeAuditEffectif, LIBELLES_AUDIT } from "./typeAudit";
+import { typeAuditEffectif, LIBELLES_AUDIT, sansRealisation } from "./typeAudit";
 import { aleaSession, dateAnalyseRisques, dateArreteRegistre, nombreIncidents } from "./registresQualite";
 import { orgVersionUlterieure, intervenantUnique } from "./versionUlterieure";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
@@ -4897,7 +4897,7 @@ function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagia
   let { iso, tenu } = dateConseilPerfectionnement(f);
   // Surveillance / renouvellement : un conseil de perfectionnement a nécessairement été tenu
   // sur la période ; on présente le PV de la dernière séance, datée dans le passé.
-  if (!tenu && typeAuditEffectif(o) !== "initial") {
+  if (!tenu && !sansRealisation(typeAuditEffectif(o))) {
     const d = dateRevueDirection(o);
     d.setMonth(d.getMonth() - 1);
     while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
@@ -11661,7 +11661,7 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const dateRD = formatDate((() => { const d = dateRevueDirection(o); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })());
   risquesAction.forEach((r, i) => {
     lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `${r.processus} — risque coté « élevé » (criticité ${r.criticite}) dans la cartographie des risques de ${o.nom}`, r.risque, r.mesure, r.pilote, "Permanent — revue annuelle", "",
-      `Indicateur de suivi : ${r.indicateur}. ${typeAud === "initial" ? "Efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`}`]);
+      `Indicateur de suivi : ${r.indicateur}. ${sansRealisation(typeAud) ? "Efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`}`]);
   });
   // Aléa de session (IND 31) — même enregistrement que le suivi des dysfonctionnements.
   const alea = aleaSession(f);
@@ -11688,9 +11688,9 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
         avantV1 ? `Réalisée — suivie à titre personnel par ${a.beneficiaires} avant la création de ${o.nom} ; attestation jointe` : "Réalisée — attestation de fin de formation jointe"]);
       return;
     }
-    lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, dateMajFr, "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, a.periode, "", typeAud === "initial" ? "Prévue — attestation à joindre" : "Voir le bilan de réalisation du plan (IND 22)"]);
+    lignes.push([`AC-P${String(i + 1).padStart(2, "0")}`, dateMajFr, "Plan de développement des compétences (IND 22)", a.besoin, "Compétence insuffisante ou non actualisée d'un intervenant", `${a.ref} — ${a.nom}`, a.beneficiaires, a.periode, "", sansRealisation(typeAud) ? "Prévue — attestation à joindre" : "Voir le bilan de réalisation du plan (IND 22)"]);
   });
-  if (typeAud !== "initial") {
+  if (!sansRealisation(typeAud)) {
     lignes.push(["AC-RD01", dateRD, `Revue de direction (${LIBELLES_AUDIT[typeAud]})`, "Revue annuelle des résultats, appréciations, réclamations, veille et risques", "Tous risques de la cartographie", typeAud === "renouvellement" ? "Bilan du cycle de certification et mise à jour de l'analyse des risques" : "Mise à jour des indicateurs publiés et de l'analyse des risques", o.dirigeant, dateRD, dateRD, "Clôturé — compte rendu de revue de direction (IND 32)"]);
   }
   lignes.forEach((l) => {

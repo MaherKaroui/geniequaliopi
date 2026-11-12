@@ -65,7 +65,7 @@ export interface OrganismeInfo {
   dateObtentionQualiopi?: string;
   dateFinValiditeQualiopi?: string;
   /** Type d'audit préparé : « auto » (défaut) = déduit du certificat Qualiopi. */
-  typeAudit?: "auto" | "initial" | "surveillance" | "renouvellement";
+  typeAudit?: "auto" | "initial" | "complementaire" | "surveillance" | "renouvellement";
   /**
    * Version du guide de lecture appliquée : « auto » (défaut) = V10 pour un nouvel entrant
    * (audit initial), V9 pour la surveillance et le renouvellement (période transitoire).

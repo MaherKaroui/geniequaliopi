@@ -1,5 +1,5 @@
 // Critère 5 — IND 21 & IND 22 generators (based on real SELECT FORMATION documents)
-import { typeAuditEffectif, versionReferentiel } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, sansRealisation } from "./typeAudit";
 import { mot } from "./resolveurFormation";
 import { isLRBFormation } from "./robertRS7013Humanized";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
@@ -562,7 +562,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const maj = (o.dateMaj || "").trim();
   const dateEtab = maj ? formatDate(maj) : formatDate(new Date().toISOString().slice(0, 10));
   const an = maj ? Number(maj.slice(0, 4)) : new Date().getFullYear();
-  const initial = typeAuditEffectif(o) === "initial";
+  const initial = sansRealisation(typeAuditEffectif(o));
   const seul = dirigeantSeul(o, f, stagiaires);
   const statut = initial
     ? "Prévue — attestation à joindre après réalisation"

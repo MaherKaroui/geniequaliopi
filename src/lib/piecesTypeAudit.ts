@@ -11,7 +11,7 @@ import { planDevActions } from "./templatesCritere5";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, isStagiaireFormationTerminee } from "./docBuilder";
 import { getSatisfactionLabel, getAssiduiteLabel, getTauxObtention, getRepartitionParAnnee } from "./indicateursResultats";
-import { typeAuditEffectif, LIBELLES_AUDIT, moisEntre, type TypeAudit } from "./typeAudit";
+import { typeAuditEffectif, LIBELLES_AUDIT, moisEntre, sansRealisation, type TypeAudit } from "./typeAudit";
 import { entreesVeille } from "./veilleExploitee";
 import { orgVersionUlterieure } from "./versionUlterieure";
 import { aleaSession, dateAnalyseRisques } from "./registresQualite";
@@ -83,7 +83,7 @@ export function genIndicateursResultatsAudit(o: OrganismeInfo, f: FormationInfo,
   const sections: { heading: string; content: string; variant?: "green" | "orange" }[] = [
     { heading: "Type d'audit", content: `<p><strong>${LIBELLES_AUDIT[type]}</strong> — ${f.intitule}.</p>` },
   ];
-  if (type === "initial") {
+  if (sansRealisation(type)) {
     sections.push(
       { heading: "Situation de nouvel entrant", content: termines.length
         ? `<p>${o.nom} est nouvel entrant. ${termines.length} parcours ${termines.length > 1 ? "sont terminés" : "est terminé"} à la date du ${formatDate(iso(today))} : les premiers résultats ci-dessous sont publiés et seront consolidés à l'audit de surveillance.</p>`
@@ -97,7 +97,7 @@ export function genIndicateursResultatsAudit(o: OrganismeInfo, f: FormationInfo,
     }
     sections.push({ heading: "Méthode et diffusion", content: definition });
   }
-  const table = type === "initial" && !termines.length ? undefined : { headers: ["Indicateur", "Valeur", "Source"], rows: chiffres.map((c) => [c.libelle, c.valeur, c.source]) };
+  const table = sansRealisation(type) && !termines.length ? undefined : { headers: ["Indicateur", "Valeur", "Source"], rows: chiffres.map((c) => [c.libelle, c.valeur, c.source]) };
   let evolution = "";
   if (type === "renouvellement") {
     const rep = getRepartitionParAnnee(f, stagiaires);
@@ -197,7 +197,7 @@ export function genBilanPlanDeveloppement(o: OrganismeInfo, f: FormationInfo, st
 export function entreesCatalogueTypeAudit(o: OrganismeInfo, today: Date = new Date()): { id: string; nom: string; critere: number; indicateur: number; template: string; params?: Record<string, unknown> }[] {
   const type = typeAuditEffectif(o, today);
   const out = [{ id: "audit_ind2_indicateurs", nom: `CT1 - IND 2 INDICATEURS DE RÉSULTATS – ${LIBELLES_AUDIT[type].toUpperCase()}`, critere: 1, indicateur: 2, template: "audit_indicateurs_resultats" }];
-  if (type !== "initial") {
+  if (!sansRealisation(type)) {
     out.push({ id: "audit_ind22_bilan_plan_dev", nom: "CT5 - IND 22 BILAN DE RÉALISATION DU PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", critere: 5, indicateur: 22, template: "audit_bilan_plan_dev" });
     out.push({ id: "audit_ind32_revue_direction", nom: "CT7 - IND 32 REVUE DE DIRECTION – BILAN QUALITÉ ANNUEL", critere: 7, indicateur: 32, template: "audit_revue_direction" });
   }

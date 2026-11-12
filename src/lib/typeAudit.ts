@@ -1,13 +1,14 @@
 /**
  * Type d'audit Qualiopi applicable au dossier : audit initial (nouvel entrant),
  * audit de surveillance (entre le 14e et le 22e mois du cycle) ou audit de
- * renouvellement (fin du cycle de 3 ans).
+ * renouvellement (fin du cycle de 3 ans), ou audit complémentaire (extension du
+ * certificat à une nouvelle catégorie d'action, auditée comme un nouvel entrant).
  *
  * Saisi dans organisme.typeAudit ; « auto » (défaut) le déduit du certificat.
  */
 import type { OrganismeInfo } from "@/types/qualiopi";
 
-export type TypeAudit = "initial" | "surveillance" | "renouvellement";
+export type TypeAudit = "initial" | "complementaire" | "surveillance" | "renouvellement";
 export type TypeAuditSaisi = TypeAudit | "auto";
 
 /** Version du guide de lecture du référentiel national qualité. */
@@ -23,6 +24,7 @@ export const indicateursNouvelEntrant = (version: VersionReferentiel = "V9") =>
 
 export const LIBELLES_AUDIT: Record<TypeAudit, string> = {
   initial: "Audit initial (nouvel entrant)",
+  complementaire: "Audit complémentaire (extension de périmètre)",
   surveillance: "Audit de surveillance",
   renouvellement: "Audit de renouvellement",
 };
@@ -58,7 +60,10 @@ export function typeAuditEffectif(o?: Partial<OrganismeInfo> | null, today: Date
   return moisEntre(obtention, today) < 30 ? "surveillance" : "renouvellement";
 }
 
-export const estNouvelEntrant = (o?: Partial<OrganismeInfo> | null, today?: Date) => typeAuditEffectif(o, today) === "initial";
+/** Audit sans réalisation attendue sur la catégorie : audit initial, ou audit complémentaire d'une nouvelle catégorie. */
+export const sansRealisation = (t: TypeAudit) => t === "initial" || t === "complementaire";
+
+export const estNouvelEntrant = (o?: Partial<OrganismeInfo> | null, today?: Date) => sansRealisation(typeAuditEffectif(o, today));
 
 export const LIBELLES_REFERENTIEL: Record<VersionReferentiel, string> = {
   V9: "Guide de lecture V9 (8 janvier 2024)",
@@ -68,24 +73,24 @@ export const LIBELLES_REFERENTIEL: Record<VersionReferentiel, string> = {
 /**
  * Version du guide de lecture appliquée au dossier :
  * - valeur saisie si elle n'est pas « auto » ;
- * - nouvel entrant (audit initial) : V10 ;
+ * - nouvel entrant (audit initial ou complémentaire) : V10 ;
  * - surveillance ou renouvellement : V9 (audit possible dans les conditions au 31/10/2026 jusqu'au 31/12/2026).
  */
 export function versionReferentiel(o?: Partial<OrganismeInfo> | null, today?: Date): VersionReferentiel {
   const saisi = o?.referentielQualiopi || "auto";
   if (saisi !== "auto") return saisi;
-  return typeAuditEffectif(o, today) === "initial" ? "V10" : "V9";
+  return estNouvelEntrant(o, today) ? "V10" : "V9";
 }
 
 /** Niveau de preuve attendu selon le type d'audit (phrase courte, guide V9 ou V10). */
 export function attenduSelonAudit(type: TypeAudit, indicateur: number, version: VersionReferentiel = "V9"): string {
   const ne = indicateursNouvelEntrant(version).includes(indicateur);
-  if (type === "initial") {
-    if (ne) return "Nouvel entrant : l'auditeur vérifie la formalisation du processus (procédures, outils, trames) ; la mise en œuvre sera vérifiée à l'audit de surveillance.";
+  if (sansRealisation(type)) {
+    if (ne) return `${type === "complementaire" ? "Extension de périmètre (nouvelle catégorie auditée comme un nouvel entrant)" : "Nouvel entrant"} : l'auditeur vérifie la formalisation du processus (procédures, outils, trames) ; la mise en œuvre sera vérifiée à l'audit de surveillance.`;
     if (version === "V10" && (indicateur === 22 || indicateur === 32)) {
       return "Nouvel entrant, guide V10 : indicateur audité dès l'audit initial — processus formalisé ET preuves de mise en œuvre (actions de développement des compétences réalisées ; analyse des risques, audit interne et suivi des heures non réalisées).";
     }
-    return "Audit initial : processus formalisé ET premières preuves de mise en œuvre lorsqu'une prestation a déjà été réalisée.";
+    return `${type === "complementaire" ? "Audit complémentaire" : "Audit initial"} : processus formalisé ET premières preuves de mise en œuvre lorsqu'une prestation a déjà été réalisée.`;
   }
   if (type === "surveillance") {
     return "Surveillance : l'auditeur vérifie la mise en œuvre effective sur la période écoulée depuis l'audit initial (preuves datées, résultats, actions réalisées).";

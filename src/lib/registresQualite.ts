@@ -6,7 +6,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { entreesVeille } from "./veilleExploitee";
 import { dateRevueDirection } from "./piecesTypeAudit";
-import { typeAuditEffectif } from "./typeAudit";
+import { typeAuditEffectif, sansRealisation } from "./typeAudit";
 import type { TypePrestation } from "./qualite2026";
 
 const v = (x: unknown) => (x == null ? "" : String(x).trim());
@@ -57,7 +57,7 @@ export function dateAnalyseRisques(o: OrganismeInfo, f: FormationInfo, today: Da
   if (!decret) return maj;
   let d = isoDepuisFr(decret.statut === "Réalisé" ? decret.echeance : decret.priseEnCompte);
   if (d < maj) d = maj;
-  if (typeAuditEffectif(o, today) !== "initial") {
+  if (!sansRealisation(typeAuditEffectif(o, today))) {
     const rd = dateRevueDirection(o, today);
     const veille = new Date(rd);
     do { veille.setDate(veille.getDate() - 1); } while (veille.getDay() === 0 || veille.getDay() === 6);
@@ -74,7 +74,7 @@ export function dateAnalyseRisques(o: OrganismeInfo, f: FormationInfo, today: Da
 export function dateArreteRegistre(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = [], today: Date = new Date()): string {
   const maj = v(o.dateMaj).slice(0, 10) || isoLocal(today);
   const auj = isoLocal(today);
-  if (typeAuditEffectif(o, today) !== "initial") {
+  if (!sansRealisation(typeAuditEffectif(o, today))) {
     const rd = isoLocal(dateRevueDirection(o, today));
     return rd < maj ? maj : rd;
   }

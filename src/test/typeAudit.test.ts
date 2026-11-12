@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { typeAuditEffectif, moisEntre } from "@/lib/typeAudit";
+import { typeAuditEffectif, moisEntre, estNouvelEntrant, versionReferentiel, LIBELLES_AUDIT } from "@/lib/typeAudit";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { ORG_TEST, FORMATIONS_TEST, STAGIAIRES_TEST } from "./dossierAudit.harness";
 
@@ -14,6 +14,17 @@ describe("type d'audit", () => {
     expect(typeAuditEffectif({ dateObtentionQualiopi: moisAvant(40) }, TODAY)).toBe("renouvellement");
     expect(typeAuditEffectif({ dateObtentionQualiopi: moisAvant(40), typeAudit: "surveillance" }, TODAY)).toBe("surveillance");
     expect(moisEntre(new Date(2024, 0, 15), new Date(2026, 6, 14))).toBe(29);
+  });
+
+  it("audit complémentaire : organisme certifié, nouvelle catégorie auditée comme un nouvel entrant", () => {
+    const o = { ...ORG_TEST, typesActions: ["vae" as const], typeAudit: "complementaire" as const, numeroCertificatQualiopi: "X", dateObtentionQualiopi: moisAvant(7) };
+    expect(typeAuditEffectif(o, TODAY)).toBe("complementaire");
+    expect(estNouvelEntrant(o, TODAY)).toBe(true);
+    expect(versionReferentiel(o, TODAY)).toBe("V10");
+    const cat = getFullCatalog(o, FORMATIONS_TEST.vae, STAGIAIRES_TEST);
+    expect(cat.some((d) => d.template === "audit_revue_direction")).toBe(false);
+    const ind2 = cat.find((d) => d.template === "audit_indicateurs_resultats")!;
+    expect(ind2.nom).toContain(LIBELLES_AUDIT.complementaire.toUpperCase());
   });
 
   for (const t of ["actions-formation", "apprentissage", "vae", "bilans-competences"] as const) {

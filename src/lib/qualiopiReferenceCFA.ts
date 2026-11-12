@@ -1,3 +1,4 @@
+import type { TypeAudit } from "./typeAudit";
 // Référentiel national qualité (décret n° 2026-728, en vigueur au 01/11/2026) — Spécialisation CFA
 // Guide de lecture V9 du 08/01/2024 — 33 indicateurs avec niveau attendu,
 // script "ce qu'il faut dire", preuves attendues, statut nouvel entrant et pondération.
@@ -217,10 +218,11 @@ export function getIndicateursByCritere(crit: number): IndicateurCFA[] {
   return INDICATEURS_CFA.filter(i => i.critere === crit);
 }
 
-export type TypeAuditCFA = 'initial' | 'surveillance' | 'renouvellement';
+export type TypeAuditCFA = TypeAudit;
 
 export function getTypeAuditLabel(t: TypeAuditCFA): string {
   if (t === 'initial') return "AUDIT INITIAL · NOUVEL ENTRANT";
+  if (t === 'complementaire') return "AUDIT COMPLÉMENTAIRE · EXTENSION DE PÉRIMÈTRE";
   if (t === 'surveillance') return "AUDIT DE SURVEILLANCE";
   return "AUDIT DE RENOUVELLEMENT";
 }

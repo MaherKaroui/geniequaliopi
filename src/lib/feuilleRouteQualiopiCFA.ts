@@ -5,7 +5,7 @@
 
 import { clampCells } from "./xlsxSafe";
 import { isStagiaireFormationTerminee } from "./docBuilder";
-import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant } from "./typeAudit";
+import { typeAuditEffectif, versionReferentiel, indicateursNouvelEntrant, sansRealisation } from "./typeAudit";
 import * as XLSX from "xlsx";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
@@ -24,7 +24,7 @@ export function generateFeuilleRouteQualiopiCFA(
   stagiaires: StagiaireInfo[] = [],
   typeAudit: TypeAuditCFA = typeAuditEffectif(org)
 ): Blob {
-  const isNE = typeAudit === 'initial';
+  const isNE = sansRealisation(typeAudit);
   const docsByInd = new Map<number, string[]>();
   catalog.forEach(d => {
     if (!docsByInd.has(d.indicateur)) docsByInd.set(d.indicateur, []);

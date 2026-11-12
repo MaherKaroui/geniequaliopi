@@ -1710,6 +1710,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                 <SelectContent>
                   <SelectItem value="auto">Automatique (d'après le certificat) — {LIBELLES_AUDIT[typeAuditEffectif({ ...mergedOrganisme, typeAudit: "auto" })]}</SelectItem>
                   <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
+                  <SelectItem value="complementaire">Audit complémentaire (extension de périmètre)</SelectItem>
                   <SelectItem value="surveillance">Audit de surveillance</SelectItem>
                   <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
                 </SelectContent>
@@ -1757,6 +1758,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires, onOrganismeChange
                   <SelectContent>
                     <SelectItem value="auto">Automatique (d'après le certificat) — {LIBELLES_AUDIT[typeAuditEffectif({ ...mergedOrganisme, typeAudit: "auto" })]}</SelectItem>
                     <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
+                    <SelectItem value="complementaire">Audit complémentaire (extension de périmètre)</SelectItem>
                     <SelectItem value="surveillance">Audit de surveillance</SelectItem>
                     <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
                   </SelectContent>
