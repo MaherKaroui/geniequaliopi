@@ -4,6 +4,8 @@ import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSumm
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
 import { genContratPrestationQualiopi } from "./contratPrestationQualiopi";
 import { renderVAETemplate } from "./vae/vaeDossier2026";
+import { calendrierVAE, frVAE } from "./vae/vaeProfil";
+import { dirigeanteFem, de, dossierVAESeul } from "./genre";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs, estCertifiante } from "./formationResolue";
 import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14MissionsCFA, genPlanAnnuel14MissionsCFA, genProcedureAccompagnementSocialCFA, genProcedureEvaluationCompetencesCFA } from "./missionsCFA2026";
@@ -234,6 +236,9 @@ const PIECES_AF_REPRISES_VAE = new Set([
 /** Vocabulaire VAE dans le texte (jamais dans les balises) : candidat, accompagnateur. */
 function vocabulaireVAE(html: string): string {
   const mots: [RegExp, string][] = [
+    // Élision avant remplacement : « le formateur » → « l'accompagnateur », « du formateur » → « de l'accompagnateur ».
+    [/\b([Ll])e formateur\b/g, "$1'accompagnateur"], [/\bdu formateur\b/g, "de l'accompagnateur"], [/\bDu formateur\b/g, "De l'accompagnateur"],
+    [/\bau formateur\b/g, "à l'accompagnateur"], [/\bce formateur\b/g, "cet accompagnateur"],
     [/\bSTAGIAIRES\b/g, "CANDIDATS"], [/\bSTAGIAIRE\b/g, "CANDIDAT"], [/\bStagiaires\b/g, "Candidats"], [/\bStagiaire\b/g, "Candidat"],
     [/\bstagiaires\b/g, "candidats"], [/\bstagiaire\b/g, "candidat"],
     [/\bFORMATEURS\b/g, "ACCOMPAGNATEURS"], [/\bFORMATEUR\b/g, "ACCOMPAGNATEUR"], [/\bFormateurs\b/g, "Accompagnateurs"], [/\bFormateur\b/g, "Accompagnateur"],
@@ -7618,16 +7623,34 @@ function lendemainOuvre(isoDate: string): string {
 }
 
 /** Bilan d'activité fondé uniquement sur les indicateurs saisis de la formation (rien d'inventé). */
-function bilanIndicateursReels(f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+function bilanIndicateursReels(f: FormationInfo, stagiaires: StagiaireInfo[], vae = false): string {
   const val = (x?: string) => String(x || "").trim();
   const nbFormes = val(f.nombreStagiairesFormes) || (stagiaires.length ? String(stagiaires.length) : "");
   const n = parseInt(nbFormes, 10);
   const avis = val(f.nombreAvisSatisfaction);
+  if (vae) {
+    // VAE : dates des séances réelles (jours fériés sautés) et assiduité tirée des émargements du calendrier.
+    const cands = stagiaires.filter((s) => (s.nom || "").trim());
+    const cals = cands.map((s) => calendrierVAE(s, f));
+    const toutes = cals.flat();
+    const faites = toutes.filter((x) => x.realisee);
+    const h = (l: typeof toutes) => l.reduce((a, x) => a + x.duree, 0);
+    const debut = toutes.map((x) => x.date.getTime()).sort((a, b) => a - b)[0];
+    const fin = toutes.map((x) => x.date.getTime()).sort((a, b) => b - a)[0];
+    const fem = cands.length > 0 && cands.every((s) => s.civilite === "Mme");
+    const lignesVAE = [
+      `<li>Accompagnement réalisé : « ${f.intitule} »${debut ? `, du ${frVAE(new Date(debut))} au ${frVAE(new Date(fin))}` : ""}${f.modalites ? ` (${/distanc/i.test(f.modalites) && !/pr[ée]sentiel|mixte/i.test(f.modalites) ? "100 % à distance" : f.modalites})` : ""}.</li>`,
+      `<li>${cands.length > 1 ? (fem ? "Candidates accompagnées" : "Candidats accompagnés") : fem ? "Candidate accompagnée" : "Candidat accompagné"} : ${cands.length}${cands.length ? ` (${cands.map((s) => `${s.prenom} ${s.nom}`).join(", ")})` : ""}.</li>`,
+      `<li>Satisfaction : ${val(f.tauxSatisfaction) ? `${val(f.tauxSatisfaction)}${avis ? ` (${avis} avis)` : ""}` : "recueillie par le questionnaire de fin d'accompagnement ; taux publié à partir des seules réponses signées (indicateurs de résultats, IND 2)"}.</li>`,
+      `<li>Assiduité : ${val(f.tauxAssiduite) || (toutes.length ? `${faites.length} séance${faites.length > 1 ? "s" : ""} sur ${toutes.length}, soit ${h(faites)} h sur ${h(toutes)} h (${Math.round((h(faites) / Math.max(1, h(toutes))) * 100)} %), selon les feuilles d'émargement` : "suivie par les feuilles d'émargement")}.</li>`,
+    ];
+    return `<ul>${lignesVAE.join("")}</ul><p>Source : indicateurs de résultats de l'accompagnement (IND 2), feuilles d'émargement et questionnaires de fin d'accompagnement du dossier.</p>`;
+  }
   const lignes = [
     `<li>Formation animée : « ${f.intitule} »${f.dateDebut && f.dateFin ? `, session du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}` : ""}${f.modalites ? ` (${f.modalites})` : ""}.</li>`,
     `<li>Stagiaires formés : ${nbFormes ? `${nbFormes} stagiaire${n > 1 ? "s" : ""}` : "non renseigné"}.</li>`,
-    `<li>Satisfaction des stagiaires : ${val(f.tauxSatisfaction) || "non renseignée"}${avis ? ` (${avis} avis recueilli${parseInt(avis, 10) > 1 ? "s" : ""})` : ""}.</li>`,
-    `<li>Assiduité : ${val(f.tauxAssiduite) || "non renseignée"}.</li>`,
+    `<li>Satisfaction des stagiaires : ${val(f.tauxSatisfaction) || "mesurée par le questionnaire de fin de formation ; taux publié à partir des seules réponses recueillies"}${avis ? ` (${avis} avis recueilli${parseInt(avis, 10) > 1 ? "s" : ""})` : ""}.</li>`,
+    `<li>Assiduité : ${val(f.tauxAssiduite) || "suivie par les feuilles d'émargement de chaque session"}.</li>`,
   ];
   return `<ul>${lignes.join("")}</ul><p>Source : indicateurs de résultats de la formation (IND 2) et questionnaires de satisfaction du dossier.</p>`;
 }
@@ -7641,11 +7664,14 @@ function genRevueCompetencesDirigeant(o: OrganismeInfo, f: FormationInfo, stagia
   const dRevue = fin ? lendemainOuvre(fin) : (o.dateMaj || new Date().toISOString().slice(0, 10));
   const org = { ...organismeALaDate(o, dRevue), dateMaj: dRevue };
   const memeNom = (a?: string, b?: string) => String(a || "").trim().toLowerCase().replace(/\s+/g, " ") === String(b || "").trim().toLowerCase().replace(/\s+/g, " ");
-  const fonctions = ["dirigeant (mandataire social)"];
+  const fem = dirigeanteFem(o);
+  const vae = dossierVAESeul(o);
+  const fonction = vae ? (fem ? "accompagnatrice" : "accompagnateur") : fem ? "formatrice" : "formateur";
+  const fonctions = [fem ? "dirigeante (mandataire sociale)" : "dirigeant (mandataire social)"];
   if (memeNom(o.responsablePedagogique, nom)) fonctions.push("responsable pédagogique");
-  if (memeNom(o.poleAdministratif, nom)) fonctions.push("référent administratif");
-  if (memeNom(o.referentHandicap, nom)) fonctions.push("référent handicap");
-  fonctions.push("formateur");
+  if (memeNom(o.poleAdministratif, nom)) fonctions.push(fem ? "référente administrative" : "référent administratif");
+  if (memeNom(o.referentHandicap, nom)) fonctions.push(fem ? "référente handicap" : "référent handicap");
+  fonctions.push(fonction);
   const actions = planDevActions(o, f, [], stagiaires);
   const realisees = actions.filter((a) => a.realisee && a.beneficiaires.toLowerCase().includes(nom.toLowerCase()));
   const finPeriode = (per: string) => { const m = per.match(/^T(\d) (\d{4})$/); return m ? `${m[2]}-${String(+m[1] * 3).padStart(2, "0")}-31` : ""; };
@@ -7654,14 +7680,14 @@ function genRevueCompetencesDirigeant(o: OrganismeInfo, f: FormationInfo, stagia
   const prevues = nonRealisees.filter((a) => !echues.includes(a));
   return buildDocument({
     org,
-    title: "REVUE ANNUELLE DES COMPÉTENCES DU DIRIGEANT-FORMATEUR",
+    title: `REVUE ANNUELLE DES COMPÉTENCES ${fem ? "DE LA DIRIGEANTE" : "DU DIRIGEANT"}-${fonction.toUpperCase()}`,
     subtitle: nom,
     sections: [
-      { heading: "Identification", content: `<p><strong>Nom :</strong> ${nom}<br><strong>Fonctions :</strong> ${fonctions.join(", ")}<br><strong>Statut :</strong> dirigeant (mandataire social) de ${o.nom} — pas d'entretien annuel ou professionnel de salarié : cette revue en tient lieu pour l'indicateur 22<br><strong>Date de la revue :</strong> ${formatDate(dRevue)}${fin ? ` (après la dernière session, terminée le ${formatDate(fin)})` : ""}</p>` },
-      { heading: "I – Bilan de l'activité de formation", content: bilanIndicateursReels(f, stagiaires) },
+      { heading: "Identification", content: `<p><strong>Nom :</strong> ${nom}<br><strong>Fonctions :</strong> ${fonctions.join(", ")}<br><strong>Statut :</strong> ${fonctions[0]} ${de(o.nom)} — pas d'entretien annuel ou professionnel de salarié : cette revue en tient lieu pour l'indicateur 22<br><strong>Date de la revue :</strong> ${formatDate(dRevue)}${fin ? ` (après la dernière session, terminée le ${formatDate(fin)})` : ""}</p>` },
+      { heading: vae ? "I – Bilan de l'activité d'accompagnement" : "I – Bilan de l'activité de formation", content: bilanIndicateursReels(f, stagiaires, vae) },
       { heading: "II – Actions de développement des compétences suivies", content: realisees.length ? `<ul>${realisees.map((a) => `<li>${a.ref} — ${a.nom} (${a.periode}) : attestation de fin de formation jointe au dossier.</li>`).join("")}</ul>` : `<p>Aucune action réalisée avec attestation au dossier à la date de la revue.</p>` },
-      { heading: "III – Besoins retenus pour la période à venir", content: `${echues.length ? `<p>Actions du plan dont l'échéance est passée sans attestation au dossier, reconduites :</p><ul>${echues.map((a) => `<li>${a.ref} — ${a.nom} (prévue ${a.periode})</li>`).join("")}</ul>` : ""}${prevues.length ? `<p>Actions inscrites au plan de développement des compétences (IND 22) :</p><ul>${prevues.map((a) => `<li>${a.ref} — ${a.nom} (${a.periode})</li>`).join("")}</ul>` : ""}${!echues.length && !prevues.length ? `<p>Besoins à inscrire au plan de développement des compétences (IND 22).</p>` : ""}` },
-      { heading: "IV – Décision", content: `<p>Qualification de ${nom} maintenue pour l'animation de la formation « ${f.intitule} ». Prochaine revue : après la dernière session de l'année suivante.</p>`, variant: "green" },
+      { heading: "III – Besoins retenus pour la période à venir", content: `${echues.length ? `<p>Actions du plan dont l'échéance est passée sans attestation au dossier, reconduites :</p><ul>${echues.map((a) => `<li>${a.ref} — ${a.nom} (prévue ${a.periode})</li>`).join("")}</ul>` : ""}${prevues.length ? `<p>Actions inscrites au plan de développement des compétences (IND 22) :</p><ul>${prevues.map((a) => `<li>${a.ref} — ${a.nom} (${a.periode})</li>`).join("")}</ul>` : ""}${!echues.length && !prevues.length ? `<p>Aucun besoin nouveau identifié à la date de la revue ; le plan de développement des compétences (IND 22) reste applicable.</p>` : ""}` },
+      { heading: "IV – Décision", content: `<p>Qualification de ${nom} maintenue pour ${vae ? "l'accompagnement" : "l'animation de la formation"} « ${f.intitule} ». Prochaine revue : après la dernière session de l'année suivante.</p>`, variant: "green" },
     ],
     signatures: { type: "1", labels: ["Le dirigeant"], names: [o.dirigeant], dates: [formatDate(dRevue)] },
   });
@@ -11848,19 +11874,24 @@ function genProcedureAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo, s
   // Organisme sans salarié (dirigeant seul intervenant) : ni « relais qualité », ni « personnel », ni « duos de formateurs ».
   const seul = intervenantUnique(o, f, stagiaires);
   const refQ = (o.referentQualite || "").replace(/\s*\(\s*externe\s*\)\s*/i, "").trim();
+  const fem = dirigeanteFem(o);
+  const vae = dossierVAESeul(o);
+  // Fonction pédagogique du dirigeant seul : formateur ou accompagnateur (VAE), accordée.
+  const fonction = vae ? (fem ? "accompagnatrice" : "accompagnateur") : fem ? "formatrice" : "formateur";
   const suiviPar = seul
-    ? `par le dirigeant${refQ && refQ !== (o.dirigeant || "").trim() ? `, avec l'appui du référent qualité (${refQ})` : ""}`
+    ? `par ${fem ? "la dirigeante" : "le dirigeant"}${refQ && refQ !== (o.dirigeant || "").trim() ? `, avec l'appui du référent qualité (${refQ})` : ""}`
     : `par le référent qualité${refQ ? ` (${refQ})` : ""}`;
   const suggestions = seul ? "des propositions du référent qualité et des retours des stagiaires" : "suggestions du personnel";
   const exemplePreventif = seul
-    ? "l'action préventive aurait pu être l'identification préalable d'un formateur remplaçant qualifié, mobilisable par contrat de sous-traitance en cas d'indisponibilité du dirigeant-formateur."
+    ? `l'action préventive aurait pu être l'identification préalable d'un ${vae ? "accompagnateur" : "formateur"} remplaçant qualifié, mobilisable par contrat de sous-traitance en cas d'indisponibilité ${fem ? "de la dirigeante" : "du dirigeant"}-${fonction}.`
     : "l'action préventive aurait pu être la création de duos de formateurs pouvant pallier les absences de l'un ou de l'autre.";
+  const remplace = seul && vae ? (fem ? "l'accompagnatrice absente" : "l'accompagnateur absent") : "le formateur absent";
   return buildDocument({ org: o, title: "PROCÉDURE AMÉLIORATION CONTINUE", sections: [
-    { heading: "1. Objet de la procédure", content: `<p>Cette procédure a pour objet de définir et détecter les dysfonctionnements liés aux prestations de formation ou au système qualité de l'organisme.</p><p>Suite à la détection des dysfonctionnements, une analyse des causes doit permettre de définir les actions correctives et/ou préventives à mettre en œuvre. Les actions correctives et préventives sont ensuite suivies dans leur mise en œuvre et leur efficacité ${suiviPar}. Les actions d'amélioration peuvent également être issues ${seul ? "" : "de "}${suggestions}.</p>` },
-    { heading: "2. Exigences couvertes par la procédure", content: `<p>Référentiel National Qualité :</p><ul><li>Critère 7 : indicateurs 31, 32</li><li>Critère 6 : indicateurs 23, 24, 25</li></ul>` },
-    { heading: "3. Principaux documents associés", content: `<ul><li>Fichier Excel « Tableau d'amélioration continue »</li><li>Fichier Excel « Réclamations et dysfonctionnements »</li><li>Enquête de satisfaction à chaud</li><li>Enquête de satisfaction à froid</li><li>Veille (innovation/métier/réglementaire)</li><li>Questionnaire parties prenantes</li></ul>` },
-    { heading: "4. Définitions relatives à l'activité décrite", content: `<p><strong>Dysfonctionnement/Réclamation :</strong> non satisfaction d'une exigence ou d'un engagement de l'organisme. Ces engagements concernent les exigences externes (légales, demandes des clients, cahier des charges, exigence normative) ou internes (engagement des organismes, objectifs, disposition des procédures…).</p><p><strong>Action corrective :</strong> après analyse, action visant à éliminer, non plus le dysfonctionnement, mais la ou les causes du dysfonctionnement. Exemple : on définit une personne ressource pouvant remplacer le formateur absent pour l'avenir.</p><p><strong>Action préventive :</strong> action visant à éliminer la cause d'un dysfonctionnement potentiel, avant que celui-ci ne se soit produit. Exemple : ${exemplePreventif}</p>` },
-    { heading: "5. Procédure", content: `<p>Cette procédure vise à positionner l'organisme de formation ${o.nom} dans une démarche d'amélioration continue pour l'ensemble de son fonctionnement.</p><p>Les sources d'amélioration comprennent :</p><ul><li>Les réclamations et aléas signalés par les stagiaires, entreprises ou financeurs</li><li>Les résultats des enquêtes de satisfaction (à chaud et à froid)</li><li>Les retours des formateurs (compte-rendu de formation)</li><li>Les résultats des veilles réglementaire, métier et technologique</li><li>Les audits internes et externes</li><li>${seul ? "La revue annuelle des compétences du dirigeant" : "Les entretiens avec le personnel"}</li></ul><p>Chaque action d'amélioration est tracée dans le tableau d'amélioration continue avec : la date d'ouverture, l'origine, la description, l'action décidée, le responsable, le délai, la date de clôture et les commentaires.</p>` },
+    { heading: "1. Objet de la procédure", content: `<p>Cette procédure a pour objet de définir et détecter les dysfonctionnements liés aux ${vae ? "prestations d'accompagnement VAE" : "prestations de formation"} ou au système qualité de l'organisme.</p><p>Suite à la détection des dysfonctionnements, une analyse des causes doit permettre de définir les actions correctives et/ou préventives à mettre en œuvre. Les actions correctives et préventives sont ensuite suivies dans leur mise en œuvre et leur efficacité ${suiviPar}. Les actions d'amélioration peuvent également être issues ${seul ? "" : "de "}${suggestions}.</p>` },
+    { heading: "2. Exigences couvertes par la procédure", content: `<p>Référentiel National Qualité :</p><ul><li>Critère 7 : indicateurs 30, 31, 32</li><li>Critère 6 : indicateurs 23, 24, 25</li></ul>` },
+    { heading: "3. Principaux documents associés", content: `<ul><li>Fichier Excel « Tableau d'amélioration continue »</li><li>${vae ? "Registre des réclamations et aléas" : "Fichier Excel « Réclamations et dysfonctionnements »"}</li>${vae ? "<li>Questionnaire de fin d'accompagnement</li>" : "<li>Enquête de satisfaction à chaud</li><li>Enquête de satisfaction à froid</li>"}<li>Veille (innovation/métier/réglementaire)</li><li>Questionnaire parties prenantes</li></ul>` },
+    { heading: "4. Définitions relatives à l'activité décrite", content: `<p><strong>Dysfonctionnement/Réclamation :</strong> non-satisfaction d'une exigence ou d'un engagement de l'organisme. Ces engagements concernent les exigences externes (légales, demandes des clients, cahier des charges, exigence normative) ou internes (engagement des organismes, objectifs, dispositions des procédures…).</p><p><strong>Action corrective :</strong> après analyse, action visant à éliminer, non plus le dysfonctionnement, mais la ou les causes du dysfonctionnement. Exemple : on définit une personne ressource pouvant remplacer ${remplace} pour l'avenir.</p><p><strong>Action préventive :</strong> action visant à éliminer la cause d'un dysfonctionnement potentiel, avant que celui-ci ne se soit produit. Exemple : ${exemplePreventif}</p>` },
+    { heading: "5. Procédure", content: `<p>Cette procédure vise à positionner l'organisme de formation ${o.nom} dans une démarche d'amélioration continue pour l'ensemble de son fonctionnement.</p><p>Les sources d'amélioration comprennent :</p><ul><li>Les réclamations et aléas signalés par les stagiaires, entreprises ou financeurs</li><li>${vae ? "Les résultats des questionnaires de fin d'accompagnement" : "Les résultats des enquêtes de satisfaction (à chaud et à froid)"}</li><li>${vae ? `Les retours ${seul ? (fem ? "de l'accompagnatrice" : "de l'accompagnateur") : "des accompagnateurs"} (bilan de fin d'accompagnement)` : "Les retours des formateurs (compte-rendu de formation)"}</li><li>Les résultats des veilles réglementaire, métier et technologique</li><li>Les audits internes et externes</li><li>${seul ? `La revue annuelle des compétences ${fem ? "de la dirigeante" : "du dirigeant"}` : "Les entretiens avec le personnel"}</li></ul><p>Chaque action d'amélioration est tracée dans le tableau d'amélioration continue avec : la date d'ouverture, l'origine, la description, l'action décidée, le responsable, le délai, la date de clôture et les commentaires.</p>` },
   ] });
 }
 
@@ -12215,16 +12246,17 @@ function genCompteRenduFormateur(o: OrganismeInfo, f: FormationInfo) {
 
 function genProcedureRelanceAppreciations(o: OrganismeInfo, f: FormationInfo) {
   const resp = o.referentQualite || o.responsablePedagogique || o.dirigeant || "Le responsable qualité";
+  const vae = dossierVAESeul(o);
   return buildDocument({ org: o, title: "PROCÉDURE DE RELANCE DES APPRÉCIATIONS", sections: [
-    { heading: "1. Objet", content: `<p>Cette procédure définit les modalités de recueil et de relance des appréciations des parties prenantes (bénéficiaires, entreprises, financeurs, formateurs) afin d'obtenir un taux de retour représentatif, conformément à l'indicateur 30 du référentiel Qualiopi.</p>` },
-    { heading: "2. Champ d'application", content: `<p>Toutes les actions dispensées par ${o.nom || "l'organisme"}${f.intitule ? `, dont la formation « ${f.intitule} »` : ""}.</p>` },
+    { heading: "1. Objet", content: `<p>Cette procédure définit les modalités de recueil et de relance des appréciations des parties prenantes (${vae ? "candidats, employeurs, financeurs, accompagnateurs" : "bénéficiaires, entreprises, financeurs, formateurs"}) afin d'obtenir un taux de retour représentatif, conformément à l'indicateur 30 du référentiel Qualiopi.</p>` },
+    { heading: "2. Champ d'application", content: `<p>Toutes les actions dispensées par ${o.nom || "l'organisme"}${f.intitule ? (vae ? `, dont l'accompagnement « ${f.intitule} »` : `, dont la formation « ${f.intitule} »`) : ""}.</p>` },
     { heading: "3. Responsable", content: `<p>${resp} pilote l'envoi des questionnaires, les relances et la consolidation des résultats.</p>` },
     { heading: "4. Calendrier des relances", content: `<table><tr><th>Échéance</th><th>Action</th><th>Support</th></tr>
-<tr><td>J+0 (dernier jour)</td><td>Envoi du questionnaire à chaud aux bénéficiaires</td><td>Courriel / lien en ligne</td></tr>
+${vae ? "<tr><td>J+0 (dernière séance)</td><td>Remise du questionnaire de fin d'accompagnement aux candidats</td><td>Courriel / lien en ligne</td></tr>" : "<tr><td>J+0 (dernier jour)</td><td>Envoi du questionnaire à chaud aux bénéficiaires</td><td>Courriel / lien en ligne</td></tr>"}
 <tr><td>J+7</td><td>1ʳᵉ relance des non-répondants</td><td>Courriel</td></tr>
 <tr><td>J+14</td><td>2ᵉ relance</td><td>Appel téléphonique</td></tr>
 <tr><td>J+21</td><td>Clôture de la campagne et consolidation</td><td>Tableau de relance</td></tr>
-<tr><td>J+90</td><td>Questionnaire à froid, puis mêmes relances</td><td>Courriel / téléphone</td></tr></table>` },
+${vae ? "<tr><td>Après le jury</td><td>Recueil de la décision du jury et de l'appréciation du candidat sur sa préparation</td><td>Courriel / téléphone</td></tr>" : "<tr><td>J+90</td><td>Questionnaire à froid, puis mêmes relances</td><td>Courriel / téléphone</td></tr>"}</table>` },
     { heading: "5. Traçabilité", content: `<p>Chaque envoi, relance et retour est consigné dans le tableau de relance (Excel). Les résultats sont analysés et les axes d'amélioration reportés au tableau d'amélioration continue (indicateur 32).</p>` },
   ] } as any);
 }

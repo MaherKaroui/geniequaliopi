@@ -19,6 +19,8 @@ import { INDICATEURS_REFERENCE } from "./qualiopiReference";
 import { parseDuree } from "./sampleData";
 import { getAssiduiteLabel } from "./indicateursResultats";
 import { calendrierVAE } from "./vae/vaeProfil";
+import { dirigeanteFem, estFemme, de } from "./genre";
+import { memePersonne } from "./docBuilder";
 
 const v = (x?: string) => (x || "").trim();
 const PUBLIC: Record<TypePrestation, [string, string]> = { AF: ["stagiaire", "stagiaires"], CFA: ["apprenti", "apprentis"], VAE: ["candidat", "candidats"], BC: ["bénéficiaire", "bénéficiaires"] };
@@ -54,7 +56,7 @@ export function entreesCatalogueReferentiel(o: OrganismeInfo): { id: string; nom
       { id: `${p}_c3i12_v10_procedure_violences`, nom: "CT3 - IND 12 PROCÉDURE DE PRÉVENTION ET DE TRAITEMENT DES VIOLENCES, DU HARCÈLEMENT ET DES DISCRIMINATIONS", critere: 3, indicateur: 12, template: "v10_procedure_violences", params: { type: tp } },
       { id: `${p}_c3i12_v10_registre_signalements`, nom: "CT3 - IND 12 REGISTRE DES SIGNALEMENTS", critere: 3, indicateur: 12, template: "v10_registre_signalements", params: { type: tp } },
       { id: `${p}_c6i23_v10_note_veille`, nom: "CT6 - IND 23 NOTE DE VEILLE – RÉFÉRENTIEL NATIONAL QUALITÉ 2026 ET DÉPÔT DES COMPTES", critere: 6, indicateur: 23, template: "v10_note_veille", params: { type: tp } },
-      { id: `${p}_c7i32_v10_audit_interne`, nom: "CT7 - IND 32 PROGRAMME ET GRILLE D'AUDIT INTERNE", critere: 7, indicateur: 32, template: "v10_audit_interne", params: { type: tp } },
+      { id: `${p}_c7i32_v10_audit_interne`, nom: "CT7 - IND 32 PROGRAMME D'AUDIT INTERNE", critere: 7, indicateur: 32, template: "v10_audit_interne", params: { type: tp } },
       { id: `${p}_c7i32_v10_suivi_heures`, nom: "CT7 - IND 32 SUIVI DES HEURES NON RÉALISÉES ET REPORTÉES", critere: 7, indicateur: 32, template: "v10_suivi_heures", params: { type: tp } },
     ];
   });
@@ -75,16 +77,22 @@ export function genProcedureViolences(oDossier: OrganismeInfo, tp: TypePrestatio
   const [pub, pubPl] = PUBLIC[tp];
   const ref = referent(o);
   const distanciel = /distanciel|distance|visio|meet|zoom|ligne/i.test(`${f?.modalites || ""} ${f?.lieu || ""}`);
+  const vae = tp === "VAE";
+  // Genre du référent (le dirigeant en règle générale) et vocabulaire de la prestation (formation ou accompagnement VAE).
+  const fem = memePersonne(ref, o.dirigeant) ? dirigeanteFem(o) : estFemme(ref);
+  const leRef = fem ? "la référente" : "le référent";
+  const prest = vae ? "l'accompagnement" : "la formation";
+  const classe = vae ? "séances en visioconférence" : "classes virtuelles";
   return buildDocument({
     org: o,
     title: "PROCÉDURE DE PRÉVENTION ET DE TRAITEMENT DES VIOLENCES, DU HARCÈLEMENT ET DES DISCRIMINATIONS",
     subtitle: "Indicateur 12 — référentiel national qualité (décret n° 2026-728)",
     sections: [
-      { heading: "Objet et champ d'application", content: `<p>${o.nom} prévient et traite toute situation de violence, dont les violences sexistes et sexuelles, de harcèlement et de discrimination qui concerne un ${pub}, un intervenant ou toute personne présente${distanciel ? ", y compris pendant les classes virtuelles, dans les messageries et sur les outils numériques de la formation" : " pendant la formation"}${tp === "CFA" ? ", au centre comme dans l'entreprise d'accueil" : ""}. La procédure est remise à chaque ${pub} avec le livret d'accueil et le règlement intérieur, et rappelée à l'ouverture de chaque session.</p>` },
-      { heading: "Ce qui est visé", content: `<ul><li><strong>Violences sexistes et sexuelles</strong> : agissement sexiste (art. L. 1142-2-1 du code du travail), outrage sexiste, harcèlement sexuel (art. 222-33 du code pénal), agression sexuelle.</li><li><strong>Harcèlement moral</strong> : agissements répétés dégradant les conditions de formation (art. 222-33-2 du code pénal).</li><li><strong>Discriminations</strong> : traitement défavorable fondé sur un critère prohibé (origine, sexe, handicap, âge, religion, orientation sexuelle… — art. 225-1 du code pénal).</li><li><strong>Violences physiques ou verbales</strong>, menaces, cyberharcèlement.</li></ul>` },
-      { heading: "Référent et canaux de signalement", content: `<p><strong>Référent chargé des signalements :</strong> ${ref}${contacts(o) ? ` — ${contacts(o)}` : ""}.</p><p>Tout ${pub}, intervenant ou témoin peut signaler une situation par courriel, par téléphone, lors d'un entretien individuel ou par le formulaire de réclamation. Le signalement peut être fait sans témoin et reste confidentiel : seules les personnes nécessaires à son traitement en ont connaissance.</p>` },
-      { heading: "Traitement", content: `<ol><li><strong>Accusé de réception</strong> sous 48 heures ouvrées et entretien d'écoute avec la personne qui signale.</li><li><strong>Mesures conservatoires</strong> immédiates si nécessaire : séparation des personnes, suspension d'un accès${distanciel ? " à la classe virtuelle" : ""}, exclusion temporaire selon le règlement intérieur (le mis en cause est entendu avant toute sanction).</li><li><strong>Orientation</strong> de la victime : 17 ou 112 en cas d'urgence (114 par SMS), 3919 (violences faites aux femmes), 119 (mineur en danger), Défenseur des droits (09 69 39 00 00), dépôt de plainte${tp === "CFA" ? ", médiateur de l'apprentissage et inspection du travail pour une situation en entreprise" : ""}.</li><li><strong>Information</strong> de l'employeur ou du financeur uniquement lorsque c'est nécessaire et avec l'accord de la victime, sauf obligation légale.</li><li><strong>Clôture</strong> : décision écrite, sanction éventuelle, suivi de la victime jusqu'à la fin de son parcours.</li></ol>` },
-      { heading: "Traçabilité et amélioration", content: `<p>Chaque signalement est inscrit au <strong>registre des signalements</strong> (date, canal, nature, mesures, orientation, clôture), conservé de façon confidentielle par le référent. Chaque cas clôturé est analysé : la cause et l'action de prévention retenue sont reportées, sans donnée nominative, au tableau d'amélioration continue (IND 32). Le référent suit une action de formation sur la prévention des violences sexistes et sexuelles (plan de développement des compétences, IND 22).</p>` },
+      { heading: "Objet et champ d'application", content: `<p>${o.nom} prévient et traite toute situation de violence, y compris les violences sexistes et sexuelles, de harcèlement et de discrimination qui concerne un ${pub}, un intervenant ou toute personne présente${distanciel ? `, y compris pendant les ${classe}, dans les messageries et sur les outils numériques de ${prest}` : ` pendant ${prest}`}${tp === "CFA" ? ", au centre comme dans l'entreprise d'accueil" : ""}. La procédure est remise à chaque ${pub} avec le livret d'accueil et le règlement intérieur, et rappelée ${vae ? "lors de la première séance d'accompagnement" : "à l'ouverture de chaque session"}.</p>` },
+      { heading: "Ce qui est visé", content: `<ul><li><strong>Violences sexistes et sexuelles</strong> : agissement sexiste (art. L. 1142-2-1 du code du travail), outrage sexiste, harcèlement sexuel (art. 222-33 du code pénal), agression sexuelle.</li><li><strong>Harcèlement moral</strong> : agissements répétés dégradant les conditions ${vae ? "d'accompagnement" : "de formation"} (art. 222-33-2 du code pénal).</li><li><strong>Discriminations</strong> : traitement défavorable fondé sur un critère prohibé (origine, sexe, handicap, âge, religion, orientation sexuelle… — art. 225-1 du code pénal).</li><li><strong>Violences physiques ou verbales</strong>, menaces, cyberharcèlement.</li></ul>` },
+      { heading: `${fem ? "Référente" : "Référent"} et canaux de signalement`, content: `<p><strong>${fem ? "Référente chargée" : "Référent chargé"} des signalements :</strong> ${ref}${contacts(o) ? ` — ${contacts(o)}` : ""}.</p><p>Tout ${pub}, intervenant ou témoin peut signaler une situation par courriel, par téléphone, lors d'un entretien individuel ou par le formulaire de réclamation. Le signalement peut être fait sans témoin et reste confidentiel : seules les personnes nécessaires à son traitement en ont connaissance.</p>` },
+      { heading: "Traitement", content: `<ol><li><strong>Accusé de réception</strong> sous 48 heures ouvrées et entretien d'écoute avec la personne qui signale.</li><li><strong>Mesures conservatoires</strong> immédiates si nécessaire : séparation des personnes, suspension d'un accès${distanciel ? (vae ? " à la visioconférence" : " à la classe virtuelle") : ""}, exclusion temporaire selon le règlement intérieur (la personne mise en cause est entendue avant toute sanction).</li><li><strong>Orientation</strong> de la victime : 17 ou 112 en cas d'urgence (114 par SMS), 3919 (violences faites aux femmes), 119 (mineur en danger), Défenseur des droits (09 69 39 00 00), dépôt de plainte${tp === "CFA" ? ", médiateur de l'apprentissage et inspection du travail pour une situation en entreprise" : ""}.</li><li><strong>Information</strong> de l'employeur ou du financeur uniquement lorsque c'est nécessaire et avec l'accord de la victime, sauf obligation légale.</li><li><strong>Clôture</strong> : décision écrite, sanction éventuelle, suivi de la victime jusqu'à la fin de son parcours.</li></ol>` },
+      { heading: "Traçabilité et amélioration", content: `<p>Chaque signalement est inscrit au <strong>registre des signalements</strong> (date, canal, nature, mesures, orientation, clôture), conservé de façon confidentielle par ${leRef}. Chaque cas clôturé est analysé : la cause et l'action de prévention retenue sont reportées, sans donnée nominative, au tableau d'amélioration continue (IND 32). ${fem ? "La référente" : "Le référent"} suit une action de formation sur la prévention des violences sexistes et sexuelles (plan de développement des compétences, IND 22).</p>` },
     ],
     signatures: { type: "1", labels: ["Le dirigeant, référent"], names: [ref], dates: [formatDate(dateV10(oDossier))] },
   });
@@ -114,7 +122,7 @@ const EVOLUTIONS_V10: { ind: number; exigence: string; types?: TypePrestation[] 
   { ind: 2, exigence: "Indicateurs de résultats publiés avec leur méthode de calcul (ex. taux de réalisation des heures)." },
   { ind: 8, exigence: "Positionnement adapté aux personnes en situation de handicap ; à distance, vérification des compétences et outils numériques.", types: ["AF", "CFA", "BC"] },
   { ind: 9, exigence: "Information renforcée pour la formation à distance (ressources, activités, rythme) et pour les personnes en situation de handicap." },
-  { ind: 12, exigence: "Procédure de prévention et de traitement des violences, dont sexistes et sexuelles, du harcèlement et des discriminations ; référent ; traçabilité." },
+  { ind: 12, exigence: "Procédure de prévention et de traitement des violences, y compris sexistes et sexuelles, du harcèlement et des discriminations ; référent ; traçabilité." },
   { ind: 15, exigence: "Information des apprentis mineurs, signalement des violences, médiateur de l'apprentissage, inspection du travail.", types: ["CFA"] },
   { ind: 17, exigence: "Visite d'une session par l'auditeur ou accès observateur à la formation à distance." },
   { ind: 19, exigence: "Suivi effectif des modules à distance (assiduité, progression)." },
@@ -127,18 +135,42 @@ const EVOLUTIONS_V10: { ind: number; exigence: string; types?: TypePrestation[] 
   { ind: 33, exigence: "Évaluation des contenus et des enseignements par les apprenants, distincte de la satisfaction.", types: ["CFA"] },
 ];
 
+/** Pièce du dossier dans laquelle chaque évolution du référentiel 2026 est exploitée (note de veille IND 23). */
+function pieceExploitation(ind: number, tp: TypePrestation): string {
+  const vae = tp === "VAE";
+  const pieces: Record<number, string> = {
+    1: vae ? "Plaquette et fiche d'information de l'accompagnement VAE" : "Programme et fiche d'information du public",
+    2: vae ? "Indicateurs de résultats de l'accompagnement VAE (méthode de calcul publiée)" : "Indicateurs de résultats (méthode de calcul publiée)",
+    8: "Positionnement et analyse du besoin",
+    9: vae ? "Livret d'accueil VAE et informations remises avant le contrat" : "Livret d'accueil et informations remises avant l'entrée",
+    12: "Procédure violences, harcèlement, discriminations et registre des signalements",
+    15: "Livret d'accueil de l'apprenti (mineurs, médiateur, inspection du travail)",
+    17: vae ? "Moyens dédiés à l'accompagnement (accès observateur aux séances à distance)" : "Moyens dédiés (accès observateur à la formation à distance)",
+    19: vae ? "Relevé des séances à distance et feuilles d'émargement" : "Suivi de l'assiduité et de la progression à distance",
+    22: "Plan de développement des compétences",
+    23: "Présente note (dépôt des comptes) et tableau de veille légale et réglementaire",
+    26: "Accessibilité et handicap : partenaires du territoire, dont la Ressource Handicap Formation",
+    27: "Partenaires : sous-traitance et portage salarial (registre IND 27)",
+    30: "Recueil des appréciations des parties prenantes",
+    32: "Analyse des risques, programme d'audit interne, suivi des heures",
+    33: "Procédure d'évaluation des contenus et des enseignements",
+  };
+  return pieces[ind] || "Pièce correspondante du dossier";
+}
+
 export function genNoteVeilleV10(oDossier: OrganismeInfo, tp: TypePrestation): string {
   const d = dateV10(oDossier);
   const o = orgVersionUlterieure(oDossier, d);
   const audit = typeAuditEffectif(oDossier);
-  const rows = EVOLUTIONS_V10.filter((e) => !e.types || e.types.includes(tp)).map((e) => [`IND ${e.ind}`, e.exigence, "Pièce du dossier mise à jour ou ajoutée", referent(o)]);
+  const rows = EVOLUTIONS_V10.filter((e) => !e.types || e.types.includes(tp)).map((e) => [`IND ${e.ind}`, e.exigence, pieceExploitation(e.ind, tp), referent(o)]);
+  const fem = dirigeanteFem(o);
   return buildDocument({
     org: o,
     title: "NOTE DE VEILLE — RÉFÉRENTIEL NATIONAL QUALITÉ 2026 ET DÉPÔT DES COMPTES",
     subtitle: "Indicateur 23 — veille légale et réglementaire",
     sections: [
       { heading: "Textes pris en compte", content: `<ul><li>Décret n° 2026-728 du 1er août 2026 : nouveau référentiel national qualité, en vigueur le 1er novembre 2026.</li><li>Arrêté du 28 octobre 2026 : modalités d'audit et période transitoire jusqu'au 31 décembre 2026.</li></ul><p>Référentiel appliqué au dossier : <strong>référentiel national qualité (décret n° 2026-728)</strong> — ${LIBELLES_AUDIT[audit]}.</p>` },
-      { heading: "Dépôt des comptes (IND 23)", content: `<p>Le dirigeant vérifie, à la clôture de chaque exercice, que les comptes annuels de ${o.nom} sont déposés au greffe dans le délai légal (dans le mois suivant leur approbation, au plus tard sept mois après la clôture) et conserve avec la présente note le justificatif de dépôt délivré par le greffe. Tant qu'aucun exercice n'est clos, la vérification est programmée à la clôture du premier exercice.</p>` },
+      { heading: "Dépôt des comptes (IND 23)", content: `<p>${fem ? "La dirigeante" : "Le dirigeant"} vérifie, à la clôture de chaque exercice, que les comptes annuels ${de(o.nom)} sont déposés au greffe dans le délai légal (dans le mois suivant leur approbation, au plus tard sept mois après la clôture) et conserve avec la présente note le justificatif de dépôt délivré par le greffe. Tant qu'aucun exercice n'est clos, la vérification est programmée à la clôture du premier exercice.</p>` },
     ],
     table: { headers: ["Indicateur", "Évolution du référentiel", "Exploitation", "Pilote"], rows },
     signatures: { type: "1", labels: ["Le référent qualité"], names: [v(o.referentQualite) || referent(o)], dates: [formatDate(d)] },
@@ -155,16 +187,20 @@ export function genAuditInterne(oDossier: OrganismeInfo, tp: TypePrestation, f?:
   const certifiante = /^(RS|RNCP)\d+$/i.test(v(f?.codeRNCP).replace(/\s+/g, ""));
   const inds = INDICATEURS_REFERENCE.filter((i) => i.applicableActions.includes(ACTION_REF[tp]))
     .filter((i) => tp !== "AF" || certifiante || ![3, 7, 16].includes(i.numero));
-  const rows = inds.map((i) => [`IND ${i.numero}`, i.intitule.length > 110 ? `${i.intitule.slice(0, 107)}…` : i.intitule, "☐ Conforme ☐ Écart", "", ""]);
+  // Programme : indicateurs audités et point de contrôle ; aucun constat n'est présenté tant qu'un audit interne n'a pas eu lieu.
+  const rows = inds.map((i) => [`IND ${i.numero}`, i.intitule.length > 110 ? `${i.intitule.slice(0, 107)}…` : i.intitule, "Échantillon de pièces datées : présence, dates et cohérence (identité, durées, montants)"]);
+  const fem = dirigeanteFem(o);
+  const prestation = tp === "AF" ? "actions de formation" : tp === "CFA" ? "actions de formation par apprentissage" : tp === "VAE" ? "accompagnement VAE" : "bilans de compétences";
+  const perimetre = f?.intitule && f.intitule.toLowerCase().startsWith(prestation.toLowerCase()) ? f.intitule : `${prestation}${f?.intitule ? ` — ${f.intitule}` : ""}`;
   return buildDocument({
     org: o,
-    title: "PROGRAMME ET GRILLE D'AUDIT INTERNE",
+    title: "PROGRAMME D'AUDIT INTERNE",
     subtitle: "Indicateur 32 — référentiel national qualité (décret n° 2026-728)",
     sections: [
-      { heading: "Programme", content: `<ul><li><strong>Périmètre :</strong> ${tp === "AF" ? "actions de formation" : tp === "CFA" ? "actions de formation par apprentissage" : tp === "VAE" ? "accompagnement VAE" : "bilans de compétences"}${f?.intitule ? ` — ${f.intitule}` : ""}.</li><li><strong>Fréquence :</strong> au moins une fois par an, et avant chaque audit de certification.</li><li><strong>Auditeur interne :</strong> ${v(o.referentQualite) || referent(o)} ; un auditeur ne juge pas seul une pièce qu'il a rédigée : la revue est validée par le dirigeant.</li><li><strong>Méthode :</strong> pour chaque indicateur applicable, vérification d'un échantillon de pièces datées et cohérentes entre elles (identité, dates, durées, montants) ; tout écart ouvre une action au tableau d'amélioration continue.</li></ul>` },
+      { heading: "Programme", content: `<ul><li><strong>Périmètre :</strong> ${perimetre}.</li><li><strong>Fréquence :</strong> au moins une fois par an, et avant chaque audit de certification.</li><li><strong>Auditeur interne :</strong> ${v(o.referentQualite) || referent(o)} ; un auditeur ne juge pas seul une pièce qu'il a rédigée : la revue est validée par ${fem ? "la dirigeante" : "le dirigeant"}.</li><li><strong>Méthode :</strong> pour chaque indicateur applicable, vérification d'un échantillon de pièces datées et cohérentes entre elles (identité, dates, durées, montants) ; tout écart ouvre une action au tableau d'amélioration continue.</li></ul>` },
     ],
-    table: { headers: ["Indicateur", "Exigence", "Constat", "Pièces vérifiées / écart relevé", "Action (réf. tableau d'amélioration)"], rows },
-    extraHtml: `<h2>Synthèse</h2><p>Programme établi le ${formatDate(d)}. La grille est complétée à chaque audit interne (au moins une fois par an et avant chaque audit de certification) ; chaque écart relevé est reporté au tableau d'amélioration continue avec son action et son échéance.</p>`,
+    table: { headers: ["Indicateur", "Exigence", "Point de contrôle"], rows },
+    extraHtml: `<h2>Synthèse</h2><p>Programme établi le ${formatDate(d)}. Chaque audit interne (au moins une fois par an et avant chaque audit de certification) fait l'objet d'un compte rendu daté reprenant ces indicateurs ; chaque écart relevé est reporté au tableau d'amélioration continue avec son action et son échéance.</p>`,
     signatures: { type: "2", labels: ["L'auditeur interne", "Le dirigeant"], names: [v(o.referentQualite) || referent(o), v(o.dirigeant)], dates: [formatDate(d), formatDate(d)] },
   });
 }
@@ -184,7 +220,8 @@ export function genSuiviHeures(oDossier: OrganismeInfo, tp: TypePrestation, f: F
       const faites = cal.filter((x) => x.realisee);
       const real = faites.reduce((a, x) => a + x.duree, 0);
       const periode = cal.length ? `${formatDate(iso(cal[0].date))} → ${formatDate(iso(cal[cal.length - 1].date))}` : "—";
-      const statut = faites.length === cal.length ? `${real} h` : `${real} h au ${formatDate(d)} (${cal.length - faites.length} séance(s) à venir)`;
+      const restantes = cal.length - faites.length;
+      const statut = restantes === 0 ? `${real} h` : `${real} h au ${formatDate(d)} (${restantes} ${restantes > 1 ? "séances" : "séance"} à venir)`;
       return [`${s.prenom} ${s.nom}`, periode, `${prev} h`, statut, "0 h", "—", "—"];
     }
     const periode = `${formatDate(v(s.dateDebutFormation) || v(f.dateDebut))} → ${formatDate(v(s.dateFinFormation) || v(f.dateFin))}`;
@@ -199,7 +236,7 @@ export function genSuiviHeures(oDossier: OrganismeInfo, tp: TypePrestation, f: F
     title: "SUIVI DES HEURES NON RÉALISÉES ET REPORTÉES",
     subtitle: "Indicateur 32 — référentiel national qualité (décret n° 2026-728)",
     sections: [
-      { heading: "Règle de suivi", content: `<ul><li>Les heures réalisées sont relevées par demi-journée (émargements${/distanciel|distance|meet|zoom/i.test(`${f?.modalites || ""} ${f?.lieu || ""}`) ? " et relevés de connexion à la classe virtuelle" : ""}).</li><li>Toute heure non réalisée (absence, retard, incident technique, annulation) est inscrite avec son motif ; un report est proposé au ${pub} et tracé avec sa date de réalisation.</li><li>Heures non reportées : facturation au prorata des heures réalisées et information du financeur le cas échéant ; analyse de la cause et action au tableau d'amélioration continue lorsqu'un motif se répète.</li></ul>` },
+      { heading: "Règle de suivi", content: `<ul><li>Les heures réalisées sont relevées ${tp === "VAE" ? "à chaque séance" : "par demi-journée"} (émargements${/distanciel|distance|meet|zoom/i.test(`${f?.modalites || ""} ${f?.lieu || ""}`) ? (tp === "VAE" ? " et journal de participation de l'outil de visioconférence" : " et relevés de connexion à la classe virtuelle") : ""}).</li><li>Toute heure non réalisée (absence, retard, incident technique, annulation) est inscrite avec son motif ; un report est proposé au ${pub} et tracé avec sa date de réalisation.</li><li>Heures non reportées : facturation au prorata des heures réalisées et information du financeur le cas échéant ; analyse de la cause et action au tableau d'amélioration continue lorsqu'un motif se répète.</li></ul>` },
     ],
     table: { headers: [`${pub.charAt(0).toUpperCase()}${pub.slice(1)}`, "Période", "Heures prévues", "Heures réalisées", "Heures non réalisées", "Motif", "Heures reportées (date)"], rows: rows.length ? rows : [[`Aucun ${pub} enregistré`, "—", "—", "—", "—", "—", "—"]] },
     extraHtml: `<p style="margin-top:10px">Situation au ${formatDate(d)} pour les ${pubPl} du dossier${assid ? ` ; taux d'assiduité déclaré : ${assid}` : ""}.</p>`,

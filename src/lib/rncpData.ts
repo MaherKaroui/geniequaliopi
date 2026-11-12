@@ -666,7 +666,7 @@ export const RNCP_FICHES: RNCPFiche[] = [
     ],
     secteursActivite: "Institut de beauté, spa, centre de bien-être, parfumerie, parapharmacie, grande distribution spécialisée, marques de cosmétiques, croisière, hôtellerie de luxe.",
     typesEmplois: ["Esthéticien(ne)", "Conseiller(ère) de vente en parfumerie/cosmétique", "Prothésiste ongulaire", "Maquilleur(se)", "Spa praticien(ne)", "Animateur(trice) beauté en grande distribution"],
-    codesROME: ["D1208 – Soins esthétiques et corporels", "D1214 – Vente en habillement et accessoires"],
+    codesROME: ["D1208 – Soins esthétiques et corporels", "D1214 – Vente en habillement et accessoires de la personne"],
     voiesAcces: ["Formation initiale sous statut scolaire", "Apprentissage", "Formation professionnelle continue", "Candidature individuelle", "VAE"],
     dureeIndicative: "Formation continue : 600 à 1200h en centre + 12 semaines de PFMP. Format court professionnalisant : 42h (préparation accélérée à l'examen pour candidats déjà expérimentés). Apprentissage : 800h/an en CFA sur 2 ans.",
   },

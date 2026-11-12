@@ -4,6 +4,16 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DO
 import { getFormationDays } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
 import { tarifNetDeTaxe } from "./sessionTextes";
+import { dirigeanteFem } from "./genre";
+
+/** Libellé de signature au féminin quand le dirigeant est une femme. */
+function libelleDirigeante(label: string): string {
+  return label
+    .replace(/^Le dirigeant\b/, "La dirigeante")
+    .replace(/, le dirigeant$/, ", la dirigeante")
+    .replace(/^(La dirigeante,?\s+)référent\b/, "$1référente")
+    .replace(/\(dirigeant\)/, "(dirigeante)");
+}
 
 /** Return telephone string only if non-empty, otherwise "" */
 export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
@@ -1027,6 +1037,8 @@ export function cachetDirigeantHtml(o: Pick<OrganismeInfo, "signatureUrl" | "tam
 
 function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
   const l = label.toLowerCase();
+  // Auditeur interne externe (FD CERTIF EXPERT) : son tampon, jamais celui de l'organisme audité.
+  if (/auditeur/.test(l) && /fd\s*certif/i.test(nom)) return tamponImg(tamponReferentQualite || "/images/FD_CERTIF_TAMPON.png");
   // Référent qualité externe FD CERTIF EXPERT : son tampon (sauf libellé combiné avec le dirigeant).
   if (/qualit/.test(l) && !/dirigeant|directeur/.test(l) && (tamponReferentQualite || /fd\s*certif/i.test(nom))) {
     return tamponImg(tamponReferentQualite || "/images/FD_CERTIF_TAMPON.png");
@@ -1172,9 +1184,9 @@ export function footer(org: OrganismeInfo): string {
   }
   return `<div class="footer">
     <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>
-    <p style="margin:0 0 8px">Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
-    <p style="margin:0 0 8px">Siret: ${org.siret}</p>
-    ${org.nda ? `<p style="margin:0 0 8px">Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>` : ""}
+    <p style="margin:0 0 8px">Adresse : ${org.adresse}, ${org.codePostal} ${org.ville}</p>
+    <p style="margin:0 0 8px">SIRET : ${org.siret}</p>
+    ${org.nda ? `<p style="margin:0 0 8px">NDA : ${org.nda} – cet enregistrement ne vaut pas agrément de l'État.</p>` : ""}
     ${qualiopiLine}
     <p style="margin:4px 0 0">V${version} ${dateMaj}</p>
   </div>`;
@@ -1219,6 +1231,10 @@ export function buildDocument(config: DocBuildConfig): string {
   if (config.extraHtml) {
     body += config.extraHtml;
   }
+  // Dirigeante : libellés de signature accordés (« La dirigeante », « Pour X, la dirigeante »).
+  if (config.signatures?.labels && dirigeanteFem(config.org)) {
+    config = { ...config, signatures: { ...config.signatures, labels: config.signatures.labels.map(libelleDirigeante) } };
+  }
   if (config.signatures) {
     const firstStagiaire = config.stagiaires?.[0];
     const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
@@ -1237,7 +1253,7 @@ export function buildDocument(config: DocBuildConfig): string {
       body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl, sigDates);
     } else if (config.signatures.type === "1") {
       body += signatureBlock1(
-        config.signatures.labels?.[0] || "Le dirigeant",
+        config.signatures.labels?.[0] || (dirigeanteFem(config.org) ? "La dirigeante" : "Le dirigeant"),
         config.signatures.names?.[0] || "",
         config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
@@ -1341,6 +1357,7 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
     [/pertinent\(e\)/gi, "pertinent", "pertinente"],
     [/indépendant\(e\)/gi, "indépendant", "indépendante"],
     // Métiers genrés
+    [/maquilleur\(se\)/gi, "maquilleur", "maquilleuse"],
     [/négociateur\(trice\)/gi, "négociateur", "négociatrice"],
     [/commercial\(e\)/gi, "commercial", "commerciale"],
     [/technico-commercial\(e\)/gi, "technico-commercial", "technico-commerciale"],

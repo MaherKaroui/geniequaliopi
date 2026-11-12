@@ -7,6 +7,7 @@ import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
 import { formationsIziRealisees, formatDateIzi } from "./attestationIzibusiness";
 import { intervenantsReels } from "./piecesAF2026";
+import { dirigeanteFem, de, dossierVAESeul } from "./genre";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
@@ -278,21 +279,43 @@ export function genProcessusRecrutementV2(o: OrganismeInfo, f?: FormationInfo, s
   if (intervenants.length === 1 && memeNom(intervenants[0], o.dirigeant)) {
     const nom = intervenants[0];
     const distance = /distanciel|foad|e-learning|mixte/i.test(f?.modalites || "");
-    return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES FORMATEURS", sections: [
-      { heading: "Champ d'application", content: `<p>À ce jour, les formations de ${o.nom} sont animées par ${nom}, dirigeant de l'organisme${memeNom(resp, nom) ? " et responsable pédagogique" : ""}. Aucun autre formateur n'intervient sur les sessions enregistrées.</p><p>Le processus ci-dessous s'applique dès que ${o.nom} recourt à un formateur externe (salarié, vacataire ou formateur indépendant sous-traitant), pour garantir le même niveau de qualité aux stagiaires.</p>` },
-      { heading: "Critères appliqués en cas de recours à un formateur externe", content: `<ul><li>Compétence dans le domaine de la formation${f?.intitule ? ` « ${f.intitule} »` : ""} : CV daté, diplômes, certifications ou attestations d'expérience.</li><li>Expérience de la formation d'adultes.</li>${distance ? "<li>Maîtrise des outils de formation à distance utilisés par l'organisme (classe virtuelle, partage d'écran, messagerie).</li>" : ""}<li>Engagement à respecter le programme, les modalités d'évaluation et la démarche qualité de l'organisme.</li><li>Pour un indépendant : SIRET et, le cas échéant, numéro de déclaration d'activité.</li></ul>` },
-      { heading: "Étapes", content: `
+    const fem = dirigeanteFem(o);
+    const dir = fem ? "dirigeante" : "dirigeant";
+    // Dossier VAE : accompagnements, candidats VAE, certification accompagnée (et non « formations », « sessions »).
+    if (dossierVAESeul(o)) {
+      const certif = (f?.intitule || "").replace(/^\s*accompagnement\s+(?:à\s+la\s+)?VAE\s*[–—:-]\s*/i, "").trim();
+      return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES ACCOMPAGNATEURS", sections: [
+        { heading: "Champ d'application", content: `<p>Les accompagnements VAE ${de(o.nom)} sont assurés par ${nom}, ${dir} de l'organisme${memeNom(resp, nom) ? " et responsable pédagogique" : ""}. Aucun autre accompagnateur n'intervient sur les accompagnements en cours ou réalisés.</p><p>Le processus ci-dessous s'applique dès ${/^[aeiouyh]/i.test(o.nom) ? "qu'" : "que "}${o.nom} recourt à un accompagnateur externe (salarié, vacataire ou indépendant sous-traitant), pour garantir le même niveau de qualité aux candidats.</p>` },
+        { heading: "Critères appliqués en cas de recours à un accompagnateur externe", content: `<ul><li>Compétence dans le domaine de la certification accompagnée${certif ? ` (${certif})` : ""} : CV daté, diplômes, certifications ou attestations d'expérience.</li><li>Expérience de l'accompagnement d'adultes, idéalement en VAE.</li>${distance ? "<li>Maîtrise des outils d'accompagnement à distance (visioconférence, partage d'écran, messagerie).</li>" : ""}<li>Engagement à respecter le programme, la règle « le candidat reste seul auteur de son dossier » et la démarche qualité de l'organisme.</li><li>Pour un indépendant : SIRET et, le cas échéant, numéro de déclaration d'activité.</li></ul>` },
+        { heading: "Étapes", content: `
       <h3>1. Analyse du besoin</h3>
-      <ul><li>Le dirigeant identifie la formation, le volume horaire et les compétences requises.</li></ul>
+      <ul><li>${fem ? "La dirigeante" : "Le dirigeant"} identifie la certification visée, le volume horaire et les compétences requises.</li></ul>
       <h3>2. Recherche et présélection</h3>
       <ul><li>Diffusion de l'offre (réseau professionnel, plateformes spécialisées) et analyse des CV au regard des critères ci-dessus.</li></ul>
       <h3>3. Entretien de sélection</h3>
-      <ul><li>Entretien conduit par le dirigeant, avec présentation d'une séquence de formation par le candidat.</li></ul>
+      <ul><li>Entretien conduit par ${fem ? "la dirigeante" : "le dirigeant"}, avec mise en situation d'un entretien d'accompagnement par le postulant.</li></ul>
+      <h3>4. Vérifications et contractualisation</h3>
+      <ul><li>Contrôle des justificatifs (diplômes, expérience) et signature du contrat de travail ou du contrat de sous-traitance.</li></ul>
+      <h3>5. Intégration</h3>
+      <ul><li>Remise du programme, des ressources remises aux candidats, des grilles de positionnement et des procédures de l'organisme.</li><li>Point de préparation avant le premier accompagnement et bilan après celui-ci, appuyé sur les appréciations des candidats.</li></ul>` },
+        { heading: "Rôles et responsabilités", content: `<p><strong>${nom}, ${dir}${memeNom(resp, nom) ? " et responsable pédagogique" : ""} :</strong> analyse le besoin, conduit les entretiens, valide le recrutement, assure l'intégration et évalue les premiers accompagnements.</p>`, variant: "green" },
+      ] });
+    }
+    return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES FORMATEURS", sections: [
+      { heading: "Champ d'application", content: `<p>À ce jour, les formations ${de(o.nom)} sont animées par ${nom}, ${dir} de l'organisme${memeNom(resp, nom) ? " et responsable pédagogique" : ""}. Aucun autre formateur n'intervient sur les sessions enregistrées.</p><p>Le processus ci-dessous s'applique dès que ${o.nom} recourt à un formateur externe (salarié, vacataire ou formateur indépendant sous-traitant), pour garantir le même niveau de qualité aux stagiaires.</p>` },
+      { heading: "Critères appliqués en cas de recours à un formateur externe", content: `<ul><li>Compétence dans le domaine de la formation${f?.intitule ? ` « ${f.intitule} »` : ""} : CV daté, diplômes, certifications ou attestations d'expérience.</li><li>Expérience de la formation d'adultes.</li>${distance ? "<li>Maîtrise des outils de formation à distance utilisés par l'organisme (classe virtuelle, partage d'écran, messagerie).</li>" : ""}<li>Engagement à respecter le programme, les modalités d'évaluation et la démarche qualité de l'organisme.</li><li>Pour un indépendant : SIRET et, le cas échéant, numéro de déclaration d'activité.</li></ul>` },
+      { heading: "Étapes", content: `
+      <h3>1. Analyse du besoin</h3>
+      <ul><li>${fem ? "La dirigeante" : "Le dirigeant"} identifie la formation, le volume horaire et les compétences requises.</li></ul>
+      <h3>2. Recherche et présélection</h3>
+      <ul><li>Diffusion de l'offre (réseau professionnel, plateformes spécialisées) et analyse des CV au regard des critères ci-dessus.</li></ul>
+      <h3>3. Entretien de sélection</h3>
+      <ul><li>Entretien conduit par ${fem ? "la dirigeante" : "le dirigeant"}, avec présentation d'une séquence de formation par le candidat.</li></ul>
       <h3>4. Vérifications et contractualisation</h3>
       <ul><li>Contrôle des justificatifs (diplômes, expérience) et signature du contrat de travail ou du contrat de sous-traitance.</li></ul>
       <h3>5. Intégration</h3>
       <ul><li>Remise du programme, des supports, des trames d'évaluation et des procédures de l'organisme.</li><li>Point de préparation avant la première session et bilan après celle-ci, appuyé sur les évaluations des stagiaires.</li></ul>` },
-      { heading: "Rôles et responsabilités", content: `<p><strong>${nom}, dirigeant${memeNom(resp, nom) ? " et responsable pédagogique" : ""} :</strong> analyse le besoin, conduit les entretiens, valide le recrutement, assure l'intégration et évalue les premières interventions.</p>`, variant: "green" },
+      { heading: "Rôles et responsabilités", content: `<p><strong>${nom}, ${dir}${memeNom(resp, nom) ? " et responsable pédagogique" : ""} :</strong> analyse le besoin, conduit les entretiens, valide le recrutement, assure l'intégration et évalue les premières interventions.</p>`, variant: "green" },
     ] });
   }
   return buildDocument({ org: o, title: "DESCRIPTION DU PROCESSUS DE RECRUTEMENT ET D'INTÉGRATION DES FORMATEURS", sections: [

@@ -60,6 +60,6 @@ describe("type d'audit", () => {
     const d = cat.find((x) => x.template === "audit_indicateurs_resultats")!;
     const h = texte(generateDocumentById(d.id, d.template, d.params, o, f, STAGIAIRES_TEST));
     expect(h).toMatch(/Évolution sur le cycle/);
-    expect(h).toMatch(/Non disponible/);
+    expect(h).toMatch(/aucune donnée enregistrée/);
   });
 });

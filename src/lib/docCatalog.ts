@@ -1419,7 +1419,7 @@ export function buildFullCatalog(
     per("vae_c2i4_analyse_besoin", "CT2 - IND 4 Analyse du besoin", 2, 4, "vae_analyse_besoin");
     per("vae_c2i4_dossier_faisabilite", "CT2 - IND 4 Préparation du dossier de faisabilité", 2, 4, "vae_dossier_faisabilite");
     per("vae_c2i4_positionnement_debut", "CT2 - IND 4 Positionnement en début d'accompagnement", 2, 4, "vae_positionnement_debut");
-    per("vae_c2i4_contrat", "CT2 - IND 4 Contrat / convention d'accompagnement", 2, 4, "vae_contrat_accompagnement");
+    per("vae_c2i4_contrat", "CT2 - IND 4 Contrat d'accompagnement VAE", 2, 4, "vae_contrat_accompagnement");
     add("vae_c2i4_handicap_entretien", "CT2 - IND 4 Accueil handicap – Entretien", 2, 4, "vae_handicap_entretien");
     add("vae_c2i4_handicap_formalisation", "CT2 - IND 4 Accueil handicap – Formalisation des aménagements", 2, 4, "vae_handicap_formalisation");
     add("vae_c2i4_handicap_bilan", "CT2 - IND 4 Accueil handicap – Bilan", 2, 4, "vae_handicap_bilan");
@@ -1428,7 +1428,7 @@ export function buildFullCatalog(
     add("vae_c2i5_engagements_respectifs", "CT2 - IND 5 Engagements respectifs", 2, 5, "vae_engagements_respectifs");
     add("vae_c2i6_programme_accompagnement", "CT2 - IND 6 Programme d'accompagnement VAE", 2, 6, "vae_programme_accompagnement");
     add("vae_c2i6_sequencage_vae", "CT2 - IND 6 Séquençage de l'accompagnement", 2, 6, "vae_sequencage");
-    per("vae_c2i6_trame_dossier_validation", "CT2 - IND 6 Trame du dossier de validation", 2, 6, "vae_trame_dossier_validation");
+    per("vae_c2i6_trame_dossier_validation", "CT2 - IND 6 Dossier de validation", 2, 6, "vae_trame_dossier_validation");
 
     // ===== CRITÈRE 3 — ACCUEIL, ACCOMPAGNEMENT, SUIVI ET ÉVALUATION =====
     add("vae_c3i9_livret_accueil", "CT3 - IND 9 Livret d'accueil VAE", 3, 9, "vae_livret_accueil");
@@ -1443,7 +1443,7 @@ export function buildFullCatalog(
     add("vae_c3i9_mail_preparation_entretien", "CT3 - IND 9 Modèle de courriel – préparation de l'entretien avec le jury", 3, 9, "vae_mail_preparation_entretien");
     add("vae_c3i9_mail_post_validation", "CT3 - IND 9 Modèle de courriel – suivi après le jury", 3, 9, "vae_mail_post_validation");
     add("vae_c3i9_mail_envoi_certificat", "CT3 - IND 9 Modèle de courriel – envoi du certificat de réalisation", 3, 9, "vae_mail_envoi_certificat");
-    per("vae_c3i9_contrat", "CT3 - IND 9 Contrat / convention d'accompagnement", 3, 9, "vae_contrat_accompagnement");
+    per("vae_c3i9_contrat", "CT3 - IND 9 Contrat d'accompagnement VAE", 3, 9, "vae_contrat_accompagnement");
     per("vae_c3i9_certificat_realisation", "CT3 - IND 9 Certificat de réalisation", 3, 9, "vae_certificat_realisation");
     add("vae_c3i10_adaptation_accompagnement", "CT3 - IND 10 Adaptation de l'accompagnement VAE", 3, 10, "vae_adaptation_accompagnement");
     add("vae_c3i10_fiche_pedagogique", "CT3 - IND 10 Fiche pédagogique VAE", 3, 10, "vae_fiche_pedagogique");

@@ -11,7 +11,8 @@
  * documents de système qualité, pas des preuves d'exécution.
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate } from "./docBuilder";
+import { buildDocument, formatDate, memePersonne } from "./docBuilder";
+import { dirigeanteFem, estFemme, de } from "./genre";
 import { orgVersionUlterieure } from "./versionUlterieure";
 import { versionReferentiel } from "./typeAudit";
 
@@ -31,7 +32,7 @@ export const REFERENCES_REGLEMENTAIRES_2026 = [
   { date: "2023-12-28", texte: "Décret n° 2023-1275 du 27 décembre 2023 relatif à la validation des acquis de l'expérience", objet: "Service public de la VAE, plateforme France VAE (vae.gouv.fr), accompagnement dès l'inscription, limite de candidatures par an.", source: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000048679270", types: ["VAE"] as TypePrestation[] },
   { date: "2022-12-22", texte: "Loi n° 2022-1598 du 21 décembre 2022 (marché du travail)", objet: "Réforme de la VAE : suppression de la durée minimale d'expérience, ouverture aux proches aidants, parcours par blocs, dossier de faisabilité et dossier de validation.", source: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000046771781", types: ["VAE"] as TypePrestation[] },
   { date: "2019-06-08", texte: "Décret n° 2019-564 du 6 juin 2019 relatif à la qualité des actions de la formation professionnelle", objet: "Obligation de certification qualité des prestataires financés par fonds publics ou mutualisés.", source: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000038565157", types: ["AF", "CFA", "VAE", "BC"] as TypePrestation[] },
-  { date: "2018-09-06", texte: "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel", objet: "Cadre de la certification qualité (art. L.6316-1), missions des CFA (art. L.6231-2), bilan de compétences (art. L.6313-4).", source: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660", types: ["AF", "CFA", "VAE", "BC"] as TypePrestation[] },
+  { date: "2018-09-06", texte: "Loi n° 2018-771 du 5 septembre 2018 pour la liberté de choisir son avenir professionnel", objet: "Cadre de la certification qualité (art. L.6316-1), missions des CFA (art. L.6231-2), bilan de compétences (art. L.6313-4).", objetVAE: "Cadre de la certification qualité (art. L.6316-1) et VAE comme action concourant au développement des compétences (art. L.6313-1).", source: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000037367660", types: ["AF", "CFA", "VAE", "BC"] as TypePrestation[] },
 ];
 
 /**
@@ -102,7 +103,7 @@ const RISQUES_COMMUNS: Risque[] = [
   { processus: "Intervenants", risque: "Compétence insuffisante ou non actualisée d'un intervenant", cause: "Recrutement sans vérification, absence de formation continue", p: 1, g: 3, mesure: "Vérification CV / diplômes, plan de développement des compétences annuel", indicateur: "Intervenants avec action de formation dans l'année", pilote: (o) => o.dirigeant, ind: "21, 22" },
   { processus: "Moyens", risque: "Défaillance technique (plateforme, visioconférence, matériel)", cause: "Outil unique sans solution de secours", p: 2, g: 2, mesure: "Solution de repli documentée (second outil, report de séance), test de connexion avant session", indicateur: "Séances reportées pour incident technique", pilote: (o) => o.dirigeant, ind: "17, 19" },
   { processus: "Sous-traitance / portage", risque: "Intervenant externe ne respectant pas le référentiel", cause: "Contrat sans clauses qualité", p: 1, g: 3, mesure: "Registre IND 27, annexe « Clauses qualité » dans chaque contrat, restitution des preuves", indicateur: "Contrats avec annexe qualité / contrats signés", pilote: (o) => o.dirigeant, ind: "27" },
-  { processus: "Appréciations et réclamations", risque: "Insatisfaction non détectée ou réclamation non traitée", cause: "Taux de retour faible, absence de registre", p: 2, g: 2, mesure: "Relance des questionnaires, registre des réclamations, réponse écrite sous 8 jours (procédure de réclamation)", indicateur: "Taux de retour des questionnaires ; délai de réponse", pilote: (o) => o.referentQualite || o.dirigeant, ind: "30, 31" },
+  { processus: "Appréciations et réclamations", risque: "Insatisfaction non détectée ou réclamation non traitée", cause: "Taux de retour faible, absence de registre", p: 2, g: 2, mesure: "Relance des questionnaires, registre des réclamations, réponse écrite sous 15 jours ouvrés (procédure de réclamation)", indicateur: "Taux de retour des questionnaires ; délai de réponse", pilote: (o) => o.referentQualite || o.dirigeant, ind: "30, 31" },
   { processus: "Veille", risque: "Évolution réglementaire non prise en compte", cause: "Veille non tracée", p: 2, g: 3, mesure: "Veille mensuelle tracée (dont décret n° 2026-728), exploitation en revue qualité", indicateur: "Évolutions intégrées / évolutions identifiées", pilote: (o) => o.referentQualite || o.dirigeant, ind: "23, 24, 25" },
   { processus: "Données personnelles", risque: "Atteinte à la confidentialité des données des " + "bénéficiaires", cause: "Partage non sécurisé de documents", p: 1, g: 3, mesure: "Stockage sécurisé, accès restreints, durée de conservation définie (RGPD)", indicateur: "Incidents de confidentialité", pilote: (o) => o.dirigeant, ind: "9, 17" },
 ];
@@ -161,16 +162,28 @@ export function genAnalyseRisquesQualite(oDossier: OrganismeInfo, type: TypePres
   const o = opts?.dateDoc ? orgVersionUlterieure(oDossier, opts.dateDoc) : oDossier;
   const incidents = (opts?.incidents || []).filter(Boolean);
   const L = LIBELLE[type];
+  // VAE : vocabulaire de l'accompagnement et personnes réelles (accompagnatrice, référente handicap), accordés.
+  const accNom = (f?.formateur || o.responsablePedagogique || o.dirigeant || "").trim();
+  const femDe = (nom: string) => (memePersonne(nom, o.dirigeant) ? dirigeanteFem(o) : estFemme(nom));
   const risques = [...RISQUES_COMMUNS, ...RISQUES_SPECIFIQUES[type]].map((r) =>
     type === "BC" || type === "VAE" ? { ...r, risque: r.risque.replace("bénéficiaires", L.publicPl) } : r,
-  );
+  ).map((r) => type !== "VAE" ? r : {
+    ...r,
+    mesure: r.mesure
+      .replace("validation par le référent pédagogique", `validation par ${femDe(accNom) ? "l'accompagnatrice" : "l'accompagnateur"}`)
+      .replace("entretien avec le référent handicap", `entretien avec ${femDe(o.referentHandicap || o.dirigeant) ? "la référente" : "le référent"} handicap (${o.referentHandicap || o.dirigeant})`)
+      .replace("test de connexion avant session", "test de connexion avant chaque séance")
+      .replace("Charte de l'accompagnateur", "Règle « le candidat reste seul auteur »"),
+  });
+  // Sous-titre sans doublon (« accompagnement VAE — Accompagnement VAE – CAP… »).
+  const perimetre = f?.intitule && f.intitule.toLowerCase().startsWith(L.prestation.toLowerCase()) ? f.intitule : `${L.prestation}${f?.intitule ? ` — ${f.intitule}` : ""}`;
   const rows = risques.map((r) => [r.processus, r.risque, r.cause, String(r.p), String(r.g), criticite(r.p, r.g), r.mesure, r.indicateur, r.pilote(o), r.ind]);
   return buildDocument({
     org: o,
     title: "ANALYSE DES RISQUES SUR LA QUALITÉ DES PRESTATIONS",
-    subtitle: `Indicateur 32 — référentiel national qualité (décret n° 2026-728) — ${L.prestation}${f?.intitule ? ` — ${f.intitule}` : ""}`,
+    subtitle: `Indicateur 32 — référentiel national qualité (décret n° 2026-728) — ${perimetre}`,
     sections: [
-      { heading: "Objet", content: `<p>Depuis le décret n° 2026-728 du 1er août 2026 (en vigueur le 1er novembre 2026), l'indicateur 32 impose, en plus de la démarche d'amélioration continue fondée sur les appréciations et les réclamations, <strong>une analyse des risques sur la qualité des formations délivrées</strong>. Ce document présente la méthode retenue par ${o.nom} et la cartographie des risques de son activité de ${L.prestation}.</p>` },
+      { heading: "Objet", content: `<p>Depuis le décret n° 2026-728 du 1er août 2026 (en vigueur le 1er novembre 2026), l'indicateur 32 impose, en plus de la démarche d'amélioration continue fondée sur les appréciations et les réclamations, <strong>une analyse des risques sur la qualité des ${type === "AF" || type === "CFA" ? "formations" : "prestations"} délivrées</strong>. Ce document présente la méthode retenue par ${o.nom} et la cartographie des risques de son activité ${de(L.prestation)}.</p>` },
       { heading: "Méthode", content: `<ul><li><strong>Identification</strong> des risques par processus (de l'information du public au recueil des appréciations).</li><li><strong>Cotation</strong> : probabilité (P) et gravité (G) de 1 à 3 ; criticité = P × G (1-2 faible, 3-4 modéré, 6-9 élevé).</li><li><strong>Maîtrise</strong> : une mesure, un indicateur de suivi et un pilote par risque ; tout risque « élevé » donne lieu à une action inscrite au tableau d'amélioration continue.</li><li><strong>Revue</strong> : au moins une fois par an, et après toute réclamation, tout incident ou toute évolution réglementaire ; la revue est tracée dans le tableau d'amélioration continue.</li></ul>` },
     ],
     table: { headers: ["Processus", "Risque", "Cause principale", "P", "G", "Criticité", "Mesure de maîtrise", "Indicateur de suivi", "Pilote", "IND"], rows },

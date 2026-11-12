@@ -139,7 +139,11 @@ function terminologieVAE(t: string): string {
     .replace(/\b([Ll])ivret 1(?: de recevabilité| \(recevabilité\))?/g, (_m, l) => `${l === "L" ? "D" : "d"}ossier de faisabilité`)
     .replace(/\b([Ll])ivret 2\b/g, (_m, l) => `${l === "L" ? "D" : "d"}ossier de validation`)
     .replace(/d'au moins (?:1|un|une) (?:an|année)s? d'expérience(?:\s*\(\s*1\s?607\s*heures?\s*\))?/gi, "d'une expérience")
-    .replace(/\s*\(\s*1\s?607\s*heures?\s*\)/gi, "");
+    .replace(/\s*\(\s*1\s?607\s*heures?\s*\)/gi, "")
+    // Ancien « livret » seul (sans « d'accueil », « d'apprentissage »…) = dossier de validation.
+    .replace(/\b(du|le|au) livret\b(?!\s+d['’])/g, (_m, art) => `${art} dossier de validation`)
+    .replace(/Validation des Acquis de l['’]Expérience/g, "validation des acquis de l'expérience")
+    .replace(/\bavec feedback\b/gi, "avec retour de l'accompagnateur");
 }
 
 /**

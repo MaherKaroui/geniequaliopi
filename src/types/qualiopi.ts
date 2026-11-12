@@ -39,6 +39,8 @@ export interface OrganismeInfo {
   siteWeb: string;
   nda: string;
   dirigeant: string;
+  /** Civilité du dirigeant (accords « la dirigeante », « l'accompagnatrice ») ; à défaut, déduite du prénom. */
+  civiliteDirigeant?: "M." | "Mme" | "";
   responsablePedagogique: string;
   referentHandicap: string;
   referentQualite: string;

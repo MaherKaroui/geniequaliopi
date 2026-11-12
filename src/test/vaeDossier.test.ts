@@ -56,7 +56,7 @@ describe("dossier VAE", () => {
     expect(cert.t).toMatch(/sera établi/);
     const em = docs.find(({ d }) => d.template === "vae_emargement")!;
     expect(em.t).not.toMatch(/Réalisée/);
-    expect(em.t).toMatch(/0 heure\(s\) réalisée\(s\)/);
+    expect(em.t).toMatch(/0 heure réalisée/);
   });
 
   it("une seule pièce contractuelle, choisie selon l'entreprise (convention tripartite si entreprise)", () => {
@@ -110,7 +110,8 @@ describe("dossier VAE", () => {
     for (const { t } of contrats) {
       expect(t).toContain("2 375 € TTC");
       expect(t).not.toContain("1 800 €");
-      expect(t).toContain("6 avril 2026");
+      // 6 avril 2026 = lundi de Pâques : la première séance réelle est le mardi 7 avril.
+      expect(t).toContain("7 avril 2026");
       expect(t).toContain("17 juillet 2026");
       expect(t).toContain("24 heures");
     }

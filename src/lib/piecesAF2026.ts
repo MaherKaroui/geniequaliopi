@@ -8,7 +8,7 @@
  * justificatif à joindre, jamais inventée.
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, subtractBusinessDays } from "./docBuilder";
+import { buildDocument, formatDate, subtractBusinessDays, memePersonne } from "./docBuilder";
 import { getFormationDays, type FormateurInfo } from "./sampleData";
 import { referencesReglementaires } from "./qualite2026";
 
@@ -243,9 +243,9 @@ export function genVeilleSourcee(o: OrganismeInfo, f: FormationInfo, theme: Them
     title: titre,
     subtitle: `Indicateur ${ind} — ${f.intitule}`,
     sections: [
-      { heading: "Organisation de la veille", content: `<p>Veille assurée par ${o.referentQualite || o.dirigeant}, consignée dans ce tableau et exploitée en revue qualité ; chaque évolution retenue donne lieu à une action au tableau d'amélioration continue. Les abonnements et courriels reçus sont conservés comme preuves par l'organisme.</p>` },
+      { heading: "Organisation de la veille", content: `<p>${o.referentQualite?.trim() && !memePersonne(o.referentQualite, o.responsablePedagogique || o.dirigeant) ? `Veille pilotée par ${o.referentQualite.trim()}, exploitée par ${o.responsablePedagogique || o.dirigeant}` : `Veille assurée par ${o.referentQualite || o.dirigeant}`}, consignée dans ce tableau et exploitée en revue qualité ; chaque évolution retenue donne lieu à une action au tableau d'amélioration continue. Les abonnements et courriels reçus sont conservés comme preuves par l'organisme.</p>` },
     ],
-    table: { headers: ["Source", "Objet suivi", "Adresse", "Fréquence", "Dernière consultation"], rows },
+    table: { headers: ["Source", "Objet suivi", "Adresse", "Fréquence", "Suivie depuis le"], rows },
     extraHtml: textes.length
       ? `<h2>Textes identifiés et exploitation</h2><table><tr><th>Publication</th><th>Texte</th><th>Contenu</th><th>Source</th><th>Exploitation</th></tr>${textes.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`
       : "",

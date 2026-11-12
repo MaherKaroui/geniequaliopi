@@ -29,11 +29,11 @@ interface FichePreuve {
   exploitation: [string, string][];
 }
 
-function depuisEntree(e: EntreeVeille): FichePreuve {
+function depuisEntree(e: EntreeVeille, vae = false): FichePreuve {
   return {
     ref: e.id, source: e.source, url: e.url, titre: e.titre, date: libelleParution(e), resume: e.resume,
     exploitation: [
-      ["Impact sur la formation", e.impact],
+      [vae ? "Impact sur l'accompagnement" : "Impact sur la formation", e.impact],
       ["Décision / action", e.action],
       ["Pilote", e.pilote],
       ["Prise en compte", e.priseEnCompte],
@@ -65,13 +65,13 @@ function ficheHtml(o: OrganismeInfo, p: FichePreuve): string {
 export function genPreuvesVeilleReglementaire(o: OrganismeInfo, f: FormationInfo): string {
   const entrees = entreesVeille(o, f, "reglementaire", typeDepuisOrganisme(o));
   const pack = getCachedVeillePack(f)?.reglementaire;
-  const fiches = pack?.length ? pack.map(depuisPackIA) : entrees.map(depuisEntree);
+  const fiches = pack?.length ? pack.map(depuisPackIA) : entrees.map((e) => depuisEntree(e, typeDepuisOrganisme(o) === "VAE"));
   return buildDocument({
     org: pack?.length ? o : orgVeille(o, entrees),
     title: "PREUVES DE VEILLE RÉGLEMENTAIRE",
     subtitle: `Indicateur 23 — ${f.intitule}`,
     sections: [
-      { heading: "Mode de lecture", content: `<p>Une fiche par information de veille. La partie 1 identifie la source externe (éditeur, titre, date de parution — ou date de consultation pour une page sans date de parution — et lien) ; le texte officiel se consulte à ce lien et une impression datée de la page peut être jointe. La partie 2 décrit l'exploitation faite par ${esc(o.nom)} ; elle est reprise au tableau de veille et au tableau d'amélioration continue.</p>` },
+      { heading: "Mode de lecture", content: `<p>Une fiche par information de veille. La partie 1 identifie la source externe (éditeur, titre, date de parution — ou date de consultation pour une page sans date de parution — et lien) ; le texte officiel se consulte au lien indiqué. La partie 2 décrit l'exploitation faite par ${esc(o.nom)} ; elle est reprise au tableau de veille et au tableau d'amélioration continue.</p>` },
     ],
     extraHtml: fiches.length ? fiches.map((p) => ficheHtml(o, p)).join("\n") : "<p>Aucune information de veille réglementaire enregistrée.</p>",
   });

@@ -26,7 +26,10 @@ export function typePrestation(o: Pick<OrganismeInfo, "typesActions">): TypePres
 
 const v = (x?: string) => (x || "").trim();
 const NOM_PUBLIC: Record<TypePrestation, [string, string]> = { AF: ["stagiaire", "stagiaires"], CFA: ["apprenti", "apprentis"], VAE: ["candidat", "candidats"], BC: ["bénéficiaire", "bénéficiaires"] };
-const NON_DISPO = "Non disponible";
+/** Cellule d'un tableau annuel sans donnée enregistrée (légende sous le tableau). */
+const NON_DISPO = "—";
+/** Vocabulaire de fin de parcours selon la prestation. */
+const finParcours = (tp: TypePrestation) => (tp === "VAE" ? "fin d'accompagnement" : tp === "BC" ? "fin de bilan" : "fin de parcours");
 
 function parseDate(x?: string): Date | null {
   const t = v(x);
@@ -50,24 +53,32 @@ export function indicateursChiffres(o: OrganismeInfo, f: FormationInfo, stagiair
   const [, pl] = NOM_PUBLIC[tp];
   const termines = stagiairesTermines(f, stagiaires);
   const annee = v(f.anneeIndicateurs) || String(new Date().getFullYear());
+  const jour = formatDate(iso(new Date()));
+  const n = termines.length;
   const out: IndicateurCalcule[] = [];
   const nbSaisi = v(f.nombreStagiairesFormes);
   out.push({ libelle: `Nombre de ${pl} ayant terminé leur parcours`, valeur: nbSaisi || String(termines.length), source: nbSaisi ? `Donnée saisie (${annee})` : `Calculé : ${pl} du dossier dont la session est terminée au ${formatDate(iso(new Date()))}` });
   const assid = getAssiduiteLabel(f);
   out.push({
     libelle: "Taux d'assiduité / de réalisation",
-    valeur: assid || (termines.length ? "100 %" : NON_DISPO),
-    source: assid ? `Donnée saisie (${annee})` : termines.length ? `Calculé : heures émargées / heures prévues sur les ${termines.length} parcours terminés (feuilles d'émargement du dossier)` : `Aucun parcours terminé à ce jour`,
+    valeur: assid || (n ? "100 %" : `Aucun parcours terminé au ${jour}`),
+    source: assid ? `Donnée saisie (${annee})` : n ? `Calculé : heures émargées / heures prévues sur ${n > 1 ? `les ${n} parcours terminés` : "le parcours terminé"} (feuilles d'émargement du dossier)` : "Heures émargées / heures prévues, calculées à la fin de chaque parcours",
   });
   const sat = getSatisfactionLabel(f);
   out.push({
     libelle: `Taux de satisfaction des ${pl}`,
-    valeur: sat || NON_DISPO,
-    source: sat ? `Questionnaires de fin de parcours (${annee})` : termines.length ? `${termines.length} questionnaire(s) de satisfaction au dossier (IND 30) : taux à reporter dans la fiche Formation, champ « taux de satisfaction »` : "Aucun questionnaire recueilli à ce jour",
+    valeur: sat || (n ? `Mesure engagée : questionnaire de ${finParcours(tp)} remis ${n > 1 ? `aux ${n} ${pl} ayant achevé leur parcours` : `${termines[0]?.civilite === "Mme" ? (tp === "VAE" ? "à la candidate" : tp === "CFA" ? "à l'apprentie" : tp === "BC" ? "à la bénéficiaire" : "à la stagiaire") : tp === "VAE" ? "au candidat" : tp === "CFA" ? "à l'apprenti" : tp === "BC" ? "au bénéficiaire" : "au stagiaire"} ayant achevé son parcours`}` : `Aucun parcours terminé au ${jour}`),
+    source: sat ? `Questionnaires de ${finParcours(tp)} (${annee})` : `Questionnaires de ${finParcours(tp)} (IND 30) ; le taux est calculé sur les seules réponses signées et publié à la mise à jour annuelle`,
   });
   if (/^(RS|RNCP)\d+$/i.test(v(f.codeRNCP).replace(/\s+/g, "")) || tp === "VAE") {
     const t = getTauxObtention(f);
-    out.push({ libelle: tp === "VAE" ? "Taux de validation (totale ou partielle)" : "Taux d'obtention de la certification", valeur: t ? `${t.taux} % (${t.admis}/${t.presentes})` : NON_DISPO, source: t ? `Résultats communiqués par le certificateur (${annee})` : "Aucun résultat de certification communiqué à ce jour" });
+    out.push({
+      libelle: tp === "VAE" ? "Taux de validation (totale ou partielle)" : "Taux d'obtention de la certification",
+      valeur: t ? `${t.taux} % (${t.admis}/${t.presentes})` : `0 décision notifiée au ${jour}`,
+      source: t ? `Résultats communiqués par le certificateur (${annee})` : tp === "VAE"
+        ? "Décisions notifiées par le certificateur ; taux = validations totales ou partielles / candidats présentés au jury, recalculé à chaque notification"
+        : "Résultats notifiés par le certificateur ; taux = admis / présentés, recalculé à chaque résultat",
+    });
   }
   return out;
 }
@@ -79,21 +90,27 @@ export function genIndicateursResultatsAudit(o: OrganismeInfo, f: FormationInfo,
   const [, pl] = NOM_PUBLIC[tp];
   const chiffres = indicateursChiffres(o, f, stagiaires);
   const termines = stagiairesTermines(f, stagiaires);
-  const definition = `<ul>${chiffres.map((c) => `<li><strong>${c.libelle}</strong> — méthode : ${c.libelle.startsWith("Nombre") ? "décompte des parcours terminés" : c.libelle.includes("assiduité") ? "heures réalisées / heures prévues, d'après les émargements" : c.libelle.includes("satisfaction") ? "part des réponses « satisfait » ou « très satisfait » au questionnaire de fin de parcours" : "admis / présentés, d'après les résultats du certificateur"}</li>`).join("")}</ul><p><strong>Fréquence :</strong> mise à jour à chaque fin de session et au moins une fois par an.<br><strong>Supports de diffusion :</strong> ${v(o.siteWeb) ? `site internet (${v(o.siteWeb)}), ` : ""}fiche formation remise avant l'inscription, livret d'accueil.</p>`;
+  const vae = tp === "VAE";
+  const definition = `<ul>${chiffres.map((c) => `<li><strong>${c.libelle}</strong> — méthode : ${c.libelle.startsWith("Nombre") ? "décompte des parcours terminés" : c.libelle.includes("assiduité") ? "heures réalisées / heures prévues, d'après les émargements" : c.libelle.includes("satisfaction") ? `part des réponses « satisfait » ou « très satisfait » au questionnaire de ${finParcours(tp)}` : vae ? "validations totales ou partielles / candidats présentés au jury, d'après les décisions du certificateur" : "admis / présentés, d'après les résultats du certificateur"}</li>`).join("")}</ul><p><strong>Fréquence :</strong> mise à jour à chaque ${vae ? "fin d'accompagnement" : "fin de session"} et au moins une fois par an.<br><strong>Supports de diffusion :</strong> ${v(o.siteWeb) ? `site internet (${v(o.siteWeb)}), ` : ""}${vae ? "fiche de présentation de l'accompagnement VAE remise avant la signature du contrat, livret d'accueil du candidat" : "fiche formation remise avant l'inscription, livret d'accueil"}.</p>`;
   const sections: { heading: string; content: string; variant?: "green" | "orange" }[] = [
     { heading: "Type d'audit", content: `<p><strong>${LIBELLES_AUDIT[type]}</strong> — ${f.intitule}.</p>` },
   ];
   if (sansRealisation(type)) {
+    const nbTxt = termines.length > 1 ? `${termines.length} parcours sont terminés` : "Un parcours est terminé";
+    const dejaCertifie = type === "complementaire" && !!v(o.numeroCertificatQualiopi);
+    const obtenu = parseDate(o.dateObtentionQualiopi);
     sections.push(
-      { heading: "Situation de nouvel entrant", content: termines.length
-        ? `<p>${o.nom} est nouvel entrant. ${termines.length} parcours ${termines.length > 1 ? "sont terminés" : "est terminé"} à la date du ${formatDate(iso(today))} : les premiers résultats ci-dessous sont publiés et seront consolidés à l'audit de surveillance.</p>`
+      { heading: dejaCertifie ? `Situation au ${formatDate(iso(today))}` : "Situation de nouvel entrant", content: dejaCertifie
+        ? `<p>${o.nom}, déjà certifié Qualiopi${v(o.organismeCertificateur) ? ` par ${v(o.organismeCertificateur)}` : ""}${obtenu ? ` depuis le ${formatDate(iso(obtenu))}` : ""}, présente ${vae ? "l'accompagnement VAE" : "cette catégorie d'action"} en extension de périmètre (audit complémentaire). ${termines.length ? `${nbTxt} au ${formatDate(iso(today))} ; ses résultats sont publiés ci-dessous et seront consolidés à l'audit de surveillance.` : `Aucun parcours de ce périmètre n'est achevé au ${formatDate(iso(today))} : l'organisme présente les indicateurs qu'il publiera, leur méthode de calcul et leurs supports de diffusion.`}</p>`
+        : termines.length
+        ? `<p>${o.nom} est nouvel entrant. ${nbTxt} à la date du ${formatDate(iso(today))} : les premiers résultats ci-dessous sont publiés et seront consolidés à l'audit de surveillance.</p>`
         : `<p>${o.nom} est nouvel entrant : aucune session n'est achevée à la date du ${formatDate(iso(today))}. Conformément au guide de lecture (indicateurs 2 et 3 audités en « nouvel entrant »), l'organisme présente les indicateurs qu'il publiera, leur méthode de calcul et leurs supports de diffusion.</p>`, variant: "green" },
       { heading: "Indicateurs définis", content: definition },
     );
   } else {
     sections.push({ heading: type === "surveillance" ? "Résultats sur la période écoulée" : "Résultats du cycle de certification", content: `<p>Les indicateurs sont chiffrés : donnée saisie lorsqu'elle existe, sinon calcul à partir des ${pl} du dossier. Aucun chiffre n'est estimé.</p>` });
     if (!termines.length && !v(f.nombreStagiairesFormes)) {
-      sections.push({ heading: "Point d'attention", content: `<p>Aucun ${NOM_PUBLIC[tp][0]} du dossier n'a terminé son parcours : l'audit de ${type === "surveillance" ? "surveillance" : "renouvellement"} attend des résultats chiffrés. Saisir les résultats des sessions réalisées dans la fiche Formation (indicateurs de résultats).</p>`, variant: "orange" });
+      sections.push({ heading: "Point d'attention", content: `<p>Aucun ${NOM_PUBLIC[tp][0]} du dossier n'a terminé son parcours : l'audit de ${type === "surveillance" ? "surveillance" : "renouvellement"} porte sur des résultats chiffrés, publiés dès la fin du premier parcours.</p>`, variant: "orange" });
     }
     sections.push({ heading: "Méthode et diffusion", content: definition });
   }
@@ -108,7 +125,7 @@ export function genIndicateursResultatsAudit(o: OrganismeInfo, f: FormationInfo,
       const saisieAnnee = v(f.anneeIndicateurs) === String(y);
       const t = getTauxObtention(f);
       return `<tr><td>${y}</td><td>${r ? r.total : NON_DISPO}</td><td>${saisieAnnee ? getSatisfactionLabel(f) || NON_DISPO : NON_DISPO}</td><td>${saisieAnnee && t ? `${t.taux} %` : NON_DISPO}</td></tr>`;
-    }).join("")}</tbody></table><p>« Non disponible » : donnée non saisie pour l'année — à compléter à partir des bilans annuels archivés.</p>`;
+    }).join("")}</tbody></table><p>« — » : aucune donnée enregistrée dans le dossier pour l'année ; les bilans annuels archivés font foi.</p>`;
   }
   return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS", subtitle: `Indicateurs 2 et 3 — ${LIBELLES_AUDIT[type]}`, formation: f, sections, table, extraHtml: evolution });
 }

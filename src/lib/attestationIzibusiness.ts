@@ -70,9 +70,9 @@ export function genAttestationIzibusiness(o: OrganismeInfo, beneficiaire?: strin
   const html = buildDocument({
     org: izi, title: "ATTESTATION DE FIN DE FORMATION", hideHeader: true, hideFooter: true,
     sections: [
-      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante de <strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}), atteste que :</p><p>${beneficiaireHtml},</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
+      { heading: "Attestation", content: `<p>Je soussignée <strong>Nadine DENDANI</strong>, dirigeante d'<strong>IZIBUSINESS</strong> (SIRET ${IZIBUSINESS_ORG.siret}), atteste que :</p><p>${beneficiaireHtml}</p><p>a suivi les deux formations suivantes, en présentiel au 6 rue d'Armaillé, 75017 Paris, avec une assiduité de 100 % :</p>` },
       ...formations.map((fi, i) => ({ heading: `Formation ${i + 1} — « ${fi.nom} »`, content: `<p>Du ${formatDate(fi.debut)} au ${formatDate(fi.fin)}, d'une durée de <strong>${fi.duree}</strong>.</p><p><strong>Objectif :</strong> ${fi.objectif}</p><p><strong>Contenu :</strong><br>${fi.programme.join("<br>")}</p>${i === formations.length - 1 ? `<p><strong>Durée totale : 4 jours (${formations.reduce((n, item) => n + item.heures, 0)} heures).</strong></p>` : ""}` })),
-      { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique en fin de chaque formation.</p>`, variant: "green" },
+      { heading: "Résultat de l'évaluation des acquis", content: `<p>Objectifs atteints — évaluation par cas pratique à la fin de chaque formation.</p>`, variant: "green" },
     ],
     extraHtml: `<p style="margin-top:12px">Fait à Paris, le ${formatDate(fin)}.</p><div style="margin-top:6px"><p><strong>Nadine DENDANI</strong>, dirigeante — IZIBUSINESS</p><img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="height:65px;max-width:160px;object-fit:contain" /></div>`,
   });

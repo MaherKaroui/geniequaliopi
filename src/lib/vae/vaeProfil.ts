@@ -214,7 +214,8 @@ export function chronoVAE(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo):
   }
   const derniere = seances.length ? seances[seances.length - 1].date : fin;
   const avantDerniere = seances.length > 2 ? seances[seances.length - 3].date : derniere;
-  return { debut, fin, entretienFaisabilite: entretien, depotFaisabilite: depot, contrat, premiereSeance: seances[0]?.date || debut, derniereSeance: derniere, depotValidation: avantDerniere };
+  // Début et fin affichés = première et dernière séance réelles (un jour férié en date de session est sauté).
+  return { debut: seances[0]?.date || debut, fin: derniere || fin, entretienFaisabilite: entretien, depotFaisabilite: depot, contrat, premiereSeance: seances[0]?.date || debut, derniereSeance: derniere, depotValidation: avantDerniere };
 }
 
 // ───────────────────────────── Profil déclaratif ─────────────────────────────
@@ -241,6 +242,10 @@ export interface ProfilVAE {
   nomComplet: string;
   civ: string;
   situation: string;
+  /** Statut court accordé : « Salariée », « Indépendant », « Demandeuse d'emploi ». */
+  statut: string;
+  /** Situation de travail : salarié d'une structure, indépendant ou demandeur d'emploi. */
+  cadre: "salarie" | "independant" | "demandeur";
   financeur: FinanceurVAE;
   contratAvecEmployeur: boolean;
   poste: string;
@@ -257,15 +262,29 @@ export interface ProfilVAE {
   blocsVigilance: string[];
 }
 
-const MOTIVATIONS: [string, string][] = [
-  ["Faire reconnaître officiellement des compétences exercées au quotidien", "Rester dans son emploi avec une qualification reconnue et une évolution de rémunération"],
-  ["Sécuriser son emploi en obtenant la certification correspondant à son poste", "Conserver et consolider son poste actuel"],
-  ["Pouvoir s'installer à son compte avec une certification reconnue", "Créer ou reprendre une activité indépendante dans le métier"],
-  ["Évoluer vers un poste à responsabilités qui exige la certification", "Candidater à des postes qualifiés dans le secteur"],
-  ["Accéder ensuite à une certification de niveau supérieur", "Poursuivre vers une certification de niveau supérieur du même domaine"],
-];
-function motivationProjet(seed: number): { motivation: string; projet: string } {
-  const [motivation, projet] = MOTIVATIONS[(seed >>> 7) % MOTIVATIONS.length];
+/** Motivation et projet selon la situation (sans possessif : lisibles à la 1re comme à la 3e personne). */
+const MOTIVATIONS: Record<ProfilVAE["cadre"], [string, string][]> = {
+  salarie: [
+    ["Faire reconnaître officiellement des compétences exercées au quotidien", "Rester dans l'emploi actuel avec une qualification reconnue et une évolution de rémunération"],
+    ["Sécuriser l'emploi actuel en obtenant la certification correspondant au poste", "Conserver et consolider le poste actuel"],
+    ["Pouvoir s'installer à son compte avec une certification reconnue", "Créer ou reprendre une activité indépendante dans le métier"],
+    ["Évoluer vers un poste à responsabilités qui exige la certification", "Candidater à des postes qualifiés dans le secteur"],
+    ["Accéder ensuite à une certification de niveau supérieur", "Poursuivre vers une certification de niveau supérieur du même domaine"],
+  ],
+  independant: [
+    ["Faire reconnaître officiellement des compétences exercées au quotidien auprès de la clientèle", "Pérenniser l'activité indépendante avec une qualification reconnue"],
+    ["Sécuriser l'activité indépendante en obtenant la certification du métier exercé", "Développer l'activité indépendante et élargir l'offre de prestations"],
+    ["Accéder ensuite à une certification de niveau supérieur", "Poursuivre vers une certification de niveau supérieur du même domaine"],
+  ],
+  demandeur: [
+    ["Faire reconnaître officiellement les compétences acquises pour retrouver un emploi", "Retrouver un emploi qualifié dans le métier"],
+    ["Pouvoir s'installer à son compte avec une certification reconnue", "Créer ou reprendre une activité indépendante dans le métier"],
+    ["Accéder ensuite à une certification de niveau supérieur", "Poursuivre vers une certification de niveau supérieur du même domaine"],
+  ],
+};
+function motivationProjet(seed: number, cadre: ProfilVAE["cadre"]): { motivation: string; projet: string } {
+  const liste = MOTIVATIONS[cadre];
+  const [motivation, projet] = liste[(seed >>> 7) % liste.length];
   return { motivation, projet };
 }
 
@@ -277,7 +296,9 @@ export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
   const fem = s.civilite === "Mme";
   const situation = financeur === "France Travail"
     ? `Demandeu${fem ? "se" : "r"} d'emploi inscrit${fem ? "e" : ""} à France Travail`
-    : salarie ? `Salarié${fem ? "e" : ""} — ${s.entreprise}` : "Activité exercée à titre indépendant (structure non renseignée à l'inscription)";
+    : salarie ? `Salarié${fem ? "e" : ""} — ${s.entreprise}` : "Activité exercée à titre indépendant";
+  const cadre: ProfilVAE["cadre"] = financeur === "France Travail" ? "demandeur" : salarie ? "salarie" : "independant";
+  const statut = cadre === "demandeur" ? `Demandeu${fem ? "se" : "r"} d'emploi` : cadre === "salarie" ? `Salarié${fem ? "e" : ""}` : `Indépendant${fem ? "e" : ""}`;
   const metier = s.poste?.trim() || (certif.metiers.length ? pick(certif.metiers, seed, 3) : `Professionnel(le) du domaine « ${certif.intitule} »`);
   const anneesLien = 2 + (seed % 7);
   const pro = certif.blocs.filter((b) => b.professionnel);
@@ -294,6 +315,8 @@ export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
     nomComplet: `${s.prenom} ${s.nom}`.trim(),
     civ: s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : "",
     situation,
+    statut,
+    cadre,
     financeur,
     contratAvecEmployeur: financeur === "Employeur / OPCO" || !!s.entreprise?.trim(),
     poste: metier,
@@ -301,7 +324,7 @@ export function profilVAE(s: StagiaireInfo, f: FormationInfo): ProfilVAE {
     anneesLien,
     anneesTotal: anneesLien + ((seed >>> 5) % 5),
     diplome: s.diplome?.trim() || "Non renseigné à l'inscription",
-    ...motivationProjet(seed),
+    ...motivationProjet(seed, cadre),
     disponibilites: pick(["En semaine, en matinée", "En semaine, en début d'après-midi", "En semaine, matin ou après-midi selon le planning de travail"], seed, 11),
     rqth: s.rqth === "oui",
     couverture,
