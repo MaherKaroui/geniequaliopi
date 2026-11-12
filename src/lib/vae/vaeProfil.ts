@@ -96,7 +96,9 @@ export function certifVAE(f: FormationInfo): CertifVAE {
   const code = (f.codeRNCP || f.referentiel?.code || "").trim().toUpperCase();
   const fiche = code ? getRNCPByCode(code) : undefined;
   const ref = f.referentiel;
-  const intitule = (f.intitule || ref?.intitule || fiche?.intitule || "").trim();
+  // Nom de la certification seule : l'intitulé de l'action (« Accompagnement VAE – … (RNCPxxxxx) ») est nettoyé.
+  const nomCertif = (x?: string) => (x || "").replace(/^\s*accompagnement\s+(?:à\s+la\s+)?VAE\s*[–—:-]\s*/i, "").replace(/\s*\((?:RNCP|RS)\s?\d+\)\s*$/i, "").trim();
+  const intitule = nomCertif(f.intitule) || nomCertif(ref?.intitule) || (fiche?.intitule || "").replace(/\s*\(fiche inactive[^)]*\)/i, "").trim();
   if (fiche) {
     const blocs: BlocVAE[] = fiche.blocsCompetences.map((b, i) => ({
       code: `${fiche.code}BC${pad(i + 1)}`,

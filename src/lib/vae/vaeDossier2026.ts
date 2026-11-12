@@ -127,9 +127,10 @@ interface Resultats { inscrits: number; acheves: number; enCours: number; satisf
 function resultatsVAE(f: FormationInfo, stagiaires: StagiaireInfo[]): Resultats {
   const v = valides(stagiaires);
   const acheves = v.filter((s) => estPasse(parseDateVAE(s.dateFinFormation || f.dateFin)));
-  const notes = acheves.map((s) => satisfactionNotes(s, f)).flat();
+  const repondus = acheves.map((s) => satisfactionNotes(s, f)).filter((n) => n.length);
+  const notes = repondus.flat();
   const moy = notes.length ? (notes.reduce((a, b) => a + b, 0) / notes.length) : 0;
-  return { inscrits: v.length, acheves: acheves.length, enCours: v.length - acheves.length, satisfaction: notes.length ? `${moy.toFixed(1).replace(".", ",")}/5` : "—", nbAvis: acheves.length };
+  return { inscrits: v.length, acheves: acheves.length, enCours: v.length - acheves.length, satisfaction: notes.length ? `${moy.toFixed(1).replace(".", ",")}/5` : "—", nbAvis: repondus.length };
 }
 
 export function genVAEIndicateursResultats(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -141,7 +142,7 @@ export function genVAEIndicateursResultats(o: OrganismeInfo, f: FormationInfo, s
       ["Candidats accompagnés (contrats signés)", String(r.inscrits), "Contrats et conventions d'accompagnement"],
       ["Accompagnements achevés", String(r.acheves), "Date de dernière séance ≤ date du jour"],
       ["Accompagnements en cours", String(r.enCours), "Calendrier des séances"],
-      ["Satisfaction des candidats (fin d'accompagnement)", saisis ? `${esc(saisis)}${f.nombreAvisSatisfaction ? ` (${esc(f.nombreAvisSatisfaction)} avis)` : ""}` : r.nbAvis ? `${r.satisfaction} (${r.nbAvis} avis)` : "Aucun accompagnement achevé", "Questionnaires de fin d'accompagnement"],
+      ["Satisfaction des candidats (fin d'accompagnement)", saisis ? `${esc(saisis)}${f.nombreAvisSatisfaction ? ` (${esc(f.nombreAvisSatisfaction)} avis)` : ""}` : r.nbAvis ? `${r.satisfaction} (${r.nbAvis} avis)` : r.acheves ? "Non disponible : réponses des candidats en attente" : "Aucun accompagnement achevé", "Questionnaires de fin d'accompagnement"],
       ["Taux de validation totale / partielle", f.nbPresentesCertification ? `${esc(f.nbAdmisCertification || "0")} / ${esc(f.nbPresentesCertification)} présentés` : "Aucun résultat de jury communiqué à ce jour", "Décisions notifiées par le certificateur"],
     ],
   }, sections: [
@@ -228,7 +229,7 @@ export function genVAEDossierFaisabilite(o: OrganismeInfo, f: FormationInfo, sta
   const naissance = parseDateVAE(s.dateNaissance);
   const structure = p.structure !== "—" ? p.structure : "ma structure";
   const debutExp = new Date((parseDateVAE(f.dateDebut) || aujourdhui()).getFullYear() - p.anneesLien, 0, 1).getFullYear();
-  return buildDocument({ org: o, title: "LIVRET 1 – DOSSIER DE FAISABILITÉ VAE", subtitle: `${esc(p.nomComplet)} — dépôt sur vae.gouv.fr`, sections: [
+  return buildDocument({ org: o, title: "DOSSIER DE FAISABILITÉ VAE", subtitle: `${esc(p.nomComplet)} — dépôt sur vae.gouv.fr`, sections: [
     { heading: "1. Identité du candidat", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)}${naissance ? ` — né${s.civilite === "Mme" ? "e" : ""} le ${frVAE(naissance)}` : ""}<br>Courriel : ${esc(s.email)}${s.telephone?.trim() ? ` — Téléphone : ${esc(s.telephone)}` : ""}${s.adresse ? `<br>Adresse : ${esc(s.adresse)} ${esc(s.codePostal || "")} ${esc(s.commune || "")}` : ""}<br>Situation : ${esc(p.situation)}<br>Dernier diplôme : ${esc(p.diplome)}</p>` },
     { heading: "2. Certification visée", content: `<p>${certifLigne(c)}</p>${alerteFiche(c)}` },
     { heading: "3. Expérience en rapport avec la certification", content: `<table><thead><tr><th>Période</th><th>Emploi</th><th>Structure</th><th>Statut</th></tr></thead><tbody><tr><td>${debutExp} – aujourd'hui</td><td>${esc(p.poste)}</td><td>${esc(structure)}</td><td>${esc(p.situation.split(" — ")[0])}</td></tr></tbody></table><p>Environ ${p.anneesLien} ans d'expérience en rapport direct avec la certification (${p.anneesTotal} ans d'expérience totale).</p>` },
@@ -267,7 +268,7 @@ export function genVAEContrat(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const tripartite = !!s.entreprise?.trim();
   const titre = tripartite ? "CONVENTION D'ACCOMPAGNEMENT VAE (TRIPARTITE)" : "CONTRAT D'ACCOMPAGNEMENT VAE";
   const adresseCandidat = [s.adresse, s.codePostal, s.commune].filter(x => x?.trim()).join(" ");
-  const parties = `<p><strong>L'organisme accompagnateur :</strong> ${esc(o.nom)}, SIRET ${esc(o.siret)}, ${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)}${o.nda ? `, déclaration d'activité n° ${esc(o.nda)} (cet enregistrement ne vaut pas agrément de l'État)` : ""}, représenté par ${esc(o.dirigeant)}${o.email ? ` ; courriel : ${esc(o.email)}` : ""}.</p><p><strong>Le bénéficiaire :</strong> ${esc(p.civ)} ${esc(p.nomComplet)}${adresseCandidat ? `, domicilié à ${esc(adresseCandidat)}` : ""}${s.email ? ` ; courriel : ${esc(s.email)}` : ""}.</p>${tripartite ? `<p><strong>L'entreprise :</strong> ${esc(s.entreprise)}${s.siretEntreprise ? `, SIRET ${esc(s.siretEntreprise)}` : ""}${s.adresseEntreprise ? `, ${esc(s.adresseEntreprise)}` : ""}${s.responsableEntreprise ? `, représentée par ${esc(s.responsableEntreprise)}` : ""}${s.emailResponsable ? ` ; courriel : ${esc(s.emailResponsable)}` : ""}.</p>` : ""}`;
+  const parties = `<p><strong>L'organisme accompagnateur :</strong> ${esc(o.nom)}, SIRET ${esc(o.siret)}, ${esc(o.adresse)}, ${esc(o.codePostal)} ${esc(o.ville)}${o.nda ? `, déclaration d'activité n° ${esc(o.nda)} (cet enregistrement ne vaut pas agrément de l'État)` : ""}, représenté par ${esc(o.dirigeant)}${o.email ? ` ; courriel : ${esc(o.email)}` : ""}.</p><p><strong>Le bénéficiaire :</strong> ${esc(p.civ)} ${esc(p.nomComplet)}${adresseCandidat ? `, domicilié${/^(mme|madame|mlle)/i.test(s.civilite || "") ? "e" : ""} à ${esc(adresseCandidat)}` : ""}${s.email ? ` ; courriel : ${esc(s.email)}` : ""}.</p>${tripartite ? `<p><strong>L'entreprise :</strong> ${esc(s.entreprise)}${s.siretEntreprise ? `, SIRET ${esc(s.siretEntreprise)}` : ""}${s.adresseEntreprise ? `, ${esc(s.adresseEntreprise)}` : ""}${s.responsableEntreprise ? `, représentée par ${esc(s.responsableEntreprise)}` : ""}${s.emailResponsable ? ` ; courriel : ${esc(s.emailResponsable)}` : ""}.</p>` : ""}`;
   const cpf = p.financeur === "CPF";
   const personnel = p.financeur === "Personnel";
   const financement = cpf
@@ -383,7 +384,7 @@ export function genVAETrameDossierValidation(o: OrganismeInfo, f: FormationInfo,
 <p><strong>Preuves jointes :</strong> attestation d'employeur (${esc(structure)}), fiche de poste, exemples de documents produits (anonymisés), tableaux de suivi, courriels de validation.</p>`,
     };
   });
-  return buildDocument({ org: o, title: "LIVRET 2 – DOSSIER DE VALIDATION VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
+  return buildDocument({ org: o, title: "DOSSIER DE VALIDATION VAE", subtitle: `${esc(p.nomComplet)} — ${esc(c.intitule)}`, sections: [
     { heading: "Candidat et certification", content: `<p>${esc(p.civ)} ${esc(p.nomComplet)} — ${esc(p.situation)}<br>Emploi exercé : ${esc(p.poste)}${p.structure !== "—" ? ` — ${esc(p.structure)}` : ""}<br>Certification visée : ${certifLigne(c)}<br>Accompagnateur : ${esc(accompagnateur(o, f, s))}</p>` },
     { heading: "Mon parcours et ma motivation", content: `<p>Mon parcours professionnel représente environ ${p.anneesTotal} ans d'expérience, dont ${p.anneesLien} ans en rapport direct avec la certification. Mon dernier diplôme déclaré : ${esc(p.diplome)}.</p><p><strong>Motivation :</strong> ${esc(p.motivation)}.<br><strong>Projet :</strong> ${esc(p.projet)}.</p>` },
     ...blocs,
@@ -861,9 +862,9 @@ export function genVAEPartenaires(o: OrganismeInfo, f: FormationInfo) {
 
 const CRITERES_SATISFACTION = ["Accueil et information", "Entretien de faisabilité", "Qualité de l'accompagnement", "Ressources remises", "Préparation à l'entretien avec le jury", "Organisation et respect du calendrier"];
 
-export function satisfactionNotes(s: StagiaireInfo, f: FormationInfo): number[] {
-  const g = graine(`sat|${s.nom}|${s.prenom}|${f.intitule}`);
-  return CRITERES_SATISFACTION.map((_, i) => ((g >>> (i * 2)) % 4 === 0 ? 4 : 5));
+/** Réponses du candidat au questionnaire : jamais générées ; aucune réponse saisie → tableau vide. */
+export function satisfactionNotes(_s: StagiaireInfo, _f: FormationInfo): number[] {
+  return [];
 }
 
 export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -871,11 +872,16 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
   const ch = chronoVAE(s, f, o);
   const fait = estPasse(ch.fin);
   const notes = fait ? satisfactionNotes(s, f) : [];
-  return buildDocument({ org: o, extraHtml: signatures([sigCandidat(s, fait ? frVAE(ch.fin) : undefined)]), title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
+  const repondu = notes.length === CRITERES_SATISFACTION.length;
+  return buildDocument({ org: o, extraHtml: repondu ? signatures([sigCandidat(s, frVAE(ch.fin))]) : "", title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
     headers: ["Critère", "1", "2", "3", "4", "5"],
     rows: CRITERES_SATISFACTION.map((c, i) => [c, ...[1, 2, 3, 4, 5].map((n) => (notes[i] === n ? "☒" : "☐"))]),
   }, sections: [
-    { heading: "Statut", content: fait ? `<p>Questionnaire rempli le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5. Recommanderiez-vous ${esc(o.nom)} ? ☒ Oui ☐ Non</p>` : `<p>Questionnaire à remplir à la fin de l'accompagnement (${frVAE(ch.fin)}).</p>` },
+    { heading: "Statut", content: repondu
+      ? `<p>Questionnaire rempli par le candidat le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
+      : fait
+        ? `<p>Questionnaire remis au candidat le ${frVAE(ch.fin)}, à l'issue de la dernière séance, à remplir et signer par lui. Les réponses ne sont jamais complétées par l'organisme ; le résultat est reporté dans la synthèse des appréciations dès réception.</p>`
+        : `<p>Questionnaire remis au candidat à l'issue de la dernière séance, prévue le ${frVAE(ch.fin)}.</p>` },
   ] });
 }
 
@@ -886,8 +892,17 @@ export function genVAESyntheseSatisfaction(o: OrganismeInfo, f: FormationInfo, s
       { heading: "Statut", content: `<p>Aucun accompagnement n'est encore achevé au ${frVAE(aujourdhui())} : la synthèse sera établie à partir des premiers questionnaires de fin d'accompagnement.</p>` },
     ] });
   }
-  const moy = CRITERES_SATISFACTION.map((_, i) => acheves.reduce((a, s) => a + satisfactionNotes(s, f)[i], 0) / acheves.length);
-  return buildDocument({ org: o, signatures: sigQualite(o), title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${acheves.length} questionnaire(s) — au ${frVAE(aujourdhui())}`, table: {
+  const recus = acheves.filter((s) => satisfactionNotes(s, f).length === CRITERES_SATISFACTION.length);
+  if (!recus.length) {
+    const saisi = (f.tauxSatisfaction || "").trim();
+    return buildDocument({ org: o, signatures: sigQualite(o), title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `Au ${frVAE(aujourdhui())}`, sections: [
+      { heading: "Statut", content: saisi
+        ? `<p>Taux de satisfaction des candidats : <strong>${esc(saisi)}</strong>${f.nombreAvisSatisfaction ? ` (${esc(f.nombreAvisSatisfaction)} avis)` : ""}, d'après les questionnaires de fin d'accompagnement reçus.</p>`
+        : `<p>${acheves.length} accompagnement(s) achevé(s) : questionnaire de fin d'accompagnement remis à chaque candidat. La synthèse critère par critère est établie dès réception des réponses ; aucun résultat n'est présenté avant.</p>` },
+    ] });
+  }
+  const moy = CRITERES_SATISFACTION.map((_, i) => recus.reduce((a, s) => a + satisfactionNotes(s, f)[i], 0) / recus.length);
+  return buildDocument({ org: o, signatures: sigQualite(o), title: "SYNTHÈSE DES APPRÉCIATIONS – VAE", subtitle: `${recus.length} questionnaire(s) — au ${frVAE(aujourdhui())}`, table: {
     headers: ["Critère", "Moyenne /5"], rows: CRITERES_SATISFACTION.map((c, i) => [c, moy[i].toFixed(1).replace(".", ",")]),
   }, sections: [
     { heading: "Analyse", content: `<p>Critère le moins bien noté : « ${CRITERES_SATISFACTION[moy.indexOf(Math.min(...moy))]} » — action de progrès inscrite au tableau d'amélioration continue.</p>`, variant: "green" },

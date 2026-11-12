@@ -55,3 +55,16 @@ describe("VAE — guide de lecture V10 et signatures", () => {
     expect(h).toMatch(/Claire ALPHA/);
   });
 });
+
+describe("VAE — dossier aussi complet que le dossier AF", () => {
+  it("pièces communes AF reprises (IND 21, 22, 23, 26, 30, 31, 32), au vocabulaire VAE", () => {
+    for (const tpl of ["procedure_recrutement_formateur", "fiche_entretien_annuel_formateur", "procedure_veille_exploitee", "cr_exploitation_veille", "preuves_veille_reglementaire", "veille_sourcee", "relances_appreciations_excel", "procedure_relance_appreciations", "formulaire_reclamation", "suivi_dysfonctionnements_excel", "procedure_amelioration_continue"]) {
+      const d = cat.find((x) => x.template === tpl);
+      expect(d, tpl).toBeTruthy();
+      if (/_excel$/.test(tpl)) continue;
+      const h = texte(generateDocumentById(d!.id, d!.template, d!.params, o, f, STAGIAIRES_TEST));
+      expect(h.length, tpl).toBeGreaterThan(300);
+      expect(h, tpl).not.toMatch(/\bstagiaires?\b|\bformateurs?\b/i);
+    }
+  });
+});

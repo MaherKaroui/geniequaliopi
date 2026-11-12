@@ -1483,22 +1483,45 @@ export function buildFullCatalog(
     add("vae_c5i21_competences_accompagnateur", "CT5 - IND 21 Compétences de l'accompagnateur et justificatifs", 5, 21, "vae_competences_accompagnateur");
     add("vae_c5i22_plan_dev_accompagnateurs", "CT5 - IND 22 Plan de développement des compétences", 5, 22, "vae_plan_dev_accompagnateurs");
     add("vae_c5i22_attestation_izi", "CT5 - IND 22 ATTESTATION DE FORMATION (IZIBUSINESS)", 5, 22, "attestation_izibusiness");
+    // Pièces communes au dossier AF : recrutement, entretien annuel de chaque accompagnateur
+    add("vae_c5i21_processus_recrutement", "CT5 - IND 21 Description du processus de recrutement", 5, 21, "procedure_recrutement_formateur");
+    const accompagnateursVAE = Array.from(new Map([...stagiaires.map((s) => s.formateur), ...formations.map((f) => f.formateur)]
+      .map((n) => (n || "").trim()).filter(Boolean).map((n) => [normalizeName(n), n] as const)).values());
+    if (!accompagnateursVAE.length && (dirigeantNom || "").trim()) accompagnateursVAE.push(String(dirigeantNom).trim());
+    accompagnateursVAE.forEach((fname) => {
+      const slug = fname.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "_").toUpperCase();
+      add(`vae_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 Fiche d'entretien annuel – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
+    });
 
     // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
     add("vae_c6i23_veille_reglementaire", "CT6 - IND 23 Veille légale et réglementaire VAE", 6, 23, "vae_veille_reglementaire");
+    add("vae_c6i23_procedure_veille", "CT6 - IND 23 Procédure de veille et d'exploitation", 6, 23, "procedure_veille_exploitee");
+    add("vae_c6i23_cr_exploitation_veille", "CT6 - IND 23 Compte rendu d'exploitation de la veille (IND 23-24-25)", 6, 23, "cr_exploitation_veille", { type: "VAE" });
+    add("vae_c6i23_preuves_veille", "CT6 - IND 23 Preuves de veille réglementaire", 6, 23, "preuves_veille_reglementaire");
     add("vae_c6i24_veille_metiers", "CT6 - IND 24 Veille compétences, métiers et emplois", 6, 24, "vae_veille_metiers");
     add("vae_c6i25_veille_innovations", "CT6 - IND 25 Veille innovations pédagogiques et technologiques", 6, 25, "vae_veille_innovations");
     add("vae_c6i26_accessibilite_handicap", "CT6 - IND 26 Accessibilité et réseau handicap", 6, 26, "vae_accessibilite_handicap");
+    add("vae_c6i26_veille_sourcee", "CT6 - IND 26 Sources et réseaux handicap suivis", 6, 26, "veille_sourcee", { theme: "handicap" });
+    add("vae_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
+    add("vae_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
+    add("vae_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
+    if (/^(75|77|78|91|92|93|94|95)/.test((orgCodePostal || "").replace(/\s/g, ""))) add("vae_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
+    add("vae_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES (diaporama)", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
     add("vae_c6i27_partenaires_vae", "CT6 - IND 27 Partenaires et certificateur", 6, 27, "vae_partenaires");
 
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
     per("vae_c7i30_satisfaction", "CT7 - IND 30 Questionnaire de satisfaction", 7, 30, "vae_satisfaction");
     add("vae_c7i30_synthese_satisfaction", "CT7 - IND 30 Synthèse des appréciations", 7, 30, "vae_synthese_satisfaction");
     add("vae_c7i30_parties_prenantes", "CT7 - IND 30 Appréciations employeurs, financeurs, accompagnateurs", 7, 30, "vae_appreciations_parties_prenantes");
+    add("vae_c7i30_tableau_relance_excel", "CT7 - IND 30 Tableau de relance", 7, 30, "relances_appreciations_excel");
+    add("vae_c7i30_procedure_relance", "CT7 - IND 30 Procédure de relance", 7, 30, "procedure_relance_appreciations");
     add("vae_c7i31_procedure_reclamation", "CT7 - IND 31 Procédure difficultés, réclamations et aléas", 7, 31, "vae_procedure_reclamation");
     add("vae_c7i31_registre_reclamations", "CT7 - IND 31 Registre des réclamations et aléas", 7, 31, "vae_registre_reclamations");
+    add("vae_c7i31_formulaire_reclamation", "CT7 - IND 31 Formulaire de dépôt de réclamation", 7, 31, "formulaire_reclamation");
+    add("vae_c7i31_suivi_dysfonctionnements_excel", "CT7 - IND 31 Suivi des dysfonctionnements internes et externes", 7, 31, "suivi_dysfonctionnements_excel");
     add("vae_c7i32_plan_amelioration", "CT7 - IND 32 Tableau d'amélioration continue", 7, 32, "vae_plan_amelioration");
     add("vae_c7i32_analyse_risques", "CT7 - IND 32 Analyse des risques sur la qualité", 7, 32, "vae_analyse_risques");
+    add("vae_c7i32_procedure_amelioration", "CT7 - IND 32 Procédure d'amélioration continue", 7, 32, "procedure_amelioration_continue");
   }
 
   // =============================================

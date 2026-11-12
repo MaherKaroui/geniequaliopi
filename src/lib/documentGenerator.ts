@@ -219,9 +219,27 @@ export function generateDocumentById(docId: string, template: string, params: Re
     ? (stagiaires[params.stagiaireIdx] || null)
     : (stagiaires.length === 1 ? stagiaires[0] : null);
   result = applyGender(result, targetStagiaire);
+  if (PIECES_AF_REPRISES_VAE.has(template) && (org?.typesActions || []).length > 0 && (org.typesActions || []).every((t) => t === "vae")) result = vocabulaireVAE(result);
   // Remove all emoji icons and replace with plain text equivalents
   result = stripEmojis(result);
   return result;
+}
+
+/** Pièces génériques du dossier AF reprises dans le dossier VAE (docCatalog, section VAE). */
+const PIECES_AF_REPRISES_VAE = new Set([
+  "procedure_recrutement_formateur", "fiche_entretien_annuel_formateur", "procedure_veille_exploitee", "cr_exploitation_veille",
+  "preuves_veille_reglementaire", "veille_sourcee", "procedure_relance_appreciations", "formulaire_reclamation", "procedure_amelioration_continue",
+]);
+
+/** Vocabulaire VAE dans le texte (jamais dans les balises) : candidat, accompagnateur. */
+function vocabulaireVAE(html: string): string {
+  const mots: [RegExp, string][] = [
+    [/\bSTAGIAIRES\b/g, "CANDIDATS"], [/\bSTAGIAIRE\b/g, "CANDIDAT"], [/\bStagiaires\b/g, "Candidats"], [/\bStagiaire\b/g, "Candidat"],
+    [/\bstagiaires\b/g, "candidats"], [/\bstagiaire\b/g, "candidat"],
+    [/\bFORMATEURS\b/g, "ACCOMPAGNATEURS"], [/\bFORMATEUR\b/g, "ACCOMPAGNATEUR"], [/\bFormateurs\b/g, "Accompagnateurs"], [/\bFormateur\b/g, "Accompagnateur"],
+    [/\bformateurs\b/g, "accompagnateurs"], [/\bformateur\b/g, "accompagnateur"],
+  ];
+  return html.replace(/(<style[\s\S]*?<\/style>)|>([^<]+)</g, (m, style, txt) => style ? m : `>${mots.reduce((t, [re, r]) => t.replace(re, r), txt)}<`);
 }
 
 /**

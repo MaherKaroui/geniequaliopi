@@ -122,7 +122,41 @@ export function resolveFormation(
   if (fc && !f.referentiel?.code) f.referentiel = ficheToReferentiel(fc);
   // Le code certification n'est jamais hérité : vide = formation non RS/RNCP (IND 3, 7 et 16 masqués).
   f.codeRNCP = code;
-  return f;
+  return actualiserFormation(f, isVAE);
+}
+
+/** Code RNCP inactif cité dans un texte → code qui le remplace (fiche connue de rncpData). */
+const codeAJour = (t: string) => t.replace(/RNCP\s?(\d{4,6})/g, (m, n) => {
+  const fiche = getRNCPByCode(`RNCP${n}`);
+  return fiche?.inactif && fiche.remplacePar ? fiche.remplacePar : m;
+});
+
+/** VAE (loi n° 2022-1598, décret n° 2023-1275) : dossier de faisabilité / de validation, aucune durée minimale d'expérience. */
+function terminologieVAE(t: string): string {
+  return t
+    .replace(/\s*\(Cerfa\s*\d{5}\*\d{2}\)/gi, "")
+    .replace(/\b([Ll])ivrets 1 et 2\b/g, (_m, l) => `${l === "L" ? "D" : "d"}ossiers de faisabilité et de validation`)
+    .replace(/\b([Ll])ivret 1(?: de recevabilité| \(recevabilité\))?/g, (_m, l) => `${l === "L" ? "D" : "d"}ossier de faisabilité`)
+    .replace(/\b([Ll])ivret 2\b/g, (_m, l) => `${l === "L" ? "D" : "d"}ossier de validation`)
+    .replace(/d'au moins (?:1|un|une) (?:an|année)s? d'expérience(?:\s*\(\s*1\s?607\s*heures?\s*\))?/gi, "d'une expérience")
+    .replace(/\s*\(\s*1\s?607\s*heures?\s*\)/gi, "");
+}
+
+/**
+ * Textes de la formation mis à jour avant toute génération : code RNCP périmé remplacé et,
+ * pour la VAE, terminologie de la réforme (dossiers saisis ou copiés avant 2024).
+ */
+export function actualiserFormation(f: FormationInfo, isVAE: boolean): FormationInfo {
+  const out = { ...f } as Record<string, unknown>;
+  for (const [k, val] of Object.entries(out)) {
+    if (typeof val !== "string" || /Url$/.test(k) || k === "codeRNCP") continue;
+    out[k] = isVAE ? terminologieVAE(codeAJour(val)) : codeAJour(val);
+  }
+  const r = out as unknown as FormationInfo;
+  if (isVAE && /expérience/i.test(r.prerequis || "") && !/durée minimale/i.test(r.prerequis || "") && r.prerequis !== f.prerequis) {
+    r.prerequis = `${r.prerequis.trim().replace(/\.?$/, ".")} Aucune durée minimale d'expérience n'est exigée (loi n° 2022-1598 du 21 décembre 2022).`;
+  }
+  return r;
 }
 
 /** Vrai si le code saisi est une certification RS ou RNCP. */
