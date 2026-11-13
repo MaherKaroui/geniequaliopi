@@ -205,7 +205,7 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
   }
   h += `<h2>Positionnement retenu par le formateur</h2>`;
   h += `<p>${CASE} Débutant &nbsp;&nbsp; ${CASE} Intermédiaire &nbsp;&nbsp; ${CASE} Avancé</p><p><strong>Adaptation du parcours :</strong></p>${LIGNES(3)}`;
-  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"]);
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], dateCourteLongue(reels.at(-1)?.date || c.p.session.dateDebut));
   return { html: doc(c, "TEST DE POSITIONNEMENT — DÉBUT DE FORMATION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };
 }
 
@@ -213,7 +213,6 @@ export function testPositionnement(c: Ctx): { html: string; reel: boolean } {
 
 export function examenFinal(c: Ctx): { html: string; reel: boolean } {
   const reels = (c.a.examenFinal || []).filter(hasRecordedQuiz);
-  let fillDate: string | undefined;
   let h = enTete(c, [["Examen prévu le", dateLongue(c.p.session.dateFin)]]);
   if (reels.length) {
     h += `<h2>Résultats enregistrés dans IZILearn</h2>`;
@@ -234,7 +233,6 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     const questions: QcmQ[] = qcm.length && (!passe || qcm.every(aCorrige)) ? qcm : qualiopi.length ? qualiopi : qcm;
     const corrigeComplet = questions.length > 0 && questions.every((q) => q.correctIndex != null && q.correctIndex >= 0 && q.correctIndex < q.options.length);
     const fill = passe && corrigeComplet;
-    if (fill) fillDate = dateCourteLongue(c.p.session.dateFin);
     let answers: number[] = [];
     if (fill) {
       const seed = Math.abs((`${c.s.prenom}${c.s.nom}examen`).split("").reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 0));
@@ -292,7 +290,7 @@ export function examenFinal(c: Ctx): { html: string; reel: boolean } {
     const noteFinale = fill && score != null ? `${Math.round((score / questions.length) * 20)} / 20` : "____________________";
     h += `<p><strong>Note finale :</strong> ${noteFinale}</p><p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / questions.length, c.s.prenom, `${c.s.nom}examen`, true))}</p>` : LIGNES(3)}`;
   }
-  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], reels.length ? undefined : fillDate);
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], dateCourteLongue(reels.at(-1)?.date || c.p.session.dateFin));
   return { html: doc(c, "EXAMEN FINAL", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: reels.length > 0 };
 }
 
@@ -513,7 +511,7 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
     });
   }
   const score = fill ? answers.filter((a, qi) => a === qs[qi].correctIndex).length : null;
-  let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`], ...(fill ? [["Réalisé le", dateCourteLongue(u.fin)] as [string, string]] : [])]);
+  let h = enTete(c, [["Période", u.label], ["QCM", `${i + 1} / ${n}`], ["Date de passage", dateCourteLongue(u.fin)]]);
   if (!fill) h += trameVierge("QCM à compléter par l'apprenant ; une seule réponse par question. Aucune réponse n'est pré-remplie.");
   h += `<h2>Questionnaire à choix multiples</h2>`;
   qs.forEach((q, k) => {
@@ -527,7 +525,7 @@ export function qcmPeriodique(c: Ctx, u: Unite, i: number, n: number, rempli = f
     h += `<p style="font-size:12px"><strong>Corrigé (réservé au formateur) :</strong> ${qs.map((q, k) => `${k + 1}-${String.fromCharCode(65 + q.correctIndex!)}`).join(" · ")}</p>`;
   }
   h += `<p><strong>Appréciation du formateur :</strong></p>${fill && score != null ? `<p>${esc(appreciationAuto(score / per, c.s.prenom, `${c.s.nom}${i}`, false))}</p>` : LIGNES(2)}`;
-  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], fill ? dateCourteLongue(u.fin) : undefined);
+  h += ZONE_SIGNATURE(["L'apprenant", "Le formateur"], dateCourteLongue(u.fin));
   return doc(c, `QCM D'ÉVALUATION ${i + 1}`, `${nomComplet(c.s)} – ${u.label}`, h);
 }
 
