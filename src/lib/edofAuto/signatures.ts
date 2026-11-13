@@ -4,7 +4,7 @@
  * Règle des dossiers : le centre est représenté par son tampon seul s'il existe, sinon par la signature
  * de son représentant (jamais les deux).
  */
-import { PDFDocument, PDFImage, PDFPage } from "pdf-lib";
+import { PDFDocument, PDFImage, PDFPage, degrees } from "pdf-lib";
 import type { EdofCandidat } from "./candidats";
 
 export interface SignaturesEval {
@@ -47,12 +47,24 @@ async function integrer(pdf: PDFDocument, octets: Uint8Array): Promise<PDFImage 
   return m.get(octets)!;
 }
 
-/** Pose l'image dans le cadre (coordonnées haut-gauche), proportions conservées, centrée. */
-export async function poserImage(pdf: PDFDocument, page: PDFPage, octets: Uint8Array | undefined, x: number, yHaut: number, largeur: number, hauteur: number) {
+/** Pose l'image dans le cadre (coordonnées haut-gauche), proportions conservées, centrée.
+ *  Avec `variation` (un numéro de ligne, par exemple), l'image change de taille, de place et
+ *  d'inclinaison d'une case à l'autre, comme une signature refaite à la main ; même numéro = même tracé. */
+export async function poserImage(pdf: PDFDocument, page: PDFPage, octets: Uint8Array | undefined, x: number, yHaut: number, largeur: number, hauteur: number, variation?: number) {
   if (!octets) return;
   const img = await integrer(pdf, octets);
   if (!img) return;
-  const k = Math.min(largeur / img.width, hauteur / img.height);
+  let k = Math.min(largeur / img.width, hauteur / img.height);
+  let dx = 0.5, dy = 0.5, angle = 0;
+  if (variation !== undefined) {
+    const r = (n: number) => { const v = Math.sin((variation + 1) * 12.9898 + n * 78.233) * 43758.5453; return v - Math.floor(v); };
+    k *= 0.6 + r(1) * 0.32; // 60 à 92 % de la case
+    dx = r(2); // de collée à gauche à collée à droite
+    dy = 0.2 + r(3) * 0.6;
+    angle = (r(4) - 0.5) * 10; // ±5°
+  }
   const w = img.width * k, h = img.height * k;
-  page.drawImage(img, { x: x + (largeur - w) / 2, y: page.getHeight() - yHaut - hauteur + (hauteur - h) / 2, width: w, height: h });
+  const px = x + (largeur - w) * dx;
+  const py = page.getHeight() - yHaut - hauteur + (hauteur - h) * dy;
+  page.drawImage(img, { x: px, y: py, width: w, height: h, rotate: degrees(angle) });
 }

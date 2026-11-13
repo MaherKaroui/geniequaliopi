@@ -231,7 +231,7 @@ export class DocPdf {
     };
     this.place(22 + hauteur);
     entete();
-    for (const ligne of lignes) {
+    for (const [n, ligne] of lignes.entries()) {
       if (this.y - hauteur < 45) { this.nouvellePage(); entete(); }
       let x = this.M;
       for (let i = 0; i < largeurs.length; i++) {
@@ -244,7 +244,8 @@ export class DocPdf {
           const tx = cel.centre ? x + (largeurs[i] - police.widthOfTextAtSize(s, sz)) / 2 : x + 3;
           this.page.drawText(s, { x: tx, y: this.y - 4 - sz - k * (size + 2.5), size: sz, font: police, color: cel.reponse ? ENCRE : NOIR });
         });
-        await poserImage(this.pdf, this.page, ligne.images[i], x + 3, this.H - this.y + 3, largeurs[i] - 6, hauteur - 6);
+        // Chaque case a son propre tracé (taille, place, inclinaison) : la signature ne se répète pas à l'identique.
+        await poserImage(this.pdf, this.page, ligne.images[i], x + 3, this.H - this.y + 3, largeurs[i] - 6, hauteur - 6, n * 7 + i);
         x += largeurs[i];
       }
       this.y -= hauteur;
