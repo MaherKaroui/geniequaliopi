@@ -57,10 +57,12 @@ describe("Automatisation EDOF — RS7650", () => {
     expect(JSON.stringify(reponsesDe(retenus[0]))).toBe(JSON.stringify(reps[0]));
     const signatures = new Set(reps.map((r) => JSON.stringify(r.theo.map((t) => t.choix))));
     expect(signatures.size).toBe(reps.length);
+    expect(new Set(reps.map((r) => JSON.stringify(r.pratique))).size).toBe(reps.length); // grilles différentes
     for (const r of reps) {
       expect(r.noteTheo).toBeGreaterThan(SEUIL_THEO);
       expect(r.theo.filter((t) => t.juste)).toHaveLength(r.noteTheo);
       expect(r.pratique.every(competenceValidee)).toBe(true);
+      for (const crit of r.pratique) expect([1, 2]).toContain(crit.filter((a) => !a).length); // 1 ou 2 « NA » par compétence
       expect(r.noteMiseEnSituation).toBe(6);
       expect(r.admis).toBe(true);
       expect(r.positionnement.prerequisRemplis).toBe("Oui");
