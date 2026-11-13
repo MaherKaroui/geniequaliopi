@@ -10364,6 +10364,82 @@ function extractFormationTopics(f: FormationInfo): string[] {
   return cleaned;
 }
 
+const COLONNES_DEROULE = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
+
+/** En-tête du tableau de déroulé : <thead>/<th> (répété à chaque page du PDF), couleurs posées
+ *  sur les cellules elles-mêmes pour rester lisibles quel que soit le thème. */
+function enteteTableDeroule(largeurs: number[]): string {
+  return `<thead><tr>${COLONNES_DEROULE.map((c, i) => `<th style="width:${largeurs[i]}%;background:#1e3a7b;color:#fff;font-weight:bold;letter-spacing:0;text-transform:none;hyphens:auto">${c}</th>`).join("")}</tr></thead>`;
+}
+
+function estPauseLigne(c: string): boolean {
+  return /^(pause|déjeuner|pause déjeuner)/i.test(c);
+}
+
+function formatMinutesDeroule(m: number): string {
+  return `${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}`;
+}
+
+/** Découpe « Module 1 — Titre (C1, 8 h) : élément ; élément ; … » en titre, volume et séquences.
+ *  Null si la ligne n'a pas au moins deux éléments séparés par « ; ». */
+export function decouperModuleEnLigne(line: string): { titre: string; heures?: number; elements: { titre: string; contenu: string }[] } | null {
+  // « : » et « ; » ne comptent qu'hors parenthèses.
+  const decouper = (texte: string, sep: string, premierSeulement: boolean): string[] => {
+    const morceaux: string[] = [];
+    let prof = 0, courant = "";
+    for (const ch of texte) {
+      if (ch === "(") prof++;
+      else if (ch === ")") prof = Math.max(0, prof - 1);
+      if (ch === sep && prof === 0 && !(premierSeulement && morceaux.length > 0)) { morceaux.push(courant); courant = ""; continue; }
+      courant += ch;
+    }
+    morceaux.push(courant);
+    return morceaux.map((m) => m.trim());
+  };
+  const [titre, corps] = decouper(line, ":", true);
+  if (!titre || corps === undefined) return null;
+  const elements = decouper(corps.replace(/[.;]\s*$/, ""), ";", false).filter(Boolean);
+  if (elements.length < 2) return null;
+  const h = titre.match(/\([^)]*?(\d+(?:[,.]\d+)?)\s*h(?:eures?)?\b[^)]*\)/i);
+  const maj = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+  return {
+    titre,
+    heures: h ? parseFloat(h[1].replace(",", ".")) : undefined,
+    elements: elements.map((e) => ({ titre: maj(e.replace(/\s*\(.*$/, "").trim() || e), contenu: maj(e) })),
+  };
+}
+
+/** Répartit un volume (en minutes) entre des séquences, par pas de 15 min, somme exacte. */
+export function repartirMinutes(contenus: string[], total: number): number[] {
+  if (contenus.length === 0) return [];
+  const duree = (c: string): number => {
+    if (/positionnement/i.test(c)) return 30;
+    if (/^QCM\b/i.test(c)) return 30;
+    if (/^(mises? en situation|cas pratique)/i.test(c)) return 60;
+    if (/évaluation finale/i.test(c)) return 60;
+    if (/^bilan\b/i.test(c)) return 30;
+    return 0;
+  };
+  let parts = contenus.map(duree);
+  let libres = parts.map((p, i) => (p === 0 ? i : -1)).filter((i) => i >= 0);
+  const reste = total - parts.reduce((a, b) => a + b, 0);
+  // Volume trop court pour les durées types (ou rien à compléter) : répartition égale.
+  if (libres.length === 0 || reste < libres.length * 30) {
+    parts = contenus.map(() => 0);
+    libres = contenus.map((_, i) => i);
+  }
+  let restant = total - parts.reduce((a, b) => a + b, 0);
+  const base = Math.floor(restant / 15 / libres.length) * 15;
+  libres.forEach((i) => { parts[i] = base; });
+  restant -= base * libres.length;
+  for (let k = 0; restant > 0; k = (k + 1) % libres.length) {
+    const ajout = Math.min(15, restant);
+    parts[libres[k]] += ajout;
+    restant -= ajout;
+  }
+  return parts;
+}
+
 // Construit le déroulé pédagogique détaillé directement à partir du programme
 // saisi dans le formulaire formation (blocs "Jour N – ..." avec lignes horaires).
 // Retourne null si le programme n'a pas de structure jour par jour exploitable.
@@ -10371,13 +10447,18 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
   const programmeLines = (f.programme || "").split("\n").map(l => l.trim()).filter(l => l.length > 0);
   if (programmeLines.length === 0) return null;
 
-  const dayBlocks: { title: string; rows: { horaire: string; contenu: string }[] }[] = [];
-  let currentDay: { title: string; rows: { horaire: string; contenu: string }[] } | null = null;
+  type LigneDeroule = { horaire: string; contenu: string; titre?: string; minutes?: number };
+  const dayBlocks: { title: string; heures?: number; rows: LigneDeroule[] }[] = [];
+  let currentDay: { title: string; heures?: number; rows: LigneDeroule[] } | null = null;
 
   for (const line of programmeLines) {
     const dayMatch = line.match(/^(Jour(?:née)?|Séance|Module)\s*\d+/i);
     if (dayMatch) {
-      currentDay = { title: line.replace(/\s*:\s*$/, "").trim(), rows: [] };
+      // Module écrit sur une seule ligne : « Module 1 — Titre (C1, 8 h) : élément ; élément ; … »
+      const enLigne = decouperModuleEnLigne(line);
+      currentDay = enLigne
+        ? { title: enLigne.titre, heures: enLigne.heures, rows: enLigne.elements.map((e) => ({ horaire: "", contenu: e.contenu, titre: e.titre })) }
+        : { title: line.replace(/\s*:\s*$/, "").trim(), rows: [] };
       dayBlocks.push(currentDay);
       continue;
     }
@@ -10396,6 +10477,17 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
 
   const heuresMatch = (f.duree || "").match(/(\d+)\s*h/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : usable.length * 7;
+
+  // Sans horaires, chaque séquence reçoit une durée dont la somme fait exactement
+  // le volume du module (ou, à défaut, le volume total réparti entre les blocs).
+  const parBloc = Math.round((totalHeures * 60) / usable.length);
+  for (const day of usable) {
+    if (day.rows.some((r) => r.horaire)) continue;
+    const lignes = day.rows.filter((r) => !estPauseLigne(r.contenu));
+    const minutes = repartirMinutes(lignes.map((r) => r.contenu), day.heures ? Math.round(day.heures * 60) : parBloc);
+    lignes.forEach((r, i) => { r.minutes = minutes[i]; });
+  }
+  const parModules = usable.every((d) => /^Module\s*\d+/i.test(d.title));
 
   const methodesPool = [
     "Démonstration + exercices pratiques",
@@ -10425,10 +10517,12 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
   const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
   const outilsBase = isDistanciel ? "PC, visioconférence, support numérique" : "PC, vidéoprojecteur, support de formation";
 
-  const estPause = (c: string) => /^(pause|déjeuner|pause déjeuner)/i.test(c);
+  const estPause = estPauseLigne;
   const estAccueil = (c: string) => /accueil|présentation de la formation|tour de table/i.test(c);
   const estPositionnement = (c: string) => /positionnement/i.test(c);
-  const estEvalFinale = (c: string) => /évaluation finale|bilan de formation|grille d'acquisition|remise des attestations/i.test(c);
+  const estEvalFinale = (c: string) => /évaluation finale|bilan de (la )?formation|grille d'acquisition|remise des attestations/i.test(c);
+  const estMiseEnSituation = (c: string) => /^(mises? en situation|cas pratique)/i.test(c);
+  const estQcm = (c: string) => /^QCM\b/i.test(c) && !estPositionnement(c);
 
   const dureeDepuisHoraire = (horaire: string): string => {
     const m = horaire.match(/(\d{1,2})[hH:](\d{2})\s*[–\-—]\s*(\d{1,2})[hH:](\d{2})/);
@@ -10440,45 +10534,52 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
     return reste === 0 ? `${h}h00` : h === 0 ? `${reste}min` : `${h}h${String(reste).padStart(2, "0")}`;
   };
 
-  const objectifPour = (contenu: string): string => {
+  const objectifPour = (contenu: string, titre?: string): string => {
+    if (/^bilan/i.test(contenu)) return "Faire le bilan de la formation avec le stagiaire";
     if (estAccueil(contenu)) return "Comprendre les objectifs et le cadre de la formation";
     if (estPositionnement(contenu)) return "Évaluer le niveau initial du stagiaire";
     if (estEvalFinale(contenu)) return "Vérifier l'acquisition des compétences visées";
-    const clean = contenu.replace(/\s*[-–—]\s*.*$/, "").trim();
-    return `Maîtriser : ${clean.charAt(0).toLowerCase()}${clean.slice(1)}`;
+    if (estMiseEnSituation(contenu)) return "Appliquer les notions du module à un cas concret";
+    if (estQcm(contenu)) return "Vérifier les acquis du module";
+    const clean = (titre || contenu.replace(/\s*[-–—]\s*.*$/, "")).trim();
+    // Pas de minuscule sur un sigle (ONU, RGPD…).
+    const debut = /^[A-ZÀ-Ý]{2}/.test(clean) ? clean.charAt(0) : clean.charAt(0).toLowerCase();
+    return `Maîtriser : ${debut}${clean.slice(1)}`;
   };
 
   const evaluationPour = (contenu: string, idx: number): string => {
     if (estPositionnement(contenu)) return "Test de positionnement initial";
     if (estEvalFinale(contenu)) return "Évaluation finale et grille d'acquisition";
     if (estAccueil(contenu)) return "Questions-réponses";
+    if (estMiseEnSituation(contenu)) return "Mise en situation corrigée";
+    if (estQcm(contenu)) return "QCM corrigé";
     return evalPool[idx % evalPool.length];
   };
 
+  const methodePour = (contenu: string, idx: number): string => {
+    if (estAccueil(contenu)) return "Échanges oraux, présentation du formateur";
+    if (/^bilan/i.test(contenu)) return "Échange formateur / stagiaire, questionnaire de satisfaction";
+    if (estEvalFinale(contenu)) return "Évaluation individuelle sur QCM et cas pratiques";
+    if (estPositionnement(contenu) || estQcm(contenu)) return "Test individuel puis correction commentée";
+    if (estMiseEnSituation(contenu)) return "Mise en situation sur cas fictif, correction commentée";
+    return methodesPool[idx % methodesPool.length];
+  };
+
   let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
-    <strong>Durée :</strong> ${totalHeures} heures — ${usable.length} jour${usable.length > 1 ? "s" : ""}<br>
+    <strong>Durée :</strong> ${totalHeures} heures — ${usable.length} ${parModules ? "module" : "jour"}${usable.length > 1 ? "s" : ""}<br>
     <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
 
   usable.forEach((day, di) => {
     extraHtml += `<h3 style="margin-top:${di > 0 ? "25" : "10"}px;color:#1e3a7b;font-size:13pt">${day.title}</h3>`;
-    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9pt;margin-bottom:10px">`;
-    extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
-      <td style="width:15%">Séquence</td>
-      <td style="width:8%">Durée</td>
-      <td style="width:16%">Objectif pédagogique</td>
-      <td style="width:18%">Contenus abordés</td>
-      <td style="width:13%">Méthodes & activités</td>
-      <td style="width:11%">Outils / supports</td>
-      <td style="width:11%">Évaluation</td>
-      <td style="width:8%">Adaptations</td>
-    </tr>`;
+    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;table-layout:fixed;overflow-wrap:anywhere;font-size:9pt;margin-bottom:10px">`;
+    extraHtml += enteteTableDeroule([15, 8, 16, 18, 13, 11, 11, 8]);
 
     let seqIdx = 0;
     day.rows.forEach((row, ri) => {
       const contenu = row.contenu;
       const pause = estPause(contenu);
-      const titreSeq = pause ? contenu : (contenu.split(/\s*[-–—:]\s*/)[0] || contenu).trim();
-      const duree = dureeDepuisHoraire(row.horaire) || "";
+      const titreSeq = row.titre || (pause ? contenu : (contenu.split(/\s*[-–—:]\s*/)[0] || contenu).trim());
+      const duree = dureeDepuisHoraire(row.horaire) || (row.minutes ? formatMinutesDeroule(row.minutes) : "");
       const sequenceCell = row.horaire ? `${row.horaire}<br>${titreSeq}` : titreSeq;
       const bgColor = pause ? "#f0f0f0" : (ri % 2 === 0 ? "#ffffff" : "#f2f6fc");
       const rowStyle = pause ? ' style="background:#f0f0f0;font-style:italic;color:#888"' : ` style="background:${bgColor}"`;
@@ -10491,9 +10592,9 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
       extraHtml += `<tr${rowStyle}>
         <td>${sequenceCell}</td>
         <td>${duree}</td>
-        <td>${objectifPour(contenu)}</td>
+        <td>${objectifPour(contenu, row.titre)}</td>
         <td>${contenu}</td>
-        <td>${estAccueil(contenu) ? "Échanges oraux, présentation du formateur" : methodesPool[seqIdx % methodesPool.length]}</td>
+        <td>${methodePour(contenu, seqIdx)}</td>
         <td>${estAccueil(contenu) ? "Support de présentation" : outilsBase}</td>
         <td>${evaluationPour(contenu, seqIdx)}</td>
         <td>${adaptPool[seqIdx % adaptPool.length]}</td>
@@ -10646,17 +10747,8 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
 
     extraHtml += `<h3 style="margin-top:${di > 0 ? '25' : '10'}px;color:#1e3a7b;font-size:13pt">Jour ${di + 1} – ${topic}</h3>`;
 
-    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9pt;margin-bottom:10px">`;
-    extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
-      <td style="width:15%">Séquence</td>
-      <td style="width:7%">Durée</td>
-      <td style="width:14%">Objectif pédagogique</td>
-      <td style="width:16%">Contenus abordés</td>
-      <td style="width:13%">Méthodes & activités</td>
-      <td style="width:12%">Outils / supports</td>
-      <td style="width:12%">Évaluation</td>
-      <td style="width:11%">Adaptations</td>
-    </tr>`;
+    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;table-layout:fixed;overflow-wrap:anywhere;font-size:9pt;margin-bottom:10px">`;
+    extraHtml += enteteTableDeroule([15, 7, 14, 16, 13, 12, 12, 11]);
 
     const sequences = generateDaySequences(topic, formation, isFirstDay, isLastDay, f, heuresParJour);
     sequences.forEach((seq, si) => {

@@ -424,9 +424,23 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           // Check overflow after adding the row
           if (current.content.scrollHeight > current.content.clientHeight + 1) {
             tbody.removeChild(rowClone);
+            // Aucune ligne n'a tenu : l'en-tête vide (et le titre juste au-dessus) ne restent pas
+            // seuls en bas de page, ils passent sur la page suivante avec la première ligne.
+            let titre: Element | null = null;
+            if (getTableBodyRows(currentTable).length === 0) {
+              const avant = currentTable.previousElementSibling;
+              titre = avant && /^H[1-4]$/.test(avant.tagName) ? avant : null;
+              if (current.content.firstElementChild !== (titre || currentTable)) {
+                currentTable.remove();
+                titre?.remove();
+              } else {
+                titre = null;
+              }
+            }
             // Start new page with a fresh table (with thead)
             current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
             pages.push(current.page);
+            if (titre) current.content.appendChild(titre);
             currentTable = cloneTableShell(node);
             current.content.appendChild(currentTable);
             const newTbody = currentTable.querySelector("tbody") || currentTable;
@@ -515,6 +529,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
                 tbody.appendChild(rowClone);
                 if (current.content.scrollHeight > current.content.clientHeight + 1) {
                   tbody.removeChild(rowClone);
+                  // En-tête vide en bas de page : il part avec la première ligne.
+                  if (getTableBodyRows(currentTable).length === 0 && current.content.firstElementChild !== currentTable) currentTable.remove();
                   current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
                   pages.push(current.page);
                   currentTable = cloneTableShell(child);

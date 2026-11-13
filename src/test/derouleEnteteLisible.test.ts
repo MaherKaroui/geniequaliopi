@@ -13,7 +13,8 @@ it("déroulé : un tableau par jour du programme et en-têtes lisibles quel que 
   const html = generateDocumentById("af_c2i5_deroule_pedagogique_0", "deroule_pedagogique_detaille", { fi: 0 }, o, f, []);
   expect(html).toContain("21 heures — 3 jours");
   expect(html).toContain("Jour 3 – Mise en page");
-  // Les lignes d'en-tête colorées en ligne gardent leur texte blanc malgré la couleur de td imposée par le thème.
-  expect(html).toContain('tr style="background:#1e3a7b;color:#fff');
-  expect(html).toMatch(/tr\[style\*="color:#fff"\]>td[^{]*\{color:inherit\}/);
+  // En-têtes en <thead>/<th> (répétés à chaque page du PDF), blanc sur bleu posé sur la cellule
+  // elle-même : le td{color} du thème ne peut plus les assombrir.
+  expect((html.match(/<thead><tr><th style="[^"]*background:#1e3a7b;color:#fff/g) || []).length).toBe(3);
+  expect(html).not.toMatch(/<tr style="background:#1e3a7b[^>]*>\s*<td/);
 });
