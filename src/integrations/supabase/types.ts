@@ -119,6 +119,39 @@ export type Database = {
         }
         Relationships: []
       }
+      edof_centre_profils: {
+        Row: {
+          centre: Json
+          cle: string
+          formateur: string
+          id: string
+          jury: Json
+          signatures: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          centre?: Json
+          cle: string
+          formateur?: string
+          id?: string
+          jury?: Json
+          signatures?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          centre?: Json
+          cle?: string
+          formateur?: string
+          id?: string
+          jury?: Json
+          signatures?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       formation_presets: {
         Row: {
           code_rncp: string | null
