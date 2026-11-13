@@ -26,19 +26,21 @@ describe("Positionnement IZILearn proposé", () => {
   it("remplit 40 copies ouvertes différentes sans compter les noms dans la comparaison", () => {
     const pieces = planPieces(contexte(session())).filter(p => p.categorie === "positionnement");
     const copies = pieces.map(p => p.rendre());
-    const answers = copies.map(h => [...h.matchAll(/Réponse du stagiaire \(proposée\) :<\/strong> ([\s\S]*?)<\/p>/g)].map(m => m[1]).join("|"));
+    const answers = copies.map((h, i) => [...h.matchAll(/Réponse du stagiaire :<\/strong> ([\s\S]*?)<\/p>/g)].map(m => m[1]).join("|").split(`Prénom${i}`).join("").split(`NOM${i}`).join(""));
     expect(pieces).toHaveLength(40);
     expect(answers.every(a => a.trim().length > 0)).toBe(true);
     expect(new Set(answers).size).toBe(40);
-    expect(copies.every(h => h.includes("☒"))).toBe(true);
+    expect(copies.every(h => /Note :<\/strong> [\d,]+ \/10/.test(h))).toBe(true);
   });
-  it("conserve un résultat enregistré de zéro et n’ajoute aucune réponse proposée", () => {
+  it("garde toujours le test Génie Qualiopi même si IZILearn a un résultat enregistré", () => {
     const p = session();
     p.apprenants[0].positionnement = [{ titre: "Test réel", date: "2026-09-01", score: 0, max: 10, appreciation: "À reprendre" }];
-    const html = planPieces(contexte(p)).find(p => p.id === "positionnement_0")?.rendre() ?? "";
-    expect(html).toContain("0 / 10");
-    expect(html).toContain("À reprendre");
-    expect(html).not.toContain("Réponse du stagiaire (proposée)");
+    const piece = planPieces(contexte(p)).find(p => p.id === "positionnement_0");
+    const html = piece?.rendre() ?? "";
+    expect(piece?.source).toBe("document");
+    expect(html).toContain("Réponse du stagiaire :");
+    expect(html).not.toContain("À reprendre");
+    expect(html).not.toContain("0 / 10");
   });
   it("ne laisse pas le questionnaire vide quand les questions ouvertes du preset sont absentes", () => {
     const base = getFormationPreset({ intitule: title });
