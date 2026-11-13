@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, Building2, Download, FileUp, Loader2, Users, Workflow, Info, Award, Stamp } from "lucide-react";
@@ -19,6 +19,7 @@ import ResultatsEdof, { type ResultatEdof } from "@/components/edof/ResultatsEdo
 import HistoriqueEdof from "@/components/edof/HistoriqueEdof";
 import { useAuth } from "@/hooks/useAuth";
 import { ajouterEnvois, chargerFichiers, enregistrer, type Automatisation, type EnvoiMail } from "@/lib/edofAuto/historique";
+import { chargerProfil, cleCentre, clePersonne, enregistrerProfil, signaturesDuJury, type ProfilCentre } from "@/lib/edofAuto/profilsCentre";
 
 // Jury du PV exemple fourni par le certificateur EYES PERFECT — à confirmer pour chaque session.
 const JURY_RS7650: Jure[] = [
@@ -56,6 +57,8 @@ export default function AutomatisationEDOF() {
   const [sigCandidats, setSigCandidats] = useState<Record<string, string | undefined>>({});
   const [resultat, setResultat] = useState<ResultatEdof | null>(null);
   const [rafraichirHist, setRafraichirHist] = useState(0);
+  const [profil, setProfil] = useState<ProfilCentre | null>(null);
+  const profilApplique = useRef(new Set<string>());
 
   const candidats = useMemo(
     () => (exportEdof?.candidats || []).filter((c) => !realisesSeulement || formationRealisee(c.statut)),
@@ -81,6 +84,41 @@ export default function AutomatisationEDOF() {
     }
     return out;
   }, [codesGenerables.join("|"), referentiels]);
+
+  // Profil du centre (jury, formateur, signatures déjà fournis) : chargé dès que le nom du centre est connu.
+  const cle = cleCentre(centre.nom);
+  useEffect(() => {
+    if (!user || !cle) { setProfil(null); return; }
+    let annule = false;
+    const t = setTimeout(() => {
+      chargerProfil(centre.nom).then((p) => { if (!annule) setProfil(p); }).catch(() => { if (!annule) setProfil(null); });
+    }, 400);
+    return () => { annule = true; clearTimeout(t); };
+  }, [user?.id, cle]);
+
+  const codesRefs = Object.keys(referentiels).join("|");
+  useEffect(() => {
+    if (!profil || profil.cle !== cle) return;
+    const fait = profilApplique.current;
+    const sig = profil.signatures || {};
+    if (!fait.has(`${cle}|base`)) {
+      fait.add(`${cle}|base`);
+      if (profil.formateur) setFormateur((f) => f || profil.formateur);
+      if (sig.formateur) setSignatureFormateur((v) => v || sig.formateur);
+      if (sig.tampon) setTampon((v) => v || sig.tampon);
+      if (sig.signatureCentre) setSignatureCentre((v) => v || sig.signatureCentre);
+    }
+    const codes = Object.keys(referentiels).filter((code) => !fait.has(`${cle}|${code}`));
+    if (!codes.length) return;
+    const jury = profil.jury?.some((j) => j.nom) ? profil.jury.slice(0, 3) : null;
+    codes.forEach((code) => fait.add(`${cle}|${code}`));
+    if (jury) setJurys((js) => ({ ...js, ...Object.fromEntries(codes.map((code) => [code, jury.map((j) => ({ ...j }))])) }));
+    setSigJurys((s) => ({
+      ...s,
+      ...Object.fromEntries(codes.map((code) => [code, signaturesDuJury(jury || [], sig).map((v, i) => v || s[code]?.[i])])),
+    }));
+    toast.success(`Jury, formateur et signatures de ${centre.nom} repris`);
+  }, [profil, cle, codesRefs]);
 
   const chercherCentre = async (siret: string) => {
     if (!siret) return;
@@ -195,7 +233,15 @@ export default function AutomatisationEDOF() {
       setResultat(r);
       toast.success(`${fichiers.length} documents générés pour ${nbRetenus} candidat(s)`);
       setTimeout(() => document.getElementById("resultats-edof")?.scrollIntoView({ behavior: "smooth" }), 100);
-      if (user) await enregistrerHistorique(r);
+      if (user) {
+        await enregistrerHistorique(r);
+        const jures: Record<string, string> = {};
+        for (const code of codesGenerables) (jurys[code] || []).forEach((j, i) => { const v = sigJurys[code]?.[i]; if (j.nom && v) jures[clePersonne(j.nom)] = v; });
+        enregistrerProfil(user.id, {
+          centre, jury: jurys[codesGenerables[0]] || [], formateur,
+          signatures: { jures, formateur: signatureFormateur, tampon, signatureCentre },
+        }).catch((e) => toast.error(`Profil du centre non enregistré : ${e.message}`));
+      }
     } catch (err: any) {
       toast.error(`Génération impossible : ${err.message || err}`);
     } finally {
@@ -368,6 +414,9 @@ export default function AutomatisationEDOF() {
               </div>
               <p className="text-xs text-muted-foreground">Pas de tampon ? Créez-le avec le <a className="underline" href="/generateur-tampon" target="_blank" rel="noreferrer">Générateur Tampon</a> puis importez l'image.</p>
             </div>
+            {profil && profil.cle === cle && (
+              <p className="text-xs text-primary">Jury, formateur et signatures enregistrés pour {centre.nom} : repris automatiquement, mis à jour à chaque génération.</p>
+            )}
             <p className="text-xs text-muted-foreground flex gap-1"><Info className="w-4 h-4 shrink-0" />
               Seules les signatures et le tampon fournis ici sont posés dans les documents ; sans image, le cadre reste vide.
             </p>
