@@ -50,6 +50,8 @@ export default function AutomatisationEDOF() {
   const [generation, setGeneration] = useState<{ fait: number; total: number } | null>(null);
   const [tampon, setTampon] = useState<string>();
   const [signatureCentre, setSignatureCentre] = useState<string>();
+  const [formateur, setFormateur] = useState("");
+  const [signatureFormateur, setSignatureFormateur] = useState<string>();
   const [sigJurys, setSigJurys] = useState<Record<string, (string | undefined)[]>>({});
   const [sigCandidats, setSigCandidats] = useState<Record<string, string | undefined>>({});
   const [resultat, setResultat] = useState<ResultatEdof | null>(null);
@@ -169,7 +171,9 @@ export default function AutomatisationEDOF() {
       const contextes = Object.fromEntries(codesGenerables.map((code) => [code, {
         centre,
         jury: jurys[code],
+        formateur,
         signatures: {
+          formateur: octets(signatureFormateur),
           tamponCentre: octets(tampon),
           signatureCentre: tampon ? undefined : octets(signatureCentre), // tampon seul s'il existe
           jurys: (sigJurys[code] || []).map(octets),
@@ -269,8 +273,8 @@ export default function AutomatisationEDOF() {
             <p className="text-sm text-muted-foreground">
               Déposez l'export « Tous les dossiers » de Mon Compte Formation (CSV ou XLSX), ou le PDF d'un seul dossier
               (« Export_PDF_dossier_n_… », plusieurs PDF possibles). Pour chaque stagiaire, quelle que soit
-              la formation, 4 documents sont produits — questionnaire de positionnement, attestation sur l'honneur,
-              évaluation des connaissances, grille d'évaluation des compétences — plus un PV par session d'examen, avec des réponses
+              la formation, 5 documents sont produits — questionnaire de positionnement, attestation sur l'honneur,
+              évaluation des connaissances, grille d'évaluation des compétences, feuille d'émargement — plus un PV par session d'examen, avec des réponses
               propres à chaque candidat. Quand le certificateur a fourni ses documents (RS7650 EYES PERFECT), ce sont eux qui sont remplis ;
               sinon les documents sont construits sur la fiche officielle France Compétences, ou à défaut sur l'intitulé de la formation.
             </p>
@@ -346,6 +350,13 @@ export default function AutomatisationEDOF() {
                 ))}
               </div>
             ))}
+            <div className="border rounded-xl p-3 space-y-2">
+              <p className="text-sm font-medium">Formateur (feuilles d'émargement)</p>
+              <div className="grid md:grid-cols-[1fr_auto] gap-3 items-center">
+                <Input value={formateur} placeholder="Nom et prénom du formateur" onChange={(e) => setFormateur(e.target.value)} />
+                <SignatureChamp compact libelle="Signature du formateur" valeur={signatureFormateur} onChange={setSignatureFormateur} />
+              </div>
+            </div>
             <div className="border rounded-xl p-3 space-y-3">
               <p className="text-sm font-medium flex items-center gap-2"><Stamp className="w-4 h-4" /> Représentant du centre habilité</p>
               <div className="grid md:grid-cols-2 gap-3">

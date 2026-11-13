@@ -212,6 +212,46 @@ export class DocPdf {
     this.y -= 8;
   }
 
+  /** Tableau dont certaines colonnes reçoivent une image (signature) ; une colonne sans image reste vide.
+   *  L'en-tête est répété en haut de chaque nouvelle page. */
+  async tableauSignatures(entetes: string[], lignes: { cellules: Cellule[]; images: (Uint8Array | undefined)[] }[], poids: number[], hauteur = 34) {
+    const size = 8.5;
+    const total = poids.reduce((a, b) => a + b, 0);
+    const largeurs = poids.map((p) => (p / total) * this.largeur);
+    const entete = () => {
+      const h = 22;
+      let x = this.M;
+      entetes.forEach((t, i) => {
+        this.page.drawRectangle({ x, y: this.y - h, width: largeurs[i], height: h, borderColor: TRAIT, borderWidth: 0.6, color: FOND });
+        this.lignes(t, largeurs[i] - 6, size, this.fb).forEach((s, k) =>
+          this.page.drawText(s, { x: x + (largeurs[i] - this.fb.widthOfTextAtSize(s, size)) / 2, y: this.y - 9 - k * (size + 1.5), size, font: this.fb, color: NOIR }));
+        x += largeurs[i];
+      });
+      this.y -= h;
+    };
+    this.place(22 + hauteur);
+    entete();
+    for (const ligne of lignes) {
+      if (this.y - hauteur < 45) { this.nouvellePage(); entete(); }
+      let x = this.M;
+      for (let i = 0; i < largeurs.length; i++) {
+        this.page.drawRectangle({ x, y: this.y - hauteur, width: largeurs[i], height: hauteur, borderColor: TRAIT, borderWidth: 0.6 });
+        const c = ligne.cellules[i] ?? "";
+        const cel = typeof c === "string" ? { t: c } : c;
+        const police = this.police(cel.gras, cel.reponse);
+        const sz = cel.reponse ? size + 0.5 : size;
+        this.lignes(cel.t, largeurs[i] - 6, sz, police).forEach((s, k) => {
+          const tx = cel.centre ? x + (largeurs[i] - police.widthOfTextAtSize(s, sz)) / 2 : x + 3;
+          this.page.drawText(s, { x: tx, y: this.y - 4 - sz - k * (size + 2.5), size: sz, font: police, color: cel.reponse ? ENCRE : NOIR });
+        });
+        await poserImage(this.pdf, this.page, ligne.images[i], x + 3, this.H - this.y + 3, largeurs[i] - 6, hauteur - 6);
+        x += largeurs[i];
+      }
+      this.y -= hauteur;
+    }
+    this.y -= 8;
+  }
+
   /** Cadres de signature ; l'image fournie (signature ou tampon) est posée dans le cadre, sinon il reste vide. */
   async signatures(libelles: string[], noms: string[], images: (Uint8Array | undefined)[] = []) {
     this.place(80);

@@ -23,6 +23,8 @@ export interface EdofCandidat {
   lieuVille: string;
   statut: string;
   dateInscription: string; // ISO
+  /** Volume de la formation quand la source le donne (dossier PDF) ; l'export CSV ne le donne pas. */
+  dureeHeures?: number;
 }
 
 export interface EdofExport {
@@ -153,6 +155,7 @@ export function lireDossierPdfEdof(texte: string): DossierPdfEdof | null {
       lieuVille: villeCentre,
       statut: statutDepuisHistorique(t),
       dateInscription: inscription ? `${inscription[3]}-${inscription[2]}-${inscription[1]}` : "",
+      dureeHeures: Number(t.match(/([\d.,]+) heures de formation au total/)?.[1].replace(",", ".")) || undefined,
     },
     centre: { nom: (par?.[1] || "").trim(), adresse: adresseCentre, ville: villeCentre },
   };

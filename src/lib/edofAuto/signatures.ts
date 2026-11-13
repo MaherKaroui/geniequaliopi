@@ -14,6 +14,8 @@ export interface SignaturesEval {
   jurys?: (Uint8Array | undefined)[];
   /** signatures des stagiaires, clé = cleCandidat */
   candidats?: Record<string, Uint8Array>;
+  /** signature du formateur (feuille d'émargement) */
+  formateur?: Uint8Array;
 }
 
 export const cleCandidat = (c: EdofCandidat) => c.numeroDossier || `${c.nom}|${c.prenom}`;

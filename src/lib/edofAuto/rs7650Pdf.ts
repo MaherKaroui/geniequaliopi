@@ -19,6 +19,8 @@ export interface ContexteRS7650 {
   jury: Jure[];
   /** signatures et tampon fournis par l'utilisateur */
   signatures?: SignaturesEval;
+  /** formateur de la session (feuille d'émargement) */
+  formateur?: string;
 }
 
 export type ChargeurModele = (fichier: string) => Promise<ArrayBuffer | Uint8Array>;
@@ -76,7 +78,7 @@ class Plume {
   }
 }
 
-const nomComplet = (c: EdofCandidat) => `${c.prenom} ${c.nom}`.trim();
+export const nomComplet = (c: EdofCandidat) => `${c.prenom} ${c.nom}`.trim();
 const juryLigne = (j: Jure[]) => j.filter((x) => x.nom).map((x) => `${x.civilite} ${x.nom}`.trim()).join(", ");
 
 async function ouvrir(charger: ChargeurModele, fichier: string) {

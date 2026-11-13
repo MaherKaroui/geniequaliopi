@@ -11,6 +11,8 @@ import { getIndexFC, loadFicheFC, loadIndexFC, rechercherFC } from "@/lib/france
 import { cleFormation, type EdofCandidat, type SessionExamen } from "./candidats";
 import { genererSessionGenerique, sourceDepuisFiche, sourceDepuisIntitule, type SourceReferentiel } from "./generique";
 import { chargeurHttp, documentsCommunsRS7650, genererSessionRS7650, slug, type ChargeurModele, type ContexteRS7650, type FichierPack } from "./rs7650Pdf";
+import { docEmargement } from "./emargement";
+import { cleCandidat } from "./signatures";
 
 export type ContexteEvaluation = ContexteRS7650;
 
@@ -85,6 +87,12 @@ export async function genererPack(
       fichiers.push(...(estOfficiel(ref)
         ? await genererSessionRS7650(dossier, s, ctx, charger, tick)
         : await genererSessionGenerique(dossier, s, ref, ctx, tick)));
+      // Feuille d'émargement de chaque stagiaire, rangée avec ses autres pièces.
+      for (let i = 0; i < s.candidats.length; i++) {
+        const c = s.candidats[i];
+        const base = `${dossier}/${String(i + 1).padStart(2, "0")}_${slug(`${c.nom}_${c.prenom}`)}`;
+        fichiers.push({ candidat: cleCandidat(c), chemin: `${base}/5_Feuille_d_emargement.pdf`, donnees: await docEmargement(ctx, c) });
+      }
     }
     if (estOfficiel(ref)) fichiers.push(...(await documentsCommunsRS7650(`${racine}/_Commun`, charger)));
   }
