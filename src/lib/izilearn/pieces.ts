@@ -27,7 +27,7 @@ export interface Categorie { key: CategorieKey; label: string; dossier: string; 
 export const CATEGORIES: Categorie[] = [
   { key: "programme", label: "Programme", dossier: "01_Programme", aide: "Programme de formation (indicateur 1)." },
   { key: "besoins", label: "Évaluation des besoins", dossier: "02_Evaluation_des_besoins", aide: "Évaluation personnalisée ; réponses IZILearn conservées lorsqu'elles existent." },
-  { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Test personnalisé comme Qualiopi ; résultats IZILearn prioritaires." },
+  { key: "positionnement", label: "Test de positionnement (début)", dossier: "03_Test_de_positionnement", aide: "Test rempli par Génie Qualiopi, comme dans le dossier Qualiopi." },
   { key: "convocation", label: "Convocation", dossier: "04_Convocation", aide: "Convocation de l'apprenant à la session." },
   { key: "convention", label: "Convention ou contrat", dossier: "05_Convention_Contrat", aide: "Convention si l'apprenant est rattaché à une entreprise, contrat de formation sinon (CFA : convention de formation par apprentissage)." },
   { key: "cerfa", label: "CERFA apprentissage", dossier: "05_CERFA_Apprentissage", aide: "CERFA 10103*14 rempli et signé (CFA : formation en apprentissage ou organisme avec code UAI)." },
@@ -97,6 +97,7 @@ function gabarits(type: IzPayload["formation"]["typeAction"]) {
     ri: vae ? "vae_reglement_interieur" : cfa ? "reglement_interieur_cfa_v2" : "reglement_interieur_stagiaire",
     livret: vae ? { t: "vae_livret_accueil", parApprenant: false } : cfa ? { t: "livret_accueil_cfa_v2", parApprenant: true } : { t: "livret_accueil", parApprenant: false },
     support: cfa ? "support_cours_cfa" : "support_cours_ref",
+    positionnement: cfa ? "test_cfa_stagiaire" : "test_positionnement_debut_stagiaire",
   };
 }
 
@@ -152,9 +153,10 @@ function piecesActionFormation(cx: Contexte): Piece[] {
         reponsesApprenant: a.besoins?.reponses,
         reponsesEntreprise: a.besoinsEntreprise?.reponses,
       }));
-    const positionnement = (a.positionnement || []).some(hasRecordedQuiz);
-    par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", positionnement ? "izilearn" : "document",
-      () => T.testPositionnement(c).html);
+    // Test de positionnement : toujours celui de Génie Qualiopi (questions, réponses,
+    // note et appréciation), les résultats IZILearn ne le remplacent pas.
+    par("positionnement", "Test de positionnement", "TEST_DE_POSITIONNEMENT_DEBUT", "document",
+      gen(`positionnement_${i}`, g.positionnement, { fi: 0, stagiaireIdx: i, phase: "debut" }));
     par("convocation", "Convocation", "CONVOCATION", "document", gen(`convocation_${i}`, g.convocation, { stagiaireIdx: i }));
     const entreprise = !!s.entreprise;
     par("convention", p.formation.typeAction === "apprentissage" ? "Convention de formation par apprentissage" : entreprise ? "Convention de formation" : "Contrat de formation",
