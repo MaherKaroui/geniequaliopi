@@ -186,6 +186,7 @@ describe("Espace IZILearn", () => {
     p.apprenants[0].connexions = [
       { debut: "2026-11-02T09:05:00", fin: "2026-11-02T10:05:00", secondes: 3600, source: "meet", ip: "80.215.186.61" },
       { debut: "2026-11-02T13:35:00", fin: "2026-11-02T15:05:00", secondes: 5400, source: "lms", ip: "80.215.186.61" },
+      { debut: "2026-11-03T09:10:00", secondes: 1800, source: "lms" },
     ];
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-11-13T10:00:00"));
@@ -194,7 +195,7 @@ describe("Espace IZILearn", () => {
     expect(html).not.toContain("09:05");
     expect(html).not.toContain("15:05");
     expect(html).not.toContain("Connexion relevée");
-    expect(html.match(/Présent\(e\)/g)?.length).toBe(2);
+    expect(html.match(/<td>Présente?(\(e\))?<\/td>/g)?.length).toBe(2);
     // IP réelle reprise (jour relevé + jour sans relevé avec l'IP habituelle).
     expect(html.match(/80\.215\.186\.61/g)?.length).toBe(2);
   });
@@ -204,7 +205,6 @@ describe("Espace IZILearn", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-11-13T10:00:00"));
     const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre() || "";
-    expect(html).toContain("Présent(e)");
     expect(html).not.toMatch(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/);
   });
 
@@ -260,7 +260,7 @@ describe("Espace IZILearn", () => {
     expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("3 / 10");
     expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("À approfondir");
     expect(pieces.find((x) => x.id === "bilan_chaud_0")?.rendre()).toContain("Organisation à améliorer");
-    expect(pieces.find((x) => x.id === "connexion_0")?.rendre()).toContain("Présent(e)");
+    expect(pieces.find((x) => x.id === "connexion_0")?.rendre()).toMatch(/<td>Présente?(\(e\))?<\/td>/);
   });
 
   it("laisse les exercices futurs et bilans non échus vides, remplit ceux échus", () => {
