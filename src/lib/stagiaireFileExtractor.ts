@@ -56,7 +56,8 @@ const readDocx = async (file: File): Promise<string> => {
   return value;
 };
 
-const readPdf = async (file: File): Promise<string> => {
+/** Texte d'un PDF (couche texte, pages séparées par un saut de ligne). */
+export const readPdf = async (file: File): Promise<string> => {
   // @ts-ignore - dynamic import worker setup
   const pdfjs: any = await import("pdfjs-dist");
   // Use the bundled worker via Vite ?url import-style fallback:

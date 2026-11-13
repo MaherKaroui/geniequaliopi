@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { fetchEntreprise } from "@/lib/bpfAnalyse";
-import { cleFormation, formationRealisee, frDate, grouperSessions, lireExportEdof, type EdofExport } from "@/lib/edofAuto/candidats";
+import { cleFormation, formationRealisee, frDate, grouperSessions, lireDossierPdfEdof, lireExportEdof, type EdofCandidat, type EdofExport } from "@/lib/edofAuto/candidats";
+import { readPdf } from "@/lib/stagiaireFileExtractor";
 import { reponsesDe, type Jure } from "@/lib/edofAuto/rs7650Pdf";
 import { construireSujet, genererReponsesGeneriques, type SujetCertification } from "@/lib/edofAuto/generique";
 import { estOfficiel, genererPack, resoudreReferentiels, type Referentiel } from "@/lib/edofAuto/pack";
@@ -93,13 +94,35 @@ export default function AutomatisationEDOF() {
     }
   };
 
-  const importer = async (file: File) => {
+  /** Un ou plusieurs dossiers « Export_PDF_dossier_n_… » : un stagiaire par PDF. */
+  const lireDossiersPdf = async (files: File[]) => {
+    const candidats: EdofExport["candidats"] = [];
+    const illisibles: string[] = [];
+    let centrePdf: typeof centre | null = null;
+    for (const f of files) {
+      const d = lireDossierPdfEdof(await readPdf(f));
+      if (!d) { illisibles.push(f.name); continue; }
+      if (!candidats.some((c) => c.numeroDossier === d.candidat.numeroDossier)) candidats.push(d.candidat);
+      if (!centrePdf && d.centre.nom) centrePdf = d.centre;
+    }
+    if (illisibles.length) toast.warning(`Pas un dossier EDOF lisible : ${illisibles.join(", ")}`);
+    return { exp: { siret: "", candidats } as EdofExport, centrePdf };
+  };
+
+  const importer = async (files: File[]) => {
+    if (!files.length) return;
     try {
-      const exp = lireExportEdof(await file.arrayBuffer(), file.name);
-      if (!exp.candidats.length) { toast.error("Aucun dossier lu dans ce fichier (colonnes NOM / PRENOM introuvables)."); return; }
+      const pdfs = files.filter((f) => /\.pdf$/i.test(f.name));
+      const lu = pdfs.length ? await lireDossiersPdf(pdfs) : { exp: lireExportEdof(await files[0].arrayBuffer(), files[0].name), centrePdf: null };
+      const exp = lu.exp;
+      if (!exp.candidats.length) {
+        toast.error(pdfs.length ? "Aucun dossier lu dans ce(s) PDF." : "Aucun dossier lu dans ce fichier (colonnes NOM / PRENOM introuvables).");
+        return;
+      }
+      if (lu.centrePdf) setCentre(lu.centrePdf);
       setExportEdof(exp);
-      setNomFichier(file.name);
-      toast.success(`${exp.candidats.length} dossiers lus`);
+      setNomFichier(pdfs.length ? (pdfs.length === 1 ? pdfs[0].name : `${pdfs.length} dossiers PDF`) : files[0].name);
+      toast.success(`${exp.candidats.length} dossier${exp.candidats.length > 1 ? "s" : ""} lu${exp.candidats.length > 1 ? "s" : ""}`);
       if (exp.siret) chercherCentre(exp.siret);
       setChargement(true);
       const refs = await resoudreReferentiels(exp.candidats);
@@ -111,6 +134,10 @@ export default function AutomatisationEDOF() {
       setChargement(false);
     }
   };
+
+  /** Complète un stagiaire (civilité, date de naissance absentes d'un dossier PDF). */
+  const majCandidat = (c: EdofCandidat, patch: Partial<EdofCandidat>) =>
+    setExportEdof((e) => e && { ...e, candidats: e.candidats.map((x) => (x === c ? { ...x, ...patch } : x)) });
 
   /** Import groupé : chaque image est rattachée au stagiaire dont le n° de dossier, ou le nom ET le prénom, figurent dans le nom du fichier. */
   const importerSignaturesStagiaires = async (files: FileList) => {
@@ -240,7 +267,8 @@ export default function AutomatisationEDOF() {
           <div>
             <h2 className="font-semibold text-lg">1. Export EDOF</h2>
             <p className="text-sm text-muted-foreground">
-              Déposez l'export « Tous les dossiers » de Mon Compte Formation (CSV ou XLSX). Pour chaque stagiaire, quelle que soit
+              Déposez l'export « Tous les dossiers » de Mon Compte Formation (CSV ou XLSX), ou le PDF d'un seul dossier
+              (« Export_PDF_dossier_n_… », plusieurs PDF possibles). Pour chaque stagiaire, quelle que soit
               la formation, 4 documents sont produits — questionnaire de positionnement, attestation sur l'honneur,
               évaluation des connaissances, grille d'évaluation des compétences — plus un PV par session d'examen, avec des réponses
               propres à chaque candidat. Quand le certificateur a fourni ses documents (RS7650 EYES PERFECT), ce sont eux qui sont remplis ;
@@ -249,12 +277,12 @@ export default function AutomatisationEDOF() {
           </div>
           <label className="flex items-center justify-center gap-2 border-2 border-dashed rounded-xl p-6 cursor-pointer hover:bg-muted/40 transition">
             <FileUp className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium">{nomFichier || "Choisir l'export EDOF (.csv, .xlsx)"}</span>
-            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={(e) => e.target.files?.[0] && importer(e.target.files[0])} />
+            <span className="text-sm font-medium">{nomFichier || "Choisir l'export EDOF (.csv, .xlsx) ou un ou plusieurs dossiers PDF (Export_PDF_dossier_n_…)"}</span>
+            <input type="file" multiple accept=".csv,.xlsx,.xls,.pdf" className="hidden" onChange={(e) => { importer(Array.from(e.target.files || [])); e.target.value = ""; }} />
           </label>
           {exportEdof && (
             <div className="flex flex-wrap items-center gap-4 text-sm">
-              <Badge variant="secondary">{exportEdof.candidats.length} dossiers</Badge>
+              <Badge variant="secondary">{exportEdof.candidats.length} dossier{exportEdof.candidats.length > 1 ? "s" : ""}</Badge>
               {exportEdof.siret && <Badge variant="outline">SIRET {exportEdof.siret}</Badge>}
               <label className="flex items-center gap-2">
                 <Checkbox checked={realisesSeulement} onCheckedChange={(v) => setRealisesSeulement(!!v)} />
@@ -366,7 +394,21 @@ export default function AutomatisationEDOF() {
                       }
                       return (
                         <tr key={c.numeroDossier + c.nom} className="border-t">
-                          <td className="p-2">{c.civilite} {c.nom} {c.prenom}</td>
+                          <td className="p-2">
+                            {c.civilite} {c.nom} {c.prenom}
+                            {(!c.civilite || !c.dateNaissance) && (
+                              <div className="flex gap-1 mt-1" title="Absent du dossier PDF : à saisir">
+                                {!c.civilite && (
+                                  <select className="border rounded px-1 h-7 bg-background" value="" onChange={(e) => majCandidat(c, { civilite: e.target.value as EdofCandidat["civilite"] })}>
+                                    <option value="">Civilité</option><option value="Mme">Mme</option><option value="M.">M.</option>
+                                  </select>
+                                )}
+                                {!c.dateNaissance && (
+                                  <Input type="date" className="h-7 w-36 text-xs" aria-label="Date de naissance" onBlur={(e) => e.target.value && majCandidat(c, { dateNaissance: e.target.value })} />
+                                )}
+                              </div>
+                            )}
+                          </td>
                           <td className="p-2">{frDate(c.dateDebut)} → {frDate(c.dateFin)}</td>
                           <td className="p-2">{c.statut}</td>
                           <td className="p-2">{theo}</td>
