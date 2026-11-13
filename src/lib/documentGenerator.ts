@@ -208,7 +208,10 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiairesSaisis: StagiaireInfo[]): string {
   // Siège en vigueur à la date du dossier (transfert de siège : ancienne adresse avant le transfert).
   org = organismeALaDate(org, org?.dateMaj);
-  const presetBlank = /besoins/.test(template) && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
+  // Évaluation des besoins et test de positionnement individuel (par stagiaire) : toujours le
+  // document Génie Qualiopi rempli ; la trame vierge du preset ne sert qu'aux trames / vierge demandé.
+  const rempliQualiopi = /besoins/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template);
+  const presetBlank = rempliQualiopi && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
   // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
   const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
