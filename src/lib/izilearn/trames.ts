@@ -651,8 +651,8 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
 
 // ───────────────────────── temps de connexion ─────────────────────────
 
-const IP_RE = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b|\b(?:[0-9a-f]{1,4}:){2,7}[0-9a-f]{0,4}\b/gi;
-const CLES_IP = /^(ip|ips|adresseip|adressesip|adresse_ip|adresses_ip|ip_address|ipaddress|ip_adresse|ipadresse|adresse|ipv4|ipv6|remote_ip|remoteip|client_ip|clientip)$/i;
+const IP_RE = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b|\b(?:[0-9a-f]{1,4}:){3,7}[0-9a-f]{0,4}\b/gi;
+const CLES_IP = /^(ip|ips|adresseip|adressesip|adresse_ip|adresses_ip|ip_address|ipaddress|ip_adresse|ipadresse|ipv4|ipv6|remote_ip|remoteip|client_ip|clientip)$/i;
 
 /** Extrait les adresses IP d'une connexion IZILearn, quel que soit le nom du champ utilisé. */
 export function extraireIps(x: unknown): string[] {

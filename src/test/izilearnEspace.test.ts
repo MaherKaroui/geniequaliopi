@@ -200,6 +200,31 @@ describe("Espace IZILearn", () => {
     expect(html.match(/80\.215\.186\.61/g)?.length).toBe(2);
   });
 
+  it("remplit chaque jour passé avec l'adresse IP la plus utilisée par l'apprenant", () => {
+    const p = payload("actions-formation", 3, "distanciel");
+    p.creneaux = p.creneaux.map((x) => ({ ...x, mode: "distanciel" }));
+    p.apprenants[0].connexions = [
+      { debut: "2026-11-02T09:05:00", secondes: 3600, source: "lms", ipAddress: "80.215.186.61" } as never,
+      { debut: "2026-11-02T13:35:00", secondes: 3600, source: "lms", adresse_ip: "80.215.186.61" } as never,
+      { debut: "2026-11-03T09:05:00", secondes: 3600, source: "lms", ip: "139.100.178.214" },
+    ];
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-13T10:00:00"));
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre() || "";
+    const ipsParJour = [...html.matchAll(/<td>([^<]*)<\/td><\/tr><\/tbody><\/table>/g)].map((m) => m[1]);
+    expect(ipsParJour).toEqual(["80.215.186.61", "139.100.178.214", "80.215.186.61"]);
+  });
+
+  it("utilise l'IP habituelle transmise par IZILearn quand la session n'a aucun relevé", () => {
+    const p = payload("actions-formation", 2, "distanciel");
+    p.creneaux = p.creneaux.map((x) => ({ ...x, mode: "distanciel" }));
+    p.apprenants[1].ipHabituelle = "80.215.186.61";
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-13T10:00:00"));
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_1")?.rendre() || "";
+    expect(html.match(/<td>80\.215\.186\.61<\/td>/g)?.length).toBe(2);
+  });
+
   it("n'invente aucune adresse IP quand IZILearn n'en transmet pas", () => {
     const p = payload("actions-formation", 1, "distanciel");
     vi.useFakeTimers();
