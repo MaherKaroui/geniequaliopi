@@ -715,8 +715,9 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
     // Adresse IP du jour ; jour sans relevé : IP réelle habituelle de l'apprenant (cette session, sinon une autre).
+    // Aucune IP transmise par IZILearn : la colonne « Adresse IP » n'est pas affichée du tout.
     const ips = ipsDe(connexions);
-    h += connectionDayTable(cells.map(esc), futur ? "—" : esc(ips.length ? ips.join(" / ") : ipHabituelle));
+    h += connectionDayTable(cells.map(esc), aUneIp ? (futur ? "—" : esc(ips.length ? ips.join(" / ") : ipHabituelle)) : undefined);
     h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
   }
   const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;
