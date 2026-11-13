@@ -66,13 +66,31 @@ export async function chargerFichiers(a: Automatisation): Promise<FichierPack[]>
   return out;
 }
 
-export async function ajouterEnvois(id: string, envois: EnvoiMail[]): Promise<void> {
-  const { error } = await table().update({ envois, updated_at: new Date().toISOString() }).eq("id", id);
+/**
+ * Ajoute des envois SANS modifier le dossier d'origine : le dossier passé reste
+ * tel quel dans l'historique et une nouvelle entrée est créée (copie du dossier +
+ * envois cumulés, même ZIP — pas de ré-upload, seul le chemin est repris).
+ */
+export async function ajouterEnvois(id: string, envois: EnvoiMail[]): Promise<Automatisation> {
+  const { data: avant, error: errLecture } = await table().select("*").eq("id", id).single();
+  if (errLecture) throw new Error(errLecture.message);
+  const a = avant as Automatisation & { user_id: string };
+  const ligne = {
+    id: crypto.randomUUID(), user_id: a.user_id, name: a.name, export_name: a.export_name, siret: a.siret,
+    centre: a.centre, jurys: a.jurys, resume: a.resume, fichiers: a.fichiers,
+    zip_path: a.zip_path, envois: [...(a.envois || []), ...envois],
+  };
+  const { data, error } = await table().insert(ligne).select().single();
   if (error) throw new Error(error.message);
+  return data as Automatisation;
 }
 
 export async function supprimer(a: Automatisation): Promise<void> {
-  if (a.zip_path) await supabase.storage.from(BUCKET).remove([a.zip_path]);
   const { error } = await table().delete().eq("id", a.id);
   if (error) throw new Error(error.message);
+  // Le ZIP n'est effacé que si aucune autre entrée de l'historique ne le réutilise.
+  if (a.zip_path) {
+    const { data: autres } = await table().select("id").eq("zip_path", a.zip_path).limit(1);
+    if (!autres?.length) await supabase.storage.from(BUCKET).remove([a.zip_path]);
+  }
 }
