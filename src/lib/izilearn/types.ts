@@ -110,6 +110,8 @@ export interface IzApprenant {
   handicap?: { declare: boolean; details?: string };
   signatures: IzSignature[];
   connexions: IzConnexion[];
+  /** IP réelle la plus fréquente de l'apprenant, toutes sessions confondues (relevée par IZILearn). */
+  ipHabituelle?: string | null;
   besoins?: IzReponses | null;
   besoinsEntreprise?: IzReponses | null;
   positionnement?: IzQuiz[];

@@ -664,7 +664,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   const ipsDe = (xs: typeof cx) => [...new Set(xs.map((x) => String(x.ip || x.adresseIp || x.ip_address || "").trim()).filter((v) => /^[0-9a-f:.]{3,45}$/i.test(v)))];
   const freq = new Map<string, number>();
   for (const x of cx) for (const ip of ipsDe([x])) freq.set(ip, (freq.get(ip) || 0) + 1);
-  const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+  const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || ipsDe([{ ip: c.a.ipHabituelle } as (typeof cx)[number]])[0] || "";
   let h = connectionIntro(`${esc(nomOF)} / Google Meet`);
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
@@ -708,7 +708,7 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     }
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
-    // Adresse IP du jour ; jour sans relevé : IP réelle habituelle de l'apprenant.
+    // Adresse IP du jour ; jour sans relevé : IP réelle habituelle de l'apprenant (cette session, sinon une autre).
     const ips = ipsDe(connexions);
     h += connectionDayTable(cells.map(esc), futur ? "—" : esc(ips.length ? ips.join(" / ") : ipHabituelle));
     h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
