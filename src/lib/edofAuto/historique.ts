@@ -86,7 +86,11 @@ export async function ajouterEnvois(id: string, envois: EnvoiMail[]): Promise<Au
 }
 
 export async function supprimer(a: Automatisation): Promise<void> {
-  if (a.zip_path) await supabase.storage.from(BUCKET).remove([a.zip_path]);
   const { error } = await table().delete().eq("id", a.id);
   if (error) throw new Error(error.message);
+  // Le ZIP n'est effacé que si aucune autre entrée de l'historique ne le réutilise.
+  if (a.zip_path) {
+    const { data: autres } = await table().select("id").eq("zip_path", a.zip_path).limit(1);
+    if (!autres?.length) await supabase.storage.from(BUCKET).remove([a.zip_path]);
+  }
 }
