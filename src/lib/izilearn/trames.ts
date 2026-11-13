@@ -651,6 +651,23 @@ export function emargement(c: Ctx): { html: string; reel: boolean } {
 
 // ───────────────────────── temps de connexion ─────────────────────────
 
+const IP_RE = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b|\b(?:[0-9a-f]{1,4}:){3,7}[0-9a-f]{0,4}\b/gi;
+const CLES_IP = /^(ip|ips|adresseip|adressesip|adresse_ip|adresses_ip|ip_address|ipaddress|ip_adresse|ipadresse|ipv4|ipv6|remote_ip|remoteip|client_ip|clientip)$/i;
+
+/** Extrait les adresses IP d'une connexion IZILearn, quel que soit le nom du champ utilisé. */
+export function extraireIps(x: unknown): string[] {
+  if (typeof x === "string") return x.match(IP_RE) || [];
+  if (Array.isArray(x)) return x.flatMap(extraireIps);
+  if (!x || typeof x !== "object") return [];
+  return Object.entries(x as Record<string, unknown>).filter(([k]) => CLES_IP.test(k)).flatMap(([, v]) => extraireIps(v));
+}
+
+/** IP(s) habituelle(s) transmises au niveau de l'apprenant (toutes sessions confondues). */
+function ipsApprenant(a: unknown): string[] {
+  const o = (a || {}) as Record<string, unknown>;
+  return [o.ipHabituelle, o.ip_habituelle, o.ipPrincipale, o.derniereIp, o.derniere_ip, o.ip, o.adresseIp, o.adresse_ip, o.ips].flatMap(extraireIps);
+}
+
 export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   const cx = c.a.connexions.map((x) => {
     const debut = d(x.debut);
@@ -660,11 +677,12 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const nomOF = c.o.nom || "Classe virtuelle";
-  // Adresses IP : uniquement celles réellement relevées par IZILearn.
-  const ipsDe = (xs: typeof cx) => [...new Set(xs.map((x) => String(x.ip || x.adresseIp || x.ip_address || "").trim()).filter((v) => /^[0-9a-f:.]{3,45}$/i.test(v)))];
+  // Adresses IP : uniquement celles réellement relevées par IZILearn pour cet apprenant.
+  const ipsDe = (xs: unknown[]) => [...new Set(xs.flatMap(extraireIps))];
   const freq = new Map<string, number>();
   for (const x of cx) for (const ip of ipsDe([x])) freq.set(ip, (freq.get(ip) || 0) + 1);
-  const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || ipsDe([{ ip: c.a.ipHabituelle } as (typeof cx)[number]])[0] || "";
+  // IP la plus souvent utilisée (cette session, sinon celle relevée par IZILearn sur ses autres sessions).
+  const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || ipsDe([ipsApprenant(c.a)])[0] || "";
   let h = connectionIntro(`${esc(nomOF)} / Google Meet`);
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
