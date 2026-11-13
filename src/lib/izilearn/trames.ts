@@ -683,6 +683,8 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   for (const x of cx) for (const ip of ipsDe([x])) freq.set(ip, (freq.get(ip) || 0) + 1);
   // IP la plus souvent utilisée (cette session, sinon celle relevée par IZILearn sur ses autres sessions).
   const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || ipsDe([ipsApprenant(c.a)])[0] || "";
+  // L'apprenant a-t-il au moins une adresse IP réellement transmise par IZILearn ?
+  const aUneIp = Boolean(ipHabituelle) || ipsDe(cx).length > 0;
   let h = connectionIntro(`${esc(nomOF)} / Google Meet`);
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
