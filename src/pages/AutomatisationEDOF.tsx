@@ -253,8 +253,8 @@ export default function AutomatisationEDOF() {
   const enregistrerHistorique = async (r: ResultatEdof) => {
     if (!user) { toast.error("Connectez-vous pour enregistrer dans l'historique."); return; }
     try {
-      const a = await enregistrer(user.id, r.meta, r.fichiers);
-      if (r.envois.length) await ajouterEnvois(a.id, r.envois);
+      let a = await enregistrer(user.id, r.meta, r.fichiers);
+      if (r.envois.length) a = await ajouterEnvois(a.id, r.envois);
       setResultat((cur) => (cur && cur.fichiers === r.fichiers ? { ...cur, histId: a.id } : cur));
       setRafraichirHist((n) => n + 1);
       toast.success("Enregistré dans l'historique");
@@ -264,9 +264,17 @@ export default function AutomatisationEDOF() {
   };
 
   const majEnvois = async (envois: EnvoiMail[]) => {
+    const avant = resultat?.envois || [];
     setResultat((r) => (r ? { ...r, envois } : r));
     if (resultat?.histId) {
-      try { await ajouterEnvois(resultat.histId, envois); setRafraichirHist((n) => n + 1); } catch (e: any) { toast.error(`Envois non enregistrés : ${e.message}`); }
+      // Seuls les nouveaux envois sont transmis : le dossier d'origine reste intact,
+      // une nouvelle entrée d'historique est créée avec les envois cumulés.
+      const nouveaux = envois.slice(avant.length);
+      try {
+        const a = await ajouterEnvois(resultat.histId, nouveaux);
+        setResultat((r) => (r ? { ...r, histId: a.id } : r));
+        setRafraichirHist((n) => n + 1);
+      } catch (e: any) { toast.error(`Envois non enregistrés : ${e.message}`); }
     }
   };
 
