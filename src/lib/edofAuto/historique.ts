@@ -67,29 +67,21 @@ export async function chargerFichiers(a: Automatisation): Promise<FichierPack[]>
 }
 
 /**
- * Ajoute des envois à une automatisation SANS modifier le dossier d'origine :
- * crée une nouvelle ligne d'historique (copie du dossier + envois cumulés, même ZIP)
- * et supprime l'ancienne ligne. Le ZIP n'est pas ré-uploadé, seul le chemin est repris.
+ * Ajoute des envois SANS modifier le dossier d'origine : le dossier passé reste
+ * tel quel dans l'historique et une nouvelle entrée est créée (copie du dossier +
+ * envois cumulés, même ZIP — pas de ré-upload, seul le chemin est repris).
  */
 export async function ajouterEnvois(id: string, envois: EnvoiMail[]): Promise<Automatisation> {
   const { data: avant, error: errLecture } = await table().select("*").eq("id", id).single();
   if (errLecture) throw new Error(errLecture.message);
   const a = avant as Automatisation & { user_id: string };
-  const cumul = [...(a.envois || []), ...envois];
-  const nouvelId = crypto.randomUUID();
   const ligne = {
-    id: nouvelId, user_id: a.user_id, name: a.name, export_name: a.export_name, siret: a.siret,
+    id: crypto.randomUUID(), user_id: a.user_id, name: a.name, export_name: a.export_name, siret: a.siret,
     centre: a.centre, jurys: a.jurys, resume: a.resume, fichiers: a.fichiers,
-    zip_path: a.zip_path, envois: cumul,
+    zip_path: a.zip_path, envois: [...(a.envois || []), ...envois],
   };
   const { data, error } = await table().insert(ligne).select().single();
   if (error) throw new Error(error.message);
-  // L'ancienne ligne est retirée (le ZIP est conservé : il appartient désormais à la nouvelle ligne).
-  const { error: errSuppr } = await table().delete().eq("id", id);
-  if (errSuppr) {
-    await table().delete().eq("id", nouvelId);
-    throw new Error(errSuppr.message);
-  }
   return data as Automatisation;
 }
 
