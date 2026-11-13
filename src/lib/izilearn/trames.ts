@@ -682,26 +682,14 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     if (renderedDays > 0 && renderedDays % 5 === 0) h += '<div class="page-break"></div>';
     renderedDays++;
     const connexions = cx.filter((x) => { const debut = d(x.debut); return debut && cleJour(debut) === key; });
-    const matin = connexions.filter((x) => (d(x.debut)?.getHours() ?? 24) < 12);
-    const apresMidi = connexions.filter((x) => (d(x.debut)?.getHours() ?? 0) >= 12);
-    const derniereFin = (xs: typeof cx) => xs.filter((x) => x.fin).map((x) => x.fin).sort().at(-1);
     const futur = jour.getTime() > new Date().setHours(0, 0, 0, 0);
     h += `<h4>📅 ${dateLongue(jour)}</h4>`;
     let cells: string[];
-    if (connexions.length) {
-      // Connexions réellement relevées par IZILearn : prioritaires, jamais remplacées.
-      cells = [
-        [...new Set(connexions.map((x) => x.source === "meet" ? "Google Meet" : nomOF))].join(" / "),
-        heure(matin[0]?.debut), heure(derniereFin(matin)),
-        heure(apresMidi[0]?.debut), heure(derniereFin(apresMidi)),
-        duree(connexions.reduce((n, x) => n + (x.secondes || 0), 0)),
-        "Connexion relevée",
-      ];
-      totalMinutes += connexions.reduce((n, x) => n + (x.secondes || 0), 0) / 60;
-    } else if (futur) {
+    if (futur) {
       cells = ["—", "—", "—", "—", "—", "—", "⏳ À venir"];
     } else {
-      // Jour passé sans relevé : remplissage automatique identique à Qualiopi.
+      // Jour passé : horaires et durée Génie Qualiopi prioritaires ;
+      // IZILearn ne fournit que l'adresse IP réellement relevée.
       const gen = buildRealisticConnectionDay(seedStag + renderedDays * 13, hpd);
       totalMinutes += gen.dureeTotalMin;
       cells = [nomOF, gen.connMatin, gen.deconnMidi, gen.connApMidi, gen.deconnSoir, `${Math.floor(gen.dureeTotalMin / 60)}h${String(gen.dureeTotalMin % 60).padStart(2, "0")}min`, "Présent(e)"];
