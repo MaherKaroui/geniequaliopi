@@ -177,7 +177,9 @@ describe("Espace IZILearn", () => {
     p.apprenants[0].positionnement = [{ titre: "Test", date: "2026-11-02", score: 0, max: 10, reussi: false }];
     p.apprenants[0].besoins = { titre: "Besoins", date: "2026-10-01", reponses: [{ question: "Adaptation ?", reponse: "Non" }] };
     const pieces = planPieces(contexte(p));
-    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("0 / 10");
+    // Positionnement : le test Génie Qualiopi reste prioritaire sur le résultat IZILearn.
+    expect(pieces.find((x) => x.id === "positionnement_0")?.source).toBe("document");
+    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("Réponse du stagiaire");
     expect(pieces.find((x) => x.id === "besoins_0")?.source).toBe("izilearn");
   });
 
@@ -276,14 +278,13 @@ describe("Espace IZILearn", () => {
     expect(test?.rendre()).toContain("Réponse du stagiaire");
   });
 
-  it("conserve les réponses, notes, signatures et connexions importées", () => {
+  it("conserve les réponses et connexions importées, garde le positionnement Génie Qualiopi", () => {
     const p = payload("actions-formation", 3, "distanciel");
     p.apprenants[0].positionnement = [{ titre: "Test réel", date: "2026-11-02", score: 3, max: 10, appreciation: "À approfondir" }];
     p.apprenants[0].bilanChaud = { titre: "Retour réel", date: "2026-11-04", reponses: [{ question: "Avis", reponse: "Organisation à améliorer" }] };
     p.apprenants[0].connexions = [{ debut: "2026-11-02T09:00:00", fin: "2026-11-02T10:00:00", secondes: 3600, source: "meet" }];
     const pieces = planPieces(contexte(p));
-    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("3 / 10");
-    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).toContain("À approfondir");
+    expect(pieces.find((x) => x.id === "positionnement_0")?.rendre()).not.toContain("À approfondir");
     expect(pieces.find((x) => x.id === "bilan_chaud_0")?.rendre()).toContain("Organisation à améliorer");
     expect(pieces.find((x) => x.id === "connexion_0")?.rendre()).toMatch(/<td>Présente?(\(e\))?<\/td>/);
   });
