@@ -660,6 +660,11 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     return { ...x, fin };
   }).sort((x, y) => (d(x.debut)?.getTime() || 0) - (d(y.debut)?.getTime() || 0));
   const nomOF = c.o.nom || "Classe virtuelle";
+  // Adresses IP : uniquement celles réellement relevées par IZILearn.
+  const ipsDe = (xs: typeof cx) => [...new Set(xs.map((x) => String(x.ip || x.adresseIp || x.ip_address || "").trim()).filter((v) => /^[0-9a-f:.]{3,45}$/i.test(v)))];
+  const freq = new Map<string, number>();
+  for (const x of cx) for (const ip of ipsDe([x])) freq.set(ip, (freq.get(ip) || 0) + 1);
+  const ipHabituelle = [...freq.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
   let h = connectionIntro(`${esc(nomOF)} / Google Meet`);
   h += `<h3>📋 ${esc(nomComplet(c.s))}</h3><p><strong>Période :</strong> ${dateLongue(c.p.session.dateDebut)} au ${dateLongue(c.p.session.dateFin)}<br><strong>Plateforme :</strong> ${esc(nomOF)} / Google Meet</p>`;
   const jours = new Map<string, Date>();
@@ -703,10 +708,9 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
     }
     // Exact same table renderer and seven columns as Qualiopi IND 11.
     // Keep the signature outside the table so it does not change its layout.
-    h += connectionDayTable(cells.map(esc));
-    // Adresse IP : uniquement celle réellement relevée par IZILearn ce jour-là.
-    const ips = [...new Set(connexions.map((x) => String(x.ip || x.adresseIp || x.ip_address || "").trim()).filter((v) => /^[0-9a-f:.]{3,45}$/i.test(v)))];
-    if (ips.length) h += `<p style="margin:4px 0 0;font-size:11px"><strong>Adresse IP :</strong> ${esc(ips.join(" / "))}</p>`;
+    // Adresse IP du jour ; jour sans relevé : IP réelle habituelle de l'apprenant.
+    const ips = ipsDe(connexions);
+    h += connectionDayTable(cells.map(esc), futur ? "—" : esc(ips.length ? ips.join(" / ") : ipHabituelle));
     h += `<div${connexions.length && !futur ? ' data-learner-signature="recorded-connection"' : ""} style="min-height:60px;margin-top:8px"><strong>Signature du stagiaire :</strong></div>`;
   }
   const heuresPrevues = c.a.heuresPrevues || c.p.formation.dureeHeures || 0;

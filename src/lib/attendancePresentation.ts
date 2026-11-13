@@ -6,8 +6,9 @@ export function attendanceDayTable(rows: { date: string; label: string; horaire:
     `<tr style="background:#fff;border-bottom:1px solid ${i === rows.length - 1 ? '#ccc' : '#ddd'}"><td>${r.date}</td><td>${r.label}<br><small>${r.horaire}</small></td><td style="padding:10px 6px">${r.learner}</td><td style="padding:10px 6px">${r.trainer}</td></tr>`).join("")}</table>`;
 }
 
-export function connectionDayTable(cells: string[]): string {
-  return tableHTML(["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"], [cells]);
+export function connectionDayTable(cells: string[], ip?: string): string {
+  const head = ["Outil", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"];
+  return ip === undefined ? tableHTML(head, [cells]) : tableHTML([...head, "Adresse IP"], [[...cells, ip]]);
 }
 
 export function connectionIntro(platform: string): string {
