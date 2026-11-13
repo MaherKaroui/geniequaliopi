@@ -382,7 +382,7 @@ export default function AutomatisationEDOF() {
               <div key={code} className="space-y-2 border rounded-xl p-3">
                 <p className="text-sm font-medium">
                   Jury {code} (3 membres, le premier préside)
-                  {code === "RS7650" && <span className="text-muted-foreground font-normal"> — repris du PV exemple du certificateur, à confirmer</span>}
+                  {code === "RS7650" && !(profil && profil.cle === cle && profil.jury?.some((j) => j.nom)) && <span className="text-muted-foreground font-normal"> — repris du PV exemple du certificateur, à confirmer</span>}
                 </p>
                 {(jurys[code] || []).map((j, i) => (
                   <div key={i} className="grid grid-cols-[70px_1fr_0.7fr_1fr_auto] gap-2 items-center">
