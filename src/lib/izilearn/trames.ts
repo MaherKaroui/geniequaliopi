@@ -544,14 +544,14 @@ export function bilanChaud(c: Ctx): { html: string; reel: boolean } {
   if (c.a.bilanChaud && hasRecordedResponses(c.a.bilanChaud)) {
     h += sourceIzilearn(`questionnaire « ${c.a.bilanChaud.titre} » rempli par l'apprenant le ${dateFr(c.a.bilanChaud.date)}.`);
     h += reponsesReelles(c.a.bilanChaud);
-    h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
+    h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`], dateCourteLongue(c.p.session.dateFin));
     return { html: doc(c, "BILAN À CHAUD — SATISFACTION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: true };
   }
   h += trameVierge("Questionnaire à remplir par l'apprenant le dernier jour de la formation (ou en ligne depuis IZILearn › Questionnaires).");
   h += `<table style="width:100%"><thead><tr><th>Critère</th><th style="width:11%">Très satisfaisant</th><th style="width:11%">Satisfaisant</th><th style="width:11%">Peu satisfaisant</th><th style="width:11%">Insatisfaisant</th></tr></thead><tbody>${CRITERES_CHAUD.map((k) =>
     `<tr><td>${k}</td>${[0, 1, 2, 3].map(() => `<td style="text-align:center">${CASE}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   h += `<p><strong>Ce que vous avez le plus apprécié :</strong></p>${LIGNES(2)}<p><strong>Ce qui pourrait être amélioré :</strong></p>${LIGNES(2)}<p><strong>Comment allez-vous utiliser ces acquis dans votre activité ?</strong></p>${LIGNES(2)}`;
-  h += ZONE_SIGNATURE(["L'apprenant"]);
+  h += ZONE_SIGNATURE(["L'apprenant"], dateCourteLongue(c.p.session.dateFin));
   return { html: doc(c, "BILAN À CHAUD — SATISFACTION", `${nomComplet(c.s)} – ${c.f.intitule}`, h), reel: false };
 }
 
@@ -716,6 +716,6 @@ export function tempsConnexion(c: Ctx): { html: string; reel: boolean } {
   const taux = heuresPrevues > 0 ? `${Math.min(100, Math.round(totalMinutes / (heuresPrevues * 60) * 100))} %${enCours ? " (en cours)" : ""}` : "";
   const hT = Math.floor(totalMinutes / 60), mT = Math.round(totalMinutes % 60);
   h += connectionSummary(`${hT}h${String(mT).padStart(2, "0")}min`, esc(c.f.duree), taux, enCours ? "⏳ Formation en cours" : taux && parseInt(taux) >= 80 ? "✅ Validé" : "");
-  h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`]);
+  h += ZONE_SIGNATURE([`Le stagiaire — ${nomComplet(c.s)}`], dateCourteLongue(c.p.session.dateFin));
   return { html: buildDocument({ org: c.o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: c.f.intitule, formation: c.f, showFormationInfo: true, stagiaires: [c.s], extraHtml: h }), reel: cx.length > 0 };
 }
