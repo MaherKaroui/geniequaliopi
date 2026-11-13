@@ -233,6 +233,18 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2026-11-13T10:00:00"));
     const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre() || "";
     expect(html).not.toMatch(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/);
+    // Aucune IP transmise : la colonne « Adresse IP » n'apparaît pas dans le tableau.
+    expect(html).not.toContain("Adresse IP");
+  });
+
+  it("affiche la colonne Adresse IP quand IZILearn en transmet", () => {
+    const p = payload("actions-formation", 1, "distanciel");
+    p.apprenants[0].connexions = [{ debut: "2026-11-02T09:05:00", secondes: 3600, source: "lms", ip: "80.215.186.61" }];
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-13T10:00:00"));
+    const html = planPieces(contexte(p)).find((x) => x.id === "connexion_0")?.rendre() || "";
+    expect(html).toContain("<th>Adresse IP</th>");
+    expect(html).toContain("80.215.186.61");
   });
 
   it("nomme l'organisme de formation comme plateforme dans le temps de connexion", () => {
