@@ -125,8 +125,9 @@ const COMMENTAIRES = [
 function genererPratique(r: () => number): boolean[][] {
   return CRITERES_PAR_COMPETENCE.map((n) => {
     const criteres = Array<boolean>(n).fill(true);
-    // Sur les compétences à 7 critères et plus, un critère peut rester non acquis (≤ 50 % : compétence validée)
-    if (n >= 7 && r() < 0.25) criteres[Math.floor(r() * n)] = false;
+    // Chaque compétence a 1 ou 2 critères « NA » à des places tirées au hasard (toujours ≤ 50 % : compétence validée)
+    const nbNA = Math.min(r() < 0.6 ? 1 : 2, Math.floor(n / 2));
+    shuffle(r, Array.from({ length: n }, (_, i) => i)).slice(0, nbNA).forEach((i) => { criteres[i] = false; });
     return criteres;
   });
 }
