@@ -152,7 +152,7 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
       <div style="text-align:center;margin:3mm 0 2mm;font-size:28px;color:#111;font-weight:700;letter-spacing:1px">${p.nomComplet}</div>
       <div style="text-align:center;font-size:12.5px;color:#333;line-height:1.5;max-width:235mm;margin:0 auto">${p.formationHtml}</div>
       <div style="font-size:11px;color:#333;line-height:1.4;max-width:235mm;margin:3mm auto 0">${p.detailsHtml}</div>
-      <div style="position:absolute;bottom:34mm;left:112mm;width:30mm;height:30mm;border-radius:50%;border:3px double ${accent};display:flex;align-items:center;justify-content:center;text-align:center;color:${accent};font-weight:700;font-size:10px;letter-spacing:2px;line-height:1.3">${initiales(p.orgName)}<br>QUALITÉ</div>
+      <div style="position:absolute;bottom:16mm;left:135mm;width:27mm;height:27mm;border-radius:50%;border:3px double ${accent};display:flex;align-items:center;justify-content:center;text-align:center;color:${accent};font-weight:700;font-size:15px;letter-spacing:2px;line-height:1.2">${initiales(p.orgName)}<br><span style="font-size:9px">★ ★ ★</span></div>
       ${bottom(p)}
     </div>`,
   },
