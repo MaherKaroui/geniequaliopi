@@ -3,7 +3,7 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays, cachetDirigeantHtml } from "./docBuilder";
 import { entreesVeille, genVeilleExploitee } from "./veilleExploitee";
-import { genVeilleSourcee, intervenantsReels, estDirigeant } from "./piecesAF2026";
+import { intervenantsReels, estDirigeant } from "./piecesAF2026";
 import type { StagiaireInfo } from "@/types/qualiopi";
 import type { TypePrestation } from "./qualite2026";
 
@@ -41,8 +41,8 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
-  // Sources handicap réelles, consultées au plus tard à la date de MAJ (plus de dates inventées).
-  return genVeilleSourcee(o, f || ({ intitule: "" } as FormationInfo), "handicap");
+  // Veille handicap exploitée (IND 26) : textes et réseaux vérifiés, impact et action propres à la formation.
+  return genVeilleExploitee(o, f || ({ intitule: "" } as FormationInfo), "handicap", typeDepuisOrganisme(o));
 }
 
 // ===== IND 27 — PARTENAIRES, CONTRAT SOUS-TRAITANCE, CHARTE QUALITÉ =====
