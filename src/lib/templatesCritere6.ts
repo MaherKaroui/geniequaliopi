@@ -3,7 +3,7 @@ import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays, cachetDirigeantHtml } from "./docBuilder";
 import { entreesVeille, genVeilleExploitee } from "./veilleExploitee";
-import { genVeilleSourcee, intervenantsReels, estDirigeant } from "./piecesAF2026";
+import { intervenantsReels, estDirigeant } from "./piecesAF2026";
 import type { StagiaireInfo } from "@/types/qualiopi";
 import type { TypePrestation } from "./qualite2026";
 
