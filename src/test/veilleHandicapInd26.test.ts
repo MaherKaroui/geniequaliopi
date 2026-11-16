@@ -9,7 +9,7 @@ describe("IND 26 — veille handicap", () => {
       const catalog = getFullCatalog(org, FORMATIONS_TEST[cle], STAGIAIRES_TEST);
       const veille = catalog.find((d) => d.indicateur === 26 && d.template === "tableau_veille" && d.params?.type === "handicap");
       expect(veille).toBeDefined();
-      const html = generateDocumentById(veille!.id, veille!.template, veille!.params, org, FORMATIONS_TEST[cle][0], STAGIAIRES_TEST) || "";
+      const html = generateDocumentById(veille!.id, veille!.template, veille!.params, org, FORMATIONS_TEST[cle], STAGIAIRES_TEST) || "";
       expect(html).toContain("VEILLE HANDICAP");
       expect(html).toContain("Loi n° 2005-102");
       expect(html).toContain("Agefiph");
@@ -19,7 +19,7 @@ describe("IND 26 — veille handicap", () => {
   it("le dossier CFA cite le référent handicap obligatoire des CFA", () => {
     const org = { ...ORG_TEST, typesActions: ["apprentissage" as const] };
     const veille = getFullCatalog(org, FORMATIONS_TEST.apprentissage, STAGIAIRES_TEST).find((d) => d.indicateur === 26 && d.params?.type === "handicap")!;
-    const html = generateDocumentById(veille.id, veille.template, veille.params, org, FORMATIONS_TEST.apprentissage[0], STAGIAIRES_TEST) || "";
+    const html = generateDocumentById(veille.id, veille.template, veille.params, org, FORMATIONS_TEST.apprentissage, STAGIAIRES_TEST) || "";
     expect(html).toContain("L.6231-2");
   });
 });
