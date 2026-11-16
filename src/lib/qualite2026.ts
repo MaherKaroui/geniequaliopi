@@ -147,17 +147,17 @@ export function risquesQualite(o: OrganismeInfo, type: TypePrestation): { proces
 
 /**
  * Cartographie à 10 colonnes : largeurs fixes (sur les en-têtes, recopiés à chaque page du PDF),
- * police réduite et césure des mots longs, pour que la colonne IND ne soit jamais coupée à droite
+ * police réduite et retour à la ligne des mots longs, pour que la colonne IND ne soit jamais coupée à droite
  * et que les lignes restent courtes (plus de risques par page, sans grands blancs).
  */
 const COLONNES_RISQUES: [string, number][] = [
-  ["Processus", 11], ["Risque", 14], ["Cause principale", 12], ["P", 3.5], ["G", 3.5], ["Criticité", 9],
-  ["Mesure de maîtrise", 20], ["Indicateur de suivi", 12], ["Pilote", 10], ["IND", 5],
+  ["Processus", 12], ["Risque", 13], ["Cause principale", 12], ["P", 3.5], ["G", 3.5], ["Criticité", 9],
+  ["Mesure de maîtrise", 19], ["Indicateur de suivi", 12], ["Pilote", 11], ["IND", 5],
 ];
 
 export function tableauRisquesHTML(rows: string[][]): string {
   const fs = Math.max(9, (getDocStyle().fontSize || 13) - 3);
-  const cell = "padding:5px 4px;overflow-wrap:anywhere;word-break:normal;hyphens:auto;-webkit-hyphens:auto;line-height:1.35;letter-spacing:0;vertical-align:top";
+  const cell = "padding:5px 4px;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;line-height:1.35;letter-spacing:0;vertical-align:top";
   const th = COLONNES_RISQUES.map(([h, w]) => `<th style="width:${w}%;${cell};font-size:${fs - 1}px">${h}</th>`).join("");
   const body = rows.map((r) => `<tr>${r.map((c) => `<td style="${cell};font-size:${fs}px">${c}</td>`).join("")}</tr>`).join("");
   return `<table lang="fr" style="width:100%;table-layout:fixed;font-size:${fs}px"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>`;
