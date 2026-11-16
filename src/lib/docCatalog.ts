@@ -407,8 +407,8 @@ export function buildFullCatalog(
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
 
     // IND 26 — Accueil et accompagnement handicap
-    // Une seule veille handicap : l'ancien « VEILLE HANDICAP » (tableau_veille type handicap) produisait
-    // exactement le même document que les sources et réseaux suivis.
+    // Veille handicap exploitée (textes, impact, action) + liste des sources et réseaux suivis.
+    add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
     add("af_c6i26_veille_sourcee", "CT6 - IND 26 SOURCES ET RÉSEAUX HANDICAP SUIVIS", 6, 26, "veille_sourcee", { theme: "handicap" });
     // PDFs statiques IND 26
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
@@ -1501,6 +1501,7 @@ export function buildFullCatalog(
     add("vae_c6i24_veille_metiers", "CT6 - IND 24 Veille compétences, métiers et emplois", 6, 24, "vae_veille_metiers");
     add("vae_c6i25_veille_innovations", "CT6 - IND 25 Veille innovations pédagogiques et technologiques", 6, 25, "vae_veille_innovations");
     add("vae_c6i26_accessibilite_handicap", "CT6 - IND 26 Accessibilité et réseau handicap", 6, 26, "vae_accessibilite_handicap");
+    add("vae_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "tableau_veille", { type: "handicap" });
     add("vae_c6i26_veille_sourcee", "CT6 - IND 26 Sources et réseaux handicap suivis", 6, 26, "veille_sourcee", { theme: "handicap" });
     add("vae_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("vae_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });

@@ -41,8 +41,8 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
-  // Sources handicap réelles, consultées au plus tard à la date de MAJ (plus de dates inventées).
-  return genVeilleSourcee(o, f || ({ intitule: "" } as FormationInfo), "handicap");
+  // Veille handicap exploitée (IND 26) : textes et réseaux vérifiés, impact et action propres à la formation.
+  return genVeilleExploitee(o, f || ({ intitule: "" } as FormationInfo), "handicap", typeDepuisOrganisme(o));
 }
 
 // ===== IND 27 — PARTENAIRES, CONTRAT SOUS-TRAITANCE, CHARTE QUALITÉ =====
