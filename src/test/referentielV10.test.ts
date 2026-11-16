@@ -69,3 +69,13 @@ describe("référentiel Qualiopi V9 / V10", () => {
     expect(h).not.toContain(SIG_DIR);
   });
 });
+
+describe("date des pièces V10", () => {
+  it("mise à jour du 02/11/2026, jamais avant la V1 ni après aujourd'hui", async () => {
+    const { dateV10 } = await import("@/lib/referentielV10");
+    const today = new Date(2026, 10, 16);
+    expect(dateV10({ ...ORG_TEST, dateMaj: "2026-06-16" }, today)).toBe("2026-11-02");
+    expect(dateV10({ ...ORG_TEST, dateMaj: "2026-11-10" }, today)).toBe("2026-11-10");
+    expect(dateV10({ ...ORG_TEST, dateMaj: "2026-06-16" }, new Date(2026, 9, 20))).toBe("2026-10-20");
+  });
+});

@@ -28,11 +28,11 @@ const PREFIXE: Record<TypePrestation, string> = { AF: "af", CFA: "cfa", VAE: "va
 const ACTION_REF: Record<TypePrestation, string> = { AF: "OF", CFA: "CFA", VAE: "VAE", BC: "CBC" };
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-/** Date des pièces V10 : application du nouveau référentiel (01/11/2026), jamais avant la V1 ni après aujourd'hui. */
+/** Date des pièces V10 : mise à jour du 02/11/2026 (premier jour ouvré après l'entrée en vigueur du 01/11/2026, dimanche férié), jamais avant la V1 ni après aujourd'hui. */
 export function dateV10(o: OrganismeInfo, today: Date = new Date()): string {
   const maj = v(o.dateMaj).slice(0, 10);
   const auj = iso(today);
-  const d = "2026-11-01" > auj ? auj : "2026-11-01";
+  const d = "2026-11-02" > auj ? auj : "2026-11-02";
   return maj && maj > d ? maj : d;
 }
 
