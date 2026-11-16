@@ -157,7 +157,7 @@ const COLONNES_RISQUES: [string, number][] = [
 
 export function tableauRisquesHTML(rows: string[][]): string {
   const fs = Math.max(9, (getDocStyle().fontSize || 13) - 3);
-  const cell = "padding:5px 4px;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;line-height:1.35;letter-spacing:0;vertical-align:top";
+  const cell = "padding:5px 4px 7px;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;line-height:1.45;letter-spacing:0;vertical-align:top";
   const th = COLONNES_RISQUES.map(([h, w]) => `<th style="width:${w}%;${cell};font-size:${fs - 1}px">${h}</th>`).join("");
   const body = rows.map((r) => `<tr>${r.map((c) => `<td style="${cell};font-size:${fs}px">${c}</td>`).join("")}</tr>`).join("");
   return `<table lang="fr" style="width:100%;table-layout:fixed;font-size:${fs}px"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>`;
