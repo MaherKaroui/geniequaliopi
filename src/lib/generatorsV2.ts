@@ -2,6 +2,7 @@
 import { estCertifiante } from "./formationResolue";
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { renderAttestationReussite } from "./attestationReussiteDesign";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee, htmlWrap, applyGender, getDateSignatureDossier, getDateConvocation, isStagiaireFormationTerminee } from "./docBuilder";
 import { mentionTVA } from "./mentionsLegales";
 import { parseMontant } from "./templatesCA";
@@ -1853,54 +1854,25 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       + `${nonAcquises.length ? ` Non acquises : ${nonAcquises.join(" ; ")}.` : ""}</p>`
     : "";
 
-  const extra = `
-    <div style="width:297mm;height:210mm;box-sizing:border-box;position:relative;padding:16mm 22mm;background:#ffffff;font-family:'Playfair Display', Georgia, serif;">
-      <!-- Bordures ornementales -->
-      <div style="position:absolute;top:8mm;left:8mm;right:8mm;bottom:8mm;border:4px double ${color};pointer-events:none;"></div>
-      <div style="position:absolute;top:11mm;left:11mm;right:11mm;bottom:11mm;border:1px solid ${color};pointer-events:none;opacity:0.6;"></div>
-
-      <!-- En-tête -->
-      <div style="text-align:center;margin-top:2mm">
-        <div style="font-size:10px;letter-spacing:5px;color:${color};font-weight:600;text-transform:uppercase">— ${o.nom.toUpperCase()} —</div>
-        <h1 style="font-size:34px;letter-spacing:5px;color:${color};margin:6px 0 2px;font-weight:700">ATTESTATION</h1>
-        <div style="font-size:16px;letter-spacing:6px;color:${color};margin-bottom:4px">${valide ? "DE RÉUSSITE" : "DE FIN DE FORMATION"}</div>
-        <div style="width:100px;height:2px;background:${color};margin:6px auto 8px"></div>
-        <p style="font-size:12px;color:#555;margin:0">Le présent document atteste que</p>
-      </div>
-
-      <!-- Bénéficiaire -->
-      <div style="text-align:center;margin:4mm 0 3mm">
-        <div style="font-size:26px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
-      </div>
-
-      <!-- Formation -->
-      <div style="text-align:center;font-size:12px;color:#333;line-height:1.5;max-width:235mm;margin:0 auto">
-        <p style="margin:0">${valide ? "a suivi avec succès et validé" : "a suivi"} la formation :</p>
+  const extra = renderAttestationReussite({
+    color,
+    orgName: o.nom.toUpperCase(),
+    titre: valide ? "DE RÉUSSITE" : "DE FIN DE FORMATION",
+    nomComplet,
+    formationHtml: `<p style="margin:0">${valide ? "a suivi avec succès et validé" : "a suivi"} la formation :</p>
         <p style="margin:4px 0;font-size:16px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
         <p style="margin:2px 0"><strong>Nature de l'action :</strong> ${natureActionLabel(f)}</p>
-        <p style="margin:2px 0"><strong>Dates :</strong> du ${debut} au ${fin}${duree ? ` — <strong>Durée :</strong> ${duree}` : ""} — <strong>Modalité :</strong> ${modaliteTexte(f)}</p>
-      </div>
-      <div style="font-size:10.5px;color:#333;line-height:1.4;max-width:235mm;margin:3mm auto 0;text-align:left">
-        ${objectifs.length ? `<p style="margin:4px 0"><strong>Objectifs :</strong> ${objectifs.join(" ; ")}.</p>` : ""}
+        <p style="margin:2px 0"><strong>Dates :</strong> du ${debut} au ${fin}${duree ? ` — <strong>Durée :</strong> ${duree}` : ""} — <strong>Modalité :</strong> ${modaliteTexte(f)}</p>`,
+    detailsHtml: `${objectifs.length ? `<p style="margin:4px 0"><strong>Objectifs :</strong> ${objectifs.join(" ; ")}.</p>` : ""}
         ${resultatsHtml}
-        <p style="margin:4px 0;font-style:italic;color:#666">Attestation délivrée en application de l'article L.6353-1 du Code du travail ; elle peut permettre de renseigner le passeport orientation-formation (art. L.6315-2).</p>
-      </div>
-
-      <!-- Cachet / signature en bas à droite -->
-      <div style="position:absolute;bottom:18mm;right:26mm;text-align:center">
-        <div style="height:70px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+        <p style="margin:4px 0;font-style:italic;color:#666">Attestation délivrée en application de l'article L.6353-1 du Code du travail ; elle peut permettre de renseigner le passeport orientation-formation (art. L.6315-2).</p>`,
+    signatureHtml: `<div style="height:70px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
         <div style="border-top:1px solid #333;padding-top:5px;font-size:11px;min-width:220px">
           <strong>${o.dirigeant || o.nom}</strong><br>
           <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
-        </div>
-      </div>
-
-      <!-- Date en bas à gauche -->
-      <div style="position:absolute;bottom:18mm;left:26mm;font-size:11px;color:#555">
-        Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}
-      </div>
-    </div>
-  `;
+        </div>`,
+    dateHtml: `Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}`,
+  }, `${f.intitule || ""}|${f.dateDebut || ""}|${o.nom || ""}`, `${s.prenom || ""}|${s.nom || ""}|${s.email || ""}`, stagiaireIdx);
 
   // Render standalone in landscape A4 (no header/footer, no title bar)
   return applyGender(htmlWrap(extra, true), s);
