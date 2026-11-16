@@ -11,7 +11,7 @@
  * documents de système qualité, pas des preuves d'exécution.
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, memePersonne } from "./docBuilder";
+import { buildDocument, formatDate, memePersonne, getDocStyle } from "./docBuilder";
 import { dirigeanteFem, estFemme, de } from "./genre";
 import { orgVersionUlterieure } from "./versionUlterieure";
 import { versionReferentiel } from "./typeAudit";
@@ -145,6 +145,24 @@ export function risquesQualite(o: OrganismeInfo, type: TypePrestation): { proces
   }));
 }
 
+/**
+ * Cartographie à 10 colonnes : largeurs fixes (sur les en-têtes, recopiés à chaque page du PDF),
+ * police réduite et retour à la ligne des mots longs, pour que la colonne IND ne soit jamais coupée à droite
+ * et que les lignes restent courtes (plus de risques par page, sans grands blancs).
+ */
+const COLONNES_RISQUES: [string, number][] = [
+  ["Processus", 12], ["Risque", 13], ["Cause principale", 12], ["P", 3.5], ["G", 3.5], ["Criticité", 9],
+  ["Mesure de maîtrise", 19], ["Indicateur de suivi", 12], ["Pilote", 11], ["IND", 5],
+];
+
+export function tableauRisquesHTML(rows: string[][]): string {
+  const fs = Math.max(9, (getDocStyle().fontSize || 13) - 3);
+  const cell = "padding:5px 4px 7px;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;line-height:1.45;letter-spacing:0;vertical-align:top";
+  const th = COLONNES_RISQUES.map(([h, w]) => `<th style="width:${w}%;${cell};font-size:${fs - 1}px">${h}</th>`).join("");
+  const body = rows.map((r) => `<tr>${r.map((c) => `<td style="${cell};font-size:${fs}px">${c}</td>`).join("")}</tr>`).join("");
+  return `<table lang="fr" style="width:100%;table-layout:fixed;font-size:${fs}px"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
 function criticite(p: number, g: number): string {
   const c = p * g;
   return c >= 6 ? `${c} — élevé` : c >= 3 ? `${c} — modéré` : `${c} — faible`;
@@ -186,8 +204,7 @@ export function genAnalyseRisquesQualite(oDossier: OrganismeInfo, type: TypePres
       { heading: "Objet", content: `<p>Depuis le décret n° 2026-728 du 1er août 2026 (en vigueur le 1er novembre 2026), l'indicateur 32 impose, en plus de la démarche d'amélioration continue fondée sur les appréciations et les réclamations, <strong>une analyse des risques sur la qualité des ${type === "AF" || type === "CFA" ? "formations" : "prestations"} délivrées</strong>. Ce document présente la méthode retenue par ${o.nom} et la cartographie des risques de son activité ${de(L.prestation)}.</p>` },
       { heading: "Méthode", content: `<ul><li><strong>Identification</strong> des risques par processus (de l'information du public au recueil des appréciations).</li><li><strong>Cotation</strong> : probabilité (P) et gravité (G) de 1 à 3 ; criticité = P × G (1-2 faible, 3-4 modéré, 6-9 élevé).</li><li><strong>Maîtrise</strong> : une mesure, un indicateur de suivi et un pilote par risque ; tout risque « élevé » donne lieu à une action inscrite au tableau d'amélioration continue.</li><li><strong>Revue</strong> : au moins une fois par an, et après toute réclamation, tout incident ou toute évolution réglementaire ; la revue est tracée dans le tableau d'amélioration continue.</li></ul>` },
     ],
-    table: { headers: ["Processus", "Risque", "Cause principale", "P", "G", "Criticité", "Mesure de maîtrise", "Indicateur de suivi", "Pilote", "IND"], rows },
-    extraHtml: `${incidents.length
+    extraHtml: `${tableauRisquesHTML(rows)}${incidents.length
       ? `<h2>Événements réels pris en compte</h2><ul>${incidents.map((i) => `<li><strong>${i.ref} — ${i.date}</strong> : ${i.desc} (cause : ${i.causes}). Risque « Défaillance technique » confirmé ; mesure appliquée : ${i.action} ; clôturé le ${i.cloture} (suivi des dysfonctionnements, IND 31).</li>`).join("")}</ul>`
       : "<p>Aucun incident ni réclamation enregistré à la date de la cartographie.</p>"}<p style="margin-top:10px">Cartographie établie le ${dateSysteme(o)} (V${o.version || "1"}). Prochaine revue : au plus tard 12 mois après cette date, ou dès qu'un événement la justifie.</p>`,
     signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite], dates: [dateSysteme(o), dateSysteme(o)] },
