@@ -61,7 +61,7 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
       <div style="position:absolute;top:18mm;left:0;width:30mm;text-align:center;color:#ffffff;font-family:'Montserrat', Arial, sans-serif;font-size:26px;font-weight:700;letter-spacing:2px">${initiales(p.orgName)}</div>
       <div style="position:absolute;top:8mm;right:8mm;bottom:8mm;left:40mm;border:1px solid ${p.color};opacity:0.35;"></div>
       <div style="font-family:'Montserrat', Arial, sans-serif;font-size:10px;letter-spacing:4px;color:${accent};font-weight:600;text-transform:uppercase">${p.orgName}</div>
-      <h1 style="font-family:'Montserrat', Arial, sans-serif;font-size:32px;letter-spacing:3px;color:${p.color};margin:6px 0 0;font-weight:700">ATTESTATION <span style="font-weight:400">${p.titre}</span></h1>
+      <div style="border:none;padding:0;font-family:'Montserrat', Arial, sans-serif;font-size:32px;letter-spacing:3px;color:${p.color};margin:6px 0 0;font-weight:700">ATTESTATION <span style="font-weight:400">${p.titre}</span></div>
       <div style="width:70px;height:3px;background:${accent};margin:8px 0 8px"></div>
       <p style="font-size:12px;color:#555;margin:0">${intro}</p>
       <div style="margin:3mm 0 2mm;font-size:25px;color:#111;font-weight:700">${p.nomComplet}</div>
@@ -76,7 +76,7 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
     <div style="${PAGE}font-family:'Libre Baskerville', Georgia, serif;">
       <div style="background:${p.color};color:#ffffff;text-align:center;padding:9mm 20mm 7mm">
         <div style="font-size:10px;letter-spacing:5px;opacity:0.9;text-transform:uppercase">${p.orgName}</div>
-        <h1 style="font-size:30px;letter-spacing:6px;margin:4px 0 2px;font-weight:700;color:#ffffff">ATTESTATION</h1>
+        <div style="border:none;padding:0;font-size:30px;letter-spacing:6px;margin:4px 0 2px;font-weight:700;color:#ffffff">ATTESTATION</div>
         <div style="font-size:14px;letter-spacing:6px">${p.titre}</div>
       </div>
       <div style="height:2mm;background:${accent}"></div>
@@ -103,7 +103,7 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
       ${c(`bottom:6mm;right:6mm;border-bottom:4px solid ${p.color};border-right:4px solid ${p.color};`)}
       <div style="text-align:center">
         <div style="font-size:12px;letter-spacing:4px;color:${accent};font-weight:700;text-transform:uppercase">${p.orgName}</div>
-        <h1 style="font-size:40px;letter-spacing:4px;color:${p.color};margin:2px 0 0;font-weight:700">Attestation</h1>
+        <div style="border:none;padding:0;font-size:40px;letter-spacing:4px;color:${p.color};margin:2px 0 0;font-weight:700">Attestation</div>
         <div style="font-size:17px;letter-spacing:5px;color:${accent};font-style:italic">${p.titre.toLowerCase()}</div>
         <div style="margin:5px auto 6px;color:${accent};font-size:14px;letter-spacing:8px">◆ ◆ ◆</div>
         <p style="font-size:14px;color:#555;margin:0;font-style:italic">${intro}</p>
@@ -126,7 +126,7 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
       <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
         <div style="width:6px;height:46px;background:${accent}"></div>
         <div>
-          <h1 style="font-size:34px;letter-spacing:2px;color:#111;margin:0;font-weight:700;font-family:'Montserrat', Arial, sans-serif">ATTESTATION</h1>
+          <div style="border:none;padding:0;font-size:34px;letter-spacing:2px;color:#111;margin:0;font-weight:700;font-family:'Montserrat', Arial, sans-serif">ATTESTATION</div>
           <div style="font-size:14px;letter-spacing:5px;color:${p.color};font-weight:600">${p.titre}</div>
         </div>
       </div>
@@ -145,14 +145,14 @@ export const ATTESTATION_VARIANTS: AttestationVariant[] = [
       <div style="position:absolute;top:12mm;left:12mm;right:12mm;bottom:12mm;border:1px dashed ${accent};border-radius:4mm;opacity:0.7;"></div>
       <div style="text-align:center">
         <div style="font-size:11px;letter-spacing:5px;color:${p.color};font-weight:600;text-transform:uppercase">${p.orgName}</div>
-        <h1 style="font-size:36px;letter-spacing:7px;color:${p.color};margin:4px 0 0;font-weight:700">ATTESTATION</h1>
+        <div style="border:none;padding:0;font-size:36px;letter-spacing:7px;color:${p.color};margin:4px 0 0;font-weight:700">ATTESTATION</div>
         <div style="font-size:15px;letter-spacing:6px;color:${accent};font-weight:600">${p.titre}</div>
         <p style="font-size:13px;color:#555;margin:6px 0 0">${intro}</p>
       </div>
       <div style="text-align:center;margin:3mm 0 2mm;font-size:28px;color:#111;font-weight:700;letter-spacing:1px">${p.nomComplet}</div>
       <div style="text-align:center;font-size:12.5px;color:#333;line-height:1.5;max-width:235mm;margin:0 auto">${p.formationHtml}</div>
       <div style="font-size:11px;color:#333;line-height:1.4;max-width:235mm;margin:3mm auto 0">${p.detailsHtml}</div>
-      <div style="position:absolute;bottom:16mm;left:135mm;width:27mm;height:27mm;border-radius:50%;border:3px double ${accent};display:flex;align-items:center;justify-content:center;text-align:center;color:${accent};font-weight:700;font-size:15px;letter-spacing:2px;line-height:1.2">${initiales(p.orgName)}<br><span style="font-size:9px">★ ★ ★</span></div>
+      <div style="position:absolute;bottom:16mm;left:135mm;width:27mm;height:27mm;border-radius:50%;border:3px double ${accent};display:flex;align-items:center;justify-content:center;text-align:center;color:${accent};font-weight:700;font-size:15px;letter-spacing:2px;line-height:1.2"><div>${initiales(p.orgName)}<div style="font-size:9px;margin-top:2px">★ ★ ★</div></div></div>
       ${bottom(p)}
     </div>`,
   },
