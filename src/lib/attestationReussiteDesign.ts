@@ -164,16 +164,19 @@ function hash(str: string): number {
   return h >>> 0;
 }
 
-/** Choix déterministe : même stagiaire + même formation → même modèle ; stagiaires voisins → modèles différents. */
-export function choisirDesignAttestation(cle: string, rang = 0) {
-  const h = hash(cle);
-  const variant = ATTESTATION_VARIANTS[(h + rang) % ATTESTATION_VARIANTS.length];
-  const accent = ACCENTS[(h >>> 8) % ACCENTS.length];
-  const intro = INTROS[(h >>> 16) % INTROS.length];
+/**
+ * Choix déterministe : le modèle de départ dépend de la session, puis chaque stagiaire avance d'un cran
+ * (deux stagiaires voisins n'ont jamais le même modèle) ; couleur d'accent et formule selon le stagiaire.
+ */
+export function choisirDesignAttestation(cleSession: string, cleStagiaire: string, rang = 0) {
+  const hs = hash(cleSession), hp = hash(cleStagiaire);
+  const variant = ATTESTATION_VARIANTS[(hs + rang) % ATTESTATION_VARIANTS.length];
+  const accent = ACCENTS[(hp >>> 3) % ACCENTS.length];
+  const intro = INTROS[(hp >>> 11) % INTROS.length];
   return { variant, accent, intro };
 }
 
-export function renderAttestationReussite(p: AttestationPieces, cle: string, rang = 0): string {
-  const { variant, accent, intro } = choisirDesignAttestation(cle, rang);
+export function renderAttestationReussite(p: AttestationPieces, cleSession: string, cleStagiaire: string, rang = 0): string {
+  const { variant, accent, intro } = choisirDesignAttestation(cleSession, cleStagiaire, rang);
   return `<!-- design:${variant.id} -->` + variant.render(p, intro, accent);
 }

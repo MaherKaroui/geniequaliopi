@@ -1872,7 +1872,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
           <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
         </div>`,
     dateHtml: `Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}`,
-  }, `${s.prenom || ""}|${s.nom || ""}|${f.intitule || ""}|${fin}`, stagiaireIdx);
+  }, `${f.intitule || ""}|${f.dateDebut || ""}|${o.nom || ""}`, `${s.prenom || ""}|${s.nom || ""}|${s.email || ""}`, stagiaireIdx);
 
   // Render standalone in landscape A4 (no header/footer, no title bar)
   return applyGender(htmlWrap(extra, true), s);
