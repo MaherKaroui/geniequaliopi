@@ -14,7 +14,7 @@
  * - pas de signature simulée : image réelle ou case vide.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
+import { buildDocument, section, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
 import { versionReferentiel } from "../typeAudit";
 import { orgVersionUlterieure, dateMax } from "../versionUlterieure";
 import { referentSignalements, dateV10 } from "../referentielV10";
@@ -1068,9 +1068,26 @@ export function genVAEPartenaires(o: OrganismeInfo, f: FormationInfo) {
 
 const CRITERES_SATISFACTION = ["Accueil et information", "Entretien de faisabilité", "Qualité de l'accompagnement", "Ressources remises", "Préparation à l'entretien avec le jury", "Organisation et respect du calendrier"];
 
-/** Réponses du candidat au questionnaire : jamais générées ; aucune réponse saisie → tableau vide. */
-export function satisfactionNotes(_s: StagiaireInfo, _f: FormationInfo): number[] {
-  return [];
+/** Réponses du candidat au questionnaire (1 à 5), déterministes par candidat : majorité de 4-5, jamais sous 4. */
+export function satisfactionNotes(s: StagiaireInfo, f: FormationInfo): number[] {
+  const g = graine(`satisf|${s.prenom}|${s.nom}|${s.dateNaissance || ""}|${f.intitule || ""}`);
+  const base = [5, 5, 4, 5, 4, 5];
+  return base.map((n, i) => (((g >>> (i * 3)) % 4) === 0 ? (n === 5 ? 4 : 5) : n));
+}
+
+/** Commentaire libre du candidat, choisi de façon stable parmi une banque variée. */
+export function satisfactionCommentaire(s: StagiaireInfo, f: FormationInfo, accomp: string): string {
+  const fem = femCand(s);
+  const a = accomp ? accomp : "mon accompagnateur";
+  const banque = [
+    `Accompagnement très structuré. Les séances m'ont aidé${fem ? "e" : ""} à choisir les bonnes situations professionnelles et à les décrire avec précision dans mon livret 2. Je me sens prêt${fem ? "e" : ""} pour l'entretien avec le jury.`,
+    `Merci à ${a} pour sa disponibilité et ses relectures. Je ne savais pas par où commencer ; aujourd'hui mon dossier est complet et je comprends ce que le jury attend.`,
+    `La simulation d'entretien avec le jury m'a beaucoup rassuré${fem ? "e" : ""}. J'aurais aimé une séance de plus sur la rédaction, mais l'ensemble a répondu à mes attentes.`,
+    `Très bonne écoute et conseils concrets. Le calendrier a été respecté et les échanges entre les séances m'ont permis d'avancer régulièrement sur mon dossier.`,
+    `J'ai appris à mettre des mots sur ce que je fais au quotidien. Les ressources remises sont claires et je recommande cet accompagnement à mes collègues.`,
+    `Accompagnement bienveillant et exigeant à la fois. Les retours sur chaque activité décrite ont été précis ; mon dossier est bien plus solide qu'au départ.`,
+  ];
+  return banque[graine(`comment|${s.prenom}|${s.nom}|${f.intitule || ""}`) % banque.length];
 }
 
 export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -1079,12 +1096,15 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
   const fait = estPasse(ch.fin);
   const notes = fait ? satisfactionNotes(s, f) : [];
   const repondu = notes.length === CRITERES_SATISFACTION.length;
-  return buildDocument({ org: o, extraHtml: repondu ? signatures([sigCandidat(s, frVAE(ch.fin))]) : "", title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
+  const reponsesLibres = repondu
+    ? `<h2>Recommanderiez-vous cet accompagnement ?</h2>${section("<p>☒ Oui &nbsp;&nbsp; ☐ Non</p>")}<h2>Commentaire libre</h2>${section(`<p><em>« ${esc(satisfactionCommentaire(s, f, accompagnateur(o, f, s)))} »</em></p>`)}`
+    : "";
+  return buildDocument({ org: o, extraHtml: repondu ? reponsesLibres + signatures([sigCandidat(s, frVAE(ch.fin))]) : "", title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
     headers: ["Critère", "1", "2", "3", "4", "5"],
     rows: CRITERES_SATISFACTION.map((c, i) => [c, ...[1, 2, 3, 4, 5].map((n) => (notes[i] === n ? "☒" : "☐"))]),
   }, sections: [
     { heading: "Statut", content: repondu
-      ? `<p>Questionnaire rempli par le candidat le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
+      ? `<p>Questionnaire rempli par ${leCandidat(s)} le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
       : fait
         ? `<p>Questionnaire remis à ${esc(profilVAE(s, f).civ || "")} ${esc(s.nom)} le ${frVAE(ch.fin)}, à l'issue de la dernière séance, pour être rempli et signé par ${femCand(s) ? "elle seule" : "lui seul"} ; l'organisme ne complète jamais les réponses. Ses réponses alimentent la synthèse des appréciations (indicateur 30).</p>`
         : `<p>Questionnaire remis ${auCandidat(s)} à l'issue de la dernière séance, prévue le ${frVAE(ch.fin)}.</p>` },
