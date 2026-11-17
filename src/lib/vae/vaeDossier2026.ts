@@ -1105,7 +1105,7 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
       { heading: "Commentaire libre", content: `<p><em>« ${esc(satisfactionCommentaire(s, f, accompagnateur(o, f, s)))} »</em></p>` },
     ] : []),
     { heading: "Statut", content: repondu
-      ? `<p>Questionnaire rempli par le candidat le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
+      ? `<p>Questionnaire rempli par ${leCandidat(s)} le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
       : fait
         ? `<p>Questionnaire remis à ${esc(profilVAE(s, f).civ || "")} ${esc(s.nom)} le ${frVAE(ch.fin)}, à l'issue de la dernière séance, pour être rempli et signé par ${femCand(s) ? "elle seule" : "lui seul"} ; l'organisme ne complète jamais les réponses. Ses réponses alimentent la synthèse des appréciations (indicateur 30).</p>`
         : `<p>Questionnaire remis ${auCandidat(s)} à l'issue de la dernière séance, prévue le ${frVAE(ch.fin)}.</p>` },
