@@ -14,7 +14,7 @@
  * - pas de signature simulée : image réelle ou case vide.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
+import { buildDocument, section, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
 import { versionReferentiel } from "../typeAudit";
 import { orgVersionUlterieure, dateMax } from "../versionUlterieure";
 import { referentSignalements, dateV10 } from "../referentielV10";
@@ -1096,14 +1096,13 @@ export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaire
   const fait = estPasse(ch.fin);
   const notes = fait ? satisfactionNotes(s, f) : [];
   const repondu = notes.length === CRITERES_SATISFACTION.length;
-  return buildDocument({ org: o, extraHtml: repondu ? signatures([sigCandidat(s, frVAE(ch.fin))]) : "", title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
+  const reponsesLibres = repondu
+    ? `<h2>Recommanderiez-vous cet accompagnement ?</h2>${section("<p>☒ Oui &nbsp;&nbsp; ☐ Non</p>")}<h2>Commentaire libre</h2>${section(`<p><em>« ${esc(satisfactionCommentaire(s, f, accompagnateur(o, f, s)))} »</em></p>`)}`
+    : "";
+  return buildDocument({ org: o, extraHtml: repondu ? reponsesLibres + signatures([sigCandidat(s, frVAE(ch.fin))]) : "", title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${esc(s.prenom)} ${esc(s.nom)}`, table: {
     headers: ["Critère", "1", "2", "3", "4", "5"],
     rows: CRITERES_SATISFACTION.map((c, i) => [c, ...[1, 2, 3, 4, 5].map((n) => (notes[i] === n ? "☒" : "☐"))]),
   }, sections: [
-    ...(repondu ? [
-      { heading: "Recommanderiez-vous cet accompagnement ?", content: `<p>☒ Oui &nbsp;&nbsp; ☐ Non</p>` },
-      { heading: "Commentaire libre", content: `<p><em>« ${esc(satisfactionCommentaire(s, f, accompagnateur(o, f, s)))} »</em></p>` },
-    ] : []),
     { heading: "Statut", content: repondu
       ? `<p>Questionnaire rempli par ${leCandidat(s)} le ${frVAE(ch.fin)} à l'issue de la dernière séance. Moyenne : ${(notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1).replace(".", ",")}/5.</p>`
       : fait
