@@ -25,3 +25,16 @@ describe("VAE — questionnaire de satisfaction", () => {
     expect(html).not.toContain("Commentaire libre");
   });
 });
+
+describe("VAE — questionnaire visible sans candidat", () => {
+  it("le catalogue VAE garde un questionnaire vierge quand aucun candidat n'est saisi", async () => {
+    const { buildFullCatalog } = await import("@/lib/docCatalog");
+    const cat = buildFullCatalog([f], [], [], ["vae"] as never, "Paul MARTIN");
+    expect(cat.some((d) => d.template === "vae_satisfaction")).toBe(true);
+  });
+  it("sans candidat, le questionnaire est vierge (rien de coché)", () => {
+    const html = genVAESatisfaction(o, f, [], 0);
+    expect(html).toContain("Commentaire libre");
+    expect(html).not.toContain("☒");
+  });
+});

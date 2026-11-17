@@ -1092,6 +1092,15 @@ export function satisfactionCommentaire(s: StagiaireInfo, f: FormationInfo, acco
 
 export function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = cand(stagiaires, si);
+  // Aucun candidat saisi : questionnaire vierge, prêt à être remis (rien n'est coché ni rédigé).
+  if (!(s.nom || "").trim()) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION – FIN D'ACCOMPAGNEMENT VAE", subtitle: esc(f.intitule || ""), table: {
+      headers: ["Critère", "1", "2", "3", "4", "5"],
+      rows: CRITERES_SATISFACTION.map((c) => [c, "☐", "☐", "☐", "☐", "☐"]),
+    }, sections: [
+      { heading: "Consigne", content: `<p>Questionnaire remis au candidat à l'issue de la dernière séance d'accompagnement. Échelle de 1 (très insatisfait) à 5 (très satisfait).</p>` },
+    ], extraHtml: `<h2>Recommanderiez-vous cet accompagnement ?</h2>${section("<p>☐ Oui &nbsp;&nbsp; ☐ Non</p>")}<h2>Commentaire libre</h2>${section("<p>……………………………………………………………………………………………………</p><p>……………………………………………………………………………………………………</p>")}` });
+  }
   const ch = chronoVAE(s, f, o);
   const fait = estPasse(ch.fin);
   const notes = fait ? satisfactionNotes(s, f) : [];

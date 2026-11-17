@@ -1512,6 +1512,8 @@ export function buildFullCatalog(
 
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
     per("vae_c7i30_satisfaction", "CT7 - IND 30 Questionnaire de satisfaction", 7, 30, "vae_satisfaction");
+    // Sans candidat saisi : le questionnaire reste visible, en version vierge.
+    if (!stagiaires.length) add("vae_c7i30_satisfaction_vierge", "CT7 - IND 30 Questionnaire de satisfaction (vierge)", 7, 30, "vae_satisfaction");
     add("vae_c7i30_synthese_satisfaction", "CT7 - IND 30 Synthèse des appréciations", 7, 30, "vae_synthese_satisfaction");
     add("vae_c7i30_parties_prenantes", "CT7 - IND 30 Appréciations employeurs, financeurs, accompagnateurs", 7, 30, "vae_appreciations_parties_prenantes");
     add("vae_c7i30_tableau_relance_excel", "CT7 - IND 30 Tableau de relance", 7, 30, "relances_appreciations_excel");
