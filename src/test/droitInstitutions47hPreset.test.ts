@@ -128,7 +128,8 @@ describe("Enseignement : fondamentaux du droit et des institutions — formation
     ]) expect(isDRI47Formation(v), v).toBe(false);
     expect(isDRI47Formation(undefined)).toBe(false);
     for (const is of AUTRES) expect(is(FORMATION_DRI47.intitule, ""), is.name).toBe(false);
-    const autresExemples = SAMPLE_FORMATIONS.filter(f => f.intitule !== FORMATION_DRI47.intitule);
+    // La variante 21 h « Initiation au droit et aux institutions politiques » partage volontairement les contenus.
+    const autresExemples = SAMPLE_FORMATIONS.filter(f => f.intitule !== FORMATION_DRI47.intitule && f.intitule !== "Initiation au droit et aux institutions politiques");
     expect(autresExemples.filter(f => isDRI47Formation(f.intitule, f.codeRNCP)).map(f => f.intitule)).toEqual([]);
     expect(SAMPLE_FORMATIONS.filter(f => f.intitule === FORMATION_DRI47.intitule)).toHaveLength(1);
   });
@@ -221,13 +222,13 @@ describe("Enseignement : fondamentaux du droit et des institutions — formation
     expect(pickDRI47ExerciceAnswer("Droit du travail", "", 0, 0, noms[0], "C1")).toBeNull();
   });
 
-  it("évaluation des besoins : réponses propres à chaque stagiaire, 47 heures en classe virtuelle", () => {
+  it("évaluation des besoins : réponses propres à chaque stagiaire, sans durée en dur (variantes 47 h et 21 h)", () => {
     const besoins = noms.map((s, i) => getDRI47EvalBesoins(s, true, i));
     expect(new Set(besoins.map(b => b.objectif)).size).toBe(12);
     expect(new Set(besoins.map(b => b.attentes)).size).toBe(12);
     expect(new Set(besoins.map(b => b.diplome)).size).toBe(12);
     expect(besoins.every(b => !/\{|\}/.test(Object.values(b).join(" ")))).toBe(true);
-    expect(besoins.every(b => /47 heures/.test(b.disponibilites))).toBe(true);
+    expect(besoins.every(b => /heures prévues|heures de classe virtuelle|durée de la formation|heures de formation/.test(b.disponibilites) && !/\d+ heures/.test(b.disponibilites))).toBe(true);
     const besoinsPrincipaux = noms.map((s, i) => getDRI47Besoin(s.nom, s.prenom, s.civilite, i));
     expect(new Set(besoinsPrincipaux).size).toBe(12);
     expect(besoinsPrincipaux.every(b => b.length > 20 && !/\{|\}/.test(b))).toBe(true);

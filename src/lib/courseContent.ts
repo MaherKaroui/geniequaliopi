@@ -498,8 +498,8 @@ import { isANG40Formation } from "./anglaisPro40hHumanized";
 import { getCohesionEquipe21hChapters } from "./courseContentCohesionEquipe21h";
 import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
 import { COH21_VIDEOS } from "./cohesionEquipe21hPreset";
-import { getDroitInstitutions47hChapters } from "./courseContentDroitInstitutions47h";
-import { isDRI47Formation } from "./droitInstitutions47hHumanized";
+import { getDroitInstitutions47hChapters, getDroitInstitutions21hChapters } from "./courseContentDroitInstitutions47h";
+import { isDRI47Formation, isDRI21Formation } from "./droitInstitutions47hHumanized";
 import { DRI47_VIDEOS } from "./droitInstitutions47hPreset";
 import { getFPA45hChapters } from "./courseContentFPA45h";
 import { isFPA45Formation } from "./fpa45hHumanized";
@@ -569,6 +569,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) : support propre, avant les règles « management » / « entreprise »
   if (isCOH21Formation(formationIntitule)) return getCohesionEquipe21hChapters();
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) : support propre, avant les règles « droit » / « enseignement »
+  if (isDRI21Formation(formationIntitule)) return getDroitInstitutions21hChapters();
   if (isDRI47Formation(formationIntitule)) return getDroitInstitutions47hChapters();
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : support propre, avant les règles « formateur » / « enseignement »
   if (isFPA45Formation(formationIntitule)) return getFPA45hChapters();

@@ -21,13 +21,21 @@ const normalize = (s?: string) =>
 /**
  * Vrai pour la formation exemple « Enseignement : fondamentaux du droit et des institutions ».
  * Reconnue par son intitulé seulement : « fondamentaux du droit », « droit et des institutions »,
- * « droit et institutions » (accents, apostrophes et casse indifférents).
+ * « droit et institutions », « droit et aux institutions » (variante 21 h, voir isDRI21Formation)
+ * (accents, apostrophes et casse indifférents).
  * À tester AVANT les règles génériques (« droit », « enseignement »…).
  */
 export function isDRI47Formation(intitule?: string, code?: string): boolean {
   void code;
   const t = normalize(intitule).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z0-9']+/g, " ").trim();
-  return /\bfondamentaux du droit\b/.test(t) || /\bdroit et (des )?institutions\b/.test(t);
+  return /\bfondamentaux du droit\b/.test(t) || /\bdroit et (des |aux )?institutions\b/.test(t);
+}
+
+/** Vrai pour la variante 21 h « Initiation au droit et aux institutions politiques » (mêmes contenus, support adapté). */
+export function isDRI21Formation(intitule?: string, code?: string): boolean {
+  void code;
+  const t = normalize(intitule).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z0-9']+/g, " ").trim();
+  return /\binitiation au droit\b/.test(t) && /\binstitutions\b/.test(t);
 }
 
 /** Empreinte déterministe et bien répartie à partir du nom + prénom. */
@@ -843,16 +851,16 @@ const BESOINS_HANDICAP = [
 ];
 
 const BESOINS_DISPOS = [
-  "Je suis disponible pour suivre les <strong>47 heures</strong> de classe virtuelle aux horaires fixés, depuis mon domicile, avec une connexion stable.",
-  "Je bloque les créneaux des classes virtuelles dans mon agenda pour suivre l'intégralité des <strong>47 heures</strong> ; je me connecte depuis un bureau au calme.",
-  "Je peux suivre toutes les séances en classe virtuelle (Google Meet / Zoom) sur la période de la formation, soit <strong>47 heures</strong>.",
-  "Je suis disponible sur toute la période de la formation pour les <strong>47 heures</strong> de classe virtuelle, sans contrainte particulière.",
-  "J'ai posé des congés pour suivre l'ensemble des <strong>47 heures</strong> de classe virtuelle dans de bonnes conditions.",
-  "Disponibilité complète pour les <strong>47 heures</strong> de formation à distance. J'ai testé ma connexion et mon micro avant la première séance.",
-  "Je suivrai les <strong>47 heures</strong> de classe virtuelle depuis mon domicile et je prévois un temps de relecture des supports entre les séances.",
-  "Je suis disponible pour toutes les séances à distance ; mon employeur a validé mon absence de poste pendant les <strong>47 heures</strong> de formation.",
-  "Les créneaux de classe virtuelle me conviennent : je suivrai l'intégralité des <strong>47 heures</strong> et je consulterai les ressources en ligne entre les séances.",
-  "Aucune contrainte sur les horaires des classes virtuelles ; je suivrai les <strong>47 heures</strong> depuis un ordinateur équipé d'une webcam et d'un micro.",
+  "Je suis disponible pour suivre les <strong>heures prévues</strong> de classe virtuelle aux horaires fixés, depuis mon domicile, avec une connexion stable.",
+  "Je bloque les créneaux des classes virtuelles dans mon agenda pour suivre l'intégralité des <strong>heures prévues</strong> ; je me connecte depuis un bureau au calme.",
+  "Je peux suivre toutes les séances en classe virtuelle (Google Meet / Zoom) sur toute la <strong>durée de la formation</strong>.",
+  "Je suis disponible sur toute la période de la formation pour les <strong>heures prévues</strong> de classe virtuelle, sans contrainte particulière.",
+  "J'ai posé des congés pour suivre l'ensemble des <strong>heures prévues</strong> de classe virtuelle dans de bonnes conditions.",
+  "Disponibilité complète pour les <strong>heures prévues</strong> de formation à distance. J'ai testé ma connexion et mon micro avant la première séance.",
+  "Je suivrai les <strong>heures prévues</strong> de classe virtuelle depuis mon domicile et je prévois un temps de relecture des supports entre les séances.",
+  "Je suis disponible pour toutes les séances à distance ; mon employeur a validé mon absence de poste pendant les <strong>heures prévues</strong> de formation.",
+  "Les créneaux de classe virtuelle me conviennent : je suivrai l'intégralité des <strong>heures prévues</strong> et je consulterai les ressources en ligne entre les séances.",
+  "Aucune contrainte sur les horaires des classes virtuelles ; je suivrai les <strong>heures prévues</strong> depuis un ordinateur équipé d'une webcam et d'un micro.",
 ];
 
 /** Réponses d'évaluation des besoins propres à la formation, différentes pour chaque stagiaire. */

@@ -205,8 +205,8 @@ import { FORMATION_ANG40 } from "./anglaisPro40hPreset";
 export { FORMATION_ANG40, seedANG40AICaches } from "./anglaisPro40hPreset";
 import { FORMATION_COH21 } from "./cohesionEquipe21hPreset";
 export { FORMATION_COH21, seedCOH21AICaches } from "./cohesionEquipe21hPreset";
-import { FORMATION_DRI47 } from "./droitInstitutions47hPreset";
-export { FORMATION_DRI47, seedDRI47AICaches } from "./droitInstitutions47hPreset";
+import { FORMATION_DRI47, FORMATION_DRI21 } from "./droitInstitutions47hPreset";
+export { FORMATION_DRI47, FORMATION_DRI21, seedDRI47AICaches } from "./droitInstitutions47hPreset";
 import { FORMATION_FPA45 } from "./fpa45hPreset";
 export { FORMATION_FPA45, seedFPA45AICaches } from "./fpa45hPreset";
 import { FORMATION_LRB } from "./robertRS7013Preset";
@@ -580,6 +580,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_COH21,
   // Enseignement : fondamentaux du droit et des institutions (non certifiante, 47 h à distance, C1 à C6) : contenus pré-remplis (droitInstitutions47hPreset), aucun stagiaire importé
   FORMATION_DRI47,
+  // Initiation au droit et aux institutions politiques (non certifiante, 21 h à distance, C1 à C6) : mêmes contenus que la 47 h, support adapté à 6 demi-journées
+  FORMATION_DRI21,
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275, 45 h à distance, C1 à C6) : contenus pré-remplis (fpa45hPreset), aucun stagiaire importé
   FORMATION_FPA45,
   // Préparation à la Certification en langue française Le Robert (RS7013, 21 h à distance, C1 et C2) : contenus pré-remplis (robertRS7013Preset), aucun stagiaire importé

@@ -58,6 +58,56 @@ export const FORMATION_DRI47: FormationInfo = {
 };
 
 // ---------------------------------------------------------------------------
+// Variante 21 h : « Initiation au droit et aux institutions politiques »
+// (contrat de formation et BPF 2025 de SPACE CONSEILS). Mêmes compétences C1 à C6 et mêmes contenus
+// (QCM, mises en situation, support de cours, veilles) que la formation 47 h, en 6 modules de 3 h 30
+// sur 3 jours de 7 h (une demi-journée par module).
+// ---------------------------------------------------------------------------
+export const DRI21_INTITULE = "Initiation au droit et aux institutions politiques";
+
+/** Les 6 modules de la variante 21 h : jour et demi-journée de chacun (09h00 – 12h30 / 13h30 – 17h00). */
+export const DRI21_MODULES = [
+  { n: 1, c: "C1", jour: 1, creneau: "09h00 – 12h30", titre: "Fondements du droit, sources et hiérarchie des normes" },
+  { n: 2, c: "C2", jour: 1, creneau: "13h30 – 17h00", titre: "Les branches du droit" },
+  { n: 3, c: "C3", jour: 2, creneau: "09h00 – 12h30", titre: "La Constitution de la Ve République, la séparation des pouvoirs et les institutions de l'État" },
+  { n: 4, c: "C4", jour: 2, creneau: "13h30 – 17h00", titre: "Institutions politiques et territoriales, citoyenneté et libertés fondamentales" },
+  { n: 5, c: "C5", jour: 3, creneau: "09h00 – 12h30", titre: "Ordre juridique interne, droit de l'Union européenne et traités internationaux" },
+  { n: 6, c: "C6", jour: 3, creneau: "13h30 – 17h00", titre: "Les juridictions judiciaires et administratives" },
+] as const;
+
+export const FORMATION_DRI21: FormationInfo = {
+  intitule: DRI21_INTITULE,
+  codeRNCP: "",
+  objectifs:
+    "Formation professionnelle non certifiante. Objectif général : acquérir les bases du système juridique et des institutions politiques françaises, pour comprendre d'où vient une règle, qui la fait, qui l'applique et devant quel juge la contester.\nÀ l'issue de la formation, le stagiaire sera capable de :\n- C1 — Identifier les fondements, les sources et la hiérarchie des normes du système juridique français.\n- C2 — Distinguer les différentes branches du droit (public, privé, constitutionnel, administratif) et leurs champs d'application respectifs.\n- C3 — Analyser l'organisation constitutionnelle de la Ve République et le principe de séparation des pouvoirs.\n- C4 — Caractériser les compétences et le fonctionnement des principales institutions politiques françaises (Présidence, Gouvernement, Parlement, Conseil constitutionnel).\n- C5 — Comprendre l'articulation entre l'ordre juridique interne, le droit de l'Union européenne et les traités internationaux.\n- C6 — Repérer les compétences des juridictions judiciaires et administratives pour orienter une démarche juridique élémentaire.",
+  prerequis:
+    "Aucun prérequis juridique spécifique. Maîtrise de la langue française à l'écrit et à l'oral (niveau B2 minimum recommandé). Intérêt pour les questions civiques, institutionnelles ou de gouvernance publique.",
+  duree: "21 heures (3 jours de 7 heures)",
+  dureeSaisiePrioritaire: true,
+  modalites: "distanciel",
+  tarif: "1 000 € (TVA non applicable, art. 261-4-4° a du CGI)",
+  programme:
+    "Module 1 — Fondements du droit, sources et hiérarchie des normes (C1, 3 h 30) : QCM de positionnement ; notion de règle de droit, droit objectif et droits subjectifs ; sources du droit (Constitution, traités, loi, règlement, jurisprudence, coutume, doctrine) ; pyramide de Kelsen et bloc de constitutionnalité ; domaine de la loi et du règlement (articles 34 et 37) ; publication au Journal officiel, entrée en vigueur, non-rétroactivité ; recherche sur Légifrance ; mises en situation 1 et 2 ; QCM C1.\n" +
+    "Module 2 — Les branches du droit (C2, 3 h 30) : droit public (constitutionnel, administratif, finances publiques, fiscal) et droit privé (civil, commercial, travail), droit pénal ; droit de l'Union européenne et droit international ; personnes physiques et morales ; contrat, responsabilité civile et preuve ; mises en situation 3 et 4 ; QCM C2.\n" +
+    "Module 3 — La Constitution de la Ve République, la séparation des pouvoirs et les institutions de l'État (C3, 3 h 30) : genèse de 1958, séparation des pouvoirs, régime parlementaire rationalisé ; Président de la République (articles 5, 8, 11, 12, 16, 19), Gouvernement (articles 20, 21, 49), Parlement (Assemblée nationale et Sénat, navette, commission mixte paritaire), cohabitation ; Conseil constitutionnel, contrôle a priori et question prioritaire de constitutionnalité ; révision de la Constitution (article 89) ; mises en situation 5 et 6 ; QCM C3 ; cas pratique intermédiaire.\n" +
+    "Module 4 — Institutions politiques et territoriales, citoyenneté et libertés fondamentales (C4, 3 h 30) : élections et modes de scrutin, référendum ; collectivités territoriales, décentralisation et déconcentration, préfet ; citoyenneté, nationalité, citoyenneté européenne ; libertés fondamentales, laïcité, Défenseur des droits, référé-liberté ; mises en situation 7 et 8 ; QCM C4.\n" +
+    "Module 5 — Ordre juridique interne, droit de l'Union européenne et traités internationaux (C5, 3 h 30) : construction européenne et traité de Lisbonne ; institutions de l'Union et procédure législative ordinaire ; primauté et effet direct ; article 55 de la Constitution, jurisprudences Jacques Vabre et Nicolo ; Conseil de l'Europe et Convention européenne des droits de l'homme ; ratification des traités ; mise en situation 9 ; QCM C5.\n" +
+    "Module 6 — Les juridictions judiciaires et administratives (C6, 3 h 30) : dualité des ordres de juridiction et Tribunal des conflits ; ordre judiciaire (juridictions civiles et pénales, cour d'appel, Cour de cassation) ; ordre administratif (tribunal administratif, cour administrative d'appel, Conseil d'État) ; voies de recours ; orientation d'une démarche juridique élémentaire ; mise en situation 10 ; QCM C6 ; évaluation finale interne ; bilan de la formation.",
+  methodesEvaluation:
+    "Positionnement à l'entrée : QCM de positionnement de 10 questions (corrigé et expliqué) et 10 questions ouvertes, comparés à l'évaluation de fin pour mesurer la progression ; exercices pratiques en cours de formation (10 mises en situation corrigées sur des cas pratiques fictifs) ; un QCM de 10 questions à la fin de chaque module (C1 à C6) ; cas pratique intermédiaire à la fin du module 3 ; évaluation finale interne à la fin du module 6 ; grille d'acquisition des compétences ; test de positionnement de fin. Évaluation à chaud (questionnaire de satisfaction en fin de formation) et évaluation à froid. Formation non certifiante : attestation de fin de formation mentionnant les objectifs et le niveau d'acquisition, et certificat de réalisation.",
+  moyensPedagogiques:
+    "Formation entièrement à distance, en classe virtuelle synchrone (Google Meet / Zoom) animée par un formateur unique, de 09h00 à 12h30 et de 13h30 à 17h00. Apports théoriques, démonstrations commentées, exercices pratiques et mises en situation, appuyés sur un support de cours en 6 chapitres (synthèses notionnelles, schémas institutionnels, extraits de textes juridiques fondamentaux), lecture guidée de textes officiels sur Légifrance et EUR-Lex, études de cas issues de l'actualité institutionnelle et administrative, QCM corrigés. Partage d'écran, tableau blanc et documents partagés ; supports transmis au format numérique. Le stagiaire dispose d'un ordinateur avec webcam, micro et connexion internet ; un test technique est proposé avant la première séance.",
+  publicVise:
+    "Toute personne (salarié, particulier) souhaitant acquérir les bases du système juridique et des institutions politiques françaises. Formation individuelle, en classe virtuelle.",
+  delaiAcces: "14 jours après validation de la préinscription et réception du dossier complet.",
+  dateDebut: "2025-12-15",
+  dateFin: "2025-12-17",
+  lieu: "Google Meet / Zoom",
+  nombreParticipants: "1",
+  formateur: "",
+};
+
+// ---------------------------------------------------------------------------
 // Analyse des besoins (pack contenu)
 // ---------------------------------------------------------------------------
 const BESOINS_LIST = [
