@@ -22,6 +22,9 @@ describe("Espace Orienta Campus", () => {
 
   it("accepte uniquement les origines Orienta Campus pour /orienta", () => {
     expect(origineAutorisee("https://orienta-campus.lovable.app", "orienta")).toBe(true);
+    expect(origineAutorisee("https://formationcampus.com", "orienta")).toBe(true);
+    expect(origineAutorisee("https://www.formationcampus.com", "orienta")).toBe(true);
+    expect(origineAutorisee("https://formationcampus.com.evil.com", "orienta")).toBe(false);
     expect(origineAutorisee("https://id-preview--9cd33bca-1e4c-42ac-9e72-b4f116584093.lovable.app", "orienta")).toBe(true);
     expect(origineAutorisee("https://orienta-campus.lovable.app.evil.com", "orienta")).toBe(false);
     expect(origineAutorisee("https://izilearn.netlify.app", "orienta")).toBe(false);

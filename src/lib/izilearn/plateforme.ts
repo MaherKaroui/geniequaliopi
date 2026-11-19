@@ -32,9 +32,9 @@ export const PLATEFORMES: Record<AppSource, Plateforme> = {
     msg: { ready: "geniequaliopi:ready", data: "crmlms:data", save: "geniequaliopi:save", saved: "crmlms:saved" },
   },
   orienta: {
-    app: "orienta", nom: "Orienta Campus", url: "https://orienta-campus.lovable.app/sessions", visio: "classe virtuelle",
-    // Site publié (orienta-campus.lovable.app, ancien english-business-import-hub), aperçus Lovable et poste local.
-    origines: [/^https:\/\/orienta-campus\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/, LOCAL],
+    app: "orienta", nom: "Formation Campus", url: "https://formationcampus.com/sessions", visio: "classe virtuelle",
+    // Domaine formationcampus.com (www compris), ancien site orienta-campus.lovable.app, aperçus Lovable et poste local.
+    origines: [/^https:\/\/(www\.)?formationcampus\.com$/, /^https:\/\/orienta-campus\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovable\.app$/, /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/, LOCAL],
     msg: { ready: "geniequaliopi:ready", data: "orienta:data", save: "geniequaliopi:save", saved: "orienta:saved" },
   },
 };
