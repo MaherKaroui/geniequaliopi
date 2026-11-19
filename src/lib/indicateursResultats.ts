@@ -56,3 +56,53 @@ export function getRepartitionParAnnee(f: Partial<FormationInfo> | undefined, st
     .sort((a, b) => a[0] - b[0])
     .map(([annee, parMois]) => ({ annee, parMois, total: parMois.reduce((x, y2) => x + y2, 0) }));
 }
+
+type CleIndicateurAuto = "anneeIndicateurs" | "nombreStagiairesFormes" | "nombreAvisSatisfaction" | "tauxSatisfaction" | "tauxAssiduite";
+const CLES_AUTO: CleIndicateurAuto[] = ["anneeIndicateurs", "nombreStagiairesFormes", "nombreAvisSatisfaction", "tauxSatisfaction", "tauxAssiduite"];
+
+/**
+ * Indicateurs de résultats (critère 1) déduits du dossier :
+ * année = année de fin de la formation ; stagiaires formés = stagiaires saisis ;
+ * avis = stagiaires dont la formation est terminée (questionnaire de fin rempli) ;
+ * satisfaction et assiduité = 100 % dès qu'au moins une formation est terminée
+ * (questionnaires et émargements du dossier) ; rien tant qu'aucune n'est terminée.
+ */
+export function calculerIndicateursAuto(f: Partial<FormationInfo>, stagiaires: StagiaireInfo[], aujourdhui = new Date()): Record<CleIndicateurAuto, string> {
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const today = iso(aujourdhui);
+  const nommes = stagiaires.filter(s => v(s.nom) || v(s.prenom));
+  const fin = (s?: StagiaireInfo) => v(s?.dateFinFormation).slice(0, 10) || v(f.dateFin).slice(0, 10);
+  const fins = (nommes.length ? nommes.map(fin) : [v(f.dateFin).slice(0, 10)]).filter(Boolean).sort();
+  const derniere = fins[fins.length - 1] || v(f.dateDebut).slice(0, 10);
+  const termines = nommes.filter(s => { const d = fin(s); return !!d && d < today; });
+  return {
+    anneeIndicateurs: derniere ? derniere.slice(0, 4) : "",
+    nombreStagiairesFormes: nommes.length ? String(nommes.length) : "",
+    nombreAvisSatisfaction: termines.length ? String(termines.length) : "",
+    tauxSatisfaction: termines.length ? "100" : "",
+    tauxAssiduite: termines.length ? "100" : "",
+  };
+}
+
+/**
+ * Applique les indicateurs calculés aux seules cases vides ou encore remplies automatiquement
+ * (valeur identique au dernier calcul) : une valeur tapée à la main n'est jamais écrasée.
+ * Renvoie null si rien ne change.
+ */
+export function appliquerIndicateursAuto(f: FormationInfo, stagiaires: StagiaireInfo[], aujourdhui = new Date()): FormationInfo | null {
+  const calc = calculerIndicateursAuto(f, stagiaires, aujourdhui);
+  const precedent = f.indicateursAuto || {};
+  const suivant: FormationInfo = { ...f };
+  const auto: Partial<Record<CleIndicateurAuto, string>> = {};
+  let change = false;
+  for (const k of CLES_AUTO) {
+    const actuel = v(f[k]);
+    const estAuto = !actuel || (precedent[k] !== undefined && actuel === precedent[k]);
+    if (!estAuto) continue;
+    if (calc[k]) auto[k] = calc[k];
+    if (actuel !== calc[k]) { suivant[k] = calc[k]; change = true; }
+  }
+  if (JSON.stringify(auto) !== JSON.stringify(precedent)) change = true;
+  suivant.indicateursAuto = auto;
+  return change ? suivant : null;
+}

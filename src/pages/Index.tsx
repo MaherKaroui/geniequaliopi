@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { appliquerIndicateursAuto } from "@/lib/indicateursResultats";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import StepIndicator from "@/components/StepIndicator";
@@ -128,6 +129,13 @@ const Index = () => {
   const updateFormation = (v: FormationInfo) => { setFormation(v); sessionStorage.setItem('qualiopi_form', JSON.stringify(v)); };
   const updateStagiaires = (v: StagiaireInfo[]) => { setStagiaires(v); sessionStorage.setItem('qualiopi_stag', JSON.stringify(v)); };
   const updateCriteres = (v: CritereData[]) => { setCriteres(v); sessionStorage.setItem('qualiopi_crit', JSON.stringify(v)); };
+
+  // Indicateurs de résultats (critère 1) remplis automatiquement depuis les dates et les stagiaires.
+  useEffect(() => {
+    const maj = appliquerIndicateursAuto(formation, stagiaires);
+    if (maj) updateFormation(maj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formation, stagiaires]);
 
   const handleLoadDossier = (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => {
     updateOrganisme(org);

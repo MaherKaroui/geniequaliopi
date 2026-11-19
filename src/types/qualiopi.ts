@@ -244,6 +244,8 @@ export interface FormationInfo {
   nombreAvisSatisfaction?: string;
   tauxAssiduite?: string;
   nombreStagiairesFormes?: string;
+  /** Dernières valeurs remplies automatiquement (indicateurs critère 1) : une saisie manuelle n'est jamais écrasée. */
+  indicateursAuto?: Partial<Record<"anneeIndicateurs" | "nombreStagiairesFormes" | "nombreAvisSatisfaction" | "tauxSatisfaction" | "tauxAssiduite", string>>;
   nbPresentesCertification?: string;
   nbAdmisCertification?: string;
   commentaireIndicateurs?: string;

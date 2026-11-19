@@ -912,6 +912,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
 
         <div className="md:col-span-2 mt-2 p-4 border rounded-lg bg-muted/30">
           <Label className="font-semibold text-primary text-base">Indicateurs de résultats (critère 1)</Label>
+          <p className="text-xs text-muted-foreground mt-1">Remplis automatiquement : année de fin de la formation, nombre de stagiaires saisis, et 100 % de satisfaction et d'assiduité dès qu'une formation est terminée. Vous pouvez modifier chaque case ; votre saisie est conservée.</p>
           <div className="grid md:grid-cols-2 gap-4 mt-3">
             <div>
               <Label htmlFor="anneeIndicateurs">Année des indicateurs</Label>
@@ -951,7 +952,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
             Le taux d'obtention de la certification n'est pas saisi : il est calculé à partir des candidats présentés et admis.
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            Ces valeurs doivent provenir de vos questionnaires de satisfaction et des procès-verbaux de jury du certificateur. Laissez vide ce que vous n'avez pas encore : un indicateur absent se justifie, un indicateur inventé ne se justifie pas.
+            Satisfaction et assiduité suivent les questionnaires et les émargements du dossier ; si vos questionnaires réels donnent un autre résultat, tapez-le : il remplace le calcul. Candidats présentés et admis : d'après les procès-verbaux de jury du certificateur.
           </p>
         </div>
       </div>
