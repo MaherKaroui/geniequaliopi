@@ -329,6 +329,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isLRBFormation(formationIntitule)) return LRB_VIDEOS;
   // Cohésion d'équipe en entreprise – 21 h : vidéos du preset, jamais les banques « management » ou « entreprise »
   if (isCOH21Formation(formationIntitule)) return COH21_VIDEOS;
+  if (isGMA70Formation(formationIntitule)) return GMA70_VIDEOS;
+  if (isMSC70Formation(formationIntitule)) return MSC70_VIDEOS;
   // Enseignement : fondamentaux du droit et des institutions : vidéos du preset, jamais les banques « droit » génériques
   if (isDRI47Formation(formationIntitule)) return DRI47_VIDEOS;
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : vidéos du preset, jamais les banques « formateur » génériques
@@ -496,8 +498,14 @@ import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { getAnglaisPro40hChapters } from "./courseContentAnglaisPro40h";
 import { isANG40Formation } from "./anglaisPro40hHumanized";
 import { getCohesionEquipe21hChapters } from "./courseContentCohesionEquipe21h";
+import { getProjecteursGrandMA70hChapters } from "./courseContentProjecteursGrandMA70h";
+import { getMachinerieScenique70hChapters } from "./courseContentMachinerieScenique70h";
 import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
+import { isGMA70Formation } from "./projecteursGrandMA70hHumanized";
+import { isMSC70Formation } from "./machinerieScenique70hHumanized";
 import { COH21_VIDEOS } from "./cohesionEquipe21hPreset";
+import { GMA70_VIDEOS } from "./projecteursGrandMA70hPreset";
+import { MSC70_VIDEOS } from "./machinerieScenique70hPreset";
 import { getDroitInstitutions47hChapters, getDroitInstitutions21hChapters } from "./courseContentDroitInstitutions47h";
 import { isDRI47Formation, isDRI21Formation } from "./droitInstitutions47hHumanized";
 import { DRI47_VIDEOS } from "./droitInstitutions47hPreset";
@@ -568,6 +576,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (isANG40Formation(formationIntitule)) return getAnglaisPro40hChapters();
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) : support propre, avant les règles « management » / « entreprise »
   if (isCOH21Formation(formationIntitule)) return getCohesionEquipe21hChapters();
+  if (isGMA70Formation(formationIntitule)) return getProjecteursGrandMA70hChapters();
+  if (isMSC70Formation(formationIntitule)) return getMachinerieScenique70hChapters();
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) : support propre, avant les règles « droit » / « enseignement »
   if (isDRI21Formation(formationIntitule)) return getDroitInstitutions21hChapters();
   if (isDRI47Formation(formationIntitule)) return getDroitInstitutions47hChapters();

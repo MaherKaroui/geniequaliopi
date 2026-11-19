@@ -27,7 +27,11 @@ import { isGSC35Formation, getGSC35AutoAnswers, GSC35_QUESTIONS_OUVERTES } from 
 import { ANG40_EXERCICES_COMPLETS, ANG40_QCM_DEBUT, ANG40_QCM_FIN } from "./anglaisPro40hPreset";
 import { isANG40Formation, getANG40AutoAnswers, ANG40_QUESTIONS_OUVERTES } from "./anglaisPro40hHumanized";
 import { COH21_EXERCICES_COMPLETS, COH21_QCM_DEBUT, COH21_QCM_FIN } from "./cohesionEquipe21hPreset";
+import { FORMATION_GMA70, GMA70_EXERCICES_COMPLETS, GMA70_QCM_DEBUT, GMA70_QCM_FIN } from "./projecteursGrandMA70hPreset";
+import { FORMATION_MSC70, MSC70_EXERCICES_COMPLETS, MSC70_QCM_DEBUT, MSC70_QCM_FIN } from "./machinerieScenique70hPreset";
 import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
+import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
+import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
 import { isDRI47Formation, getDRI47AutoAnswers, DRI47_QUESTIONS_OUVERTES } from "./droitInstitutions47hHumanized";
 import { FPA45_EXERCICES_COMPLETS, FPA45_QCM_DEBUT, FPA45_QCM_FIN } from "./fpa45hPreset";
@@ -1344,6 +1348,40 @@ EVAL_CONTENT["COH21"] = {
   ],
 };
 
+// ===== Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, C1 à C6) =====
+// 10 mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["GMA70"] = {
+  qcmPositionnement: GMA70_QCM_DEBUT,
+  qcmFinal: GMA70_QCM_FIN,
+  exercices: GMA70_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: FORMATION_GMA70.objectifs.split("\n").filter(l => /^- C\d/.test(l)).map(l => l.slice(2)),
+  appreciations: [
+    "Bonne lecture des fiches techniques et des chartes DMX ; choix de parc argumenté. Vocabulaire des effets encore à fixer.",
+    "Accroche et élingue de sécurité systématiques, adressage DMX juste ; le bilan électrique doit être posé par écrit avant le câblage.",
+    "Patch et show file maîtrisés, sauvegardes régulières. Navigation dans les vues encore lente.",
+    "Groupes et presets bien construits ; tracking compris. Le timing des cues reste à affiner.",
+    "Phasers et MAtricks utilisés avec justesse ; macros simples écrites seul. Encodage d'une conduite écrite à consolider.",
+    "Restitution sereine, diagnostic de panne méthodique ; routine de maintenance et d'archivage appliquée.",
+  ],
+};
+
+// ===== Machinerie scénique, moteurs et ponts : équipements fixes et grils provisoires – 70 h (non certifiante, C1 à C6) =====
+// 10 mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["MSC70"] = {
+  qcmPositionnement: MSC70_QCM_DEBUT,
+  qcmFinal: MSC70_QCM_FIN,
+  exercices: MSC70_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: FORMATION_MSC70.objectifs.split("\n").filter(l => /^- C\d/.test(l)).map(l => l.slice(2)),
+  appreciations: [
+    "Cadre réglementaire et responsabilités bien situés ; réflexe de prévention présent. Vérifications périodiques à mieux connaître.",
+    "Manœuvre des porteuses contrebalancées sûre, équilibrage correct ; annonces de manœuvre à rendre plus systématiques.",
+    "Calculs d'angles d'élingage et de CMU justes ; contrôle visuel des accessoires appliqué. Feuille de charges à compléter.",
+    "Mise en place des palans et contrôle de chaîne maîtrisés ; distinction D8 / D8+ / C1 acquise.",
+    "Lecture des tables de charge du fabricant correcte ; répartition entre moteurs posée avec méthode. Porte-à-faux à vérifier systématiquement.",
+    "Mise en œuvre ordonnée de la préparation au démontage ; communication radio claire, consignation appliquée.",
+  ],
+};
+
 // ===== Enseignement : fondamentaux du droit et des institutions (non certifiante, C1 à C6 = modules 1 à 6) =====
 // Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
 EVAL_CONTENT["DRI47"] = {
@@ -1642,6 +1680,8 @@ function getContentKey(intitule: string): string {
   if (isANG40Formation(lower)) return "ANG40";
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) — avant toute règle « management », « entreprise », « communication »
   if (isCOH21Formation(lower)) return "COH21";
+  if (isGMA70Formation(lower)) return "GMA70";
+  if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
   if (isDRI47Formation(lower)) return "DRI47";
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) — avant toute règle « formateur », « formation », « enseignement »
@@ -1843,6 +1883,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (presetEvalContent(formationIntitule)) return true;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return true;
+  if (isGMA70Formation(formationIntitule)) return true;
+  if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
   if (isDRI47Formation(formationIntitule)) return true;
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : reconnue aussi sous ses variantes d'intitulé
@@ -1855,6 +1897,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (preset) return preset;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
+  if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
+  if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
   if (isDRI47Formation(formationIntitule)) return EVAL_CONTENT["DRI47"];
   // Formation de formateur professionnel pour adultes (TP FPA – RNCP37275) : reconnue aussi sous ses variantes d'intitulé
@@ -2437,6 +2481,8 @@ QUESTIONS_OUVERTES["ANG40"] = ANG40_QUESTIONS_OUVERTES;
 
 // Cohésion d'équipe en entreprise – 21 h — 10 questions début / fin dans l'ordre des ateliers.
 QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
+QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
+QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
 // Enseignement : fondamentaux du droit et des institutions — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["DRI47"] = DRI47_QUESTIONS_OUVERTES;
@@ -2923,6 +2969,26 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoCoh.reponses, autoCoh.scores);
+  }
+  if (isGMA70Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoGma = getGMA70AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoGma.reponses, autoGma.scores);
+  }
+  if (isMSC70Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoMsc = getMSC70AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoMsc.reponses, autoMsc.scores);
   }
 
   // Anglais Professionnel – 40 h : moteur humanisé (une copie différente par stagiaire).

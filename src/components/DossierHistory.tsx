@@ -10,7 +10,11 @@ import { seedGSC35AICaches } from "@/lib/gererCentre35hPreset";
 import { isANG40Formation } from "@/lib/anglaisPro40hHumanized";
 import { seedANG40AICaches } from "@/lib/anglaisPro40hPreset";
 import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
+import { isGMA70Formation } from "@/lib/projecteursGrandMA70hHumanized";
+import { isMSC70Formation } from "@/lib/machinerieScenique70hHumanized";
 import { seedCOH21AICaches } from "@/lib/cohesionEquipe21hPreset";
+import { seedGMA70AICaches } from "@/lib/projecteursGrandMA70hPreset";
+import { seedMSC70AICaches } from "@/lib/machinerieScenique70hPreset";
 import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
 import { seedDRI47AICaches } from "@/lib/droitInstitutions47hPreset";
 import { isFPA45Formation } from "@/lib/fpa45hHumanized";
@@ -180,6 +184,12 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     // Cohésion d'équipe en entreprise – 21 h : même rechargement des packs du preset.
     if (d.formation && isCOH21Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedCOH21AICaches(d.formation);
+    }
+    if (d.formation && isGMA70Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedGMA70AICaches(d.formation);
+    }
+    if (d.formation && isMSC70Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedMSC70AICaches(d.formation);
     }
     // Enseignement : fondamentaux du droit et des institutions : même rechargement des packs du preset.
     if (d.formation && isDRI47Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {

@@ -204,7 +204,11 @@ export { FORMATION_GSC35, seedGSC35AICaches } from "./gererCentre35hPreset";
 import { FORMATION_ANG40 } from "./anglaisPro40hPreset";
 export { FORMATION_ANG40, seedANG40AICaches } from "./anglaisPro40hPreset";
 import { FORMATION_COH21 } from "./cohesionEquipe21hPreset";
+import { FORMATION_GMA70 } from "./projecteursGrandMA70hPreset";
+import { FORMATION_MSC70 } from "./machinerieScenique70hPreset";
 export { FORMATION_COH21, seedCOH21AICaches } from "./cohesionEquipe21hPreset";
+export { FORMATION_GMA70, seedGMA70AICaches } from "./projecteursGrandMA70hPreset";
+export { FORMATION_MSC70, seedMSC70AICaches } from "./machinerieScenique70hPreset";
 import { FORMATION_DRI47, FORMATION_DRI21 } from "./droitInstitutions47hPreset";
 export { FORMATION_DRI47, FORMATION_DRI21, seedDRI47AICaches } from "./droitInstitutions47hPreset";
 import { FORMATION_FPA45 } from "./fpa45hPreset";
@@ -578,6 +582,10 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ANG40,
   // Cohésion d'équipe en entreprise – 21 h (non certifiante, 6 modules, intra-entreprise) : contenus pré-remplis (cohesionEquipe21hPreset), aucun stagiaire importé
   FORMATION_COH21,
+  // Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (projecteursGrandMA70hPreset), aucun stagiaire importé
+  FORMATION_GMA70,
+  // Machinerie scénique, moteurs et ponts : équipements fixes et grils provisoires – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (machinerieScenique70hPreset), aucun stagiaire importé
+  FORMATION_MSC70,
   // Enseignement : fondamentaux du droit et des institutions (non certifiante, 47 h à distance, C1 à C6) : contenus pré-remplis (droitInstitutions47hPreset), aucun stagiaire importé
   FORMATION_DRI47,
   // Initiation au droit et aux institutions politiques (non certifiante, 21 h à distance, C1 à C6) : mêmes contenus que la 47 h, support adapté à 6 demi-journées
