@@ -76,6 +76,11 @@ export interface OrganismeInfo {
   /** Signature du référent qualité lorsqu'il n'est pas le dirigeant (guide V10). */
   referentQualiteSignatureUrl?: string;
   /**
+   * Signatures propres des référents et responsables (clé = champ du nom : referentHandicap,
+   * referentMobilite, poleAdministratif…). Un référent qui porte le nom du dirigeant reprend sa signature.
+   */
+  signatureReferents?: Partial<Record<"responsablePedagogique" | "referentHandicap" | "referentQualite" | "poleAdministratif" | "relationEntreprises" | "referentMobilite" | "referentDecrochage" | "coordinateurPedagogique" | "conseillerFormation" | "referentNumerique", string>>;
+  /**
    * Siège précédent (transfert de siège) : les pièces datées avant `jusquAu` portent
    * cette adresse, ce SIRET et ce tampon, et non ceux du siège actuel.
    */

@@ -5,6 +5,7 @@ import { getFormationDays } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
 import { tarifNetDeTaxe } from "./sessionTextes";
 import { dirigeanteFem } from "./genre";
+import { referentDepuisLibelle, sourceSignatureReferent } from "./signaturesReferents";
 
 /** Libellé de signature au féminin quand le dirigeant est une femme. */
 function libelleDirigeante(label: string): string {
@@ -1003,6 +1004,8 @@ function tamponImg(url: string | undefined): string {
 let tamponReferentQualite: string | undefined;
 /** Guide V10 : signature du référent qualité interne (null = règle par défaut, ligne vide). */
 let signatureReferentQualite: string | null = null;
+/** Organisme du document en cours : signatures des référents (formulaire Organisme). */
+let orgReferents: Partial<OrganismeInfo> | undefined;
 const nomCle = (n?: string) => (n || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().split(/[\s-]+/).filter(Boolean).sort().join(" ");
 /** Même personne (casse, accents et ordre prénom / nom ignorés) ? */
 export const memePersonne = (a?: string, b?: string) => !!nomCle(a) && nomCle(a) === nomCle(b);
@@ -1013,6 +1016,7 @@ export function referentQualiteEstDirigeant(o?: Partial<Pick<OrganismeInfo, "ref
 export function setReferentQualiteTampon(org: Partial<OrganismeInfo> | undefined) {
   tamponReferentQualite = /fd\s*certif/i.test(org?.referentQualite || "") ? "/images/FD_CERTIF_TAMPON.png" : undefined;
   signatureReferentQualite = null;
+  orgReferents = org;
   if (!org || tamponReferentQualite || versionReferentiel(org) !== "V10") return;
   // Même personne que le dirigeant : sa signature (à défaut son tampon) ; sinon la signature saisie dans le formulaire organisme.
   signatureReferentQualite = referentQualiteEstDirigeant(org)
@@ -1045,6 +1049,17 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   }
   if (/qualit/.test(l) && !/dirigeant|directeur/.test(l) && signatureReferentQualite) {
     return signatureReferentQualite;
+  }
+  // Référents et responsables (formulaire Organisme) : même nom que le dirigeant → sa signature ;
+  // sinon la signature propre saisie pour ce référent. Sans signature : règles ci-dessous.
+  const cleRef = tamponReferentQualite && /qualit/.test(l) ? null : referentDepuisLibelle(orgReferents, label, nom);
+  if (cleRef) {
+    const src = sourceSignatureReferent(orgReferents, cleRef);
+    if (src?.type === "propre") return sigImg(src.url, "Signature référent");
+    if (src?.type === "dirigeant") {
+      const sig = sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant") || tamponImg(urls.tamponUrl);
+      if (sig) return sig;
+    }
   }
   // Specific CFA Conseil de Perfectionnement overrides
   if (l.includes('directeur du cfa')) {

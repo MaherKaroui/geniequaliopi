@@ -1,5 +1,5 @@
 import SignatureChamp from "@/components/SignatureChamp";
-import { referentQualiteEstDirigeant } from "@/lib/docBuilder";
+import { referentEstDirigeant, type CleReferent } from "@/lib/signaturesReferents";
 import { useState } from "react";
 import { OrganismeInfo, SiegeAnterieur } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
@@ -65,6 +65,25 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
     } finally {
       setLoading(false);
     }
+  };
+
+  const signatureReferent = (cle: CleReferent, libelle: string) => {
+    const nom = ((data[cle] as string | undefined) || "").trim();
+    if (!nom) return null;
+    if (referentEstDirigeant(data, cle)) {
+      return <p className="text-[11px] text-muted-foreground mt-1">Même personne que le dirigeant : sa signature est reprise automatiquement sur les pièces du {libelle}.</p>;
+    }
+    const valeur = data.signatureReferents?.[cle] || (cle === "referentQualite" ? data.referentQualiteSignatureUrl : undefined);
+    return (
+      <div className="mt-2">
+        <p className="text-[11px] text-muted-foreground mb-1">Personne différente du dirigeant : ajoutez la signature de {nom} ({libelle}).</p>
+        <SignatureChamp compact valeur={valeur} libelle={`Signature — ${nom}`} onChange={(v) => {
+          const sigs = { ...(data.signatureReferents || {}) };
+          if (v) sigs[cle] = v; else delete sigs[cle];
+          onChange({ ...data, signatureReferents: sigs, ...(cle === "referentQualite" ? { referentQualiteSignatureUrl: v } : {}) });
+        }} />
+      </div>
+    );
   };
 
   const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
@@ -153,50 +172,52 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
         <div>
           <Label htmlFor="responsablePedagogique">Responsable pédagogique</Label>
           <Input id="responsablePedagogique" value={data.responsablePedagogique} onChange={e => update('responsablePedagogique', e.target.value)} placeholder="Nom du responsable pédagogique" />
+          {signatureReferent("responsablePedagogique", "responsable pédagogique")}
         </div>
         <div>
           <Label htmlFor="referentHandicap">Référent handicap</Label>
           <Input id="referentHandicap" value={data.referentHandicap} onChange={e => update('referentHandicap', e.target.value)} placeholder="Nom du référent handicap" />
+          {signatureReferent("referentHandicap", "référent handicap")}
         </div>
         <div>
           <Label htmlFor="referentQualite">Référent qualité</Label>
           <Input id="referentQualite" value={data.referentQualite} onChange={e => update('referentQualite', e.target.value)} placeholder="Nom du référent qualité" />
-          {(data.referentQualite || "").trim() && !/fd\s*certif/i.test(data.referentQualite) && (
-            referentQualiteEstDirigeant(data)
-              ? <p className="text-[11px] text-muted-foreground mt-1">Même personne que le dirigeant : sa signature est reprise sur les pièces du référent qualité (référentiel 2026).</p>
-              : <div className="mt-2">
-                  <p className="text-[11px] text-muted-foreground mb-1">Signature du référent qualité (pièces V10 qu'il signe : veille, analyse des risques, audit interne…)</p>
-                  <SignatureChamp compact valeur={data.referentQualiteSignatureUrl} libelle="Signature du référent qualité" onChange={(v) => onChange({ ...data, referentQualiteSignatureUrl: v })} />
-                </div>
-          )}
+          {!/fd\s*certif/i.test(data.referentQualite || "") && signatureReferent("referentQualite", "référent qualité")}
         </div>
         <div>
           <Label htmlFor="poleAdministratif">Pôle Administratif</Label>
           <Input id="poleAdministratif" value={data.poleAdministratif} onChange={e => update('poleAdministratif', e.target.value)} placeholder="Nom du responsable administratif" />
+          {signatureReferent("poleAdministratif", "responsable administratif")}
         </div>
         <div>
           <Label htmlFor="relationEntreprises">Relation Entreprises</Label>
           <Input id="relationEntreprises" value={data.relationEntreprises} onChange={e => update('relationEntreprises', e.target.value)} placeholder="Nom du responsable relation entreprises" />
+          {signatureReferent("relationEntreprises", "responsable relation entreprises")}
         </div>
         <div>
           <Label htmlFor="referentMobilite">Référent Mobilité nationale et internationale (externalisé)</Label>
           <Input id="referentMobilite" value={data.referentMobilite} onChange={e => update('referentMobilite', e.target.value)} placeholder="Nom du référent mobilité (Mobi'Jeunes/Erasmus+)" />
+          {signatureReferent("referentMobilite", "référent mobilité")}
         </div>
         <div>
           <Label htmlFor="referentDecrochage">Référent Décrochage / Lutte contre l'abandon (CFA)</Label>
           <Input id="referentDecrochage" value={data.referentDecrochage || ""} onChange={e => update('referentDecrochage', e.target.value)} placeholder="Nom du référent décrochage" />
+          {signatureReferent("referentDecrochage", "référent décrochage")}
         </div>
         <div>
           <Label htmlFor="coordinateurPedagogique">Coordinateur Pédagogique (CFA)</Label>
           <Input id="coordinateurPedagogique" value={data.coordinateurPedagogique || ""} onChange={e => update('coordinateurPedagogique', e.target.value)} placeholder="Nom du coordinateur pédagogique" />
+          {signatureReferent("coordinateurPedagogique", "coordinateur pédagogique")}
         </div>
         <div>
           <Label htmlFor="conseillerFormation">Conseiller en Formation / Orientation</Label>
           <Input id="conseillerFormation" value={data.conseillerFormation || ""} onChange={e => update('conseillerFormation', e.target.value)} placeholder="Nom du conseiller en formation" />
+          {signatureReferent("conseillerFormation", "conseiller en formation")}
         </div>
         <div>
           <Label htmlFor="referentNumerique">Référent Numérique / Distanciel</Label>
           <Input id="referentNumerique" value={data.referentNumerique || ""} onChange={e => update('referentNumerique', e.target.value)} placeholder="Nom du référent numérique" />
+          {signatureReferent("referentNumerique", "référent numérique")}
         </div>
         {!hidden('domainesFormation') && (
         <div className="md:col-span-2">
