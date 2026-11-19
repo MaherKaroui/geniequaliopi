@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
-  ArrowRight, ArrowUpRight, BadgeCheck, Check, ChevronRight, Clock, FolderCheck, History, LogIn, LogOut, Palette, Play, Search, ShieldCheck, Zap,
+  ArrowRight, ArrowUpRight, Check, ChevronRight, Clock, FolderCheck, History, LogIn, LogOut, Palette, Play, Search, ShieldCheck, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import LogoGenie from "@/components/LogoGenie";
 import { DESIGNS, FAMILLES, choisirDesign as enregistrerDesign, useDesignAccueil, type Outil } from "@/lib/outilsAccueil";
 
 
@@ -117,14 +118,7 @@ const Accueil = ({ user, isSuperAdmin, onSignOut, onNavigate, onPreparer, onOuvr
   };
 
   // ---------- Éléments communs ----------
-  const Marque = ({ claire = false }: { claire?: boolean }) => (
-    <div style={TITRE} className={`flex items-center gap-2.5 text-lg font-bold tracking-tight ${claire ? "text-white" : ""}`}>
-      <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-blue-900 text-primary-foreground shadow-md">
-        <BadgeCheck className="w-5 h-5" />
-      </span>
-      Génie Qualiopi
-    </div>
-  );
+  const Marque = () => <LogoGenie />;
 
   const BarreRecherche = ({ large = false }: { large?: boolean }) => (
     <button

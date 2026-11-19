@@ -15,7 +15,7 @@ import { EVT_ECRAN, type DemandeEcran } from "@/lib/outilsAccueil";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, LogIn, LogOut, FileSpreadsheet, Upload, Loader2, ShieldCheck, Zap } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
-import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
+import LogoGenie from "@/components/LogoGenie";
 import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
@@ -177,7 +177,7 @@ const Index = () => {
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={qualiopiLogo.url} alt="Qualiopi Generator" className="h-16 w-auto" />
+            <button type="button" onClick={() => updateStarted(false)} aria-label="Génie Qualiopi — accueil"><LogoGenie /></button>
           </div>
           <div className="flex items-center gap-2">
             {user ? (

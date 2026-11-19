@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowUpRight, BadgeCheck, LayoutDashboard } from "lucide-react";
+import { ArrowUpRight, LayoutDashboard } from "lucide-react";
+import LogoGenie from "@/components/LogoGenie";
 import { FAMILLES, demanderEcran, useParcoursOuvert, type Outil } from "@/lib/outilsAccueil";
 
 /**
@@ -40,13 +41,10 @@ const MenuEspace = () => {
       <button
         type="button"
         onClick={() => demanderEcran(navigate, { parcours: false })}
-        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-        className="flex items-center gap-2.5 px-2 text-lg font-bold tracking-tight text-white"
+        aria-label="Génie Qualiopi — tableau de bord"
+        className="px-2"
       >
-        <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-blue-900 text-primary-foreground shadow-md">
-          <BadgeCheck className="w-5 h-5" />
-        </span>
-        Génie Qualiopi
+        <LogoGenie claire />
       </button>
       <nav className="space-y-5">
         <div className="space-y-0.5">
