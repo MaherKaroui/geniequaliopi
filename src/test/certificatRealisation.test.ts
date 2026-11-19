@@ -14,6 +14,8 @@ describe("certificat de réalisation", () => {
     expect(lieuRealisationCertificat(org, { modalites: "presentiel", lieu: "Salle Atlas, 4 rue Lafayette, 75009 Paris" })).toBe("Salle Atlas, 4 rue Lafayette, 75009 Paris");
     expect(lieuRealisationCertificat({ adresse: "12 rue de l'Information", codePostal: "75011", ville: "Paris" }, { modalites: "presentiel", lieu: "" })).toBe("12 rue de l'Information, 75011 Paris");
     expect(lieuRealisationCertificat(org, { modalites: "distanciel", lieu: "À distance (classe virtuelle)" })).toBe("");
+    // Un lien de visio n'est jamais un lieu de réalisation : adresse de l'organisme à la place.
+    expect(lieuRealisationCertificat({ adresse: "3 rue de la Paix", codePostal: "69002", ville: "Lyon" }, { modalites: "presentiel", lieu: "Google Meet / Zoom" })).toBe("3 rue de la Paix, 69002 Lyon");
   });
   it("seul le cachet de l'organisme, sans bloc représentant légal ni signature du dirigeant", () => {
     const h = genCertificatRealisationStagiaire(org, { ...f0, modalites: "presentiel", lieu: "Salle Atlas, Paris" }, STAGIAIRES_TEST, 0);

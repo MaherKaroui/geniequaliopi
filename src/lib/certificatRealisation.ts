@@ -17,7 +17,7 @@ export function adresseOrganisme(o: Partial<OrganismeInfo>): string {
 export function lieuRealisationCertificat(o: Partial<OrganismeInfo>, f: Partial<FormationInfo>, s?: Partial<StagiaireInfo>): string {
   const mod = t(f.modalites).toLowerCase();
   const lieuSaisi = t((s as { lieu?: string } | undefined)?.lieu) || t(f.lieu);
-  const distance = /distanciel|distance|foad|e-?learning|classe virtuelle/i;
+  const distance = /distanciel|distance|foad|e-?learning|classe virtuelle|visio|zoom|google meet|\bmeet\b|teams|webex|en ligne/i;
   const presentiel = /pr[ée]sentiel|mixte|hybride|blended/.test(mod) || (!mod && !!lieuSaisi && !distance.test(lieuSaisi));
   if (!presentiel) return "";
   const lieu = lieuSaisi && !distance.test(lieuSaisi) ? lieuSaisi : adresseOrganisme(o);
