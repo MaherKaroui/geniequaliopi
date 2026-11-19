@@ -20,10 +20,12 @@ export interface FicheFC {
   anciennes: string[]; url: string;
 }
 export interface IndexFC { c: string; i: string; a?: string; n?: string; t?: string; on: boolean; fin: string; cert?: string[]; new?: string[] }
+export interface HabilitationsFC { cs: string[]; p: string[] }
 export interface MetaFC { source: string; exportDate: string; syncDate: string; fiches: number; actives: number }
 
 const BASE = "/france-competences";
 const fiches = new Map<string, FicheFC | null>();
+const habilitations = new Map<string, HabilitationsFC | null>();
 const shardsLoaded = new Map<string, Promise<void>>();
 let index: Map<string, IndexFC> | null = null;
 let indexPromise: Promise<void> | null = null;
@@ -70,23 +72,36 @@ function shardKey(code: string): string {
   return m[1] === "RNCP" ? `RNCP${m[2].slice(0, 3)}` : `${m[1]}${m[2].slice(0, 2)}`;
 }
 
-/** Charge (une fois) le paquet contenant la fiche et la renvoie ; null si inconnue ou inactive. */
-export async function loadFicheFC(code?: string): Promise<FicheFC | null> {
+/** Charge (une fois) le paquet `dossier/<clé>.fcz` contenant le code et renvoie l'entrée ; null si absente. */
+async function chargerDepuisPaquet<T>(dossier: string, cache: Map<string, T | null>, code?: string): Promise<T | null> {
   const c = normaliserCode(code);
   if (!c) return null;
-  if (fiches.has(c)) return fiches.get(c) ?? null;
-  const key = shardKey(c);
+  if (cache.has(c)) return cache.get(c) ?? null;
+  const key = `${dossier}/${shardKey(c)}`;
   if (!shardsLoaded.has(key)) {
     shardsLoaded.set(key, (async () => {
-      const bytes = await reader(`fiches/${key}.fcz`);
+      const bytes = await reader(`${key}.fcz`);
       if (!bytes) return;
-      const data = await gunzipJson<Record<string, FicheFC>>(bytes);
-      for (const [k, v] of Object.entries(data)) fiches.set(k, v);
+      const data = await gunzipJson<Record<string, T>>(bytes);
+      for (const [k, v] of Object.entries(data)) cache.set(k, v);
     })().catch(() => { shardsLoaded.delete(key); }));
   }
   await shardsLoaded.get(key);
-  if (!fiches.has(c)) fiches.set(c, null);
-  return fiches.get(c) ?? null;
+  if (!cache.has(c)) cache.set(c, null);
+  return cache.get(c) ?? null;
+}
+
+/** Charge (une fois) le paquet contenant la fiche et la renvoie ; null si inconnue ou inactive. */
+export function loadFicheFC(code?: string): Promise<FicheFC | null> {
+  return chargerDepuisPaquet("fiches", fiches, code);
+}
+
+/**
+ * Certificateurs et partenaires habilités d'une fiche (active ou échue).
+ * `p` : « SIRET|F (former) / E (organiser l'évaluation) / FE|1 actif, 0 inactif|date d'effet|date du dernier changement ».
+ */
+export function loadHabilitationsFC(code?: string): Promise<HabilitationsFC | null> {
+  return chargerDepuisPaquet("partenaires", habilitations, code);
 }
 
 /** Fiche en cache (synchrone) — appeler loadFicheFC avant la génération. */

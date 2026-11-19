@@ -1,12 +1,12 @@
 {
  "source": "https://www.data.gouv.fr/datasets/5eebbc067a14b6fecc9c9976/",
- "exportDate": "2026-09-30",
- "syncDate": "2026-09-30",
- "fiches": 30542,
- "actives": 6470,
+ "exportDate": "2026-11-19",
+ "syncDate": "2026-11-19",
+ "fiches": 30818,
+ "actives": 6578,
  "volumes": {
-  "rncp": 25690,
-  "rs": 4852
+  "rncp": 25830,
+  "rs": 4988
  },
- "shards": 95
+ "shards": 96
 }

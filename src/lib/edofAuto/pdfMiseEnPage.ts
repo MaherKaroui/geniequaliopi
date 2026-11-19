@@ -21,29 +21,33 @@ export interface EnteteDoc { organisme: string; titre: string; sousTitre: string
 
 export class DocPdf {
   pdf!: PDFDocument;
-  private f!: PDFFont;
-  private fb!: PDFFont;
-  private fi!: PDFFont;
+  protected f!: PDFFont;
+  protected fb!: PDFFont;
+  protected fi!: PDFFont;
   page!: PDFPage;
   y = 0;
   readonly W: number;
   readonly H: number;
   readonly M = 40;
 
-  private constructor(private entete: EnteteDoc, paysage: boolean) {
+  protected constructor(protected entete: EnteteDoc, paysage: boolean) {
     this.W = paysage ? 842 : 595;
     this.H = paysage ? 595 : 842;
   }
 
   static async creer(entete: EnteteDoc, paysage = false): Promise<DocPdf> {
     const d = new DocPdf(entete, paysage);
-    d.pdf = await PDFDocument.create();
-    d.f = await d.pdf.embedFont(StandardFonts.Helvetica);
-    d.fb = await d.pdf.embedFont(StandardFonts.HelveticaBold);
-    d.fi = await d.pdf.embedFont(StandardFonts.HelveticaOblique);
-    d.pdf.setTitle(`${entete.titre} — ${entete.sousTitre}`);
-    d.nouvellePage();
+    await d.init();
     return d;
+  }
+
+  protected async init() {
+    this.pdf = await PDFDocument.create();
+    this.f = await this.pdf.embedFont(StandardFonts.Helvetica);
+    this.fb = await this.pdf.embedFont(StandardFonts.HelveticaBold);
+    this.fi = await this.pdf.embedFont(StandardFonts.HelveticaOblique);
+    this.pdf.setTitle(`${this.entete.titre} — ${this.entete.sousTitre}`);
+    this.nouvellePage();
   }
 
   get largeur() { return this.W - 2 * this.M; }
@@ -59,13 +63,21 @@ export class DocPdf {
     }).join("");
   }
 
-  private police(gras?: boolean, reponse?: boolean) { return reponse ? this.fi : gras ? this.fb : this.f; }
+  protected police(gras?: boolean, reponse?: boolean) { return reponse ? this.fi : gras ? this.fb : this.f; }
 
   lignes(texte: string, largeur: number, size: number, police: PDFFont = this.f): string[] {
     const out: string[] = [];
     for (const para of this.propre(texte).split("\n")) {
       let cur = "";
-      for (const mot of para.split(/\s+/).filter(Boolean)) {
+      for (let mot of para.split(/\s+/).filter(Boolean)) {
+        // Mot plus large que la colonne (code sans espace) : coupé au caractère.
+        while (police.widthOfTextAtSize(mot, size) > largeur && mot.length > 1) {
+          let n = mot.length - 1;
+          while (n > 1 && police.widthOfTextAtSize(mot.slice(0, n), size) > largeur) n--;
+          if (cur) { out.push(cur); cur = ""; }
+          out.push(mot.slice(0, n));
+          mot = mot.slice(n);
+        }
         const essai = cur ? `${cur} ${mot}` : mot;
         if (police.widthOfTextAtSize(essai, size) > largeur && cur) { out.push(cur); cur = mot; } else cur = essai;
       }
@@ -96,13 +108,13 @@ export class DocPdf {
     });
   }
 
-  private ecrireCentre(t: string, cx: number, y: number, size: number, police: PDFFont, color: RGB = NOIR, max?: number) {
+  protected ecrireCentre(t: string, cx: number, y: number, size: number, police: PDFFont, color: RGB = NOIR, max?: number) {
     let s = this.propre(t), sz = size;
     if (max) while (sz > 6 && police.widthOfTextAtSize(s, sz) > max) sz -= 0.5;
     this.page.drawText(s, { x: cx - police.widthOfTextAtSize(s, sz) / 2, y, size: sz, font: police, color });
   }
 
-  private ecrireBloc(t: string, x: number, y: number, largeur: number, size: number, police: PDFFont, color: RGB, maxLignes = 99): number {
+  protected ecrireBloc(t: string, x: number, y: number, largeur: number, size: number, police: PDFFont, color: RGB, maxLignes = 99): number {
     const ls = this.lignes(t, largeur, size, police).slice(0, maxLignes);
     ls.forEach((l, i) => this.page.drawText(l, { x, y: y - i * (size + 2.5), size, font: police, color }));
     return ls.length * (size + 2.5);
@@ -183,8 +195,8 @@ export class DocPdf {
     this.y -= 4;
   }
 
-  /** Tableau à colonnes proportionnelles ; la première ligne est l'en-tête. */
-  tableau(entetes: string[], lignes: Cellule[][], poids: number[], opts: { size?: number } = {}) {
+  /** Tableau à colonnes proportionnelles ; la première ligne est l'en-tête (répétée à chaque page si `repeterEntete`). */
+  tableau(entetes: string[], lignes: Cellule[][], poids: number[], opts: { size?: number; repeterEntete?: boolean } = {}) {
     const size = opts.size ?? 8.5;
     const total = poids.reduce((a, b) => a + b, 0);
     const largeurs = poids.map((p) => (p / total) * this.largeur);
@@ -192,6 +204,7 @@ export class DocPdf {
       const norm = cells.map((c) => (typeof c === "string" ? { t: c } : c));
       const contenus = norm.map((c, i) => this.lignes(c.t, largeurs[i] - 6, c.reponse ? size + 0.5 : size, this.police(entete || c.gras, c.reponse)));
       const h = Math.max(...contenus.map((l) => l.length)) * (size + 2.5) + 7;
+      if (!entete && opts.repeterEntete && this.y - h < 45) { this.nouvellePage(); dessinerLigne(entetes, true); }
       this.place(h);
       let x = this.M;
       norm.forEach((c, i) => {

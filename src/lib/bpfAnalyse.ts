@@ -62,7 +62,10 @@ export const longDate = (iso: string) => {
 export const exerciceLabel = (b: BpfData) =>
   b.exerciceDebut || b.exerciceFin ? `${b.exerciceDebut ? longDate(b.exerciceDebut) : "?"} – ${b.exerciceFin ? longDate(b.exerciceFin) : "?"}` : "Exercice non renseigné";
 
-export interface EntrepriseInfo { nom: string; siren: string; dateCreation: string; dirigeant: string; etat: string; activite: string; adresse: string }
+export interface EntrepriseInfo {
+  nom: string; siren: string; dateCreation: string; dirigeant: string; etat: string; activite: string; adresse: string;
+  codePostal?: string; nda?: string; dirigeants?: { nom: string; prenoms: string; qualite: string }[];
+}
 
 export type Level = "ok" | "warn" | "error" | "info";
 export interface Check { level: Level; label: string; detail: string }
@@ -217,5 +220,8 @@ export async function fetchEntreprise(siret: string): Promise<EntrepriseInfo | n
     etat: e.etat_administratif === "A" ? "Active" : e.etat_administratif === "C" ? "Cessée" : (e.etat_administratif || ""),
     activite: e.activite_principale || "",
     adresse: e.siege?.adresse || "",
+    codePostal: e.siege?.code_postal || "",
+    nda: (e.complements?.liste_id_organisme_formation || []).join(", "),
+    dirigeants: (e.dirigeants || []).filter((x: any) => x.nom).map((x: any) => ({ nom: x.nom, prenoms: x.prenoms || "", qualite: x.qualite || "" })),
   };
 }

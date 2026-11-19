@@ -13,6 +13,8 @@ Sortie (servie statiquement par l'application, chargée à la demande ; .fcz = J
   public/france-competences/fiches/<clé>.fcz   détail des fiches ACTIVES, par paquet de codes
                                                (blocs + compétences + modalités d'évaluation, ROME,
                                                activités, capacités, prérequis, voies d'accès…)
+  public/france-competences/partenaires/<clé>.fcz  SIRET des certificateurs et des partenaires habilités
+                                               (former / organiser l'évaluation), fiches actives et échues
 
 Usage : python scripts/sync_france_competences.py [--work <dossier de travail>]
 Rien n'est inventé : chaque champ est recopié de l'export officiel.
@@ -95,7 +97,10 @@ def fr_to_iso(d):
     return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else ""
 
 
-def parse(xml_path, kind, index, details):
+HABILITATIONS = {"HABILITATION_FORMER": "F", "HABILITATION_ORGANISER": "E", "HABILITATION_ORGA_FORM": "FE"}
+
+
+def parse(xml_path, kind, index, details, partenaires):
     n = 0
     for _, el in ET.iterparse(xml_path):
         if el.tag != "FICHE":
@@ -116,6 +121,14 @@ def parse(xml_path, kind, index, details):
         }
         if nouvelles:
             entry["new"] = [x for x in nouvelles if x]
+        # Habilitations (fiches actives ET échues) : « SIRET|F/E/FE|1 actif 0 inactif|date d'effet|date du dernier changement ».
+        cs = [txt(c, "SIRET_CERTIFICATEUR") for c in el.findall("CERTIFICATEURS/CERTIFICATEUR")]
+        ps = ["|".join((txt(p, "SIRET_PARTENAIRE"), HABILITATIONS.get(txt(p, "HABILITATION_PARTENAIRE"), "?"),
+                        "1" if txt(p, "ETAT_HABILITATION") == "Actif" else "0",
+                        fr_to_iso(txt(p, "DATE_ACTIF")), fr_to_iso(txt(p, "DATE_DERNIERE_MODIFICATION_ETAT"))))
+              for p in el.findall("PARTENAIRES/PARTENAIRE") if txt(p, "SIRET_PARTENAIRE")]
+        if cs or ps:
+            partenaires[code] = {"cs": [x for x in cs if x], "p": ps}
         # Index : fiche inactive réduite à l'essentiel (alerte + remplaçante éventuelle).
         index.append(entry if actif else {k: v for k, v in entry.items() if k in ("c", "i", "a", "n", "on", "fin", "new")})
         if actif:
@@ -173,7 +186,7 @@ def main():
     a = ap.parse_args()
     os.makedirs(a.work, exist_ok=True)
     res = latest_resources()
-    index, details, volumes, export_date = [], {}, {}, ""
+    index, details, partenaires, volumes, export_date = [], {}, {}, {}, ""
     for kind in ("rncp", "rs"):
         r = res[kind]
         export_date = max(export_date, re.search(r"(\d{4}-\d{2}-\d{2})", r["title"]).group(1))
@@ -183,13 +196,16 @@ def main():
             xml_path = os.path.join(a.work, name)
             if not os.path.exists(xml_path):
                 z.extract(name, a.work)
-        volumes[kind] = parse(xml_path, kind, index, details)
-    os.makedirs(os.path.join(OUT, "fiches"), exist_ok=True)
-    for f in os.listdir(os.path.join(OUT, "fiches")):
-        os.remove(os.path.join(OUT, "fiches", f))
-    shards = {}
+        volumes[kind] = parse(xml_path, kind, index, details, partenaires)
+    for sub in ("fiches", "partenaires"):
+        os.makedirs(os.path.join(OUT, sub), exist_ok=True)
+        for f in os.listdir(os.path.join(OUT, sub)):
+            os.remove(os.path.join(OUT, sub, f))
+    shards, shards_p = {}, {}
     for code, d in details.items():
         shards.setdefault(shard_key(code), {})[code] = d
+    for code, d in partenaires.items():
+        shards_p.setdefault(shard_key(code), {})[code] = d
     # JSON compressé en gzip, extension neutre « .fcz » pour qu'aucun hébergeur n'ajoute
     # d'en-tête Content-Encoding : le navigateur décompresse avec DecompressionStream.
     def dump_gz(obj, path):
@@ -198,6 +214,8 @@ def main():
             fh.write(gzip.compress(raw, compresslevel=9, mtime=0))
     for k, v in shards.items():
         dump_gz(v, os.path.join(OUT, "fiches", f"{k}.fcz"))
+    for k, v in shards_p.items():
+        dump_gz(v, os.path.join(OUT, "partenaires", f"{k}.fcz"))
     index.sort(key=lambda e: e["c"])
     dump_gz(index, os.path.join(OUT, "index.fcz"))
     if os.path.exists(os.path.join(OUT, "index.json")):
