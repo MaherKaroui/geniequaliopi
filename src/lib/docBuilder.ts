@@ -793,7 +793,7 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
   const logoAlign = s.logoPosition === 'left' ? 'text-align:left' : s.logoPosition === 'right' ? 'text-align:right' : 'text-align:center';
   const logoHtml = org.logoUrl ? `<img src="${org.logoUrl}" alt="Logo ${org.nom}" style="max-height:80px;max-width:200px;object-fit:contain" />` : "";
   const subtitleHtml = subtitle ? `<div style="margin-top:8px;font-weight:600;font-size:${s.fontSize + 3}px;font-family:${s.headingFont}">${subtitle}</div>` : "";
-  const ndaLine = org.nda ? `Organisme de formation – NDA : ${org.nda} – SIRET : ${org.siret}` : `Organisme de formation – SIRET : ${org.siret}`;
+  const ndaLine = ["Organisme de formation", org.nda ? `NDA : ${org.nda}` : "", (org.siret || "").trim() ? `SIRET : ${org.siret}` : ""].filter(Boolean).join(" – ");
 
   if (hs === 'banner') {
     return `<div style="background:${s.primaryColor};color:white;padding:20px 24px;border-radius:8px;margin-bottom:24px;${logoAlign}">
