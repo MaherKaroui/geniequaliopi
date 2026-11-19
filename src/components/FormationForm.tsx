@@ -1,3 +1,4 @@
+import SignatureChamp from "@/components/SignatureChamp";
 import { useRef, useState } from "react";
 import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
@@ -904,17 +905,8 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         </div>
         <div className="md:col-span-2">
           <Label>Signature du formateur</Label>
-          <div className="flex items-center gap-4 mt-1">
-            {data.formateurSignatureUrl ? (
-              <div className="relative">
-                <img src={data.formateurSignatureUrl} alt="Signature formateur" className="h-16 border rounded p-1" />
-                <button type="button" onClick={() => onChange({ ...data, formateurSignatureUrl: '' })} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
-              </div>
-            ) : null}
-            <Button type="button" variant="outline" size="sm" onClick={() => formateurSigRef.current?.click()}>
-              <Upload className="w-4 h-4 mr-1" /> Importer signature
-            </Button>
-            <input ref={formateurSigRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFormateurSigFile(e.target.files[0]); }} />
+          <div className="mt-1">
+            <SignatureChamp valeur={data.formateurSignatureUrl || undefined} libelle="Signature du formateur" onChange={(v) => onChange({ ...data, formateurSignatureUrl: v || '' })} />
           </div>
         </div>
 
