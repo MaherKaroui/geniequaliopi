@@ -13,7 +13,7 @@ export default function SignatureChamp({ valeur, onChange, libelle, compact }: {
   const [dessin, setDessin] = useState(false);
   const fichier = useRef<HTMLInputElement>(null);
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {valeur
         ? <img src={valeur} alt={libelle} className={`${compact ? "h-8 max-w-[110px]" : "h-12 max-w-[160px]"} object-contain border rounded bg-white`} />
         : <span className="text-xs text-muted-foreground">{compact ? "—" : "Aucune image"}</span>}
