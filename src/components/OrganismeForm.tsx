@@ -1,5 +1,5 @@
-import SignatureChamp from "@/components/SignatureChamp";
-import { referentEstDirigeant, type CleReferent } from "@/lib/signaturesReferents";
+import SignatureReferentChamp from "@/components/SignatureReferentChamp";
+import type { CleReferent } from "@/lib/signaturesReferents";
 import { useState } from "react";
 import { OrganismeInfo, SiegeAnterieur } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
@@ -67,24 +67,9 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
     }
   };
 
-  const signatureReferent = (cle: CleReferent, libelle: string) => {
-    const nom = ((data[cle] as string | undefined) || "").trim();
-    if (!nom) return null;
-    if (referentEstDirigeant(data, cle)) {
-      return <p className="text-[11px] text-muted-foreground mt-1">Même personne que le dirigeant : sa signature est reprise automatiquement sur les pièces du {libelle}.</p>;
-    }
-    const valeur = data.signatureReferents?.[cle] || (cle === "referentQualite" ? data.referentQualiteSignatureUrl : undefined);
-    return (
-      <div className="mt-2">
-        <p className="text-[11px] text-muted-foreground mb-1">Personne différente du dirigeant : ajoutez la signature de {nom} ({libelle}).</p>
-        <SignatureChamp compact valeur={valeur} libelle={`Signature — ${nom}`} onChange={(v) => {
-          const sigs = { ...(data.signatureReferents || {}) };
-          if (v) sigs[cle] = v; else delete sigs[cle];
-          onChange({ ...data, signatureReferents: sigs, ...(cle === "referentQualite" ? { referentQualiteSignatureUrl: v } : {}) });
-        }} />
-      </div>
-    );
-  };
+  const signatureReferent = (cle: CleReferent, libelle: string) => (
+    <SignatureReferentChamp data={data} cle={cle} libelle={libelle} onChange={(patch) => onChange({ ...data, ...patch })} />
+  );
 
   const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
     const current = data.typesActions || [];
@@ -182,7 +167,7 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
         <div>
           <Label htmlFor="referentQualite">Référent qualité</Label>
           <Input id="referentQualite" value={data.referentQualite} onChange={e => update('referentQualite', e.target.value)} placeholder="Nom du référent qualité" />
-          {!/fd\s*certif/i.test(data.referentQualite || "") && signatureReferent("referentQualite", "référent qualité")}
+          {signatureReferent("referentQualite", "référent qualité")}
         </div>
         <div>
           <Label htmlFor="poleAdministratif">Pôle Administratif</Label>

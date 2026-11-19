@@ -28,6 +28,7 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { parseEdofXlsx } from "@/lib/edofParser";
 import { extractMultipleStagiairesFromFile, extractionToStagiaire } from "@/lib/stagiaireFileExtractor";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
+import SignatureReferentChamp from "@/components/SignatureReferentChamp";
 import SignaturePad from "@/components/SignaturePad";
 import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import { setDocStyle } from "@/lib/docBuilder";
@@ -909,10 +910,30 @@ const GenerationRapide = () => {
 
           <Section icon={<FileText className="w-4 h-4" />} title="Champs optionnels" defaultOpen={false}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Field label="Responsable pédagogique" value={organisme.responsablePedagogique} onChange={(e) => setOrg({ responsablePedagogique: e.target.value })} />
-              <Field label="Référent qualité" value={organisme.referentQualite} onChange={(e) => setOrg({ referentQualite: e.target.value })} />
-              <Field label="Référent handicap" value={organisme.referentHandicap} onChange={(e) => setOrg({ referentHandicap: e.target.value })} />
-              <Field label="Pôle administratif" value={organisme.poleAdministratif} onChange={(e) => setOrg({ poleAdministratif: e.target.value })} />
+              <div>
+                <Field label="Responsable pédagogique" value={organisme.responsablePedagogique || ""} onChange={(e) => setOrg({ responsablePedagogique: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="responsablePedagogique" libelle="responsable pédagogique" onChange={setOrg} />
+              </div>
+              <div>
+                <Field label="Référent qualité" value={organisme.referentQualite || ""} onChange={(e) => setOrg({ referentQualite: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="referentQualite" libelle="référent qualité" onChange={setOrg} />
+              </div>
+              <div>
+                <Field label="Référent handicap" value={organisme.referentHandicap || ""} onChange={(e) => setOrg({ referentHandicap: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="referentHandicap" libelle="référent handicap" onChange={setOrg} />
+              </div>
+              <div>
+                <Field label="Pôle administratif" value={organisme.poleAdministratif || ""} onChange={(e) => setOrg({ poleAdministratif: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="poleAdministratif" libelle="responsable administratif" onChange={setOrg} />
+              </div>
+              <div>
+                <Field label="Relation entreprises" value={organisme.relationEntreprises || ""} onChange={(e) => setOrg({ relationEntreprises: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="relationEntreprises" libelle="responsable relation entreprises" onChange={setOrg} />
+              </div>
+              <div>
+                <Field label="Référent mobilité nationale et internationale" value={organisme.referentMobilite || ""} onChange={(e) => setOrg({ referentMobilite: e.target.value })} />
+                <SignatureReferentChamp data={organisme} cle="referentMobilite" libelle="référent mobilité" onChange={setOrg} />
+              </div>
               <Field label="Site web" value={organisme.siteWeb} onChange={(e) => setOrg({ siteWeb: e.target.value })} />
             </div>
             <LogoSignatureUpload
