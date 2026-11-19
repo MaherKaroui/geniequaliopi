@@ -30,6 +30,8 @@ import { isEmbeddedVAE } from "./lib/vae/embedMode";
 import { isEmbeddedBDC } from "./lib/bdc/embedMode";
 import FormationPresetLoader from "./components/FormationPresetLoader";
 import EspaceIzilearn from "./pages/EspaceIzilearn";
+import MenuEspace from "./components/MenuEspace";
+import { useDesignAccueil } from "./lib/outilsAccueil";
 
 installActivityTracker();
 
@@ -37,6 +39,7 @@ const queryClient = new QueryClient();
 
 const ApplicationContent = () => {
   const location = useLocation();
+  const design = useDesignAccueil();
   // Espace IZILearn : accessible par lien, sans code d'accès ; ses données viennent d'IZILearn.
   if (location.pathname === "/izilearn") return <EspaceIzilearn />;
   // Espace CRM LMS : même espace, données envoyées par la fiche session de CRM LMS.
@@ -58,6 +61,10 @@ const ApplicationContent = () => {
         <AccessGate>
         <BackgroundJobsProvider>
         <RouteActivityTracker />
+        {/* Design « Espace de travail » : menu latéral fixe sur toutes les pages (sauf la connexion). */}
+        <div className={design === "espace" && location.pathname !== "/auth" ? "lg:grid lg:grid-cols-[240px_1fr]" : undefined}>
+        {design === "espace" && location.pathname !== "/auth" && <MenuEspace />}
+        <div className="min-w-0">
         <Routes>
           <Route path="/admin" element={<Admin />} />
           <Route path="/" element={<Index />} />
@@ -80,6 +87,8 @@ const ApplicationContent = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
+        </div>
         <SophieChat />
         </BackgroundJobsProvider>
         </AccessGate>

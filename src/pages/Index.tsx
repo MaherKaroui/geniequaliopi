@@ -10,6 +10,7 @@ import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 import Accueil from "@/components/Accueil";
+import { EVT_ECRAN, type DemandeEcran } from "@/lib/outilsAccueil";
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, LogIn, LogOut, FileSpreadsheet, Upload, Loader2, ShieldCheck, Zap } from "lucide-react";
@@ -139,6 +140,17 @@ const Index = () => {
     if (maj) updateFormation(maj);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formation, stagiaires]);
+
+  // Menu de l'espace de travail : « Tableau de bord » ou « Préparer dossier Qualiopi » alors que cette page est déjà affichée.
+  useEffect(() => {
+    const surDemande = (e: Event) => {
+      const { parcours, etape } = (e as CustomEvent<DemandeEcran>).detail;
+      if (etape) updateStep(etape);
+      updateStarted(parcours);
+    };
+    window.addEventListener(EVT_ECRAN, surDemande);
+    return () => window.removeEventListener(EVT_ECRAN, surDemande);
+  }, []);
 
   const handleLoadDossier = (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => {
     updateOrganisme(org);

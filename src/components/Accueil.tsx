@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
-  ArrowRight, ArrowUpRight, BadgeCheck, BarChart3, Building2, CalendarDays, Check, ChevronRight, Clock, FileBadge,
-  FileCheck, FileSearch, FolderCheck, Globe, GraduationCap, History, LayoutDashboard, LayoutGrid, LogIn, LogOut, Mail,
-  Palette, PanelLeft, Play, Search, ShieldCheck, Sparkles, Stamp, Truck, UserCircle, Workflow, Zap,
+  ArrowRight, ArrowUpRight, BadgeCheck, Check, ChevronRight, Clock, FolderCheck, History, LogIn, LogOut, Palette, Play, Search, ShieldCheck, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,68 +12,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { DESIGNS, FAMILLES, choisirDesign as enregistrerDesign, useDesignAccueil, type Outil } from "@/lib/outilsAccueil";
 
-/** Un outil de l'accueil : une page de l'application (`route`), un autre site (`url`) ou le parcours en 5 étapes. */
-interface Outil {
-  label: string;
-  description: string;
-  icon: LucideIcon;
-  route?: string;
-  url?: string;
-  action?: "preparer";
-}
-
-interface Famille {
-  titre: string;
-  sousTitre: string;
-  icon: LucideIcon;
-  /** Dégradé de la pastille d'icône. */
-  couleur: string;
-  outils: Outil[];
-}
-
-const FAMILLES: Famille[] = [
-  {
-    titre: "Dossiers Qualiopi", sousTitre: "AF, CFA, VAE, BC", icon: FolderCheck,
-    couleur: "from-blue-500 to-blue-800",
-    outils: [
-      { label: "Préparer dossier Qualiopi", description: "5 étapes, de l'organisme aux documents", icon: FolderCheck, action: "preparer" },
-      { label: "Génération rapide", description: "Un dossier complet en quelques minutes", icon: Zap, route: "/rapide" },
-      { label: "Génération VAE", description: "Accompagnement à la VAE", icon: GraduationCap, route: "/vae" },
-      { label: "Bilan de compétences", description: "Dossier BC complet", icon: FileCheck, route: "/bilan-competences" },
-    ],
-  },
-  {
-    titre: "EDOF et financeurs", sousTitre: "CPF, OPCO, BPF", icon: Workflow,
-    couleur: "from-amber-400 to-orange-700",
-    outils: [
-      { label: "Automatisation EDOF", description: "Pièces depuis l'export EDOF", icon: Workflow, route: "/automatisation-edof" },
-      { label: "Audit EDOF (PDF)", description: "Analyse d'un export EDOF", icon: FileSearch, route: "/audit-edof" },
-      { label: "Contrôle EDOF / EY", description: "Préparer un contrôle", icon: ShieldCheck, route: "/controle-ey" },
-      { label: "OPCO Mobilités", description: "Dossiers OPCO Mobilités", icon: Truck, route: "/opco-mobilites" },
-      { label: "Analyse BPF", description: "Lecture du bilan pédagogique", icon: BarChart3, route: "/analyse-bpf" },
-    ],
-  },
-  {
-    titre: "Identité de l'organisme", sousTitre: "NDA, tampon, logo, CV", icon: Building2,
-    couleur: "from-emerald-400 to-emerald-700",
-    outils: [
-      { label: "Demande NDA", description: "Déclaration d'activité", icon: FileBadge, route: "/demande-nda" },
-      { label: "Générateur de tampon", description: "Tampon de l'organisme", icon: Stamp, route: "/generateur-tampon" },
-      { label: "Créateur de logo", description: "Logo de l'organisme", icon: Sparkles, route: "/generateur-logo" },
-      { label: "Générateur de CV", description: "CV du formateur", icon: UserCircle, route: "/generateur-cv" },
-    ],
-  },
-  {
-    titre: "Messagerie modifiable", sousTitre: "S'ouvre dans un autre site", icon: Mail,
-    couleur: "from-rose-400 to-rose-700",
-    outils: [
-      { label: "Outlook", description: "Autre site", icon: Mail, url: "https://outlook-modifiable.netlify.app/" },
-      { label: "Gmail", description: "Autre site", icon: Globe, url: "https://gmail-modifiable.netlify.app/" },
-      { label: "Agenda", description: "Autre site", icon: CalendarDays, url: "https://agenda-modifiable.netlify.app/" },
-    ],
-  },
-];
 
 const TYPES: Record<string, { court: string; classe: string }> = {
   "actions-formation": { court: "AF", classe: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300" },
@@ -92,23 +30,6 @@ const ETAPES = [
   { n: 5, titre: "Documents", detail: "≈ 500 preuves" },
 ];
 
-export type DesignAccueil = "tableau" | "lanceur" | "espace";
-
-const DESIGNS: { id: DesignAccueil; nom: string; detail: string; icon: LucideIcon }[] = [
-  { id: "tableau", nom: "Tableau de bord", detail: "Bandeau, dossiers récents et familles d'outils", icon: LayoutDashboard },
-  { id: "lanceur", nom: "Lanceur d'outils", detail: "Recherche au centre et tuiles", icon: LayoutGrid },
-  { id: "espace", nom: "Espace de travail", detail: "Menu latéral et 5 étapes", icon: PanelLeft },
-];
-
-const CLE_DESIGN = "gq_design_accueil";
-
-function lireDesign(): DesignAccueil {
-  try {
-    const v = localStorage.getItem(CLE_DESIGN);
-    if (v === "tableau" || v === "lanceur" || v === "espace") return v;
-  } catch { /* stockage indisponible : design par défaut */ }
-  return "tableau";
-}
 
 interface DossierRecent {
   id: string;
@@ -154,15 +75,12 @@ interface AccueilProps {
 }
 
 const Accueil = ({ user, isSuperAdmin, onSignOut, onNavigate, onPreparer, onOuvrirDossier }: AccueilProps) => {
-  const [design, setDesign] = useState<DesignAccueil>(lireDesign);
+  const design = useDesignAccueil();
   const [recents, setRecents] = useState<DossierRecent[]>([]);
   const [compte, setCompte] = useState<{ actifs: number; ceMois: number } | null>(null);
   const [recherche, setRecherche] = useState(false);
 
-  const choisirDesign = (d: DesignAccueil) => {
-    setDesign(d);
-    try { localStorage.setItem(CLE_DESIGN, d); } catch { /* choix gardé pour cette visite seulement */ }
-  };
+  const choisirDesign = enregistrerDesign;
 
   useEffect(() => {
     if (!user) { setRecents([]); setCompte(null); return; }
@@ -445,32 +363,8 @@ const Accueil = ({ user, isSuperAdmin, onSignOut, onNavigate, onPreparer, onOuvr
   );
 
   // ---------- C — Espace de travail ----------
+  // Le menu latéral fixe est posé autour de toutes les pages par l'application (MenuEspace).
   const Espace = () => (
-    <div className="min-h-screen grid lg:grid-cols-[240px_1fr]">
-      <aside className="hidden lg:block bg-[#0f1a33] text-[#c9d3e8] px-3 py-5 space-y-5 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-        <div className="px-2"><Marque claire /></div>
-        <nav className="space-y-5">
-          <div className="space-y-0.5">
-            <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[.09em] text-[#7f8cab]">Accueil</p>
-            <span className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-white bg-[#1d2b4f] shadow-[inset_2px_0_0_#6b97f5]">
-              <LayoutDashboard className="w-4 h-4 text-[#8fb0ff]" /> Tableau de bord
-            </span>
-          </div>
-          {FAMILLES.map(f => (
-            <div key={f.titre} className="space-y-0.5">
-              <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[.09em] text-[#7f8cab]">{f.titre}</p>
-              {f.outils.map(o => (
-                <button key={o.label} type="button" onClick={() => ouvrir(o)} className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm hover:bg-white/5 transition-colors">
-                  <o.icon className="w-4 h-4 text-[#7f8cab]" />
-                  <span className="flex-1 text-left">{o.label}</span>
-                  {o.url && <ArrowUpRight className="w-3 h-3 text-[#7f8cab]" />}
-                </button>
-              ))}
-            </div>
-          ))}
-        </nav>
-      </aside>
-
       <main className="min-w-0 px-4 md:px-8 py-6 space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <BarreRecherche />
@@ -540,7 +434,6 @@ const Accueil = ({ user, isSuperAdmin, onSignOut, onNavigate, onPreparer, onOuvr
           </div>
         </section>
       </main>
-    </div>
   );
 
   return (
