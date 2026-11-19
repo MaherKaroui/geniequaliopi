@@ -567,7 +567,7 @@ const DemandeNDA = () => {
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {currentStep === 1 && <OrganismeForm data={organisme} onChange={setOrganisme} hideFields={['nda', 'domainesFormation', 'certifications', 'outilsUtilises', 'version', 'typesActions']} />}
-          {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />}
+          {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} stagiaires={stagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} formation={formation} />}
           {currentStep === 4 && (
             <div className="space-y-8">

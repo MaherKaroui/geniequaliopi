@@ -1,5 +1,6 @@
+import { appliquerIndicateursAuto } from "@/lib/indicateursResultats";
 import SignatureChamp from "@/components/SignatureChamp";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,9 +25,18 @@ interface FormationFormProps {
   onChange: (data: FormationInfo) => void;
   onImportStagiaires?: (stagiaires: StagiaireInfo[]) => void;
   onApplyOrganisme?: (organisme: OrganismeInfo) => void;
+  /** Stagiaires du dossier : servent à remplir automatiquement les indicateurs de résultats. */
+  stagiaires?: StagiaireInfo[];
 }
 
-const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }: FormationFormProps) => {
+const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, stagiaires = [] }: FormationFormProps) => {
+  // Indicateurs de résultats (critère 1) : remplis depuis les dates et les stagiaires, saisie manuelle conservée.
+  useEffect(() => {
+    const maj = appliquerIndicateursAuto(data, stagiaires);
+    if (maj) onChange(maj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, stagiaires]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);

@@ -303,7 +303,7 @@ const Index = () => {
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {currentStep === 1 && <OrganismeForm data={organisme} onChange={updateOrganisme} />}
-          {currentStep === 2 && <FormationForm data={formation} onChange={updateFormation} onImportStagiaires={updateStagiaires} />}
+          {currentStep === 2 && <FormationForm data={formation} onChange={updateFormation} onImportStagiaires={updateStagiaires} stagiaires={stagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} formation={formation} typesActions={organisme.typesActions} />}
           {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
           {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} onOrganismeChange={updateOrganisme} />}
