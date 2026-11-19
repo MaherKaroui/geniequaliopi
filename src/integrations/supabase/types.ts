@@ -653,6 +653,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      saved_dossiers_liste: {
+        Args: { p_user: string }
+        Returns: {
+          archived: boolean
+          created_at: string
+          id: string
+          intitule: string
+          name: string
+          nb_stagiaires: number
+          noms_stagiaires: string
+          org_nom: string
+          type_action: string
+          updated_at: string
+        }[]
+      }
       transition_formation_preset: {
         Args: {
           p_action: string
