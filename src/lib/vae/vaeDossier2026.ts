@@ -14,6 +14,7 @@
  * - pas de signature simulée : image réelle ou case vide.
  */
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
+import { cachetCertificatHtml, faitALe, lieuRealisationCertificat } from "../certificatRealisation";
 import { buildDocument, section, formatDate, linkUrl, isFacebookPage, getStagiaireTarif, memePersonne, referentQualiteEstDirigeant } from "../docBuilder";
 import { versionReferentiel } from "../typeAudit";
 import { orgVersionUlterieure, dateMax } from "../versionUlterieure";
@@ -678,9 +679,10 @@ export function genVAECertificatRealisation(o: OrganismeInfo, f: FormationInfo, 
     ] });
   }
   const d = frVAE(ch.fin);
+  const lieuCertif = lieuRealisationCertificat(o, f, s);
   return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", subtitle: "Action concourant au développement des compétences", sections: [
-    { heading: "Attestation", content: `<p>Je soussigné${dirigeanteFem(o) ? "e" : ""} ${esc(o.dirigeant)}, ${dirigeanteFem(o) ? "représentante légale" : "représentant légal"} ${esc(de(o.nom))}${o.nda ? ` (déclaration d'activité n° ${esc(o.nda)})` : ""}, atteste que :</p><p><strong>${esc(s.civilite || "")} ${esc(s.prenom)} ${esc(s.nom)}</strong> a suivi l'action <strong>« Accompagnement VAE — ${esc(c.intitule)} »</strong>, de nature : <strong>action permettant de faire valider les acquis de l'expérience</strong> (article L.6313-1, 3° du Code du travail),<br>qui s'est déroulée du ${frVAE(ch.debut)} au ${frVAE(ch.fin)}, pour une durée réalisée de <strong>${heures} heures</strong> (sur ${heuresVAE(f)} heures prévues).</p><p>Sans préjudice des délais imposés par les règles fixées par le financeur, ${femCand(s) ? "la bénéficiaire" : "le bénéficiaire"} et l'organisme conservent l'ensemble des pièces justificatives ayant permis d'établir le présent certificat pendant 3 ans à compter de la fin de l'année du dernier paiement.</p>` },
-  ], extraHtml: signatures([sigOrganisme(o, d)]) });
+    { heading: "Attestation", content: `<p>Je soussigné${dirigeanteFem(o) ? "e" : ""} ${esc(o.dirigeant)}, ${dirigeanteFem(o) ? "représentante légale" : "représentant légal"} ${esc(de(o.nom))}${o.nda ? ` (déclaration d'activité n° ${esc(o.nda)})` : ""}, atteste que :</p><p><strong>${esc(s.civilite || "")} ${esc(s.prenom)} ${esc(s.nom)}</strong> a suivi l'action <strong>« Accompagnement VAE — ${esc(c.intitule)} »</strong>, de nature : <strong>action permettant de faire valider les acquis de l'expérience</strong> (article L.6313-1, 3° du Code du travail),<br>qui s'est déroulée du ${frVAE(ch.debut)} au ${frVAE(ch.fin)}${lieuCertif ? ` (${/mixte|hybride/i.test(f.modalites || "") ? "séances en présentiel" : "lieu de réalisation"} : ${esc(lieuCertif)})` : ""}, pour une durée réalisée de <strong>${heures} heures</strong> (sur ${heuresVAE(f)} heures prévues).</p><p>Sans préjudice des délais imposés par les règles fixées par le financeur, ${femCand(s) ? "la bénéficiaire" : "le bénéficiaire"} et l'organisme conservent l'ensemble des pièces justificatives ayant permis d'établir le présent certificat pendant 3 ans à compter de la fin de l'année du dernier paiement.</p>` },
+  ], extraHtml: `<p>${esc(faitALe(o, d))}</p>${cachetCertificatHtml(o)}` });
 }
 
 const mail = (o: OrganismeInfo, titre: string, objet: string, corps: string) => buildDocument({ org: o, title: `MODÈLE DE COURRIEL – ${titre}`, sections: [

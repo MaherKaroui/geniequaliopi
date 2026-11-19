@@ -1199,8 +1199,8 @@ export function footer(org: OrganismeInfo): string {
   }
   return `<div class="footer">
     <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>
-    <p style="margin:0 0 8px">Adresse : ${org.adresse}, ${org.codePostal} ${org.ville}</p>
-    <p style="margin:0 0 8px">SIRET : ${org.siret}</p>
+    ${[org.adresse, [org.codePostal, org.ville].filter(x => (x || "").trim()).join(" ")].filter(x => (x || "").trim()).length ? `<p style="margin:0 0 8px">Adresse : ${[org.adresse, [org.codePostal, org.ville].filter(x => (x || "").trim()).join(" ")].filter(x => (x || "").trim()).join(", ")}</p>` : ""}
+    ${(org.siret || "").trim() ? `<p style="margin:0 0 8px">SIRET : ${org.siret}</p>` : ""}
     ${org.nda ? `<p style="margin:0 0 8px">NDA : ${org.nda} – cet enregistrement ne vaut pas agrément de l'État.</p>` : ""}
     ${qualiopiLine}
     <p style="margin:4px 0 0">V${version} ${dateMaj}</p>

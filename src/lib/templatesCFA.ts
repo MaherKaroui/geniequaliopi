@@ -2,6 +2,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee, getFormationProgress, getPassedFormationDays, subtractBusinessDays } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
+import { cachetCertificatHtml, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
 import { getEvalContent } from "./evalContent";
 
 const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
@@ -1253,7 +1254,8 @@ export function genListeAideSocialCFA(o: OrganismeInfo) {
 }
 
 export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
-  // Mode individuel si un stagiaireIdx est fourni : un certificat pour ce stagiaire uniquement
+  // Mode individuel si un stagiaireIdx est fourni : un certificat pour ce stagiaire uniquement.
+  // Une seule page A4, lieu de réalisation si présentiel, seul le cachet de l'organisme.
   const target = typeof stagiaireIdx === "number" ? stagiaires[stagiaireIdx] : null;
   const stagList = target
     ? `${target.civilite || ""} ${target.prenom || ""} ${target.nom || ""}`.trim()
@@ -1261,25 +1263,22 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
   // Dates : individuelles si présentes, sinon dates formation
   const dDeb = target?.dateDebutFormation || f.dateDebut;
   const dFin = target?.dateFinFormation || f.dateFin;
+  const lieu = lieuRealisationCertificat(o, f, target || undefined);
+  const dirigeant = (o.dirigeant || "").trim();
   return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", extraHtml: `
-    <p>Je soussigné <strong>${o.dirigeant}</strong>, représentant légal du dispensateur de l'action concourant au développement des compétences, de l'organisme de formation <strong>${o.nom}</strong></p>
+    <div style="page-break-inside:avoid;break-inside:avoid">
+    <p>Je soussigné${dirigeant ? ` <strong>${dirigeant}</strong>,` : ","} représentant légal du dispensateur de l'action concourant au développement des compétences, de l'organisme de formation <strong>${o.nom}</strong></p>
     <p>atteste que :</p>
-    <p style="font-size:14pt;font-weight:bold;text-align:center;margin:20px 0">${stagList}</p>
+    <p style="font-size:14pt;font-weight:bold;text-align:center;margin:12px 0">${stagList}</p>
     <p>a suivi l'action <strong>${f.intitule}</strong></p>
-    <p><strong>Nature de l'action :</strong></p>
-    <ul>
-      <li>☐ action de formation</li>
-      <li>☐ bilan de compétences</li>
-      <li>☐ action de VAE</li>
-      <li>☑ action de formation par apprentissage</li>
-    </ul>
-    <p>Qui s'est déroulée du <strong>${formatDate(dDeb)}</strong> au <strong>${formatDate(dFin)}</strong> pour une durée de <strong>${f.duree}</strong></p>
-    <p style="margin-top:20px">Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
+    <p><strong>Nature de l'action :</strong><br>☐ action de formation &nbsp; ☐ bilan de compétences &nbsp; ☐ action de VAE &nbsp; ☒ action de formation par apprentissage</p>
+    <p>Qui s'est déroulée du <strong>${formatDate(dDeb)}</strong> au <strong>${formatDate(dFin)}</strong> pour une durée de <strong>${f.duree}</strong>${lieu ? `<br><strong>${/mixte|hybride/i.test(f.modalites || "") ? "Lieu des séances en présentiel" : "Lieu de réalisation"} :</strong> ${lieu}` : ""}</p>
+    <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>En cas de cofinancement des fonds européens, la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.</p>
-    <p style="margin-top:30px">Fait à <strong>${o.ville}</strong>, le <strong>${formatDate(dFin)}</strong></p>
-    <p>Cachet et signature du responsable du dispensateur de formation</p>
-    <p style="margin-top:40px"><strong>${o.dirigeant}</strong></p>
-  ` }).replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
+    <p>${faitALe(o, formatDate(dFin))}</p>
+    ${cachetCertificatHtml(o)}
+    </div>
+  ` });
 }
 
 // ========== IND 14 — WEBINAIRES (CFA) ==========

@@ -1,5 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { mot } from "./resolveurFormation";
+import { cachetCertificatHtml, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays, getStagiaireDuree } from "./docBuilder";
@@ -185,23 +186,28 @@ export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stag
 export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   // Modèle unique aligné sur le certificat de réalisation du ministère du Travail :
   // nature de l'action cochée, durée RÉALISÉE propre à chaque stagiaire (dates individuelles).
+  // Une page A4 par certificat, lieu de réalisation si présentiel, seul le cachet de l'organisme.
   const isCFA = (o.typesActions || []).includes("apprentissage") || !!(f.rythmeAlternance || "").trim();
-  const extra = stagiaires.map(s => `
-    <div class="section" style="padding:25px"><p style="text-align:center;font-size:16px;margin-bottom:15px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
-    <p>Je soussigné(e) <strong>${o.dirigeant}</strong>, représentant légal du dispensateur de l'action concourant au développement des compétences <strong>${o.nom}</strong>${o.nda ? ` (déclaration d'activité n° ${o.nda})` : ""}${o.siret ? `, SIRET ${o.siret}` : ""},</p>
+  const dirigeant = (o.dirigeant || "").trim();
+  const extra = stagiaires.map((s, i) => {
+    const lieu = lieuRealisationCertificat(o, f, s);
+    const fin = formatDate(getStagiaireDateFin(s, f));
+    return `
+    <div class="section" style="padding:16px 22px;page-break-inside:avoid;break-inside:avoid"><p style="text-align:center;font-size:16px;margin:0 0 10px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
+    <p>Je soussigné(e)${dirigeant ? ` <strong>${dirigeant}</strong>,` : ","} représentant légal du dispensateur de l'action concourant au développement des compétences <strong>${o.nom}</strong>${o.nda ? ` (déclaration d'activité n° ${o.nda})` : ""}${o.siret ? `, SIRET ${o.siret}` : ""},</p>
     <p>atteste que <strong>${[s.civilite, s.prenom, s.nom].filter(Boolean).join(" ")}</strong>${s.entreprise?.trim() ? `, salarié(e) de l'entreprise ${s.entreprise}` : ""},</p>
     <p>a suivi l'action <strong>« ${f.intitule} »</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ""}</p>
     <p><strong>Nature de l'action concourant au développement des compétences :</strong><br>
     ${isCFA ? "☐" : "☒"} action de formation &nbsp; ☐ bilan de compétences &nbsp; ☐ action de VAE &nbsp; ${isCFA ? "☒" : "☐"} action de formation par apprentissage</p>
-    <p><strong>Qui s'est déroulée du</strong> ${formatDate(getStagiaireDateDebut(s, f))} <strong>au</strong> ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <p><strong>Qui s'est déroulée du</strong> ${formatDate(getStagiaireDateDebut(s, f))} <strong>au</strong> ${fin}<br>
+    ${lieu ? `<strong>${/mixte|hybride/i.test(f.modalites || "") ? "Lieu des séances en présentiel" : "Lieu de réalisation"} :</strong> ${lieu}<br>` : ""}
     <strong>Pour une durée réalisée de</strong> ${getStagiaireDuree(s, f)}${/distanciel|foad/i.test(f.modalites || "") ? " (formation à distance, relevés de connexion à l'appui)" : ""}.</p>
     <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
-    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
-    </div><div class="page-break"></div>`).join("");
-  return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
-    // Signé à la fin de la formation (date du « Fait à »), jamais à la date du jour.
-    signatures: { type: "2", labels: ["Le représentant légal du dispensateur", "Cachet de l'organisme"], names: [o.dirigeant, o.nom], dates: stagiaires.length === 1 ? [formatDate(getStagiaireDateFin(stagiaires[0], f)), formatDate(getStagiaireDateFin(stagiaires[0], f))] : undefined } })
-    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
+    <p>${faitALe(o, fin)}</p>
+    ${cachetCertificatHtml(o)}
+    </div>${i < stagiaires.length - 1 ? '<div class="page-break"></div>' : ""}`;
+  }).join("");
+  return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra });
 }
 
 // ========== DOCUMENTS PÉDAGOGIQUES AF ==========
