@@ -34,6 +34,9 @@ interface DossierHistoryProps {
   formation: FormationInfo;
   stagiaires: StagiaireInfo[];
   onLoad: (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => void;
+  /** Dossier à ouvrir dès que la liste est chargée (choisi depuis l'accueil). */
+  ouvrirId?: string | null;
+  onOuvert?: () => void;
 }
 
 interface SavedDossier {
@@ -47,7 +50,7 @@ interface SavedDossier {
   archived?: boolean;
 }
 
-const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: DossierHistoryProps) => {
+const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvrirId, onOuvert }: DossierHistoryProps) => {
   const [dossiers, setDossiers] = useState<SavedDossier[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -208,6 +211,15 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     setSaveName(d.name);
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
+
+  useEffect(() => {
+    if (!ouvrirId) return;
+    const d = dossiers.find((x) => x.id === ouvrirId);
+    if (d) {
+      handleLoad(d);
+      onOuvert?.();
+    }
+  }, [ouvrirId, dossiers]);
 
   const q = search.trim().toLowerCase();
   const visible = dossiers

@@ -9,9 +9,10 @@ import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
+import Accueil from "@/components/Accueil";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, GraduationCap, Mail, Globe, Sparkles, Zap, BarChart3, Workflow, CalendarDays, FileSearch } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, FileSpreadsheet, Upload, Loader2, ShieldCheck, Zap } from "lucide-react";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
@@ -51,6 +52,8 @@ const Index = () => {
   const [airtableLoading, setAirtableLoading] = useState(false);
   const [brandingOpen, setBrandingOpen] = useState(false);
   const [myCertifOpen, setMyCertifOpen] = useState(false);
+  /** Dossier choisi dans « Reprendre un dossier » de l'accueil, ouvert par l'historique une fois chargé. */
+  const [ouvrirId, setOuvrirId] = useState<string | null>(null);
 
   const getAirtableErrorMessage = (payload: any) => {
     if (!payload) return "Erreur Airtable inconnue";
@@ -146,102 +149,14 @@ const Index = () => {
 
   if (!started) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-2xl text-center space-y-8">
-          {/* Auth button top right */}
-          <div className="fixed top-4 right-4">
-            {user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground flex items-center gap-1">
-                  <User className="w-3.5 h-3.5" /> {user.email}
-                </span>
-                {isSuperAdmin && (
-                  <Button variant="outline" size="sm" onClick={() => navigate("/admin")} className="gap-1">
-                    <ShieldCheck className="w-4 h-4" /> Admin
-                  </Button>
-                )}
-                <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
-              </div>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-2">
-                <LogIn className="w-4 h-4" /> Connexion
-              </Button>
-            )}
-          </div>
-
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              <span className="text-gradient-hero">Qualiopi</span> Generator
-            </h1>
-            <p className="text-lg text-muted-foreground mt-3 max-w-lg mx-auto">
-              Générez automatiquement votre dossier Qualiopi complet : ~500 documents de preuves pour les 7 critères et 33 indicateurs du RNQ.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-            {[
-              { title: "~500 documents", desc: "Dossier complet prêt pour audit avec toutes les preuves" },
-              { title: "33 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
-              { title: "Pré-rempli", desc: "Documents remplis avec données réalistes et signatures" },
-            ].map((item, i) => (
-              <div key={i} className="p-5 bg-card rounded-xl border shadow-card">
-                <h3 className="font-semibold text-sm">{item.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
-            <Button size="lg" className="bg-gradient-accent border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated gap-2" onClick={() => navigate("/rapide")}>
-              <Zap className="w-5 h-5" /> Génération rapide
-            </Button>
-            <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
-              Commencer <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/automatisation-edof")}>
-              <Workflow className="w-5 h-5" /> Automatisation EDOF
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/audit-edof")}>
-              <FileSearch className="w-5 h-5" /> Audit EDOF (PDF)
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/controle-ey")}>
-              <ShieldCheck className="w-5 h-5" /> Contrôle EDOF / EY
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/demande-nda")}>
-              <FileCheck className="w-5 h-5" /> DemandeNDA
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-cv")}>
-              <UserCircle className="w-5 h-5" /> Générateur CV
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-tampon")}>
-              <Stamp className="w-5 h-5" /> Générateur Tampon
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-logo")}>
-              <Sparkles className="w-5 h-5" /> Créateur de logo
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
-              <Truck className="w-5 h-5" /> OPCO Mobilités
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/analyse-bpf")}>
-              <BarChart3 className="w-5 h-5" /> Analyse BPF
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => navigate("/vae")}>
-              <GraduationCap className="w-5 h-5" /> Génération VAE
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/bilan-competences")}>
-              <FileCheck className="w-5 h-5" /> Génération Bilan de compétences
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://outlook-modifiable.netlify.app/", "_blank")}>
-              <Mail className="w-5 h-5" /> Outlook 
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://gmail-modifiable.netlify.app/", "_blank")}>
-              <Globe className="w-5 h-5" /> Gmail 
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => window.open("https://agenda-modifiable.netlify.app/", "_blank")}>
-              <CalendarDays className="w-5 h-5" /> Agenda
-            </Button>
-
-          </div>
-        </div>
-      </div>
+      <Accueil
+        user={user}
+        isSuperAdmin={isSuperAdmin}
+        onSignOut={signOut}
+        onNavigate={navigate}
+        onPreparer={(etape) => { if (etape) updateStep(etape); updateStarted(true); }}
+        onOuvrirDossier={(id) => { setOuvrirId(id); updateStarted(true); }}
+      />
     );
   }
 
@@ -296,6 +211,8 @@ const Index = () => {
             formation={formation}
             stagiaires={stagiaires}
             onLoad={handleLoadDossier}
+            ouvrirId={ouvrirId}
+            onOuvert={() => setOuvrirId(null)}
           />
         )}
 
