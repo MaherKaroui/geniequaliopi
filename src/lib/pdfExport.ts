@@ -155,6 +155,52 @@ function getPageBreakBehavior(node: ChildNode): PageBreakBehavior {
   return { before, after, markerOnly };
 }
 
+/** <meta name="pdf-une-page"> : chaque segment (entre sauts de page explicites) tient sur une page. */
+const UNE_PAGE_RE = /<meta\s+name=["']pdf-une-page["']/i;
+
+/** Attend le chargement des images (logo, cachet) : leur hauteur compte dans la mesure. */
+async function imagesChargees(root: HTMLElement): Promise<void> {
+  const imgs = Array.from(root.querySelectorAll("img"));
+  await Promise.all(imgs.map((img) => img.complete ? null : Promise.race([
+    img.decode().catch(() => undefined),
+    new Promise((r) => setTimeout(r, 3000)),
+  ])));
+}
+
+async function pagesUneParSegment(host: HTMLDivElement, nodes: ChildNode[], footerHtml: string, footerHeightPx: number, pageWPx: number, pageHPx: number): Promise<HTMLDivElement[]> {
+  const segments: ChildNode[][] = [[]];
+  const dernier = () => segments[segments.length - 1];
+  for (const node of nodes) {
+    const b = getPageBreakBehavior(node);
+    if (b.markerOnly) {
+      if ((b.before || b.after) && dernier().length) segments.push([]);
+      continue;
+    }
+    if (b.before && dernier().length) segments.push([]);
+    dernier().push(node);
+    if (b.after) segments.push([]);
+  }
+  const pages: HTMLDivElement[] = [];
+  for (const seg of segments.filter((x) => x.length)) {
+    // Page rendue plus grande (W/k × H/k) puis réduite à l'A4 au rendu : tout le contenu
+    // (en-tête, texte, cachet, pied) est réduit uniformément, sans couper ni déborder.
+    let k = 1;
+    let parts = createPage(host, footerHtml, footerHeightPx, pageWPx, pageHPx);
+    seg.forEach((n) => parts.content.appendChild(n.cloneNode(true)));
+    await imagesChargees(parts.page);
+    while (parts.content.scrollHeight > parts.content.clientHeight + 1 && k > 0.55) {
+      k = Math.round((k - 0.03) * 100) / 100;
+      const prochain = createPage(host, footerHtml, footerHeightPx, Math.round(pageWPx / k), Math.round(pageHPx / k));
+      while (parts.content.firstChild) prochain.content.appendChild(parts.content.firstChild);
+      parts.page.remove();
+      parts = prochain;
+    }
+    if (k < 1) parts.page.dataset.echelle = String(k);
+    pages.push(parts.page);
+  }
+  return pages;
+}
+
 function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number, pageWPx = A4_WIDTH_PX, pageHPx = A4_HEIGHT_PX): PageParts {
   const page = document.createElement("div");
   page.className = "pdf-page";
@@ -370,12 +416,20 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
   try {
     const footerHeightPx = measureFooterHeight(host, footerHtml, PAGE_W_PX);
     const nodes = getRenderableNodes(source);
+    // Documents « une page » (ex. certificat de réalisation) : chaque segment entre deux sauts
+    // de page explicites tient sur UNE page, réduit proportionnellement si nécessaire.
+    const unePage = UNE_PAGE_RE.test(htmlContent);
 
     const pages: HTMLDivElement[] = [];
     let current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
     pages.push(current.page);
+    if (unePage) {
+      current.page.remove();
+      pages.length = 0;
+      pages.push(...await pagesUneParSegment(host, nodes, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX));
+    }
 
-    for (let index = 0; index < nodes.length; index++) {
+    for (let index = 0; !unePage && index < nodes.length; index++) {
       const node = nodes[index];
       const pageBreak = getPageBreakBehavior(node);
       const hasMoreNodes = index < nodes.length - 1;
@@ -661,14 +715,15 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       const anchors = page.querySelectorAll("a[href]");
       if (!anchors.length) return;
       const pageRect = page.getBoundingClientRect();
+      const ratio = pxToMm * PAGE_W_PX / (pageRect.width || PAGE_W_PX);
       anchors.forEach((anchor) => {
         const href = anchor.getAttribute("href");
         if (!href || !href.startsWith("http")) return;
         const rect = anchor.getBoundingClientRect();
-        const x = (rect.left - pageRect.left) * pxToMm;
-        const y = (rect.top - pageRect.top) * pxToMm;
-        const w = rect.width * pxToMm;
-        const h = rect.height * pxToMm;
+        const x = (rect.left - pageRect.left) * ratio;
+        const y = (rect.top - pageRect.top) * ratio;
+        const w = rect.width * ratio;
+        const h = rect.height * ratio;
         if (w > 0 && h > 0) {
           pdf.link(x, y, w, h, { url: href });
         }
@@ -687,15 +742,18 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     /** Rendu page par page (chemin de secours, comportement historique). */
     const renderPageByPage = async (batch: HTMLDivElement[]) => {
       for (const page of batch) {
+        // Page « une page » agrandie (data-echelle) : rendue à sa taille puis réduite à l'A4.
+        const w = page.dataset.echelle ? page.offsetWidth : PAGE_W_PX;
+        const h = page.dataset.echelle ? page.offsetHeight : PAGE_H_PX;
         const canvas = await html2canvas(page, {
-          scale,
+          scale: scale * PAGE_W_PX / w,
           useCORS: true,
           logging: false,
           backgroundColor: "#ffffff",
-          width: PAGE_W_PX,
-          height: PAGE_H_PX,
-          windowWidth: PAGE_W_PX,
-          windowHeight: PAGE_H_PX,
+          width: w,
+          height: h,
+          windowWidth: w,
+          windowHeight: h,
         });
         await addPageFromCanvas(canvas, page);
         disposeCanvas(canvas);
@@ -713,7 +771,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         await ceder();
       }
 
-      if (batch.length === 1) {
+      if (batch.length === 1 || batch.some((page) => page.dataset.echelle)) {
         await renderPageByPage(batch);
       } else {
         const strip = document.createElement("div");

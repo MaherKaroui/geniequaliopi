@@ -2,7 +2,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee, getFormationProgress, getPassedFormationDays, subtractBusinessDays } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
-import { cachetCertificatHtml, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
+import { CERTIF_BLOC_STYLE, cachetCertificatHtml, compacterParagraphes, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
 import { getEvalContent } from "./evalContent";
 
 const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
@@ -1265,11 +1265,11 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
   const dFin = target?.dateFinFormation || f.dateFin;
   const lieu = lieuRealisationCertificat(o, f, target || undefined);
   const dirigeant = (o.dirigeant || "").trim();
-  return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", extraHtml: `
-    <div style="page-break-inside:avoid;break-inside:avoid">
+  return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", extraHtml: compacterParagraphes(`
+    <div style="${CERTIF_BLOC_STYLE}">
     <p>Je soussigné${dirigeant ? ` <strong>${dirigeant}</strong>,` : ","} représentant légal du dispensateur de l'action concourant au développement des compétences, de l'organisme de formation <strong>${o.nom}</strong></p>
     <p>atteste que :</p>
-    <p style="font-size:14pt;font-weight:bold;text-align:center;margin:12px 0">${stagList}</p>
+    <p style="font-size:13pt;font-weight:bold;text-align:center;margin:6px 0">${stagList}</p>
     <p>a suivi l'action <strong>${f.intitule}</strong></p>
     <p><strong>Nature de l'action :</strong><br>☐ action de formation &nbsp; ☐ bilan de compétences &nbsp; ☐ action de VAE &nbsp; ☒ action de formation par apprentissage</p>
     <p>Qui s'est déroulée du <strong>${formatDate(dDeb)}</strong> au <strong>${formatDate(dFin)}</strong> pour une durée de <strong>${f.duree}</strong>${lieu ? `<br><strong>${/mixte|hybride/i.test(f.modalites || "") ? "Lieu des séances en présentiel" : "Lieu de réalisation"} :</strong> ${lieu}` : ""}</p>
@@ -1278,7 +1278,7 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
     <p>${faitALe(o, formatDate(dFin))}</p>
     ${cachetCertificatHtml(o)}
     </div>
-  ` });
+  `) });
 }
 
 // ========== IND 14 — WEBINAIRES (CFA) ==========

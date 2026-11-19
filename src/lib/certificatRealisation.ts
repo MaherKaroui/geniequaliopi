@@ -24,6 +24,20 @@ export function lieuRealisationCertificat(o: Partial<OrganismeInfo>, f: Partial<
   return lieu;
 }
 
+/**
+ * Mise en page compacte commune aux certificats : le certificat doit tenir sur UNE page A4,
+ * quelle que soit la charte graphique (en-tête avec logo, grands titres).
+ */
+export const CERTIF_BLOC_STYLE = "padding:8px 14px;margin-top:8px;margin-bottom:8px;font-size:0.92em;line-height:1.32;page-break-inside:avoid;break-inside:avoid";
+/** Signale à l'export PDF que chaque certificat doit tenir sur une seule page. */
+export const CERTIF_UNE_PAGE_META = '<meta name="pdf-une-page" content="1">';
+export const CERTIF_P_STYLE = "margin:0 0 5px";
+
+/** Applique l'espacement compact à tous les paragraphes sans style propre. */
+export function compacterParagraphes(html: string): string {
+  return CERTIF_UNE_PAGE_META + html.replace(/<p>/g, `<p style="${CERTIF_P_STYLE}">`);
+}
+
 /** « Fait à Ville, le date » sans « à » vide. */
 export function faitALe(o: Partial<OrganismeInfo>, date: string): string {
   return t(o.ville) ? `Fait à ${t(o.ville)}, le ${date}` : `Fait le ${date}`;
@@ -32,11 +46,11 @@ export function faitALe(o: Partial<OrganismeInfo>, date: string): string {
 /** Bloc de fin du certificat : uniquement le cachet de l'organisme (tampon, à défaut signature). */
 export function cachetCertificatHtml(o: OrganismeInfo): string {
   const img = cachetDirigeantHtml(o);
-  return `<div style="display:flex;justify-content:flex-end;margin-top:14px;page-break-inside:avoid;break-inside:avoid">
+  return `<div style="display:flex;justify-content:flex-end;margin-top:6px;page-break-inside:avoid;break-inside:avoid">
     <div style="min-width:230px;text-align:center">
-      <p style="margin:0 0 4px;font-weight:700;text-transform:uppercase;font-size:0.9em">Cachet de l'organisme</p>
-      <p style="margin:0 0 4px">${o.nom || ""}</p>
-      <div style="min-height:70px;display:flex;align-items:center;justify-content:center">${img || ""}</div>
+      <p style="margin:0 0 2px;font-weight:700;text-transform:uppercase;font-size:0.9em">Cachet de l'organisme</p>
+      <p style="margin:0 0 2px">${o.nom || ""}</p>
+      <div style="height:72px;overflow:hidden;display:flex;align-items:center;justify-content:center">${img || ""}</div>
     </div>
   </div>`;
 }

@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { mot } from "./resolveurFormation";
-import { cachetCertificatHtml, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
+import { CERTIF_BLOC_STYLE, cachetCertificatHtml, compacterParagraphes, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays, getStagiaireDuree } from "./docBuilder";
@@ -192,8 +192,8 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
   const extra = stagiaires.map((s, i) => {
     const lieu = lieuRealisationCertificat(o, f, s);
     const fin = formatDate(getStagiaireDateFin(s, f));
-    return `
-    <div class="section" style="padding:16px 22px;page-break-inside:avoid;break-inside:avoid"><p style="text-align:center;font-size:16px;margin:0 0 10px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
+    return compacterParagraphes(`
+    <div class="section" style="${CERTIF_BLOC_STYLE}">${stagiaires.length > 1 ? `<p style="text-align:center;font-size:15px;margin:0 0 8px"><strong>CERTIFICAT DE RÉALISATION</strong></p>` : ""}
     <p>Je soussigné(e)${dirigeant ? ` <strong>${dirigeant}</strong>,` : ","} représentant légal du dispensateur de l'action concourant au développement des compétences <strong>${o.nom}</strong>${o.nda ? ` (déclaration d'activité n° ${o.nda})` : ""}${o.siret ? `, SIRET ${o.siret}` : ""},</p>
     <p>atteste que <strong>${[s.civilite, s.prenom, s.nom].filter(Boolean).join(" ")}</strong>${s.entreprise?.trim() ? `, salarié(e) de l'entreprise ${s.entreprise}` : ""},</p>
     <p>a suivi l'action <strong>« ${f.intitule} »</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ""}</p>
@@ -205,7 +205,7 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>${faitALe(o, fin)}</p>
     ${cachetCertificatHtml(o)}
-    </div>${i < stagiaires.length - 1 ? '<div class="page-break"></div>' : ""}`;
+    </div>${i < stagiaires.length - 1 ? '<div class="page-break"></div>' : ""}`);
   }).join("");
   return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra });
 }

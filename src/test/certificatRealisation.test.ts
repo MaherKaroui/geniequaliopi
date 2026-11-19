@@ -32,6 +32,12 @@ describe("certificat de réalisation", () => {
     expect(h.split(TAMPON).length - 1).toBe(1);
     expect(h).toContain("CFA Nord, Lille");
   });
+  it("chaque certificat (AF, CFA) demande à l'export PDF de tenir sur une seule page", () => {
+    const af = genCertificatRealisationStagiaire(org, f0, STAGIAIRES_TEST, 0);
+    const cfa = genCertificatRealisationCFA(org, f0, STAGIAIRES_TEST, 0);
+    expect(af).toMatch(/<meta name="pdf-une-page"/);
+    expect(cfa).toMatch(/<meta name="pdf-une-page"/);
+  });
   it("sans ville ni dirigeant : pas de « Fait à , » ni « Je soussigné , »", () => {
     const h = genCertificatRealisationStagiaire({ ...org, ville: "", dirigeant: "" }, { ...f0, modalites: "distanciel" }, STAGIAIRES_TEST, 0);
     writeFileSync("/tmp/certif/izi.html", h);
