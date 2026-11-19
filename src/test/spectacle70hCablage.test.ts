@@ -6,14 +6,14 @@ import { seedMSC70AICaches } from "@/lib/machinerieScenique70hPreset";
 const INTERDITS = /RNCP|RSs?d{3,4}|CPF|France Compétences|jury|formation certifiante|titre professionnel|TOEIC/i;
 const DOCS_ORGANISME = /^af_c(1i2|5i21|5i22|6i23|7i32)_/;
 const HORS_FORMATION = /TOEIC|VTest/i;
-import { FORMATION_GMA70, GMA70_EXERCICES } from "@/lib/projecteursGrandMA70hPreset";
-import { FORMATION_MSC70, MSC70_EXERCICES } from "@/lib/machinerieScenique70hPreset";
+import { FORMATION_GMA70, GMA70_EXERCICES_COMPLETS } from "@/lib/projecteursGrandMA70hPreset";
+import { FORMATION_MSC70, MSC70_EXERCICES_COMPLETS } from "@/lib/machinerieScenique70hPreset";
 import { isGMA70Formation } from "@/lib/projecteursGrandMA70hHumanized";
 import { isMSC70Formation } from "@/lib/machinerieScenique70hHumanized";
 
 const CAS = [
-  { f: FORMATION_GMA70, ex: GMA70_EXERCICES, is: isGMA70Formation },
-  { f: FORMATION_MSC70, ex: MSC70_EXERCICES, is: isMSC70Formation },
+  { f: FORMATION_GMA70, complets: GMA70_EXERCICES_COMPLETS, is: isGMA70Formation },
+  { f: FORMATION_MSC70, complets: MSC70_EXERCICES_COMPLETS, is: isMSC70Formation },
 ];
 
 describe("Formations spectacle 70 h — câblage", () => {
@@ -40,9 +40,9 @@ describe("Formations spectacle 70 h — câblage", () => {
 
   it("contenu d'évaluation propre : exercices du preset et 6 compétences", async () => {
     const { getEvalContent } = await import("@/lib/evalContent");
-    for (const { f, ex } of CAS) {
+    for (const { f, complets } of CAS) {
       const ev = getEvalContent(f.intitule);
-      expect(ev.exercices[0].titre).toBe(ex[0].titre);
+      expect(ev.exercices.map(e => e.titre)).toEqual(complets.map(e => e.titre));
       expect(ev.competences).toHaveLength(6);
       expect(ev.appreciations).toHaveLength(6);
     }

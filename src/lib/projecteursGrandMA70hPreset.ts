@@ -44,7 +44,7 @@ export const FORMATION_GMA70: FormationInfo = {
   programme:
     "JOUR 1 — LES PROJECTEURS AUTOMATIQUES (C1, 7 h) : QCM de positionnement et recueil des attentes ; familles d'appareils (spot, wash, beam, hybride) ; sources (lampe à décharge, LED, laser-phosphore) ; chaîne optique et effets (gobos fixes et tournants, prismes, iris, frost, mélange CMY, CTO, roues de couleurs, zoom et focus) ; mise en situation « Lire une fiche technique et une charte DMX ».\nJOUR 2 — CHOISIR UN PARC, PUIS ACCROCHER EN SÉCURITÉ (C1 et C2, 7 h) : matin, choix d'un parc pour une création au Théâtre des Quatre Vents (cahier des charges, flux, poids, consommation, bruit, budget de canaux), QCM C1 ; après-midi, accroche (crochets, colliers, oméga, élingue de sécurité), travail en hauteur et protections collectives, distribution électrique et puissances.\nJOUR 3 — CÂBLER, ADRESSER, METTRE EN RÉSEAU (C2, 7 h) : DMX512 (adresses, univers, terminaison, splitter), RDM, réseaux Art-Net et sACN, nodes ; plan de feux et patch papier ; mises en situation « Accrocher un projecteur en sécurité », « Adresser et câbler une ligne DMX » et « Plan de feux, univers et réseau » ; QCM C2.\nJOUR 4 — PRENDRE EN MAIN LE PUPITRE grandMA3 (C3, 7 h) : architecture du système (consoles, onPC, processing units, MA-Net3), show file, setup, patch et bibliothèque de fixtures, layout, vues et fenêtres, utilisateurs et profils, sauvegardes ; mise en situation « Créer le show file et patcher le parc ».\nJOUR 5 — DU PATCH À LA PREMIÈRE PROGRAMMATION (C3 et C4, 7 h) : matin, vues personnalisées, contrôle de la sortie DMX, QCM C3 ; après-midi, sélection et groupes, programmer, attributs et encodeurs ; cas pratique intermédiaire.\nJOUR 6 — PRESETS ET CUES (C4, 7 h) : presets (dimmer, position, gobo, color, beam, focus), stores de cues, séquences et executors, update et merge ; mise en situation « Groupes et presets du spectacle ».\nJOUR 7 — TRACKING ET TEMPS, PUIS PREMIERS EFFETS (C4 et C5, 7 h) : matin, tracking, temps de transition et delay, mise en situation « Cues, séquence et tracking », QCM C4 ; après-midi, phasers et effets de groupe.\nJOUR 8 — EFFETS ET ORGANISATION DU PUPITRE (C5, 7 h) : MAtricks, pages et executors, macros, déclenchements par timecode ; encodage d'une conduite écrite.\nJOUR 9 — CONDUITE COMPLÈTE, PUIS EXPLOITATION (C5 et C6, 7 h) : matin, mise en situation « Phasers, MAtricks et encodage de la conduite », QCM C5 ; après-midi, restitution en conditions de spectacle, gestion des imprévus, maintenance préventive (optiques, filtres, ventilateurs).\nJOUR 10 — DÉPANNER, ARCHIVER, ÉVALUER (C6, 7 h) : diagnostic de pannes (DMX, alimentation, moteurs, capteurs), mise à jour logicielle, archivage du spectacle ; mise en situation « Maintenance et diagnostic de panne » ; QCM C6 ; évaluation finale ; bilan de la formation.",
   methodesEvaluation:
-    "Positionnement en ouverture : QCM de positionnement de 10 questions (une seule bonne réponse chacune, corrigé et expliqué), comparé à l'évaluation finale pour mesurer la progression, et 10 questions ouvertes de positionnement ; 10 mises en situation corrigées sur le parc et le pupitre ; un QCM corrigé de 10 questions à la fin de chaque compétence (C1 à C6) ; cas pratique intermédiaire en fin de jour 5 ; évaluation finale le jour 10 : QCM de fin, mise en œuvre pratique (patch, programmation et restitution d'une conduite, diagnostic d'une panne) notée sur une grille d'acquisition des compétences C1 à C6 ; test de positionnement de fin. Évaluation à chaud (questionnaire de satisfaction en fin de formation) et évaluation à froid à trois mois. Formation non certifiante : attestation de fin de formation mentionnant les objectifs et le niveau d'acquisition, et certificat de réalisation.",
+    "Positionnement en ouverture : QCM de positionnement de 10 questions (une seule bonne réponse chacune, corrigé et expliqué), comparé à l'évaluation finale pour mesurer la progression, et 10 questions ouvertes de positionnement ; une évaluation formative chaque jour, en alternant mises en situation corrigées sur le parc et le pupitre et QCM corrigés de 10 questions sur la compétence du jour (C1 à C6) ; cas pratique intermédiaire en fin de jour 5 ; évaluation finale le jour 10 : QCM de fin, mise en œuvre pratique (patch, programmation et restitution d'une conduite, diagnostic d'une panne) notée sur une grille d'acquisition des compétences C1 à C6 ; test de positionnement de fin. Évaluation à chaud (questionnaire de satisfaction en fin de formation) et évaluation à froid à trois mois. Formation non certifiante : attestation de fin de formation mentionnant les objectifs et le niveau d'acquisition, et certificat de réalisation.",
   moyensPedagogiques:
     "Alternance d'apports techniques courts, de démonstrations commentées et de mises en situation progressives sur un parc de projecteurs automatiques (spots, wash, beams) et sur le pupitre grandMA3 ou le logiciel grandMA3 onPC associé à un visualiseur 3D. Fil rouge : le Théâtre des Quatre Vents, salle fictive de 600 places (scène de 14 m sur 10 m, cintres de 18 m). Ressources fournies : support de cours en six chapitres avec fiches à retenir, quiz et cas pratiques corrigés, fiches techniques et chartes DMX d'appareils courants, modèle de plan de feux et de patch, conduite écrite d'un spectacle, fiches de maintenance et de diagnostic. Matériel de sécurité présenté et manipulé : élingues de sécurité, crochets, colliers, équipements de protection individuelle.",
   publicVise:
@@ -288,10 +288,26 @@ export const GMA70_QCM_COMPETENCES: AIContentExercise[] = [
 ];
 
 /**
- * Ordre volontaire : les 10 mises en situation d'abord (C1 à C6), alignées sur les 10 questions de
- * positionnement et sur les copies de `projecteursGrandMA70hHumanized.ts` ; les 6 QCM ensuite.
+ * Une évaluation par jour : le générateur prend les 10 premiers éléments, un par journée.
+ * Exercices et QCM alternent, chacun sur la compétence travaillée ce jour-là ; les éléments
+ * suivants restent au pack (réutilisés si le parcours compte plus de journées).
+ * `E` = mise en situation n° (1 à 10), `Q` = QCM de la compétence n° (1 à 6).
  */
-export const GMA70_EXERCICES_COMPLETS: AIContentExercise[] = [...GMA70_EXERCICES, ...GMA70_QCM_COMPETENCES];
+const GMA70_PLAN_JOURS: Array<["E" | "Q", number]> = [
+  ["E", 1], ["Q", 1], ["E", 4], ["Q", 3], ["E", 6],
+  ["E", 7], ["Q", 4], ["E", 9], ["Q", 5], ["E", 10],
+];
+
+const GMA70_PLAN_ITEMS = GMA70_PLAN_JOURS.map(([type, n]) => (type === "E" ? GMA70_EXERCICES : GMA70_QCM_COMPETENCES)[n - 1]);
+
+/** Sans son numéro d'origine, qui ne correspond plus au rang du jour (« Exercice 4 » le jour 3). */
+const sansNumero = (e: AIContentExercise): AIContentExercise =>
+  ({ ...e, titre: e.titre.replace(/^Exercice \d+ — /, "Mise en situation — ") });
+
+export const GMA70_EXERCICES_COMPLETS: AIContentExercise[] = [
+  ...GMA70_PLAN_ITEMS,
+  ...[...GMA70_EXERCICES, ...GMA70_QCM_COMPETENCES].filter(e => !GMA70_PLAN_ITEMS.includes(e)),
+].map(sansNumero);
 
 const RESSOURCES_SUPPORTS_HTML = `
 <ul>
