@@ -50,8 +50,23 @@ interface SavedDossier {
   archived?: boolean;
 }
 
+/** Ligne de la liste : résumé sans images ni contenu (fonction saved_dossiers_liste). */
+interface DossierResume {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  archived: boolean;
+  org_nom: string | null;
+  intitule: string | null;
+  type_action: string | null;
+  nb_stagiaires: number;
+  noms_stagiaires: string | null;
+}
+
 const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvrirId, onOuvert }: DossierHistoryProps) => {
-  const [dossiers, setDossiers] = useState<SavedDossier[]>([]);
+  const [dossiers, setDossiers] = useState<DossierResume[]>([]);
+  const [ouverture, setOuverture] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -63,15 +78,12 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
 
   const fetchDossiers = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("saved_dossiers")
-      .select("*")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
+    // Résumé seulement : le dossier complet (logo, tampon, signatures, stagiaires) n'est lu qu'à l'ouverture.
+    const { data, error } = await (supabase.rpc as any)("saved_dossiers_liste", { p_user: userId });
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
-      setDossiers((data as unknown as SavedDossier[]) || []);
+      setDossiers((data as DossierResume[]) || []);
     }
     setLoading(false);
   };
@@ -162,6 +174,18 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     setDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, archived: !archived } : d)));
   };
 
+  /** Lit le dossier complet puis l'ouvre. */
+  const chargerDossier = async (id: string) => {
+    setOuverture(id);
+    const { data, error } = await supabase.from("saved_dossiers").select("*").eq("id", id).single();
+    setOuverture(null);
+    if (error || !data) {
+      toast({ title: "Erreur", description: error?.message || "Dossier introuvable", variant: "destructive" });
+      return;
+    }
+    handleLoad(data as unknown as SavedDossier);
+  };
+
   const handleLoad = (d: SavedDossier) => {
     // IA 21 h (non certifiante) : un dossier créé hors du formulaire n'a pas les packs du preset en cache
     // (veille, ressources, évaluations) ; on les recharge sans écraser un pack déjà présent.
@@ -212,29 +236,23 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
 
+  // Dossier choisi depuis l'accueil : ouvert tout de suite, sans attendre la liste.
   useEffect(() => {
     if (!ouvrirId) return;
-    const d = dossiers.find((x) => x.id === ouvrirId);
-    if (d) {
-      handleLoad(d);
-      onOuvert?.();
-    }
-  }, [ouvrirId, dossiers]);
+    onOuvert?.();
+    chargerDossier(ouvrirId);
+  }, [ouvrirId]);
 
   const q = search.trim().toLowerCase();
   const visible = dossiers
     .filter((d) => (showArchived ? d.archived : !d.archived))
     .filter((d) => {
       if (!q) return true;
-      const stagNames = (d.stagiaires || [])
-        .map((s: any) => `${s?.prenom || ""} ${s?.nom || ""}`)
-        .join(" ")
-        .toLowerCase();
       return (
         d.name.toLowerCase().includes(q) ||
-        (d.organisme?.nom || "").toLowerCase().includes(q) ||
-        (d.formation?.intitule || "").toLowerCase().includes(q) ||
-        stagNames.includes(q)
+        (d.org_nom || "").toLowerCase().includes(q) ||
+        (d.intitule || "").toLowerCase().includes(q) ||
+        (d.noms_stagiaires || "").toLowerCase().includes(q)
       );
     });
   const archivedCount = dossiers.filter((d) => d.archived).length;
@@ -338,12 +356,12 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
                       {d.archived && <span className="text-xs text-muted-foreground ml-2">(archivé)</span>}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(d.updated_at || d.created_at).toLocaleDateString("fr-FR")} – {(d.stagiaires as any[])?.length || 0} stagiaire(s)
+                      {new Date(d.updated_at || d.created_at).toLocaleDateString("fr-FR")} – {d.nb_stagiaires} stagiaire(s)
                     </p>
                   </div>
                   <div className="flex gap-1 ml-2">
-                    <Button size="sm" variant="ghost" onClick={() => handleLoad(d)} className="gap-1 text-xs">
-                      <FolderOpen className="w-3.5 h-3.5" /> Charger
+                    <Button size="sm" variant="ghost" onClick={() => chargerDossier(d.id)} disabled={ouverture === d.id} className="gap-1 text-xs">
+                      <FolderOpen className="w-3.5 h-3.5" /> {ouverture === d.id ? "Ouverture…" : "Charger"}
                     </Button>
                     <Button
                       size="sm"
