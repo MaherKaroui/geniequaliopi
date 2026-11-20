@@ -32,6 +32,8 @@ import { FORMATION_MSC70, MSC70_EXERCICES_COMPLETS, MSC70_QCM_DEBUT, MSC70_QCM_F
 import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
 import { HYG14_EXERCICES_COMPLETS, HYG14_QCM_DEBUT, HYG14_QCM_FIN } from "./hygieneAlimentaire14hPreset";
 import { isHYG14Formation, getHYG14AutoAnswers, HYG14_QUESTIONS_OUVERTES } from "./hygieneAlimentaire14hHumanized";
+import { VTC48_EXERCICES_COMPLETS, VTC48_QCM_DEBUT, VTC48_QCM_FIN } from "./vtc48hPreset";
+import { isVTC48Formation, getVTC48AutoAnswers, VTC48_QUESTIONS_OUVERTES } from "./vtc48hHumanized";
 import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
@@ -1456,6 +1458,30 @@ EVAL_CONTENT["HYG14"] = {
   ],
 };
 
+// ===== Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h (C1 à C6) =====
+// Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["VTC48"] = {
+  qcmPositionnement: VTC48_QCM_DEBUT,
+  qcmFinal: VTC48_QCM_FIN,
+  exercices: VTC48_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Appliquer la réglementation du transport public particulier de personnes (épreuve A)",
+    "C2 – Gérer son entreprise : statuts, comptabilité, TVA, charges, prix de revient et seuil de rentabilité (épreuve B)",
+    "C3 – Conduire en sécurité et réagir en cas d'accident (épreuve C)",
+    "C4 – S'exprimer et comprendre en français (épreuve D) et en anglais (épreuve E)",
+    "C5 – Développer son activité commerciale et appliquer la réglementation spécifique VTC (épreuves F et G)",
+    "C6 – Réaliser une course dans les conditions de l'épreuve pratique d'admission",
+  ],
+  appreciations: [
+    "Réglementation du T3P bien maîtrisée : la réservation préalable et les démarches après l'examen sont acquises. Vocabulaire juridique à consolider.",
+    "Calculs de gestion justes (marge sur coûts variables, seuil de rentabilité) ; le choix du statut juridique reste à argumenter davantage.",
+    "Conduite à tenir en cas d'accident correctement ordonnée ; les règles sur la fatigue et les médicaments sont à revoir avant l'examen.",
+    "Bon niveau d'expression écrite ; l'accueil en anglais est correct, la prononciation reste à travailler.",
+    "Plan commercial réaliste et diversifié ; les droits face aux plateformes sont bien connus.",
+    "Simulation de course complète et courtoise ; la facturation est juste, la préparation de l'itinéraire de délestage est à systématiser.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1708,6 +1734,8 @@ function getContentKey(intitule: string): string {
   if (isCOH21Formation(lower)) return "COH21";
   // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante) — avant la règle « restauration »
   if (isHYG14Formation(lower)) return "HYG14";
+  // Préparation à l'examen VTC (RS5637) – 48 h — avant la règle « vtc » générique
+  if (isVTC48Formation(lower)) return "VTC48";
   if (isGMA70Formation(lower)) return "GMA70";
   if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
@@ -1913,6 +1941,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isCOH21Formation(formationIntitule)) return true;
   // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé (« hygiène alimentaire », « HACCP »)
   if (isHYG14Formation(formationIntitule)) return true;
+  // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé (« VTC », « voiture de transport avec chauffeur »)
+  if (isVTC48Formation(formationIntitule)) return true;
   if (isGMA70Formation(formationIntitule)) return true;
   if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -1929,6 +1959,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
   // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé
   if (isHYG14Formation(formationIntitule)) return EVAL_CONTENT["HYG14"];
+  // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé
+  if (isVTC48Formation(formationIntitule)) return EVAL_CONTENT["VTC48"];
   if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
   if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2516,6 +2548,9 @@ QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
 
 // Hygiène alimentaire en restauration commerciale – 14 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["HYG14"] = HYG14_QUESTIONS_OUVERTES;
+
+// Préparation à l'examen VTC (RS5637) – 48 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["VTC48"] = VTC48_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
@@ -3004,6 +3039,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoHyg.reponses, autoHyg.scores);
+  }
+
+  // Préparation à l'examen VTC (RS5637) – 48 h : moteur humanisé (une copie différente par stagiaire).
+  if (isVTC48Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoVtc = getVTC48AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoVtc.reponses, autoVtc.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).

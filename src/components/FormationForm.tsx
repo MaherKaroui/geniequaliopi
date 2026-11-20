@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches, FORMATION_GSC35, seedGSC35AICaches, FORMATION_LRB, seedLRBAICaches, FORMATION_ANG40, seedANG40AICaches, FORMATION_COH21, seedCOH21AICaches, FORMATION_HYG14, seedHYG14AICaches, FORMATION_GMA70, seedGMA70AICaches, FORMATION_MSC70, seedMSC70AICaches, FORMATION_DRI47, FORMATION_DRI21, seedDRI47AICaches, FORMATION_FPA45, seedFPA45AICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HAYB_GOTRM, STAGIAIRES_GOTRM_SEPTEMBRE, HAYB_FORMATIONS_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches, IA_GENERATIVE_ORG, STAGIAIRES_IA_GENERATIVE, seedIAGenerativeAICaches, VITRAGE_ORG, STAGIAIRES_VITRAGE, seedVitrageAICaches, seedOngulaireAICaches, FORMATION_RPMS, seedRPMSAICaches, FORMATION_WM14, seedWM14AICaches, FORMATION_TVTE, seedTVTEAICaches, FORMATION_IAP21, seedIAP21AICaches, FORMATION_MSP21, seedMSP21AICaches, FORMATION_ARH41366, seedARH41366AICaches, FORMATION_GSC35, seedGSC35AICaches, FORMATION_LRB, seedLRBAICaches, FORMATION_ANG40, seedANG40AICaches, FORMATION_COH21, seedCOH21AICaches, FORMATION_HYG14, seedHYG14AICaches, FORMATION_VTC48, seedVTC48AICaches, FORMATION_GMA70, seedGMA70AICaches, FORMATION_MSC70, seedMSC70AICaches, FORMATION_DRI47, FORMATION_DRI21, seedDRI47AICaches, FORMATION_FPA45, seedFPA45AICaches } from "@/lib/sampleData";
 import { isAncienExempleARH } from "@/lib/arhExercises";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
@@ -346,6 +346,14 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, s
         onChange(hyg);
         seedHYG14AICaches(hyg);
         toast.success("Hygiène alimentaire en restauration commerciale – 14 h : évaluation des besoins, positionnement, 10 mises en situation corrigées, 6 QCM de 10 questions par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
+      }
+      // Préparation à l'examen VTC (RS5637) – 48 h (certifiante, Répertoire spécifique) : contenus 100 % pré-remplis, AUCUN stagiaire importé ;
+      // le formateur déjà saisi dans le dossier est conservé.
+      if (selected.intitule === FORMATION_VTC48.intitule) {
+        const vtc = { ...selected, formateur: data.formateur || selected.formateur, formateurSignatureUrl: data.formateurSignatureUrl };
+        onChange(vtc);
+        seedVTC48AICaches(vtc);
+        toast.success("Préparation à l'examen VTC (RS5637) – 48 h : évaluation des besoins, positionnement, 10 mises en situation corrigées, 6 QCM de 10 questions par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
       }
       // Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, 70 h) : contenus 100 % pré-remplis, AUCUN stagiaire importé ; le formateur déjà saisi est conservé.
       if (selected.intitule === FORMATION_GMA70.intitule) {

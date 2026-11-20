@@ -15,6 +15,8 @@ import { isMSC70Formation } from "@/lib/machinerieScenique70hHumanized";
 import { seedCOH21AICaches } from "@/lib/cohesionEquipe21hPreset";
 import { isHYG14Formation } from "@/lib/hygieneAlimentaire14hHumanized";
 import { seedHYG14AICaches } from "@/lib/hygieneAlimentaire14hPreset";
+import { isVTC48Formation } from "@/lib/vtc48hHumanized";
+import { seedVTC48AICaches } from "@/lib/vtc48hPreset";
 import { seedGMA70AICaches } from "@/lib/projecteursGrandMA70hPreset";
 import { seedMSC70AICaches } from "@/lib/machinerieScenique70hPreset";
 import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
@@ -217,6 +219,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     // Hygiène alimentaire en restauration commerciale – 14 h : même rechargement des packs du preset.
     if (d.formation && isHYG14Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedHYG14AICaches(d.formation);
+    }
+    // Préparation à l'examen VTC (RS5637) – 48 h : même rechargement des packs du preset.
+    if (d.formation && isVTC48Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedVTC48AICaches(d.formation);
     }
     if (d.formation && isGMA70Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedGMA70AICaches(d.formation);
