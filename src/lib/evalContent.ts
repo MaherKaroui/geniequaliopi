@@ -30,6 +30,8 @@ import { COH21_EXERCICES_COMPLETS, COH21_QCM_DEBUT, COH21_QCM_FIN } from "./cohe
 import { FORMATION_GMA70, GMA70_EXERCICES_COMPLETS, GMA70_QCM_DEBUT, GMA70_QCM_FIN } from "./projecteursGrandMA70hPreset";
 import { FORMATION_MSC70, MSC70_EXERCICES_COMPLETS, MSC70_QCM_DEBUT, MSC70_QCM_FIN } from "./machinerieScenique70hPreset";
 import { isCOH21Formation, getCOH21AutoAnswers, COH21_QUESTIONS_OUVERTES } from "./cohesionEquipe21hHumanized";
+import { HYG14_EXERCICES_COMPLETS, HYG14_QCM_DEBUT, HYG14_QCM_FIN } from "./hygieneAlimentaire14hPreset";
+import { isHYG14Formation, getHYG14AutoAnswers, HYG14_QUESTIONS_OUVERTES } from "./hygieneAlimentaire14hHumanized";
 import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
@@ -1430,6 +1432,30 @@ EVAL_CONTENT["FPA45"] = {
   ],
 };
 
+// ===== Hygiène alimentaire en restauration commerciale – 14 h (non certifiante, C1 à C6) =====
+// Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["HYG14"] = {
+  qcmPositionnement: HYG14_QCM_DEBUT,
+  qcmFinal: HYG14_QCM_FIN,
+  exercices: HYG14_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Identifier les dangers, expliquer la multiplication des micro-organismes et décrire les TIAC et leurs conséquences",
+    "C2 – Repérer les principaux germes pathogènes et leurs toxines et relier chaque danger à une situation de cuisine",
+    "C3 – Identifier les grands principes de la réglementation en hygiène alimentaire et les obligations de l'exploitant",
+    "C4 – Mettre en œuvre les bonnes pratiques d'hygiène en restauration commerciale",
+    "C5 – Appliquer la méthode HACCP, la traçabilité et la gestion des non-conformités",
+    "C6 – Construire le plan de maîtrise sanitaire de son établissement et un plan d'action",
+  ],
+  appreciations: [
+    "Dangers correctement identifiés et classés ; relie bien les situations de cuisine aux risques. Vocabulaire des germes à consolider.",
+    "Bonne compréhension de la zone de danger et des règles de refroidissement. Doit encore systématiser les enregistrements.",
+    "Obligations de l'exploitant bien connues, y compris l'information sur les allergènes. La procédure de retrait-rappel reste à formaliser.",
+    "Bonnes pratiques d'hygiène appliquées avec rigueur dans les mises en situation ; analyse HACCP juste sur une recette simple.",
+    "Traçabilité et gestion des non-conformités maîtrisées. Les limites critiques des CCP sont à préciser dans le plan de maîtrise sanitaire.",
+    "Plan d'action réaliste avec responsables, échéances et preuves ; plan de maîtrise sanitaire adapté à la taille de l'établissement.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1680,6 +1706,8 @@ function getContentKey(intitule: string): string {
   if (isANG40Formation(lower)) return "ANG40";
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) — avant toute règle « management », « entreprise », « communication »
   if (isCOH21Formation(lower)) return "COH21";
+  // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante) — avant la règle « restauration »
+  if (isHYG14Formation(lower)) return "HYG14";
   if (isGMA70Formation(lower)) return "GMA70";
   if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
@@ -1883,6 +1911,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (presetEvalContent(formationIntitule)) return true;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return true;
+  // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé (« hygiène alimentaire », « HACCP »)
+  if (isHYG14Formation(formationIntitule)) return true;
   if (isGMA70Formation(formationIntitule)) return true;
   if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -1897,6 +1927,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (preset) return preset;
   // Cohésion d'équipe en entreprise – 21 h : reconnue aussi sous ses variantes d'intitulé (« cohésion d'équipe »…)
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
+  // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé
+  if (isHYG14Formation(formationIntitule)) return EVAL_CONTENT["HYG14"];
   if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
   if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2481,6 +2513,9 @@ QUESTIONS_OUVERTES["ANG40"] = ANG40_QUESTIONS_OUVERTES;
 
 // Cohésion d'équipe en entreprise – 21 h — 10 questions début / fin dans l'ordre des ateliers.
 QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
+
+// Hygiène alimentaire en restauration commerciale – 14 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["HYG14"] = HYG14_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
@@ -2957,6 +2992,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoFpa.reponses, autoFpa.scores);
+  }
+
+  // Hygiène alimentaire en restauration commerciale – 14 h : moteur humanisé (une copie différente par stagiaire).
+  if (isHYG14Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoHyg = getHYG14AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoHyg.reponses, autoHyg.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).

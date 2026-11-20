@@ -13,6 +13,8 @@ import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
 import { isGMA70Formation } from "@/lib/projecteursGrandMA70hHumanized";
 import { isMSC70Formation } from "@/lib/machinerieScenique70hHumanized";
 import { seedCOH21AICaches } from "@/lib/cohesionEquipe21hPreset";
+import { isHYG14Formation } from "@/lib/hygieneAlimentaire14hHumanized";
+import { seedHYG14AICaches } from "@/lib/hygieneAlimentaire14hPreset";
 import { seedGMA70AICaches } from "@/lib/projecteursGrandMA70hPreset";
 import { seedMSC70AICaches } from "@/lib/machinerieScenique70hPreset";
 import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
@@ -211,6 +213,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     // Cohésion d'équipe en entreprise – 21 h : même rechargement des packs du preset.
     if (d.formation && isCOH21Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedCOH21AICaches(d.formation);
+    }
+    // Hygiène alimentaire en restauration commerciale – 14 h : même rechargement des packs du preset.
+    if (d.formation && isHYG14Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedHYG14AICaches(d.formation);
     }
     if (d.formation && isGMA70Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedGMA70AICaches(d.formation);

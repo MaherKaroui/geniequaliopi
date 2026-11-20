@@ -50,6 +50,7 @@ import { pickARH41366ExerciceAnswer, isARH41366Formation, arh41366NoteExercice }
 import { pickGSC35ExerciceAnswer, isGSC35Formation, gsc35NoteExercice } from "./gererCentre35hHumanized";
 import { pickANG40ExerciceAnswer, isANG40Formation, ang40NoteExercice } from "./anglaisPro40hHumanized";
 import { pickCOH21ExerciceAnswer, isCOH21Formation, coh21NoteExercice } from "./cohesionEquipe21hHumanized";
+import { pickHYG14ExerciceAnswer, isHYG14Formation, hyg14NoteExercice } from "./hygieneAlimentaire14hHumanized";
 import { pickGMA70ExerciceAnswer, isGMA70Formation, gma70NoteExercice } from "./projecteursGrandMA70hHumanized";
 import { pickMSC70ExerciceAnswer, isMSC70Formation, msc70NoteExercice } from "./machinerieScenique70hHumanized";
 import { pickDRI47ExerciceAnswer, isDRI47Formation, dri47NoteExercice } from "./droitInstitutions47hHumanized";
@@ -1260,6 +1261,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, ang40NoteExercice(stagiaireIdx, ei, true))
         : isCOH21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, coh21NoteExercice(stagiaireIdx, ei, true))
+        : isHYG14Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, hyg14NoteExercice(stagiaireIdx, ei, true))
         : isGMA70Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, gma70NoteExercice(stagiaireIdx, ei, true))
         : isMSC70Formation(f.intitule, f.codeRNCP)
@@ -1344,6 +1347,8 @@ D) Drive faster to finish the ride.`,
       ? ang40NoteExercice(stagiaireIdx, ei, false)
       : isCOH21Formation(f.intitule, f.codeRNCP)
       ? coh21NoteExercice(stagiaireIdx, ei, false)
+      : isHYG14Formation(f.intitule, f.codeRNCP)
+      ? hyg14NoteExercice(stagiaireIdx, ei, false)
       : isGMA70Formation(f.intitule, f.codeRNCP)
       ? gma70NoteExercice(stagiaireIdx, ei, false)
       : isMSC70Formation(f.intitule, f.codeRNCP)
@@ -1412,6 +1417,7 @@ D) Drive faster to finish the ride.`,
       || pickGSC35ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickANG40ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCOH21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || pickHYG14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickGMA70ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickMSC70ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickDRI47ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)

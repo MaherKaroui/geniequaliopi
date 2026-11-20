@@ -329,6 +329,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isLRBFormation(formationIntitule)) return LRB_VIDEOS;
   // Cohésion d'équipe en entreprise – 21 h : vidéos du preset, jamais les banques « management » ou « entreprise »
   if (isCOH21Formation(formationIntitule)) return COH21_VIDEOS;
+  // Hygiène alimentaire en restauration commerciale – 14 h : vidéos du preset, avant la banque « restauration » / « haccp »
+  if (isHYG14Formation(formationIntitule)) return HYG14_VIDEOS;
   if (isGMA70Formation(formationIntitule)) return GMA70_VIDEOS;
   if (isMSC70Formation(formationIntitule)) return MSC70_VIDEOS;
   // Enseignement : fondamentaux du droit et des institutions : vidéos du preset, jamais les banques « droit » génériques
@@ -504,6 +506,9 @@ import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
 import { isGMA70Formation } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation } from "./machinerieScenique70hHumanized";
 import { COH21_VIDEOS } from "./cohesionEquipe21hPreset";
+import { getHygieneAlimentaire14hChapters } from "./courseContentHygieneAlimentaire14h";
+import { isHYG14Formation } from "./hygieneAlimentaire14hHumanized";
+import { HYG14_VIDEOS } from "./hygieneAlimentaire14hPreset";
 import { GMA70_VIDEOS } from "./projecteursGrandMA70hPreset";
 import { MSC70_VIDEOS } from "./machinerieScenique70hPreset";
 import { getDroitInstitutions47hChapters, getDroitInstitutions21hChapters } from "./courseContentDroitInstitutions47h";
@@ -576,6 +581,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (isANG40Formation(formationIntitule)) return getAnglaisPro40hChapters();
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) : support propre, avant les règles « management » / « entreprise »
   if (isCOH21Formation(formationIntitule)) return getCohesionEquipe21hChapters();
+  // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante) : support propre, avant les règles « restauration » / « haccp »
+  if (isHYG14Formation(formationIntitule)) return getHygieneAlimentaire14hChapters();
   if (isGMA70Formation(formationIntitule)) return getProjecteursGrandMA70hChapters();
   if (isMSC70Formation(formationIntitule)) return getMachinerieScenique70hChapters();
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) : support propre, avant les règles « droit » / « enseignement »

@@ -207,6 +207,8 @@ import { FORMATION_COH21 } from "./cohesionEquipe21hPreset";
 import { FORMATION_GMA70 } from "./projecteursGrandMA70hPreset";
 import { FORMATION_MSC70 } from "./machinerieScenique70hPreset";
 export { FORMATION_COH21, seedCOH21AICaches } from "./cohesionEquipe21hPreset";
+import { FORMATION_HYG14 } from "./hygieneAlimentaire14hPreset";
+export { FORMATION_HYG14, seedHYG14AICaches } from "./hygieneAlimentaire14hPreset";
 export { FORMATION_GMA70, seedGMA70AICaches } from "./projecteursGrandMA70hPreset";
 export { FORMATION_MSC70, seedMSC70AICaches } from "./machinerieScenique70hPreset";
 import { FORMATION_DRI47, FORMATION_DRI21 } from "./droitInstitutions47hPreset";
@@ -582,6 +584,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ANG40,
   // Cohésion d'équipe en entreprise – 21 h (non certifiante, 6 modules, intra-entreprise) : contenus pré-remplis (cohesionEquipe21hPreset), aucun stagiaire importé
   FORMATION_COH21,
+  // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante, 2 jours à distance, C1 à C6) : contenus pré-remplis (hygieneAlimentaire14hPreset), aucun stagiaire importé
+  FORMATION_HYG14,
   // Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (projecteursGrandMA70hPreset), aucun stagiaire importé
   FORMATION_GMA70,
   // Machinerie scénique, moteurs et ponts : équipements fixes et grils provisoires – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (machinerieScenique70hPreset), aucun stagiaire importé
