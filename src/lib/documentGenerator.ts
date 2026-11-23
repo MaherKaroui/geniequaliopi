@@ -214,7 +214,9 @@ export function generateDocumentById(docId: string, template: string, params: Re
   org = organismeALaDate(org, org?.dateMaj);
   // Évaluation des besoins et test de positionnement individuel (par stagiaire) : toujours le
   // document Génie Qualiopi rempli ; la trame vierge du preset ne sert qu'aux trames / vierge demandé.
-  const rempliQualiopi = /besoins/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template);
+  // Bilans à chaud / à froid et enquêtes de satisfaction : pas de corrigé pédagogique, le
+  // générateur Qualiopi applique lui-même ses échéances (fin de formation, +3 mois).
+  const rempliQualiopi = /besoins|bilan_(chaud|froid)|satisfaction/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template);
   const presetBlank = rempliQualiopi && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
   // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).

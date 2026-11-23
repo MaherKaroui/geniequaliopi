@@ -317,6 +317,24 @@ describe("Espace IZILearn", () => {
     vi.setSystemTime(new Date("2027-02-05T13:48:00Z"));
     expect(planPieces(contexte(p)).find((x) => x.id === "bilan_froid_0")?.source).toBe("document");
   });
+  it("formation reconnue (preset LILATE) : bilan à froid rempli 3 mois après la fin, vierge avant", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-23T10:00:00Z"));
+    const p = payload("actions-formation", 3);
+    p.formation.intitule = "Anglais professionnel";
+    p.formation.codeCertification = "RS7314";
+    p.session.dateDebut = "2026-06-01";
+    p.session.dateFin = "2026-06-05";
+    const froid = planPieces(contexte(p)).find((x) => x.id === "bilan_froid_0")!;
+    expect(froid.source).toBe("document");
+    expect(froid.rendre()).toContain("Questionnaire de Satisfaction du bénéficiaire – À froid");
+    expect(froid.rendre()).toMatch(/>X</);
+    expect(planPieces(contexte(p)).find((x) => x.id === "bilan_chaud_0")!.rendre()).toMatch(/>X</);
+    p.session.dateDebut = "2026-10-01";
+    p.session.dateFin = "2026-10-05";
+    expect(planPieces(contexte(p)).find((x) => x.id === "bilan_froid_0")!.source).toBe("trame");
+  });
+
   it("formation inconnue : support de cours et exercices tirés du contenu IZILearn", () => {
     const p = payload("actions-formation", 3);
     p.formation.contenu = {
