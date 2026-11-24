@@ -66,13 +66,15 @@ describe("Automatisation EDOF — toutes certifications", () => {
     expect(construireSujet(refs.RNCP41480 as SourceReferentiel).unites).toHaveLength(4);
   });
 
-  it("génère 4 PDF par candidat et un PV par session, pour chaque formation", async () => {
+  it("génère 5 PDF par candidat (4 pièces + feuille d'émargement) et un PV par session, pour chaque formation", async () => {
     const refs = await resoudreReferentiels(candidats);
     const sessions = grouperSessions(candidats);
     const ctx = Object.fromEntries(Object.keys(refs).map((k) => [k, { centre, jury }]));
     const pack = await genererPack(sessions, ctx, refs);
-    expect(pack.filter((f) => f.chemin.startsWith("RS7332/"))).toHaveLength(2 * 4 + 1);
-    for (const code of ["RNCP41480", "CPF200", "RS6168"]) expect(pack.filter((f) => f.chemin.startsWith(`${code}/`))).toHaveLength(4 + 1);
+    expect(pack.filter((f) => f.chemin.startsWith("RS7332/"))).toHaveLength(2 * 5 + 1);
+    for (const code of ["RNCP41480", "CPF200", "RS6168"]) expect(pack.filter((f) => f.chemin.startsWith(`${code}/`))).toHaveLength(5 + 1);
+    // une feuille d'émargement par candidat, rangée avec ses autres pièces
+    expect(pack.filter((f) => f.chemin.endsWith("/5_Feuille_d_emargement.pdf"))).toHaveLength(candidats.length);
     for (const f of pack) expect((await PDFDocument.load(f.donnees)).getPageCount()).toBeGreaterThan(0);
     const out = process.env.EDOF_OUT;
     if (out) for (const f of pack) { const p = join(out, f.chemin); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, f.donnees); }

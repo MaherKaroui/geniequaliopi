@@ -53,6 +53,12 @@ export function getFormationPreset(f: Pick<FormationInfo, 'intitule'> & { codeRN
  const rank = (a: FormationPreset, b: FormationPreset) => Number(b.statut === 'valide') - Number(a.statut === 'valide') || (b.updated_at ?? '').localeCompare(a.updated_at ?? '');
  return (code ? all.filter(p => normaliseCode(p.code_rncp) === code).sort(rank)[0] : undefined) ?? all.filter(p => p.intitule_normalise === title).sort(rank)[0] ?? null;
 }
+/** Preset enregistré (base / générateur), hors presets intégrés (TP, LILATE, Orienta) :
+ *  ses corrigés ne doivent jamais devenir des réponses de stagiaire. */
+export function isRegisteredFormationPreset(f: Pick<FormationInfo, 'intitule'> & { codeRNCP?: string }): boolean {
+ const p = getFormationPreset(f);
+ return !!p && entries.get(p.id) === p;
+}
 export function presetContentPack(f: Pick<FormationInfo,'intitule'> & { codeRNCP?: string }): AIContentPack | null {
  const override = overrides.get(normaliseTitle(f.intitule)); if (override) return override;
  const p = getFormationPreset(f); const plan = p?.data.plan; const evaluations = p?.data.evaluations;

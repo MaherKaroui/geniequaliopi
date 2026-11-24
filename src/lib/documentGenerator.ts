@@ -1,4 +1,5 @@
 import { presetBlankDocument } from "./formationPresets/blankDocuments";
+import { isRegisteredFormationPreset } from "./formationPresets/registry";
 import { getOrientaEvalBesoins } from "./orientaBesoins";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "./attendancePresentation";
 import { genProcedureCoordinationAlternanceCFA, genTableauMissionsBlocsCFA, genCalendrierAlternanceCFA, genProcedureRupturesSansDelaiCFA, genInformationViolencesMediateurCFA, genPartHeuresPermanentsCFA, genJustificatifsIntervenantsCFA, genVeilleSourceeCFA, genProcedureInsertionPoursuiteEtudesCFA, blocsCertification, finBlocApprenti } from "./templatesCFA2026";
@@ -3811,6 +3812,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   extra += `<p><strong>Note :</strong> ${fmtNote(totalScore)} /10${baremeTxt}</p>`;
 
   extra += `<h3>Questions</h3>`;
+  const corrigePreset = isRegisteredFormationPreset({ intitule: f.intitule, codeRNCP: f.codeRNCP });
   questions.forEach((q, qi) => {
     const ans = answers[qi];
     const notee = noteTest.notees[qi];
@@ -3820,7 +3822,8 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     extra += `<p><strong>Réponse du stagiaire :</strong> ${ans.reponse}</p>`;
     // Corrigé affiché seulement pour une question de connaissances : une réponse modèle écrite
     // à la 1re personne (vécu, attentes) n'est pas un corrigé et ferait doublon avec la réponse.
-    const attendu = String((q as any).reponseAttendue || "").trim();
+    // Formation d'un preset enregistré : son corrigé reste au formateur (jamais sur la copie du stagiaire).
+    const attendu = corrigePreset ? "" : String((q as any).reponseAttendue || "").trim();
     if (attendu && !/^(J['’]|Je |Pour moi|Mon |Ma |Mes |Dans mon |Actuellement)/.test(attendu)) extra += `<p style="color:#475569"><strong>Corrigé / éléments attendus :</strong> ${attendu}</p>`;
     else if (attendu) extra += `<p style="color:#475569"><strong>Éléments d'appréciation :</strong> question de positionnement sans réponse type, non notée ; la réponse sert à connaître le parcours et les attentes du stagiaire.</p>`;
     extra += notee

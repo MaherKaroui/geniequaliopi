@@ -103,6 +103,9 @@ describe("Espace IZILearn", () => {
   });
 
   it("utilise les questions finales IZILearn sans résultats préremplis", () => {
+    // Session à venir (02→04/11/2026) : trame vierge, questions IZILearn affichées sans réponses.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T10:00:00"));
     const p = payload("actions-formation", 3);
     p.formation.contenu = { chapitres: [], exercices: [], positionnement: [], examenFinal: [{ question: "Livrable final du projet ?", options: ["Bilan du projet", "Planning initial"] }] };
     const exam = planPieces(contexte(p)).find((x) => x.id === "examen_final_0");
@@ -336,6 +339,9 @@ describe("Espace IZILearn", () => {
   });
 
   it("formation inconnue : support de cours et exercices tirés du contenu IZILearn", () => {
+    // Session à venir (02→04/11/2026) : trame vierge, questions IZILearn affichées sans réponses.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T10:00:00"));
     const p = payload("actions-formation", 3);
     p.formation.contenu = {
       chapitres: [{ titre: "Cadrer le projet", description: "Bases", sections: [{ titre: "La note de cadrage", html: "<p>MARQUEUR_LECON_IZILEARN</p>" }] }],
@@ -355,6 +361,9 @@ describe("Espace IZILearn", () => {
   });
 
   it("chaque période reçoit un QCM différent, sans réponses pré-remplies", () => {
+    // Session à venir (02→04/11/2026) : trame vierge, questions IZILearn affichées sans réponses.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-20T10:00:00"));
     const p = payload("actions-formation", 3);
     p.formation.contenu = {
       chapitres: [], exercices: [],

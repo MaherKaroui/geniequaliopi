@@ -1,5 +1,5 @@
 // Formation-specific QCM questions, exercises, and evaluation content
-import { presetEvalContent } from "./formationPresets/registry";
+import { presetEvalContent, isRegisteredFormationPreset } from "./formationPresets/registry";
 import { hasExactStaticContent } from "./formationPresets/catalog";
 import { getCachedContentPack } from "./aiContentPack";
 import { mot } from "./resolveurFormation";
@@ -3371,6 +3371,10 @@ export function generateStagiaireOpenAnswers(
   // Detect if questions are in English
   const isEnglish = questions.some(q => /^(how|what|why|where|when|who|which|do |does |can |could |complete|count|put |name |write |ask |describe |translate |introduce)/i.test(q.question));
 
+  // Formation reconnue par le registre des presets : le corrigé du preset reste au formateur,
+  // la copie du stagiaire est rédigée à partir de la question seule (jamais du corrigé).
+  const sansCorrige = !!formationInfo?.intitule && isRegisteredFormationPreset({ intitule: formationInfo.intitule, codeRNCP: formationInfo.codeRNCP });
+
   // Generate final answers with adjusted qualities
   return rawAnswers.map((raw, i) => {
     const quality = adjustedQualities[i];
@@ -3378,6 +3382,15 @@ export function generateStagiaireOpenAnswers(
     let reponse: string;
     let score: number;
     let feedback: string;
+
+    if (sansCorrige && quality !== 'empty') {
+      const r = reponseSansCorrige(raw.question, quality, raw.seed, stagiaireIndex, raw.qi, isDebut);
+      score = quality === 'full' ? 1 : quality === 'partial' ? 0.5 : 0;
+      const pool = quality === 'full' ? ["Bonne réponse"]
+        : quality === 'partial' ? ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"]
+        : ["Réponse insuffisante", "Réponse incorrecte", "Réponse hors sujet", "Réponse erronée"];
+      return { reponse: r, score, feedback: pool[(raw.seed + stagiaireIndex) % pool.length] };
+    }
     
     switch (quality) {
       case 'full':
@@ -3424,6 +3437,67 @@ export function generateStagiaireOpenAnswers(
     
     return { reponse, score, feedback };
   });
+}
+
+/** Thème d'une question ouverte, pour une réponse rédigée sans le corrigé (« le cadrage d'un projet »). */
+function themeQuestion(question: string): string {
+  let t = String(question || "").replace(/\s+/g, " ").trim().replace(/[\s?!.:;…]+$/, "");
+  t = t.replace(/^(selon vous|d['’]après vous|à votre avis|avant la formation|à l['’]issue de la formation)\s*,?\s*/i, "");
+  t = t.replace(/^(qu['’]est-ce que|qu['’]est-ce qu['’]|que signifie|que savez-vous sur|que savez-vous de|expliquez ce que vous maîtrisez sur|expliquez|décrivez|citez|présentez|définissez|comment|pourquoi|quels? sont|quelles? sont|quels?|quelles?|en quoi)\s*:?\s*/i, "");
+  t = t.replace(/^(vous\s+|on\s+)/i, "");
+  const mots = t.split(" ").filter(Boolean).slice(0, 14).join(" ");
+  if (!mots) return "ce point";
+  // Pas de minuscule sur un sigle (« RGPD », « TVA »).
+  return /^\p{Lu}\p{Ll}/u.test(mots) ? mots.charAt(0).toLowerCase() + mots.slice(1) : mots;
+}
+
+/** Réponse ouverte du stagiaire rédigée à partir de la question seule (formation d'un preset enregistré). */
+function reponseSansCorrige(
+  q: QuestionOuverte,
+  quality: 'full' | 'partial' | 'wrong',
+  seed: number,
+  stagiaireIndex: number,
+  questionIndex: number,
+  isDebut: boolean,
+): string {
+  const theme = themeQuestion(q.question);
+  const k = seed + stagiaireIndex * 7 + questionIndex * 3;
+  if (estQuestionOpinion(q)) {
+    const perso = [
+      "Je souhaite consolider mes pratiques actuelles et gagner en autonomie dans mon poste.",
+      "Pour moi, l'enjeu est de mettre en œuvre rapidement ce que j'apprends dans mes missions quotidiennes.",
+      "J'ai quelques bases acquises sur le terrain, mais je veux structurer ma méthode de travail.",
+      "Mon objectif est de mieux comprendre les attentes de mon activité et de les appliquer avec méthode.",
+      "J'attends de la formation des outils concrets et des exemples proches de ma situation professionnelle.",
+    ];
+    return perso[k % perso.length];
+  }
+  if (quality === 'full') {
+    const full = isDebut
+      ? [
+          `Sur ${theme}, j'ai déjà une expérience pratique : je sais identifier les éléments essentiels et les appliquer dans des situations courantes de mon travail.`,
+          `Je connais ${theme} : je l'ai mis en pratique dans mon poste, en vérifiant chaque étape avant de passer à la suivante.`,
+          `Concernant ${theme}, je maîtrise les principes de base et je sais expliquer pourquoi ils sont importants pour la qualité du travail.`,
+          `J'ai déjà travaillé sur ${theme} ; je sais m'organiser, choisir la bonne méthode et contrôler le résultat obtenu.`,
+        ]
+      : [
+          `Sur ${theme}, je sais maintenant appliquer une démarche structurée : analyser la situation, choisir la méthode adaptée puis vérifier le résultat.`,
+          `La formation m'a permis de maîtriser ${theme} ; je peux l'expliquer, le mettre en œuvre seul(e) et justifier mes choix.`,
+          `Pour ${theme}, j'applique désormais les bonnes pratiques vues en formation et je sais repérer les erreurs à éviter.`,
+          `Je suis à l'aise avec ${theme} : je l'ai pratiqué pendant les exercices et je sais le transposer à mes situations professionnelles.`,
+        ];
+    return full[k % full.length];
+  }
+  if (quality === 'partial') {
+    const partial = [
+      `J'ai une idée générale de ${theme}, mais je ne saurais pas encore détailler toutes les étapes.`,
+      `Je connais une partie de ${theme}, surtout l'aspect pratique, sans pouvoir tout justifier.`,
+      `Sur ${theme}, je retiens l'essentiel mais il me manque encore de la méthode.`,
+      `Je vois à quoi correspond ${theme}, mais je l'applique encore de façon approximative.`,
+    ];
+    return partial[k % partial.length];
+  }
+  return generateWrongAnswer("", seed, stagiaireIndex, questionIndex);
 }
 
 // Clean brackets from expected answers and replace with realistic values

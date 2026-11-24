@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { writeFileSync } from "fs";
 import { genCertificatRealisationStagiaire } from "@/lib/templatesAF";
 import { genCertificatRealisationCFA } from "@/lib/templatesCFA";
 import { lieuRealisationCertificat } from "@/lib/certificatRealisation";
@@ -19,7 +18,6 @@ describe("certificat de réalisation", () => {
   });
   it("seul le cachet de l'organisme, sans bloc représentant légal ni signature du dirigeant", () => {
     const h = genCertificatRealisationStagiaire(org, { ...f0, modalites: "presentiel", lieu: "Salle Atlas, Paris" }, STAGIAIRES_TEST, 0);
-    writeFileSync("/tmp/certif/af.html", h);
     expect(h).toContain(TAMPON);
     expect(h.split(TAMPON).length - 1).toBe(1);
     expect(h).not.toContain(SIG);
@@ -30,7 +28,6 @@ describe("certificat de réalisation", () => {
   });
   it("CFA : même règle", () => {
     const h = genCertificatRealisationCFA(org, { ...f0, modalites: "presentiel", lieu: "CFA Nord, Lille" }, STAGIAIRES_TEST, 0);
-    writeFileSync("/tmp/certif/cfa.html", h);
     expect(h.split(TAMPON).length - 1).toBe(1);
     expect(h).toContain("CFA Nord, Lille");
   });
@@ -42,7 +39,6 @@ describe("certificat de réalisation", () => {
   });
   it("sans ville ni dirigeant : pas de « Fait à , » ni « Je soussigné , »", () => {
     const h = genCertificatRealisationStagiaire({ ...org, ville: "", dirigeant: "" }, { ...f0, modalites: "distanciel" }, STAGIAIRES_TEST, 0);
-    writeFileSync("/tmp/certif/izi.html", h);
     expect(h).not.toContain("Fait à ,");
     expect(h).not.toMatch(/Je soussigné\(e\)\s*,\s*,/);
   });
