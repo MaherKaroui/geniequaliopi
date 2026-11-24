@@ -34,6 +34,8 @@ import { HYG14_EXERCICES_COMPLETS, HYG14_QCM_DEBUT, HYG14_QCM_FIN } from "./hygi
 import { isHYG14Formation, getHYG14AutoAnswers, HYG14_QUESTIONS_OUVERTES } from "./hygieneAlimentaire14hHumanized";
 import { VTC48_EXERCICES_COMPLETS, VTC48_QCM_DEBUT, VTC48_QCM_FIN } from "./vtc48hPreset";
 import { isVTC48Formation, getVTC48AutoAnswers, VTC48_QUESTIONS_OUVERTES } from "./vtc48hHumanized";
+import { ECO21_EXERCICES_COMPLETS, ECO21_QCM_DEBUT, ECO21_QCM_FIN } from "./ecommerce21hPreset";
+import { isECO21Formation, getECO21AutoAnswers, ECO21_QUESTIONS_OUVERTES } from "./ecommerce21hHumanized";
 import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
@@ -1482,6 +1484,32 @@ EVAL_CONTENT["VTC48"] = {
   ],
 };
 
+// ===== Créer et développer une e-boutique professionnelle (RS6475) – 21 h (C1 à C7) =====
+// Mises en situation corrigées (C1 à C7) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["ECO21"] = {
+  qcmPositionnement: ECO21_QCM_DEBUT,
+  qcmFinal: ECO21_QCM_FIN,
+  exercices: ECO21_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Concevoir un site de e-commerce attrayant, simple d'accès et facile d'utilisation, notamment pour les publics en situation de handicap",
+    "C2 – Gérer un site de e-commerce avec les technologies et plateformes appropriées pour tout type de clientèle",
+    "C3 – Développer une stratégie de marketing en ligne : moteurs de recherche, réseaux sociaux, publicité, planning de publication",
+    "C4 – Rendre son site accessible à tous en s'appuyant sur le RGAA",
+    "C5 – Optimiser la disponibilité des produits par la gestion des stocks et des livraisons",
+    "C6 – Indexer et analyser les données statistiques du site pour ajuster et fidéliser",
+    "C7 – Sécuriser les données sensibles des clients et de l'entreprise conformément au RGPD",
+  ],
+  appreciations: [
+    "Choix de plateforme argumenté et arborescence claire ; les fiches produits gagneraient à être plus détaillées sur la livraison et les retours.",
+    "Paramétrage du paiement et de la livraison maîtrisé ; les pages légales sont complètes, la médiation de la consommation est à mentionner systématiquement.",
+    "Mots-clés pertinents et planning de publication réaliste ; le suivi des campagnes publicitaires reste à systématiser.",
+    "Défauts d'accessibilité bien repérés avec les critères du RGAA ; les tests au clavier sont à refaire après chaque changement de thème.",
+    "Calcul du point de commande juste et réglages de stock adaptés ; la procédure en cas de retard de livraison est à formaliser.",
+    "Indicateurs bien calculés (taux de conversion, panier moyen) ; les ajustements proposés doivent davantage s'appuyer sur les sources de trafic.",
+    "Bonnes mesures de sécurité et bandeau de cookies conforme ; le registre des traitements est à compléter avec les durées de conservation.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1736,6 +1764,8 @@ function getContentKey(intitule: string): string {
   if (isHYG14Formation(lower)) return "HYG14";
   // Préparation à l'examen VTC (RS5637) – 48 h — avant la règle « vtc » générique
   if (isVTC48Formation(lower)) return "VTC48";
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h — avant toute règle « e-commerce », « commerce », « web »
+  if (isECO21Formation(lower)) return "ECO21";
   if (isGMA70Formation(lower)) return "GMA70";
   if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
@@ -1943,6 +1973,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isHYG14Formation(formationIntitule)) return true;
   // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé (« VTC », « voiture de transport avec chauffeur »)
   if (isVTC48Formation(formationIntitule)) return true;
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé (« e-boutique … 21 h », « RS6475 »)
+  if (isECO21Formation(formationIntitule)) return true;
   if (isGMA70Formation(formationIntitule)) return true;
   if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -1961,6 +1993,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isHYG14Formation(formationIntitule)) return EVAL_CONTENT["HYG14"];
   // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé
   if (isVTC48Formation(formationIntitule)) return EVAL_CONTENT["VTC48"];
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé
+  if (isECO21Formation(formationIntitule)) return EVAL_CONTENT["ECO21"];
   if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
   if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2551,6 +2585,9 @@ QUESTIONS_OUVERTES["HYG14"] = HYG14_QUESTIONS_OUVERTES;
 
 // Préparation à l'examen VTC (RS5637) – 48 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["VTC48"] = VTC48_QUESTIONS_OUVERTES;
+
+// Créer et développer une e-boutique professionnelle (RS6475) – 21 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["ECO21"] = ECO21_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
@@ -3051,6 +3088,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoVtc.reponses, autoVtc.scores);
+  }
+
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : moteur humanisé (une copie différente par stagiaire).
+  if (isECO21Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoEco = getECO21AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoEco.reponses, autoEco.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).

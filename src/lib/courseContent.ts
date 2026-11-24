@@ -333,6 +333,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isHYG14Formation(formationIntitule)) return HYG14_VIDEOS;
   // Préparation à l'examen VTC (RS5637) – 48 h : vidéos du preset, avant la banque « vtc » générique
   if (isVTC48Formation(formationIntitule)) return VTC48_VIDEOS;
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : vidéos du preset, avant les banques « webmarketing » / « e-commerce »
+  if (isECO21Formation(formationIntitule)) return ECO21_VIDEOS;
   if (isGMA70Formation(formationIntitule)) return GMA70_VIDEOS;
   if (isMSC70Formation(formationIntitule)) return MSC70_VIDEOS;
   // Enseignement : fondamentaux du droit et des institutions : vidéos du preset, jamais les banques « droit » génériques
@@ -514,6 +516,9 @@ import { HYG14_VIDEOS } from "./hygieneAlimentaire14hPreset";
 import { getVtc48hChapters } from "./courseContentVtc48h";
 import { isVTC48Formation } from "./vtc48hHumanized";
 import { VTC48_VIDEOS } from "./vtc48hPreset";
+import { getEcommerce21hChapters } from "./courseContentEcommerce21h";
+import { isECO21Formation } from "./ecommerce21hHumanized";
+import { ECO21_VIDEOS } from "./ecommerce21hPreset";
 import { GMA70_VIDEOS } from "./projecteursGrandMA70hPreset";
 import { MSC70_VIDEOS } from "./machinerieScenique70hPreset";
 import { getDroitInstitutions47hChapters, getDroitInstitutions21hChapters } from "./courseContentDroitInstitutions47h";
@@ -590,6 +595,8 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (isHYG14Formation(formationIntitule)) return getHygieneAlimentaire14hChapters();
   // Préparation à l'examen VTC (RS5637) – 48 h : support propre, avant la règle « vtc » générique (getVTCChapters)
   if (isVTC48Formation(formationIntitule)) return getVtc48hChapters();
+  // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : support propre, avant les règles « webmarketing » / « e-commerce » / « web »
+  if (isECO21Formation(formationIntitule)) return getEcommerce21hChapters();
   if (isGMA70Formation(formationIntitule)) return getProjecteursGrandMA70hChapters();
   if (isMSC70Formation(formationIntitule)) return getMachinerieScenique70hChapters();
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) : support propre, avant les règles « droit » / « enseignement »
