@@ -15,7 +15,7 @@ describe("mails automatiques", () => {
   it("AF non certifiante : avec entreprise → convention tripartite ; sans entreprise → contrat avec rétractation, jamais CPF", () => {
     const f = FORMATIONS_TEST["actions-formation"];
     const stag = financeursEffectifs(STAGIAIRES_TEST, f, ORG_TEST);
-    expect(stag.every((s) => s.financeur === "Personnel")).toBe(true);
+    expect(stag.some((s) => /cpf/i.test(s.financeur || ""))).toBe(false);
     for (const s of stag) {
       const ins = mailsStagiaire(ORG_TEST, f, s, "actions-formation").find((m) => m.key === "af_inscription")!;
       const t = texte(ins.messages[0].body);

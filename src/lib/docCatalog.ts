@@ -1,4 +1,5 @@
 import { DocEntry, FormationInfo, OrganismeInfo } from "@/types/qualiopi";
+import { financeParEntreprise, typeFinancement } from "./financement";
 import { planNexus, NEXUS_PDF_AGEFIPH } from "./bdc/nexus/nexusDocs";
 import { titreNexus } from "./bdc/nexus/nexusTitres";
 import { NEXUS_TEMPLATES } from "./bdc/nexus/nexusTemplates";
@@ -167,10 +168,9 @@ export function buildFullCatalog(
     });
     // Contrat ou Convention de formation — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
-      // Règle : stagiaire avec entreprise → convention tripartite (jamais de contrat) ;
-      // sans entreprise → contrat bilatéral (art. L.6353-3, la personne finance elle-même).
-      const hasEntreprise = !!(s.entreprise && s.entreprise.trim());
-      if (hasEntreprise) {
+      // Règle : financement OPCO / employeur (entreprise renseignée) → convention tripartite ;
+      // CPF, France Travail, Région ou financement personnel → contrat bilatéral (art. L.6353-3).
+      if (financeParEntreprise(s)) {
         add(`af_c3i9_convention_formation_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION TRIPARTITE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_tripartite", { stagiaireIdx: si });
       } else {
         add(`af_c3i9_contrat_formation_${si}`, `CT3 - IND 9 CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 9, "contrat_formation_pro_stagiaire", { stagiaireIdx: si });
@@ -518,7 +518,7 @@ export function buildFullCatalog(
       add(`af_c7i30_appreciations_entreprises_${ei}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE – ${ent}`, 7, 30, "appreciations_entreprises", { entreprise: ent });
     });
     // Enquête financeur : seulement s'il existe un financeur tiers (pas pour un dossier 100 % autofinancé).
-    if (!stagiaires.length || stagiaires.some((s) => !/particulier|personnel|fonds propres|autofinanc|auto-financ|financement perso/i.test(s.financeur || ""))) {
+    if (!stagiaires.length || stagiaires.some((s) => typeFinancement(s) !== "Personnel")) {
       add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
     }
     add("af_c7i30_tableau_relance_excel", "CT7 - IND 30 TABLEAU DE RELANCE", 7, 30, "relances_appreciations_excel");

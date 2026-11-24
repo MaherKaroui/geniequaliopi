@@ -4,6 +4,7 @@
  * heures de bureau, JAMAIS dans le futur), rendu ensuite en capture Gmail ou Outlook
  * selon la messagerie de l'organisme (voir captureMail.ts).
  */
+import { financeParEntreprise } from "../financement";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { joursFeriesDeLAnnee, cleDate } from "../joursFeries";
 import { getDateAnalyseBesoins, getDateSignatureDossier } from "../docBuilder";
@@ -102,8 +103,9 @@ function v<T>(c: Ctx, cle: string, options: T[]): T {
 type Regime = "cpf" | "convention" | "contrat" | "aif";
 
 /**
- * Cadre contractuel : stagiaire avec entreprise → convention de formation tripartite
- * (jamais de contrat) ; sans entreprise → contrat de formation professionnelle.
+ * Cadre contractuel, selon le type de financement du formulaire Stagiaires : OPCO ou employeur
+ * (entreprise renseignée) → convention de formation tripartite ; sinon contrat de formation
+ * professionnelle (CPF certifiant : CGU de Mon Compte Formation ; France Travail : devis AIF).
  */
 function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: string; art: string; participe: string } {
   const fin = (c.s.financeur || "").toLowerCase();
@@ -114,7 +116,7 @@ function regime(c: Ctx): { r: Regime; piece: string; libelle: string; phrase: st
   if (/france travail|aif/.test(fin) && !(c.s.entreprise || "").trim()) {
     return { r: "aif", piece: "Devis AIF", libelle: "devis AIF", phrase: "Le devis d'aide individuelle à la formation (AIF) est à valider avec votre conseiller France Travail avant le démarrage.", art: "le", participe: "signé" };
   }
-  if (/opco|entreprise|employeur|plan|r[ée]gion/.test(fin) || (c.s.entreprise || "").trim()) {
+  if (financeParEntreprise(c.s)) {
     return { r: "convention", piece: "Convention de formation", libelle: "convention de formation", phrase: `La convention de formation est à signer par ${esc((c.s.entreprise || "votre employeur").trim())} et à nous retourner avant le démarrage.`, art: "la", participe: "signée" };
   }
   return { r: "contrat", piece: "Contrat de formation professionnelle", libelle: "contrat de formation professionnelle", phrase: "Conformément à l'article L.6353-5 du Code du travail, vous disposez d'un délai de rétractation de 10 jours à compter de la signature du contrat ; aucune somme ne peut être exigée avant l'expiration de ce délai.", art: "le", participe: "signé" };

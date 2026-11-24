@@ -6,6 +6,7 @@
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { financeursEffectifs } from "@/lib/formationResolue";
+import { financeParEntreprise } from "@/lib/financement";
 import { ORG_TEST, FORMATIONS_TEST, FUITES, type TypeAction } from "./dossierAudit.harness";
 
 export interface Cas { id: string; type: TypeAction; org: OrganismeInfo; f: FormationInfo; stagiaires: StagiaireInfo[]; tags: string[] }
@@ -131,9 +132,10 @@ export function auditerCas(c: Cas, opts: { limitParType?: number } = {}): { tota
     if (s) {
       // Financement : rien de CPF pour une formation non certifiante.
       if (c.type === "actions-formation" && !certifiante && /\bCPF\b|Mon Compte Formation/i.test(t) && !/non (éligible|eligible)|pas (éligible|eligible)|hors CPF|n'est pas éligible/i.test(t)) add("cpf-non-certifiant", d, extrait(t, /\bCPF\b|Mon Compte Formation/i));
-      // Règle : avec entreprise → convention tripartite (jamais de contrat) ; sans entreprise → contrat (AF).
-      if (c.type === "actions-formation" && /CONVENTION DE FORMATION/i.test(d.nom) && s.financeur === "Personnel" && !s.entreprise?.trim()) add("convention-pour-personnel", d, d.nom);
-      if (c.type === "actions-formation" && /CONTRAT DE FORMATION/i.test(d.nom) && (s.entreprise?.trim() || /opco|entreprise/i.test(s.financeur || ""))) add("contrat-pour-opco", d, d.nom);
+      // Règle : financement OPCO / employeur avec entreprise → convention tripartite (jamais de contrat) ;
+      // sinon (personnel, CPF, France Travail, Région) → contrat (AF), même si une entreprise est renseignée.
+      if (c.type === "actions-formation" && /CONVENTION DE FORMATION/i.test(d.nom) && !financeParEntreprise(s)) add("convention-pour-personnel", d, d.nom);
+      if (c.type === "actions-formation" && /CONTRAT DE FORMATION/i.test(d.nom) && financeParEntreprise(s)) add("contrat-pour-opco", d, d.nom);
       // Civilité.
       if (s.civilite === "Mme" && new RegExp(`Monsieur\\s+(${s.nom}|${s.prenom})`, "i").test(t)) add("civilite", d, extrait(t, /Monsieur/));
       if (s.civilite === "M." && new RegExp(`Madame\\s+(${s.nom}|${s.prenom})`, "i").test(t)) add("civilite", d, extrait(t, /Madame/));

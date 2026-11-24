@@ -1006,6 +1006,12 @@ let tamponReferentQualite: string | undefined;
 let signatureReferentQualite: string | null = null;
 /** Organisme du document en cours : signatures des référents (formulaire Organisme). */
 let orgReferents: Partial<OrganismeInfo> | undefined;
+/** Formation du document en cours : signature du formateur saisie dans le formulaire Formation,
+ *  utilisée par toutes les pièces, même celles qui ne passent pas la formation à buildDocument. */
+let formationCourante: Pick<FormationInfo, "formateurSignatureUrl"> | undefined;
+export function setDocFormation(f: Pick<FormationInfo, "formateurSignatureUrl"> | undefined): void {
+  formationCourante = f;
+}
 const nomCle = (n?: string) => (n || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().split(/[\s-]+/).filter(Boolean).sort().join(" ");
 /** Même personne (casse, accents et ordre prénom / nom ignorés) ? */
 export const memePersonne = (a?: string, b?: string) => !!nomCle(a) && nomCle(a) === nomCle(b);
@@ -1252,7 +1258,7 @@ export function buildDocument(config: DocBuildConfig): string {
   }
   if (config.signatures) {
     const firstStagiaire = config.stagiaires?.[0];
-    const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
+    const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl || formationCourante?.formateurSignatureUrl;
     const stagSigUrl = config.signatures.stagiaireSignatureUrl || firstStagiaire?.signatureUrl;
     const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl || firstStagiaire?.signatureResponsableUrl;
     // Auto-compute signature dates if not provided

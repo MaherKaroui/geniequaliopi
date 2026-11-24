@@ -8,6 +8,7 @@ import { calendrierVAE, frVAE } from "./vae/vaeProfil";
 import { dirigeanteFem, de, dossierVAESeul } from "./genre";
 import { mot } from "./resolveurFormation";
 import { resolveFormation, financeursEffectifs, estCertifiante } from "./formationResolue";
+import { financeParEntreprise, libelleCourtFinancement, nomFinanceur, questionFinancement, reponseFinancement, typeFinancement } from "./financement";
 import { genFicheMissionCFA, genEmargementAtelierMissionCFA, genTableauBord14MissionsCFA, genPlanAnnuel14MissionsCFA, genProcedureAccompagnementSocialCFA, genProcedureEvaluationCompetencesCFA } from "./missionsCFA2026";
 import { genPlanMixiteEgaliteFH2026, genPlanMixiteMetiers2026, genPlanDiversite2026, genInformationDroitsDevoirsSST2026, genTableauCandidatsSansContrat2026 } from "./missionsCFA2026Plans";
 import { entreesCatalogueMails, retrouverMail, mailHtmlSimple } from "./mails/mailsAutomatiques";
@@ -35,7 +36,7 @@ import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTSt
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement, signatureDirigeantHtml, cachetDirigeantHtml } from "./docBuilder";
+import { buildDocument, setDocFormation, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getDateAnalyseBesoins, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, isBilanFroidDisponible, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement, signatureDirigeantHtml, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, organismeALaDate, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { estJourFormation, estFormationHebdo, texteHorairesHebdo } from "./joursFeries";
 import { horairesSessionTexte, horairesSessionLigne, tarifNetDeTaxe, tarifMentionneTva, estDistancielPur, joursSessionLabel } from "./sessionTextes";
@@ -220,7 +221,8 @@ export function generateDocumentById(docId: string, template: string, params: Re
   const rempliQualiopi = /besoins|bilan_(chaud|froid)|satisfaction/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template);
   const presetBlank = rempliQualiopi && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
-  // AF non certifiante : financement toujours personnel (pas de CPF sans RS/RNCP).
+  setDocFormation(userFormation);
+  // AF non certifiante : pas de CPF sans RS/RNCP (le CPF saisi devient un financement personnel).
   const userStagiaires = financeursEffectifs(userStagiairesSaisis, userFormation, org);
   let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
   // Apply gender adaptation based on the relevant stagiaire
@@ -2060,8 +2062,8 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     const rows = stagiaires.map((s, i) => {
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
-      // Prise en charge déterministe : avec entreprise → OPCO, sans entreprise → Financement personnel.
-      const financement = (o.typesActions || []).includes("vae") || financeParEntreprise(s) === false ? "Financement personnel" : "OPCO";
+      // Type de financement choisi dans le formulaire Stagiaires (à défaut : entreprise → OPCO, sinon personnel).
+      const financement = (o.typesActions || []).includes("vae") ? "Financement personnel" : libelleCourtFinancement(s);
       const besoinIndiv = isVitrageFormation(f.intitule, f.codeRNCP)
         ? getVitrageBesoin(s.nom, s.prenom, s.civilite)
         : isOngulaireFormation(f.intitule, f.codeRNCP)
@@ -8626,21 +8628,11 @@ ${blocDistanceBesoins(f)}
 }
 
 const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge des frais pédagogiques par <strong>l'OPCO dont relève l'employeur</strong>, au niveau de prise en charge (NPEC) fixé par la branche, au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
-const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
-/** Formation non certifiante : pas d'éligibilité au CPF, la question ne le propose pas. */
-const QUESTION_FINANCEMENT_NON_CERTIFIANTE = "Quel budget avez-vous prévu pour cette formation et comment la financez-vous (financement personnel, employeur, France Travail) ?";
-/** Prise en charge de l'évaluation des besoins (IND 4) : un stagiaire rattaché à une entreprise
- *  est financé par l'OPCO (plan de développement des compétences) ; sans entreprise, le
- *  financement est personnel. Le champ « financeur » saisi ne change pas cette règle. */
-function financeParEntreprise(s: StagiaireInfo): boolean {
-  const ent = (s.entreprise || "").trim();
-  return !!ent && ent.toLowerCase() !== "entreprise";
+/** Question « financement » de l'évaluation des besoins (IND 4) : suit le type de financement
+ *  choisi dans le formulaire Stagiaires (à défaut : entreprise → OPCO, sinon personnel). */
+function questionFinancementPour(s: StagiaireInfo, _f: FormationInfo): string {
+  return questionFinancement(s);
 }
-function questionFinancementPour(s: StagiaireInfo, f: FormationInfo): string {
-  if (financeParEntreprise(s)) return QUESTION_FINANCEMENT_ENTREPRISE;
-  return /^(RS|RNCP)\d+$/i.test(String(f.codeRNCP || "").replace(/\s+/g, "")) ? QUESTION_FINANCEMENT_STANDARD : QUESTION_FINANCEMENT_NON_CERTIFIANTE;
-}
-const QUESTION_FINANCEMENT_ENTREPRISE = "Quel dispositif de financement est mobilisé par l'entreprise pour cette formation (OPCO / plan de développement des compétences) ?";
 const QUESTION_FINANCEMENT_ALTERNANCE = "Quel dispositif de financement est mobilisé pour cette formation en alternance (OPCO / contrat d'apprentissage) ?";
 
 function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
@@ -9095,14 +9087,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const hasEntreprise = financeParEntreprise(s);
   // Données saisies prioritaires, pour TOUTES les formations (y compris presets vitrage / ongulaire).
   if ((s.diplome || "").trim()) result.diplome = s.diplome!.trim();
-  // Prise en charge IND 4 : stagiaire avec entreprise → OPCO, sans entreprise → Financement personnel.
-  if (isCFAAlternance) {
-    result.budget = ALTERNANCE_OPCO_FINANCEMENT;
-  } else if (hasEntreprise) {
-    result.budget = `Formation prise en charge par l'OPCO de ${(s.entreprise || "").trim()} au titre du plan de développement des compétences.`;
-  } else {
-    result.budget = "Financement personnel";
-  }
+  // Prise en charge IND 4 : type de financement choisi dans le formulaire Stagiaires.
+  result.budget = isCFAAlternance ? ALTERNANCE_OPCO_FINANCEMENT : reponseFinancement(s);
   if (isStagiairePSH(s)) {
     result.handicap = `Oui, je bénéficie d'une reconnaissance de la qualité de travailleur handicapé (RQTH). Je souhaite échanger avec le référent handicap (${o.referentHandicap || o.dirigeant}) pour définir les aménagements utiles : rythme, pauses, supports adaptés.`;
   }
@@ -12194,15 +12180,6 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
 function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   let extra = `<p><em>En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone pendant un mois.</em></p>`;
   // Financeurs réels, déduits du champ « financeur » des stagiaires (plus de financeurs inventés).
-  const nomFinanceur = (st: StagiaireInfo): string | null => {
-    const x = (st.financeur || "").toLowerCase();
-    if (x.includes("cpf")) return "Caisse des Dépôts et Consignations (Mon Compte Formation)";
-    if (x.includes("opco")) return st.entreprise?.trim() ? `OPCO de ${st.entreprise.trim()}` : "OPCO de l'employeur";
-    if (x.includes("france travail") || x.includes("pôle emploi") || x.includes("pole emploi")) return "France Travail";
-    if (x.includes("région") || x.includes("region")) return "Conseil régional";
-    if (x.includes("entreprise") || x.includes("employeur")) return st.entreprise?.trim() || "Employeur";
-    return null;
-  };
   const financeurs = Array.from(new Set(stagiaires.map(nomFinanceur).filter((x): x is string => !!x)));
   const remplie = isFormationTerminee(f, stagiaires);
   if (financeurs.length === 0) {
@@ -12530,7 +12507,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
 
   // Items sans objet : aide au financement si autofinancement, confort / équipement des locaux si 100 % à distance.
   const distQ = /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || "");
-  const autofinance = /particulier|personnel|fonds propres|autofinanc|auto-financ/i.test(s.financeur || "");
+  const autofinance = typeFinancement(s) === "Personnel";
   const ncQ = (label: string) => (autofinance && /dossier de financement/.test(label)) || (distQ && /Confort et équipement/.test(label));
   const criteresLabels: [string, boolean][] = [
     ["1. Avant l'entrée en formation", true],

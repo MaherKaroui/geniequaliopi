@@ -12,6 +12,8 @@ import CerfaComplementEditor from "@/components/CerfaComplementEditor";
 import { rechercherEntrepriseParSiret } from "@/lib/siretLookup";
 import { completerNir, debutNir } from "@/lib/nir";
 import { toast } from "sonner";
+import { TYPES_FINANCEMENT, normaliserFinanceur } from "@/lib/financement";
+import { estCertifiante } from "@/lib/formationResolue";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
 import {
@@ -354,6 +356,21 @@ const StagiairesForm = ({ data, onChange, formation, typesActions }: StagiairesF
                 <option value="">—</option>
                 <option value="oui">Oui</option>
                 <option value="non">Non</option>
+              </select>
+            </div>
+            <div>
+              <Label>Type de financement</Label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={normaliserFinanceur(stagiaire.financeur)}
+                onChange={e => updateStagiaire(index, 'financeur', e.target.value)}
+              >
+                <option value="">Automatique ({(stagiaire.entreprise || "").trim() ? "OPCO" : "financement personnel"})</option>
+                {TYPES_FINANCEMENT.map((t) => (
+                  <option key={t.value} value={t.value} disabled={t.value === "CPF" && !!formation && !estCertifiante(formation)}>
+                    {t.label}{t.value === "CPF" && !!formation && !estCertifiante(formation) ? " — formation non certifiante" : ""}
+                  </option>
+                ))}
               </select>
             </div>
             {estCFA && (

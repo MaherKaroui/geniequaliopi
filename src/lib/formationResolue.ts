@@ -171,12 +171,13 @@ export function estCertifiante(f?: Partial<FormationInfo>): boolean {
 /**
  * Financeur réellement applicable à chaque stagiaire.
  * Action de formation NON certifiante (ni RS ni RNCP) : pas d'éligibilité au CPF,
- * le financement est toujours personnel (contrat de formation professionnelle,
- * art. L.6353-3 et suivants, rétractation de 10 jours).
+ * un CPF saisi est ignoré et la règle automatique s'applique (entreprise → OPCO et convention,
+ * sinon financement personnel et contrat, art. L.6353-3, rétractation de 10 jours). Les autres
+ * choix du formulaire (OPCO, employeur, France Travail, Région, personnel) sont conservés.
  */
 export function financeursEffectifs(stagiaires: StagiaireInfo[], f?: Partial<FormationInfo>, org?: Partial<OrganismeInfo>): StagiaireInfo[] {
   const types = org?.typesActions || [];
   const isAF = types.length === 0 || types.includes("actions-formation");
   if (!isAF || estCertifiante(f)) return stagiaires;
-  return (stagiaires || []).map((s) => (s && s.financeur !== "Personnel" ? { ...s, financeur: "Personnel" } : s));
+  return (stagiaires || []).map((s) => (s && /cpf|compte (personnel de )?formation/i.test(s.financeur || "") ? { ...s, financeur: "" } : s));
 }

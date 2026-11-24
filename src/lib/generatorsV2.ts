@@ -1,4 +1,5 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
+import { libelleFinancement } from "./financement";
 import { estCertifiante } from "./formationResolue";
 import { mot } from "./resolveurFormation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
@@ -145,7 +146,7 @@ function contratSessionInfos(s: StagiaireInfo, f: FormationInfo, stagiaires: Sta
   const formateur = ((s as any).formateur || f.formateur || "").trim();
   const deb = getStagiaireDateDebut(s, f), fin = getStagiaireDateFin(s, f);
   const effectif = stagiaires.filter((x) => getStagiaireDateDebut(x, f) === deb && getStagiaireDateFin(x, f) === fin).length || stagiaires.length;
-  const financement = ((s as any).financeur || "").trim();
+  const financement = libelleFinancement(s);
   return (!isPresentiel(f) && (f.lieu || "").trim() ? `<br><strong>Classe virtuelle :</strong> ${f.lieu}` : "")
     + (formateur ? `<br><strong>Formateur :</strong> ${formateur}` : "")
     + (effectif > 0 ? `<br><strong>Effectif de la session :</strong> ${effectif} stagiaire${effectif > 1 ? "s" : ""}` : "")
