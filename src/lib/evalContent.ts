@@ -1460,7 +1460,7 @@ EVAL_CONTENT["HYG14"] = {
   ],
 };
 
-// ===== Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h (C1 à C6) =====
+// ===== Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 140 h (C1 à C6) =====
 // Mises en situation corrigées (C1 à C6) puis un QCM de 10 questions par compétence.
 EVAL_CONTENT["VTC48"] = {
   qcmPositionnement: VTC48_QCM_DEBUT,
@@ -1762,7 +1762,7 @@ function getContentKey(intitule: string): string {
   if (isCOH21Formation(lower)) return "COH21";
   // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante) — avant la règle « restauration »
   if (isHYG14Formation(lower)) return "HYG14";
-  // Préparation à l'examen VTC (RS5637) – 48 h — avant la règle « vtc » générique
+  // Préparation à l'examen VTC (RS5637) – 140 h — avant la règle « vtc » générique
   if (isVTC48Formation(lower)) return "VTC48";
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h — avant toute règle « e-commerce », « commerce », « web »
   if (isECO21Formation(lower)) return "ECO21";
@@ -1971,7 +1971,7 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isCOH21Formation(formationIntitule)) return true;
   // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé (« hygiène alimentaire », « HACCP »)
   if (isHYG14Formation(formationIntitule)) return true;
-  // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé (« VTC », « voiture de transport avec chauffeur »)
+  // Préparation à l'examen VTC (RS5637) – 140 h : reconnue aussi sous ses variantes d'intitulé (« VTC », « voiture de transport avec chauffeur »)
   if (isVTC48Formation(formationIntitule)) return true;
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé (« e-boutique … 21 h », « RS6475 »)
   if (isECO21Formation(formationIntitule)) return true;
@@ -1991,7 +1991,7 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isCOH21Formation(formationIntitule)) return EVAL_CONTENT["COH21"];
   // Hygiène alimentaire en restauration commerciale – 14 h : reconnue aussi sous ses variantes d'intitulé
   if (isHYG14Formation(formationIntitule)) return EVAL_CONTENT["HYG14"];
-  // Préparation à l'examen VTC (RS5637) – 48 h : reconnue aussi sous ses variantes d'intitulé
+  // Préparation à l'examen VTC (RS5637) – 140 h : reconnue aussi sous ses variantes d'intitulé
   if (isVTC48Formation(formationIntitule)) return EVAL_CONTENT["VTC48"];
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé
   if (isECO21Formation(formationIntitule)) return EVAL_CONTENT["ECO21"];
@@ -2583,7 +2583,7 @@ QUESTIONS_OUVERTES["COH21"] = COH21_QUESTIONS_OUVERTES;
 // Hygiène alimentaire en restauration commerciale – 14 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["HYG14"] = HYG14_QUESTIONS_OUVERTES;
 
-// Préparation à l'examen VTC (RS5637) – 48 h — 10 questions début / fin dans l'ordre des mises en situation.
+// Préparation à l'examen VTC (RS5637) – 140 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["VTC48"] = VTC48_QUESTIONS_OUVERTES;
 
 // Créer et développer une e-boutique professionnelle (RS6475) – 21 h — 10 questions début / fin dans l'ordre des mises en situation.
@@ -3078,7 +3078,7 @@ export function generateStagiaireOpenAnswers(
     return toAnswers(autoHyg.reponses, autoHyg.scores);
   }
 
-  // Préparation à l'examen VTC (RS5637) – 48 h : moteur humanisé (une copie différente par stagiaire).
+  // Préparation à l'examen VTC (RS5637) – 140 h : moteur humanisé (une copie différente par stagiaire).
   if (isVTC48Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
     const autoVtc = getVTC48AutoAnswers(
       stagiaireInfo?.nom,

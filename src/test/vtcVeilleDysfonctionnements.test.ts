@@ -59,15 +59,18 @@ describe("VTC — veilles sourcées et dysfonctionnements IND 31", () => {
   });
 });
 
-describe("VTC 48 h — évaluations du jour : mises en situation illustrées et QCM mêlés", () => {
+describe("VTC — évaluation de chaque semaine : 2 mises en situation illustrées et QCM", () => {
   const fSansDuree = { ...f, intitule: "Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637)" } as FormationInfo;
-  const doc = (si: number, jour: number) => generateDocumentById("t", "exercices_stagiaire", { stagiaireIdx: si, exerciceIdx: jour }, o, fSansDuree, stagiaires);
+  const doc = (si: number, semaine: number) => generateDocumentById("t", "exercices_stagiaire", { stagiaireIdx: si, exerciceIdx: semaine }, o, fSansDuree, stagiaires);
 
-  it("chaque jour reprend le plan et le jour 2 mêle exercice et QCM", () => {
-    const j2 = doc(0, 1);
-    expect(j2).toContain("ÉVALUATION DU JOUR – MISES EN SITUATION ET QCM");
-    expect(j2).toContain("QCM C1");
-    expect(j2).toContain("Exercice 3");
+  it("chaque semaine reprend le plan : la semaine 2 mêle 2 mises en situation et les QCM C2 et C3", () => {
+    const s2 = doc(0, 1);
+    expect(s2).toContain("ÉVALUATION DE LA SEMAINE – MISES EN SITUATION ET QCM");
+    expect(s2).toContain("Exercice 4");
+    expect(s2).toContain("Exercice 5");
+    expect(s2).toContain("QCM C2");
+    expect(s2).toContain("QCM C3");
+    expect(s2).not.toContain("Exercice 3");
   });
 
   it("insère le document illustré avec largeur et hauteur (export Word)", () => {

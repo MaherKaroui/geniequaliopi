@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
-// « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h » — moteur de réponses HUMANISÉES
-// Formation certifiante (Répertoire spécifique RS5637) : 48 h sur 7 jours en classe virtuelle (jours 1 à 6 de 7 h,
-// jour 7 de 6 h), 1 à 12 stagiaires,
+// « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) » — moteur de réponses HUMANISÉES
+// Formation certifiante (Répertoire spécifique RS5637) : 140 h sur 4 semaines en classe virtuelle (20 jours de 7 h
+// du lundi au vendredi, 09h00 – 12h30 / 13h30 – 17h00), 1 à 12 stagiaires,
 // examen organisé par la CMA (inscription individuelle du candidat).
 // 100 % statique (aucun appel IA / réseau).
 // Chaque stagiaire reçoit des réponses DIFFÉRENTES et cohérentes :
@@ -20,9 +20,11 @@ const normalize = (s?: string) =>
   (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toUpperCase();
 
 /**
- * Vrai pour la formation exemple « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h ».
+ * Vrai pour la formation exemple « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) »
+ * (140 h sur 4 semaines ; anciens intitulés du preset suffixés « – 48 h » toujours reconnus).
  * Il faut à la fois : (le code RS5637, ou un intitulé qui contient « VTC », « voiture de transport avec chauffeur »
- * ou « RS5637 ») ET un intitulé qui précise la durée de 48 heures (« 48 h », « 48h », « 48 heures »).
+ * ou « RS5637 ») ET un intitulé qui est celui du preset, ou qui précise la durée de 140 heures (« 140 h », « 140h »,
+ * « 140 heures ») ou, pour les anciens dossiers, de 48 heures (« 48 h », « 48h », « 48 heures »).
  * Accents et casse indifférents. Une autre formation VTC (autre durée, ex. « Habilitation VTC – Préparation à
  * l'examen (RS5637) » de la liste d'exemples) n'est donc jamais captée.
  * Jamais pour : un autre code de répertoire saisi (taxi, deux ou trois roues motorisés, titre…), un intitulé qui parle de taxi
@@ -33,10 +35,11 @@ export function isVTC48Formation(intitule?: string, code?: string): boolean {
   const c = (code || "").toUpperCase().replace(/\s/g, "");
   const t = normalize(intitule).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z0-9']+/g, " ").trim();
   if (!t) return false;
-  // La durée de 48 heures doit figurer dans l'intitulé (« 48 h », « 48h », « 48 heures »)
+  // La durée doit figurer dans l'intitulé : 140 heures (« 140 h », « 140h », « 140 heures ») ou, pour les anciens
+  // dossiers, 48 heures (« 48 h », « 48h », « 48 heures »).
   // Exception : l'intitulé exact du preset sans sa durée (« Préparation à l'examen d'accès à la profession de
   // conducteur VTC (RS5637) »), qu'aucune autre formation d'exemple n'emploie.
-  if (!/\b48 ?h(eures?)?\b/.test(t) && !/\bpreparation a l'examen d'acces a la profession de conducteur vtc\b/.test(t)) return false;
+  if (!/\b(48|140) ?h(eures?)?\b/.test(t) && !/\bpreparation a l'examen d'acces a la profession de conducteur vtc\b/.test(t)) return false;
   if (c === "RS5637") return true;
   if (/^R[N]CP\d|^R[S]\d/.test(c)) return false;
   if (/\b(taxis?|vmdtr|rs ?5635|formation continue|bilan de competences|vae)\b/.test(t)) return false;
@@ -637,12 +640,14 @@ export function getVTC48Besoin(nom?: string, prenom?: string, civilite?: string,
 // Indices : 0 professions et conditions d'accès, 1 réservation et maraude, 2 statut juridique,
 //           3 prix de revient et seuil, 4 accident, 5 fatigue et sécurité, 6 français et anglais,
 //           7 développement commercial, 8 plateformes et réglementation spécifique, 9 épreuve pratique ;
-//           8 productions par banque.
+//           12 productions par banque.
 // La k-ième production de chaque banque suit le même stagiaire fictif : un stagiaire garde le même
 // parcours d'un exercice à l'autre.
 //   0 ancien·ne livreur·se · 1 salarié·e du commerce en reconversion · 2 demandeur·se d'emploi
 //   3 ancien·ne agent de sécurité · 4 ancien·ne réceptionniste d'hôtel · 5 porteur·se d'un projet de société
 //   6 conducteur·rice salarié·e de transport de personnes · 7 jeune conducteur·rice hors période probatoire
+//   8 ancien·ne chauffeur de taxi · 9 ancien·ne salarié·e d'une société d'ambulances
+//   10 ancien·ne militaire · 11 ancien·ne salarié·e de la restauration (service en salle)
 // ---------------------------------------------------------------------------
 const EXERCICES_PRODUCTIONS: string[][] = [
   // 0 — Professions et conditions d'accès
@@ -655,6 +660,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Je prépare une société de VTC avec un associé. Nous devrons chacun obtenir notre carte professionnelle, et la société devra être inscrite au registre des exploitants. J'ai aussi noté que la carte se renouvelle avec une formation continue.",
     "Je suis déjà conduct{/rice} salarié{e} dans le transport de personnes, mais pas en VTC. J'ai appris que l'examen ne suffit pas : sans carte professionnelle, je ne peux pas transporter de clients en VTC, même pour un employeur.",
     "J'ai mon permis depuis quatre ans, il n'est plus probatoire. J'ai vérifié chaque condition pour mon cas et préparé la liste des pièces pour la carte professionnelle : aptitude médicale, attestation de premiers secours, justificatifs.",
+    "J'ai conduit un taxi en location pendant six ans. En VTC, la maraude disparaît : seule la réservation préalable compte. Je dois passer les épreuves propres au VTC auprès de la CMA, puis demander au préfet ma carte professionnelle de conduct{/rice} VTC avant d'immatriculer mon entreprise au registre.",
+    "J'ai travaillé huit ans dans une société d'ambulances ; j'ai déjà le PSC1 et l'habitude de la visite médicale. Les trois professions du T3P sont le taxi, le VTC et les deux ou trois roues motorisés ; l'examen est organisé par la CMA et la carte professionnelle est délivrée par le préfet.",
+    "J'ai servi neuf ans dans l'armée, où je conduisais des véhicules de transport de personnel. J'ai classé les démarches de Samir : examen à la CMA, admissibilité puis épreuve pratique, carte professionnelle en préfecture, création de l'entreprise, registre des exploitants VTC, assurance, signalétique.",
+    "J'ai travaillé en salle dans la restauration, souvent le soir. Je croyais que le VTC pouvait chercher des clients dans la rue comme le taxi : c'est faux. Mon permis est hors période probatoire et mon casier est vierge ; après l'examen, j'obtiendrai la carte professionnelle, que je renouvellerai par la formation continue.",
   ],
   // 1 — Réservation préalable, maraude et contrôle
   [
@@ -666,6 +675,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Pour notre future société, chaque conducteur devra garder ses justificatifs de réservation pour les contrôles. Nous ne stationnerons jamais sur une station de taxis.",
     "Dans mon emploi actuel, les courses sont planifiées à l'avance : en VTC, la réservation préalable fonctionne de la même façon, avec un justificatif à présenter.",
     "Le cas de Samir m'a montré qu'un geste de bonne volonté peut être une infraction. Je retiens trois règles : réservation préalable, justificatif, pas d'attente sur la voie publique.",
+    "En taxi, je prenais les voyageurs qui me hélaient à la gare ; en VTC, c'est fini. Au voyageur de la gare de Lyon, je réponds que je ne peux le prendre que sur réservation préalable et je lui montre la station de taxis, où je ne m'arrête plus jamais.",
+    "Dans le transport sanitaire, chaque trajet avait son bon de transport ; en VTC, c'est le justificatif de réservation qui joue ce rôle lors d'un contrôle, avec la carte professionnelle, le permis, l'attestation d'assurance et la signalétique apposée.",
+    "J'ai l'habitude des consignes strictes. Sans réservation, Samir rentre à son lieu d'établissement ou stationne hors de la chaussée dans un lieu autorisé ; signaler sa disponibilité à un client avant toute réservation, c'est de la maraude électronique.",
+    "Je travaillerai souvent tard, à la sortie des restaurants et des gares. Je refuse toute personne qui me fait signe sans réservation, même pour une course facile, et je ne tourne pas autour de la gare en attendant la suivante.",
   ],
   // 2 — Statut juridique
   [
@@ -677,6 +690,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Avec mon associé, nous créerons une SAS : nous avons comparé la responsabilité, le régime social du président et le coût de la comptabilité.",
     "En EURL, le gérant associé unique est en principe travailleur indépendant. J'ai fait le tableau comparatif et je vérifierai les seuils et taux sur les sites officiels.",
     "Pour Samir, je recommande une société ou le régime réel, car sa location de véhicule et ses commissions pèsent lourd. Pour moi, je commence en micro-entreprise avec un véhicule loué.",
+    "En taxi, j'étais déjà à mon compte avec un véhicule en location. Pour le VTC, je reste en entreprise individuelle, mais au régime réel : en micro-entreprise, je paierais sur mon chiffre d'affaires sans déduire la location et le carburant, qui sont mes plus grosses charges.",
+    "J'ai été salarié{e} toute ma carrière et je tiens à une protection sociale proche de celle d'un salarié : la SASU, avec un président assimilé salarié, me correspond, même si la comptabilité complète a un coût. Je ferai valider ce choix par un expert-comptable.",
+    "J'ai construit un tableau à quatre colonnes pour les trois statuts : personnalité juridique, patrimoine, régime social, comptabilité. Pour Samir, avec un véhicule acheté à crédit, je retiens l'EURL ou le régime réel ; je vérifierai les seuils sur service-public.fr et sur le site de l'URSSAF.",
+    "Je ne connaissais que le statut de salarié. En micro-entreprise, les cotisations sont calculées sur le chiffre d'affaires après un abattement forfaitaire : avec peu de charges au début, cela peut me convenir, mais je changerai de statut si j'achète un véhicule.",
   ],
   // 3 — Prix de revient et seuil de rentabilité
   [
@@ -688,6 +705,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Pour notre société, nous avons calculé un seuil par conducteur et un seuil global. Le tableau nous servira à fixer les prix des devis.",
     "Je compare désormais chaque offre de course à mon prix de revient : au-delà du seuil, une course qui couvre les charges variables reste utile pour remplir un creux.",
     "Au-dessus de mon seuil de rentabilité, mon résultat prévisionnel pour 120 courses est positif, mais je dois encore payer mes cotisations personnelles : je garde une marge de sécurité dans mes prix.",
+    "En taxi, je ne calculais jamais mon prix de revient. Pour Samir, je classe la location, l'assurance, le téléphone, le logiciel et l'expert-comptable en charges fixes, et le carburant, l'entretien, les pneus et la commission en charges variables : son seuil de rentabilité est de 50 courses, soit 1 500 € de chiffre d'affaires hors taxes.",
+    "J'ai calculé le résultat de Samir pour 120 courses : 120 × 21 − 1 050 = 1 470 € avant impôt et cotisations personnelles. Au seuil de 50 courses, il ne se rémunère pas encore : c'est le chiffre à garder en tête au démarrage.",
+    "La course à 14 € couvre les 9 € de charges variables et laisse 5 € de marge, mais elle reste sous le prix de revient complet de 17,75 € : au-delà du seuil de rentabilité, je l'accepte pour combler un temps mort, jamais comme prix habituel.",
+    "Pour 120 courses, 1 050 / 120 = 8,75 € de charges fixes par course, plus 9 € de charges variables, soit 17,75 € de prix de revient. J'ai vérifié qu'au seuil de 50 courses, 50 × 21 = 1 050 € : le résultat est bien nul.",
   ],
   // 4 — Accident
   [
@@ -699,6 +720,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "S'il y a un blessé, j'alerte les secours ; si l'accrochage est sans blessé, nous remplissons un constat amiable avec un croquis et je le transmets à l'assureur. Notre société aura une procédure écrite.",
     "Je transporte déjà des passagers : leur sécurité passe avant tout. Je les fais sortir côté opposé à la circulation, puis j'alerte.",
     "Je n'avais aucune formation en secourisme. Je vais suivre le PSC1 demandé pour la carte, et je connais déjà les étapes pour alerter les secours.",
+    "En taxi, j'ai déjà été témoin d'un accrochage. Sur l'A86, je ralentis, j'allume les feux de détresse et je m'arrête au-delà de l'accident sur la bande d'arrêt d'urgence ; mes deux clients sortent côté glissière. J'alerte ensuite le 112 en précisant le sens vers Orly.",
+    "Dans mon ancien métier, je recevais souvent des messages d'alerte : lieu précis, nature de l'accident, nombre et état des victimes, dangers. Le conducteur respire mais reste immobile : je ne le déplace pas, sauf incendie ou risque de sur-accident, et je surveille sa respiration.",
+    "L'armée m'a appris à sécuriser avant d'intervenir. J'enfile le gilet, je mets les passagers à l'abri derrière la glissière, je pose le triangle seulement si c'est sans danger, puis j'alerte le 112 et je ne raccroche pas le premier.",
+    "Si l'accrochage avait été sans blessé, j'aurais rempli le constat amiable avec l'autre conducteur, croquis compris, signé par nous deux, puis transmis à mon assureur dans le délai du contrat. Ici, il y a un blessé : je protège, j'alerte, je secours.",
   ],
   // 5 — Fatigue, alcool, médicaments
   [
@@ -710,6 +735,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Dans notre société, le planning prévoit des pauses obligatoires et une amplitude limitée pour chaque conducteur.",
     "Alcool et stupéfiants allongent le temps de réaction : zéro consommation quand je travaille. Je fais une pause dès que ma vigilance baisse.",
     "J'ai construit une journée type avec mes pauses toutes les deux heures environ, et je vérifie que mes passagers sont attachés avant de démarrer.",
+    "En taxi, je faisais des journées de douze heures sans m'arrêter, et j'ai déjà senti mes yeux se fermer sur le périphérique. Pour Samir, je réduis l'amplitude, avec une pause d'un quart d'heure toutes les deux heures et une vraie coupure pour le repas.",
+    "J'ai vu les effets des médicaments sur les patients : le pictogramme va du niveau 1, « soyez prudent », au niveau 3, « ne pas conduire ». Sous un traitement de niveau 2, je demande l'avis du médecin avant de conduire, et je fais une pause dès les premiers bâillements.",
+    "Dans l'armée, les convois prévoyaient des haltes régulières. J'applique la même règle : pause toutes les deux heures, téléphone sur son support et jamais en main, au moins deux secondes de distance, vitesse adaptée à la pluie et à la nuit.",
+    "J'ai l'habitude de finir tard, mais conduire fatigué{e} est autre chose. Je prévois une sieste courte avant le service du soir et une pause entre deux réservations ; zéro alcool, même un verre en fin de service.",
   ],
   // 6 — Français et anglais
   [
@@ -721,6 +750,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Pour notre société, j'ai rédigé un modèle de message de confirmation en français et en anglais pour les clients d'entreprise.",
     "Je propose en anglais la climatisation ou la musique ; en français, j'ai corrigé mes abréviations dans les messages aux clients.",
     "En anglais, je réponds à « How much is the fare? » en rappelant le prix fixé à la réservation. Mon message en français est court et poli.",
+    "En taxi, je transportais déjà des touristes, mais mon anglais se limitait à « Where to? ». J'accueille maintenant M. Smith : « Good afternoon, Mr Smith. Let me help you with your luggage. » Mon message à Mme Durand précise la plaque du véhicule.",
+    "J'ai l'habitude de rassurer des patients ; en anglais, je dis à M. Smith « Please fasten your seatbelt » et je lui demande s'il souhaite la climatisation. En français, j'ai reformulé l'article : le conducteur VTC ne prend un client que sur réservation préalable.",
+    "J'ai pratiqué l'anglais en mission à l'étranger. Je vérifie la destination de M. Smith, « You're going to the Hôtel du Parc, is that right? », et j'annonce environ quarante minutes de trajet. Mon message à Mme Durand est sans abréviation et se termine par une formule de politesse.",
+    "En salle, j'accueillais déjà des clients étrangers en anglais ; je réutilise les mêmes formules de politesse avec M. Smith. Mon point faible était l'écrit : j'ai corrigé les accords de mon message de confirmation à Mme Durand.",
   ],
   // 7 — Développement commercial
   [
@@ -732,6 +765,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Avec mon associé, nous ciblons les clients d'entreprise de la zone d'activités. Notre tableau de bord suivra les kilomètres à vide et la marge par client.",
     "Je connais déjà des établissements dont les clients ont besoin de transport régulier ; je leur proposerai un devis et une réservation directe simple.",
     "J'ai créé une fiche d'établissement en ligne et des cartes de visite ; mon objectif est d'avoir des clients directs réguliers d'ici six mois.",
+    "J'avais une clientèle d'habitués en taxi ; je la garderai en VTC grâce à la réservation directe. Mon étude de marché vise les hôpitaux et les gares du Val-de-Marne, où les clients attendent de la ponctualité et une facture.",
+    "Je connais les établissements de santé de Créteil : je proposerai des trajets non médicalisés aux patients qui sortent de consultation. Mon tableau de bord suit le nombre de courses, les kilomètres à vide et les avis clients.",
+    "J'ai découpé mon plan en actions datées : semaine 1, fiche d'établissement en ligne ; semaine 2, visite des entreprises de la zone d'activités ; semaine 3, partenariat avec un hôtel. Pour fidéliser chaque client d'entreprise, je propose un point mensuel.",
+    "Les restaurants où j'ai travaillé me recommanderont à leurs clients qui sortent tard le soir. Mon devis pour une entreprise précise le temps d'attente compris, les bagages, le prix et les conditions d'annulation ; je ne dénigre jamais la concurrence.",
   ],
   // 8 — Plateformes et réglementation spécifique
   [
@@ -743,6 +780,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Pour notre société, nous travaillerons avec deux plateformes au plus et nous garderons une clientèle directe pour ne pas dépendre d'elles.",
     "Je garde la trace de chaque course de la plateforme et de son prix pour vérifier mes revenus et mes justificatifs de réservation.",
     "J'ai appris que la loi d'orientation des mobilités oblige la plateforme à m'informer avant l'acceptation : je refuserai les courses non rentables.",
+    "En taxi, le prix venait du taximètre et du tarif réglementé ; en VTC, il est fixé à la réservation ou selon un mode de calcul communiqué au client. Avec la plateforme, je compare le prix minimal garanti à mon prix de revient avant d'accepter.",
+    "Je viens d'un métier où le véhicule obéissait à des normes strictes. En VTC, je me réfère au code des transports pour les caractéristiques techniques, et je garde la signalétique, l'assurance et le contrôle technique à jour, même si je ne travaille qu'avec une plateforme.",
+    "Je me méfiais des applications. J'ai appris que la plateforme ne peut pas me sanctionner pour un refus, que je choisis mes plages de connexion et que l'ARPE, créée en 2021, organise le dialogue social entre plateformes et indépendants.",
+    "Avant d'accepter, je lis la distance et le prix minimal garanti, net de commission, que la plateforme doit afficher ; si la course ne couvre pas mes charges, je la refuse sans pénalité.",
   ],
   // 9 — Épreuve pratique
   [
@@ -754,6 +795,10 @@ const EXERCICES_PRODUCTIONS: string[][] = [
     "Nous utiliserons la même grille d'auto-évaluation pour former les futurs conducteurs de notre société : accueil, conduite, facturation, prise de congé.",
     "Je suis habitué{e} à transporter des passagers, mais pas à facturer : j'ai appris les mentions de la note de course.",
     "J'ai listé les erreurs qui pénalisent : infraction au code de la route, accueil négligé, facture incomplète. Je m'entraîne sur ces trois points.",
+    "Je connais bien la circulation parisienne, mais en taxi je ne préparais pas de délestage. Pour Mme Lefèvre, j'ai prévu l'A86 puis l'A4 et un trajet de secours ; à l'arrivée, elle paie par carte et je lui remets une facture complète.",
+    "Aider à porter une valise et installer une personne, je sais faire. J'ai travaillé la fin de course : arrêt en lieu sûr, paiement par carte, facture avec l'identité de l'entreprise, la date, les lieux et le prix, vérification qu'aucun objet n'est oublié.",
+    "J'ai préparé la course comme une mission : itinéraire principal, délestage, horaire de départ avec une marge. Pendant l'épreuve, je préviens Mme Lefèvre si je change d'itinéraire, puis je termine par la facturation et une prise de congé courtoise.",
+    "L'accueil et la prise de congé sont mes points forts grâce à la salle de restaurant. Je dois encore travailler la facture : j'oubliais les lieux de départ et d'arrivée sur ma note de course.",
   ],
 ];
 
@@ -761,13 +806,20 @@ const EXERCICES_PRODUCTIONS: string[][] = [
  * Ce que le stagiaire relève dans le document illustré de la mise en situation (banque par exercice,
  * mêmes index que EXERCICES_PRODUCTIONS). Absent pour les mises en situation sans document.
  */
-const OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
+export const VTC48_OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
   1: [
     "Sur le document, le voyageur lève la main juste à côté de la station de taxis : c'est exactement la situation où je dois refuser.",
     "J'ai regardé l'heure sur le document : 22 h 40 et aucune réservation en cours, donc je ne reste pas devant la gare.",
     "Sur l'image, ma vignette VTC est bien visible sur le pare-brise ; elle ne me donne pas pour autant le droit de prendre ce voyageur.",
     "Le document montre la station de taxis à quelques mètres : c'est vers elle que j'oriente le voyageur.",
     "En observant la scène, j'ai noté que je suis arrêté sur la chaussée devant la gare : je dois repartir vers mon lieu d'établissement.",
+    "Le panneau « TAXIS » du document signale une station réservée : je n'ai pas le droit d'y attendre, même quelques minutes.",
+    "La scène se passe un vendredi soir à la sortie de la gare de Lyon, quand beaucoup de voyageurs cherchent une voiture : la tentation est forte, mais la règle ne change pas.",
+    "Le document précise « aucune réservation en cours » : je n'aurais aucun justificatif à présenter si une patrouille me contrôlait avec ce voyageur à bord.",
+    "Sur l'image, un taxi attend à la station juste à côté : c'est lui qui peut prendre ce voyageur sans réservation.",
+    "J'ai distingué sur le document le taxi, signalé par l'inscription « TAXI », de mon véhicule, qui porte seulement la signalétique VTC.",
+    "Le voyageur du document ne m'a pas réservé : le prendre reviendrait à faire de la maraude, ce qui peut me coûter ma carte professionnelle.",
+    "D'après la consigne qui accompagne le document, Samir vient de déposer un client : sans nouvelle réservation, sa course suivante ne peut pas commencer devant la gare.",
   ],
   3: [
     "J'ai repris les montants du relevé : 650 + 180 + 30 + 40 + 150 = 1 050 € de charges fixes, puis 5,20 + 1,30 + 2,50 = 9 € de charges variables par course.",
@@ -775,6 +827,13 @@ const OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
     "Dans le tableau, j'ai classé chaque ligne avant de calculer ; la commission de la plateforme est bien une charge variable puisqu'elle dépend des courses.",
     "Avec les 62 courses du relevé, j'ai calculé 62 × 21 − 1 050 = 252 € de résultat avant la rémunération de Samir.",
     "J'ai vérifié que le prix moyen du relevé, 30 € HT, est bien hors taxes avant de calculer la marge.",
+    "Le relevé porte sur le mois de mars et tous ses montants sont hors taxes : je n'ai pas mélangé HT et TTC dans mes calculs.",
+    "La colonne « Nature » du relevé est à compléter : j'ai écrit « fixe » pour les cinq premières lignes et « variable » pour les trois lignes « par course ».",
+    "Sur le relevé, la location du véhicule en LLD, 650 €, est de loin la plus grosse charge fixe de Samir.",
+    "Le carburant ou la recharge, 5,20 € par course, représente plus de la moitié des 9 € de charges variables du relevé.",
+    "Avec les données du relevé, j'ai calculé le chiffre d'affaires du mois : 62 × 30 = 1 860 € HT.",
+    "Le relevé indique 2,50 € de commission par course : sur 62 courses, Samir a versé 155 € à la plateforme ce mois-ci.",
+    "J'ai comparé le seuil au relevé : 50 courses × 30 € = 1 500 € HT, alors que Samir a réalisé 1 860 € HT ce mois-ci.",
   ],
   4: [
     "Sur le croquis, j'ai placé ma voiture après le véhicule accidenté, sur la bande d'arrêt d'urgence, feux de détresse allumés.",
@@ -782,6 +841,13 @@ const OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
     "J'ai indiqué le triangle en amont, à l'endroit du premier « ? », seulement si je peux le poser sans me mettre en danger.",
     "Le croquis montre un conducteur conscient : je lui parle sans le déplacer et je donne ce détail en alertant le 112.",
     "J'ai repéré le sens de circulation vers Orly sur le croquis pour donner une localisation précise aux secours.",
+    "Le croquis comporte trois « ? » : j'ai justifié chacun, l'arrêt de mon véhicule, la place des clients et celle du triangle.",
+    "Sur le croquis, mon véhicule arrive derrière le véhicule accidenté : je le dépasse prudemment avant de m'arrêter, pour rester hors de la zone de choc.",
+    "Le croquis indique deux clients à bord : je les compte en les faisant sortir pour m'assurer que personne ne reste dans le véhicule.",
+    "Le croquis est une vue de dessus de l'A86 : j'ai repéré la bande d'arrêt d'urgence, seul endroit où je peux m'arrêter.",
+    "Sur le croquis, le véhicule accidenté touche la glissière : je m'approche du conducteur en restant moi-même hors des voies de circulation.",
+    "Rien sur le croquis n'indique de fumée ni de feu : je n'ai donc aucune raison de déplacer le conducteur accidenté.",
+    "Le croquis me rappelle qu'un second accident peut survenir : feux de détresse dès le ralentissement, puis gilet enfilé avant de descendre.",
   ],
   5: [
     "La boîte porte le pictogramme orange de niveau 2 : je ne conduis pas sans l'avis de mon médecin ou de mon pharmacien.",
@@ -789,30 +855,69 @@ const OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
     "Le planning prévoit le comprimé à 10 h au milieu des courses : j'ai demandé à mon médecin un traitement qui ne fait pas dormir.",
     "J'ai remplacé le sandwich au volant du planning par une vraie coupure d'au moins trente minutes.",
     "J'ai repris le planning heure par heure en ajoutant une pause d'un quart d'heure toutes les deux heures.",
+    "Le planning commence à 6 h à Orly et se termine à 20 h porte de Versailles : la dernière course tombe au moment où la fatigue est la plus forte.",
+    "Sur le planning, les cafés ne durent que 5 minutes : ce ne sont pas de vraies pauses de repos.",
+    "J'ai compté cinq cafés sur le planning, de 8 h à 18 h : le café masque la fatigue sans la supprimer.",
+    "J'ai recopié la mention de niveau 2 de la boîte : « Soyez très prudent. Ne pas conduire sans l'avis d'un professionnel de santé. »",
+    "Le planning est celui d'un mardi de salon : j'ai allégé les réservations de l'après-midi pour finir plus tôt.",
+    "La boîte du document est celle d'un antiallergique fictif : j'ai retenu qu'il faut regarder le pictogramme de chaque boîte, pas seulement le nom du produit.",
+    "Le planning ne laisse aucune marge en cas de retard de vol à Orly : j'ai prévu des créneaux libres entre les réservations pour ne pas courir après l'horaire.",
   ],
   6: [
     "Dans le message de Mme Durand, j'ai relevé les deux valises et la présence de sa mère pour prévoir un véhicule adapté.",
     "Le vol est à 9 h 50 : j'ai proposé une prise en charge à 7 h pour arriver à Orly avec une marge suffisante.",
     "Ma réponse au message reprend chaque question de la cliente : l'heure, le lieu exact et la description du véhicule.",
     "J'ai répondu le soir même au message reçu à 19 h 12, avec mon numéro pour la joindre le matin.",
+    "Mme Durand demande où je l'attendrai : j'ai indiqué un point précis, devant l'entrée de son immeuble.",
+    "Le message est poli et se termine par « Merci ! » : j'ai répondu sur le même ton, en commençant par « Bonjour Madame Durand ».",
+    "Mme Durand voyage avec sa mère : j'ai proposé d'aider sa mère à s'installer et de charger moi-même les deux valises.",
+    "Le numéro de Mme Durand s'affiche en haut du message : je l'ai enregistré pour la prévenir de mon arrivée.",
+    "Dans ma réponse au message, j'ai décrit le véhicule, sa couleur et sa plaque, puisque Mme Durand ne me connaît pas.",
+    "J'ai relu ma réponse au message pour supprimer les abréviations : ni « RDV » ni « mn ».",
+    "Le message parle d'« une voiture » réservée : j'ai rappelé dans ma réponse mon nom et la réservation de la course.",
+    "J'ai terminé ma réponse au message par une formule de politesse et ma disponibilité pour toute question avant le départ.",
   ],
   7: [
     "Le courriel de Mme Moreau demande le prix, ce qu'il comprend, l'annulation et la facturation : mon devis traite ces quatre points.",
     "J'ai repris les informations du courriel : 2 personnes, bagages, Orly terminal 4, jeudi 14 à 8 h 30, accueil aux arrivées.",
     "Le courriel annonce 4 à 6 transferts par mois : j'ai proposé un tarif entreprise et une facturation mensuelle.",
     "Dans mon devis, j'ai prévu le temps d'attente à l'aéroport, puisque l'heure d'arrivée d'un vol peut changer.",
+    "Le courriel vient des services généraux : mon devis est adressé à Mme Moreau, avec la raison sociale de sa société.",
+    "Les visiteurs sont des clients étrangers : j'ai précisé dans le devis que l'accueil peut se faire en anglais.",
+    "La destination du courriel est la zone d'activités Europarc, à Créteil : j'ai repéré l'accès aux locaux avant de calculer le prix.",
+    "Mme Moreau demande si le péage est compris : j'ai précisé que ce trajet n'en comporte pas et que le prix du devis est ferme.",
+    "Le courriel demande un accueil à la sortie des arrivées : j'ai prévu une pancarte au nom des visiteurs.",
+    "Le courriel est adressé à contact@samir-vtc.fr : je réponds depuis cette adresse professionnelle, pas depuis une adresse personnelle.",
+    "Pour le jeudi 14 à 8 h 30, j'ai prévu d'arriver au terminal 4 avec un quart d'heure d'avance en suivant l'atterrissage du vol.",
+    "Comme le courriel envisage une relation régulière, j'ai ajouté au devis mon numéro d'inscription au registre des exploitants VTC.",
   ],
   8: [
     "Sur l'écran, la plateforme affiche la distance (17,8 km) et le prix minimal garanti net de commission (21,40 €) : ce sont les informations obligatoires.",
     "L'écran laisse 18 secondes pour répondre : je peux refuser cette course sans être pénalisé.",
     "Avec 21,40 € pour 38 minutes, j'ai calculé que la course me rapporte environ 34 € de l'heure avant mes charges.",
     "J'ai comparé le prix affiché à la distance : 21,40 € pour 17,8 km, soit environ 1,20 € par kilomètre.",
+    "L'écran indique un trajet de Créteil Soleil vers Paris 15e : je pense au retour à vide depuis Paris avant d'accepter.",
+    "Le prix affiché sur l'écran est net de commission : je le compare directement à mes charges, sans rien retirer pour la plateforme.",
+    "Les boutons « Refuser » et « Accepter » figurent côte à côte sur l'écran : refuser est un choix normal, pas une faute.",
+    "La durée estimée de 38 minutes pour 17,8 km montre une circulation dense : la course m'immobilise longtemps pour un prix modeste.",
+    "L'astérisque à côté du prix renvoie à la mention « net de la commission de la plateforme » : j'ai lu cette ligne avant de décider.",
+    "Avec un prix de revient de 17,75 € comme celui de Samir, les 21,40 € de l'écran couvrent la course, mais avec une faible marge.",
+    "L'écran n'affiche que le départ, l'arrivée, la distance, la durée et le prix : ce sont ces éléments qui guident ma décision.",
+    "Les 18 secondes de l'écran sont courtes : je fixe à l'avance mon prix plancher au kilomètre pour décider vite.",
   ],
   9: [
     "Sur le plan, j'ai pris l'itinéraire principal par l'A86 et l'A4 ; à cause des travaux signalés, j'ai gardé le délestage en réserve.",
     "Le plan montre des travaux sur l'itinéraire principal : j'ai prévenu la cliente que je pourrais passer par le délestage, 4 minutes de plus.",
     "J'ai comparé les deux trajets du plan : 11 km en 24 minutes contre 12,5 km en 28 minutes.",
     "Avant de partir, j'ai repéré sur le plan le lieu exact du rendez-vous à Vincennes pour déposer la cliente sans hésiter.",
+    "Le plan est schématique et sans échelle : je vérifie le temps réel sur l'application de navigation avant de partir, téléphone sur son support.",
+    "Le point de départ du plan est la gare RER de Créteil-Préfecture : j'attends Mme Lefèvre à la sortie, sur un emplacement autorisé.",
+    "Le délestage du plan fait 1,5 km et 4 minutes de plus que l'itinéraire principal : l'écart est faible pour la cliente.",
+    "Sur le plan, les deux itinéraires franchissent la Marne : j'ai repéré le passage de chacun pour ne pas me tromper de sortie.",
+    "L'arrivée du plan est au bord du bois de Vincennes : j'ai prévu un endroit sûr pour m'arrêter et sortir la valise.",
+    "J'ai calculé la vitesse moyenne de l'itinéraire principal du plan : 11 km en 24 minutes, un peu plus de 27 km/h, signe d'une circulation chargée.",
+    "Pour un rendez-vous professionnel, j'ai ajouté aux 24 minutes du plan une marge en cas de bouchon dû aux travaux.",
+    "Je n'ai pas consulté le plan en roulant : je l'ai étudié avant l'accueil de Mme Lefèvre, puis j'ai suivi le guidage vocal.",
   ],
 };
 
@@ -866,12 +971,13 @@ export function pickVTC48ExerciceAnswer(
 
   // Production tirée par permutation du rang du stagiaire, avec le même décalage pour toutes les
   // banques : un stagiaire garde le même parcours d'un exercice à l'autre, et sur un groupe de
-  // 8 stagiaires les 8 productions d'un même exercice sont toutes différentes. Le bilan personnel
+  // 12 stagiaires les 12 productions (et les 12 observations du document) d'un même exercice sont
+  // toutes différentes. Le bilan personnel
   // change d'un exercice à l'autre. L'entreprise du stagiaire est citée quand elle est renseignée.
   const pool = EXERCICES_PRODUCTIONS[bloc];
   const production = pool[rang(stagiaireIdx, 3, pool.length)];
   const bilan = BILANS_PERSONNELS[rang(stagiaireIdx, bloc + 11, BILANS_PERSONNELS.length)];
-  const obs = OBSERVATIONS_DOCUMENT[bloc];
+  const obs = VTC48_OBSERVATIONS_DOCUMENT[bloc];
   const observation = obs ? `${obs[rang(stagiaireIdx, bloc + 5, obs.length)]} ` : "";
   const entreprise = (s.entreprise || "").trim();
   const contexteEnt = entreprise && entreprise.toLowerCase() !== "entreprise"
@@ -919,19 +1025,19 @@ const BESOINS_HANDICAP = [
 ];
 
 const BESOINS_DISPOS = [
-  "Je suis disponible pour les 7 jours en classe virtuelle, de <strong>09h00 à 17h00</strong> (16h00 le dernier jour), samedi compris.",
-  "J'ai bloqué les 7 jours dans mon planning (<strong>09h00 – 12h30 / 13h30 – 17h00</strong>) et je réviserai les QCM le soir.",
-  "Je suis disponible de <strong>09h00 à 17h00</strong> pendant les 7 jours, depuis un endroit calme avec une bonne connexion.",
-  "Je peux suivre l'intégralité des 7 jours à distance, de <strong>09h00 à 17h00</strong>, samedi inclus, sans contrainte particulière.",
-  "Je suis disponible pour les 7 jours (<strong>09h00 – 17h00</strong>) ; j'ai décalé mes rendez-vous de recherche d'emploi après la formation.",
-  "Disponibilité complète pour les 7 jours, de <strong>09h00 à 17h00</strong>. J'ai fait le test de connexion proposé.",
-  "Pour les 7 jours, je suis disponible de <strong>09h00 à 17h00</strong> ; j'ai organisé la garde de mes enfants, y compris le samedi.",
-  "Je suis disponible de <strong>09h00 à 17h00</strong> pendant les 7 jours, et je consulterai l'espace e-learning le soir.",
-  "Je suivrai les 7 jours en classe virtuelle (<strong>09h00 – 17h00</strong>, 16h00 le dernier jour) et je prévois de refaire les examens blancs le soir.",
-  "Aucune contrainte sur les 7 jours, de <strong>09h00 à 17h00</strong>, samedi compris. Mon employeur a validé mon absence.",
+  "Je suis disponible pour les 4 semaines en classe virtuelle, du lundi au vendredi, de <strong>09h00 à 17h00</strong>.",
+  "J'ai bloqué les 20 jours dans mon planning, du lundi au vendredi (<strong>09h00 – 12h30 / 13h30 – 17h00</strong>), et je réviserai les QCM le soir.",
+  "Je suis disponible de <strong>09h00 à 17h00</strong> du lundi au vendredi pendant les 4 semaines, depuis un endroit calme avec une bonne connexion.",
+  "Je peux suivre l'intégralité des 20 jours à distance, du lundi au vendredi de <strong>09h00 à 17h00</strong>, sans contrainte particulière.",
+  "Je suis disponible pendant les 4 semaines (<strong>09h00 – 17h00</strong>, du lundi au vendredi) ; j'ai décalé mes rendez-vous de recherche d'emploi après la formation.",
+  "Disponibilité complète pour les 4 semaines, du lundi au vendredi de <strong>09h00 à 17h00</strong>. J'ai fait le test de connexion proposé.",
+  "Pour les 20 jours, je suis disponible de <strong>09h00 à 17h00</strong> ; j'ai organisé la garde de mes enfants du lundi au vendredi pendant les 4 semaines.",
+  "Je suis disponible de <strong>09h00 à 17h00</strong> du lundi au vendredi pendant les 4 semaines, et je consulterai l'espace e-learning le soir et le week-end.",
+  "Je suivrai les 4 semaines en classe virtuelle (<strong>09h00 – 17h00</strong>, du lundi au vendredi) et je prévois de refaire les examens blancs le week-end.",
+  "Aucune contrainte sur les 4 semaines, du lundi au vendredi de <strong>09h00 à 17h00</strong>. Mon employeur a validé mon absence.",
 ];
 
-/** Réponses d'évaluation des besoins propres à la formation VTC 48 h, différentes pour chaque stagiaire. */
+/** Réponses d'évaluation des besoins propres à la formation VTC (RS5637), différentes pour chaque stagiaire. */
 export function getVTC48EvalBesoins(
   s: { nom?: string; prenom?: string; civilite?: string; entreprise?: string },
   hasEntreprise: boolean,

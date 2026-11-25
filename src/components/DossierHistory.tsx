@@ -222,7 +222,7 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     if (d.formation && isHYG14Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedHYG14AICaches(d.formation);
     }
-    // Préparation à l'examen VTC (RS5637) – 48 h : même rechargement des packs du preset.
+    // Préparation à l'examen VTC (RS5637) – 140 h : même rechargement des packs du preset.
     if (d.formation && isVTC48Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedVTC48AICaches(d.formation);
     }

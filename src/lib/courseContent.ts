@@ -331,7 +331,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isCOH21Formation(formationIntitule)) return COH21_VIDEOS;
   // Hygiène alimentaire en restauration commerciale – 14 h : vidéos du preset, avant la banque « restauration » / « haccp »
   if (isHYG14Formation(formationIntitule)) return HYG14_VIDEOS;
-  // Préparation à l'examen VTC (RS5637) – 48 h : vidéos du preset, avant la banque « vtc » générique
+  // Préparation à l'examen VTC (RS5637) – 140 h : vidéos du preset, avant la banque « vtc » générique
   if (isVTC48Formation(formationIntitule)) return VTC48_VIDEOS;
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : vidéos du preset, avant les banques « webmarketing » / « e-commerce »
   if (isECO21Formation(formationIntitule)) return ECO21_VIDEOS;
@@ -512,6 +512,7 @@ import { isMSC70Formation } from "./machinerieScenique70hHumanized";
 import { COH21_VIDEOS } from "./cohesionEquipe21hPreset";
 import { getHygieneAlimentaire14hChapters } from "./courseContentHygieneAlimentaire14h";
 import { isHYG14Formation } from "./hygieneAlimentaire14hHumanized";
+import { selonModalite } from "./modalitePresentiel";
 import { HYG14_VIDEOS } from "./hygieneAlimentaire14hPreset";
 import { getVtc48hChapters } from "./courseContentVtc48h";
 import { isVTC48Formation } from "./vtc48hHumanized";
@@ -581,7 +582,13 @@ function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
   }
 }
 
-export function getCourseChapters(formationIntitule: string): CourseChapter[] {
+/** Supports rédigés pour la classe virtuelle (hygiène 14 h, VTC) : version salle quand la session est en présentiel. */
+function chapitresSelonModalite(chapitres: CourseChapter[], modalites?: string): CourseChapter[] {
+  if (modalites !== "presentiel") return chapitres;
+  return chapitres.map(ch => ({ ...ch, description: selonModalite(modalites, ch.description), sections: ch.sections.map(s => ({ ...s, content: selonModalite(modalites, s.content) })) }));
+}
+
+export function getCourseChapters(formationIntitule: string, modalites?: string): CourseChapter[] {
   const preset = presetContentPack({ intitule: formationIntitule });
   if (preset?.chapters.length) return preset.chapters.map(ch => ({ title: ch.title, description: ch.description, sections: ch.sections.map(s => ({ title: s.title, content: s.contentHtml })) }));
   const t0 = formationIntitule.toLowerCase();
@@ -592,9 +599,9 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   // Cohésion d'équipe en entreprise – 21 h (non certifiante) : support propre, avant les règles « management » / « entreprise »
   if (isCOH21Formation(formationIntitule)) return getCohesionEquipe21hChapters();
   // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante) : support propre, avant les règles « restauration » / « haccp »
-  if (isHYG14Formation(formationIntitule)) return getHygieneAlimentaire14hChapters();
-  // Préparation à l'examen VTC (RS5637) – 48 h : support propre, avant la règle « vtc » générique (getVTCChapters)
-  if (isVTC48Formation(formationIntitule)) return getVtc48hChapters();
+  if (isHYG14Formation(formationIntitule)) return chapitresSelonModalite(getHygieneAlimentaire14hChapters(), modalites);
+  // Préparation à l'examen VTC (RS5637) – 140 h : support propre, avant la règle « vtc » générique (getVTCChapters)
+  if (isVTC48Formation(formationIntitule)) return chapitresSelonModalite(getVtc48hChapters(), modalites);
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : support propre, avant les règles « webmarketing » / « e-commerce » / « web »
   if (isECO21Formation(formationIntitule)) return getEcommerce21hChapters();
   if (isGMA70Formation(formationIntitule)) return getProjecteursGrandMA70hChapters();

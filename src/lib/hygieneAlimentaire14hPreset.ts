@@ -29,6 +29,7 @@ import type { AIVeillePack } from "./aiVeillePack";
 import { setCachedContentPack } from "./aiContentPack";
 import { setCachedPack as setCachedEvalPack } from "./aiEvalPack";
 import { setCachedVeillePack } from "./aiVeillePack";
+import { packSelonModalite } from "./modalitePresentiel";
 
 // ---------------------------------------------------------------------------
 // Formation
@@ -548,9 +549,10 @@ export const HYG14_VEILLE_PACK: AIVeillePack = {
 // ---------------------------------------------------------------------------
 export function seedHYG14AICaches(f: FormationInfo = FORMATION_HYG14): void {
   try {
-    setCachedContentPack(f, HYG14_CONTENT_PACK);
-    setCachedEvalPack(f, HYG14_EVAL_PACK);
-    setCachedVeillePack(f, HYG14_VEILLE_PACK);
+    // Session en présentiel : les textes rédigés pour la classe virtuelle passent en version salle.
+    setCachedContentPack(f, packSelonModalite(f.modalites, HYG14_CONTENT_PACK));
+    setCachedEvalPack(f, packSelonModalite(f.modalites, HYG14_EVAL_PACK));
+    setCachedVeillePack(f, packSelonModalite(f.modalites, HYG14_VEILLE_PACK));
   } catch {
     /* stockage indisponible : ignoré */
   }

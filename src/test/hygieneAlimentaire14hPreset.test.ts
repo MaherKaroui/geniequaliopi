@@ -12,6 +12,7 @@ import {
   HYG14_QUESTIONS_OUVERTES,
 } from "@/lib/hygieneAlimentaire14hHumanized";
 import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
+import { selonModalite } from "@/lib/modalitePresentiel";
 import { isGSC35Formation } from "@/lib/gererCentre35hHumanized";
 import { isIAP21Formation } from "@/lib/iaPro21hHumanized";
 import { isMSP21Formation } from "@/lib/msp21Humanized";
@@ -333,5 +334,20 @@ describe("Hygiène alimentaire en restauration commerciale – 14 h — câblage
     }
     expect(generes).toBeGreaterThan(50);
     expect(fuites).toEqual([]);
+
+    // Même session en présentiel : plus aucune trace de la classe virtuelle dans les documents.
+    // (champs du dossier passés en présentiel comme dans un dossier réel, puis documents générés)
+    const fp = Object.fromEntries(Object.entries({ ...f, modalites: "presentiel", lieu: "85 avenue du Général de Gaulle, 94000 Créteil" })
+      .map(([k, v]) => [k, typeof v === "string" ? selonModalite("presentiel", v) : v])) as typeof f;
+    seedHYG14AICaches(fp);
+    const distanciel: string[] = [];
+    for (const d of getFullCatalog(org, fp, stagiaires)) {
+      let html = "";
+      try { html = generateDocumentById(d.id, d.template, d.params, org, fp, stagiaires) || ""; } catch { continue; }
+      const texte = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+      const m = texte.match(/.{0,60}(classe virtuelle|salles? virtuelles?|Google Meet|Zoom).{0,60}/i);
+      if (m) distanciel.push(`${d.id} — ${d.nom} : …${m[0]}…`);
+    }
+    expect(distanciel).toEqual([]);
   }, 600_000);
 });

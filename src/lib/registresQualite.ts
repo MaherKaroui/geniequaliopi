@@ -71,11 +71,11 @@ function dysfonctionnementsVTC(f: FormationInfo, stagiaires: StagiaireInfo[], au
   const sessions = sessionsDossier(f, stagiaires).filter((s) => s.debut <= auj);
   const distanciel = /distanciel|distance|ligne|visio|meet|zoom/i.test(`${f.modalites} ${f.lieu}`) && !/mixte|pr[ée]sentiel/i.test(v(f.modalites));
   const terminee = sessions.find((s) => /^\d{4}-\d{2}-\d{2}$/.test(s.fin) && s.fin <= auj);
-  if (distanciel && terminee) {
+  if (terminee) {
     const clo = addBusinessDays(terminee.fin, 10);
     out.push({
       date: fmtFr(terminee.fin), cloture: fmtFr(clo > auj ? auj : clo), type: "Interne", partie: "Stagiaire", canal: "Questionnaire de satisfaction à chaud",
-      desc: "Demande de séances de conduite réelle pour préparer l'épreuve pratique d'admission : la formation à distance en travaille la méthode (simulation commentée d'une course) mais ne comprend pas de conduite en véhicule",
+      desc: "Demande de séances de conduite réelle pour préparer l'épreuve pratique d'admission : la formation en travaille la méthode (simulation commentée d'une course) mais ne comprend pas de conduite en véhicule",
       causes: "Absence de conduite réelle insuffisamment expliquée lors de l'entretien préalable ; aucune solution d'entraînement en véhicule proposée au stagiaire",
       action: "Mention « conduite réelle en véhicule non incluse » portée au programme, à l'entretien préalable et à la convocation ; liste d'auto-écoles et de loueurs de véhicules VTC à double commande remise au stagiaire en fin de parcours",
       risque: "Information du public incomplète sur le contenu de la prestation",
@@ -86,7 +86,7 @@ function dysfonctionnementsVTC(f: FormationInfo, stagiaires: StagiaireInfo[], au
   if (apresT3P) {
     const clo = addBusinessDays(apresT3P.debut, 2);
     out.push({
-      date: fmtFr(apresT3P.debut), cloture: fmtFr(clo > auj ? auj : clo), type: "Externe", partie: "Stagiaire ; CMA France (plateforme Examen T3P)", canal: "Oral en classe virtuelle",
+      date: fmtFr(apresT3P.debut), cloture: fmtFr(clo > auj ? auj : clo), type: "Externe", partie: "Stagiaire ; CMA France (plateforme Examen T3P)", canal: distanciel ? "Oral en classe virtuelle" : "Oral en salle de formation",
       desc: "Inscription à l'examen VTC non finalisée : depuis le 04/11/2025 les inscriptions se font uniquement sur la plateforme nationale exament3p.fr et le tutoriel remis au stagiaire portait sur l'ancien site",
       causes: "Changement de plateforme d'inscription décidé par CMA France ; tutoriel interne pas encore mis à jour (action de veille en cours)",
       action: "Tutoriel refait sur exament3p.fr ; création du compte et dépôt des pièces accompagnés le premier jour ; inscription vérifiée en fin de parcours",

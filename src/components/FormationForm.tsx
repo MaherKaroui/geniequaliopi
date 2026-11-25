@@ -347,13 +347,13 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme, s
         seedHYG14AICaches(hyg);
         toast.success("Hygiène alimentaire en restauration commerciale – 14 h : évaluation des besoins, positionnement, 10 mises en situation corrigées, 6 QCM de 10 questions par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
       }
-      // Préparation à l'examen VTC (RS5637) – 48 h (certifiante, Répertoire spécifique) : contenus 100 % pré-remplis, AUCUN stagiaire importé ;
+      // Préparation à l'examen VTC (RS5637) – 140 h (certifiante, Répertoire spécifique) : contenus 100 % pré-remplis, AUCUN stagiaire importé ;
       // le formateur déjà saisi dans le dossier est conservé.
       if (selected.intitule === FORMATION_VTC48.intitule) {
         const vtc = { ...selected, formateur: data.formateur || selected.formateur, formateurSignatureUrl: data.formateurSignatureUrl };
         onChange(vtc);
         seedVTC48AICaches(vtc);
-        toast.success("Préparation à l'examen VTC (RS5637) – 48 h : évaluation des besoins, positionnement, 10 mises en situation corrigées, 6 QCM de 10 questions par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
+        toast.success("Préparation à l'examen VTC (RS5637) – 140 h : évaluation des besoins, positionnement, 10 mises en situation corrigées, 6 QCM de 10 questions par compétence (C1 à C6), support de cours en 6 chapitres et veilles inclus");
       }
       // Créer et développer une e-boutique professionnelle (RS6475) – 21 h (certifiante, Répertoire spécifique) : contenus 100 % pré-remplis,
       // AUCUN stagiaire importé ; le formateur déjà saisi dans le dossier est conservé.

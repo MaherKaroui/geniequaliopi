@@ -9,7 +9,7 @@ import {
 import {
   isVTC48Formation, getVTC48AutoAnswers, getVTC48EvalBesoins, getVTC48Besoin, pickVTC48ExerciceAnswer,
   vtc48NoteDebutSur20, vtc48BonnesQcmDebut, vtc48ReponsesQcmDebut, vtc48NoteExercice, vtc48Seed,
-  VTC48_QUESTIONS_OUVERTES,
+  VTC48_QUESTIONS_OUVERTES, VTC48_OBSERVATIONS_DOCUMENT,
 } from "@/lib/vtc48hHumanized";
 import { isHYG14Formation } from "@/lib/hygieneAlimentaire14hHumanized";
 import { isCOH21Formation } from "@/lib/cohesionEquipe21hHumanized";
@@ -23,6 +23,7 @@ import { isTVTEFormation } from "@/lib/ventesEnergie35hHumanized";
 import { isWM14Formation } from "@/lib/webmarketing14hHumanized";
 import { isRPMSFormation } from "@/lib/rpmsHumanized";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
+import { selonModalite } from "@/lib/modalitePresentiel";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import type { OrganismeInfo, StagiaireInfo } from "@/types/qualiopi";
 
@@ -58,7 +59,7 @@ const noms = Array.from({ length: 12 }, (_, i) => ({
   nom: `NOM${i}`, prenom: i % 2 ? "Julie" : "Karim", civilite: i % 2 ? "Mme" : "M.", entreprise: "",
 }));
 
-/** Mot attendu dans chacune des 8 copies de chaque mise en situation (C1 à C6). */
+/** Mot attendu dans chacune des 12 copies de chaque mise en situation (C1 à C6). */
 const MOTS_EXERCICES = [
   /carte professionnelle/, /réservation/, /micro-entreprise|SASU|EURL|\bSAS\b|statut/, /seuil/, /alert/i,
   /pause/, /anglais/, /client/, /plateforme/, /factur/,
@@ -69,18 +70,15 @@ const AUTRES = [isHYG14Formation, isCOH21Formation, isGSC35Formation, isIAP21For
 
 const LETTRE_INDEX: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
 
-describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple certifiante", () => {
-  it("données de la formation : RS5637, 48 h sur 7 jours (6 × 7 h + 6 h), distanciel, 480 € par stagiaire, 1 à 12 stagiaires", () => {
+describe("Préparation à l'examen VTC (RS5637) – 140 h — formation exemple certifiante", () => {
+  it("données de la formation : RS5637, 140 h sur 4 semaines (20 × 7 h), distanciel, 820 € HT par stagiaire, 1 à 12 stagiaires", () => {
     const f = FORMATION_VTC48;
-    expect(f.intitule).toBe("Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h");
+    expect(f.intitule).toBe("Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637)");
     expect(f.codeRNCP).toBe("RS5637");
-    expect(f.duree).toMatch(/^48 heures/);
-    expect(f.duree).toMatch(/7 jours/);
-    expect(f.duree).toMatch(/jours 1 à 6 de 7 h \(09h00 – 12h30 \/ 13h30 – 17h00\)/);
-    expect(f.duree).toMatch(/jour 7 de 6 h \(09h00 – 12h30 \/ 13h30 – 16h00\)/);
+    expect(f.duree).toBe("140 heures réparties sur 4 semaines : 20 jours de 7 h du lundi au vendredi (09h00 – 12h30 / 13h30 – 17h00)");
     expect(f.dureeSaisiePrioritaire).toBe(true);
     expect(f.modalites).toBe("distanciel");
-    expect(f.tarif).toBe("480 € net de taxes par stagiaire");
+    expect(f.tarif).toBe("820 € HT par stagiaire");
     expect(f.lieu).toBe("");
     expect(f.formateur).toBe("");
     expect(f.prerequis).toMatch(/permis B hors période probatoire/);
@@ -91,21 +89,21 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple c
     expect(f.objectifs).toMatch(/Répertoire spécifique sous le code RS5637/);
     expect(f.objectifs).toMatch(/chambres de métiers et de l'artisanat/);
     for (const k of ["C1", "C2", "C3", "C4", "C5", "C6"]) expect(f.objectifs).toContain(k);
-    // Programme « Module N — Titre (Cx, N h) : a ; b ; c », 48 h au total
-    const heures = [...f.programme.matchAll(/^Module (\d) — [^\n]+\((C\d), (\d+) h\) : [^\n]+;/gm)];
+    // Programme « … Module N — Titre (Cx, N h) : … », 140 h au total
+    const heures = [...f.programme.matchAll(/Module (\d) — [^\n]+?\((C\d), (\d+) h\) : /gm)];
     expect(heures.map(m => m[1])).toEqual(["1", "2", "3", "4", "5", "6"]);
     expect(heures.map(m => m[2])).toEqual(["C1", "C2", "C3", "C4", "C5", "C6"]);
-    expect(heures.reduce((t, m) => t + parseInt(m[3]), 0)).toBe(48);
+    expect(heures.reduce((t, m) => t + parseInt(m[3]), 0)).toBe(140);
     expect(f.programme).not.toContain("Module 7");
-    // Rythme aligné sur les émargements : 7 jours, « JOUR N — … (7 h) », le dernier de 6 h
-    const jours = [...f.programme.matchAll(/^JOUR (\d) — [^\n]+\((\d) h\)$/gm)];
-    expect(jours.map(m => m[1])).toEqual(["1", "2", "3", "4", "5", "6", "7"]);
-    expect(jours.map(m => parseInt(m[2]))).toEqual([7, 7, 7, 7, 7, 7, 6]);
-    // Aucun reste de l'ancien rythme en séances de 4 h
+    // Rythme : 4 semaines de 35 h (jours 1 à 20), une évaluation par semaine
+    const semaines = [...f.programme.matchAll(/^SEMAINE (\d) — [^\n]+\(jours \d+ à \d+, 35 h\)$/gm)];
+    expect(semaines.map(m => m[1])).toEqual(["1", "2", "3", "4"]);
+    expect([...f.programme.matchAll(/^Évaluation de la semaine \d/gm)]).toHaveLength(4);
+    expect([f.duree, f.programme, f.methodesEvaluation].join(" ")).not.toMatch(/48 h|7 jours|samedi|16h00/i);
     const textes = [f.duree, f.programme, f.methodesEvaluation, f.delaiAcces, f.moyensPedagogiques].join(" ");
     expect(textes).not.toMatch(/séance|13h00/i);
-    expect(f.dateDebut).toBe("2026-12-01");
-    expect(f.dateFin).toBe("2026-12-08");
+    expect(f.dateDebut).toBe("2026-11-23");
+    expect(f.dateFin).toBe("2026-12-18");
     expect(f.methodesEvaluation).toMatch(/certificat de réalisation/);
     expect(f.methodesEvaluation).toMatch(/arrêté du 6 avril 2017/);
     expect(f.methodesEvaluation).toMatch(/s'inscrit lui-même/);
@@ -224,21 +222,32 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple c
     expect(vtc48Seed("MARTIN", "Sophie")).toBe(vtc48Seed("martin", "SOPHIE"));
   });
 
-  it("mises en situation : 8 copies différentes par exercice, tirées de la bonne banque", () => {
+  it("mises en situation : 12 copies différentes par exercice, tirées de la bonne banque", () => {
     VTC48_EXERCICES.forEach((ex, ei) => {
-      const prods = noms.slice(0, 8).map((s, i) => pickVTC48ExerciceAnswer(FORMATION_VTC48.intitule, "RS5637", ei, i, s, ex.titre));
-      expect(new Set(prods).size, ex.titre).toBe(8);
+      const prods = noms.slice(0, 12).map((s, i) => pickVTC48ExerciceAnswer(FORMATION_VTC48.intitule, "RS5637", ei, i, s, ex.titre));
+      expect(new Set(prods).size, ex.titre).toBe(12);
+      // Document illustré : 12 observations distinctes, une par stagiaire
+      const obs = VTC48_OBSERVATIONS_DOCUMENT[ei];
+      if (obs) {
+        expect(obs.length, ex.titre).toBeGreaterThanOrEqual(12);
+        expect(new Set(obs).size, ex.titre).toBe(obs.length);
+        const vues = prods.map(p => obs.filter(o => p!.includes(o)));
+        vues.forEach((v, i) => expect(v.length, `${ex.titre} copie ${i}`).toBe(1));
+        expect(new Set(vues.map(v => v[0])).size, ex.titre).toBe(12);
+      }
       prods.forEach((p, i) => {
         expect(p, `${ex.titre} copie ${i}`).toMatch(MOTS_EXERCICES[ei]);
         expect(p!, `${ex.titre} copie ${i}`).not.toMatch(/\{|\}/);
       });
       expect(pickVTC48ExerciceAnswer(FORMATION_VTC48.intitule, "RS5637", ei + 3, 0, noms[0], ex.titre)).toBe(prods[0]);
     });
+    expect(Object.keys(VTC48_OBSERVATIONS_DOCUMENT).map(Number)).toEqual([1, 3, 4, 5, 6, 7, 8, 9]);
+    Object.values(VTC48_OBSERVATIONS_DOCUMENT).forEach(o => expect(o.length).toBe(12));
     const avecEnt = pickVTC48ExerciceAnswer(FORMATION_VTC48.intitule, "", 0, 0, { ...noms[0], entreprise: "VTC TEST" }, VTC48_EXERCICES[0].titre);
     expect(avecEnt).toMatch(/VTC TEST/);
     expect(pickVTC48ExerciceAnswer("Préparation à l'examen de conducteur de taxi", "RS5635", 0, 0, noms[0], "C1")).toBeNull();
     // Accords : aucune forme féminine dans une copie au masculin
-    const copies = (civilite: string) => VTC48_EXERCICES.flatMap((ex, ei) => Array.from({ length: 8 }, (_, i) =>
+    const copies = (civilite: string) => VTC48_EXERCICES.flatMap((ex, ei) => Array.from({ length: 12 }, (_, i) =>
       pickVTC48ExerciceAnswer(FORMATION_VTC48.intitule, "", ei, i, { ...noms[i], civilite }, ex.titre))).join(" ");
     const masc = copies("M.");
     const fem = copies("Mme");
@@ -246,13 +255,13 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple c
     expect(fem).toMatch(/conductrice salariée /);
   });
 
-  it("évaluation des besoins : réponses propres à chaque stagiaire, 7 jours de 09h00 à 17h00", () => {
+  it("évaluation des besoins : réponses propres à chaque stagiaire, 4 semaines de 09h00 à 17h00", () => {
     const besoins = noms.map((s, i) => getVTC48EvalBesoins(s, true, i));
     expect(new Set(besoins.map(b => b.objectif)).size).toBe(12);
     expect(new Set(besoins.map(b => b.attentes)).size).toBe(12);
     expect(new Set(besoins.map(b => b.diplome)).size).toBe(12);
     expect(besoins.every(b => !/\{|\}/.test(Object.values(b).join(" ")))).toBe(true);
-    expect(besoins.every(b => /7 jours/.test(b.disponibilites) && /17h00/.test(b.disponibilites) && !/séance|13h00/.test(b.disponibilites))).toBe(true);
+    expect(besoins.every(b => /4 semaines|20 jours/.test(b.disponibilites) && /17h00/.test(b.disponibilites) && !/séance|13h00/.test(b.disponibilites))).toBe(true);
     const besoinsPrincipaux = noms.map((s, i) => getVTC48Besoin(s.nom, s.prenom, s.civilite, i));
     expect(new Set(besoinsPrincipaux).size).toBe(12);
     expect(besoinsPrincipaux.every(b => b.length > 20 && !/\{|\}/.test(b))).toBe(true);
@@ -313,7 +322,7 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple c
   });
 });
 
-describe("Préparation à l'examen VTC (RS5637) – 48 h — câblage", () => {
+describe("Préparation à l'examen VTC (RS5637) – 140 h — câblage", () => {
   it("le support de cours compte 6 chapitres (un par compétence), avant la banque « VTC » générique", async () => {
     const { getCourseChapters, getYoutubeVideos } = await import("@/lib/courseContent");
     const { getVtc48hChapters } = await import("@/lib/courseContentVtc48h");
@@ -387,5 +396,19 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — câblage", () => {
     }
     expect(generes).toBeGreaterThan(50);
     expect(fuites).toEqual([]);
+
+    // Même session en présentiel (champs du dossier passés en version salle) : plus aucune trace de la classe virtuelle.
+    const fp = Object.fromEntries(Object.entries({ ...f, modalites: "presentiel", lieu: "85 avenue du Général de Gaulle, 94000 Créteil" })
+      .map(([k, v]) => [k, typeof v === "string" ? selonModalite("presentiel", v) : v])) as typeof f;
+    seedVTC48AICaches(fp);
+    const distanciel: string[] = [];
+    for (const d of getFullCatalog(org, fp, stagiaires)) {
+      let html = "";
+      try { html = generateDocumentById(d.id, d.template, d.params, org, fp, stagiaires) || ""; } catch { continue; }
+      const texte = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+      const m = texte.match(/.{0,60}(classe virtuelle|salles? virtuelles?|Google Meet|Zoom).{0,60}/i);
+      if (m) distanciel.push(`${d.id} — ${d.nom} : …${m[0]}…`);
+    }
+    expect(distanciel).toEqual([]);
   }, 600_000);
 });

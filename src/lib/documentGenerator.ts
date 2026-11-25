@@ -59,6 +59,7 @@ import { isGSC35Formation, getGSC35Besoin, getGSC35EvalBesoins, gsc35BonnesQcmDe
 import { isANG40Formation, getANG40Besoin, getANG40EvalBesoins, ang40BonnesQcmDebut, ang40ReponsesQcmDebut } from "./anglaisPro40hHumanized";
 import { isCOH21Formation, getCOH21Besoin, getCOH21EvalBesoins, coh21BonnesQcmDebut, coh21ReponsesQcmDebut } from "./cohesionEquipe21hHumanized";
 import { isHYG14Formation, getHYG14Besoin, getHYG14EvalBesoins, hyg14BonnesQcmDebut, hyg14ReponsesQcmDebut } from "./hygieneAlimentaire14hHumanized";
+import { selonModalite } from "./modalitePresentiel";
 import { isVTC48Formation, getVTC48Besoin, getVTC48EvalBesoins, vtc48BonnesQcmDebut, vtc48ReponsesQcmDebut } from "./vtc48hHumanized";
 import { isECO21Formation, getECO21Besoin, getECO21EvalBesoins, eco21BonnesQcmDebut, eco21ReponsesQcmDebut } from "./ecommerce21hHumanized";
 import { isGMA70Formation, getGMA70Besoin, getGMA70EvalBesoins, gma70BonnesQcmDebut, gma70ReponsesQcmDebut } from "./projecteursGrandMA70hHumanized";
@@ -2567,7 +2568,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   // Build bloc-based déroulé for FLE/certification formations
   let blocDerouleHtml = "";
   if (isBlocFormation) {
-    const chapters = getCourseChapters(f.intitule);
+    const chapters = getCourseChapters(f.intitule, f.modalites);
     if (chapters.length > 0) {
       for (const chapter of chapters) {
         blocDerouleHtml += `<h3 style="margin-top:20px;color:${getDocStyle().primaryColor}">${chapter.title}</h3>`;
@@ -5581,7 +5582,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
 
   } else {
     // Generic: course chapters based
-    const chapters = getCourseChapters(f.intitule);
+    const chapters = getCourseChapters(f.intitule, f.modalites);
     const nbBlocs = Math.min(chapters.length, 6);
     const perBloc = Math.round((effectiveTotal * 0.85) / Math.max(1, nbBlocs));
 
@@ -5808,7 +5809,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     sheet3 += tr(["TOTAL", `${effectiveTotal}h`, `${heuresRealisees}h`, `${effectiveTotal - heuresRealisees}h`, `${Math.round(progressRatio * 100)}%`, "", "", "", ""], true);
     sheets.push({ name: "Suivi par module", html: `<table>${sheet3}</table>` });
   } else {
-    const chapters = getCourseChapters(f.intitule);
+    const chapters = getCourseChapters(f.intitule, f.modalites);
     const nbBlocs = Math.min(chapters.length, 6);
     const perBloc = Math.round((effectiveTotal * 0.85) / Math.max(1, nbBlocs));
     let moduleCumul = 0;
@@ -8397,7 +8398,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   }
 
   // Fallback: generic synopsis
-  const chapters = getCourseChapters(f.intitule);
+  const chapters = getCourseChapters(f.intitule, f.modalites);
   const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
   const accompHours = Math.round(effectiveTotal * 0.15);
   const perBloc = Math.round((effectiveTotal - accompHours) / nbBlocs);
@@ -9009,10 +9010,10 @@ function getDisponibilitesAnswer(s: StagiaireInfo, f?: FormationInfo): string {
     return getCOH21EvalBesoins(s, false).disponibilites;
   }
   if (f && isHYG14Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
-    return getHYG14EvalBesoins(s, false).disponibilites;
+    return selonModalite(f.modalites, getHYG14EvalBesoins(s, false).disponibilites);
   }
   if (f && isVTC48Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
-    return getVTC48EvalBesoins(s, false).disponibilites;
+    return selonModalite(f.modalites, getVTC48EvalBesoins(s, false).disponibilites);
   }
   if (f && isECO21Formation(f.intitule, f.codeRNCP) && !isStagiairePSH(s)) {
     return getECO21EvalBesoins(s, false).disponibilites;
@@ -9196,12 +9197,14 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
 
   // === Early return : Hygiène alimentaire en restauration commerciale – 14 h (non certifiante), avant les réponses génériques (restauration) ===
   if (isHYG14Formation(f.intitule, f.codeRNCP)) {
-    return getHYG14EvalBesoins(s, hasEntreprise, idx);
+    const r = getHYG14EvalBesoins(s, hasEntreprise, idx);
+    return { ...r, disponibilites: selonModalite(f.modalites, r.disponibilites) };
   }
 
-  // === Early return : Préparation à l'examen VTC (RS5637) – 48 h, avant les réponses génériques (vtc / t3p) ===
+  // === Early return : Préparation à l'examen VTC (RS5637) – 140 h, avant les réponses génériques (vtc / t3p) ===
   if (isVTC48Formation(f.intitule, f.codeRNCP)) {
-    return getVTC48EvalBesoins(s, hasEntreprise, idx);
+    const r = getVTC48EvalBesoins(s, hasEntreprise, idx);
+    return { ...r, disponibilites: selonModalite(f.modalites, r.disponibilites) };
   }
 
   // === Early return : Créer et développer une e-boutique professionnelle (RS6475) – 21 h, avant les réponses génériques (e-commerce / web) ===
@@ -11274,7 +11277,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
         imageQuery: c.imageQuery,
         sections: c.sections.map(s => ({ title: s.title, content: s.contentHtml })),
       }))
-    : getCourseChapters(f.intitule).map(c => ({ ...c, imageQuery: f.intitule } as any))
+    : getCourseChapters(f.intitule, f.modalites).map(c => ({ ...c, imageQuery: f.intitule } as any))
   );
 
   let chaptersHtml = '';
@@ -13262,7 +13265,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
       });
     });
   } else {
-    const chapters = getCourseChapters(f.intitule);
+    const chapters = getCourseChapters(f.intitule, f.modalites);
     chapters.slice(0, 5).forEach(ch => {
       extra += `<tr style="background:#e8edf5;font-weight:bold"><td colspan="6">${ch.title}</td></tr>`;
       ch.sections.slice(0, 3).forEach(sec => {
@@ -13405,7 +13408,7 @@ ${tauxReussite ? `<tr><td><strong>Taux de réussite aux évaluations</strong></t
 
 function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
   const theme = pickSupportTheme(`${f.intitule}|${f.codeRNCP || ''}|${o.nom}`);
-  const chapters = getCourseChapters(f.intitule);
+  const chapters = getCourseChapters(f.intitule, f.modalites);
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
@@ -13661,7 +13664,7 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const scale = chapters.length > 0 ? blocHoursTotal / chapters.reduce((s, b) => s + b.matieres.reduce((ss, m) => ss + (parseInt(m.volume) || 0), 0), 0) || 1 : 1;
   const modules = chapters.length > 0
     ? chapters.map((bloc, i) => ({ titre: `Bloc ${i + 1} – ${bloc.titre}`, volume: Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale) }))
-    : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
+    : getCourseChapters(f.intitule, f.modalites).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule, f.modalites).length, 5)) }));
   modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
 
   // Build full-year calendar (52 weeks from start date)
@@ -15416,7 +15419,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
 
   } else {
     // Generic: use course chapters with detailed breakdown
-    const chapters = getCourseChapters(f.intitule);
+    const chapters = getCourseChapters(f.intitule, f.modalites);
     const nbBlocs = Math.min(chapters.length, 6);
     const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
 
@@ -15478,7 +15481,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   let cfaWk = 0;
   const modList = rncp && rncp.blocsCompetences.length > 0
     ? rncp.blocsCompetences.map((b, i) => `Bloc ${i + 1} – ${b.titre}`)
-    : getCourseChapters(f.intitule).slice(0, 5).map(ch => ch.title);
+    : getCourseChapters(f.intitule, f.modalites).slice(0, 5).map(ch => ch.title);
   modList.push('Accompagnement + Examens');
 
   for (let cycle = 0; cycle < totalCycles; cycle++) {

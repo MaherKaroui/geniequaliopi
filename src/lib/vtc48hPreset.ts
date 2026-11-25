@@ -1,5 +1,5 @@
 /**
- * Preset complet « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h »
+ * Preset complet « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) »
  * — formation CERTIFIANTE préparant à la certification inscrite au Répertoire spécifique sous le code RS5637
  * « Habilitation pour l'accès à la profession de conducteur de voiture de transport avec chauffeur (VTC) »
  * (certificateur : ministère chargé des transports ; enregistrement de droit ; fin d'enregistrement de la fiche
@@ -9,10 +9,10 @@
  * R. 3120-6 et suivants), arrêté du 6 avril 2017 relatif aux programmes et à l'évaluation des épreuves.
  * Les coefficients, durées d'épreuve, notes éliminatoires et frais d'examen ne sont volontairement PAS écrits :
  * ils sont renvoyés à l'arrêté du 6 avril 2017 et au site de la CMA.
- * 48 heures sur 7 jours, samedi inclus : jours 1 à 6 de 7 h (09h00 – 12h30 / 13h30 – 17h00), jour 7 de 6 h
- * (09h00 – 12h30 / 13h30 – 16h00), à distance en classe virtuelle synchrone
+ * 140 heures sur 4 semaines : 20 jours de 7 h du lundi au vendredi (09h00 – 12h30 / 13h30 – 17h00),
+ * à distance en classe virtuelle synchrone
  * (Google Meet / Zoom) avec le formateur en direct, espace e-learning (QCM d'entraînement, examens blancs) ;
- * groupe de 1 à 12 ; prérequis : permis B hors période probatoire. Tarif : 480 € net de taxes par stagiaire.
+ * groupe de 1 à 12 ; prérequis : permis B hors période probatoire. Tarif : 820 € HT par stagiaire.
  * La conduite réelle en véhicule n'est pas incluse : le module pratique prépare à l'épreuve d'admission
  * (méthode, itinéraire, accueil, facturation, relation client).
  *
@@ -22,7 +22,7 @@
  *  - AUCUN stagiaire pré-importé
  *  - Pack contenu : analyse des besoins, 10 mises en situation corrigées et 6 QCM de 10 questions (un par compétence)
  *  - Pack évaluation : QCM de positionnement de début (10 questions, corrigé expliqué), QCM de fin (10 questions),
- *    cas pratique intermédiaire (fin du jour 5), évaluation finale interne (examen blanc, jour 7)
+ *    cas pratique intermédiaire (fin du jour 14), évaluation finale interne (examen blanc, jour 20)
  *  - Pack veille (réglementaire / métier / technologique)
  * Le support de cours (6 chapitres) est dans `vtc48h/` ; les réponses propres à chaque stagiaire dans
  * `vtc48hHumanized.ts`. Aucune donnée de satisfaction ni aucun taux de réussite n'est pré-rempli.
@@ -35,33 +35,34 @@ import { setCachedContentPack } from "./aiContentPack";
 import { setCachedPack as setCachedEvalPack } from "./aiEvalPack";
 import { setCachedVeillePack } from "./aiVeillePack";
 import { VTC48_VISUELS, type VisuelExercice } from "./vtc48h/visuels";
+import { packSelonModalite } from "./modalitePresentiel";
 
 // ---------------------------------------------------------------------------
 // Formation
 // ---------------------------------------------------------------------------
 export const FORMATION_VTC48: FormationInfo = {
-  intitule: "Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h",
+  intitule: "Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637)",
   codeRNCP: "RS5637",
   objectifs:
     "Formation certifiante préparant à l'examen d'accès à la profession de conducteur de voiture de transport avec chauffeur (VTC) : certification enregistrée au Répertoire spécifique sous le code RS5637 « Habilitation pour l'accès à la profession de conducteur de voiture de transport avec chauffeur (VTC) » (certificateur : ministère chargé des transports ; examen organisé par les chambres de métiers et de l'artisanat). Objectif général : acquérir les connaissances et les savoir-faire évalués par les épreuves d'admissibilité et par l'épreuve pratique d'admission, et préparer son installation comme conducteur VTC.\nÀ l'issue de la formation, le stagiaire sera capable de :\n- C1 — Appliquer la réglementation du transport public particulier de personnes (T3P) : professions, conditions d'accès, carte professionnelle, registre, contrôles et sanctions (épreuve A).\n- C2 — Gérer son entreprise : statuts juridiques, notions de comptabilité, TVA, charges, prix de revient et seuil de rentabilité (épreuve B).\n- C3 — Conduire en sécurité : code de la route, fatigue et temps de conduite, alcool et stupéfiants, conduite à tenir en cas d'accident et gestes de premiers secours (épreuve C).\n- C4 — S'exprimer et comprendre en langue française (épreuve D) et en anglais dans les situations courantes du métier (épreuve E).\n- C5 — Développer son activité commerciale et appliquer la gestion et la réglementation nationale propres à l'activité VTC (épreuves F et G).\n- C6 — Réaliser une course dans les conditions de l'épreuve pratique d'admission : accueil et prise en charge du client, itinéraire, conduite souple, facturation et relation client.",
   prerequis:
     "Être titulaire du permis B hors période probatoire. Pour la carte professionnelle, après la réussite à l'examen : conditions d'honorabilité (casier judiciaire), formation aux premiers secours (PSC1 ou équivalent) et visite médicale demandées par la préfecture. Lire et comprendre le français. Disposer d'un ordinateur (ou d'une tablette) avec caméra, micro et connexion internet pour la classe virtuelle. Un entretien préalable vérifie le projet et les conditions d'accès à la profession.",
-  duree: "48 heures réparties sur 7 jours : jours 1 à 6 de 7 h (09h00 – 12h30 / 13h30 – 17h00) et jour 7 de 6 h (09h00 – 12h30 / 13h30 – 16h00), samedi inclus",
+  duree: "140 heures réparties sur 4 semaines : 20 jours de 7 h du lundi au vendredi (09h00 – 12h30 / 13h30 – 17h00)",
   dureeSaisiePrioritaire: true,
   modalites: "distanciel",
-  tarif: "480 € net de taxes par stagiaire",
+  tarif: "820 € HT par stagiaire",
   programme:
-    "JOUR 1 — Accueil, positionnement et réglementation du T3P (7 h)\nModule 1 — Réglementation du transport public particulier de personnes, épreuve A (C1, 10 h) : sur deux jours, 7 h le jour 1 et 3 h le jour 2 ; accueil, présentation du fil rouge (Samir, futur chauffeur VTC indépendant à Créteil, personnage fictif), du déroulé de l'examen organisé par la CMA et QCM de positionnement ; les professions du T3P (taxis, VTC, véhicules motorisés à deux ou trois roues) ; conditions d'accès à la profession (permis B hors période probatoire, honorabilité, examen, carte professionnelle, formation continue) ; registre des exploitants VTC et signalétique ; réservation préalable et interdiction de la maraude.\nJOUR 2 — Fin de la réglementation du T3P et début de la gestion (7 h)\nModule 1 (suite et fin, 3 h) : acteurs du contrôle, infractions et sanctions ; QCM d'entraînement de l'épreuve A.\nModule 2 — Gestion, épreuve B (C2, 8 h) : sur deux jours, 4 h le jour 2 et 4 h le jour 3 ; statuts juridiques (entreprise individuelle, micro-entreprise, EURL, SASU) ; obligations comptables et documents de synthèse (bilan, compte de résultat) ; TVA et régimes sociaux et fiscaux.\nJOUR 3 — Gestion et début de la sécurité routière (7 h)\nModule 2 (suite et fin, 4 h) : charges fixes et variables, amortissement du véhicule ; prix de revient d'une course, marge sur coûts variables et seuil de rentabilité ; QCM d'entraînement de l'épreuve B.\nModule 3 — Sécurité routière, épreuve C (C3, 8 h) : sur deux jours, 3 h le jour 3 et 5 h le jour 4 ; règles du code de la route utiles au conducteur professionnel et permis à points ; vitesse, distances de sécurité et conduite préventive.\nJOUR 4 — Sécurité routière et début du français (7 h)\nModule 3 (suite et fin, 5 h) : alcool, stupéfiants et médicaments ; fatigue, temps de conduite et pauses ; conduite à tenir en cas d'accident (protéger, alerter, secourir), constat amiable et premiers secours ; QCM d'entraînement de l'épreuve C.\nModule 4 — Français et anglais, épreuves D et E (C4, 8 h) : sur deux jours, 2 h le jour 4 et 6 h le jour 5 ; compréhension de textes réglementaires et professionnels ; vocabulaire et orthographe.\nJOUR 5 — Français, anglais et cas pratique intermédiaire (7 h)\nModule 4 (suite et fin, 6 h) : rédaction de messages aux clients ; anglais de l'accueil, du trajet, du paiement et des situations imprévues ; QCM d'entraînement des épreuves D et E ; cas pratique intermédiaire en fin de journée (réglementation, gestion, sécurité routière et anglais).\nModule 5 — Développement commercial et réglementation spécifique VTC, épreuves F et G (C5, 10 h) : sur trois jours, 1 h le jour 5, 7 h le jour 6 et 2 h le jour 7 ; étude de marché et clientèles (particuliers, entreprises, hôtels, événements).\nJOUR 6 — Développement commercial et réglementation spécifique VTC (7 h)\nModule 5 (suite, 7 h) : plateformes de réservation et clientèle directe ; communication et fidélisation ; devis et tableau de bord commercial ; réglementation nationale propre aux VTC : réservation préalable et justificatif, retour au lieu d'établissement, signalétique, relations avec les plateformes et droits issus de la loi d'orientation des mobilités.\nJOUR 7 — Fin du développement commercial, épreuve pratique et examen blanc final (6 h)\nModule 5 (suite et fin, 2 h) : révision des épreuves F et G ; QCM d'entraînement.\nModule 6 — Préparation à l'épreuve pratique d'admission et examen blanc final (C6, 4 h) : le jour 7 ; méthode de l'épreuve pratique (préparation de l'itinéraire, accueil et prise en charge du client, conduite souple, information du client, facturation, prise de congé) ; simulation commentée d'une course ; évaluation finale (examen blanc) ; inscription à l'examen auprès de la CMA (candidature individuelle) ; bilan de la formation.",
+    "SEMAINE 1 — Accueil, réglementation du T3P et début de la gestion (jours 1 à 5, 35 h)\nJOURS 1 à 3 — Module 1 — Réglementation du transport public particulier de personnes, épreuve A (C1, 21 h) : jour 1, accueil, présentation du fil rouge (Samir, futur chauffeur VTC indépendant à Créteil, personnage fictif), du déroulé de l'examen organisé par la CMA et QCM de positionnement, puis les professions du T3P (taxis, VTC, véhicules motorisés à deux ou trois roues) ; jour 2, conditions d'accès à la profession (permis B hors période probatoire, honorabilité, examen, carte professionnelle, formation continue), registre des exploitants VTC et signalétique ; jour 3, réservation préalable et interdiction de la maraude, acteurs du contrôle, infractions et sanctions ; QCM d'entraînement de l'épreuve A.\nJOURS 4 et 5 — Module 2 — Gestion, épreuve B (C2, 28 h) : sur deux semaines, 14 h les jours 4 et 5 puis 14 h les jours 6 et 7 ; statuts juridiques (entreprise individuelle, micro-entreprise, EURL, SASU) ; obligations comptables et documents de synthèse (bilan, compte de résultat) ; TVA et régimes sociaux et fiscaux.\nÉvaluation de la semaine 1 : mises en situation 1 et 2 et QCM C1.\nSEMAINE 2 — Fin de la gestion, sécurité routière et premiers secours (jours 6 à 10, 35 h)\nJOURS 6 et 7 — Module 2 (suite et fin, 14 h) : charges fixes et variables, amortissement du véhicule ; prix de revient d'une course, marge sur coûts variables et seuil de rentabilité ; QCM d'entraînement de l'épreuve B.\nJOURS 8 à 10 — Module 3 — Sécurité routière et premiers secours, épreuve C (C3, 21 h) : jour 8, règles du code de la route utiles au conducteur professionnel et permis à points, vitesse, distances de sécurité et conduite préventive ; jour 9, alcool, stupéfiants et médicaments, fatigue, temps de conduite et pauses ; jour 10, conduite à tenir en cas d'accident (protéger, alerter, secourir), constat amiable et premiers secours ; QCM d'entraînement de l'épreuve C.\nÉvaluation de la semaine 2 : mises en situation 4 et 5, QCM C2 et QCM C3.\nSEMAINE 3 — Français, anglais et début du développement commercial (jours 11 à 15, 35 h)\nJOURS 11 à 14 — Module 4 — Français et anglais, épreuves D et E (C4, 28 h) : français les jours 11 et 12 (compréhension de textes réglementaires et professionnels ; vocabulaire et orthographe ; rédaction de messages aux clients) ; anglais les jours 13 et 14 (anglais de l'accueil, du trajet, du paiement et des situations imprévues) ; QCM d'entraînement des épreuves D et E ; cas pratique intermédiaire en fin de jour 14 (réglementation, gestion, sécurité routière, français et anglais).\nJOUR 15 — Module 5 — Développement commercial et réglementation spécifique VTC, épreuves F et G (C5, 21 h) : sur deux semaines, 7 h le jour 15 puis 14 h les jours 16 et 17 ; étude de marché et clientèles (particuliers, entreprises, hôtels, événements) ; plateformes de réservation et clientèle directe ; communication et fidélisation ; devis et tableau de bord commercial.\nÉvaluation de la semaine 3 : mises en situation 7 et 8 et QCM C4.\nSEMAINE 4 — Réglementation spécifique VTC, épreuve pratique et examen blanc final (jours 16 à 20, 35 h)\nJOURS 16 et 17 — Module 5 (suite et fin, 14 h) : réglementation nationale propre aux VTC : réservation préalable et justificatif, retour au lieu d'établissement, signalétique, relations avec les plateformes et droits issus de la loi d'orientation des mobilités ; révision des épreuves F et G ; QCM d'entraînement.\nJOURS 18 à 20 — Module 6 — Préparation à l'épreuve pratique d'admission et examen blanc final (C6, 21 h) : jours 18 et 19, méthode de l'épreuve pratique (préparation de l'itinéraire, accueil et prise en charge du client, conduite souple, information du client, facturation, prise de congé) et simulations commentées de courses ; jour 20, évaluation finale (examen blanc des épreuves écrites et simulation de l'épreuve pratique d'admission), inscription à l'examen auprès de la CMA sur exament3p.fr (candidature individuelle) et bilan de la formation.\nÉvaluation de la semaine 4 : mises en situation 9 et 10, QCM C5 et QCM C6.",
   methodesEvaluation:
-    "Positionnement en ouverture : QCM de positionnement de 10 questions (une seule bonne réponse chacune, corrigé et expliqué), comparé à l'évaluation finale pour mesurer la progression, et 10 questions ouvertes de positionnement ; une évaluation formative chaque jour, qui mêle les 10 mises en situation corrigées sur le fil rouge de Samir (personnage fictif), dont 8 appuyées sur un document illustré (scène, relevé de charges, croquis d'accident, boîte de médicament et planning, message client, demande de devis, écran de plateforme, plan d'itinéraire), et un QCM corrigé de 10 questions par compétence (C1 à C6) le jour où la compétence est terminée ; QCM d'entraînement et examens blancs dans l'espace e-learning ; cas pratique intermédiaire en fin de jour 5 ; évaluation finale interne le jour 7 (examen blanc reprenant les épreuves écrites et simulation de l'épreuve pratique d'admission) ; test de positionnement de fin. Évaluation à chaud (questionnaire de satisfaction en fin de formation) et évaluation à froid. Certification RS5637 délivrée après réussite à l'examen organisé par la chambre de métiers et de l'artisanat, auquel le candidat s'inscrit lui-même ; les épreuves, leurs modalités et leur notation sont fixées par l'arrêté du 6 avril 2017 et précisées par la CMA. L'organisme remet un certificat de réalisation et une attestation de fin de formation.",
+    "Positionnement en ouverture : QCM de positionnement de 10 questions (une seule bonne réponse chacune, corrigé et expliqué), comparé à l'évaluation finale pour mesurer la progression, et 10 questions ouvertes de positionnement ; une évaluation formative chaque semaine, qui mêle deux mises en situation corrigées sur le fil rouge de Samir (personnage fictif), le plus souvent illustrées par un document (scène, relevé de charges, croquis d'accident, boîte de médicament et planning, message client, demande de devis, écran de plateforme, plan d'itinéraire), et le QCM corrigé de 10 questions de chaque compétence terminée dans la semaine (C1 à C6) : semaine 1, mises en situation 1 et 2 et QCM C1 ; semaine 2, mises en situation 4 et 5, QCM C2 et QCM C3 ; semaine 3, mises en situation 7 et 8 et QCM C4 ; semaine 4, mises en situation 9 et 10, QCM C5 et QCM C6 ; les mises en situation 3 et 6 restent des exercices d'entraînement ; QCM d'entraînement et examens blancs dans l'espace e-learning ; cas pratique intermédiaire en fin de jour 14 ; évaluation finale interne le jour 20 (examen blanc reprenant les épreuves écrites et simulation de l'épreuve pratique d'admission) ; test de positionnement de fin. Évaluation à chaud (questionnaire de satisfaction en fin de formation) et évaluation à froid. Certification RS5637 délivrée après réussite à l'examen organisé par la chambre de métiers et de l'artisanat, auquel le candidat s'inscrit lui-même ; les épreuves, leurs modalités et leur notation sont fixées par l'arrêté du 6 avril 2017 et précisées par la CMA. L'organisme remet un certificat de réalisation et une attestation de fin de formation.",
   moyensPedagogiques:
-    "Formation à distance en classe virtuelle synchrone (Google Meet ou Zoom), formateur en direct pendant les 48 heures, caméra et micro des stagiaires actifs. Méthodes actives : apports courts illustrés, études de cas et mises en situation sur le fil rouge de Samir, futur chauffeur VTC indépendant à Créteil (personnage fictif, clients fictifs), calculs de gestion guidés, jeux de rôle en français et en anglais, simulation commentée d'une course, sondages et QCM corrigés en direct, travail en sous-groupes dans des salles virtuelles, tableau blanc collaboratif. Espace e-learning : support de cours en 6 chapitres, fiches à retenir, QCM d'entraînement par épreuve, examens blancs, modèles de devis et de note de course, vidéos, accessibles pendant toute la formation et jusqu'à la date d'examen choisie par le stagiaire. La conduite réelle en véhicule n'est pas incluse. Ressources officielles : code des transports et arrêté du 6 avril 2017 sur Légifrance, pages du ministère chargé des transports, informations de la CMA sur l'examen.",
+    "Formation à distance en classe virtuelle synchrone (Google Meet ou Zoom), formateur en direct pendant les 140 heures, caméra et micro des stagiaires actifs. Méthodes actives : apports courts illustrés, études de cas et mises en situation sur le fil rouge de Samir, futur chauffeur VTC indépendant à Créteil (personnage fictif, clients fictifs), calculs de gestion guidés, jeux de rôle en français et en anglais, simulation commentée d'une course, sondages et QCM corrigés en direct, travail en sous-groupes dans des salles virtuelles, tableau blanc collaboratif. Espace e-learning : support de cours en 6 chapitres, fiches à retenir, QCM d'entraînement par épreuve, examens blancs, modèles de devis et de note de course, vidéos, accessibles pendant toute la formation et jusqu'à la date d'examen choisie par le stagiaire. La conduite réelle en véhicule n'est pas incluse. Ressources officielles : code des transports et arrêté du 6 avril 2017 sur Légifrance, pages du ministère chargé des transports, informations de la CMA sur l'examen.",
   publicVise:
     "Particuliers finançant eux-mêmes leur formation, demandeurs d'emploi, salariés en reconversion et toute personne souhaitant devenir conducteur de voiture de transport avec chauffeur (VTC), à titre indépendant ou salarié. Groupe de 1 à 12 stagiaires.",
   delaiAcces:
     "Inscription possible avant chaque session, sous réserve de places disponibles, de l'entretien préalable et de la signature du contrat ou de la convention de formation ; en financement personnel, l'entrée en formation intervient à l'expiration du délai de rétractation de 10 jours suivant la signature du contrat de formation professionnelle. Le lien de la classe virtuelle et les accès à l'espace e-learning sont envoyés avant le premier jour de formation. L'inscription à l'examen est faite par le stagiaire auprès de la CMA, selon le calendrier publié par celle-ci.",
-  dateDebut: "2026-12-01",
-  dateFin: "2026-12-08",
+  dateDebut: "2026-11-23",
+  dateFin: "2026-12-18",
   lieu: "",
   nombreParticipants: "12",
   formateur: "",
@@ -300,19 +301,17 @@ export const VTC48_QCM_COMPETENCES: AIContentExercise[] = [
 export const VTC48_EXERCICES_COMPLETS: AIContentExercise[] = [...VTC48_EXERCICES, ...VTC48_QCM_COMPETENCES];
 
 /**
- * Évaluation de chaque journée (7 jours) : la ou les mises en situation de la compétence travaillée,
- * illustrées par un document, et le QCM de la compétence le jour où le programme le prévoit
- * (A le jour 2, B le jour 3, C le jour 4, D et E le jour 5, F et G et l'épreuve pratique le jour 7).
+ * Évaluation de chaque semaine (4 semaines) : deux mises en situation corrigées, illustrées par un
+ * document le plus souvent, et le QCM de chaque compétence terminée dans la semaine
+ * (C1 en semaine 1, C2 et C3 en semaine 2, C4 en semaine 3, C5 et C6 en semaine 4).
+ * Les mises en situation 3 et 6 restent des exercices d'entraînement.
  * Chaque entrée est un début de titre d'exercice : l'ordre des listes ne compte pas.
  */
-export const VTC48_PLAN_JOURS: string[][] = [
-  ["Exercice 1 —", "Exercice 2 —"],
-  ["QCM C1 —", "Exercice 3 —"],
-  ["Exercice 4 —", "QCM C2 —"],
-  ["Exercice 5 —", "Exercice 6 —", "QCM C3 —"],
-  ["Exercice 7 —", "QCM C4 —"],
-  ["Exercice 8 —", "Exercice 9 —"],
-  ["Exercice 10 —", "QCM C5 —", "QCM C6 —"],
+export const VTC48_PLAN_SEMAINES: string[][] = [
+  ["Exercice 1 —", "Exercice 2 —", "QCM C1 —"],
+  ["Exercice 4 —", "Exercice 5 —", "QCM C2 —", "QCM C3 —"],
+  ["Exercice 7 —", "Exercice 8 —", "QCM C4 —"],
+  ["Exercice 9 —", "Exercice 10 —", "QCM C5 —", "QCM C6 —"],
 ];
 
 /** Document illustré d'une mise en situation (« Exercice N — … »), s'il en a un. */
@@ -323,7 +322,7 @@ export function vtc48Visuel(titre: string): VisuelExercice | undefined {
 
 const RESSOURCES_SUPPORTS_HTML = `
 <ul>
-  <li><strong>Support de cours « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h » (6 chapitres, un par compétence C1 à C6)</strong> : cours détaillé, tableaux, exemples tirés du fil rouge de Samir (personnage fictif), encadrés « À retenir », quiz corrigés et cas pratiques corrigés.</li>
+  <li><strong>Support de cours « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) » (6 chapitres, un par compétence C1 à C6)</strong> : cours détaillé, tableaux, exemples tirés du fil rouge de Samir (personnage fictif), encadrés « À retenir », quiz corrigés et cas pratiques corrigés.</li>
   <li><strong>Espace e-learning</strong> : support de cours, fiches à retenir, QCM d'entraînement par épreuve, examens blancs corrigés, vidéos, accessibles pendant toute la formation et jusqu'à la date d'examen choisie par le stagiaire.</li>
   <li><strong>Modèles de documents</strong> : devis de transfert, note de course ou facture, tableau de calcul du prix de revient et du seuil de rentabilité, tableau de bord commercial, fiche de préparation d'itinéraire, check-list d'accueil du client.</li>
   <li><strong>Fiches de travail des mises en situation</strong> : conditions d'accès et démarches, comparatif des statuts juridiques, conduite à tenir en cas d'accident, phrases d'accueil en anglais, grille d'auto-évaluation de la course simulée.</li>
@@ -424,7 +423,7 @@ export const VTC48_EVAL_PACK: AIEvalPack = {
   qcmDebut: VTC48_QCM_DEBUT,
   qcmFin: VTC48_QCM_FIN,
   exerciceIntermediaire: {
-    titre: "Cas pratique intermédiaire (fin du jour 5) — une semaine difficile pour Samir, futur chauffeur VTC fictif",
+    titre: "Cas pratique intermédiaire (fin du jour 14) — une semaine difficile pour Samir, futur chauffeur VTC fictif",
     contexte:
       "Samir vient de démarrer son activité à Créteil. Lundi, devant la gare de Lyon, il accepte un voyageur qui l'a hélé sur le trottoir. Mardi, il fixe le prix d'une course pour une entreprise sans connaître son prix de revient : 1 050 € de charges fixes par mois, 9 € de charges variables par course, et une plateforme qui lui propose des courses à 14 €. Mercredi, après onze heures de conduite et un traitement qui provoque de la somnolence, il est témoin d'un accident sur l'A86 ; un conducteur est inconscient mais respire. Jeudi, un client anglophone lui demande « How much is the fare to Orly? ».",
     questions: [
@@ -435,7 +434,7 @@ export const VTC48_EVAL_PACK: AIEvalPack = {
     ],
   },
   evaluationFinale: {
-    titre: "Évaluation finale interne — examen blanc des épreuves écrites et simulation de l'épreuve pratique d'admission (jour 7), grille d'acquisition des compétences C1 à C6",
+    titre: "Évaluation finale interne — examen blanc des épreuves écrites et simulation de l'épreuve pratique d'admission (jour 20), grille d'acquisition des compétences C1 à C6",
     exercices: [
       {
         titre: "Partie 1 — Examen blanc des épreuves écrites (C1 à C5)",
@@ -516,7 +515,7 @@ export const VTC48_VEILLE_PACK: AIVeillePack = {
       titre: "Calendrier des sessions et inscription individuelle à l'examen",
       date: "Novembre 2026",
       commentaire: "Les CMA publient le calendrier des sessions, les modalités d'inscription et les informations pratiques de l'examen. Le stagiaire s'inscrit lui-même ; l'organisme l'accompagne pour constituer son dossier et choisir une session compatible avec la fin de sa formation.",
-      exploitation: "Preuve : calendrier en vigueur remis aux stagiaires le jour 1. Action : rappel des dates limites d'inscription le jour 4 et le jour 7.",
+      exploitation: "Preuve : calendrier en vigueur remis aux stagiaires le jour 1. Action : rappel des dates limites d'inscription à la fin de chaque semaine et le jour 20.",
     },
     {
       lien: "https://www.legifrance.gouv.fr/",
@@ -550,7 +549,7 @@ export const VTC48_VEILLE_PACK: AIVeillePack = {
       titre: "Applications de réservation et de navigation : usage sans danger",
       date: "Septembre 2026",
       commentaire: "L'usage du téléphone tenu en main en conduisant est interdit ; les applications de réservation et de navigation doivent être réglées avant le départ et consultées à l'arrêt, sur un support fixe. Point repris dans la préparation de l'épreuve pratique.",
-      exploitation: "Preuve : règle intégrée à la check-list d'itinéraire. Action : rappel lors de la simulation de course du jour 7.",
+      exploitation: "Preuve : règle intégrée à la check-list d'itinéraire. Action : rappel lors des simulations de course des jours 18 à 20.",
     },
     {
       lien: "https://www.cnil.fr/fr/reglement-europeen-protection-donnees",
@@ -568,9 +567,10 @@ export const VTC48_VEILLE_PACK: AIVeillePack = {
 // ---------------------------------------------------------------------------
 export function seedVTC48AICaches(f: FormationInfo = FORMATION_VTC48): void {
   try {
-    setCachedContentPack(f, VTC48_CONTENT_PACK);
-    setCachedEvalPack(f, VTC48_EVAL_PACK);
-    setCachedVeillePack(f, VTC48_VEILLE_PACK);
+    // Session en présentiel : les textes rédigés pour la classe virtuelle passent en version salle.
+    setCachedContentPack(f, packSelonModalite(f.modalites, VTC48_CONTENT_PACK));
+    setCachedEvalPack(f, packSelonModalite(f.modalites, VTC48_EVAL_PACK));
+    setCachedVeillePack(f, packSelonModalite(f.modalites, VTC48_VEILLE_PACK));
   } catch {
     /* stockage indisponible : ignoré */
   }

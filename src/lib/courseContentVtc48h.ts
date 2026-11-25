@@ -7,7 +7,7 @@ import { VTC48_CHAPITRE_5 } from "./vtc48h/chapitre5";
 import { VTC48_CHAPITRE_6 } from "./vtc48h/chapitre6";
 
 /**
- * Support de cours « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 48 h »
+ * Support de cours « Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637) – 140 h »
  * (6 chapitres, un par compétence) : 1 réglementation du T3P (épreuve A), 2 gestion (épreuve B),
  * 3 sécurité routière (épreuve C), 4 français et anglais (épreuves D et E), 5 développement commercial et
  * réglementation spécifique VTC (épreuves F et G), 6 préparation à l'épreuve pratique d'admission.

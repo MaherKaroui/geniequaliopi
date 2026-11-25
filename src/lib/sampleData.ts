@@ -590,7 +590,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_COH21,
   // Hygiène alimentaire en restauration commerciale – 14 h (non certifiante, 2 jours à distance, C1 à C6) : contenus pré-remplis (hygieneAlimentaire14hPreset), aucun stagiaire importé
   FORMATION_HYG14,
-  // Préparation à l'examen VTC (RS5637) – 48 h (certifiante, Répertoire spécifique, 7 jours à distance, 6 × 7 h + 6 h, C1 à C6) : contenus pré-remplis (vtc48hPreset), aucun stagiaire importé
+  // Préparation à l'examen VTC (RS5637) – 140 h (certifiante, Répertoire spécifique, 4 semaines de 5 × 7 h, C1 à C6) : contenus pré-remplis (vtc48hPreset), aucun stagiaire importé
   FORMATION_VTC48,
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h (certifiante, Répertoire spécifique, 4 semaines à distance, 6 classes virtuelles de 3 h 30, C1 à C7) : contenus pré-remplis (ecommerce21hPreset), aucun stagiaire importé
   FORMATION_ECO21,

@@ -52,8 +52,9 @@ import { pickGSC35ExerciceAnswer, isGSC35Formation, gsc35NoteExercice } from "./
 import { pickANG40ExerciceAnswer, isANG40Formation, ang40NoteExercice } from "./anglaisPro40hHumanized";
 import { pickCOH21ExerciceAnswer, isCOH21Formation, coh21NoteExercice } from "./cohesionEquipe21hHumanized";
 import { pickHYG14ExerciceAnswer, isHYG14Formation, hyg14NoteExercice } from "./hygieneAlimentaire14hHumanized";
+import { selonModalite } from "./modalitePresentiel";
 import { pickVTC48ExerciceAnswer, isVTC48Formation, vtc48NoteExercice } from "./vtc48hHumanized";
-import { VTC48_PLAN_JOURS, vtc48Visuel } from "./vtc48hPreset";
+import { VTC48_PLAN_SEMAINES, vtc48Visuel } from "./vtc48hPreset";
 import { pickECO21ExerciceAnswer, isECO21Formation, eco21NoteExercice } from "./ecommerce21hHumanized";
 import { pickGMA70ExerciceAnswer, isGMA70Formation, gma70NoteExercice } from "./projecteursGrandMA70hHumanized";
 import { pickMSC70ExerciceAnswer, isMSC70Formation, msc70NoteExercice } from "./machinerieScenique70hHumanized";
@@ -1119,11 +1120,11 @@ D) Drive faster to finish the ride.`,
 
   const blockStart = exerciceIdx !== undefined ? (exerciceIdx % Math.max(1, nbBlocks)) * EXERCICES_PER_BLOCK : 0;
   const blockEnd = exerciceIdx !== undefined ? blockStart + EXERCICES_PER_BLOCK : totalExNeeded;
-  // VTC 48 h : plan par journée (mises en situation illustrées et QCM mêlés, selon le programme).
+  // VTC : plan par semaine (2 mises en situation illustrées et QCM des compétences terminées, selon le programme).
   // Indices dans `exercices`, résolus par début de titre ; sinon un bloc régulier.
   const _isVTC48 = isVTC48Formation(f.intitule, f.codeRNCP);
-  const _planJour = _isVTC48 && exerciceIdx !== undefined ? VTC48_PLAN_JOURS[exerciceIdx] : undefined;
-  const _planIdx = (_planJour || []).map(p => exercices.findIndex(e => e.titre.startsWith(p))).filter(i => i >= 0);
+  const _planSemaine = _isVTC48 && exerciceIdx !== undefined ? VTC48_PLAN_SEMAINES[exerciceIdx] : undefined;
+  const _planIdx = (_planSemaine || []).map(p => exercices.findIndex(e => e.titre.startsWith(p))).filter(i => i >= 0);
   const selectedExercices = _planIdx.length
     ? _planIdx.map(i => exercices[i])
     : exercices.slice(blockStart, Math.min(blockEnd, exercices.length));
@@ -1157,10 +1158,10 @@ D) Drive faster to finish the ride.`,
   const qcmTitleLabel = selectedExercices[0]?.titre || `QCM`;
   // Libellé exact : un exercice pratique n'est pas présenté comme un « QCM ».
   const estQcm = /^\s*QCM\b/i.test(qcmTitleLabel) || !!evalPackIA;
-  // Plusieurs évaluations dans la journée (plan VTC 48 h) : intitulé de l'ensemble, pas du premier élément.
+  // Plusieurs évaluations dans la semaine (plan VTC) : intitulé de l'ensemble, pas du premier élément.
   const _groupe = _planIdx.length > 1;
   const _nbQcm = selectedExercices.filter(e => /^\s*QCM\b/i.test(e.titre)).length;
-  const libelleEval = _groupe ? "ÉVALUATION DU JOUR" : estQcm ? "QCM" : "EXERCICE PRATIQUE";
+  const libelleEval = _groupe ? "ÉVALUATION DE LA SEMAINE" : estQcm ? "QCM" : "EXERCICE PRATIQUE";
   const libelleEvalMin = _groupe ? "cette évaluation" : estQcm ? "ce QCM" : "cet exercice";
   const titreEval = _groupe
     ? (_nbQcm && _nbQcm < selectedExercices.length ? "MISES EN SITUATION ET QCM" : _nbQcm ? "QCM" : "MISES EN SITUATION")
@@ -1447,8 +1448,8 @@ D) Drive faster to finish the ride.`,
       || pickGSC35ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickANG40ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickCOH21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
-      || pickHYG14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
-      || pickVTC48ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
+      || selonModalite(f.modalites, pickHYG14ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre))
+      || selonModalite(f.modalites, pickVTC48ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre))
       || pickECO21ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickGMA70ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
       || pickMSC70ExerciceAnswer(f.intitule || "", f.codeRNCP, ei, stagiaireIdx, s, ex.titre)
