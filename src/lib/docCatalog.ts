@@ -1234,6 +1234,10 @@ export function buildFullCatalog(
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE (CFA) =====
 
     // IND 30 — Appréciations et amélioration continue
+    // Évaluation formateur — un fichier par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
+    });
     // Auto-évaluation formateur — un fichier par session (groupé par dates)
     {
       const f0 = formations[0];
@@ -1266,6 +1270,9 @@ export function buildFullCatalog(
       const fname = String(fName).trim();
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
       add(`cfa_c7i30_bilan_fin_formateur_${slug}`, `CT7 - IND 30 BILAN DE FIN DE FORMATION – ${fname}`, 7, 30, "bilan_fin_formation_formateur", { formateurNom: fname });
+    });
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_appreciations_beneficiaires_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION – ${s.prenom} ${s.nom}`, 7, 30, "appreciations_beneficiaires_stagiaire", { stagiaireIdx: si });
     });
     // Un questionnaire commanditaire par entreprise (aucun si pas d'entreprise)
     Array.from(new Set(stagiaires.map((s) => (s.entreprise || "").trim()).filter(Boolean))).forEach((ent, ei) => {
