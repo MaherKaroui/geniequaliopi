@@ -272,7 +272,10 @@ export function buildFullCatalog(
         // Nombre d'exercices / QCM dérivé du parcours RÉEL du stagiaire :
         // ≤ 12 jours de formation → 1 par jour ; au-delà → 1 par semaine calendaire.
         const unites = getUnitesExercices(s, f);
-        const nbQcm = moduleTitles ? moduleTitles.length : unites.length;
+        // VTC : une évaluation par semaine du plan (4) ; une 5e semaine calendaire (jours fériés) n'en ajoute pas.
+        const nbQcm = moduleTitles ? moduleTitles.length
+          : isVTC48Formation(f.intitule, f.codeRNCP) && unites[0]?.type === "semaine" ? Math.min(unites.length, VTC48_PLAN_SEMAINES.length)
+          : unites.length;
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
           if (moduleTitles) {
             add(

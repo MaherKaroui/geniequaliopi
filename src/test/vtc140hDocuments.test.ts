@@ -45,4 +45,11 @@ describe("VTC 140 h — documents", () => {
     const tout = plan + entretien + fiche;
     expect(tout).not.toMatch(/1978|Stains|07 69|aziz\.bouyahia@/);
   });
+
+  it("session d'avril-mai 2026 (jours fériés, 5 semaines calendaires) : 4 évaluations hebdomadaires", async () => {
+    const { getFullCatalog } = await import("@/lib/documentGenerator");
+    const st = [{ civilite: "M.", nom: "EL MOUCHTABA", prenom: "Mohamed", dateDebutFormation: "2026-04-13", dateFinFormation: "2026-05-12" }] as unknown as StagiaireInfo[];
+    const evals = getFullCatalog(o, f, st).filter((d) => /IND 11 ÉVALUATION \d/.test(d.nom));
+    expect(evals.map((d) => d.nom.match(/Semaine \d/)?.[0])).toEqual(["Semaine 1", "Semaine 2", "Semaine 3", "Semaine 4"]);
+  });
 });
