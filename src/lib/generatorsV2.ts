@@ -53,6 +53,7 @@ import { pickANG40ExerciceAnswer, isANG40Formation, ang40NoteExercice } from "./
 import { pickCOH21ExerciceAnswer, isCOH21Formation, coh21NoteExercice } from "./cohesionEquipe21hHumanized";
 import { pickHYG14ExerciceAnswer, isHYG14Formation, hyg14NoteExercice } from "./hygieneAlimentaire14hHumanized";
 import { pickVTC48ExerciceAnswer, isVTC48Formation, vtc48NoteExercice } from "./vtc48hHumanized";
+import { VTC48_PLAN_JOURS, vtc48Visuel } from "./vtc48hPreset";
 import { pickECO21ExerciceAnswer, isECO21Formation, eco21NoteExercice } from "./ecommerce21hHumanized";
 import { pickGMA70ExerciceAnswer, isGMA70Formation, gma70NoteExercice } from "./projecteursGrandMA70hHumanized";
 import { pickMSC70ExerciceAnswer, isMSC70Formation, msc70NoteExercice } from "./machinerieScenique70hHumanized";
@@ -1118,7 +1119,14 @@ D) Drive faster to finish the ride.`,
 
   const blockStart = exerciceIdx !== undefined ? (exerciceIdx % Math.max(1, nbBlocks)) * EXERCICES_PER_BLOCK : 0;
   const blockEnd = exerciceIdx !== undefined ? blockStart + EXERCICES_PER_BLOCK : totalExNeeded;
-  const selectedExercices = exercices.slice(blockStart, Math.min(blockEnd, exercices.length));
+  // VTC 48 h : plan par journée (mises en situation illustrées et QCM mêlés, selon le programme).
+  // Indices dans `exercices`, résolus par début de titre ; sinon un bloc régulier.
+  const _isVTC48 = isVTC48Formation(f.intitule, f.codeRNCP);
+  const _planJour = _isVTC48 && exerciceIdx !== undefined ? VTC48_PLAN_JOURS[exerciceIdx] : undefined;
+  const _planIdx = (_planJour || []).map(p => exercices.findIndex(e => e.titre.startsWith(p))).filter(i => i >= 0);
+  const selectedExercices = _planIdx.length
+    ? _planIdx.map(i => exercices[i])
+    : exercices.slice(blockStart, Math.min(blockEnd, exercices.length));
 
   let jourLabel: string;
   if (exerciceIdx !== undefined && _unites[exerciceIdx]) {
@@ -1149,10 +1157,16 @@ D) Drive faster to finish the ride.`,
   const qcmTitleLabel = selectedExercices[0]?.titre || `QCM`;
   // Libellé exact : un exercice pratique n'est pas présenté comme un « QCM ».
   const estQcm = /^\s*QCM\b/i.test(qcmTitleLabel) || !!evalPackIA;
-  const libelleEval = estQcm ? "QCM" : "EXERCICE PRATIQUE";
-  const libelleEvalMin = estQcm ? "ce QCM" : "cet exercice";
+  // Plusieurs évaluations dans la journée (plan VTC 48 h) : intitulé de l'ensemble, pas du premier élément.
+  const _groupe = _planIdx.length > 1;
+  const _nbQcm = selectedExercices.filter(e => /^\s*QCM\b/i.test(e.titre)).length;
+  const libelleEval = _groupe ? "ÉVALUATION DU JOUR" : estQcm ? "QCM" : "EXERCICE PRATIQUE";
+  const libelleEvalMin = _groupe ? "cette évaluation" : estQcm ? "ce QCM" : "cet exercice";
+  const titreEval = _groupe
+    ? (_nbQcm && _nbQcm < selectedExercices.length ? "MISES EN SITUATION ET QCM" : _nbQcm ? "QCM" : "MISES EN SITUATION")
+    : qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase();
   let extra = `
-    <h2>${libelleEval} – ${qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase()} – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <h2>${libelleEval} – ${titreEval} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
   `;
@@ -1237,7 +1251,7 @@ D) Drive faster to finish the ride.`,
   };
 
   selectedExercices.forEach((ex, localIdx) => {
-    const ei = blockStart + localIdx;
+    const ei = _planIdx.length ? _planIdx[localIdx] : blockStart + localIdx;
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
 
     // ====== TENTATIVE DE RENDU EN VRAI QCM ======
@@ -1378,6 +1392,11 @@ D) Drive faster to finish the ride.`,
     if (localIdx > 0) extra += `<br/>`;
     extra += `<h3>${ex.titre}</h3>`;
     extra += `<p><strong>Consigne :</strong></p><p>${ex.consigne}</p>`;
+    // Document illustré de la mise en situation (largeur et hauteur explicites : requis par l'export Word).
+    const visuel = _isVTC48 ? vtc48Visuel(ex.titre) : undefined;
+    if (visuel) {
+      extra += `<div style="margin:10px 0;page-break-inside:avoid;text-align:center"><img src="${visuel.src}" alt="${visuel.legende}" width="${visuel.largeur}" height="${visuel.hauteur}" style="max-width:${visuel.largeur}px;max-height:${visuel.hauteur}px;border:1px solid #cbd5e0" /><p style="font-size:9pt;font-style:italic;color:#475569;margin:4px 0 0">${visuel.legende}</p></div>`;
+    }
     extra += `<p><strong>Travail réalisé par ${s.prenom} ${s.nom} :</strong></p>`;
 
     const repBase = ex.reponseAttendue;
@@ -1534,9 +1553,10 @@ D) Drive faster to finish the ride.`,
   extra += `<p><strong>Score final attribué : ${totalNote}/${totalMax} points (soit ${moyenneFinale}/10)</strong></p>`;
 
   const appreciationFinale = appreciationsFR[appIdx][appSeed]
-    .replace(/Validation sans réserve\./, manquesFichier.length ? "Compétence validée ; l'élément non finalisé sera repris." : "Validation sans réserve.").replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`);
+    .replace(/Validation sans réserve\./, manquesFichier.length ? "Compétence validée ; l'élément non finalisé sera repris." : "Validation sans réserve.").replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, _groupe ? "L'évaluation " : estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`)
+    .replace(/QCM réussi/g, _groupe ? "Évaluation réussie" : "QCM réussi");
   extra = extra.replace("__APPRECIATION_FINALE__", appreciationFinale);
-  return buildDocument({ org: o, title: `${libelleEval} – ${qcmTitleLabel.replace(/^\s*QCM\s*[–:-]?\s*/i, "").toUpperCase()} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: `${libelleEval} – ${titreEval} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 

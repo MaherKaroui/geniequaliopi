@@ -14,7 +14,7 @@ import { getSatisfactionLabel, getAssiduiteLabel, getTauxObtention, getRepartiti
 import { typeAuditEffectif, LIBELLES_AUDIT, moisEntre, sansRealisation, type TypeAudit } from "./typeAudit";
 import { entreesVeille } from "./veilleExploitee";
 import { orgVersionUlterieure } from "./versionUlterieure";
-import { aleaSession, dateAnalyseRisques } from "./registresQualite";
+import { dateAnalyseRisques, dysfonctionnements } from "./registresQualite";
 import { organismeALaDate } from "./sampleData";
 
 export type TypePrestation = "AF" | "CFA" | "VAE" | "BC";
@@ -154,9 +154,9 @@ export function genRevueDirection(o: OrganismeInfo, f: FormationInfo, stagiaires
     ? `Certificat${numCertif ? ` n° ${numCertif}` : ""} obtenu le ${formatDate(iso(obtention))}${v(o.organismeCertificateur) ? ` (${v(o.organismeCertificateur)})` : ""} — ${moisEntre(obtention, today)} mois écoulés sur le cycle de 36 mois.`
     : `${type === "renouvellement" ? "Fin du cycle de certification en cours" : "Cycle de certification en cours"}${numCertif ? ` (certificat n° ${numCertif}${v(o.organismeCertificateur) ? `, ${v(o.organismeCertificateur)}` : ""})` : ""}.`;
   // Réclamations et aléas : mêmes enregistrements que le suivi des dysfonctionnements et le tableau d'amélioration.
-  const alea = aleaSession(f);
-  const reclamations = alea
-    ? `<p>Aucune réclamation enregistrée au ${dateTxt}. Un dysfonctionnement a été enregistré : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} le ${alea.date} (signalé par ${alea.canal.toLowerCase()}), clôturé le ${alea.cloture} ; action corrective ${alea.ref} au tableau d'amélioration continue (${alea.action.charAt(0).toLowerCase()}${alea.action.slice(1)}).</p>`
+  const dysf = dysfonctionnements(f, stagiaires, today).filter((d) => d.date.split("/").reverse().join("-") <= iso(date));
+  const reclamations = dysf.length
+    ? `<p>Aucune réclamation enregistrée au ${dateTxt}. ${dysf.length > 1 ? `${dysf.length} dysfonctionnements ont été enregistrés` : "Un dysfonctionnement a été enregistré"} :</p><ul>${dysf.map((d) => `<li>${d.desc.charAt(0).toLowerCase()}${d.desc.slice(1)} le ${d.date} (${d.type.toLowerCase()}, signalé par ${d.canal.charAt(0).toLowerCase()}${d.canal.slice(1)}), clôturé le ${d.cloture} ; action corrective ${d.ref} au tableau d'amélioration continue (${d.action.charAt(0).toLowerCase()}${d.action.slice(1)}).</li>`).join("")}</ul>`
     : `<p>Aucune réclamation ni aucun dysfonctionnement enregistré au ${dateTxt}.</p>`;
   const appreciations = stagiaires.some((s) => isStagiaireFormationTerminee(s, f))
     ? "Les questionnaires de satisfaction des parties prenantes sont examinés en séance (synthèse AC-S01 au tableau d'amélioration continue)."
@@ -167,7 +167,7 @@ export function genRevueDirection(o: OrganismeInfo, f: FormationInfo, stagiaires
     { heading: "1. Résultats (IND 2 et 3)", content: `<ul>${chiffres.map((c) => `<li>${c.libelle} : <strong>${c.valeur}</strong> — ${c.source}</li>`).join("")}</ul>` },
     { heading: "2. Appréciations et réclamations (IND 30 et 31)", content: `<p>${appreciations}</p>${reclamations}` },
     { heading: "3. Veille et environnement (IND 23 à 26)", content: `<p>${veilles.length} information(s) de veille exploitée(s) sur la période (références AC-V au tableau d'amélioration continue) : ${enCours ? `${realisees} action(s) clôturée(s), ${enCours} en cours suivie(s) au tableau d'amélioration continue.` : "toutes les actions correspondantes sont clôturées."}</p>` },
-    { heading: "4. Analyse des risques qualité (IND 32 — décret n° 2026-728)", content: `<p>La cartographie des risques établie le ${formatDate(isoRisques)} est revue : les mesures de maîtrise des risques cotés « élevés » (références AC-R) sont maintenues${alea ? ` ; l'aléa ${alea.ref} confirme le risque de défaillance technique, dont la mesure est appliquée` : ""} ; leur efficacité est appréciée au regard des indicateurs ci-dessus (abandons, satisfaction, réclamations). Toute évolution est reportée dans l'analyse des risques mise à jour à cette date.</p>` },
+    { heading: "4. Analyse des risques qualité (IND 32 — décret n° 2026-728)", content: `<p>La cartographie des risques établie le ${formatDate(isoRisques)} est revue : les mesures de maîtrise des risques cotés « élevés » (références AC-R) sont maintenues${dysf.length ? ` ; ${dysf.map((d) => `${d.ref} confirme le risque « ${d.risque.charAt(0).toLowerCase()}${d.risque.slice(1)} »`).join(", ")}, dont la mesure est appliquée` : ""} ; leur efficacité est appréciée au regard des indicateurs ci-dessus (abandons, satisfaction, réclamations). Toute évolution est reportée dans l'analyse des risques mise à jour à cette date.</p>` },
     { heading: "5. Compétences des intervenants (IND 21 et 22)", content: `<p>Le bilan de réalisation du plan de développement des compétences est examiné : les actions dont l'échéance est passée sont confirmées (attestation jointe) ou reportées avec motif.</p>` },
     { heading: "6. Décisions", content: `<ul><li>Mise à jour des indicateurs publiés et de la fiche formation « ${f.intitule} ».</li><li>Maintien des mesures de maîtrise des risques ; revue de l'analyse des risques dans 12 mois au plus.</li><li>${type === "renouvellement" ? "Constitution du dossier de renouvellement : preuves du cycle classées par indicateur." : "Préparation de l'audit de surveillance : preuves de mise en œuvre sur la période classées par indicateur."}</li></ul>`, variant: "green" },
   ];

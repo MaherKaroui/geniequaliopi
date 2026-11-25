@@ -7,6 +7,7 @@ import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualio
 import { entreesVeille } from "./veilleExploitee";
 import { dateRevueDirection } from "./piecesTypeAudit";
 import { typeAuditEffectif, sansRealisation } from "./typeAudit";
+import { addBusinessDays } from "./docBuilder";
 import type { TypePrestation } from "./qualite2026";
 
 const v = (x: unknown) => (x == null ? "" : String(x).trim());
@@ -20,13 +21,31 @@ export function typePrestationOrganisme(o: OrganismeInfo): TypePrestation {
 
 export interface AleaSession { ref: string; date: string; cloture: string; partie: string; canal: string; desc: string; causes: string; action: string }
 
+/** Enregistrement du suivi des dysfonctionnements (IND 31), repris tel quel par les autres pièces. */
+export interface Dysfonctionnement extends AleaSession {
+  type: "Interne" | "Externe";
+  /** Risque de la cartographie (IND 32) que l'événement confirme. */
+  risque: string;
+}
+
+/** Sessions du dossier (dates propres aux stagiaires, sinon dates de la formation), triées. */
+function sessionsDossier(f: FormationInfo, stagiaires: StagiaireInfo[]): { debut: string; fin: string }[] {
+  const brutes = stagiaires.map((s) => ({ debut: isoDepuisFr(v(s.dateDebutFormation) || v(f.dateDebut)), fin: isoDepuisFr(v(s.dateFinFormation) || v(f.dateFin)) }));
+  if (!brutes.length) brutes.push({ debut: isoDepuisFr(v(f.dateDebut)), fin: isoDepuisFr(v(f.dateFin)) });
+  const vues = new Map<string, { debut: string; fin: string }>();
+  brutes.filter((s) => /^\d{4}-\d{2}-\d{2}$/.test(s.debut)).forEach((s) => vues.set(`${s.debut}|${s.fin}`, s));
+  return [...vues.values()].sort((a, b) => a.debut.localeCompare(b.debut));
+}
+
 /**
  * Aléa de la première session commencée (IND 31) : même enregistrement dans le suivi des
  * dysfonctionnements, le tableau d'amélioration continue, le registre des réclamations, le bilan
- * formateur, l'analyse des risques et la revue de direction.
+ * formateur, l'analyse des risques et la revue de direction. Sans date de formation (dossier à
+ * plusieurs sessions), la première session est celle du premier stagiaire.
  */
-export function aleaSession(f: FormationInfo): AleaSession | null {
-  const debut = new Date(`${(f.dateDebut || "").slice(0, 10)}T00:00:00`);
+export function aleaSession(f: FormationInfo, stagiaires: StagiaireInfo[] = []): AleaSession | null {
+  const premiere = v(f.dateDebut) ? isoDepuisFr(v(f.dateDebut)) : sessionsDossier(f, stagiaires)[0]?.debut || "";
+  const debut = new Date(`${premiere}T00:00:00`);
   if (isNaN(debut.getTime())) return null;
   const now = new Date();
   if (debut > now) return null;
@@ -41,9 +60,62 @@ export function aleaSession(f: FormationInfo): AleaSession | null {
     : { ref: "AC-D01", date: fmt(debut), cloture, partie: "Stagiaire", canal: "Oral en formation", desc: "Nuisances sonores dans la salle de formation", causes: "Travaux imprévus à proximité de la salle", action: "Changement de salle et vérification des conditions d'accueil la veille de chaque session" };
 }
 
-/** Nombre d'aléas enregistrés (0 ou 1) — même source que le suivi des dysfonctionnements. */
-export function nombreIncidents(f: FormationInfo): number {
-  return aleaSession(f) ? 1 : 0;
+const fmtFr = (iso: string) => iso.split("-").reverse().join("/");
+
+/**
+ * Dysfonctionnements propres à la préparation à l'examen VTC (T3P), datés sur les sessions du
+ * dossier et rattachés à des faits vérifiés (veille IND 23) : jamais dans le futur.
+ */
+function dysfonctionnementsVTC(f: FormationInfo, stagiaires: StagiaireInfo[], auj: string): Omit<Dysfonctionnement, "ref">[] {
+  const out: Omit<Dysfonctionnement, "ref">[] = [];
+  const sessions = sessionsDossier(f, stagiaires).filter((s) => s.debut <= auj);
+  const distanciel = /distanciel|distance|ligne|visio|meet|zoom/i.test(`${f.modalites} ${f.lieu}`) && !/mixte|pr[ée]sentiel/i.test(v(f.modalites));
+  const terminee = sessions.find((s) => /^\d{4}-\d{2}-\d{2}$/.test(s.fin) && s.fin <= auj);
+  if (distanciel && terminee) {
+    const clo = addBusinessDays(terminee.fin, 10);
+    out.push({
+      date: fmtFr(terminee.fin), cloture: fmtFr(clo > auj ? auj : clo), type: "Interne", partie: "Stagiaire", canal: "Questionnaire de satisfaction à chaud",
+      desc: "Demande de séances de conduite réelle pour préparer l'épreuve pratique d'admission : la formation à distance en travaille la méthode (simulation commentée d'une course) mais ne comprend pas de conduite en véhicule",
+      causes: "Absence de conduite réelle insuffisamment expliquée lors de l'entretien préalable ; aucune solution d'entraînement en véhicule proposée au stagiaire",
+      action: "Mention « conduite réelle en véhicule non incluse » portée au programme, à l'entretien préalable et à la convocation ; liste d'auto-écoles et de loueurs de véhicules VTC à double commande remise au stagiaire en fin de parcours",
+      risque: "Information du public incomplète sur le contenu de la prestation",
+    });
+  }
+  // Plateforme nationale Examen T3P (CMA France) en service depuis le 4 novembre 2025.
+  const apresT3P = sessions.find((s) => s.debut >= "2025-11-04");
+  if (apresT3P) {
+    const clo = addBusinessDays(apresT3P.debut, 2);
+    out.push({
+      date: fmtFr(apresT3P.debut), cloture: fmtFr(clo > auj ? auj : clo), type: "Externe", partie: "Stagiaire ; CMA France (plateforme Examen T3P)", canal: "Oral en classe virtuelle",
+      desc: "Inscription à l'examen VTC non finalisée : depuis le 04/11/2025 les inscriptions se font uniquement sur la plateforme nationale exament3p.fr et le tutoriel remis au stagiaire portait sur l'ancien site",
+      causes: "Changement de plateforme d'inscription décidé par CMA France ; tutoriel interne pas encore mis à jour (action de veille en cours)",
+      action: "Tutoriel refait sur exament3p.fr ; création du compte et dépôt des pièces accompagnés le premier jour ; inscription vérifiée en fin de parcours",
+      risque: "Évolution réglementaire ou externe non prise en compte",
+    });
+  }
+  return out;
+}
+
+/**
+ * Tous les dysfonctionnements enregistrés (IND 31) : l'aléa de session (AC-D01) puis les
+ * événements propres à la formation, numérotés AC-D02… dans l'ordre chronologique. Source unique
+ * du suivi des dysfonctionnements, du tableau d'amélioration, du registre et des bilans.
+ */
+export function dysfonctionnements(f: FormationInfo, stagiaires: StagiaireInfo[] = [], today: Date = new Date()): Dysfonctionnement[] {
+  const auj = isoLocal(today);
+  const alea = aleaSession(f, stagiaires);
+  const vtc = /\bvtc\b|\bt3p\b|rs\s?5637/i.test(`${v(f.intitule)} ${v(f.codeRNCP)}`);
+  const autres = vtc ? dysfonctionnementsVTC(f, stagiaires, auj) : [];
+  autres.sort((a, b) => isoDepuisFr(a.date).localeCompare(isoDepuisFr(b.date)));
+  return [
+    ...(alea ? [{ ...alea, type: "Externe" as const, risque: "Défaillance technique ou matérielle" }] : []),
+    ...autres.map((d, i) => ({ ...d, ref: `AC-D${String(i + 2).padStart(2, "0")}` })),
+  ];
+}
+
+/** Nombre de dysfonctionnements enregistrés — même source que le suivi des dysfonctionnements. */
+export function nombreIncidents(f: FormationInfo, stagiaires: StagiaireInfo[] = []): number {
+  return dysfonctionnements(f, stagiaires).length;
 }
 
 /**

@@ -34,7 +34,9 @@ export function isVTC48Formation(intitule?: string, code?: string): boolean {
   const t = normalize(intitule).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z0-9']+/g, " ").trim();
   if (!t) return false;
   // La durée de 48 heures doit figurer dans l'intitulé (« 48 h », « 48h », « 48 heures »)
-  if (!/\b48 ?h(eures?)?\b/.test(t)) return false;
+  // Exception : l'intitulé exact du preset sans sa durée (« Préparation à l'examen d'accès à la profession de
+  // conducteur VTC (RS5637) »), qu'aucune autre formation d'exemple n'emploie.
+  if (!/\b48 ?h(eures?)?\b/.test(t) && !/\bpreparation a l'examen d'acces a la profession de conducteur vtc\b/.test(t)) return false;
   if (c === "RS5637") return true;
   if (/^R[N]CP\d|^R[S]\d/.test(c)) return false;
   if (/\b(taxis?|vmdtr|rs ?5635|formation continue|bilan de competences|vae)\b/.test(t)) return false;
@@ -755,6 +757,65 @@ const EXERCICES_PRODUCTIONS: string[][] = [
   ],
 ];
 
+/**
+ * Ce que le stagiaire relève dans le document illustré de la mise en situation (banque par exercice,
+ * mêmes index que EXERCICES_PRODUCTIONS). Absent pour les mises en situation sans document.
+ */
+const OBSERVATIONS_DOCUMENT: Record<number, string[]> = {
+  1: [
+    "Sur le document, le voyageur lève la main juste à côté de la station de taxis : c'est exactement la situation où je dois refuser.",
+    "J'ai regardé l'heure sur le document : 22 h 40 et aucune réservation en cours, donc je ne reste pas devant la gare.",
+    "Sur l'image, ma vignette VTC est bien visible sur le pare-brise ; elle ne me donne pas pour autant le droit de prendre ce voyageur.",
+    "Le document montre la station de taxis à quelques mètres : c'est vers elle que j'oriente le voyageur.",
+    "En observant la scène, j'ai noté que je suis arrêté sur la chaussée devant la gare : je dois repartir vers mon lieu d'établissement.",
+  ],
+  3: [
+    "J'ai repris les montants du relevé : 650 + 180 + 30 + 40 + 150 = 1 050 € de charges fixes, puis 5,20 + 1,30 + 2,50 = 9 € de charges variables par course.",
+    "D'après le relevé, Samir a fait 62 courses ce mois-ci : c'est au-dessus de son seuil de 50 courses, donc il dégage un résultat positif.",
+    "Dans le tableau, j'ai classé chaque ligne avant de calculer ; la commission de la plateforme est bien une charge variable puisqu'elle dépend des courses.",
+    "Avec les 62 courses du relevé, j'ai calculé 62 × 21 − 1 050 = 252 € de résultat avant la rémunération de Samir.",
+    "J'ai vérifié que le prix moyen du relevé, 30 € HT, est bien hors taxes avant de calculer la marge.",
+  ],
+  4: [
+    "Sur le croquis, j'ai placé ma voiture après le véhicule accidenté, sur la bande d'arrêt d'urgence, feux de détresse allumés.",
+    "Sur le croquis, les clients sortent côté droit et passent derrière la glissière, jamais sur les voies.",
+    "J'ai indiqué le triangle en amont, à l'endroit du premier « ? », seulement si je peux le poser sans me mettre en danger.",
+    "Le croquis montre un conducteur conscient : je lui parle sans le déplacer et je donne ce détail en alertant le 112.",
+    "J'ai repéré le sens de circulation vers Orly sur le croquis pour donner une localisation précise aux secours.",
+  ],
+  5: [
+    "La boîte porte le pictogramme orange de niveau 2 : je ne conduis pas sans l'avis de mon médecin ou de mon pharmacien.",
+    "Sur le planning, je relève 14 heures d'amplitude et des cafés à la place de vraies pauses : je réduis la journée.",
+    "Le planning prévoit le comprimé à 10 h au milieu des courses : j'ai demandé à mon médecin un traitement qui ne fait pas dormir.",
+    "J'ai remplacé le sandwich au volant du planning par une vraie coupure d'au moins trente minutes.",
+    "J'ai repris le planning heure par heure en ajoutant une pause d'un quart d'heure toutes les deux heures.",
+  ],
+  6: [
+    "Dans le message de Mme Durand, j'ai relevé les deux valises et la présence de sa mère pour prévoir un véhicule adapté.",
+    "Le vol est à 9 h 50 : j'ai proposé une prise en charge à 7 h pour arriver à Orly avec une marge suffisante.",
+    "Ma réponse au message reprend chaque question de la cliente : l'heure, le lieu exact et la description du véhicule.",
+    "J'ai répondu le soir même au message reçu à 19 h 12, avec mon numéro pour la joindre le matin.",
+  ],
+  7: [
+    "Le courriel de Mme Moreau demande le prix, ce qu'il comprend, l'annulation et la facturation : mon devis traite ces quatre points.",
+    "J'ai repris les informations du courriel : 2 personnes, bagages, Orly terminal 4, jeudi 14 à 8 h 30, accueil aux arrivées.",
+    "Le courriel annonce 4 à 6 transferts par mois : j'ai proposé un tarif entreprise et une facturation mensuelle.",
+    "Dans mon devis, j'ai prévu le temps d'attente à l'aéroport, puisque l'heure d'arrivée d'un vol peut changer.",
+  ],
+  8: [
+    "Sur l'écran, la plateforme affiche la distance (17,8 km) et le prix minimal garanti net de commission (21,40 €) : ce sont les informations obligatoires.",
+    "L'écran laisse 18 secondes pour répondre : je peux refuser cette course sans être pénalisé.",
+    "Avec 21,40 € pour 38 minutes, j'ai calculé que la course me rapporte environ 34 € de l'heure avant mes charges.",
+    "J'ai comparé le prix affiché à la distance : 21,40 € pour 17,8 km, soit environ 1,20 € par kilomètre.",
+  ],
+  9: [
+    "Sur le plan, j'ai pris l'itinéraire principal par l'A86 et l'A4 ; à cause des travaux signalés, j'ai gardé le délestage en réserve.",
+    "Le plan montre des travaux sur l'itinéraire principal : j'ai prévenu la cliente que je pourrais passer par le délestage, 4 minutes de plus.",
+    "J'ai comparé les deux trajets du plan : 11 km en 24 minutes contre 12,5 km en 28 minutes.",
+    "Avant de partir, j'ai repéré sur le plan le lieu exact du rendez-vous à Vincennes pour déposer la cliente sans hésiter.",
+  ],
+};
+
 const BILANS_PERSONNELS = [
   "Cette mise en situation m'a surtout appris à justifier mes réponses avec la règle exacte.",
   "Le plus difficile a été de tout faire dans le temps imparti ; je refais l'exercice dans l'espace e-learning.",
@@ -810,11 +871,13 @@ export function pickVTC48ExerciceAnswer(
   const pool = EXERCICES_PRODUCTIONS[bloc];
   const production = pool[rang(stagiaireIdx, 3, pool.length)];
   const bilan = BILANS_PERSONNELS[rang(stagiaireIdx, bloc + 11, BILANS_PERSONNELS.length)];
+  const obs = OBSERVATIONS_DOCUMENT[bloc];
+  const observation = obs ? `${obs[rang(stagiaireIdx, bloc + 5, obs.length)]} ` : "";
   const entreprise = (s.entreprise || "").trim();
   const contexteEnt = entreprise && entreprise.toLowerCase() !== "entreprise"
     ? `J'ai transposé la mise en situation à mon projet, au sein de ${entreprise}. `
     : "";
-  return accorder(`${contexteEnt}${production} ${bilan}`, fem);
+  return accorder(`${contexteEnt}${observation}${production} ${bilan}`, fem);
 }
 
 // ============================================================

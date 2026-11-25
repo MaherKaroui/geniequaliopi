@@ -1153,9 +1153,10 @@ export const RNCP_FICHES: RNCPFiche[] = [
   },
   {
     code: "RS5637",
-    intitule: "Conduite d'une voiture de transport avec chauffeur (VTC)",
+    intitule: "Habilitation pour l'accès à la profession de conducteur de voiture de transport avec chauffeur (VTC)",
     niveau: "Sans niveau spécifique",
-    certificateur: "CHAMBRE DES MÉTIERS ET DE L'ARTISANAT (CMA France)",
+    // Fiche France Compétences : le certificateur est le ministère ; les CMA organisent l'examen.
+    certificateur: "Ministère de la Transition écologique (examen organisé par les chambres de métiers et de l'artisanat)",
     dateEnregistrement: "20/12/2021",
     dateEcheance: "31/12/2026",
     codeNSF: "311 – Transports, manutention, magasinage",

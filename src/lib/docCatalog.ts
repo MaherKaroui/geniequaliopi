@@ -8,6 +8,7 @@ import { isGSC35Formation } from "./gererCentre35hHumanized";
 import { isCOH21Formation } from "./cohesionEquipe21hHumanized";
 import { isHYG14Formation } from "./hygieneAlimentaire14hHumanized";
 import { isVTC48Formation } from "./vtc48hHumanized";
+import { VTC48_PLAN_JOURS } from "./vtc48hPreset";
 import { isECO21Formation } from "./ecommerce21hHumanized";
 import { isGMA70Formation } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation } from "./machinerieScenique70hHumanized";
@@ -284,7 +285,9 @@ export function buildFullCatalog(
           }
           const exTitle = nbExContent ? evalData?.exercices?.[exIdx % nbExContent]?.titre : undefined;
           const isQcm = exTitle ? (/^QCM\b/i.test(exTitle) || isIAForm) : (exIdx % 2 === 0);
-          const prefix = isQcm ? `QCM ${exIdx + 1}` : `EXERCICE ${exIdx + 1}`;
+          // VTC 48 h : chaque journée mêle mises en situation illustrées et QCM (VTC48_PLAN_JOURS).
+          const planVTC = isVTC48Formation(f.intitule, f.codeRNCP) ? VTC48_PLAN_JOURS[exIdx] : undefined;
+          const prefix = planVTC && planVTC.length > 1 ? `ÉVALUATION ${exIdx + 1}` : isQcm ? `QCM ${exIdx + 1}` : `EXERCICE ${exIdx + 1}`;
           add(
             `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
             `CT3 - IND 11 ${prefix} - ${unites[exIdx]?.label || `Jour ${exIdx + 1}`} – ${s.prenom} ${s.nom}`,

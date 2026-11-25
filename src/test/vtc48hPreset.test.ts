@@ -123,6 +123,8 @@ describe("Préparation à l'examen VTC (RS5637) – 48 h — formation exemple c
     ]) expect(isVTC48Formation(v), v).toBe(true);
     expect(isVTC48Formation("Préparation à l'examen – 48 h", "RS5637")).toBe(true);
     expect(isVTC48Formation("Préparation à l'examen – 48 heures", "RS 5637")).toBe(true);
+    // Intitulé du preset sans « – 48 h » (dossier IN3M FORMA).
+    expect(isVTC48Formation("Préparation à l'examen d'accès à la profession de conducteur VTC (RS5637)", "RS5637")).toBe(true);
     // Sans la durée de 48 h dans l'intitulé : jamais capté (autres formations VTC, dossiers d'autres organismes)
     for (const v of [
       "Préparation à l'examen VTC", "Formation VTC", "Habilitation VTC – Préparation à l'examen (RS5637)", "Préparation VTC – 35 h",

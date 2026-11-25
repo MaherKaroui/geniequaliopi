@@ -18,7 +18,7 @@ import { genFicheCertificationFC, genTableauCroiseFC, genBanqueExercicesFC, genE
 import { entreesCatalogueTypeAudit, renderTypeAuditTemplate, dateRevueDirection } from "./piecesTypeAudit";
 import { entreesCatalogueReferentiel, renderReferentielTemplate, retirePiecesV9 } from "./referentielV10";
 import { typeAuditEffectif, LIBELLES_AUDIT, sansRealisation } from "./typeAudit";
-import { aleaSession, dateAnalyseRisques, dateArreteRegistre, nombreIncidents } from "./registresQualite";
+import { aleaSession, dateAnalyseRisques, dateArreteRegistre, dysfonctionnements, nombreIncidents } from "./registresQualite";
 import { orgVersionUlterieure, intervenantUnique } from "./versionUlterieure";
 import { formateursReels, genPieceAFournir, genMoyensEnvironnement, genCRReunionPedagogique, genPlanningIntervenants as genPlanningIntervenantsAF, genVeilleSourcee, genCooperationSocioEconomique } from "./piecesAF2026";
 import { genProcedureVeilleExploitee, genCompteRenduExploitationVeille, entreesVeille } from "./veilleExploitee";
@@ -701,7 +701,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "cr_reunion_pedagogique_af": return genCRReunionPedagogique(o, f, stagiaires);
     case "planning_intervenants_af": return genPlanningIntervenantsAF(o, f, stagiaires);
     case "cooperation_socio_eco_af": return genCooperationSocioEconomique(o, f, stagiaires);
-    case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f, { dateDoc: dateAnalyseRisques(o, f), incidents: [aleaSession(f)].filter(Boolean) });
+    case "analyse_risques_qualite": return genAnalyseRisquesQualite(o, params?.type ?? "AF", f, { dateDoc: dateAnalyseRisques(o, f), incidents: dysfonctionnements(f, stagiaires) });
     case "clauses_qualite_contrat": return genClausesQualiteContrat(o, params?.type ?? "AF");
     case "preuves_veille_reglementaire": return genPreuvesVeilleReglementaire(o, f);
     case "fiche_innovation": return genFicheInnovation(o, params?.sujet ?? "");
@@ -1154,7 +1154,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "veille_sourcee_cfa": return genVeilleSourceeCFA(o, f);
     case "procedure_insertion_poursuite_etudes_cfa": return genProcedureInsertionPoursuiteEtudesCFA(o, f);
     case "clauses_qualite_contrat_cfa": return genClausesQualiteContrat(o, params?.typePrestation ?? "CFA");
-    case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f, { dateDoc: dateAnalyseRisques(o, f), incidents: [aleaSession(f)].filter(Boolean) });
+    case "analyse_risques_qualite_cfa": return genAnalyseRisquesQualite(o, params?.typePrestation ?? "CFA", f, { dateDoc: dateAnalyseRisques(o, f), incidents: dysfonctionnements(f, stagiaires) });
     case "procedure_evaluation_enseignements_cfa": return genProcedureEvaluationEnseignements(o, f);
     case "grille_evaluation_enseignements_cfa": {
       const s0 = stagiaires[params?.stagiaireIdx ?? 0] || stagiaires[0];
@@ -4749,12 +4749,11 @@ function genProcedureReclamation(o: OrganismeInfo, f?: FormationInfo, stagiaires
   // Registre réel : arrêté à une date, aucune réclamation inventée ; l'aléa du suivi des
   // dysfonctionnements (même source) y est reporté. Arrêté après la V1 → version ultérieure.
   const dateRegistre = f ? dateArreteRegistre(o, f, stagiaires) : (o.dateMaj || new Date().toISOString().slice(0, 10));
-  const alea = f ? aleaSession(f) : null;
-  const lieuSession = f ? [f.intitule, alea?.date, f.lieu].filter(Boolean).join(", ") : "";
-  const registre = `<h2>Registre des réclamations et dysfonctionnements</h2><p><strong>Aucune réclamation enregistrée au ${formatDate(dateRegistre)}.</strong>${alea ? " Dysfonctionnement reporté du suivi des dysfonctionnements (IND 31) :" : " Aucun dysfonctionnement enregistré à cette date."}</p>`;
+  const dysf = f ? dysfonctionnements(f, stagiaires).filter((d) => d.date.split("/").reverse().join("-") <= dateRegistre) : [];
+  const registre = `<h2>Registre des réclamations et dysfonctionnements</h2><p><strong>Aucune réclamation enregistrée au ${formatDate(dateRegistre)}.</strong>${dysf.length ? ` ${dysf.length > 1 ? "Dysfonctionnements reportés" : "Dysfonctionnement reporté"} du suivi des dysfonctionnements (IND 31) :` : " Aucun dysfonctionnement enregistré à cette date."}</p>`;
   return buildDocument({ org: orgVersionUlterieure(o, dateRegistre), title: "GESTION DES RÉCLAMATIONS, DES DYSFONCTIONNEMENTS, ALÉAS ET PLAN D'AMÉLIORATION CONTINUE", sections: [
     { heading: "Procédure", content: `<p>L'organisme de formation enregistre et gère les réclamations de tiers et les dysfonctionnements internes.</p><p>Chaque réclamation (qu'elle soit exprimée par téléphone, mail, courrier ou tout autre moyen) est enregistrée et comprend :</p><ul><li>La date de réclamation</li><li>L'identification de la personne réclamant : nom, fonction, coordonnées</li><li>La formation concernée par le sujet (intitulé, date et lieu)</li><li>L'objet de la réclamation</li></ul><p>L'organisme de formation accuse réception de la réclamation par mail dans un délai de <strong>48H</strong>.</p><p>La réclamation est traitée dans le cadre de la gestion des dysfonctionnements.</p><p>Une réponse écrite par mail ou courrier est adressée au réclamant dans un délai de <strong>8 jours maximum</strong>.</p><p>L'organisme de formation analyse chaque dysfonctionnement, quelle qu'en soit la source afin de déterminer les actions d'amélioration à mettre en œuvre, le délai de réalisation et le responsable de l'action.</p>` },
-  ], extraHtml: registre + (alea ? `<table><thead><tr>${["Formation concernée (intitulé, date, lieu)", "Objet de la réclamation, dysfonctionnement, aléa", "Personne réclamant (nom, fonction, coordonnées)", "Date de réception", "Date de l'accusé réception", "Référent", "Solutions apportées / actions"].map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody><tr>${[lieuSession, `Dysfonctionnement (pas une réclamation) : ${alea.desc} — cause : ${alea.causes}`, `${alea.partie} (signalement par ${alea.canal.toLowerCase()})`, alea.date, "Sans objet (signalement traité en séance)", o.responsablePedagogique || o.dirigeant, `${alea.ref} : ${alea.action} ; clôturé le ${alea.cloture}`].map((c) => `<td>${c}</td>`).join("")}</tr></tbody></table>` : "") });
+  ], extraHtml: registre + (dysf.length ? `<table><thead><tr>${["Formation concernée (intitulé, date, lieu)", "Objet de la réclamation, dysfonctionnement, aléa", "Personne réclamant (nom, fonction, coordonnées)", "Date de réception", "Date de l'accusé réception", "Référent", "Solutions apportées / actions"].map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${dysf.map((d) => `<tr>${[[f?.intitule, d.date, f?.lieu].filter(Boolean).join(", "), `Dysfonctionnement ${d.type.toLowerCase()} (pas une réclamation) : ${d.desc} — cause : ${d.causes}`, `${d.partie} (signalement par ${d.canal.charAt(0).toLowerCase()}${d.canal.slice(1)})`, d.date, "Sans objet (signalement traité en séance)", o.responsablePedagogique || o.dirigeant, `${d.ref} : ${d.action} ; clôturé le ${d.cloture}`].map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>` : "") });
 }
 
 function genFicheReclamation(o: OrganismeInfo, num: number) {
@@ -7959,7 +7958,7 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
     const dirigeant = estDirigeantFormateur(o, formateurNom);
     const unStag = stagiaires.length <= 1;
     const distEnq = /distanciel|foad|e-learning/i.test(f.modalites || "") && !/mixte|pr[ée]sentiel/i.test(f.modalites || "");
-    const aleaEnq = aleaSession(f);
+    const aleaEnq = aleaSession(f, stagiaires);
     const base = commentaires[globalIdx % commentaires.length];
     const c = dirigeant
       ? { pos: unStag ? "Stagiaire impliqué, progression régulière, supports adaptés à son niveau." : "Stagiaires impliqués, supports adaptés au niveau du groupe.", axes: aleaEnq ? `${aleaEnq.action} (suite à l'aléa du ${aleaEnq.date}).` : "Prévoir davantage de cas pratiques sectoriels.", reco: true }
@@ -11844,11 +11843,10 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
     lignes.push([`AC-R${String(i + 1).padStart(2, "0")}`, dateRisques, "Analyse des risques qualité (IND 32)", `${r.processus} — risque coté « élevé » (criticité ${r.criticite}) dans la cartographie des risques de ${o.nom}`, r.risque, r.mesure, r.pilote, "Permanent — revue annuelle", "",
       `Indicateur de suivi : ${r.indicateur}. ${sansRealisation(typeAud) ? "Efficacité revue à la revue qualité annuelle" : `Efficacité revue à la revue de direction du ${dateRD} : mesure maintenue`}`]);
   });
-  // Aléa de session (IND 31) — même enregistrement que le suivi des dysfonctionnements.
-  const alea = aleaSession(f);
-  if (alea) {
-    lignes.push([alea.ref, alea.date, "Aléa / difficulté signalé (IND 31)", `${alea.desc} — cause : ${alea.causes}`, "Défaillance technique ou matérielle", alea.action, o.responsablePedagogique || o.dirigeant, "Session suivante", alea.cloture, "Clôturé — action corrective appliquée ; voir le suivi des dysfonctionnements (IND 31)"]);
-  }
+  // Dysfonctionnements (IND 31) — mêmes enregistrements que le suivi des dysfonctionnements.
+  dysfonctionnements(f, stagiaires).forEach((d) => {
+    lignes.push([d.ref, d.date, `Dysfonctionnement ${d.type.toLowerCase()} signalé (IND 31)`, `${d.desc} — cause : ${d.causes}`, d.risque, d.action, o.responsablePedagogique || o.dirigeant, "Session suivante", d.cloture, "Clôturé — action corrective appliquée ; voir le suivi des dysfonctionnements (IND 31)"]);
+  });
   // Appréciations de la session (IND 30) : analysées une fois la session terminée.
   const finSession = new Date(`${(f.dateFin || "").slice(0, 10)}T00:00:00`);
   if (termine && !isNaN(finSession.getTime())) {
@@ -11913,13 +11911,10 @@ function genSuiviDysfonctionnementsExcel(o: OrganismeInfo, f: FormationInfo, sta
 </tr>`;
 
   // Même enregistrement que la ligne AC-D01 du tableau d'amélioration continue.
-  const alea = aleaSession(f);
-  const dysfonctionnements = alea
-    ? [{ date: alea.date, partie: alea.partie, type: "Externe", canal: alea.canal, desc: alea.desc, causes: alea.causes, action: `Oui – ${alea.ref} : ${alea.action}`, cloture: alea.cloture }]
-    : [];
+  const lignesDysf = dysfonctionnements(f, stagiaires).map((d) => ({ date: d.date, partie: d.partie, type: d.type, canal: d.canal, desc: d.desc, causes: d.causes, action: `Oui – ${d.ref} : ${d.action}`, cloture: d.cloture }));
   void baseDate; void fmtDate; void addDays;
 
-  dysfonctionnements.forEach(d => {
+  lignesDysf.forEach(d => {
     xlsHtml += `<tr>
   <td>${d.date}</td>
   <td>${d.partie}</td>
@@ -13322,8 +13317,8 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
   const obtention = getTauxObtention(f);
   const tauxReussite = obtention ? `${obtention.taux} % (${obtention.admis} admis sur ${obtention.presentes} présentés)` : "";
   // Incidents : même source que le suivi des dysfonctionnements (IND 31).
-  const alea = aleaSession(f);
-  const nbIncidents = nombreIncidents(f);
+  const dysfF = dysfonctionnements(f, stagiaires);
+  const nbIncidents = nombreIncidents(f, stagiaires);
   // Accords au nombre réel de stagiaires.
   const un = nbStagiairesFormateur === 1;
   const lesStag = un ? "le stagiaire" : "les stagiaires";
@@ -13365,11 +13360,11 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 <tr><td><strong>Taux de présence</strong></td><td>${tauxPresence}</td></tr>
 ${tauxReussite ? `<tr><td><strong>Taux de réussite aux évaluations</strong></td><td>${tauxReussite}</td></tr>` : ""}
 <tr><td><strong>Nombre d'abandons</strong></td><td>0</td></tr>
-<tr><td><strong>Nombre d'incidents</strong></td><td>${nbIncidents}${alea ? ` (${alea.date} : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} — ${alea.ref}, voir le suivi des dysfonctionnements)` : ""}</td></tr>
+<tr><td><strong>Nombre d'incidents</strong></td><td>${nbIncidents}${dysfF.length ? ` (${dysfF.map((d) => `${d.date} : ${d.desc.charAt(0).toLowerCase()}${d.desc.slice(1)} — ${d.ref}`).join(" ; ")} ; voir le suivi des dysfonctionnements)` : ""}</td></tr>
 </table>
 
 <h3>4. Difficultés rencontrées</h3>
-<p>${alea ? `Une difficulté a été rencontrée : ${alea.desc.charAt(0).toLowerCase()}${alea.desc.slice(1)} (${alea.date}). Action corrective : ${alea.action.charAt(0).toLowerCase()}${alea.action.slice(1)}.` : "Aucune difficulté majeure n'a été rencontrée."} ${un ? "Le rythme et les exercices ont été adaptés au niveau du stagiaire, mesuré au test de positionnement." : "L'hétérogénéité des niveaux initiaux a nécessité une adaptation ponctuelle du rythme et des exercices complémentaires pour les participants les plus avancés."}</p>
+<p>${dysfF.length ? dysfF.map((d, i) => `${i ? "Autre difficulté" : dysfF.length > 1 ? "Difficultés rencontrées — " : "Une difficulté a été rencontrée : "}${i ? " : " : ""}${d.desc.charAt(0).toLowerCase()}${d.desc.slice(1)} (${d.date}). Action corrective : ${d.action.charAt(0).toLowerCase()}${d.action.slice(1)}.`).join(" ") : "Aucune difficulté majeure n'a été rencontrée."} ${un ? "Le rythme et les exercices ont été adaptés au niveau du stagiaire, mesuré au test de positionnement." : "L'hétérogénéité des niveaux initiaux a nécessité une adaptation ponctuelle du rythme et des exercices complémentaires pour les participants les plus avancés."}</p>
 
 <h3>5. Points forts de la formation</h3>
 <ul>

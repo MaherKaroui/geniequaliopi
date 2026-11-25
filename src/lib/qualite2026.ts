@@ -169,7 +169,7 @@ function criticite(p: number, g: number): string {
 }
 
 /** Incident réellement enregistré (suivi des dysfonctionnements) à intégrer à l'analyse. */
-export interface IncidentAnalyse { ref: string; date: string; desc: string; causes: string; action: string; cloture: string }
+export interface IncidentAnalyse { ref: string; date: string; desc: string; causes: string; action: string; cloture: string; risque?: string }
 
 /**
  * Analyse des risques sur la qualité des formations délivrées (IND 32, décret 2026-728).
@@ -205,7 +205,7 @@ export function genAnalyseRisquesQualite(oDossier: OrganismeInfo, type: TypePres
       { heading: "Méthode", content: `<ul><li><strong>Identification</strong> des risques par processus (de l'information du public au recueil des appréciations).</li><li><strong>Cotation</strong> : probabilité (P) et gravité (G) de 1 à 3 ; criticité = P × G (1-2 faible, 3-4 modéré, 6-9 élevé).</li><li><strong>Maîtrise</strong> : une mesure, un indicateur de suivi et un pilote par risque ; tout risque « élevé » donne lieu à une action inscrite au tableau d'amélioration continue.</li><li><strong>Revue</strong> : au moins une fois par an, et après toute réclamation, tout incident ou toute évolution réglementaire ; la revue est tracée dans le tableau d'amélioration continue.</li></ul>` },
     ],
     extraHtml: `${tableauRisquesHTML(rows)}${incidents.length
-      ? `<h2>Événements réels pris en compte</h2><ul>${incidents.map((i) => `<li><strong>${i.ref} — ${i.date}</strong> : ${i.desc} (cause : ${i.causes}). Risque « Défaillance technique » confirmé ; mesure appliquée : ${i.action} ; clôturé le ${i.cloture} (suivi des dysfonctionnements, IND 31).</li>`).join("")}</ul>`
+      ? `<h2>Événements réels pris en compte</h2><ul>${incidents.map((i) => `<li><strong>${i.ref} — ${i.date}</strong> : ${i.desc} (cause : ${i.causes}). Risque « ${i.risque || "Défaillance technique"} » confirmé ; mesure appliquée : ${i.action} ; clôturé le ${i.cloture} (suivi des dysfonctionnements, IND 31).</li>`).join("")}</ul>`
       : "<p>Aucun incident ni réclamation enregistré à la date de la cartographie.</p>"}<p style="margin-top:10px">Cartographie établie le ${dateSysteme(o)} (V${o.version || "1"}). Prochaine revue : au plus tard 12 mois après cette date, ou dès qu'un événement la justifie.</p>`,
     signatures: { type: "2", labels: ["Le dirigeant", "Le référent qualité"], names: [o.dirigeant, o.referentQualite], dates: [dateSysteme(o), dateSysteme(o)] },
   });
