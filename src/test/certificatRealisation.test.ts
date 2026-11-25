@@ -31,6 +31,26 @@ describe("certificat de réalisation", () => {
     expect(h.split(TAMPON).length - 1).toBe(1);
     expect(h).toContain("CFA Nord, Lille");
   });
+  it("espace IZILearn : formateur cité et signature du formateur à côté du cachet (AF et CFA)", () => {
+    const FSIG = "data:image/png;base64,SIGFORMATEUR";
+    const fi = { ...f0, formateur: "Claire MARTIN", certificatAvecFormateur: true, formateurSignatureUrl: FSIG };
+    for (const h of [genCertificatRealisationStagiaire(org, fi, STAGIAIRES_TEST, 0), genCertificatRealisationCFA(org, fi, STAGIAIRES_TEST, 0)]) {
+      expect(h).toContain("<strong>Formateur :</strong> Claire MARTIN");
+      expect(h).toContain("Signature du formateur");
+      expect(h).toContain(FSIG);
+      expect(h.split(TAMPON).length - 1).toBe(1);
+      expect(h).not.toContain(SIG);
+    }
+    // pas encore signé : nom et cadre vide, aucune image inventée
+    const vide = genCertificatRealisationStagiaire(org, { ...fi, formateurSignatureUrl: "" }, STAGIAIRES_TEST, 0);
+    expect(vide).toContain("Signature du formateur");
+    expect(vide).not.toContain("SIGFORMATEUR");
+  });
+  it("hors IZILearn : certificat inchangé, même si un formateur est renseigné", () => {
+    const h = genCertificatRealisationStagiaire(org, { ...f0, formateur: "Claire MARTIN", formateurSignatureUrl: "data:image/png;base64,SIGFORMATEUR" }, STAGIAIRES_TEST, 0);
+    expect(h).not.toContain("Signature du formateur");
+    expect(h).not.toContain("SIGFORMATEUR");
+  });
   it("chaque certificat (AF, CFA) demande à l'export PDF de tenir sur une seule page", () => {
     const af = genCertificatRealisationStagiaire(org, f0, STAGIAIRES_TEST, 0);
     const cfa = genCertificatRealisationCFA(org, f0, STAGIAIRES_TEST, 0);

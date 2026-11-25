@@ -238,6 +238,8 @@ export interface FormationInfo {
   /** Type d'action Qualiopi : pilote la « Nature de l'action » des contrats/conventions. */
   typeAction?: 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
   formateurSignatureUrl?: string;
+  /** Espace IZILearn / CRM LMS : le certificat de réalisation cite le formateur et porte sa signature. */
+  certificatAvecFormateur?: boolean;
   // ===== Indicateurs de résultats (critère 1) — saisis, jamais fabriqués =====
   anneeIndicateurs?: string;
   tauxSatisfaction?: string;

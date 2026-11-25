@@ -2,7 +2,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee, getFormationProgress, getPassedFormationDays, subtractBusinessDays } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
-import { CERTIF_BLOC_STYLE, cachetCertificatHtml, compacterParagraphes, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
+import { CERTIF_BLOC_STYLE, compacterParagraphes, faitALe, formateurCertificatHtml, lieuRealisationCertificat, signaturesCertificatHtml } from "./certificatRealisation";
 import { getEvalContent } from "./evalContent";
 
 const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
@@ -1273,10 +1273,11 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
     <p>a suivi l'action <strong>${f.intitule}</strong></p>
     <p><strong>Nature de l'action :</strong><br>☐ action de formation &nbsp; ☐ bilan de compétences &nbsp; ☐ action de VAE &nbsp; ☒ action de formation par apprentissage</p>
     <p>Qui s'est déroulée du <strong>${formatDate(dDeb)}</strong> au <strong>${formatDate(dFin)}</strong> pour une durée de <strong>${f.duree}</strong>${lieu ? `<br><strong>${/mixte|hybride/i.test(f.modalites || "") ? "Lieu des séances en présentiel" : "Lieu de réalisation"} :</strong> ${lieu}` : ""}</p>
+    ${formateurCertificatHtml(f)}
     <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>En cas de cofinancement des fonds européens, la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.</p>
     <p>${faitALe(o, formatDate(dFin))}</p>
-    ${cachetCertificatHtml(o)}
+    ${signaturesCertificatHtml(o, f, target || undefined)}
     </div>
   `) });
 }

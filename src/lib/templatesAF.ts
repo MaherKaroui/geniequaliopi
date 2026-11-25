@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { mot } from "./resolveurFormation";
-import { CERTIF_BLOC_STYLE, cachetCertificatHtml, compacterParagraphes, faitALe, lieuRealisationCertificat } from "./certificatRealisation";
+import { CERTIF_BLOC_STYLE, compacterParagraphes, faitALe, formateurCertificatHtml, lieuRealisationCertificat, signaturesCertificatHtml } from "./certificatRealisation";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isBilanFroidDisponible, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays, getStagiaireDuree } from "./docBuilder";
@@ -202,9 +202,10 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p><strong>Qui s'est déroulée du</strong> ${formatDate(getStagiaireDateDebut(s, f))} <strong>au</strong> ${fin}<br>
     ${lieu ? `<strong>${/mixte|hybride/i.test(f.modalites || "") ? "Lieu des séances en présentiel" : "Lieu de réalisation"} :</strong> ${lieu}<br>` : ""}
     <strong>Pour une durée réalisée de</strong> ${getStagiaireDuree(s, f)}${/distanciel|foad/i.test(f.modalites || "") ? " (formation à distance, relevés de connexion à l'appui)" : ""}.</p>
+    ${formateurCertificatHtml(f)}
     <p>Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>${faitALe(o, fin)}</p>
-    ${cachetCertificatHtml(o)}
+    ${signaturesCertificatHtml(o, f, s)}
     </div>${i < stagiaires.length - 1 ? '<div class="page-break"></div>' : ""}`);
   }).join("");
   return buildDocument({ org: o, title: stagiaires.length > 1 ? "CERTIFICATS DE RÉALISATION" : "CERTIFICAT DE RÉALISATION", subtitle: f.intitule, extraHtml: extra });

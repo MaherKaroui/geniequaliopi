@@ -43,6 +43,30 @@ export function faitALe(o: Partial<OrganismeInfo>, date: string): string {
   return t(o.ville) ? `Fait à ${t(o.ville)}, le ${date}` : `Fait le ${date}`;
 }
 
+/** Ligne « Formateur : … » du certificat (espace IZILearn seulement, formateur renseigné). */
+export function formateurCertificatHtml(f: Partial<FormationInfo>): string {
+  return f.certificatAvecFormateur && t(f.formateur) ? `<p><strong>Formateur :</strong> ${t(f.formateur)}</p>` : "";
+}
+
+/**
+ * Bloc de fin du certificat. Espace IZILearn : signature du formateur (image si signée, sinon cadre vide)
+ * à gauche, cachet de l'organisme à droite. Ailleurs : uniquement le cachet.
+ */
+export function signaturesCertificatHtml(o: OrganismeInfo, f: Partial<FormationInfo>, s?: Partial<StagiaireInfo>): string {
+  const nom = t(f.formateur);
+  if (!f.certificatAvecFormateur || !nom) return cachetCertificatHtml(o);
+  const sig = t(s?.formateurSignatureUrl) || t(f.formateurSignatureUrl);
+  const img = /^(data:image\/|https?:\/\/)/.test(sig) ? `<img src="${sig}" alt="Signature du formateur" style="max-height:68px;max-width:200px;object-fit:contain" />` : "";
+  return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-top:6px;page-break-inside:avoid;break-inside:avoid">
+    <div style="min-width:230px;text-align:center">
+      <p style="margin:0 0 2px;font-weight:700;text-transform:uppercase;font-size:0.9em">Signature du formateur</p>
+      <p style="margin:0 0 2px">${nom}</p>
+      <div style="height:72px;overflow:hidden;display:flex;align-items:center;justify-content:center">${img}</div>
+    </div>
+    ${cachetCertificatHtml(o).replace(/^<div style="display:flex;justify-content:flex-end;margin-top:6px;page-break-inside:avoid;break-inside:avoid">/, '<div>')}
+  </div>`;
+}
+
 /** Bloc de fin du certificat : uniquement le cachet de l'organisme (tampon, à défaut signature). */
 export function cachetCertificatHtml(o: OrganismeInfo): string {
   const img = cachetDirigeantHtml(o);

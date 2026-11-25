@@ -110,6 +110,7 @@ export function versFormation(p: IzPayload): FormationInfo {
     lieu: t(s.lieu) || (distanciel ? "À distance (classe virtuelle)" : ""),
     nombreParticipants: String(p.apprenants.length || ""),
     formateur: t(s.formateur),
+    certificatAvecFormateur: true,
     codeRNCP: codeCertificationLms(t(f.codeCertification), t(f.intitule), t(s.dateDebut)) || undefined,
     rythmeAlternance: " ",
     typeAction: f.typeAction,
