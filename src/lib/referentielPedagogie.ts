@@ -123,11 +123,12 @@ export function exercicesReferentiel(f: FormationInfo): Exercice[] {
 
 function enteteFiche(f: FormationInfo, fiche: FicheFC | null): string {
   const meta = getMetaFC();
+  // Seule une fiche inactive est signalée sur le document ; l'échéance proche relève de la veille (IND 23).
   const st = statutFC(f.codeRNCP);
   const src = fiche
     ? `Données officielles France Compétences — export open data du ${meta?.exportDate ? formatDate(meta.exportDate) : "jour"} (<a href="${fiche.url}">${fiche.url}</a>).`
     : `Référentiel saisi dans le dossier (fiche France Compétences non trouvée dans la base synchronisée).`;
-  return `<p><strong>${f.intitule}</strong>${f.codeRNCP ? ` — <strong>${f.codeRNCP}</strong>` : ""}<br>${src}</p>${st.alerte ? `<p style="color:#b45309"><strong>Alerte :</strong> ${st.alerte}</p>` : ""}`;
+  return `<p><strong>${f.intitule}</strong>${f.codeRNCP ? ` — <strong>${f.codeRNCP}</strong>` : ""}<br>${src}</p>${st.alerte && !st.actif ? `<p style="color:#b45309"><strong>Alerte :</strong> ${st.alerte}</p>` : ""}`;
 }
 
 /** Fiche officielle de la certification (IND 3 et 7). */

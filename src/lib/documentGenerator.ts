@@ -9090,6 +9090,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const hasEntreprise = financeParEntreprise(s);
   // Données saisies prioritaires, pour TOUTES les formations (y compris presets vitrage / ongulaire).
   if ((s.diplome || "").trim()) result.diplome = s.diplome!.trim();
+  // VTC : le permis B (hors période probatoire) est un prérequis, cité avec le diplôme.
+  if (isVTC48Formation(f.intitule, f.codeRNCP) && !/permis\s*B/i.test(result.diplome || "")) result.diplome = `${result.diplome} + permis B`;
   // Prise en charge IND 4 : type de financement choisi dans le formulaire Stagiaires.
   result.budget = isCFAAlternance ? ALTERNANCE_OPCO_FINANCEMENT : reponseFinancement(s);
   if (isStagiairePSH(s)) {
@@ -10495,7 +10497,40 @@ function genDerouleDepuisProgramme(o: OrganismeInfo, f: FormationInfo): string |
   const dayBlocks: { title: string; heures?: number; rows: LigneDeroule[] }[] = [];
   let currentDay: { title: string; heures?: number; rows: LigneDeroule[] } | null = null;
 
+  // Programme organisé en semaines : titres « SEMAINE N — … » ignorés ; chaque ligne « JOURS a à b — … »
+  // (ou « JOUR n — … ») donne un bloc par jour de la plage, d'une journée chacun. Les éléments qui
+  // commencent par « jour N » vont à ce jour ; sinon ils sont répartis dans l'ordre sur les jours.
+  const hJour = (f.duree || "").match(/jours?\s+de\s+(\d+(?:[,.]\d+)?)\s*h/i);
+  const heuresJour = hJour ? parseFloat(hJour[1].replace(",", ".")) : 7;
   for (const line of programmeLines) {
+    if (/^SEMAINE\s+\d+\b/i.test(line)) continue;
+    const plage = line.match(/^JOURS?\s+(\d+)(?:\s*(?:à|et)\s*(\d+))?\s*[—–-]\s*(?=Module\s*\d)/);
+    if (plage) {
+      const debut = parseInt(plage[1]), fin = Math.max(debut, plage[2] ? parseInt(plage[2]) : debut);
+      const reste = line.slice(plage[0].length);
+      const enLigne = decouperModuleEnLigne(reste);
+      const titreModule = (enLigne?.titre || reste).replace(/\s*:\s*$/, "");
+      const elements = enLigne ? enLigne.elements : [{ titre: titreModule, contenu: reste }];
+      const nb = fin - debut + 1;
+      const parJour: LigneDeroule[][] = Array.from({ length: nb }, () => []);
+      const dates = elements.some((e) => /^jours?\s+\d+/i.test(e.contenu));
+      let k = 0;
+      elements.forEach((e, i) => {
+        const j = e.contenu.match(/^jours?\s+(\d+)/i);
+        if (j && +j[1] >= debut && +j[1] <= fin) k = +j[1] - debut;
+        else if (!dates) k = Math.min(nb - 1, Math.floor((i * nb) / elements.length));
+        parJour[k].push({ horaire: "", contenu: e.contenu, titre: e.titre });
+      });
+      parJour.forEach((rows, i) => {
+        if (rows.length === 0) {
+          const prec = parJour.slice(0, i).reverse().find((r) => r.length)?.slice(-1)[0];
+          rows.push({ horaire: "", contenu: `Suite et approfondissement${prec ? ` : ${prec.titre || prec.contenu}` : ""} — exercices d'application et QCM d'entraînement`, titre: "Suite et approfondissement" });
+        }
+        currentDay = { title: `Jour ${debut + i} — ${titreModule}`, heures: heuresJour, rows };
+        dayBlocks.push(currentDay);
+      });
+      continue;
+    }
     const dayMatch = line.match(/^(Jour(?:née)?|Séance|Module)\s*\d+/i);
     if (dayMatch) {
       // Module écrit sur une seule ligne : « Module 1 — Titre (C1, 8 h) : élément ; élément ; … »

@@ -7,6 +7,7 @@ import { buildDocument, formatDate, cachetDirigeantHtml } from "./docBuilder";
 import { FormateurInfo } from "./sampleData";
 import { formationsIziRealisees, formatDateIzi } from "./attestationIzibusiness";
 import { intervenantsReels } from "./piecesAF2026";
+import { profilFormateur } from "./profilsFormateurs";
 import { dirigeanteFem, de, dossierVAESeul } from "./genre";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
@@ -57,7 +58,10 @@ function rolesOF(o: OrganismeInfo): { k: RoleOF; lib: string; nom: string }[] {
 function sectionTitulaire(o: OrganismeInfo, nom?: string): { heading: string; content: string }[] {
   const n = (nom || "").trim();
   if (!n) return [];
-  return [{ heading: "Titulaire du poste", content: `<p><strong>${n}</strong>${memeNom(n, o.dirigeant) ? `, dirigeant (mandataire social) de ${o.nom}` : ""}</p>` }];
+  // CV réel transmis : qualifications et expérience du titulaire (IND 21).
+  const cv = profilFormateur(n);
+  const qualif = cv ? `<p><strong>Spécialité :</strong> ${cv.specialite}</p><p><strong>Diplômes :</strong> ${cv.diplomes}</p><p><strong>Expérience :</strong> ${cv.experience}</p>` : "";
+  return [{ heading: "Titulaire du poste", content: `<p><strong>${n}</strong>${memeNom(n, o.dirigeant) ? `, dirigeant (mandataire social) de ${o.nom}` : ""}</p>${qualif}` }];
 }
 
 /** Lieu d'intervention selon la modalité réelle des formations (le texte présentiel reste celui d'origine). */
@@ -512,6 +516,12 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   const out: PlanDevAction[] = [];
   const add = (a: Omit<PlanDevAction, "ref">) => out.push({ ref: "", ...a });
 
+  // 0. Écarts entre le CV réel d'un formateur et les modules qu'il anime (IND 21-22)
+  formateursNoms.forEach((nom) => (profilFormateur(nom)?.besoins(f) || []).forEach((b) => add({
+    famille: "metier", besoin: `${b.origine} — CV du formateur (IND 21)`, indicateurs: "21, 22",
+    nom: b.nom, objectif: b.objectif, beneficiaires: nom, modalite: "Externe — présentiel", prestataire: b.prestataire,
+    duree: b.duree, periode: "", financement, priorite: b.priorite, efficacite: "Attestation jointe au dossier du formateur ; module concerné animé avec la qualification acquise (IND 21)",
+  })));
   // 1. Compétences métier (IND 21-22 : expertise à jour dans le domaine enseigné)
   if (!isVAE && !isBC) {
     formationsMetier(f).forEach((m) => add({

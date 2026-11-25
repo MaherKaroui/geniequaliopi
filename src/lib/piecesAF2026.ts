@@ -11,6 +11,7 @@ import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualio
 import { buildDocument, formatDate, subtractBusinessDays, memePersonne } from "./docBuilder";
 import { getFormationDays, type FormateurInfo } from "./sampleData";
 import { referencesReglementaires } from "./qualite2026";
+import { profilFormateur } from "./profilsFormateurs";
 
 const v = (x: unknown) => (x == null ? "" : String(x).trim());
 
@@ -40,12 +41,14 @@ export function intervenantsReels(o: OrganismeInfo, f?: FormationInfo, stagiaire
 export function formateursReels(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[]): FormateurInfo[] {
   return intervenantsReels(o, f, stagiaires).map((nomComplet) => {
     const parts = nomComplet.split(/\s+/);
+    // CV réel du formateur s'il a été transmis (profilsFormateurs) ; sinon renvoi aux pièces jointes.
+    const cv = profilFormateur(nomComplet);
     return {
       prenom: parts.length > 1 ? parts.slice(0, -1).join(" ") : nomComplet,
       nom: parts.length > 1 ? parts[parts.length - 1] : "",
-      specialite: v(f?.intitule) || v(o.domainesFormation) || "Formation professionnelle",
-      diplomes: "Diplômes et certifications : copies jointes au dossier de l'intervenant",
-      experience: "Expérience professionnelle : voir CV daté et signé joint au dossier",
+      specialite: cv?.specialite || v(f?.intitule) || v(o.domainesFormation) || "Formation professionnelle",
+      diplomes: cv?.diplomes || "Diplômes et certifications : copies jointes au dossier de l'intervenant",
+      experience: cv?.experience || "Expérience professionnelle : voir CV daté et signé joint au dossier",
       email: v(o.email),
     };
   });
