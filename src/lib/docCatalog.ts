@@ -333,14 +333,16 @@ export function buildFullCatalog(
     // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
     formations.forEach((f, fi) => {
       if (isCodeRsrncp(f.codeRNCP)) {
-        add(`af_c3i16_procedure_certification_${fi}`, `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
+        // VTC : examen organisé par la CMA, inscription individuelle — l'organisme ne convoque pas.
+        const examenCMA = isVTC48Formation(f.intitule, f.codeRNCP);
+        add(`af_c3i16_procedure_certification_${fi}`, examenCMA ? `CT3 - IND 16 PROCÉDURE D'ACCOMPAGNEMENT À L'EXAMEN (CMA)` : `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
         stagiaires.forEach((s, si) => {
-          add(`af_c3i16_convocation_certification_${fi}_${si}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
+          add(`af_c3i16_convocation_certification_${fi}_${si}`, examenCMA ? `CT3 - IND 16 ACCOMPAGNEMENT À L'INSCRIPTION À L'EXAMEN – ${s.prenom} ${s.nom}` : `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
         });
         stagiaires.forEach((s, si) => {
           add(`af_c3i16_pv_examen_${fi}_${si}`, `CT3 - IND 16 SUIVI DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "pv_examen_certification", { fi, stagiaireIdx: si });
         });
-        stagiaires.forEach((s, si) => {
+        if (!examenCMA) stagiaires.forEach((s, si) => {
           add(`af_c3i16_attestation_presentation_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "attestation_presentation_certification", { fi, stagiaireIdx: si });
         });
       }

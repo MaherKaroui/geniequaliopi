@@ -1186,6 +1186,34 @@ export function tableHTML(headers: string[], rows: string[][]): string {
   return `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
 
+const CATEGORIES_QUALIOPI: [RegExp, string, string][] = [
+  [/apprentissage/i, "apprentissage", "actions de formation par apprentissage"],
+  [/bilans?.de.comp/i, "bilans-competences", "bilans de compétences"],
+  [/\bVAE\b|validation des acquis/i, "vae", "actions permettant de faire valider les acquis de l'expérience"],
+];
+
+/**
+ * Catégories couvertes par le certificat cité : lues dans le libellé « certifications » de l'organisme
+ * autour du numéro (ex. « BCI n° CW… — catégorie « actions de formation par apprentissage » »), sinon
+ * déduites des types d'actions du dossier. Jamais « actions de formation » par défaut pour un certificat
+ * qui ne couvre que l'apprentissage, les bilans ou la VAE.
+ */
+export function categoriesCertificat(org: OrganismeInfo, numQ: string): string {
+  const txt = String((org as any).certifications || "");
+  const i = numQ ? txt.indexOf(numQ) : -1;
+  if (i >= 0) {
+    const fin = txt.slice(i + numQ.length).search(/Qualiopi\s|\n/);
+    const seg = txt.slice(i, fin < 0 ? undefined : i + numQ.length + fin);
+    const trouvees: string[] = [];
+    if (/actions? de formation(?!\s+par\s+apprentissage)/i.test(seg.replace(/actions de formation par apprentissage/gi, ""))) trouvees.push("actions de formation");
+    CATEGORIES_QUALIOPI.forEach(([re, , lib]) => { if (re.test(seg)) trouvees.push(lib); });
+    if (trouvees.length) return trouvees.join(", ");
+  }
+  const types: string[] = (org as any).typesActions || [];
+  const libs = [types.includes("actions-formation") || !types.length ? "actions de formation" : "", ...CATEGORIES_QUALIOPI.filter(([, k]) => types.includes(k)).map(([, , lib]) => lib)].filter(Boolean);
+  return libs.join(", ");
+}
+
 export function footer(org: OrganismeInfo): string {
   const version = (org as any).version || "1";
   const dateMaj = (org as any).dateMaj
@@ -1201,7 +1229,7 @@ export function footer(org: OrganismeInfo): string {
   const avantCertificat = !!obtention && !!datePiece && datePiece < obtention;
   if (numQ && !avantCertificat) {
     const finTxt = finVal ? new Date(finVal).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' }) : "";
-    qualiopiLine = `<p style="margin:0 0 8px">Certifié Qualiopi n° ${numQ}${certif ? ` délivré par ${certif}` : ""} au titre des actions de formation${finTxt ? ` — valable jusqu'au ${finTxt}` : ""}</p>`;
+    qualiopiLine = `<p style="margin:0 0 8px">Certifié Qualiopi n° ${numQ}${certif ? ` délivré par ${certif}` : ""} au titre de la catégorie : ${categoriesCertificat(org, numQ)}${finTxt ? ` — valable jusqu'au ${finTxt}` : ""}</p>`;
   }
   return `<div class="footer">
     <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>

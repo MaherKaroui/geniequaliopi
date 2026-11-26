@@ -520,7 +520,7 @@ export function planDevActions(o: OrganismeInfo, f: FormationInfo, formateurs: F
   formateursNoms.forEach((nom) => (profilFormateur(nom)?.besoins(f) || []).forEach((b) => add({
     famille: "metier", besoin: `${b.origine} — CV du formateur (IND 21)`, indicateurs: "21, 22",
     nom: b.nom, objectif: b.objectif, beneficiaires: nom, modalite: "Externe — présentiel", prestataire: b.prestataire,
-    duree: b.duree, periode: "", financement, priorite: b.priorite, efficacite: "Attestation jointe au dossier du formateur ; module concerné animé avec la qualification acquise (IND 21)",
+    duree: b.duree, periode: "", financement, priorite: b.priorite, efficacite: "Attestation jointe au dossier du formateur ; apports intégrés au module concerné (IND 21)",
   })));
   // 1. Compétences métier (IND 21-22 : expertise à jour dans le domaine enseigné)
   if (!isVAE && !isBC) {

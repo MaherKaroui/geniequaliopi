@@ -133,20 +133,22 @@ function scenarioAF(c: Ctx): MailAuto[] {
   const programme = pj(c, `Programme ${f.intitule}`, false);
   const out: MailAuto[] = [];
 
-  // 1. Pré-inscription : programme + évaluation des besoins + test de positionnement
-  out.push(mail("af_preinscription", "Pré-inscription : envoi de l'évaluation des besoins et du test de positionnement",
+  // 1. Pré-inscription : programme + évaluation des besoins. Le test de positionnement est passé le
+  //    premier jour de la formation (date portée sur le test) : il n'est jamais joint à ce mail.
+  const jourTest = `Le test de positionnement se fera le premier jour de la formation, le ${fr(c.debut)}.`;
+  out.push(mail("af_preinscription", "Pré-inscription : envoi de l'évaluation des besoins",
     v(c, "sp", [`Pré-inscription – ${f.intitule}`, `Votre demande de formation ${f.intitule}`, `${f.intitule} : documents de pré-inscription`]), [
       deOF(c, aHeure(jo(analyse, -3), k + "p1"), v(c, "bp", [
-        `<p>${c.appel},</p><p>Merci pour l'intérêt que vous portez à notre formation ${formation}.</p><p>Vous trouverez en pièces jointes le programme détaillé, la trame d'évaluation de vos besoins et le test de positionnement. Merci de nous les retourner complétés : ils nous permettent de vérifier les prérequis et d'adapter la formation à votre situation.</p>`,
-        `<p>${c.appel},</p><p>Suite à notre échange téléphonique, je vous adresse les documents de pré-inscription à la formation ${formation} : le programme, le questionnaire d'évaluation de vos besoins et un court test de positionnement (15 minutes environ).</p><p>Vos réponses nous aideront à construire un parcours adapté à vos objectifs.</p>`,
-        `<p>${c.appel},</p><p>Nous avons bien reçu votre demande concernant la formation ${formation}. Avant de valider votre inscription, merci de compléter les deux documents joints — évaluation des besoins et test de positionnement — et de lire attentivement le programme.</p>`,
+        `<p>${c.appel},</p><p>Merci pour l'intérêt que vous portez à notre formation ${formation}.</p><p>Vous trouverez en pièces jointes le programme détaillé et la trame d'évaluation de vos besoins. Merci de nous retourner cette trame complétée : elle nous permet de vérifier les prérequis et d'adapter la formation à votre situation.</p><p>${jourTest}</p>`,
+        `<p>${c.appel},</p><p>Suite à notre échange téléphonique, je vous adresse les documents de pré-inscription à la formation ${formation} : le programme et le questionnaire d'évaluation de vos besoins.</p><p>Vos réponses nous aideront à construire un parcours adapté à vos objectifs. ${jourTest}</p>`,
+        `<p>${c.appel},</p><p>Nous avons bien reçu votre demande concernant la formation ${formation}. Avant de valider votre inscription, merci de compléter l'évaluation des besoins jointe et de lire attentivement le programme.</p><p>${jourTest}</p>`,
       ]) + `<p>Si vous êtes en situation de handicap ou avez besoin d'un aménagement, indiquez-le-nous : notre référent handicap, ${esc(c.o.referentHandicap || c.o.dirigeant)}, vous contactera.</p>`,
-      [programme, pj(c, "Evaluation des besoins"), pj(c, "Test de positionnement")]),
+      [programme, pj(c, "Evaluation des besoins")]),
       deStagiaire(c, aHeure(jo(analyse, -1), k + "p2", [1020, 1260]), v(c, "rp", [
-        `<p>Bonjour,</p><p>Veuillez trouver ci-joint l'évaluation des besoins et le test de positionnement complétés.</p><p>Bien cordialement,</p>`,
+        `<p>Bonjour,</p><p>Veuillez trouver ci-joint l'évaluation des besoins complétée.</p><p>Bien cordialement,</p>`,
         `<p>Bonjour,</p><p>Voici mes documents remplis. Je reste disponible si vous avez besoin de précisions sur mon projet.</p><p>Cordialement,</p>`,
-        `<p>Bonjour,</p><p>Merci pour votre envoi. Je vous retourne les deux documents complétés.</p><p>Bonne journée,</p>`,
-      ]), [pj(c, "Evaluation des besoins completee"), pj(c, "Test de positionnement complete")]),
+        `<p>Bonjour,</p><p>Merci pour votre envoi. Je vous retourne le questionnaire complété.</p><p>Bonne journée,</p>`,
+      ]), [pj(c, "Evaluation des besoins completee")]),
     ]));
 
   if (s.rqth === "oui") {

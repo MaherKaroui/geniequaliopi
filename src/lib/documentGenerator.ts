@@ -60,6 +60,8 @@ import { isANG40Formation, getANG40Besoin, getANG40EvalBesoins, ang40BonnesQcmDe
 import { isCOH21Formation, getCOH21Besoin, getCOH21EvalBesoins, coh21BonnesQcmDebut, coh21ReponsesQcmDebut } from "./cohesionEquipe21hHumanized";
 import { isHYG14Formation, getHYG14Besoin, getHYG14EvalBesoins, hyg14BonnesQcmDebut, hyg14ReponsesQcmDebut } from "./hygieneAlimentaire14hHumanized";
 import { selonModalite } from "./modalitePresentiel";
+import { genTableauCroiseVTC48 } from "./vtc48h/tableauCroise";
+import { genProcedureCertificationVTC48, genInscriptionExamenVTC48 } from "./vtc48h/certification";
 import { isVTC48Formation, getVTC48Besoin, getVTC48EvalBesoins, vtc48BonnesQcmDebut, vtc48ReponsesQcmDebut } from "./vtc48hHumanized";
 import { isECO21Formation, getECO21Besoin, getECO21EvalBesoins, eco21BonnesQcmDebut, eco21ReponsesQcmDebut } from "./ecommerce21hHumanized";
 import { isGMA70Formation, getGMA70Besoin, getGMA70EvalBesoins, gma70BonnesQcmDebut, gma70ReponsesQcmDebut } from "./projecteursGrandMA70hHumanized";
@@ -318,6 +320,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   // Fiche officielle et tableau croisé : données France Compétences quand la fiche est chargée.
   if (template === "fiche_certification_rs" || template === "tableau_croise_cfa" || template.startsWith("fc_")) {
     const fFC = resolveFormation(userFormation, org, userStagiaires);
+    if (template === "tableau_croise_cfa" && isVTC48Formation(fFC.intitule, fFC.codeRNCP)) return genTableauCroiseVTC48(o, fFC);
     if (getFicheFC(fFC.codeRNCP)) {
       if (template === "fiche_certification_rs") return genFicheCertificationFC(o, fFC);
       if (template === "tableau_croise_cfa") return genTableauCroiseFC(o, fFC);
@@ -1078,8 +1081,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "matrice_competences_excel": return genMatriceCompetencesExcel(o, f, stagiaires);
     case "suivi_chiffre_formation_excel": return genSuiviChiffreFormationExcel(o, f, stagiaires);
     case "fiche_certification_rs": return genFicheCertificationRS(o, f);
-    case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
-    case "convocation_certification": return genConvocationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "procedure_presentation_certification": return isVTC48Formation(f.intitule, f.codeRNCP) ? genProcedureCertificationVTC48(o, f) : genProcedurePresentationCertification(o, f);
+    case "convocation_certification": return isVTC48Formation(f.intitule, f.codeRNCP) ? genInscriptionExamenVTC48(o, f, stagiaires[params?.stagiaireIdx ?? 0] || stagiaires[0]) : genConvocationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "pv_examen_certification": return genPVExamenCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
@@ -6100,7 +6103,12 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       ["Certification visée", `${certifIntitule}${certifCode ? ` (${certifCode})` : ""}`],
       ["Certificateur", certifNom],
     ]) },
-    { heading: "Étapes de présentation (exigences formelles du certificateur)", content: tableHTML(["Étape", "Responsable", "Preuve"], [
+    { heading: "Étapes de présentation (exigences formelles du certificateur)", content: tableHTML(["Étape", "Responsable", "Preuve"], isVTC48Formation(f.intitule, f.codeRNCP) ? [
+      ["Information sur l'examen et atelier d'inscription sur exament3p.fr", f.formateur || o.responsablePedagogique || o.dirigeant, "Fiche d'accompagnement à l'inscription"],
+      ["Inscription et paiement des frais d'examen", `${s.prenom} ${s.nom} (candidat)`, "Récapitulatif d'inscription exament3p.fr"],
+      ["Aménagement d'épreuves si situation de handicap", `${s.prenom} ${s.nom} auprès de la CMA`, s.rqth === "oui" ? "Copie de la demande adressée à la CMA" : "Sans objet (aucun besoin déclaré)"],
+      ["Convocation et passage des épreuves", "CMA", "Convocation et relevé de notes émis par la CMA"],
+    ] : [
       ["Vérification des conditions d'accès et du dossier d'inscription", o.responsablePedagogique || o.dirigeant, "Dossier d'inscription transmis au certificateur"],
       ["Information du candidat sur les modalités d'évaluation et le règlement", o.responsablePedagogique || o.dirigeant, "Convocation aux épreuves"],
       ["Aménagement d'épreuves si situation de handicap", o.referentHandicap || o.dirigeant, s.rqth === "oui" ? "Demande d'aménagement transmise au certificateur" : "Sans objet (aucun besoin déclaré)"],

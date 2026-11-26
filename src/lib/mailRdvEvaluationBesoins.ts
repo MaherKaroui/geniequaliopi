@@ -65,7 +65,7 @@ export function genMailRdvEvaluationBesoins(
   const apprenantPrenom = s.prenom || "";
   const toEmail = s.email || `${(s.prenom || "stagiaire").toLowerCase()}.${(s.nom || "").toLowerCase()}@email.fr`;
 
-  const sujet = `Convocation au rendez-vous d'évaluation des besoins et test de positionnement`;
+  const sujet = `Convocation au rendez-vous d'évaluation des besoins`;
   const lieu = `${o.adresse || ""}${o.codePostal || o.ville ? ` – ${o.codePostal || ""} ${o.ville || ""}` : ""}`.trim();
   const intitule = (f.intitule || "").toUpperCase();
 
@@ -112,7 +112,7 @@ export function genMailRdvEvaluationBesoins(
 
     <ul style="margin:0 0 14px;padding-left:22px;">
       <li>Un <strong>entretien individuel d'évaluation des besoins</strong> ;</li>
-      <li>Un <strong>test de positionnement</strong> permettant d'évaluer votre niveau de départ.</li>
+      <li>La présentation du <strong>test de positionnement</strong>, que vous passerez le premier jour de la formation (${escapeHtml(fmtLongDate(debut))}) pour évaluer votre niveau de départ.</li>
     </ul>
 
     <div style="border:1px solid #c7e0f4;background:#eff6fc;border-radius:4px;padding:12px 16px;margin:0 0 16px;">

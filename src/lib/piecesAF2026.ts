@@ -132,7 +132,7 @@ function sessions(f: FormationInfo, stagiaires: StagiaireInfo[]): { debut: strin
     if (!map.has(k)) map.set(k, { debut, fin, noms: [] });
     if (s) map.get(k)!.noms.push(`${s.prenom} ${s.nom}`);
   });
-  return [...map.values()];
+  return [...map.values()].sort((a, b) => a.debut.localeCompare(b.debut));
 }
 
 export function genCRReunionPedagogique(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
@@ -148,7 +148,8 @@ export function genCRReunionPedagogique(o: OrganismeInfo, f: FormationInfo, stag
   const nbStag = sess.noms.length;
   const plusieursIntervenants = intervenants.length > 1;
   const stagTxt = nbStag ? `${nbStag} stagiaire${nbStag > 1 ? "s" : ""} (${sess.noms.join(", ")})` : "effectif à confirmer";
-  const psh = stagiaires.filter((s) => s.rqth === "oui").map((s) => `${s.prenom} ${s.nom}`);
+  // Seuls les stagiaires de la session préparée : jamais ceux des sessions suivantes, inconnus à cette date.
+  const psh = stagiaires.filter((s) => s.rqth === "oui" && sess.noms.includes(`${s.prenom} ${s.nom}`)).map((s) => `${s.prenom} ${s.nom}`);
   // Une seule personne (dirigeant formateur unique) : pas de « réunion » ni de groupes de niveau, mais une note de préparation.
   const seul = participants.length <= 1;
   const titre = seul
@@ -191,11 +192,23 @@ export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo, stag
       modules[modules.length - 1] += `${/ : /.test(modules[modules.length - 1]) ? " ; " : " : "}${contenu}`;
     }
   });
+  // Programme découpé par jours (« JOURS 1 à 3 — Module 1 … », « JOUR 15 — … ») : chaque date reçoit le bloc
+  // qui couvre son numéro de jour, au lieu du même bloc répété sur toute la session.
+  const blocsJours: { de: number; a: number; titre: string }[] = [];
+  (f.programme || "").split("\n").forEach((l) => {
+    const m = l.trim().match(/^JOURS?\s+(\d{1,3})(?:\s*(?:à|et|-|–)\s*(\d{1,3}))?\s*[—–-]\s*(.+)$/i);
+    if (m) blocsJours.push({ de: +m[1], a: +(m[2] || m[1]), titre: m[3].split(" : ")[0].trim() });
+  });
+  const sequenceDuJour = (i: number) => {
+    const b = blocsJours.find((x) => i + 1 >= x.de && i + 1 <= x.a);
+    if (b) return `Jour ${i + 1} — ${b.titre}`;
+    return modules.length ? modules[Math.min(i, modules.length - 1)] : `Séquence ${i + 1}`;
+  };
   sessions(f, stagiaires).forEach((sess) => {
     const jours = getFormationDays({ ...f, dateDebut: sess.debut, dateFin: sess.fin });
     const intervenant = stagiaires.find((s) => v(s.dateDebutFormation) === sess.debut && v(s.formateur))?.formateur || f.formateur || o.dirigeant;
     jours.forEach((j, i) => {
-      rows.push([j, "09h00 – 12h30 / 13h30 – 17h00", modules.length ? modules[Math.min(i, modules.length - 1)] : `Séquence ${i + 1}`, intervenant, modalite(f) === "presentiel" ? (f.lieu || o.ville) : "Classe virtuelle"]);
+      rows.push([j, "09h00 – 12h30 / 13h30 – 17h00", sequenceDuJour(i), intervenant, modalite(f) === "presentiel" ? (f.lieu || o.ville) : "Classe virtuelle"]);
     });
   });
   return buildDocument({
