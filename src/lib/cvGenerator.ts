@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro" | "nordique" | "atelier" | "impact" | "botanique" | "compact";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro" | "nordique" | "atelier" | "impact" | "botanique" | "compact" | "ardoise" | "lavande" | "ocean" | "prestige" | "epure";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -77,6 +77,11 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "impact", label: "Impact", description: "Titre fort, contraste graphite et orange", accent: "#ea580c" },
   { id: "botanique", label: "Botanique", description: "Vert sauge, élégant et naturel", accent: "#3f6212" },
   { id: "compact", label: "Compact", description: "Deux colonnes denses pour un CV court", accent: "#334155" },
+  { id: "ardoise", label: "Ardoise", description: "Colonne sombre ardoise, accents turquoise", accent: "#14b8a6" },
+  { id: "lavande", label: "Lavande", description: "Doux violet, cartes arrondies", accent: "#6d28d9" },
+  { id: "ocean", label: "Océan", description: "Bandeau dégradé bleu profond", accent: "#0e7490" },
+  { id: "prestige", label: "Prestige", description: "Noir et or, centré et raffiné", accent: "#a16207" },
+  { id: "epure", label: "Épuré", description: "Grille aérée, dates en marge", accent: "#475569" },
 ];
 
 // ===== HTML Generators =====
@@ -92,7 +97,7 @@ function skillBar(level: number, accent: string, style: "bar" | "dots" | "line" 
   if (style === "line") {
     return `<div style="background:#e5e7eb;border-radius:4px;height:4px;width:100%;margin-top:4px;"><div style="background:${accent};height:100%;border-radius:4px;width:${level * 20}%"></div></div>`;
   }
-  return `<div style="background:#e5e7eb;border-radius:4px;height:8px;width:100%;margin-top:4px;"><div style="background:${accent};height:100%;border-radius:4px;width:${level * 20}%"></div></div>`;
+  return `<div style="background:#e5e7eb;border-radius:4px;height:5px;width:100%;margin-top:5px;"><div style="background:${accent};height:100%;border-radius:4px;width:${level * 20}%"></div></div>`;
 }
 
 function photoBlock(url: string, size = 100, round = true) {
@@ -108,7 +113,7 @@ function sectionTitle(text: string, accent: string, style: "underline" | "filled
 }
 
 function expBlock(exp: CVExperience) {
-  return `<div style="margin-bottom:10px;"><strong>${escapeHtml(exp.poste)}</strong>${exp.entreprise ? ` — ${escapeHtml(exp.entreprise)}` : ""}${exp.dateDebut ? `<br><span style="color:#666;font-size:11px;">${exp.dateDebut}${exp.dateFin ? ` – ${exp.dateFin}` : " – Présent"}</span>` : ""}${exp.description ? `<p style="margin:4px 0 0 0;font-size:12px;color:#444;">${escapeHtml(exp.description)}</p>` : ""}</div>`;
+  return `<div style="margin-bottom:13px;break-inside:avoid;"><strong>${escapeHtml(exp.poste)}</strong>${exp.entreprise ? ` — ${escapeHtml(exp.entreprise)}` : ""}${exp.dateDebut ? `<br><span style="color:#666;font-size:11px;">${exp.dateDebut}${exp.dateFin ? ` – ${exp.dateFin}` : " – Présent"}</span>` : ""}${exp.description ? `<p style="margin:4px 0 0 0;font-size:12px;line-height:1.55;color:#444;">${escapeHtml(exp.description)}</p>` : ""}</div>`;
 }
 
 export function generateCVHTML(data: CVData, design: CVDesign, options?: { accent?: string; fontFamily?: string }): string {
@@ -133,7 +138,7 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
   const pedSection = data.experiencePedagogique ? `${sectionTitle("Expérience pédagogique", accent, secStyle)}<p style="font-size:12px;line-height:1.6;color:#333;">${escapeHtml(data.experiencePedagogique)}</p>` : "";
   const formSection = forms.length ? `${sectionTitle("Formation", accent, secStyle)}${forms.map(f => `<div style="margin-bottom:6px;"><strong>${escapeHtml(f.diplome)}</strong>${f.etablissement ? ` — ${escapeHtml(f.etablissement)}` : ""}${f.annee ? ` <span style="color:#666;font-size:11px;">(${f.annee})</span>` : ""}</div>`).join("")}` : "";
   const certSection = certs.length ? `${sectionTitle("Certifications", accent, secStyle)}${certs.map(c => `<div style="margin-bottom:4px;font-size:12px;">• ${escapeHtml(c.nom)}${c.annee ? ` (${c.annee})` : ""}</div>`).join("")}` : "";
-  const compSection = comps.length ? `${sectionTitle("Compétences", accent, secStyle)}${comps.map(c => `<div style="margin-bottom:6px;"><span style="font-size:12px;">${escapeHtml(c.nom)}</span>${skillBar(c.niveau, accent, design === "minimaliste" ? "line" : design === "elegant" ? "dots" : "bar")}</div>`).join("")}` : "";
+  const compSection = comps.length ? `${sectionTitle("Compétences", accent, secStyle)}${comps.map(c => `<div style="margin-bottom:10px;break-inside:avoid;"><span style="font-size:11.5px;line-height:1.35;display:block;">${escapeHtml(c.nom)}</span>${skillBar(c.niveau, accent, design === "minimaliste" ? "line" : design === "elegant" ? "dots" : "bar")}</div>`).join("")}` : "";
   const langSection = langs.length ? `${sectionTitle("Langues", accent, secStyle)}${langs.map(l => `<div style="font-size:12px;margin-bottom:3px;">${escapeHtml(l.langue)} — <em>${escapeHtml(l.niveau)}</em></div>`).join("")}` : "";
   const pubSection = data.publications ? `${sectionTitle("Publications", accent, secStyle)}<p style="font-size:12px;color:#333;white-space:pre-wrap;">${escapeHtml(data.publications)}</p>` : "";
 
@@ -380,6 +385,93 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
         <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
         <aside>${speSection}${compSection}${formSection}${certSection}${langSection}</aside>
       </div>
+    </div>`;
+  }
+
+  if (design === "ardoise") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    const light = (h: string) => h.replace(/color:[^;"]+;/g, "color:#e2e8f0;").split(`border-bottom:2px solid ${accent}`).join("border-bottom:1px solid #475569");
+    return `<div style="font-family:${ff};color:#1e293b;font-size:12px;line-height:1.55;display:grid;grid-template-columns:250px 1fr;min-height:1050px;">
+      <aside style="background:#1e293b;color:#e2e8f0;padding:34px 22px;">
+        ${photoBlock(data.photoUrl, 110, true)}
+        <h1 style="font-size:24px;line-height:1.15;margin:14px 0 6px 0;color:#fff;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:12px;color:${accent};margin:0 0 18px 0;font-weight:600;">${escapeHtml(data.titre)}</p>
+        <div style="font-size:10.5px;line-height:1.8;color:#cbd5e1;">${[data.email, data.telephone, data.adresse].filter(Boolean).map(escapeHtml).join("<br>")}</div>
+        ${light(compSection)}${light(langSection)}${light(certSection)}
+      </aside>
+      <main style="padding:36px 30px;">${profilSection}${speSection}${expSection}${pedSection}${formSection}${pubSection}</main>
+    </div>`;
+  }
+
+  if (design === "lavande") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    const card = (h: string) => h ? `<div style="background:#fff;border:1px solid #e9e3f7;border-radius:12px;padding:2px 16px 12px 16px;margin-bottom:12px;">${h}</div>` : "";
+    return `<div style="font-family:${ff};color:#2e2640;font-size:12px;line-height:1.55;background:#f6f3fc;padding:30px 32px;">
+      <header style="display:flex;align-items:center;gap:20px;background:#fff;border-radius:14px;padding:20px 22px;margin-bottom:14px;border-left:6px solid ${accent};">
+        ${photoBlock(data.photoUrl, 86, true)}
+        <div style="flex:1;"><h1 style="font-size:28px;margin:0;color:#2e1065;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:13px;color:${accent};margin:3px 0 5px 0;font-weight:600;">${escapeHtml(data.titre)}</p>
+        <p style="font-size:10.5px;color:#6b6280;margin:0;">${contactInfo}</p></div>
+      </header>
+      <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:14px;">
+        <main>${card(profilSection)}${card(expSection)}${card(pedSection)}${card(pubSection)}</main>
+        <aside>${card(speSection)}${card(compSection)}${card(formSection)}${card(certSection)}${card(langSection)}</aside>
+      </div>
+    </div>`;
+  }
+
+  if (design === "ocean") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#0f2a35;font-size:12px;line-height:1.55;background:#fff;">
+      <header style="background:linear-gradient(120deg,#0c4a6e,${accent});color:#fff;padding:34px 36px 40px 36px;display:flex;align-items:center;gap:22px;">
+        ${photoBlock(data.photoUrl, 96, true)}
+        <div style="flex:1;"><h1 style="font-size:32px;margin:0;font-weight:300;letter-spacing:0.5px;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:14px;margin:4px 0 8px 0;font-weight:600;color:#cffafe;">${escapeHtml(data.titre)}</p>
+        <p style="font-size:10.5px;margin:0;color:#e0f2fe;">${contactInfo}</p></div>
+      </header>
+      <div style="padding:10px 36px 28px 36px;display:grid;grid-template-columns:1.75fr 1fr;gap:28px;">
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+        <aside style="border-left:2px solid #e0f2f7;padding-left:20px;">${speSection}${compSection}${formSection}${certSection}${langSection}</aside>
+      </div>
+    </div>`;
+  }
+
+  if (design === "prestige") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#1c1917;font-size:12px;line-height:1.6;background:#fff;">
+      <header style="background:#111;color:#fff;text-align:center;padding:34px 40px 26px 40px;border-bottom:4px solid ${accent};">
+        ${data.photoUrl ? `<div style="display:flex;justify-content:center;margin-bottom:12px;">${photoBlock(data.photoUrl, 90, true)}</div>` : ""}
+        <h1 style="font-size:30px;margin:0;font-weight:400;letter-spacing:5px;text-transform:uppercase;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:12px;color:#e7c46a;margin:8px 0;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(data.titre)}</p>
+        <p style="font-size:10.5px;color:#d6d3d1;margin:0;font-family:Arial,sans-serif;">${contactInfo}</p>
+      </header>
+      <div style="padding:14px 42px 30px 42px;display:grid;grid-template-columns:1.7fr 1fr;gap:30px;">
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+        <aside>${speSection}${compSection}${formSection}${certSection}${langSection}</aside>
+      </div>
+    </div>`;
+  }
+
+  if (design === "epure") {
+    const ff = fontOverride || "'Helvetica Neue',Helvetica,Arial,sans-serif";
+    const row = (label: string, body: string) => body ? `<div style="display:grid;grid-template-columns:130px 1fr;gap:22px;border-top:1px solid #e5e7eb;padding:14px 0;break-inside:avoid;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${accent};">${label}</div><div>${body}</div></div>` : "";
+    const expRows = exps.map(e => `<div style="margin-bottom:12px;break-inside:avoid;"><div style="display:flex;justify-content:space-between;gap:12px;"><strong>${escapeHtml(e.poste)}${e.entreprise ? ` <span style="font-weight:400;color:#555;">— ${escapeHtml(e.entreprise)}</span>` : ""}</strong><span style="font-size:10.5px;color:#888;white-space:nowrap;">${escapeHtml(e.dateDebut || "")}${e.dateDebut ? (e.dateFin ? ` – ${escapeHtml(e.dateFin)}` : " – Présent") : ""}</span></div>${e.description ? `<p style="margin:4px 0 0 0;color:#444;">${escapeHtml(e.description)}</p>` : ""}</div>`).join("");
+    return `<div style="font-family:${ff};color:#1f2937;font-size:11.5px;line-height:1.55;background:#fff;padding:42px 48px;">
+      <header style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
+        ${photoBlock(data.photoUrl, 80, true)}
+        <div style="flex:1;"><h1 style="font-size:34px;margin:0;font-weight:300;letter-spacing:-0.5px;color:#111;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:13px;margin:4px 0;color:${accent};">${escapeHtml(data.titre)}</p>
+        <p style="font-size:10.5px;color:#888;margin:0;">${contactInfo}</p></div>
+      </header>
+      ${row("Profil", data.profil ? escapeHtml(data.profil) : "")}
+      ${row("Spécialités", data.specialites ? escapeHtml(data.specialites) : "")}
+      ${row("Expérience", expRows)}
+      ${row("Pédagogie", data.experiencePedagogique ? escapeHtml(data.experiencePedagogique) : "")}
+      ${row("Formation", forms.map(f => `<div style="margin-bottom:4px;"><strong>${escapeHtml(f.diplome)}</strong>${f.etablissement ? ` — ${escapeHtml(f.etablissement)}` : ""}${f.annee ? ` <span style="color:#888;">(${escapeHtml(f.annee)})</span>` : ""}</div>`).join(""))}
+      ${row("Compétences", comps.map(c => `<span style="display:inline-block;border:1px solid #d1d5db;border-radius:999px;padding:2px 10px;margin:0 6px 6px 0;font-size:10.5px;">${escapeHtml(c.nom)}</span>`).join(""))}
+      ${row("Certifications", certs.map(c => `<div>${escapeHtml(c.nom)}${c.annee ? ` (${escapeHtml(c.annee)})` : ""}</div>`).join(""))}
+      ${row("Langues", langs.map(l => `<div>${escapeHtml(l.langue)} — <em>${escapeHtml(l.niveau)}</em></div>`).join(""))}
+      ${row("Publications", data.publications ? `<div style="white-space:pre-wrap;">${escapeHtml(data.publications)}</div>` : "")}
     </div>`;
   }
 
