@@ -23,6 +23,8 @@ import { isREC30Formation } from "@/lib/recrutement30hHumanized";
 import { seedREC30AICaches } from "@/lib/recrutement30hPreset";
 import { isIAE67Formation } from "@/lib/iaEntreprise67hHumanized";
 import { seedIAE67AICaches } from "@/lib/iaEntreprise67hPreset";
+import { isWM14Formation } from "@/lib/webmarketing14hHumanized";
+import { seedWM14AICaches } from "@/lib/webmarketing14hPreset";
 import { seedGMA70AICaches } from "@/lib/projecteursGrandMA70hPreset";
 import { seedMSC70AICaches } from "@/lib/machinerieScenique70hPreset";
 import { isDRI47Formation } from "@/lib/droitInstitutions47hHumanized";
@@ -237,6 +239,10 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad, ouvr
     // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : même rechargement des packs du preset.
     if (d.formation && isREC30Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
       seedREC30AICaches(d.formation);
+    }
+    // Développer son activité avec le webmarketing – 14 h : même rechargement des packs du preset.
+    if (d.formation && isWM14Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
+      seedWM14AICaches(d.formation);
     }
     // Intelligence artificielle en entreprise – 67 h (non certifiante) : même rechargement des packs du preset.
     if (d.formation && isIAE67Formation(d.formation.intitule, d.formation.codeRNCP) && !getCachedContentPack(d.formation)) {
