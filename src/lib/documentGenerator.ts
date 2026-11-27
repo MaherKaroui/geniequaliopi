@@ -3564,8 +3564,14 @@ function parseFrLongDate(dayStr: string): Date | null {
 
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
   const mixte = isMixte(f);
-  const { hoursPerDay } = parseDuree(f.duree);
-  const hpd = hoursPerDay > 0 && hoursPerDay <= 12 ? hoursPerDay : 7;
+  const { hoursPerDay, totalHours } = parseDuree(f.duree);
+  // Durée sans nombre de jours (« 30 heures (6 modules de 5 h) ») : parseDuree suppose 3 jours ; on répartit
+  // alors le total d'heures sur les jours réels du stagiaire, pour que le relevé égale la durée de la formation.
+  const sansJours = !/\d+\s*jours?/i.test(f.duree || "") && /\d+\s*heures?/i.test(f.duree || "");
+  const hpdPour = (nbJours: number) => {
+    const h = sansJours && nbJours > 0 ? totalHours / nbJours : hoursPerDay;
+    return h > 0 && h <= 12 ? h : 7;
+  };
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const cfaWeeks = isCFA ? getCFAWeekDates(f) : [];
   const isInCFAWeek = (d: Date): boolean => {
@@ -3586,6 +3592,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     : stagiaires;
   targetList.forEach((s, si) => {
     const days = getStagiaireDays(s, f);
+    const hpd = hpdPour(days.length);
     if (si > 0) extra += '<div class="page-break"></div>';
     extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
     extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams / LMS Moodle'}</p>`;
@@ -12244,13 +12251,15 @@ function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo, stagiair
     extra += `<p>Aucun financeur tiers identifié pour cette session (financement personnel ou non renseigné). Le questionnaire ci-dessous est adressé à tout financeur dès qu'une prise en charge est accordée, au moins une fois par an.</p>`;
     financeurs.push("");
   }
+  // Référence datée de l'année de la session (fin de formation), pas de l'année de génération.
+  const anneeSession = (f.dateFin || f.dateDebut || "").match(/\d{4}/)?.[0] || String(new Date().getFullYear());
   financeurs.forEach((fin, i) => {
     if (!remplie || !fin) {
       extra += `<h3>Financeur : ${fin || "……………………………………"}</h3><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>Non concerné</th><th>Insuffisant</th><th>Correct</th><th>Très bien</th></tr>${["Informations figurant sur nos conventions", "Qualité des factures", "Respect des délais de traitement", "Tarifs proposés", "Documents remis en fin de formation", "Qualité globale des formations", "Cohérence avec les attentes"].map(c => `<tr><td>${c}</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>`).join("")}</table><p><strong>Commentaires :</strong></p><div style="height:50px;border:1px dashed #999"></div><hr/>`;
       return;
     }
     extra += `<h3>Financeur : ${fin}</h3>`;
-    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Nom du financeur :</strong></td><td>${fin}</td></tr><tr><td><strong>Références des dossiers financés :</strong></td><td>Dossier ${new Date().getFullYear()}-${String(i + 1).padStart(3, '0')}</td></tr></table>`;
+    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Nom du financeur :</strong></td><td>${fin}</td></tr><tr><td><strong>Références des dossiers financés :</strong></td><td>Dossier ${anneeSession}-${String(i + 1).padStart(3, '0')}</td></tr></table>`;
     const criteres = [
       ["QUALITÉ DU SERVICE ADMINISTRATIF", null],
       ["Informations figurant sur nos conventions de formation", i % 2 === 0 ? "Très bien" : "Correct"],
