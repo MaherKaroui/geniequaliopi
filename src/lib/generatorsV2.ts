@@ -940,6 +940,45 @@ export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
   // NO signatures
 }
 
+interface BilanQcm { titre: string; ei: number; score: number; total: number; rates: { num: number; enonce: string }[] }
+
+/** Appréciation globale d'un ou plusieurs QCM, rédigée à partir du résultat réel du stagiaire. */
+function appreciationQcm(s: StagiaireInfo, bilans: BilanQcm[], seed: number): string {
+  const score = bilans.reduce((t, b) => t + b.score, 0), total = bilans.reduce((t, b) => t + b.total, 0);
+  const ratio = total ? score / total : 0;
+  const pick = <T,>(list: T[], k: number) => list[((seed * 31 + bilans[0].ei * 17 + k * 7) & 0x7fffffff) % list.length];
+  const theme = bilans.map(b => `« ${b.titre.replace(/^\s*QCM\s*\d*\s*[—–:-]\s*/i, "")} »`).join(" et ");
+  const p = s.prenom;
+  const deP = /^[aeiouyhàâéèêîïôû]/i.test(p) ? `d'${p}` : `de ${p}`;
+  const ouverture = ratio >= 0.9 ? [
+    `Très bon résultat ${deP} sur ${theme}.`, `${p} maîtrise ${theme} avec précision.`,
+    `Excellent travail ${deP} sur ${theme}.`, `Sur ${theme}, ${p} fait preuve d'une grande sûreté.`,
+  ] : ratio >= 0.7 ? [
+    `Bon résultat ${deP} sur ${theme}.`, `${p} réussit l'essentiel de ${theme}.`,
+    `Sur ${theme}, ${p} montre une compréhension solide.`, `Travail sérieux ${deP} sur ${theme}.`,
+  ] : ratio >= 0.6 ? [
+    `${p} valide ${theme}, avec quelques fragilités.`, `Résultat correct ${deP} sur ${theme}.`,
+    `Sur ${theme}, les bases sont acquises par ${p}.`,
+  ] : [
+    `${p} n'atteint pas encore le seuil attendu sur ${theme}.`, `Sur ${theme}, les acquis ${deP} restent partiels.`,
+    `${theme} demande encore du travail à ${p}.`,
+  ];
+  const resultat = `${score} bonne${score > 1 ? "s" : ""} réponse${score > 1 ? "s" : ""} sur ${total}.`;
+  const rates = bilans.flatMap(b => b.rates);
+  const court = (t: string) => { const x = t.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(); return x.length > 70 ? `${x.slice(0, 67).trim()}…` : x; };
+  const erreurs = !rates.length
+    ? pick(["Aucune erreur relevée.", "Sans-faute sur l'ensemble des questions.", "Toutes les réponses sont justes."], 1)
+    : rates.length === 1
+      ? `Seule erreur : question ${rates[0].num} (${court(rates[0].enonce)}).`
+      : `Erreurs aux questions ${rates.map(r => r.num).join(", ").replace(/, (\d+)$/, " et $1")}, dont la question ${rates[0].num} (${court(rates[0].enonce)}).`;
+  const suite = ratio >= 0.9
+    ? pick([`Compétence acquise ; ${p} peut viser le niveau supérieur.`, "Compétence acquise, à entretenir par la pratique.", `Je propose à ${p} des exercices d'approfondissement.`], 2)
+    : ratio >= 0.6
+      ? pick([`Points à revoir avec ${p} en début de séance suivante.`, "Compétence en voie d'acquisition : fiche de révision transmise.", `${p} reprendra les questions manquées sur la plateforme.`, "Un court entraînement ciblé consolidera ces notions."], 2)
+      : pick([`Remédiation prévue avec ${p} sur ces notions avant la séance suivante.`, "Reprise des notions avec le formateur et nouvel entraînement planifié.", `Accompagnement individuel proposé à ${p}.`], 2);
+  return `${pick(ouverture, 0)} ${resultat} ${erreurs} ${suite}`;
+}
+
 export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, exerciceIdx?: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   // IA générative (RS6776) : QCM complets générés directement depuis la banque
@@ -1251,6 +1290,8 @@ D) Drive faster to finish the ride.`,
     return { questions, correct };
   };
 
+  // Résultat réel de chaque QCM rendu : sert à l'appréciation globale du formateur.
+  const bilansQcm: BilanQcm[] = [];
   selectedExercices.forEach((ex, localIdx) => {
     const ei = _planIdx.length ? _planIdx[localIdx] : blockStart + localIdx;
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
@@ -1331,6 +1372,7 @@ D) Drive faster to finish the ride.`,
       totalNote += noteRound;
       totalMax += noteMax;
       notesRecap.push({ titre: ex.titre, note: noteRound, max: noteMax });
+      bilansQcm.push({ titre: ex.titre, ei, score: scoreObtenu, total: qcm.questions.length, rates: qcm.questions.filter((_, qi) => wrongIdx.has(qi)).map(q => ({ num: q.num, enonce: q.enonce })) });
 
       if (localIdx > 0) extra += `<br/>`;
       extra += `<h3>${ex.titre}</h3>`;
@@ -1553,7 +1595,11 @@ D) Drive faster to finish the ride.`,
   // Un seul barème affiché : les points obtenus sur les points possibles de l'exercice.
   extra += `<p><strong>Score final attribué : ${totalNote}/${totalMax} points (soit ${moyenneFinale}/10)</strong></p>`;
 
-  const appreciationFinale = appreciationsFR[appIdx][appSeed]
+  // QCM uniquement : appréciation tirée du résultat réel (score, thème, questions ratées), donc propre à
+  // chaque stagiaire et à chaque QCM. Sinon : banque d'appréciations par niveau.
+  const appreciationFinale = bilansQcm.length && bilansQcm.length === selectedExercices.length
+    ? appreciationQcm(s, bilansQcm, hash + stagiaireIdx * 19)
+    : appreciationsFR[appIdx][appSeed]
     .replace(/Validation sans réserve\./, manquesFichier.length ? "Compétence validée ; l'élément non finalisé sera repris." : "Validation sans réserve.").replace(/ce QCM/g, libelleEvalMin).replace(/Le QCM /g, _groupe ? "L'évaluation " : estQcm ? "Le QCM " : "L'exercice ").replace(/sur ce QCM/g, `sur ${libelleEvalMin}`)
     .replace(/QCM réussi/g, _groupe ? "Évaluation réussie" : "QCM réussi");
   extra = extra.replace("__APPRECIATION_FINALE__", appreciationFinale);

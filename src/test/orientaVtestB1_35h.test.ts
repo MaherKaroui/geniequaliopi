@@ -45,5 +45,22 @@ describe('ORIENTA CONSULT : VTest B1 – 35 h, exercices en QCM', () => {
     });
     expect(new Set(reponses).size).toBeGreaterThan(1);
   });
+
+  it('appréciation globale du formateur différente pour chaque stagiaire et chaque QCM, tirée du résultat', () => {
+    const o: any = { nom: 'ORIENTA CONSULT', siret: '93401856500010', nda: '11788720978', adresse: '', codePostal: '', ville: '', dirigeant: 'Rahma GARY', typesActions: ['actions-formation'] };
+    const f: any = { intitule: INTITULE, codeRNCP: 'RS6905', duree: '35 heures (10 séances de 3 h 30)', dateDebut: '2026-11-02', dateFin: '2026-11-16', modalites: 'distanciel', formateur: 'Rahma GARY' };
+    const st: any[] = ['Inès', 'Yanis', 'Claire', 'Sofia'].map((prenom, i) => ({ nom: `NOM${i}`, prenom, civilite: 'Mme', dateDebutFormation: '2026-11-02', dateFinFormation: '2026-11-16' }));
+    const appreciation = (si: number, ei: number) => {
+      const txt = generateDocumentById(`ap_${si}_${ei}`, 'exercices_stagiaire', { fi: 0, stagiaireIdx: si, exerciceIdx: ei }, o, f, st).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+      const m = txt.match(/Appréciation globale du formateur : [^,]+, [^ ]+ (.*?) Score final/);
+      expect(m, txt.slice(-600)).not.toBeNull();
+      return m![1];
+    };
+    const parStagiaire = st.map((_, si) => appreciation(si, 0));
+    expect(new Set(parStagiaire).size).toBe(4);
+    parStagiaire.forEach((a, si) => { expect(a).toContain(st[si].prenom); expect(a).toMatch(/\d+ bonnes? réponses? sur 10/); });
+    expect(new Set([0, 1, 2, 3].map(ei => appreciation(0, ei))).size).toBe(4);
+    console.log([...parStagiaire, appreciation(0, 1), appreciation(0, 2)].join('\n'));
+  });
 });
 
