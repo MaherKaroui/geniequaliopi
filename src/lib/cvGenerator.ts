@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro" | "nordique" | "atelier" | "impact" | "botanique" | "compact";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -72,6 +72,11 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "consulting", label: "Consulting", description: "Style McKinsey/BCG, bleu sobre", accent: "#1e40af" },
   { id: "monochrome", label: "Monochrome", description: "100% noir & blanc, typographie forte", accent: "#000000" },
   { id: "serif_pro", label: "Serif Pro", description: "Serif éditorial, blanc, raffiné", accent: "#374151" },
+  { id: "nordique", label: "Nordique", description: "Colonne bleu glacier, claire et structurée", accent: "#155e75" },
+  { id: "atelier", label: "Atelier", description: "Papier ivoire et accents terracotta", accent: "#b45309" },
+  { id: "impact", label: "Impact", description: "Titre fort, contraste graphite et orange", accent: "#ea580c" },
+  { id: "botanique", label: "Botanique", description: "Vert sauge, élégant et naturel", accent: "#3f6212" },
+  { id: "compact", label: "Compact", description: "Deux colonnes denses pour un CV court", accent: "#334155" },
 ];
 
 // ===== HTML Generators =====
@@ -286,6 +291,95 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
         <p style="font-size:10.5px;color:#6b7280;margin:0;text-align:right;line-height:1.5;">${[data.email, data.telephone, data.adresse].filter(Boolean).map(escapeHtml).join("<br>")}</p>
       </div>
       ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "nordique") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#16303b;font-size:12px;line-height:1.55;background:#f8fafc;display:grid;grid-template-columns:245px 1fr;min-height:1050px;">
+      <aside style="background:#e6f1f4;padding:34px 24px;border-top:10px solid ${accent};">
+        ${photoBlock(data.photoUrl, 112, false)}
+        <h1 style="font-size:25px;line-height:1.12;margin:0 0 8px 0;color:#0f3d4d;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:12px;color:${accent};margin:0 0 22px 0;font-weight:600;">${escapeHtml(data.titre)}</p>
+        <div style="font-size:10.5px;line-height:1.7;border-top:1px solid #b7d2da;padding-top:14px;margin-bottom:8px;">${[data.email, data.telephone, data.adresse].filter(Boolean).map(escapeHtml).join("<br>")}</div>
+        ${compSection}${langSection}${certSection}
+      </aside>
+      <main style="padding:38px 32px;background:#fff;">
+        ${profilSection}${speSection}${expSection}${pedSection}${formSection}${pubSection}
+      </main>
+    </div>`;
+  }
+
+  if (design === "atelier") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#342b25;font-size:12px;line-height:1.6;background:#fffdf8;padding:34px 38px;border-top:9px solid ${accent};">
+      <header style="display:flex;align-items:center;gap:22px;padding-bottom:20px;border-bottom:1px solid #d8cbbd;">
+        ${photoBlock(data.photoUrl, 92, false)}
+        <div style="flex:1;">
+          <p style="font-family:Arial,sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:${accent};margin:0 0 7px 0;">Curriculum vitae</p>
+          <h1 style="font-size:32px;font-weight:400;margin:0;color:#3b2f28;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:14px;margin:3px 0 7px 0;color:${accent};font-style:italic;">${escapeHtml(data.titre)}</p>
+          <p style="font-family:Arial,sans-serif;font-size:10px;color:#75675d;margin:0;">${contactInfo}</p>
+        </div>
+      </header>
+      <div style="display:grid;grid-template-columns:1.8fr 1fr;gap:30px;margin-top:4px;">
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+        <aside style="border-left:1px solid #e3d8ca;padding-left:22px;">${speSection}${formSection}${certSection}${compSection}${langSection}</aside>
+      </div>
+    </div>`;
+  }
+
+  if (design === "impact") {
+    const ff = fontOverride || "'Arial Narrow','Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#202428;font-size:12px;line-height:1.5;background:#fff;">
+      <header style="background:#20262b;color:#fff;padding:32px 36px;border-left:12px solid ${accent};display:flex;align-items:center;gap:24px;">
+        ${photoBlock(data.photoUrl, 96, false)}
+        <div style="flex:1;">
+          <h1 style="font-size:38px;line-height:1;margin:0;text-transform:uppercase;letter-spacing:-1px;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:15px;color:#ffb48c;margin:9px 0 6px 0;font-weight:700;text-transform:uppercase;letter-spacing:1px;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:10.5px;color:#d7dde1;margin:0;">${contactInfo}</p>
+        </div>
+      </header>
+      <div style="padding:24px 34px;display:grid;grid-template-columns:1.75fr 1fr;gap:28px;">
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+        <aside style="background:#f4f1ee;padding:4px 18px 18px 18px;">${speSection}${compSection}${formSection}${certSection}${langSection}</aside>
+      </div>
+    </div>`;
+  }
+
+  if (design === "botanique") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#293127;font-size:12px;line-height:1.6;background:#fbfcf7;padding:34px 38px;">
+      <header style="position:relative;padding:0 0 20px 24px;border-left:3px solid ${accent};border-bottom:1px solid #cbd5c0;display:flex;align-items:center;gap:20px;">
+        ${photoBlock(data.photoUrl, 92, true)}
+        <div style="flex:1;">
+          <h1 style="font-size:31px;font-weight:400;margin:0;color:#314224;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:14px;color:${accent};margin:4px 0;font-style:italic;">${escapeHtml(data.titre)}</p>
+          <p style="font-family:Arial,sans-serif;font-size:10px;color:#687362;margin:0;">${contactInfo}</p>
+        </div>
+      </header>
+      <div style="display:grid;grid-template-columns:1fr 1.75fr;gap:32px;">
+        <aside>${speSection}${compSection}${langSection}${certSection}${formSection}</aside>
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+      </div>
+    </div>`;
+  }
+
+  if (design === "compact") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#252b32;font-size:11px;line-height:1.42;background:#fff;padding:26px 30px;">
+      <header style="display:flex;align-items:center;gap:16px;border-bottom:4px solid ${accent};padding-bottom:12px;">
+        ${photoBlock(data.photoUrl, 72, false)}
+        <div style="flex:1;">
+          <h1 style="font-size:26px;margin:0;color:#1e293b;letter-spacing:-0.4px;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:12px;margin:2px 0;color:${accent};font-weight:600;">${escapeHtml(data.titre)}</p>
+        </div>
+        <p style="font-size:9.5px;text-align:right;color:#64748b;margin:0;line-height:1.55;">${[data.email, data.telephone, data.adresse].filter(Boolean).map(escapeHtml).join("<br>")}</p>
+      </header>
+      <div style="display:grid;grid-template-columns:1.65fr 1fr;gap:24px;">
+        <main>${profilSection}${expSection}${pedSection}${pubSection}</main>
+        <aside>${speSection}${compSection}${formSection}${certSection}${langSection}</aside>
+      </div>
     </div>`;
   }
 

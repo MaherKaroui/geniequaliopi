@@ -25,6 +25,7 @@ import { DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import DossierOutputSettings from "@/components/DossierOutputSettings";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { generateCVWithAI } from "@/lib/cvGeneration";
 import { supabase } from "@/integrations/supabase/client";
 
 const NDA_STEPS = [
@@ -629,28 +630,21 @@ const DemandeNDA = () => {
                             // "Liste des Formateurs" gets real content.
                             setExtractingCV(true);
                             try {
-                              const { data: extracted, error } = await supabase.functions.invoke("generate-cv", {
-                                body: { fileDataUrl: dataUrl, fileType: file.type },
+                              const extracted = await generateCVWithAI({ fileDataUrl: dataUrl, fileType: file.type });
+                              setCvData({
+                                ...emptyCV,
+                                ...extracted,
+                                experiences: extracted.experiences || [],
+                                formations: extracted.formations || [],
+                                competences: extracted.competences || [],
+                                langues: extracted.langues || [],
+                                certifications: extracted.certifications || [],
+                                photoUrl: cvData.photoUrl || "",
                               });
-                              if (error) throw error;
-                              if (extracted && !extracted.error) {
-                                setCvData({
-                                  ...emptyCV,
-                                  ...extracted,
-                                  experiences: extracted.experiences || [],
-                                  formations: extracted.formations || [],
-                                  competences: extracted.competences || [],
-                                  langues: extracted.langues || [],
-                                  certifications: extracted.certifications || [],
-                                  photoUrl: cvData.photoUrl || "",
-                                });
-                                toast.success("Données du CV extraites avec succès");
-                              } else {
-                                toast.error(extracted?.error || "Extraction impossible");
-                              }
+                              toast.success("Données du CV extraites avec succès");
                             } catch (err: any) {
                               console.error("CV extraction error:", err);
-                              toast.error("Extraction automatique échouée");
+                              toast.error(err.message || "Extraction automatique échouée");
                             } finally {
                               setExtractingCV(false);
                             }

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Corriger le générateur de CV : cause « non-2xx » sans compte identifiée, consigne et bouton de connexion ajoutés, erreurs serveur rendues explicites ; cinq designs (Nordique, Atelier, Impact, Botanique, Compact). Génération IA 200 vérifiée avec compte, parcours sans compte sans appel IA, aperçus, Word et cinq PDF d’une page contrôlés ; 4 tests réussis, build OK.
+
 - [x] Adapter le diplôme proposé dans les besoins Product Builder No-Code aux prérequis Bac+2/niveau 5 : cinq diplômes affichés sans mention de validation, diplômes déclarés et réponses enregistrées prioritaires.
 
 - [x] Compléter les réponses proposées des besoins VTest RS6905 et Product Builder No-Code RNCP41480 : 40 objectifs/projets distincts par parcours, réponses LMS prioritaires, 47 tests réussis et deux aperçus vérifiés en session connectée avec données de contrôle ; session réelle non disponible, non publié.

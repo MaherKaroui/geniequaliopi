@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Eye, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Trash2, Eye, Sparkles, Loader2, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { CVData, CVDesign, CV_DESIGNS, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
+import { generateCVWithAI } from "@/lib/cvGeneration";
+import { useAuth } from "@/hooks/useAuth";
+import { CVData, CVDesign, CV_DESIGNS, generateCVHTML } from "@/lib/cvGenerator";
 
 interface CVGeneratorEmbedProps {
   cvData: CVData;
@@ -17,6 +19,8 @@ interface CVGeneratorEmbedProps {
 }
 
 const CVGeneratorEmbed = ({ cvData, onCVChange, selectedDesign, onDesignChange }: CVGeneratorEmbedProps) => {
+  const navigate = useNavigate();
+  const { session, loading: authLoading } = useAuth();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -51,11 +55,7 @@ const CVGeneratorEmbed = ({ cvData, onCVChange, selectedDesign, onDesignChange }
     }
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-cv", {
-        body: { description: aiPrompt },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      const data = await generateCVWithAI({ description: aiPrompt });
       onCVChange({ ...cvData, ...data, photoUrl: cvData.photoUrl });
       toast.success("CV généré par IA !");
     } catch (e: any) {
@@ -86,10 +86,18 @@ const CVGeneratorEmbed = ({ cvData, onCVChange, selectedDesign, onDesignChange }
               placeholder="Ex: Formateur en management, 10 ans d'expérience, Lyon"
               className="resize-none"
             />
-            <Button onClick={handleAIGenerate} disabled={aiLoading} className="w-full gap-2 bg-gradient-hero border-0 text-primary-foreground" size="sm">
+            <Button onClick={handleAIGenerate} disabled={aiLoading || authLoading} className="w-full gap-2 bg-gradient-hero border-0 text-primary-foreground" size="sm">
               {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {aiLoading ? "Génération..." : "Générer avec l'IA"}
             </Button>
+            {!authLoading && !session && (
+              <div className="rounded-md border bg-card p-2 space-y-2">
+                <p className="text-xs text-muted-foreground">La génération IA nécessite un compte ; la saisie manuelle reste disponible.</p>
+                <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="w-full gap-2">
+                  <LogIn className="w-3.5 h-3.5" /> Se connecter
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -5,16 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Download, Plus, Trash2, Eye, Sparkles, Loader2, FileText } from "lucide-react";
+import { ChevronLeft, Download, Plus, Trash2, Eye, Sparkles, Loader2, FileText, LogIn } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { generateCVWithAI } from "@/lib/cvGeneration";
+import { useAuth } from "@/hooks/useAuth";
 import { CVData, CVDesign, CV_DESIGNS, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
-import type { CVExperience } from "@/lib/cvGenerator";
 
 // ===== Component =====
 const GenerateurCV = () => {
   const navigate = useNavigate();
+  const { session, loading: authLoading } = useAuth();
   const [cv, setCv] = useState<CVData>(emptyCV);
   const [selectedDesign, setSelectedDesign] = useState<CVDesign>("classique");
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -78,11 +79,7 @@ const GenerateurCV = () => {
     }
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-cv", {
-        body: { description: aiPrompt },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      const data = await generateCVWithAI({ description: aiPrompt });
       setCv(prev => ({
         ...emptyCV,
         ...prev,
@@ -146,12 +143,20 @@ const GenerateurCV = () => {
               />
               <Button
                 onClick={handleAIGenerate}
-                disabled={aiLoading}
+                disabled={aiLoading || authLoading}
                 className="w-full gap-2 bg-gradient-hero border-0 text-primary-foreground"
               >
                 {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 {aiLoading ? "Génération en cours..." : "Générer mon CV avec l'IA"}
               </Button>
+              {!authLoading && !session && (
+                <div className="rounded-lg border bg-card p-3 text-center space-y-2">
+                  <p className="text-xs text-muted-foreground">Un compte est nécessaire uniquement pour la génération IA. Vous pouvez aussi remplir et exporter votre CV sans compte.</p>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-2">
+                    <LogIn className="w-4 h-4" /> Se connecter pour utiliser l'IA
+                  </Button>
+                </div>
+              )}
               <p className="text-xs text-muted-foreground text-center">
                 L'IA remplit tous les champs automatiquement. Vous pourrez ensuite modifier les détails.
               </p>
