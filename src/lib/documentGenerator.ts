@@ -1,4 +1,4 @@
-import { presetBlankDocument } from "./formationPresets/blankDocuments";
+import { presetBlankDocument, presetExerciceQcm } from "./formationPresets/blankDocuments";
 import { isRegisteredFormationPreset } from "./formationPresets/registry";
 import { getOrientaEvalBesoins } from "./orientaBesoins";
 import { attendanceDayTable, connectionDayTable, connectionIntro, connectionSummary } from "./attendancePresentation";
@@ -222,7 +222,10 @@ export function generateDocumentById(docId: string, template: string, params: Re
   // document Génie Qualiopi rempli ; la trame vierge du preset ne sert qu'aux trames / vierge demandé.
   // Bilans à chaud / à froid et enquêtes de satisfaction : pas de corrigé pédagogique, le
   // générateur Qualiopi applique lui-même ses échéances (fin de formation, +3 mois).
-  const rempliQualiopi = /besoins|bilan_(chaud|froid)|satisfaction/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template);
+  // QCM d'un stagiaire (exercice du preset au format QCM) : document rempli, réponses cochées propres au
+  // stagiaire, corrigé et note ; aucun texte de corrigé ne devient réponse. Autres exercices : trame vierge.
+  const rempliQualiopi = /besoins|bilan_(chaud|froid)|satisfaction/.test(template) || /^test_positionnement_(debut|fin)_stagiaire$|^test_cfa_stagiaire$/.test(template)
+    || (template === "exercices_stagiaire" && presetExerciceQcm(userFormation, params?.exerciceIdx));
   const presetBlank = rempliQualiopi && params?.vierge !== true ? null : presetBlankDocument(template, params, org, userFormation, userStagiairesSaisis);
   if (presetBlank) return presetBlank;
   setDocFormation(userFormation);

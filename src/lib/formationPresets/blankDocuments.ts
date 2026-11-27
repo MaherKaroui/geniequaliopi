@@ -1,6 +1,11 @@
 import { buildDocument, tableHTML, hasDistanciel } from '@/lib/docBuilder';
 import type { FormationInfo, OrganismeInfo, StagiaireInfo } from '@/types/qualiopi';
 import { getFormationPreset } from './registry';
+/** Exercice n° idx (rotation sur la liste) du preset au format QCM : « QCM … » avec un corrigé « 1-B  2-C … ». */
+export function presetExerciceQcm(f:FormationInfo,idx:unknown):boolean {
+ const ex=getFormationPreset(f)?.data.evaluations?.exercices;if(!ex?.length||typeof idx!=='number')return false;
+ const x=ex[idx%ex.length];return /^QCM\b/i.test(x.titre)&&/^(\s*\d+\s*-\s*[A-D])+\s*$/.test(x.reponseAttendue);
+}
 const esc=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 export function presetBlankDocument(template:string,params:Record<string,unknown>|undefined,o:OrganismeInfo,f:FormationInfo,people:StagiaireInfo[]):string|null {
  const p=getFormationPreset(f),e=p?.data.evaluations;if(!p||!e)return null;
@@ -9,7 +14,7 @@ export function presetBlankDocument(template:string,params:Record<string,unknown
  const sig=learner?`<div class="sig-box"><p class="sig-label">Signature du stagiaire</p></div>`:'';
  let title='',html='';
  if(/positionnement|qcm|evaluation_finale|examen_final|exercices/.test(template)){
-  if(/exercices/.test(template)) {title='EXERCICES PRATIQUES';const index=typeof params?.exerciceIdx==='number'?params.exerciceIdx:null;const exercises=index===null?e.exercices:e.exercices.slice(index,index+1);html=exercises.map((x,i)=>`<h2>${(index??0)+i+1}. ${esc(x.titre)}</h2><p>${esc(x.consigne)}</p><p>Barème : ${x.points} points</p><p>Réponse du stagiaire :</p><div style="min-height:120px"></div><p>Évaluation du formateur :</p><div style="min-height:40px"></div>`).join('');}
+  if(/exercices/.test(template)) {title='EXERCICES PRATIQUES';const index=typeof params?.exerciceIdx==='number'?params.exerciceIdx:null;const exercises=index===null?e.exercices:e.exercices.slice(index,index+1);html=exercises.map((x,i)=>`<h2>${(index??0)+i+1}. ${esc(x.titre)}</h2><p>${esc(x.consigne).replace(/\n/g,'<br>')}</p>${x.points?`<p>Barème : ${x.points} points</p>`:''}<p>Réponse du stagiaire :</p><div style="min-height:120px"></div><p>Évaluation du formateur :</p><div style="min-height:40px"></div>`).join('');}
   else if(/evaluation_finale|examen_final/.test(template)){title='ÉVALUATION FINALE';html=`<h2>${esc(e.evaluationFinale.titre)}</h2>`+e.evaluationFinale.exercices.map(x=>`<h3>${esc(x.titre)}</h3><p>${esc(x.consigne)}</p><div style="min-height:120px"></div>`).join('')+tableHTML(['Critère','Barème','Résultat'],e.evaluationFinale.grille.map(x=>[esc(x.critere),String(x.points),'']));}
   else {const fin=/fin|final/.test(template);title=fin?'TEST DE POSITIONNEMENT — FIN':'TEST DE POSITIONNEMENT — DÉBUT';html=(fin?e.qcmFin:e.qcmDebut).map((q,i)=>`<h3>${i+1}. ${esc(q.question)}</h3><p>${q.options.map(x=>`☐ ${esc(x)}`).join('<br>')}</p>`).join('');html+=(fin?e.questionsOuvertesFin:e.questionsOuvertesDebut).map(q=>`<p><strong>${esc(q.question)}</strong></p><div style="min-height:70px"></div>`).join('');}
  }else if(/besoins/.test(template)){title='ÉVALUATION DES BESOINS';html=(p.data.plan?.besoins.besoinsList??[]).map(x=>`<p><strong>${esc(x)}</strong></p><div style="min-height:50px"></div>`).join('')+(hasDistanciel(f)?`<h3>FORMATION À DISTANCE</h3><p><strong>Compétences et équipement numériques vérifiés (connexion, ordinateur, utilisation de la plateforme) :</strong></p><p>☐ Oui &nbsp;&nbsp;&nbsp; ☐ Non</p>`:'');}

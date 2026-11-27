@@ -146,7 +146,7 @@ def qcm_exercice(titre, questions):
         for i, (q, opts, _) in enumerate(questions)
     )
     reponse = "  ".join(f"{i + 1}-{LETTRES[c]}" for i, (_, _, c) in enumerate(questions))
-    return {"titre": titre, "consigne": consigne, "reponseAttendue": reponse}
+    return {"titre": titre, "consigne": consigne, "reponseAttendue": reponse, "points": len(questions)}
 
 
 def main():
