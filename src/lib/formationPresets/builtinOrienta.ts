@@ -1,6 +1,7 @@
 import type { FormationPreset } from './registry';
 import vA2 from '@/data/tpPresets/orienta/vtest-a2.json';
 import vB1 from '@/data/tpPresets/orienta/vtest-b1.json';
+import vB1x35 from '@/data/tpPresets/orienta/vtest-b1-35h.json';
 import vB2 from '@/data/tpPresets/orienta/vtest-b2.json';
 import vC1 from '@/data/tpPresets/orienta/vtest-c1.json';
 import chA2 from '@/data/tpPresets/orienta/vtest-a2.chapters.json';
@@ -18,6 +19,7 @@ import ch420 from '@/data/tpPresets/orienta/pbnc-420.chapters.json';
  * Parcours d'Orienta Campus (scripts/build-orienta-presets.mjs) :
  * VTest Business English – 4 Skills (RS6905, EXASSESS) en parcours A2, B1, B2 et C1,
  * Product Builder No-Code (RNCP41480, CONSULTING SCHOOL) en titre complet et par bloc.
+ * Parcours B1 de 35 h du site d'ORIENTA CONSULT (scripts/build-vtest-b1-35h.py) : contenu du B1, exercices remplacés par 10 QCM.
  * Pas de code RNCP / RS sur le preset : il n'est trouvé que par son intitulé, pour ne pas
  * remplacer le contenu des dossiers RS6905 existants (exemple « Anglais Professionnel – Certification VTest »).
  */
@@ -38,7 +40,7 @@ function chapitresBloc(bloc: number): Chapter[] {
 }
 
 const DEFS: [Raw, Chapter[]][] = [
-  [vA2, chA2 as Chapter[]], [vB1, chB1 as Chapter[]], [vB2, chB2 as Chapter[]], [vC1, chC1 as Chapter[]],
+  [vA2, chA2 as Chapter[]], [vB1, chB1 as Chapter[]], [vB1x35, chB1 as Chapter[]], [vB2, chB2 as Chapter[]], [vC1, chC1 as Chapter[]],
   [p420, ch420 as Chapter[]], [pB1, chapitresBloc(1)], [pB2, chapitresBloc(2)], [pB3, chapitresBloc(3)], [pB4, chapitresBloc(4)],
 ];
 
