@@ -56,6 +56,7 @@ import { selonModalite } from "./modalitePresentiel";
 import { pickVTC48ExerciceAnswer, isVTC48Formation, vtc48NoteExercice } from "./vtc48hHumanized";
 import { VTC48_PLAN_SEMAINES, vtc48Visuel } from "./vtc48hPreset";
 import { pickECO21ExerciceAnswer, isECO21Formation, eco21NoteExercice } from "./ecommerce21hHumanized";
+import { isREC30Formation, rec30NoteExercice } from "./recrutement30hHumanized";
 import { pickGMA70ExerciceAnswer, isGMA70Formation, gma70NoteExercice } from "./projecteursGrandMA70hHumanized";
 import { pickMSC70ExerciceAnswer, isMSC70Formation, msc70NoteExercice } from "./machinerieScenique70hHumanized";
 import { pickDRI47ExerciceAnswer, isDRI47Formation, dri47NoteExercice } from "./droitInstitutions47hHumanized";
@@ -1326,6 +1327,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, vtc48NoteExercice(stagiaireIdx, ei, true))
         : isECO21Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, eco21NoteExercice(stagiaireIdx, ei, true))
+        : isREC30Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, rec30NoteExercice(stagiaireIdx, ei, true))
         : isGMA70Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, gma70NoteExercice(stagiaireIdx, ei, true))
         : isMSC70Formation(f.intitule, f.codeRNCP)
@@ -1417,6 +1420,8 @@ D) Drive faster to finish the ride.`,
       ? vtc48NoteExercice(stagiaireIdx, ei, false)
       : isECO21Formation(f.intitule, f.codeRNCP)
       ? eco21NoteExercice(stagiaireIdx, ei, false)
+      : isREC30Formation(f.intitule, f.codeRNCP)
+      ? rec30NoteExercice(stagiaireIdx, ei, false)
       : isGMA70Formation(f.intitule, f.codeRNCP)
       ? gma70NoteExercice(stagiaireIdx, ei, false)
       : isMSC70Formation(f.intitule, f.codeRNCP)

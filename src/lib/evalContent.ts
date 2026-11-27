@@ -36,6 +36,8 @@ import { VTC48_EXERCICES_COMPLETS, VTC48_QCM_DEBUT, VTC48_QCM_FIN } from "./vtc4
 import { isVTC48Formation, getVTC48AutoAnswers, VTC48_QUESTIONS_OUVERTES } from "./vtc48hHumanized";
 import { ECO21_EXERCICES_COMPLETS, ECO21_QCM_DEBUT, ECO21_QCM_FIN } from "./ecommerce21hPreset";
 import { isECO21Formation, getECO21AutoAnswers, ECO21_QUESTIONS_OUVERTES } from "./ecommerce21hHumanized";
+import { REC30_EXERCICES_COMPLETS, REC30_QCM_DEBUT, REC30_QCM_FIN } from "./recrutement30hPreset";
+import { isREC30Formation, getREC30AutoAnswers, REC30_QUESTIONS_OUVERTES } from "./recrutement30hHumanized";
 import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
@@ -1510,6 +1512,30 @@ EVAL_CONTENT["ECO21"] = {
   ],
 };
 
+// ===== Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h (C1 à C6) =====
+// 10 QCM d'entraînement (à la place des exercices pratiques) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["REC30"] = {
+  qcmPositionnement: REC30_QCM_DEBUT,
+  qcmFinal: REC30_QCM_FIN,
+  exercices: REC30_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Définir les critères de recrutement et élaborer une grille de décision structurée",
+    "C2 – Diffuser une offre de recrutement engageante sur des canaux variés, avec les outils digitaux",
+    "C3 – Mener un entretien de recrutement chaleureux et structuré, sans discrimination et dans une démarche inclusive",
+    "C4 – Présenter les atouts de l'entreprise et du poste de manière convaincante",
+    "C5 – Intégrer le collaborateur au sein de l'équipe avec des moments dédiés",
+    "C6 – Accueillir et accompagner un collaborateur en situation de handicap",
+  ],
+  appreciations: [
+    "Fiche de poste précise et grille de décision bien pondérée ; les indicateurs observables de certains critères restent à affiner.",
+    "Offre claire et conforme, canaux variés et justifiés ; le suivi des retombées par canal est à systématiser.",
+    "Entretien structuré et bienveillant, questions comportementales pertinentes ; les relances pour obtenir des exemples précis sont à renforcer.",
+    "Atouts de l'entreprise présentés de façon concrète et honnête ; le traitement des objections gagnerait en assurance.",
+    "Parcours d'intégration complet du pré-boarding au bilan de période d'essai ; les moments dédiés avec l'équipe sont à planifier plus tôt.",
+    "Bonne connaissance des aménagements et des acteurs (médecin du travail, Agefiph, Cap emploi) ; la confidentialité est bien respectée.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1766,6 +1792,8 @@ function getContentKey(intitule: string): string {
   if (isVTC48Formation(lower)) return "VTC48";
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h — avant toute règle « e-commerce », « commerce », « web »
   if (isECO21Formation(lower)) return "ECO21";
+  // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h — avant toute règle « recrutement », « RH », « management »
+  if (isREC30Formation(lower)) return "REC30";
   if (isGMA70Formation(lower)) return "GMA70";
   if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
@@ -1975,6 +2003,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isVTC48Formation(formationIntitule)) return true;
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé (« e-boutique … 21 h », « RS6475 »)
   if (isECO21Formation(formationIntitule)) return true;
+  // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : reconnue aussi sous ses variantes d'intitulé (« RS6168 », « … CP-FFP »)
+  if (isREC30Formation(formationIntitule)) return true;
   if (isGMA70Formation(formationIntitule)) return true;
   if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -1995,6 +2025,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isVTC48Formation(formationIntitule)) return EVAL_CONTENT["VTC48"];
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h : reconnue aussi sous ses variantes d'intitulé
   if (isECO21Formation(formationIntitule)) return EVAL_CONTENT["ECO21"];
+  // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : reconnue aussi sous ses variantes d'intitulé
+  if (isREC30Formation(formationIntitule)) return EVAL_CONTENT["REC30"];
   if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
   if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2588,6 +2620,9 @@ QUESTIONS_OUVERTES["VTC48"] = VTC48_QUESTIONS_OUVERTES;
 
 // Créer et développer une e-boutique professionnelle (RS6475) – 21 h — 10 questions début / fin dans l'ordre des mises en situation.
 QUESTIONS_OUVERTES["ECO21"] = ECO21_QUESTIONS_OUVERTES;
+
+// Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h — 10 questions début / fin dans l'ordre des QCM d'entraînement.
+QUESTIONS_OUVERTES["REC30"] = REC30_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
@@ -3100,6 +3135,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoEco.reponses, autoEco.scores);
+  }
+
+  // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : moteur humanisé (une copie différente par stagiaire).
+  if (isREC30Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoRec = getREC30AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoRec.reponses, autoRec.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).

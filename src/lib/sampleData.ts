@@ -213,6 +213,8 @@ import { FORMATION_VTC48 } from "./vtc48hPreset";
 export { FORMATION_VTC48, seedVTC48AICaches } from "./vtc48hPreset";
 import { FORMATION_ECO21 } from "./ecommerce21hPreset";
 export { FORMATION_ECO21, seedECO21AICaches } from "./ecommerce21hPreset";
+import { FORMATION_REC30 } from "./recrutement30hPreset";
+export { FORMATION_REC30, seedREC30AICaches } from "./recrutement30hPreset";
 export { FORMATION_GMA70, seedGMA70AICaches } from "./projecteursGrandMA70hPreset";
 export { FORMATION_MSC70, seedMSC70AICaches } from "./machinerieScenique70hPreset";
 import { FORMATION_DRI47, FORMATION_DRI21 } from "./droitInstitutions47hPreset";
@@ -594,6 +596,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_VTC48,
   // Créer et développer une e-boutique professionnelle (RS6475) – 21 h (certifiante, Répertoire spécifique, 4 semaines à distance, 6 classes virtuelles de 3 h 30, C1 à C7) : contenus pré-remplis (ecommerce21hPreset), aucun stagiaire importé
   FORMATION_ECO21,
+  // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h (certifiante, Répertoire spécifique, 100 % à distance, 6 modules de 5 h, C1 à C6) : contenus pré-remplis (recrutement30hPreset), aucun stagiaire importé
+  FORMATION_REC30,
   // Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (projecteursGrandMA70hPreset), aucun stagiaire importé
   FORMATION_GMA70,
   // Machinerie scénique, moteurs et ponts : équipements fixes et grils provisoires – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (machinerieScenique70hPreset), aucun stagiaire importé
