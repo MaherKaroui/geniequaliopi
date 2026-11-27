@@ -337,6 +337,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (isECO21Formation(formationIntitule)) return ECO21_VIDEOS;
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : vidéos du preset, avant les banques « recrutement » / « RH » / « management »
   if (isREC30Formation(formationIntitule)) return REC30_VIDEOS;
+  // Intelligence artificielle en entreprise – 67 h : vidéos du preset, avant les banques « intelligence artificielle » / « IA générative »
+  if (isIAE67Formation(formationIntitule)) return IAE67_VIDEOS;
   if (isGMA70Formation(formationIntitule)) return GMA70_VIDEOS;
   if (isMSC70Formation(formationIntitule)) return MSC70_VIDEOS;
   // Enseignement : fondamentaux du droit et des institutions : vidéos du preset, jamais les banques « droit » génériques
@@ -525,6 +527,9 @@ import { ECO21_VIDEOS } from "./ecommerce21hPreset";
 import { getRecrutement30hChapters } from "./courseContentRecrutement30h";
 import { isREC30Formation } from "./recrutement30hHumanized";
 import { REC30_VIDEOS } from "./recrutement30hPreset";
+import { getIAEntreprise67hChapters } from "./courseContentIAEntreprise67h";
+import { isIAE67Formation } from "./iaEntreprise67hHumanized";
+import { IAE67_VIDEOS } from "./iaEntreprise67hPreset";
 import { GMA70_VIDEOS } from "./projecteursGrandMA70hPreset";
 import { MSC70_VIDEOS } from "./machinerieScenique70hPreset";
 import { getDroitInstitutions47hChapters, getDroitInstitutions21hChapters } from "./courseContentDroitInstitutions47h";
@@ -611,6 +616,8 @@ export function getCourseChapters(formationIntitule: string, modalites?: string)
   if (isECO21Formation(formationIntitule)) return getEcommerce21hChapters();
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : support propre, avant les règles « recrutement » / « RH » / « management »
   if (isREC30Formation(formationIntitule)) return getRecrutement30hChapters();
+  // Intelligence artificielle en entreprise – 67 h (non certifiante) : support propre, avant les règles IA 21 h / « intelligence artificielle » / « IA générative »
+  if (isIAE67Formation(formationIntitule)) return getIAEntreprise67hChapters();
   if (isGMA70Formation(formationIntitule)) return getProjecteursGrandMA70hChapters();
   if (isMSC70Formation(formationIntitule)) return getMachinerieScenique70hChapters();
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) : support propre, avant les règles « droit » / « enseignement »

@@ -11,6 +11,7 @@ import { isVTC48Formation } from "./vtc48hHumanized";
 import { VTC48_PLAN_SEMAINES } from "./vtc48hPreset";
 import { isECO21Formation } from "./ecommerce21hHumanized";
 import { isREC30Formation } from "./recrutement30hHumanized";
+import { isIAE67Formation } from "./iaEntreprise67hHumanized";
 import { isGMA70Formation } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation } from "./machinerieScenique70hHumanized";
 import { isDRI47Formation } from "./droitInstitutions47hHumanized";
@@ -266,9 +267,9 @@ export function buildFullCatalog(
           "Accueil, téléphone et anglais pro",
           "Organisation, archivage et employabilité",
         ];
-        const isIAForm = !isIAP21Formation(f.intitule, f.codeRNCP) && (tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative"));
+        const isIAForm = !isIAP21Formation(f.intitule, f.codeRNCP) && !isIAE67Formation(f.intitule, f.codeRNCP) && (tPaie.includes("intelligence artificielle") || tPaie.includes("ia générative"));
         // Gérer son centre de formation – 35 h et Certification Le Robert (RS7013) : jamais de modules paie / secrétariat (exercices du preset).
-        const moduleTitles = isGSC35Formation(f.intitule, f.codeRNCP) || isLRBFormation(f.intitule, f.codeRNCP) || isCOH21Formation(f.intitule, f.codeRNCP) || isHYG14Formation(f.intitule, f.codeRNCP) || isVTC48Formation(f.intitule, f.codeRNCP) || isECO21Formation(f.intitule, f.codeRNCP) || isREC30Formation(f.intitule, f.codeRNCP) || isGMA70Formation(f.intitule, f.codeRNCP) || isMSC70Formation(f.intitule, f.codeRNCP) || isDRI47Formation(f.intitule, f.codeRNCP) || isFPA45Formation(f.intitule, f.codeRNCP) ? null : isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
+        const moduleTitles = isGSC35Formation(f.intitule, f.codeRNCP) || isLRBFormation(f.intitule, f.codeRNCP) || isCOH21Formation(f.intitule, f.codeRNCP) || isHYG14Formation(f.intitule, f.codeRNCP) || isVTC48Formation(f.intitule, f.codeRNCP) || isECO21Formation(f.intitule, f.codeRNCP) || isREC30Formation(f.intitule, f.codeRNCP) || isIAE67Formation(f.intitule, f.codeRNCP) || isGMA70Formation(f.intitule, f.codeRNCP) || isMSC70Formation(f.intitule, f.codeRNCP) || isDRI47Formation(f.intitule, f.codeRNCP) || isFPA45Formation(f.intitule, f.codeRNCP) ? null : isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
         // Nombre d'exercices / QCM dérivé du parcours RÉEL du stagiaire :
         // ≤ 12 jours de formation → 1 par jour ; au-delà → 1 par semaine calendaire.

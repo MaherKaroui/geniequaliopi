@@ -38,6 +38,8 @@ import { ECO21_EXERCICES_COMPLETS, ECO21_QCM_DEBUT, ECO21_QCM_FIN } from "./ecom
 import { isECO21Formation, getECO21AutoAnswers, ECO21_QUESTIONS_OUVERTES } from "./ecommerce21hHumanized";
 import { REC30_EXERCICES_COMPLETS, REC30_QCM_DEBUT, REC30_QCM_FIN } from "./recrutement30hPreset";
 import { isREC30Formation, getREC30AutoAnswers, REC30_QUESTIONS_OUVERTES } from "./recrutement30hHumanized";
+import { IAE67_EXERCICES_COMPLETS, IAE67_QCM_DEBUT, IAE67_QCM_FIN } from "./iaEntreprise67hPreset";
+import { isIAE67Formation, getIAE67AutoAnswers, IAE67_QUESTIONS_OUVERTES } from "./iaEntreprise67hHumanized";
 import { isGMA70Formation, getGMA70AutoAnswers, GMA70_QUESTIONS_OUVERTES } from "./projecteursGrandMA70hHumanized";
 import { isMSC70Formation, getMSC70AutoAnswers, MSC70_QUESTIONS_OUVERTES } from "./machinerieScenique70hHumanized";
 import { DRI47_EXERCICES_COMPLETS, DRI47_QCM_DEBUT, DRI47_QCM_FIN } from "./droitInstitutions47hPreset";
@@ -1536,6 +1538,30 @@ EVAL_CONTENT["REC30"] = {
   ],
 };
 
+// ===== Intelligence artificielle en entreprise : déployer les usages de l'IA dans les métiers – 67 h (non certifiante, C1 à C6) =====
+// 10 mises en situation (QCM d'entraînement corrigés) puis un QCM de 10 questions par compétence.
+EVAL_CONTENT["IAE67"] = {
+  qcmPositionnement: IAE67_QCM_DEBUT,
+  qcmFinal: IAE67_QCM_FIN,
+  exercices: IAE67_EXERCICES_COMPLETS.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })),
+  competences: [
+    "C1 – Expliquer le fonctionnement, les apports et les limites de l'IA",
+    "C2 – Rédiger des prompts efficaces et vérifier les productions de l'IA générative",
+    "C3 – Utiliser l'IA pour produire et analyser : rédaction, marketing, relation client, données et reporting",
+    "C4 – Automatiser des tâches et des processus métiers en gardant un contrôle humain",
+    "C5 – Utiliser l'IA dans le respect du cadre légal et éthique",
+    "C6 – Conduire un projet de déploiement de l'IA dans son service",
+  ],
+  appreciations: [
+    "Notions clés bien comprises et expliquées avec des mots simples ; les limites des modèles sont connues, l'exemple métier reste à étoffer.",
+    "Prompts structurés et itérés ; la vérification des faits et des sources est à rendre systématique.",
+    "Productions écrites de qualité et reporting lisible ; le contrôle des calculs sur un exemple connu est à généraliser.",
+    "Automatisation cohérente avec un point de validation humaine ; la gestion des erreurs et la documentation sont à compléter.",
+    "Bonne connaissance du RGPD et du règlement européen sur l'IA ; les règles de la charte d'usage sont à décliner par cas d'usage.",
+    "Feuille de route réaliste et priorisée ; le calcul du ROI gagnerait à intégrer tous les coûts, relecture comprise.",
+  ],
+};
+
 // ===== Gérer son centre de formation – 35 h (non certifiante, C1 à C6) =====
 EVAL_CONTENT["GSC35"] = {
   qcmPositionnement: GSC35_QCM_DEBUT,
@@ -1794,6 +1820,8 @@ function getContentKey(intitule: string): string {
   if (isECO21Formation(lower)) return "ECO21";
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h — avant toute règle « recrutement », « RH », « management »
   if (isREC30Formation(lower)) return "REC30";
+  // Intelligence artificielle en entreprise – 67 h (non certifiante) — avant les règles IA 21 h / « intelligence artificielle » / « IA générative »
+  if (isIAE67Formation(lower)) return "IAE67";
   if (isGMA70Formation(lower)) return "GMA70";
   if (isMSC70Formation(lower)) return "MSC70";
   // Enseignement : fondamentaux du droit et des institutions (non certifiante) — avant toute règle « droit », « enseignement »
@@ -2005,6 +2033,8 @@ export function hasEvalContentDedie(formationIntitule: string): boolean {
   if (isECO21Formation(formationIntitule)) return true;
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : reconnue aussi sous ses variantes d'intitulé (« RS6168 », « … CP-FFP »)
   if (isREC30Formation(formationIntitule)) return true;
+  // Intelligence artificielle en entreprise – 67 h : reconnue aussi sous ses variantes d'intitulé (« IA en entreprise … 67 h »)
+  if (isIAE67Formation(formationIntitule)) return true;
   if (isGMA70Formation(formationIntitule)) return true;
   if (isMSC70Formation(formationIntitule)) return true;
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2027,6 +2057,8 @@ export function getEvalContent(formationIntitule: string): FormationEvalContent 
   if (isECO21Formation(formationIntitule)) return EVAL_CONTENT["ECO21"];
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h : reconnue aussi sous ses variantes d'intitulé
   if (isREC30Formation(formationIntitule)) return EVAL_CONTENT["REC30"];
+  // Intelligence artificielle en entreprise – 67 h : reconnue aussi sous ses variantes d'intitulé
+  if (isIAE67Formation(formationIntitule)) return EVAL_CONTENT["IAE67"];
   if (isGMA70Formation(formationIntitule)) return EVAL_CONTENT["GMA70"];
   if (isMSC70Formation(formationIntitule)) return EVAL_CONTENT["MSC70"];
   // Enseignement : fondamentaux du droit et des institutions : reconnue aussi sous ses variantes d'intitulé
@@ -2623,6 +2655,9 @@ QUESTIONS_OUVERTES["ECO21"] = ECO21_QUESTIONS_OUVERTES;
 
 // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h — 10 questions début / fin dans l'ordre des QCM d'entraînement.
 QUESTIONS_OUVERTES["REC30"] = REC30_QUESTIONS_OUVERTES;
+
+// Intelligence artificielle en entreprise – 67 h — 10 questions début / fin dans l'ordre des mises en situation.
+QUESTIONS_OUVERTES["IAE67"] = IAE67_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["GMA70"] = GMA70_QUESTIONS_OUVERTES;
 QUESTIONS_OUVERTES["MSC70"] = MSC70_QUESTIONS_OUVERTES;
 
@@ -3147,6 +3182,18 @@ export function generateStagiaireOpenAnswers(
       Math.max(1, questions.length),
     );
     return toAnswers(autoRec.reponses, autoRec.scores);
+  }
+
+  // Intelligence artificielle en entreprise – 67 h : moteur humanisé (une copie différente par stagiaire).
+  if (isIAE67Formation(formationInfo?.intitule, formationInfo?.codeRNCP)) {
+    const autoIae = getIAE67AutoAnswers(
+      stagiaireInfo?.nom,
+      stagiaireInfo?.prenom,
+      stagiaireInfo?.civilite,
+      isDebut,
+      Math.max(1, questions.length),
+    );
+    return toAnswers(autoIae.reponses, autoIae.scores);
   }
 
   // Cohésion d'équipe en entreprise – 21 h : moteur humanisé (une copie différente par stagiaire).

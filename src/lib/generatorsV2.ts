@@ -57,6 +57,7 @@ import { pickVTC48ExerciceAnswer, isVTC48Formation, vtc48NoteExercice } from "./
 import { VTC48_PLAN_SEMAINES, vtc48Visuel } from "./vtc48hPreset";
 import { pickECO21ExerciceAnswer, isECO21Formation, eco21NoteExercice } from "./ecommerce21hHumanized";
 import { isREC30Formation, rec30NoteExercice } from "./recrutement30hHumanized";
+import { isIAE67Formation, iae67NoteExercice } from "./iaEntreprise67hHumanized";
 import { pickGMA70ExerciceAnswer, isGMA70Formation, gma70NoteExercice } from "./projecteursGrandMA70hHumanized";
 import { pickMSC70ExerciceAnswer, isMSC70Formation, msc70NoteExercice } from "./machinerieScenique70hHumanized";
 import { pickDRI47ExerciceAnswer, isDRI47Formation, dri47NoteExercice } from "./droitInstitutions47hHumanized";
@@ -985,7 +986,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   // IA générative (RS6776) : QCM complets générés directement depuis la banque
   // intégrée (pas de dépendance au cache), même si la formation n'est pas terminée.
   const _tIA = (f.intitule || "").toLowerCase();
-  const _isIAGen = !isIAP21Formation(f.intitule, f.codeRNCP) && _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
+  const _isIAGen = !isIAP21Formation(f.intitule, f.codeRNCP) && !isIAE67Formation(f.intitule, f.codeRNCP) && _tIA.includes("intelligence artificielle") || _tIA.includes("ia générative") || (f.codeRNCP || "").toUpperCase() === "RS6776";
   const evalPackIA = _isIAGen ? IA_GENERATIVE_EVAL_PACK : null;
   const termine = isStagiaireFormationTerminee(s, f) || !!evalPackIA;
   if (!termine) {
@@ -1329,6 +1330,8 @@ D) Drive faster to finish the ride.`,
         ? Math.min(qcm.questions.length, eco21NoteExercice(stagiaireIdx, ei, true))
         : isREC30Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, rec30NoteExercice(stagiaireIdx, ei, true))
+        : isIAE67Formation(f.intitule, f.codeRNCP)
+        ? Math.min(qcm.questions.length, iae67NoteExercice(stagiaireIdx, ei, true))
         : isGMA70Formation(f.intitule, f.codeRNCP)
         ? Math.min(qcm.questions.length, gma70NoteExercice(stagiaireIdx, ei, true))
         : isMSC70Formation(f.intitule, f.codeRNCP)
@@ -1422,6 +1425,8 @@ D) Drive faster to finish the ride.`,
       ? eco21NoteExercice(stagiaireIdx, ei, false)
       : isREC30Formation(f.intitule, f.codeRNCP)
       ? rec30NoteExercice(stagiaireIdx, ei, false)
+      : isIAE67Formation(f.intitule, f.codeRNCP)
+      ? iae67NoteExercice(stagiaireIdx, ei, false)
       : isGMA70Formation(f.intitule, f.codeRNCP)
       ? gma70NoteExercice(stagiaireIdx, ei, false)
       : isMSC70Formation(f.intitule, f.codeRNCP)

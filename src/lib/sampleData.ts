@@ -215,6 +215,8 @@ import { FORMATION_ECO21 } from "./ecommerce21hPreset";
 export { FORMATION_ECO21, seedECO21AICaches } from "./ecommerce21hPreset";
 import { FORMATION_REC30 } from "./recrutement30hPreset";
 export { FORMATION_REC30, seedREC30AICaches } from "./recrutement30hPreset";
+import { FORMATION_IAE67 } from "./iaEntreprise67hPreset";
+export { FORMATION_IAE67, seedIAE67AICaches } from "./iaEntreprise67hPreset";
 export { FORMATION_GMA70, seedGMA70AICaches } from "./projecteursGrandMA70hPreset";
 export { FORMATION_MSC70, seedMSC70AICaches } from "./machinerieScenique70hPreset";
 import { FORMATION_DRI47, FORMATION_DRI21 } from "./droitInstitutions47hPreset";
@@ -598,6 +600,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_ECO21,
   // Recruter et intégrer ses collaborateurs (CP-FFP) – RS6168, 30 h (certifiante, Répertoire spécifique, 100 % à distance, 6 modules de 5 h, C1 à C6) : contenus pré-remplis (recrutement30hPreset), aucun stagiaire importé
   FORMATION_REC30,
+  // Intelligence artificielle en entreprise : déployer les usages de l'IA dans les métiers – 67 h (non certifiante, 100 % à distance, 10 jours : 9 × 7 h + 1 × 4 h, C1 à C6) : contenus pré-remplis (iaEntreprise67hPreset), aucun stagiaire importé
+  FORMATION_IAE67,
   // Projecteurs automatiques et pupitre grandMA – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (projecteursGrandMA70hPreset), aucun stagiaire importé
   FORMATION_GMA70,
   // Machinerie scénique, moteurs et ponts : équipements fixes et grils provisoires – 70 h (non certifiante, 10 jours, C1 à C6) : contenus pré-remplis (machinerieScenique70hPreset), aucun stagiaire importé
